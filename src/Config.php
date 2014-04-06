@@ -1,3 +1,4 @@
+<?php
 /**
  * Create DOM from XML config files in folowing order
  *
@@ -6,7 +7,7 @@
  */
 class Config {
 
-  __construct($plugin="default") {
+  function __construct($plugin="default") {
 
     if(!is_string($plugin)) throw new Exception('Variable type: not string.');
 
@@ -24,3 +25,4 @@ class Config {
   }
 
 }
+?>
