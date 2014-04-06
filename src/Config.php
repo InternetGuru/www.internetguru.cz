@@ -1,3 +1,5 @@
+<?php 
+
 /**
  * Create DOM from XML config files in folowing order
  *
