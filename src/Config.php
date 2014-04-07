@@ -1,9 +1,12 @@
 <?php
 /**
- * Create DOM from XML config files in folowing order
+ * Create DOM from XML config files in folowing order: default/admin/user.
+ * Respect readonly attribute when applying user file.
+ * Default XML file is required (plugin does not have to use Config at all).
  *
- * @VARIABLE: String plugin (optional)
- * @USAGE: $myCfg = new Config("slider");
+ * @PARAM: String plugin (optional)
+ * @USAGE: DOMDocument $myCfg = new Config("slider");
+ * @THROWS: Exception when files don't exist or are corrupted/empty
  */
 class Config {
 
@@ -17,16 +20,20 @@ class Config {
     $this->cfg->formatOutput = true;
 
     // create DOM from default config xml (cms or plugin)
-    if($plugin == "default") $this->cfg->load("default.xml");
-    else $this->cfg->load("plugins/$plugin/$plugin.xml");
+    if($plugin == "default") {
+      if(!@$this->cfg->load("default.xml"))
+        throw new Exception('Unable to load XML file.');
+    } else {
+      if(!@$this->cfg->load("plugins/$plugin/$plugin.xml"))
+        throw new Exception('Unable to load XML file.');
+    }
     if($this::DEBUG) echo "<pre>".htmlspecialchars($this->cfg->saveXML())."</pre>";
 
-    // modify DOM by admin data
+    // update DOM by admin data (all of them)
     $this->updateDom(ADMIN_FOLDER."/$plugin.xml");
-
     if($this::DEBUG) echo "<pre>".htmlspecialchars($this->cfg->saveXML())."</pre>";
 
-    // modify DOM by user data (except readonly)
+    // update DOM by user data (except readonly)
     $this->updateDom(USER_FOLDER."/$plugin.xml",false);
     if($this::DEBUG) echo "<pre>".htmlspecialchars($this->cfg->saveXML())."</pre>";
 
@@ -35,8 +42,11 @@ class Config {
   private function updateDom($xmlFile,$ignoreReadonly=true) {
     if(!is_string($xmlFile)) throw new Exception('Variable type: not string.');
 
+    if(!is_file($xmlFile)) return; // file is optional
+    if(!filesize($xmlFile)) return; // file can be empty
     $doc = new DOMDocument();
-    $doc->load($xmlFile);
+    if(!@$doc->load($xmlFile))
+      throw new Exception('Unable to load XML file.');
     $nodes = $doc->firstChild->childNodes;
     $xPath = new DOMXPath($this->cfg);
 

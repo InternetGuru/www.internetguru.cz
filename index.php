@@ -13,6 +13,14 @@ function __autoload($className) {
   include SOURCE_FOLDER . "/$className.php";
 }
 
-$cfg = new Config();
+try {
+
+  $cfg = new Config();
+
+} catch(Exception $e) {
+
+  echo "Exception: ".$e->getMessage();
+
+}
 
 ?>
