@@ -2,7 +2,7 @@
 /**
  * Create DOM from XML config files in folowing order: default/admin/user.
  * Respect readonly attribute when applying user file.
- * Default XML file is required (plugin does not have to use Config at all).
+ * Default XML file is required (plugins do not have to use Config at all).
  *
  * @PARAM: String plugin (optional)
  * @USAGE: DOMDocument $myCfg = new Config("slider");
@@ -17,14 +17,14 @@ class Config {
     if(!is_string($plugin)) throw new Exception('Variable type: not string.');
 
     $this->cfg = new DOMDocument();
-    $this->cfg->formatOutput = true;
+    if($this::DEBUG) $this->cfg->formatOutput = true;
 
     // create DOM from default config xml (cms or plugin)
     if($plugin == "default") {
       if(!@$this->cfg->load("default.xml"))
         throw new Exception('Unable to load XML file.');
     } else {
-      if(!@$this->cfg->load("plugins/$plugin/$plugin.xml"))
+      if(!@$this->cfg->load("plugins/$plugin/default.xml"))
         throw new Exception('Unable to load XML file.');
     }
     if($this::DEBUG) echo "<pre>".htmlspecialchars($this->cfg->saveXML())."</pre>";
