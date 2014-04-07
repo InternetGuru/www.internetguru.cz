@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<cms>
+  <c readonly="readonly">
+    <a>111</a>
+  </c>
+  <d>333</d>
+</cms>
