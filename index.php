@@ -13,7 +13,6 @@ function __autoload($className) {
   include SOURCE_FOLDER . "/$className.php";
 }
 
-
 try {
 
   $cfg = new Config();
