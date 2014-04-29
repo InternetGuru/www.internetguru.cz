@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Create DOM from XML config files in folowing order: default/admin/user.
  * Respect readonly attribute when applying user file.
