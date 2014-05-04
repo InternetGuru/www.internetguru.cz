@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<body>
-  <header>
-    <!-- {{logo}} -->
-    logo@. = <img src="logo.png" alt="NašeFirma.cz - domovská stránka" />
-    else = <a href="." title="Na úvodní stránku"><img src="logo.png" alt="NašeFirma.cz" /></a>
-  </header>
-  <footer></footer>
-</body>

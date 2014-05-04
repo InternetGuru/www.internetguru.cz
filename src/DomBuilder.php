@@ -11,7 +11,7 @@
  */
 class DomBuilder {
 
-  const DEBUG = true;
+  const DEBUG = false;
 
   private function __construct() {}
 

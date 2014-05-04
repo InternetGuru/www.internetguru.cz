@@ -21,24 +21,34 @@ function __autoload($className) {
     include PLUGIN_FOLDER . "/$className/$className.php";
 }
 
-// plugin attach into class Plugins (Subject)
-$plugins = new Plugins();
-foreach(scandir(PLUGIN_FOLDER) as $plugin) {
-  // omit folders starting with a dot
-  if(substr($plugin,0,1) == ".") continue;
-  $plugins->attach(new $plugin);
+try {
+
+  // init CMS
+  $cms = new Cms();
+
+  // plugin attach into class Plugins (Subject)
+  $plugins = new Plugins();
+  $plugins->setCms($cms);
+  foreach(scandir(PLUGIN_FOLDER) as $plugin) {
+    // omit folders starting with a dot
+    if(substr($plugin,0,1) == ".") continue;
+    $plugins->attach(new $plugin);
+  }
+
+  // notify plugins, status init
+  $plugins->setStatus("init");
+  $plugins->notify();
+
+  // notify plugins, status process
+  $plugins->setStatus("process");
+  $plugins->notify();
+
+  echo $cms->getOutput();
+
+} catch(Exception $e) {
+
+  echo "Exception: ".$e->getMessage();
+
 }
-
-// notify plugins, status init
-$plugins->setStatus("init");
-$plugins->notify();
-
-// init CMS
-$cms = new Cms();
-$plugins->setCms($cms);
-
-// notify plugins, status process
-$plugins->setStatus("process");
-$plugins->notify();
 
 ?>
