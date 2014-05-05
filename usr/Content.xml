@@ -1,4 +1,60 @@
-<?xml version="1.0"  encoding="utf-8" ?>
-<test>
-  <a>not working sample</a>
-</test>
+<?xml version="1.0" encoding="utf-8" ?>
+<Content>
+  <body lang="cs">
+    <h title="internetguru.cz">Internet guru: webové služby</h>
+    <description>Jsme internetoví specialisté. Tvoříme funkční řešení a pomáháme růst vašemu byznysu. Navrhujeme, vytváříme a optimalizujeme webové prezentace, aplikace na míru a internetový marketing.</description>
+    <section>
+      <h title="O nás">Náš tým a technologie</h><!-- php etc -->
+      <description>Vyvíjíme převážně na technologii PHP s použitím modulárního přístupu, který klientům zaručuje dlouhodobou podporu a vývoj na všech úrovních aplikace. U našich řešení se v podstatě nemůže stát, že by některé rozhraní provozované u nás zastaralo. Může být vyměněno za nové atd.</description>
+      <!--
+      <section>
+        <h>Naše priority</h>
+        <description></description>
+        <dl>
+          <dt>Přizpůsobivý vzhled (také responzivní či flexibilní design)</dt>
+          <dd>Stránky se zobrazí kompletně (bez horizontálního posuvníku) na různých zařízeních a různých velikostech okna prohlížeče.</dd>
+        </dl>
+      </section>
+      -->
+      <h title="Služby" link="sluzby" id="h.d1asdf546yc2">Služby...</h>
+      <description>Poskytujeme služby pro <strong>prezentaci firem a jednotlivců</strong>, přebíráme projekty a vytváříme služby na míru. Disponujeme řadou odborníků jak na konzultační, tak na úrovni implementace.</description>
+      <h>Prezentace firem – Webová základna</h>
+      <description>Vyvíjíme <a href="www.webovazakladna.cz">projekt Webová základna</a>, který...</description>
+      <h>Přebírání projektů</h>
+      <description>Dotahujeme a provozujeme projekty postavené </description>
+      <section>
+        <h>Webová prezentace Hotelu Patriot (Drupal)</h>
+        <description>Převzali jsme realizaci a provoz nového webu <a href="http://www.hotelpatriot.cz">sporthotelu Patriot</a>. Podle existujících návrhů jsme provedli realizaci na klientem zvolené platformě s důrazem na <em>přizpůsobivé zobrazení</em> (stránky přizpůsobí svou šířku oknu prohlížeče včetně animace obrázků) za pouhých 10.000 Kč.</description>
+        <h>Internetový obchod Matrace Proseč (Prestashop)</h>
+        <description>Obrátil se na nás vývojář v koncích, že narazil na problém, který je nad jeho možnosti, a předal projekt do našich rukou včetně následné komunikace s klientem. ...</description>
+      </section>
+      <h>Aplikace na míru</h>
+      <description>...</description>
+      <section>
+        <h>Multigenerátor</h>
+        <description>Převod mezi <strong>dokumenty Google, LaTeX a HTML</strong>. Jedná se o funkční jádro toho času bez frontendu. Pokud máte zájem o použití generátoru nebo jeho nasazení pro vlastní účely, kontaktujte nás.</description>
+        <h>Textové transformace</h>
+        <description>Systém pro...</description>
+        <h>Generátor hesel</h>
+        <description>Velmi rychlý způsob, jak <a href="http://pwgen.iix.cz/">vygenerovat heslo</a>. Výhodou (proti jiným generátorům) je absence zaměnitelných znaků (0Oo1lIyzYZ).</description>
+      </section>
+      <h title="Kontakt">Kontaktujte nás</h>
+      <description>Domluvte si s námi schůzku nebo pošlete zadání k nacenění. Jednání je možné situovat k nám nebo jinam v Prahy.</description>
+      <ul>
+        <li>Obchod a marketing<ul>
+          <li>Jan Pospíšil</li>
+          <li>obchod@internetguru.cz</li>
+          <li>+420 654327654</li>
+        </ul></li>
+        <li>Vývoj a technická podpora<ul>
+          <li>Pavel Petržela</li>
+          <li>podpora@internetguru.cz</li>
+        </ul></li>
+        <li>Sídlo s jednací místností<ul>
+          <li>Brožíkova 1/15, 150 00 Praha 5 - Košíře</li>
+          <li><a href="">Mapa</a></li>
+        </ul></li>
+      </ul>
+    </section>
+  </body>
+</Content>
