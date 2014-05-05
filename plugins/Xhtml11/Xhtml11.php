@@ -12,7 +12,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     #getTitle();
     #getLinks();
     #getScripts();
-    return "xhtml1 output, title:" . $cms->getTitle();
+    return "<pre>".htmlspecialchars($cms->getTitle())."</pre>";
   }
 
 }

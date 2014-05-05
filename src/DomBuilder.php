@@ -15,29 +15,29 @@ class DomBuilder {
 
   private function __construct() {}
 
-  public static function build($plugin="default") {
-    if(!is_string($plugin)) throw new Exception('Variable type: not string.');
+  public static function build($xml="Cms") {
+    if(!is_string($xml)) throw new Exception('Variable type: not string.');
 
     $cfg = new DOMDocument();
     if(self::DEBUG) $cfg->formatOutput = true;
 
-    // create DOM from default config xml (cms or plugin)
-    if($plugin == "default") {
-      if(!@$cfg->load("default.xml"))
-        throw new Exception('Unable to load XML file.');
-      $plugin = DEFAULT_CFG_FILE;
+    // create DOM from default config xml (Cms root or Plugin dir)
+    if($xml == "Cms") {
+      if(!@$cfg->load("$xml.xml"))
+        throw new Exception(sprintf('Unable to load XML file %s.',"$xml.xml"));
     } else {
-      if(!@$cfg->load("plugins/$plugin/default.xml"))
-        throw new Exception('Unable to load XML file.');
+      $fileName = PLUGIN_FOLDER . "/$xml/$xml.xml";
+      if(!@$cfg->load($fileName))
+        throw new Exception(sprintf('Unable to load XML file %s.',$fileName));
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($cfg->saveXML())."</pre>";
 
     // update DOM by admin data (all of them)
-    self::updateDom($cfg,ADMIN_FOLDER."/$plugin.xml");
+    self::updateDom($cfg,ADMIN_FOLDER."/$xml.xml");
     if(self::DEBUG) echo "<pre>".htmlspecialchars($cfg->saveXML())."</pre>";
 
     // update DOM by user data (except readonly)
-    self::updateDom($cfg,USER_FOLDER."/$plugin.xml",false);
+    self::updateDom($cfg,USER_FOLDER."/$xml.xml",false);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($cfg->saveXML())."</pre>";
 
     return $cfg;

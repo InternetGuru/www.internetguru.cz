@@ -1,9 +1,0 @@
-<?xml version="1.0"?>
-<body>
-  <h title="def-title-short">Long default title</h>
-  <p>Some paragraph...</p>
-  <section>
-    <h>Subheading</h>
-    <p>Another paragraph...</p>
-  </section>
-</body>

@@ -1,16 +1,23 @@
 <?php
 
 class Dom {
-  private $document;
+  private $doc;
 
-  public function __construct ($plugin="default") {
-    $this->document = DomBuilder::build($plugin);
+  public function __construct($plugin=null) {
+    if(!strlen($plugin))
+      $this->doc = DomBuilder::build();
+    else
+      $this->doc = DomBuilder::build($plugin);
   }
 
   public function finalize() {
     // procede replacements etc.
     #todo
-    return $this->document;
+    return $this->doc;
+  }
+
+  public function getStructure() {
+    return $this->doc->saveXML();
   }
 
 }

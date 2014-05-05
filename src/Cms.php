@@ -16,7 +16,8 @@ class Cms {
   public function getTitle() {
     #todo
     #return $this->content->getStructure();
-    return "test_title";
+
+    return $this->content->getStructure();
   }
 
   public function getConfig() {

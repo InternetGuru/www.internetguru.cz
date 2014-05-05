@@ -8,7 +8,6 @@
 define('SOURCE_FOLDER', 'src'); // where objects and other src are stored
 define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
-define('DEFAULT_CFG_FILE','cms.xml'); // admin and user cms cfg xml file
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 
 /**
