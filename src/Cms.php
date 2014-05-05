@@ -12,7 +12,20 @@ class Cms {
   }
 
   #public function getStructure() {}
-  #public function getContent() {}
+
+  public function getTitle() {
+    #todo
+    #return $this->content->getStructure();
+    return "test_title";
+  }
+
+  public function getConfig() {
+    return $this->config;
+  }
+
+  public function getContent() {
+    return $this->content;
+  }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
     $this->outputStrategy = $strategy;
@@ -25,13 +38,13 @@ class Cms {
   public function getOutput() {
     if(!isset($this->content)) throw new Exception("Content not set");
     if(!isset($this->outputStrategy)) return $this->content->finalize()->saveXML();
-    return $this->outputStrategy->output($this->content->finalize());
+    return $this->outputStrategy->output($this);
   }
 
 }
 
 interface OutputStrategyInterface {
-    public function output(DOMDocument $dom);
+    public function output(Cms $cms);
 }
 
 ?>

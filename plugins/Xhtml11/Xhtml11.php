@@ -8,8 +8,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     }
   }
 
-  public function output(DOMDocument $doc) {
-    return $doc->saveXML();
+  public function output(Cms $cms) {
+    #getTitle();
+    #getLinks();
+    #getScripts();
+    return "xhtml1 output, title:" . $cms->getTitle();
   }
 
 }
