@@ -10,15 +10,12 @@ class Dom {
       $this->doc = DomBuilder::build($plugin);
   }
 
-  public function finalize() {
-    // procede replacements etc.
-    #todo
+  public function getDoc() {
     return $this->doc;
   }
 
-  public function getStructure() {
-    return $this->doc->saveXML();
-  }
+  #public function finalize() {} // procede replacements etc.
+  #public function getPath(XPath $xpath) {}
 
 }
 
