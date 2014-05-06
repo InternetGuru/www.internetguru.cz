@@ -10,7 +10,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   }
 
   public function output(Cms $cms) {
-    #$cms->getContent()->finalize();
+
+    $body = $this->transformBody($cms->getBody());
     $lang = $cms->getBodyLang();
 
     // create output DOM with doctype
@@ -20,6 +21,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
         'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
     $doc = $imp->createDocument(null, null, $dtd);
     $doc->formatOutput = true;
+    $doc->encoding="utf-8";
 
     // add root element
     $html = $doc->createElement("html");
@@ -36,17 +38,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $this->addMeta("Content-Language", "cs");
 
     // add body element
-    $body = $doc->importNode($cms->getBody(),true);
+    $body = $doc->importNode($body->documentElement,true);
     $html->appendChild($body);
 
+    // and that's it
     return $doc->saveXML();
-
-    // transform body
-    #$xsl = DomBuilder::build("Xhtml11","xsl");
-    #$proc = new XSLTProcessor();
-    #$proc->importStylesheet($xsl);
-    #return $proc->transformToDoc()->saveXML();
-
   }
 
   private function addMeta($nameValue,$contentValue,$httpEquiv=false) {
@@ -54,6 +50,16 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"),$nameValue);
     $meta->setAttribute("content",$contentValue);
     $this->head->appendChild($meta);
+  }
+
+  private function transformBody(DOMElement $dom) {
+    // transform body
+    $xsl = DomBuilder::build("Xhtml11","xsl");
+    $proc = new XSLTProcessor();
+    $proc->importStylesheet($xsl);
+    $output = $proc->transformToDoc($dom);
+    $output->encoding="utf-8";
+    return $output;
   }
 
 }
