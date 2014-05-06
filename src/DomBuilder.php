@@ -15,56 +15,56 @@ class DomBuilder {
 
   private function __construct() {}
 
-  public static function build($xml="Cms") {
-    if(!is_string($xml)) throw new Exception('Variable type: not string.');
+  public static function build($path="Cms",$ext="xml") {
+    if(!is_string($path)) throw new Exception('Variable type: not string.');
 
-    $cfg = new DOMDocument();
-    if(self::DEBUG) $cfg->formatOutput = true;
+    $doc = new DOMDocument();
+    if(self::DEBUG) $doc->formatOutput = true;
 
     // create DOM from default config xml (Cms root or Plugin dir)
-    if($xml == "Cms") {
-      if(!@$cfg->load("$xml.xml"))
-        throw new Exception(sprintf('Unable to load XML file %s.',"$xml.xml"));
+    if($path == "Cms") {
+      if(!@$doc->load("$path.$ext"))
+        throw new Exception(sprintf('Unable to load XML file %s.',"$path.$ext"));
     } else {
-      $fileName = PLUGIN_FOLDER . "/$xml/$xml.xml";
-      if(!@$cfg->load($fileName))
+      $fileName = PLUGIN_FOLDER . "/$path/$path.$ext";
+      if(!@$doc->load($fileName))
         throw new Exception(sprintf('Unable to load XML file %s.',$fileName));
     }
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($cfg->saveXML())."</pre>";
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
     // update DOM by admin data (all of them)
-    self::updateDom($cfg,ADMIN_FOLDER."/$xml.xml");
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($cfg->saveXML())."</pre>";
+    self::updateDom($doc,ADMIN_FOLDER."/$path.$ext");
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
     // update DOM by user data (except readonly)
-    self::updateDom($cfg,USER_FOLDER."/$xml.xml",false);
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($cfg->saveXML())."</pre>";
+    self::updateDom($doc,USER_FOLDER."/$path.$ext",false);
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
-    return $cfg;
+    return $doc;
 
   }
 
-  private static function updateDom(&$cfg,$xmlFile,$ignoreReadonly=true) {
-    if(!is_string($xmlFile)) throw new Exception('Variable type: not string.');
+  private static function updateDom(&$doc,$pathFile,$ignoreReadonly=true) {
+    if(!is_string($pathFile)) throw new Exception('Variable type: not string.');
 
-    if(!is_file($xmlFile)) return; // file is optional
-    if(!filesize($xmlFile)) return; // file can be empty
+    if(!is_file($pathFile)) return; // file is optional
+    if(!filesize($pathFile)) return; // file can be empty
     $doc = new DOMDocument();
-    if(!@$doc->load($xmlFile))
+    if(!@$doc->load($pathFile))
       throw new Exception('Unable to load XML file.');
     $nodes = $doc->firstChild->childNodes;
-    $xPath = new DOMXPath($cfg);
+    $xPath = new DOMXPath($doc);
 
     for($i = 0; $i < $nodes->length; $i++) {
       if($nodes->item($i)->nodeType != 1) continue;
-      $cfgNodes = $xPath->query($nodes->item($i)->getNodePath());
+      $docNodes = $xPath->query($nodes->item($i)->getNodePath());
       // only elements pass
-      if($cfgNodes->length != 1) continue;
+      if($docNodes->length != 1) continue;
       // only without attribute readonly
       if(!$ignoreReadonly
-        && $cfgNodes->item(0)->getAttribute("readonly") == "readonly") continue;
-      $cfg->firstChild->replaceChild(
-        $cfg->importNode($nodes->item($i),true),$cfgNodes->item(0)
+        && $docNodes->item(0)->getAttribute("readonly") == "readonly") continue;
+      $doc->firstChild->replaceChild(
+        $doc->importNode($nodes->item($i),true),$docNodes->item(0)
       );
     }
   }

@@ -35,6 +35,8 @@
         <description>Převod mezi <strong>dokumenty Google, LaTeX a HTML</strong>. Jedná se o funkční jádro toho času bez frontendu. Pokud máte zájem o použití generátoru nebo jeho nasazení pro vlastní účely, kontaktujte nás.</description>
         <h>Textové transformace</h>
         <description>Systém pro...</description>
+        <h>Hromadné rozesílání zpráv</h>
+        <description>Systém na registraci uživatelů, kteří si přejí odebírat upozornění (na novinky, akce či produkty) na daném webu. Odeslání hromadné zprávy je jednoduché a <em>v souladu se zákonem</em> (automatická možnost odhlášení).</description>
         <h>Generátor hesel</h>
         <description>Velmi rychlý způsob, jak <a href="http://pwgen.iix.cz/">vygenerovat heslo</a>. Výhodou (proti jiným generátorům) je absence zaměnitelných znaků (0Oo1lIyzYZ).</description>
       </section>

@@ -14,12 +14,21 @@ class Cms {
   #public function getStructure() {}
 
   public function getTitle() {
-    // HP
+
+    // if HP
     $xpath = new DOMXPath($this->content->getDoc());
     $h = $xpath->query("body/h");
-    // return title attr if exists
-    #if($h->item(0)->hasAttribute("title"))
     return $h->item(0)->nodeValue;
+
+    // else add path (attr title if exists)
+    #if($h->item(0)->hasAttribute("title"))
+    #  $h->item(0)->getAttribute("title");
+
+  }
+
+  public function getBodyLang() {
+    $h = $this->content->getDoc()->getElementsByTagName("body");
+    return $h->item(0)->getAttribute("lang");
   }
 
   public function getConfig() {
