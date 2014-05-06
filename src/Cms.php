@@ -35,6 +35,11 @@ class Cms {
     return $this->config;
   }
 
+  // return current page html+
+  public function getBody() {
+    return $this->content->getDoc()->getElementsByTagName("body")->item(0);
+  }
+
   public function getContent() {
     return $this->content;
   }

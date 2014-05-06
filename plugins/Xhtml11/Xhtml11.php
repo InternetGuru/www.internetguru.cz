@@ -1,6 +1,7 @@
 <?php
 
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
+  private $head;
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
@@ -12,21 +13,33 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     #$cms->getContent()->finalize();
     $lang = $cms->getBodyLang();
 
-    // create output DOM
+    // create output DOM with doctype
+    $imp = new DOMImplementation();
+    $dtd = $imp->createDocumentType('html',
+        '-//W3C//DTD XHTML 1.1//EN',
+        'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
+    $doc = $imp->createDocument(null, null, $dtd);
+    $doc->formatOutput = true;
 
-    echo '<' . '?xml version="1.0" encoding="utf-8"?' . '>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
-  "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="'.$lang.'" lang="'.$lang.'">
-<head>
-  <title>' . $cms->getTitle() . '</title>
-</head><body>
-<h>empty doc</h>
-</body>
-</html>';
+    // add root element
+    $html = $doc->createElement("html");
+    $html->setAttribute("xmlns","http://www.w3.org/1999/xhtml");
+    $html->setAttribute("xml:lang",$lang);
+    $html->setAttribute("lang",$lang);
+    $doc->appendChild($html);
 
-    // add content into output body
-    #$cms->getContent()->getDoc();
+    // add head element
+    $this->head = $doc->createElement("head");
+    $html->appendChild($this->head);
+    $this->head->appendChild($doc->createElement("title",$cms->getTitle()));
+    $this->addMeta("Content-Type","text/html; charset=utf-8");
+    $this->addMeta("Content-Language", "cs");
+
+    // add body element
+    $body = $doc->importNode($cms->getBody(),true);
+    $html->appendChild($body);
+
+    return $doc->saveXML();
 
     // transform body
     #$xsl = DomBuilder::build("Xhtml11","xsl");
@@ -34,6 +47,13 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     #$proc->importStylesheet($xsl);
     #return $proc->transformToDoc()->saveXML();
 
+  }
+
+  private function addMeta($nameValue,$contentValue,$httpEquiv=false) {
+    $meta = $this->head->ownerDocument->createElement("meta");
+    $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"),$nameValue);
+    $meta->setAttribute("content",$contentValue);
+    $this->head->appendChild($meta);
   }
 
 }
