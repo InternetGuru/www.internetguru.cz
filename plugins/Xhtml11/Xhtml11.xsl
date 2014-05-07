@@ -10,7 +10,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
     </xsl:apply-templates>
     <xsl:apply-templates select="description"/>
     <xsl:apply-templates select="section">
-      <xsl:with-param name="i" select="2"/>
+      <xsl:with-param name="i" select="1"/>
     </xsl:apply-templates>
   </body>
 </xsl:template>
@@ -31,11 +31,7 @@ xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 <xsl:template match="section">
   <xsl:param name="i"/>
   <xsl:element name = "section">
-    <xsl:apply-templates select="h">
-      <xsl:with-param name="i" select="$i"/>
-    </xsl:apply-templates>
-    <xsl:apply-templates select="description"/>
-    <xsl:apply-templates select="section">
+    <xsl:apply-templates select="*">
       <xsl:with-param name="i" select="$i+1"/>
     </xsl:apply-templates>
   </xsl:element>
