@@ -9,7 +9,7 @@
  * @USAGE: $document = DomBuilder::build([plugin]);
  * @THROWS: Exception when files don't exist or are corrupted/empty
  */
-class DomBuilder {
+class DOMBuilder {
 
   const DEBUG = false;
 

@@ -10,8 +10,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   }
 
   public function output(Cms $cms) {
-
-    $body = $this->transformBody($cms->getBody());
+    $body = $this->transformBody($cms->getContent());
     $lang = $cms->getBodyLang();
 
     // create output DOM with doctype
@@ -52,8 +51,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $this->head->appendChild($meta);
   }
 
-  private function transformBody(DOMElement $dom) {
-    // transform body
+  private function transformBody(DOMDocument $dom) {
     $xsl = DomBuilder::build("Xhtml11","xsl");
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);

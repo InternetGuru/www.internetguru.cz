@@ -8,7 +8,7 @@ class Cms {
   #private const $page;
 
   function __construct() {
-      $config = new Dom();
+      $config = DOMBuilder::build();
   }
 
   #public function getStructure() {}
@@ -16,9 +16,7 @@ class Cms {
   public function getTitle() {
 
     // if HP
-    $xpath = new DOMXPath($this->content->getDoc());
-    $h = $xpath->query("body/h");
-    return $h->item(0)->nodeValue;
+    $this->content->getElementsByTagName("h")->item(0)->nodeValue;
 
     // else add path (attr title if exists)
     #if($h->item(0)->hasAttribute("title"))
@@ -27,17 +25,12 @@ class Cms {
   }
 
   public function getBodyLang() {
-    $h = $this->content->getDoc()->getElementsByTagName("body");
+    $h = $this->content->getElementsByTagName("body");
     return $h->item(0)->getAttribute("lang");
   }
 
   public function getConfig() {
     return $this->config;
-  }
-
-  // return current page html+
-  public function getBody() {
-    return $this->content->getDoc()->getElementsByTagName("body")->item(0);
   }
 
   public function getContent() {
@@ -48,7 +41,11 @@ class Cms {
     $this->outputStrategy = $strategy;
   }
 
-  public function setContent(Dom $content) {
+  public function setContent(DOMDocument $content) {
+    // must be in HTML+ format, see HTML+ specification
+    #todo: validation
+    if ($content->documentElement->tagName != "body")
+      throw new Exception("Content DOM is invalid!");
     $this->content = $content;
   }
 
