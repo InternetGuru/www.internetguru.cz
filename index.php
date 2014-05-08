@@ -1,14 +1,14 @@
 <?php
 
-#error_reporting(E_ALL);
-#ini_set("display_errors", 1);
+error_reporting(E_ALL);
+ini_set("display_errors", 1);
 
 # Global constants
 
-define('SOURCE_FOLDER', 'src'); // where objects and other src are stored
-define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
-define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
-define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
+define('SOURCE_FOLDER', dirname(__FILE__) . '/src'); // where objects and other src are stored
+define('ADMIN_FOLDER', dirname(__FILE__) . '/adm'); // where admin cfg xml files are stored
+define('USER_FOLDER', dirname(__FILE__) . '/usr'); // where user cfg xml files are stored
+define('PLUGIN_FOLDER', dirname(__FILE__) . '/plugins'); // where plugins are stored
 
 /**
  * Autoload classes from source folder
