@@ -10,7 +10,7 @@
   define('USER_FOLDER',   dirname(__FILE__) . '/usr'); // where user cfg xml files are stored
   define('PLUGIN_FOLDER', dirname(__FILE__) . '/plugins'); // where plugins are stored
 
-  /**
+  /**\
    * Autoload classes from source folder
    */
   function __autoload($className) {
