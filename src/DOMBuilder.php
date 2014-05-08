@@ -18,7 +18,7 @@ class DOMBuilder {
   public static function build($path="Cms",$ext="xml") {
     if(!is_string($path)) throw new Exception('Variable type: not string.');
 
-    $doc = new DOMDocument();
+    $doc = new DOMDocument('1.0', 'utf-8');
     if(self::DEBUG) $doc->formatOutput = true;
 
     // create DOM from default config xml (Cms root or Plugin dir)
