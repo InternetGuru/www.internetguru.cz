@@ -2,13 +2,22 @@
 
 class Cms {
 
+  private $domBuilder; // DOMBuilder
   private $config; // DOMDocument
   private $content; // DOMDocument
   private $outputStrategy; // OutputStrategyInterface
   #private const $page;
 
-  function __construct() {
-      $config = DOMBuilder::build();
+  function __construct(DOMBuilder $domBuilder) {
+    $this->domBuilder = $domBuilder;
+  }
+
+  public function init() {
+      $config = $this->domBuilder->build();
+  }
+
+  public function getDOMBuilder() {
+    return $this->domBuilder;
   }
 
   #public function getStructure() {}

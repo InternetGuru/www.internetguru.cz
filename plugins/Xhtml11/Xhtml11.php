@@ -2,9 +2,11 @@
 
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $head;
+  private $subject; // SplSubject
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
+      $this->subject = $subject;
       $subject->getCms()->setOutputStrategy($this);
     }
   }
@@ -52,7 +54,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   }
 
   private function transformBody(DOMDocument $dom) {
-    $xsl = DomBuilder::build("Xhtml11","xsl");
+    $xsl = $this->subject->getCms()->getDOMBuilder()->build("Xhtml11","xsl");
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $output = $proc->transformToDoc($dom);

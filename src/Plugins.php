@@ -2,12 +2,23 @@
 
 class Plugins implements SplSubject {
   private $status = null;
-  private $cms = null;
+  private $cms;
   private $observers = array();
 
-  public function setCms(Cms $cms) {
-    if($this->cms === null) $this->cms = $cms;
+  public function __construct(Cms $cms) {
+    $this->cms = $cms;
+    // plugin attach into class Plugins (Subject)
+    foreach(scandir(PLUGIN_FOLDER) as $plugin) {
+      // omit folders starting with a dot
+      if(substr($plugin,0,1) == ".") continue;
+      $this->attach(new $plugin);
+    }
   }
+
+  #delete
+  #public function setCms(Cms $cms) {
+  #  if($this->cms === null) $this->cms = $cms;
+  #}
 
   public function getCms() {
     return $this->cms;

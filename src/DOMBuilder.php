@@ -12,22 +12,25 @@
 class DOMBuilder {
 
   const DEBUG = false;
+  private $backupStrategy = null;
 
-  private function __construct() {}
+  public function __construct() {}
 
-  public static function build($path="Cms",$ext="xml") {
+  public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
+    $this->backupStrategy = $backupStrategy;
+  }
+
+  public function build($path="Cms",$ext="xml") {
     if(!is_string($path)) throw new Exception('Variable type: not string.');
 
-    $doc = new DOMDocument();
+    $doc = new DOMDocument("1.0","utf-8");
     if(self::DEBUG) $doc->formatOutput = true;
 
     // create DOM from default config xml (Cms root or Plugin dir)
-    if($path == "Cms") {
-      if(!@$doc->load("$path.$ext"))
-        throw new Exception(sprintf('Unable to load XML file %s.',"$path.$ext"));
-    } else {
-      $fileName = PLUGIN_FOLDER . "/$path/$path.$ext";
-      if(!@$doc->load($fileName))
+    if($path == "Cms") $fileName = "$path.$ext";
+    else $fileName = PLUGIN_FOLDER . "/$path/$path.$ext";
+
+    if(!@$doc->load($fileName)) {
         throw new Exception(sprintf('Unable to load XML file %s.',$fileName));
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
@@ -44,7 +47,7 @@ class DOMBuilder {
 
   }
 
-  private static function updateDom(&$doc,$pathFile,$ignoreReadonly=true) {
+  private function updateDom(&$doc,$pathFile,$ignoreReadonly=true) {
     if(!is_string($pathFile)) throw new Exception('Variable type: not string.');
 
     if(!is_file($pathFile)) return; // file is optional
@@ -70,4 +73,10 @@ class DOMBuilder {
   }
 
 }
+
+interface BackupStrategyInterface {
+    public function backupFile($file);
+    public function restoreFile($file);
+}
+
 ?>

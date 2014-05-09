@@ -9,6 +9,7 @@ define('SOURCE_FOLDER', dirname(__FILE__) . '/src'); // where objects and other 
 define('ADMIN_FOLDER', dirname(__FILE__) . '/adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', dirname(__FILE__) . '/usr'); // where user cfg xml files are stored
 define('PLUGIN_FOLDER', dirname(__FILE__) . '/plugins'); // where plugins are stored
+define('BACKUP_FOLDER', dirname(__FILE__) . '/bck'); // where user backup files are stored
 
 /**
  * Autoload classes from source folder
@@ -22,17 +23,17 @@ function __autoload($className) {
 
 try {
 
-  // init CMS
-  $cms = new Cms();
+  // register core variables
+  $domBuilder = new DOMBuilder();
+  $cms = new Cms($domBuilder);
+  $plugins = new Plugins($cms);
 
-  // plugin attach into class Plugins (Subject)
-  $plugins = new Plugins();
-  $plugins->setCms($cms);
-  foreach(scandir(PLUGIN_FOLDER) as $plugin) {
-    // omit folders starting with a dot
-    if(substr($plugin,0,1) == ".") continue;
-    $plugins->attach(new $plugin);
-  }
+  // notify plugins, status init
+  $plugins->setStatus("preinit");
+  $plugins->notify();
+
+  // init CMS
+  $cms->init();
 
   // notify plugins, status init
   $plugins->setStatus("init");
