@@ -2,9 +2,9 @@
 
 class Cms {
 
-  private $config;
-  private $content;
-  private $outputStrategy;
+  private $config; // DOMDocument
+  private $content; // DOMDocument
+  private $outputStrategy; // OutputStrategyInterface
   #private const $page;
 
   function __construct() {
