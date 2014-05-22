@@ -1,0 +1,38 @@
+
+
+body {
+  overflow: hidden;
+}
+
+#slides {
+  position: relative;
+  /*margin-left: -100%; */ /* first slide */
+  /*margin-left: -200%; */ /* second slide */
+}
+
+.slide {
+  float: left;
+  height: 100%;
+}
+
+.slide > div {
+  margin: 0 10% 0 10%;
+}
+
+#arrow-left, #arrow-right {
+  position: absolute;
+  top: 50%;
+  font-size: 2em;
+  padding: 0.5em;
+  margin: 1em;
+  background: #eee;
+  cursor: pointer;
+}
+
+#arrow-left {
+  left: 0;
+}
+
+#arrow-right {
+  right: 0;
+}
