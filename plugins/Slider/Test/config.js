@@ -18,5 +18,5 @@ Config.width = 1; // between 0 and 1
 
 // ~generated~
 Config.mode = Config.modes.HORIZONTAL;
-Config.width = 0.67;
+Config.width = 1;
 // ~!generated~

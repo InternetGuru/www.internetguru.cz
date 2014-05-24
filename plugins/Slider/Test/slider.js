@@ -22,7 +22,7 @@
       initHorizontalCSS = function() {
         var style = $(
            "<style type='text/css'>"
-         + "#slides { width: " + (numSlides * 100 * Config.width) + "%; }\n"
+         + "#slides { width: " + ( numSlides * 100 * Config.width ) + "%; left: 0%; }\n"
          + ".slide  { width: " + parseFloat(100 / numSlides).toFixed(2) + "%; }\n"
          + "</style>"
         );
@@ -47,7 +47,7 @@
 
         currentSlide = n;
 
-        $("#slides").css("margin-left", "-" + n + "00%");
+        $("#slides").css("margin-left", (n * 100) + "%");
       },
 
       initHorizontal = function() {
@@ -79,7 +79,7 @@
         currentSlide++;
         //$("#slides").css("margin-left", "-" + currentSlide + "00%");
         $("#slides").animate({
-          marginLeft: "-" + ((currentSlide * 100 * Config.width) ) + "%"
+          marginLeft: "-" + ( (currentSlide * 100 * Config.width) ) + "%"
         });
         win.location.hash = slideHash[currentSlide];
       },
