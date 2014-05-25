@@ -5,11 +5,11 @@ ini_set("display_errors", 1);
 
 # Global constants
 
-define('SOURCE_FOLDER', dirname(__FILE__) . '/src'); // where objects and other src are stored
-define('ADMIN_FOLDER', dirname(__FILE__) . '/adm'); // where admin cfg xml files are stored
-define('USER_FOLDER', dirname(__FILE__) . '/usr'); // where user cfg xml files are stored
-define('PLUGIN_FOLDER', dirname(__FILE__) . '/plugins'); // where plugins are stored
-define('BACKUP_FOLDER', dirname(__FILE__) . '/bck'); // where user backup files are stored
+define('SOURCE_FOLDER', __DIR__ . '/src'); // where objects and other src are stored
+define('ADMIN_FOLDER', __DIR__ . '/adm'); // where admin cfg xml files are stored
+define('USER_FOLDER', __DIR__ . '/usr'); // where user cfg xml files are stored
+define('PLUGIN_FOLDER', __DIR__ . '/plugins'); // where plugins are stored
+define('BACKUP_FOLDER', __DIR__ . '/bck'); // where user backup files are stored
 
 /**
  * Autoload classes from source folder

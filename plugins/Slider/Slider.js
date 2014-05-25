@@ -63,6 +63,8 @@
 
         addCSS(Config.styleSheet);
 
+        $(".slide").css("max-width",$(win).outerWidth(true));
+
         var e = null;
         var width = 0;
         for (var i = 0; i < numSlides; i++) {
@@ -145,20 +147,24 @@
         });
         if(slides != null) slides.append(slide);
 
-        var controls = $("<div id='slider-controll'></div>");
-        controls.append("<span id='arrow-left'>" + Config.leftArrow + "</span>");
-        controls.append("<span id='arrow-right'>" + Config.rightArrow + "</span>");
+        var controls = $("<div class='slider-controll'></div>");
+        controls.append("<span class='slider-arrow-left'>" + Config.leftArrow + "</span>");
+        controls.append("<span class='slider-arrow-right'>" + Config.rightArrow + "</span>");
+
+        var slider = $("<div id='slider'></div>");
+        slider.append(slides);
+        $("body > div.section").append(slider);
+
         if(Config.arrowsPrepend)
           $(Config.arrowsLocation).prepend(controls);
         else
           $(Config.arrowsLocation).append(controls);
 
-        $("body > div.section").append(slides);
       },
 
       fireEvents = function() {
-        var arrowLeft = $("#arrow-left");
-        var arrowRight = $("#arrow-right");
+        var arrowLeft = $(".slider-arrow-left");
+        var arrowRight = $(".slider-arrow-right");
 
         $(document).keydown(function(e){
           switch(e.keyCode){
@@ -171,7 +177,6 @@
               slideRight();
             break;
           }
-          return false;
         });
 
         arrowLeft.click(slideLeft);
@@ -205,7 +210,7 @@
          },
 
          setRightArrow: function(arrow) {
-            Config.leftArrow = arrow;
+            Config.rightArrow = arrow;
          },
 
          setArrowsLocation: function(selector) {
@@ -213,7 +218,11 @@
          },
 
          setArrowsPrepend: function(prepend) {
-            Config.arrowsPrepend = prepend;
+            Config.arrowsPrepend = prepend != "false";
+         },
+
+         setCss: function(css) {
+          Config.styleSheet = css;
          }
       }
    };
@@ -221,9 +230,8 @@
    var slider = new Slider();
    win.Slider = slider;
 
-
    $(function(){
-     slider.init();
+    slider.init();
    });
 
 })(window);

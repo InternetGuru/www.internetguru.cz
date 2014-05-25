@@ -6,7 +6,8 @@
  * Default XML file is required (plugins do not have to use Config at all).
  *
  * @PARAM: String plugin (optional)
- * @USAGE: $document = DomBuilder::build([plugin]);
+ * @USAGE: $config = $this->domBuilder->build();
+ * @RETURNS: DOMDocument
  * @THROWS: Exception when files don't exist or are corrupted/empty
  */
 class DOMBuilder {
@@ -30,8 +31,8 @@ class DOMBuilder {
     if($path == "Cms") $fileName = "$path.$ext";
     else $fileName = PLUGIN_FOLDER . "/$path/$path.$ext";
 
-    if(!@$doc->load($fileName)) {
-        throw new Exception(sprintf('Unable to load XML file %s.',$fileName));
+    if(!$doc->load($fileName)) {
+        throw new Exception(sprintf('Unable to load XML file %s',$fileName));
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 

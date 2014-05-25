@@ -10,8 +10,8 @@ class Cms {
 
   function __construct(DOMBuilder $domBuilder) {
     $this->domBuilder = $domBuilder;
-    error_log("CMS created:0",0);
-    error_log("CMS created:3",3,"aaa.log");
+    #error_log("CMS created:0",0);
+    #error_log("CMS created:3",3,"aaa.log");
   }
 
   public function init() {
@@ -64,6 +64,10 @@ class Cms {
     if(!isset($this->content)) throw new Exception("Content not set");
     if(!isset($this->outputStrategy)) return $this->content->getDoc()->saveXML();
     return $this->outputStrategy->output($this);
+  }
+
+  public function getOutputStrategy() {
+    return $this->outputStrategy;
   }
 
 }
