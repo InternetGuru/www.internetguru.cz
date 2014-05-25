@@ -9,6 +9,7 @@
   Config.rightArrow = "&gt;";
   Config.arrowsLocation = "body"; // selector
   Config.arrowsPrepend = false; // prepend (true) or append (false)
+  Config.styleSheet = "Slider.css";
 
 
   /**
@@ -60,7 +61,7 @@
         if(numSlides == -1)
           throw "no slides loaded";
 
-        addCSS("horizontal.css");
+        addCSS(Config.styleSheet);
 
         var e = null;
         var width = 0;
