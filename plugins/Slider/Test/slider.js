@@ -8,6 +8,8 @@
    * h1 => title
    * h2 => slide heading
    * content between h2 => slide content
+   *
+   * TODO set all styles by jQuery css()
    */
    var Slider = function() {
 
@@ -65,19 +67,23 @@
       slideLeft = function() {
         if(currentSlide == 0) return;
         currentSlide--;
-        //$("#slides").css("margin-left", "-" + currentSlide + "00%");
-        $("#slides").animate({
-          marginLeft: "-" + ( (currentSlide * 100 * Config.width) )+ "%"
-        });
-        win.location.hash = slideHash[currentSlide];
+        slideHorizontalAnim();
       },
 
       slideRight = function() {
         if(currentSlide+1 == numSlides) return;
         currentSlide++;
-        //$("#slides").css("margin-left", "-" + currentSlide + "00%");
+        slideHorizontalAnim();
+      },
+
+      slideHorizontalAnim = function() {
+        var marginLeft = getLeftMargin();
+        for (var i = 0; i < currentSlide; i++) {
+          marginLeft -= $("#slide"+i).outerWidth(true);
+        }
+        marginLeft =
         $("#slides").animate({
-          marginLeft: "-" + ( (currentSlide * 100 * Config.width) ) + "%"
+          marginLeft:  marginLeft + "px"
         });
         win.location.hash = slideHash[currentSlide];
       },
