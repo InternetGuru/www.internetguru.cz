@@ -201,6 +201,7 @@
          },
 
          setAnimationSpeed: function(speed) {
+            speed = parseInt(speed);
             if(!isInt(speed)) return;
             Config.animationSpeed = speed;
          },

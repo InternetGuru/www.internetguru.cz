@@ -5,7 +5,7 @@
     <setCss>Slider.css</setCss>
   </resources>
   <parameters>
-    <setAnimationSpeed>5000</setAnimationSpeed>
+    <setAnimationSpeed>1000</setAnimationSpeed>
     <setLeftArrow>&#171;</setLeftArrow>
     <setRightArrow>&#187;</setRightArrow>
     <setArrowsLocation>body</setArrowsLocation>
