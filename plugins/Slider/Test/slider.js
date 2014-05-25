@@ -26,7 +26,9 @@
         return ($(win).outerWidth() - el.outerWidth(true)) / 2;
       },
 
-      setHorizontalSlide = function(hash) {
+      setSlide = function(hash) {
+
+        $("#slide" + currentSlide).removeClass("active");
 
         hash = hash.substr(1, hash.length);
 
@@ -36,11 +38,12 @@
             break;
           }
         };
-        // alert(getLeftMargin());
-        $("#slides").css("margin-left", getLeftMargin());
+
+        slideHorizontalAnim(false);
+        $("#slide" + currentSlide).addClass("active");
       },
 
-      initHorizontal = function() {
+      initSlides = function() {
         if(numSlides == -1)
           throw "no slides loaded";
 
@@ -51,40 +54,45 @@
         for (var i = 0; i < numSlides; i++) {
           e = $('#slide'+i);
           width += e.outerWidth(true);
-        };
+        }
         $("#slides").css("width",width);
-
-        win.setTimeout(function() {
-          setHorizontalSlide(win.location.hash);
+        win.setTimeout(function(){
+          setSlide(win.location.hash);
         }, 100);
-      },
-
-      initVertical = function() {
-        addCSS("vertical.css");
-        // TODO slide script
       },
 
       slideLeft = function() {
         if(currentSlide == 0) return;
+        $("#slide" + currentSlide).removeClass("active");
         currentSlide--;
         slideHorizontalAnim();
+        $("#slide" + currentSlide).addClass("active");
       },
 
       slideRight = function() {
         if(currentSlide+1 == numSlides) return;
+        $("#slide" + currentSlide).removeClass("active");
         currentSlide++;
         slideHorizontalAnim();
+        $("#slide" + currentSlide).addClass("active");
       },
 
-      slideHorizontalAnim = function() {
+      slideHorizontalAnim = function(animation) {
+
+        if(typeof(animation)==='undefined') animation = true;
+
         var marginLeft = getLeftMargin();
         for (var i = 0; i < currentSlide; i++) {
           marginLeft -= $("#slide"+i).outerWidth(true);
         }
-        marginLeft =
-        $("#slides").animate({
-          marginLeft:  marginLeft + "px"
-        });
+        $("#slides").clearQueue();
+        if(animation){
+          $("#slides").animate({
+            marginLeft:  marginLeft + "px"
+          }, Config.animationSpeed);
+        } else {
+          $("#slides").css("margin-left", marginLeft + "px");
+        }
         win.location.hash = slideHash[currentSlide];
       },
 
@@ -98,7 +106,6 @@
 
       initStructure = function() {
         var slides = $("<div id='slides'></div>");
-        // var slides = $("body > div.section");
         var el = $("body > div.section").children();
 
         var addToSlide = false;
@@ -124,14 +131,15 @@
         });
         if(slides != null) slides.append(slide);
 
-        var controls = $("<div></div>");
-        controls.append("<span id='arrow-left'>&lt;</span>");
-        controls.append("<span id='arrow-right'>&gt;</span>");
+        var controls = $("<div id='slider-controll'></div>");
+        controls.append("<span id='arrow-left'>" + Config.leftArrow + "</span>");
+        controls.append("<span id='arrow-right'>" + Config.rightArrow + "</span>");
+        if(Config.arrowsPrepend)
+          $(Config.arrowsLocation).prepend(controls);
+        else
+          $(Config.arrowsLocation).append(controls);
 
-        var wrapper = $("<div class='slides-wrapper'></div>")
-        wrapper.append(slides);
-        wrapper.append(controls);
-        $("body > div.section").append(wrapper);
+        $("body > div.section").append(slides);
       },
 
       fireEvents = function() {
@@ -141,9 +149,11 @@
         $(document).keydown(function(e){
           switch(e.keyCode){
             case 37:
+            // case 40:
               slideLeft();
             break;
             case 39:
+            // case 38:
               slideRight();
             break;
           }
@@ -167,17 +177,7 @@
 
          init : function() {
             initStructure();
-
-            switch(this.mode()) {
-
-              case Config.modes.HORIZONTAL:
-                initHorizontal();
-              break;
-
-              case Config.modes.VERTICAL:
-                initVertical();
-              break;
-            }
+            initSlides();
             fireEvents();
          }
 

@@ -1,22 +1,11 @@
 
 
-var Config = {
-
-  modes: {
-    HORIZONTAL : "horizontal",
-    VERTICAL   : "vertical"
-  }
-
-}
+var Config = {}
 
 
 // default mode
-Config.mode = Config.modes.HORIZONTAL;
-Config.width = 1; // between 0 and 1
-
-
-
-// ~generated~
-Config.mode = Config.modes.HORIZONTAL;
-Config.width = 1;
-// ~!generated~
+Config.animationSpeed = 500; // ms
+Config.leftArrow = "&lt;";
+Config.rightArrow = "&gt;";
+Config.arrowsLocation = "body"; // selector
+Config.arrowsPrepend = false; // prepend (true) or append (false)

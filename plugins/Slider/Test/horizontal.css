@@ -4,36 +4,20 @@ body {
 }
 
 #slides {
-  /*position: relative;*/
+  display: flex;
 }
 
 .slide {
-  /*float: left;*/
-  float: left;
-  max-width: 60em;
-  min-width: 20em;
-  /*border: 1px solid #555;*/
-  margin: 0 5em;
+  max-width: 100vw;
 }
 
 .slide > div {
-  /*margin: 0 10% 0 10%;*/
+  /*max-width: 60em;*/
+}
+
+.active {
 }
 
 #arrow-left, #arrow-right {
-  position: absolute;
-  top: 50%;
-  font-size: 2em;
-  padding: 0.5em;
-  margin: 1em;
-  background: #eee;
   cursor: pointer;
-}
-
-#arrow-left {
-  left: 0;
-}
-
-#arrow-right {
-  right: 0;
 }
