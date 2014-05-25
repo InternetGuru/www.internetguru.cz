@@ -1,22 +1,22 @@
 
-
 body {
-  overflow: hidden;
+  overflow-x: hidden;
 }
 
 #slides {
-  position: relative;
-  /*margin-left: -100%; */ /* first slide */
-  /*margin-left: -200%; */ /* second slide */
+  /*position: relative;*/
 }
 
 .slide {
+  /*float: left;*/
   float: left;
-  height: 100%;
+  max-width: 60em;
+  min-width: 20em;
+  border: 1px solid #555;
 }
 
 .slide > div {
-  margin: 0 10% 0 10%;
+  /*margin: 0 10% 0 10%;*/
 }
 
 #arrow-left, #arrow-right {

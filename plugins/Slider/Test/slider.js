@@ -19,35 +19,23 @@
       currentSlide = 0,
       slideHash = [],
 
-      initHorizontalCSS = function() {
-        var style = $(
-           "<style type='text/css'>"
-         + "#slides { width: " + ( numSlides * 100 * Config.width ) + "%; left: 0%; }\n"
-         + ".slide  { width: " + parseFloat(100 / numSlides).toFixed(2) + "%; }\n"
-         + "</style>"
-        );
-        style.appendTo("head");
+      getLeftMargin = function() {
+        var el = $("#slide" + currentSlide);
+        return ($(win).outerWidth() - el.outerWidth(true)) / 2;
       },
 
       setHorizontalSlide = function(hash) {
 
-        if(hash == "") return;
-
         hash = hash.substr(1, hash.length);
-        var n = -1;
 
         for (var i = 0; i < slideHash.length; i++) {
           if(hash == slideHash[i]) {
-            n = i;
+            currentSlide = i;
             break;
           }
         };
-
-        if(n == -1) return;
-
-        currentSlide = n;
-
-        $("#slides").css("margin-left", (n * 100) + "%");
+        // alert(getLeftMargin());
+        $("#slides").css("margin-left", getLeftMargin());
       },
 
       initHorizontal = function() {
@@ -55,8 +43,18 @@
           throw "no slides loaded";
 
         addCSS("horizontal.css");
-        initHorizontalCSS();
-        setHorizontalSlide(win.location.hash);
+
+        var e = null;
+        var width = 0;
+        for (var i = 0; i < numSlides; i++) {
+          e = $('#slide'+i);
+          width += e.outerWidth(true);
+        };
+        $("#slides").css("width",width);
+
+        win.setTimeout(function() {
+          setHorizontalSlide(win.location.hash);
+        }, 100);
       },
 
       initVertical = function() {
@@ -103,10 +101,10 @@
         el.each(function(i) {
           if(el[i].nodeName == "H2") {
             addToSlide = true;
-            numSlides++;
             if(slides != null)
               slides.append(slide);
-            slide = $("<div class='slide slide" + numSlides + "'></div>");
+            slide = $("<div id='slide" + numSlides + "' class='slide'></div>");
+            numSlides++;
             slideDiv = $("<div></div>");
             slide.append(slideDiv);
             slideDiv.append(el[i]);

@@ -10,6 +10,8 @@ class Cms {
 
   function __construct(DOMBuilder $domBuilder) {
     $this->domBuilder = $domBuilder;
+    error_log("CMS created:0",0);
+    error_log("CMS created:3",3,"aaa.log");
   }
 
   public function init() {
