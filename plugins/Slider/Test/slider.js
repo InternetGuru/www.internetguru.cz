@@ -1,6 +1,15 @@
 
 (function(win) {
 
+  var Config = {}
+
+  // default mode
+  Config.animationSpeed = 500; // ms
+  Config.leftArrow = "&lt;";
+  Config.rightArrow = "&gt;";
+  Config.arrowsLocation = "body"; // selector
+  Config.arrowsPrepend = false; // prepend (true) or append (false)
+
 
   /**
    * Slider object
@@ -20,6 +29,10 @@
       numSlides = 0,
       currentSlide = 0,
       slideHash = [],
+
+      isInt = function(n) {
+         return typeof n === 'number' && parseFloat(n) == parseInt(n, 10) && !isNaN(n);
+      },
 
       getLeftMargin = function() {
         var el = $("#slide" + currentSlide);
@@ -179,8 +192,28 @@
             initStructure();
             initSlides();
             fireEvents();
-         }
+         },
 
+         setAnimationSpeed: function(speed) {
+            if(!isInt(speed)) return;
+            Config.animationSpeed = speed;
+         },
+
+         setLeftArrow: function(arrow) {
+            Config.leftArrow = arrow;
+         },
+
+         setRightArrow: function(arrow) {
+            Config.leftArrow = arrow;
+         },
+
+         setArrowsLocation: function(selector) {
+            Config.arrowsLocation = selector;
+         },
+
+         setArrowsPrepend: function(prepend) {
+            Config.arrowsPrepend = prepend;
+         }
       }
    };
 
