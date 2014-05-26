@@ -1,5 +1,10 @@
 <?php
 
+/**
+ *
+ * TODO: ignored plugins in cfg
+ */
+
 class Cms {
 
   private $domBuilder; // DOMBuilder
