@@ -1,9 +1,2 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Cms>
-  <a>1</a>
-  <b>2</b>
-  <c>
-    <a>1</a>
-    <b>2</b>
-  </c>
-</Cms>
+<Cms />
