@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Content>
   <body lang="en">
-    <h title="def-title-short">Long default title</h>
+    <h title="def-title-short" link="somelink" id="h.someidxxxxxx" style="color:red">Long default title</h>
     <p>Some paragraph...</p>
     <section lang="en">
       <h>Subheading</h>
+      <p class="a">Another paragraph...</p>
+      <h>Subheading2</h>
+      <p>Another paragraph...</p>
+      <h>Subheading3</h>
       <p>Another paragraph...</p>
     </section>
   </body>
