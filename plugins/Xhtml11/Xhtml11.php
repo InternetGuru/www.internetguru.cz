@@ -58,11 +58,19 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   }
 
   public function addJsFile($fileName,$plugin = "",$priority = 10) {
-    $this->jsFiles[($plugin == "" ? "" : basename(PLUGIN_FOLDER) . "/$plugin/" ) . "$fileName"] = $priority;
+    $fileName = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . "$fileName";
+    if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
+    $this->jsFiles[$fileName] = $priority;
+  }
+
+  public function addCssFile($fileName,$plugin, $priority = 10) {
+    $fileName = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . "$fileName";
+    if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
+    $this->cssFiles[$fileName] = $priority;
   }
 
   private function addJsFiles() {
-    #todo: existence souboru
+    #todo: sort by priority
     foreach($this->jsFiles as $k => $p) {
       $content = "";
       if(is_numeric($k)) $content = $this->jsContent[$k];
@@ -73,12 +81,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     }
   }
 
-  public function addCssFile($fileName,$plugin, $priority = 10) {
-    $this->cssFiles[($plugin == "" ? "" : basename(PLUGIN_FOLDER) . "/$plugin/" ) . "$fileName"] = $priority;
-  }
-
   private function addCssFiles() {
-    #todo: existence souboru
+    #todo: sort by priority
     foreach($this->cssFiles as $f => $p) {
       $e = $this->head->ownerDocument->createElement("link");
       $e->setAttribute("type","text/css");

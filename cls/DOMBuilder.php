@@ -30,7 +30,6 @@ class DOMBuilder {
     // create DOM from default config xml (Cms root or Plugin dir)
     if($path == "Cms") $fileName = "$path.$ext";
     else $fileName = PLUGIN_FOLDER . "/$path/$path.$ext";
-
     if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
 
     if(!@$doc->load($fileName)) {
