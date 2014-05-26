@@ -5,20 +5,27 @@ ini_set("display_errors", 1);
 
 # Global constants
 
-define('SOURCE_FOLDER', __DIR__ . '/src'); // where objects and other src are stored
-define('ADMIN_FOLDER', __DIR__ . '/adm'); // where admin cfg xml files are stored
-define('USER_FOLDER', __DIR__ . '/usr'); // where user cfg xml files are stored
-define('PLUGIN_FOLDER', __DIR__ . '/plugins'); // where plugins are stored
-define('BACKUP_FOLDER', __DIR__ . '/bck'); // where user backup files are stored
+define('CMS_FOLDER', "cms");
+define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
+define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
+define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
+define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
+#define('BACKUP_FOLDER', 'bck'); // where user backup files are stored
 
 /**
  * Autoload classes from source folder
  */
 function __autoload($className) {
-  if(is_file(SOURCE_FOLDER . "/$className.php"))
-    include SOURCE_FOLDER . "/$className.php";
-  else
+  if(is_file(CLASS_FOLDER . "/$className.php"))
+    include CLASS_FOLDER . "/$className.php";
+  elseif(is_file(PLUGIN_FOLDER . "/$className/$className.php"))
     include PLUGIN_FOLDER . "/$className/$className.php";
+  elseif(is_file("../" . CMS_FOLDER . "/". CLASS_FOLDER . "/$className.php"))
+    include "../" . CMS_FOLDER . "/". CLASS_FOLDER . "/$className.php";
+  elseif(is_file("../" . CMS_FOLDER . "/". PLUGIN_FOLDER . "/$className/$className.php"))
+    include "../" . CMS_FOLDER . "/". PLUGIN_FOLDER . "/$className/$className.php";
+  else
+    throw new Exception("Unable to find class $className");
 }
 
 try {
@@ -47,7 +54,7 @@ try {
 
 } catch(Exception $e) {
 
-  echo "Exception: ".$e->getMessage();
+  echo "Exception: ".$e->getMessage()." in ".$e->getFile()." @ ".$e->getLine();
 
 }
 
