@@ -15,7 +15,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
 
   public function output(Cms $cms) {
     $body = $this->transformBody($cms->getContent());
-    $lang = $cms->getBodyLang();
+    $lang = $cms->getLanguage();
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
@@ -38,7 +38,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $html->appendChild($this->head);
     $this->head->appendChild($doc->createElement("title",$cms->getTitle()));
     $this->addMeta("Content-Type","text/html; charset=utf-8");
-    $this->addMeta("Content-Language", "cs");
+    $this->addMeta("Content-Language", $lang);
     $this->addJsFiles();
     $this->addCssFiles();
 

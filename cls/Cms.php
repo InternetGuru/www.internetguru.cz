@@ -30,17 +30,12 @@ class Cms {
   #public function getStructure() {}
 
   public function getTitle() {
-
-    // if HP
-    $this->content->getElementsByTagName("h")->item(0)->nodeValue;
-
-    // else add path (attr title if exists)
-    #if($h->item(0)->hasAttribute("title"))
-    #  $h->item(0)->getAttribute("title");
-
+    $h = $this->content->getElementsByTagName("h")->item(0);
+    if($h->hasAttribute("short")) return $h->getAttribute("short");
+    return $h->nodeValue;
   }
 
-  public function getBodyLang() {
+  public function getLanguage() {
     $h = $this->content->getElementsByTagName("body");
     return $h->item(0)->getAttribute("lang");
   }
