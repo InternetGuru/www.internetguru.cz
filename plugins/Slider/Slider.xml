@@ -2,7 +2,7 @@
 <Slider>
   <resources readonly="readonly">
     <jsLib absolute="absolute">lib/jquery-2.1.1.min.js</jsLib>
-    <setCss>Slider.css</setCss>
+    <setCss>slider.css</setCss>
   </resources>
   <parameters>
     <setAnimationSpeed>1000</setAnimationSpeed>

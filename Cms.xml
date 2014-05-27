@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Cms />
+<Cms>
+  <stylesheets>
+    <stylesheet>cms-basic.css</stylesheet>
+    <stylesheet media="print">cms-print.css</stylesheet>
+  </stylesheets>
+  <plugins all="allow">
+    <plugin>Slider</plugin>
+  </plugins>
+</Cms>
