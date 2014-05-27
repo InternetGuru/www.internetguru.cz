@@ -1,0 +1,26 @@
+
+body {
+  overflow-x: hidden;
+}
+
+#slider {
+  width: 100%;
+}
+
+#slides {
+  display: flex;
+}
+
+.slide {
+}
+
+.slide > div {
+  /*max-width: 60em;*/
+}
+
+.active {
+}
+
+.slider-arrow-left, .slider-arrow-right {
+  cursor: pointer;
+}
