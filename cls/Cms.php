@@ -13,8 +13,8 @@ class Cms {
   private $outputStrategy; // OutputStrategyInterface
   #private const $page;
 
-  function __construct(DOMBuilder $domBuilder) {
-    $this->domBuilder = $domBuilder;
+  function __construct() {
+    $this->domBuilder = new DOMBuilder();;
     #error_log("CMS created:0",0);
     #error_log("CMS created:3",3,"aaa.log");
   }

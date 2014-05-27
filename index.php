@@ -31,8 +31,7 @@ function __autoload($className) {
 try {
 
   // register core variables
-  $domBuilder = new DOMBuilder();
-  $cms = new Cms($domBuilder);
+  $cms = new Cms();
   $plugins = new Plugins($cms);
 
   // notify plugins, status init
