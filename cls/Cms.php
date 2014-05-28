@@ -20,11 +20,15 @@ class Cms {
   }
 
   public function init() {
-      $config = $this->domBuilder->build();
+      $this->config = $this->domBuilder->build();
   }
 
-  public function getDOMBuilder() {
-    return $this->domBuilder;
+  public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
+    $this->domBuilder->setBackupStrategy($backupStrategy);
+  }
+
+  public function getDOM($plugin,$ext="xml") {
+    return $this->domBuilder->build($plugin,$ext);
   }
 
   #public function getStructure() {}

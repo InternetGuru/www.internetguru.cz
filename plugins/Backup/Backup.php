@@ -4,7 +4,7 @@ class Backup implements SplObserver, BackupStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "preinit") {
-      $subject->getCms()->getDOMBuilder()->setBackupStrategy($this);
+      $subject->getCms()->setBackupStrategy($this);
     }
   }
 

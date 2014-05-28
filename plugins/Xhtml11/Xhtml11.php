@@ -99,7 +99,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   }
 
   private function transformBody(DOMDocument $dom) {
-    $xsl = $this->subject->getCms()->getDOMBuilder()->build("Xhtml11","xsl");
+    $xsl = $this->subject->getCms()->getDOM("Xhtml11","xsl");
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $output = $proc->transformToDoc($dom);

@@ -4,7 +4,4 @@
     <stylesheet>cms-basic.css</stylesheet>
     <stylesheet media="print">cms-print.css</stylesheet>
   </stylesheets>
-  <plugins all="allow">
-    <plugin>Slider</plugin>
-  </plugins>
 </Cms>
