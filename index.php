@@ -3,10 +3,12 @@
 /**
  * TODOS:
  * - plugin subset @localhost (@vps)
+ * - errory @localhost, @dev
+ * - timezone...
+ *
  */
-
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+#error_reporting(E_ALL);
+#ini_set("display_errors", 1);
 
 # Global constants
 

@@ -62,14 +62,14 @@ class DOMBuilder {
     }
   }
 
-  private function updateDom($doc,$filePath,$ignoreReadonly=true) {
+  private function updateDom(DOMDOcument $doc,$filePath,$ignoreReadonly=true) {
     if(!is_string($filePath)) throw new Exception('Variable type: not string.');
 
     if(!is_file($filePath)) return; // file is optional
     if(!filesize($filePath)) return; // file can be empty
-    $doc = new DOMDocument();
-    $this->loadToDoc($doc,$filePath);
-    $nodes = $doc->firstChild->childNodes;
+    $tempDoc = new DOMDocument();
+    $this->loadToDoc($tempDoc,$filePath);
+    $nodes = $tempDoc->firstChild->childNodes;
     $xPath = new DOMXPath($doc);
 
     for($i = 0; $i < $nodes->length; $i++) {
