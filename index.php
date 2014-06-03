@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * TODOS:
+ * - plugin subset @localhost (@vps)
+ */
+
 error_reporting(E_ALL);
 ini_set("display_errors", 1);
 
@@ -10,7 +15,6 @@ define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
-#define('BACKUP_FOLDER', 'bck'); // where user backup files are stored
 
 /**
  * Autoload classes from source folder

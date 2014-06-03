@@ -28,35 +28,47 @@ class DOMBuilder {
     if(self::DEBUG) $doc->formatOutput = true;
 
     // create DOM from default config xml (Cms root or Plugin dir)
-    if($path == "Cms") $fileName = "$path.$ext";
-    else $fileName = PLUGIN_FOLDER . "/$path/$path.$ext";
-    if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
+    if($path == "Cms") $filePath = "$path.$ext";
+    else $filePath = PLUGIN_FOLDER . "/$path/$path.$ext";
+    if(!is_file($filePath)) $filePath = "../" . CMS_FOLDER . "/$filePath";
 
-    if(!@$doc->load($fileName)) {
-      throw new Exception(sprintf('Unable to load XML file %s',$fileName));
-    }
+    $this->loadToDoc($doc,$filePath);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
     // update DOM by admin data (all of them)
-    self::updateDom($doc,ADMIN_FOLDER."/$path.$ext");
+    $this->updateDom($doc,ADMIN_FOLDER."/$path.$ext");
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
     // update DOM by user data (except readonly)
-    self::updateDom($doc,USER_FOLDER."/$path.$ext",false);
+    $this->updateDom($doc,USER_FOLDER."/$path.$ext",false);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
     return $doc;
 
   }
 
-  private function updateDom(&$doc,$pathFile,$ignoreReadonly=true) {
-    if(!is_string($pathFile)) throw new Exception('Variable type: not string.');
+  private function loadToDoc(DOMDocument $doc,$filePath) {
+    if(@$doc->load($filePath)) {
+      if($this->backupStrategy !== null) {
+        $this->backupStrategy->doBackup($filePath);
+      }
+    } elseif($this->backupStrategy !== null) {
+      $this->backupStrategy->restoreNewestBackup($filePath);
+      if(!@$doc->load($filePath)) {
+        throw new Exception(sprintf('Unable to load restored XML file %s',$filePath));
+      }
+    } else {
+      throw new Exception(sprintf('Unable to load XML file %s',$filePath));
+    }
+  }
 
-    if(!is_file($pathFile)) return; // file is optional
-    if(!filesize($pathFile)) return; // file can be empty
+  private function updateDom($doc,$filePath,$ignoreReadonly=true) {
+    if(!is_string($filePath)) throw new Exception('Variable type: not string.');
+
+    if(!is_file($filePath)) return; // file is optional
+    if(!filesize($filePath)) return; // file can be empty
     $doc = new DOMDocument();
-    if(!@$doc->load($pathFile))
-      throw new Exception('Unable to load XML file.');
+    $this->loadToDoc($doc,$filePath);
     $nodes = $doc->firstChild->childNodes;
     $xPath = new DOMXPath($doc);
 
@@ -77,8 +89,8 @@ class DOMBuilder {
 }
 
 interface BackupStrategyInterface {
-    public function backupFile($file);
-    public function restoreFile($file);
+    public function doBackup($filePath);
+    public function restoreNewestBackup($filePath);
 }
 
 ?>
