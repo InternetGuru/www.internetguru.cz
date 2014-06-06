@@ -34,13 +34,14 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $doc->appendChild($html);
 
     // add head element
-    $this->head = $doc->createElement("head");
-    $html->appendChild($this->head);
-    $this->head->appendChild($doc->createElement("title",$cms->getTitle()));
-    $this->addMeta("Content-Type","text/html; charset=utf-8");
-    $this->addMeta("Content-Language", $lang);
-    $this->addJsFiles();
-    $this->addCssFiles();
+    $head = $doc->createElement("head");
+    $head->appendChild($doc->createElement("title",$cms->getTitle()));
+    $this->appendMetaElement($head,"Content-Type","text/html; charset=utf-8");
+    $this->appendMetaElement($head,"Content-Language", $lang);
+    $this->appendMetaElement($head,"description", $cms->getDescription());
+    $this->appendJsFiles($head);
+    $this->appendCssFiles($head);
+    $html->appendChild($head);
 
     // add body element
     $body = $doc->importNode($body->documentElement,true);
@@ -50,11 +51,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     return $doc->saveXML();
   }
 
-  private function addMeta($nameValue,$contentValue,$httpEquiv=false) {
-    $meta = $this->head->ownerDocument->createElement("meta");
+  private function appendMetaElement(DOMElement $e,$nameValue,$contentValue,$httpEquiv=false) {
+    $meta = $e->ownerDocument->createElement("meta");
     $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"),$nameValue);
     $meta->setAttribute("content",$contentValue);
-    $this->head->appendChild($meta);
+    $e->appendChild($meta);
   }
 
   public function addJsFile($fileName,$plugin = "",$priority = 10) {
@@ -74,28 +75,28 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $this->cssMedia[$fileName] = $media;
   }
 
-  private function addJsFiles() {
+  private function appendJsFiles(DOMElement $parent) {
     #todo: sort by priority
     foreach($this->jsFiles as $k => $p) {
       $content = "";
       if(is_numeric($k)) $content = $this->jsContent[$k];
-      $e = $this->head->ownerDocument->createElement("script",$content);
+      $e = $parent->ownerDocument->createElement("script",$content);
       $e->setAttribute("type","text/javascript");
       if(!is_numeric($k)) $e->setAttribute("src",$k);
-      $this->head->appendChild($e);
+      $parent->appendChild($e);
     }
   }
 
-  private function addCssFiles() {
+  private function appendCssFiles(DOMElement $parent) {
     #todo: sort by priority
     foreach($this->cssFiles as $f => $p) {
-      $e = $this->head->ownerDocument->createElement("link");
+      $e = $parent->ownerDocument->createElement("link");
       $e->setAttribute("type","text/css");
       $e->setAttribute("rel","stylesheet");
       $e->setAttribute("href",$f);
       if(isset($this->cssMedia[$f])) $e->setAttribute("media",$this->cssMedia[$f]);
-      $this->head->appendChild($e);
-      #$this->head->appendChild(new DOMComment("test"));
+      $parent->appendChild($e);
+      #$parent->appendChild(new DOMComment("test"));
     }
   }
 

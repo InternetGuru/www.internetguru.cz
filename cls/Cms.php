@@ -48,6 +48,10 @@ class Cms {
     return $h->nodeValue;
   }
 
+  public function getDescription() {
+    return $this->content->getElementsByTagName("description")->item(0)->nodeValue;
+  }
+
   public function getLanguage() {
     $h = $this->content->getElementsByTagName("body");
     return $h->item(0)->getAttribute("lang");
