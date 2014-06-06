@@ -20,13 +20,15 @@ class Backup implements SplObserver, BackupStrategyInterface {
   }
 
   private function getNewestBackupFileName($dirName,$fileName) {
-    foreach(scandir($dirName,SCANDIR_SORT_DESCENDING) as $backupFileName) {
-      if(!is_file($dirName ."/". $backupFileName)) continue;
-      if(strpos($backupFileName,$fileName.self::BACKUP_FILENAME_SEPARATOR) === 0) {
-        return $backupFileName;
+    if(is_dir($dirName)) {
+      foreach(scandir($dirName,SCANDIR_SORT_DESCENDING) as $backupFileName) {
+        if(!is_file($dirName ."/". $backupFileName)) continue;
+        if(strpos($backupFileName,$fileName.self::BACKUP_FILENAME_SEPARATOR) === 0) {
+          return $backupFileName;
+        }
       }
     }
-    throw new Exception("Unable to find backup of $filePath");
+    throw new Exception("Unable to find backup of $fileName");
   }
 
   public function update(SplSubject $subject) {

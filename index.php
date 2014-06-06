@@ -7,16 +7,26 @@
  * - timezone...
  *
  */
-#error_reporting(E_ALL);
-#ini_set("display_errors", 1);
+if(isAtLocalhost()) {
+  error_reporting(E_ALL);
+  ini_set("display_errors", 1);
+}
 
 # Global constants
-
 define('CMS_FOLDER', "cms");
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
+
+function isAtLocalhost() {
+  if($_SERVER["REMOTE_ADDR"] == "127.0.0.1"
+  || substr($_SERVER["REMOTE_ADDR"],0,8) == "192.168."
+  || substr($_SERVER["REMOTE_ADDR"],0,3) == "10.") {
+    return true;
+  }
+  return false;
+}
 
 /**
  * Autoload classes from source folder
