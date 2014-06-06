@@ -63,10 +63,15 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $this->jsFiles[$fileName] = $priority;
   }
 
-  public function addCssFile($fileName,$plugin, $priority = 10) {
+  public function addCssFile($fileName,$plugin = "", $priority = 10) {
     $fileName = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . "$fileName";
     if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
     $this->cssFiles[$fileName] = $priority;
+  }
+
+  public function setCssMedia($fileName,$media) {
+    if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
+    $this->cssMedia[$fileName] = $media;
   }
 
   private function addJsFiles() {
@@ -88,7 +93,9 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
       $e->setAttribute("type","text/css");
       $e->setAttribute("rel","stylesheet");
       $e->setAttribute("href",$f);
+      if(isset($this->cssMedia[$f])) $e->setAttribute("media",$this->cssMedia[$f]);
       $this->head->appendChild($e);
+      #$this->head->appendChild(new DOMComment("test"));
     }
   }
 

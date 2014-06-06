@@ -20,7 +20,16 @@ class Cms {
   }
 
   public function init() {
-      $this->config = $this->domBuilder->build();
+    $this->config = $this->domBuilder->build();
+  }
+
+  private function addStylesheets() {
+    foreach($this->config->getElementsByTagName("stylesheet") as $css) {
+      $this->outputStrategy->addCssFile($css->nodeValue);
+      if($css->hasAttribute("media")) {
+        $this->outputStrategy->setCssMedia($css->nodeValue,$css->getAttribute("media"));
+      }
+    }
   }
 
   public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
@@ -54,6 +63,7 @@ class Cms {
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
     $this->outputStrategy = $strategy;
+    $this->addStylesheets();
   }
 
   public function setContent(DOMDocument $content) {
