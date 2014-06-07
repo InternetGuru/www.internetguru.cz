@@ -1,23 +1,30 @@
 <?php
 
-/**
- * TODOS:
- * - plugin subset @localhost (@vps)
- * - errory @localhost, @dev
- * - timezone...
- *
- */
-if(isAtLocalhost()) {
-  error_reporting(E_ALL);
-  ini_set("display_errors", 1);
-}
+// --------------------------------------------------------------------
+// TODOS
+// --------------------------------------------------------------------
 
-# Global constants
+# plugin subset when run from a common core
+# parameter error reporting (dev/prod)
+# log warnings and errors (plugin)
+# e-mail errors (plugin)
+
+
+// --------------------------------------------------------------------
+// GLOBAL CONSTANTS
+// --------------------------------------------------------------------
+
 define('CMS_FOLDER', "cms");
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
+define('TIMEZONE', 'Europe/Prague');
+
+
+// --------------------------------------------------------------------
+// GLOBAL FUNCTIONS
+// --------------------------------------------------------------------
 
 function isAtLocalhost() {
   if($_SERVER["REMOTE_ADDR"] == "127.0.0.1"
@@ -28,9 +35,6 @@ function isAtLocalhost() {
   return false;
 }
 
-/**
- * Autoload classes from source folder
- */
 function __autoload($className) {
   if(is_file(CLASS_FOLDER . "/$className.php"))
     include CLASS_FOLDER . "/$className.php";
@@ -43,6 +47,22 @@ function __autoload($className) {
   else
     throw new Exception("Unable to find class $className");
 }
+
+
+// --------------------------------------------------------------------
+// ENVIRONMENT SETUP
+// --------------------------------------------------------------------
+
+date_default_timezone_set(TIMEZONE);
+if(isAtLocalhost()) {
+  error_reporting(E_ALL);
+  ini_set("display_errors", 1);
+}
+
+
+// --------------------------------------------------------------------
+// CORE
+// --------------------------------------------------------------------
 
 try {
 
@@ -69,7 +89,7 @@ try {
 
 } catch(Exception $e) {
 
-  echo "Exception: ".$e->getMessage()." in ".$e->getFile()." @ ".$e->getLine();
+  echo "Exception: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
 
 }
 
