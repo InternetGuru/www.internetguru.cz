@@ -18,8 +18,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    */
   public function output() {
     $cms = $this->subject->getCms();
-    $body = $this->transformBody($cms);
     $lang = $cms->getLanguage();
+    $title = $cms->getTitle();
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
@@ -39,7 +39,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
 
     // add head element
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title",$cms->getTitle()));
+    $head->appendChild($doc->createElement("title",$title));
     $this->appendMetaElement($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMetaElement($head,"Content-Language", $lang);
     $this->appendMetaElement($head,"description", $cms->getDescription());
@@ -47,7 +47,12 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $this->appendCssFiles($head);
     $html->appendChild($head);
 
-    // add body element
+    // transform content and add as body element
+    $xsl = $cms->getDOM("Xhtml11","xsl");
+    $proc = new XSLTProcessor();
+    $proc->importStylesheet($xsl);
+    $body = $proc->transformToDoc($cms->getContent());
+    $body->encoding="utf-8";
     $body = $doc->importNode($body->documentElement,true);
     $html->appendChild($body);
 
@@ -148,20 +153,6 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
       $parent->appendChild($e);
       #$parent->appendChild(new DOMComment("test"));
     }
-  }
-
-  /**
-   * Transform HTML+ into XHTML 1.1 body (XSLT)
-   * @param  DOMDocument $dom [description]
-   * @return [type]           [description]
-   */
-  private function transformBody(Cms $cms) {
-    $xsl = $cms->getDOM("Xhtml11","xsl");
-    $proc = new XSLTProcessor();
-    $proc->importStylesheet($xsl);
-    $output = $proc->transformToDoc($cms->getContent());
-    $output->encoding="utf-8";
-    return $output;
   }
 
 }
