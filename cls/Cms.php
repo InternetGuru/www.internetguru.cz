@@ -91,7 +91,7 @@ class Cms {
 }
 
 interface OutputStrategyInterface {
-    public function output(Cms $cms);
+    public function output();
 }
 
 ?>

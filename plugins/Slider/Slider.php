@@ -31,7 +31,7 @@ class Slider implements SplObserver {
       $setters[$r->nodeName] = "Slider." . $r->nodeName . "('" . $r->nodeValue . "');";
     }
     $this->cms->getOutputStrategy()->addJsFile("Slider.js","Slider");
-    $this->cms->getOutputStrategy()->addJs(implode($setters));
+    $this->cms->getOutputStrategy()->addJs(implode($setters),20);
   }
 
 }

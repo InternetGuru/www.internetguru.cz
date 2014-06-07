@@ -1,7 +1,6 @@
 <?php
 
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
-  private $head;
   private $subject; // SplSubject
   private $jsFiles = array(); // String filename => Int priority
   private $cssFiles = array(); // String filename => Int priority
@@ -13,8 +12,13 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     }
   }
 
-  public function output(Cms $cms) {
-    $body = $this->transformBody($cms->getContent());
+  /**
+   * Create XHTML 1.1 output from HTML+ content and own registers (JS/CSS)
+   * @return void
+   */
+  public function output() {
+    $cms = $this->subject->getCms();
+    $body = $this->transformBody($cms);
     $lang = $cms->getLanguage();
 
     // create output DOM with doctype
@@ -51,6 +55,14 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     return $doc->saveXML();
   }
 
+  /**
+   * Append meta element to an element (supposed head)
+   * @param  DOMElement $e            Element to which meta is to be appended
+   * @param  string     $nameValue    Value of attribute name/http-equiv
+   * @param  string     $contentValue Value of attribute content
+   * @param  boolean    $httpEquiv    Use attr. http-equiv instead of name
+   * @return void
+   */
   private function appendMetaElement(DOMElement $e,$nameValue,$contentValue,$httpEquiv=false) {
     $meta = $e->ownerDocument->createElement("meta");
     $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"),$nameValue);
@@ -58,25 +70,58 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $e->appendChild($meta);
   }
 
+  /**
+   * Add unique JS file into register with priority
+   * @param string  $fileName JS file to be registered
+   * @param string  $plugin   Plugin name (no plugin by default)
+   * @param integer $priority The higher priority the lower appearance
+   */
   public function addJsFile($fileName,$plugin = "",$priority = 10) {
     $fileName = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . "$fileName";
     if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
     $this->jsFiles[$fileName] = $priority;
   }
 
+  /**
+   * Add JS (as a string) into register with priority
+   * @param string  $content  JS to be added
+   * @param integer $priority The higher priority the lower appearance
+   */
+  public function addJs($content,$priority = 10) {
+    $this->jsFiles[] = $priority;
+    end($this->jsFiles);
+    $this->jsContent[key($this->jsFiles)] = $content;
+  }
+
+  /**
+   * Add unique CSS file into register with priority
+   * @param string  $fileName JS file to be registered
+   * @param string  $plugin   Plugin name (no plugin by default)
+   * @param integer $priority The higher priority the lower appearance
+   */
   public function addCssFile($fileName,$plugin = "", $priority = 10) {
     $fileName = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . "$fileName";
     if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
     $this->cssFiles[$fileName] = $priority;
   }
 
+  /**
+   * Set media attribute for a specific CSS file
+   * @param string $fileName CSS file name (eg. style.css)
+   * @param string $media    Attribute media value (eg. print, all, screen)
+   */
   public function setCssMedia($fileName,$media) {
     if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
     $this->cssMedia[$fileName] = $media;
   }
 
+  /**
+   * Append all registered JS files into a parent (usually head)
+   * @param  DOMElement $parent Element to append JS files to
+   * @return void
+   */
   private function appendJsFiles(DOMElement $parent) {
-    #todo: sort by priority
+    asort($this->jsFiles);
     foreach($this->jsFiles as $k => $p) {
       $content = "";
       if(is_numeric($k)) $content = $this->jsContent[$k];
@@ -87,8 +132,13 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     }
   }
 
+  /**
+   * Append all registered CSS files into a parent (usually head)
+   * @param  DOMElement $parent Element to append JS files to
+   * @return void
+   */
   private function appendCssFiles(DOMElement $parent) {
-    #todo: sort by priority
+    asort($this->cssFiles);
     foreach($this->cssFiles as $f => $p) {
       $e = $parent->ownerDocument->createElement("link");
       $e->setAttribute("type","text/css");
@@ -100,17 +150,16 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     }
   }
 
-  public function addJs($content,$priority = 10) {
-    $this->jsFiles[] = $priority;
-    end($this->jsFiles);
-    $this->jsContent[key($this->jsFiles)] = $content;
-  }
-
-  private function transformBody(DOMDocument $dom) {
-    $xsl = $this->subject->getCms()->getDOM("Xhtml11","xsl");
+  /**
+   * Transform HTML+ into XHTML 1.1 body (XSLT)
+   * @param  DOMDocument $dom [description]
+   * @return [type]           [description]
+   */
+  private function transformBody(Cms $cms) {
+    $xsl = $cms->getDOM("Xhtml11","xsl");
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
-    $output = $proc->transformToDoc($dom);
+    $output = $proc->transformToDoc($cms->getContent());
     $output->encoding="utf-8";
     return $output;
   }
