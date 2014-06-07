@@ -6,7 +6,7 @@
  * Default XML file is required (plugins do not have to use Config at all).
  *
  * @param: String plugin (optional)
- * @usage: $config = $this->domBuilder->build();
+ * @useage: $config = $this->domBuilder->build();
  * @return: DOMDocument
  * @throws: Exception when files don't exist or are corrupted/empty
  */

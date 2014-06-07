@@ -19,7 +19,6 @@ define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
-define('TIMEZONE', 'Europe/Prague');
 
 
 // --------------------------------------------------------------------
@@ -46,17 +45,6 @@ function __autoload($className) {
     include "../" . CMS_FOLDER . "/". PLUGIN_FOLDER . "/$className/$className.php";
   else
     throw new Exception("Unable to find class $className");
-}
-
-
-// --------------------------------------------------------------------
-// ENVIRONMENT SETUP
-// --------------------------------------------------------------------
-
-date_default_timezone_set(TIMEZONE);
-if(isAtLocalhost()) {
-  error_reporting(E_ALL);
-  ini_set("display_errors", 1);
 }
 
 

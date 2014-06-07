@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Cms>
+  <error_reporting readonly="readonly">E_ERROR</error_reporting>
+  <timezone readonly="readonly">Europe/Prague</timezone>
   <defaultStyles>
     <stylesheet>cms-basic.css</stylesheet>
     <stylesheet media="print">cms-print.css</stylesheet>

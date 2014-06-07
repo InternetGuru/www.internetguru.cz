@@ -1,17 +1,11 @@
 <?php
 
-/**
- *
- * TODO: ignored plugins in cfg
- */
-
 class Cms {
 
   private $domBuilder; // DOMBuilder
   private $config; // DOMDocument
   private $content; // DOMDocument
   private $outputStrategy; // OutputStrategyInterface
-  #private const $page;
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();;
@@ -21,6 +15,17 @@ class Cms {
 
   public function init() {
     $this->config = $this->domBuilder->build();
+    $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
+    if(@constant($er) === null) // keep outside if to check value
+      throw new Exception("Undefined constatnt '$er' used in error_reporting.");
+    if(!isAtLocalhost()) {
+      error_reporting(E_ALL);
+      ini_set("display_errors", 1);
+    } else {
+      error_reporting(constant($er));
+    }
+    $tz = $this->config->getElementsByTagName("timezone")->item(0)->nodeValue;
+    date_default_timezone_set($tz);
   }
 
   private function addStylesheets() {
