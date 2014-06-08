@@ -5,7 +5,6 @@
 // --------------------------------------------------------------------
 
 # plugin subset when run from a common core
-# parameter error reporting (dev/prod)
 # log warnings and errors (plugin)
 # e-mail errors (plugin)
 
