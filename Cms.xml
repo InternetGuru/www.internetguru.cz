@@ -5,12 +5,10 @@
   <timezone readonly="readonly">Europe/Prague</timezone>
 
   <!-- environmental DEV -->
-  <error_reporting match="dev" />
-  <error_reporting match="dev">E_ALL</error_reporting>
+  <error_reporting subdom="dev localhost" />
+  <error_reporting subdom="dev localhost">E_ALL</error_reporting>
 
   <!-- visual -->
   <stylesheet readonly="readonly">cms-basic.css</stylesheet>
   <stylesheet media="print">cms-print.css</stylesheet>
-  <stylesheet subdom="dev" />
-  <stylesheet subdom="dev">aaa.css</stylesheet>
 </Cms>

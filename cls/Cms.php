@@ -25,7 +25,7 @@ class Cms {
     $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
     if(@constant($er) === null) // keep outside if to check value
       throw new Exception("Undefined constatnt '$er' used in error_reporting.");
-    if(!isAtLocalhost()) {
+    if(isAtLocalhost()) {
       error_reporting(E_ALL);
       ini_set("display_errors", 1);
     } else {
