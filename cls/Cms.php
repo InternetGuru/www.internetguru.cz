@@ -4,8 +4,9 @@ class Cms {
 
   private $domBuilder; // DOMBuilder
   private $config; // DOMDocument
-  private $content; // DOMDocument
-  private $outputStrategy; // OutputStrategyInterface
+  private $content = null; // DOMDocument
+  private $outputStrategy = null; // OutputStrategyInterface
+  private $contentStrategy = null; // OutputStrategyInterface
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();;
@@ -67,6 +68,7 @@ class Cms {
   }
 
   public function getContent() {
+    if(!is_null($this->contentStrategy)) return $this->contentStrategy->getContent();
     return $this->content;
   }
 
@@ -84,9 +86,9 @@ class Cms {
   }
 
   public function getOutput() {
-    if(!isset($this->content)) throw new Exception("Content not set");
-    if(!isset($this->outputStrategy)) return $this->content->getDoc()->saveXML();
-    return $this->outputStrategy->output($this);
+    if(is_null($this->content)) throw new Exception("Content not set");
+    if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput();
+    return $this->getContent()->saveXML();
   }
 
   public function getOutputStrategy() {
@@ -96,7 +98,7 @@ class Cms {
 }
 
 interface OutputStrategyInterface {
-    public function output();
+    public function getOutput();
 }
 
 ?>
