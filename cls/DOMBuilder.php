@@ -11,7 +11,7 @@
  */
 class DOMBuilder {
 
-  const DEBUG = false;
+  const DEBUG = true;
   private $backupStrategy = null;
 
   public function __construct() {}

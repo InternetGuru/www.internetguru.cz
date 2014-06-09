@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Cms>
+  <!-- environmental -->
   <error_reporting readonly="readonly">E_ERROR</error_reporting>
   <timezone readonly="readonly">Europe/Prague</timezone>
-  <defaultStyles>
-    <stylesheet>cms-basic.css</stylesheet>
-    <stylesheet media="print">cms-print.css</stylesheet>
-  </defaultStyles>
-  <userStyles />
+
+  <!-- environmental DEV -->
+  <error_reporting match="dev" />
+  <error_reporting match="dev">E_ALL</error_reporting>
+
+  <!-- visual -->
+  <stylesheet readonly="readonly">cms-basic.css</stylesheet>
+  <stylesheet media="print">cms-print.css</stylesheet>
+  <stylesheet subdom="dev" />
+  <stylesheet subdom="dev">aaa.css</stylesheet>
 </Cms>
