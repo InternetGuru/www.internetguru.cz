@@ -6,12 +6,18 @@ class Cms {
   private $config; // DOMDocument
   private $content = null; // DOMDocument
   private $outputStrategy = null; // OutputStrategyInterface
-  private $contentStrategy = null; // OutputStrategyInterface
+  private $contentStrategy = null; // ContentStrategyInterface
+  private $link = null;
 
   function __construct() {
-    $this->domBuilder = new DOMBuilder();;
+    $this->domBuilder = new DOMBuilder();
+    if(isset($_GET["page"])) $this->link = $_GET["page"]; // todo: linkStrategy
     #error_log("CMS created:0",0);
     #error_log("CMS created:3",3,"aaa.log");
+  }
+
+  public function getLink() {
+    return $this->link;
   }
 
   public function init() {
@@ -68,8 +74,12 @@ class Cms {
   }
 
   public function getContent() {
-    if(!is_null($this->contentStrategy)) return $this->contentStrategy->getContent();
+    if(!is_null($this->contentStrategy)) return $this->contentStrategy->getContent($this->content);
     return $this->content;
+  }
+
+  public function setContentStrategy(ContentStrategyInterface $strategy) {
+    $this->contentStrategy = $strategy;
   }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
@@ -98,7 +108,11 @@ class Cms {
 }
 
 interface OutputStrategyInterface {
-    public function getOutput();
+  public function getOutput();
+}
+
+interface ContentStrategyInterface {
+  public function getContent(DOMDocument $content);
 }
 
 ?>
