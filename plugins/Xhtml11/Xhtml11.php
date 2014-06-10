@@ -82,9 +82,10 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($fileName,$plugin = "",$priority = 10) {
-    $fileName = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . "$fileName";
-    if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
-    $this->jsFiles[$fileName] = $priority;
+    $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
+    if(!is_file($f)) $f = "../" . CMS_FOLDER . "/$f";
+    if(!is_file($f)) $this->jsFiles[$fileName] = null;
+    else $this->jsFiles[$f] = $priority;
   }
 
   /**
@@ -105,9 +106,10 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($fileName,$plugin = "", $priority = 10) {
-    $fileName = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . "$fileName";
-    if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
-    $this->cssFiles[$fileName] = $priority;
+    $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
+    if(!is_file($f)) $f = "../" . CMS_FOLDER . $f;
+    if(!is_file($f)) $this->cssFiles[$fileName] = null;
+    else $this->cssFiles[$f] = $priority;
   }
 
   /**
@@ -128,11 +130,15 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private function appendJsFiles(DOMElement $parent) {
     asort($this->jsFiles);
     foreach($this->jsFiles as $k => $p) {
+      if(is_null($p)) {
+        $parent->appendChild(new DOMComment(" JS file '$f' not found "));
+        continue;
+      }
       $content = "";
       if(is_numeric($k)) $content = $this->jsContent[$k];
       $e = $parent->ownerDocument->createElement("script",$content);
       $e->setAttribute("type","text/javascript");
-      if(!is_numeric($k)) $e->setAttribute("src",$k);
+      if(!is_numeric($k)) $e->setAttribute("src","/$k");
       $parent->appendChild($e);
     }
   }
@@ -145,13 +151,16 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private function appendCssFiles(DOMElement $parent) {
     asort($this->cssFiles);
     foreach($this->cssFiles as $f => $p) {
+      if(is_null($p)) {
+        $parent->appendChild(new DOMComment(" CSS file '$f' not found "));
+        continue;
+      }
       $e = $parent->ownerDocument->createElement("link");
       $e->setAttribute("type","text/css");
       $e->setAttribute("rel","stylesheet");
-      $e->setAttribute("href",$f);
+      $e->setAttribute("href","/$f");
       if(isset($this->cssMedia[$f])) $e->setAttribute("media",$this->cssMedia[$f]);
       $parent->appendChild($e);
-      #$parent->appendChild(new DOMComment("test"));
     }
   }
 
