@@ -83,7 +83,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    */
   public function addJsFile($fileName,$plugin = "",$priority = 10) {
     $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
-    if(!is_file($f)) $f = "../" . CMS_FOLDER . "/$f";
+    if(!is_file($f)) $f = "../" . CMS_FOLDER . "/" . $f;
     if(!is_file($f)) $this->jsFiles[$fileName] = null;
     else $this->jsFiles[$f] = $priority;
   }
@@ -107,7 +107,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    */
   public function addCssFile($fileName,$plugin = "", $priority = 10) {
     $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
-    if(!is_file($f)) $f = "../" . CMS_FOLDER . $f;
+    if(!is_file($f)) $f = "../" . CMS_FOLDER . "/" . $f;
     if(!is_file($f)) $this->cssFiles[$fileName] = null;
     else $this->cssFiles[$f] = $priority;
   }
@@ -129,16 +129,16 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    */
   private function appendJsFiles(DOMElement $parent) {
     asort($this->jsFiles);
-    foreach($this->jsFiles as $k => $p) {
+    foreach($this->jsFiles as $f => $p) {
       if(is_null($p)) {
         $parent->appendChild(new DOMComment(" JS file '$f' not found "));
         continue;
       }
       $content = "";
-      if(is_numeric($k)) $content = $this->jsContent[$k];
+      if(is_numeric($f)) $content = $this->jsContent[$f];
       $e = $parent->ownerDocument->createElement("script",$content);
       $e->setAttribute("type","text/javascript");
-      if(!is_numeric($k)) $e->setAttribute("src","/$k");
+      if(!is_numeric($f)) $e->setAttribute("src",$this->getSubdom() . $f);
       $parent->appendChild($e);
     }
   }
@@ -158,10 +158,16 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
       $e = $parent->ownerDocument->createElement("link");
       $e->setAttribute("type","text/css");
       $e->setAttribute("rel","stylesheet");
-      $e->setAttribute("href","/$f");
+      $e->setAttribute("href",$this->getSubdom() ."/". $f);
       if(isset($this->cssMedia[$f])) $e->setAttribute("media",$this->cssMedia[$f]);
       $parent->appendChild($e);
     }
+  }
+
+  private function getSubdom() {
+    if(!isAtLocalhost()) return;
+    $d = explode("/", $_SERVER["SCRIPT_FILENAME"]);
+    return "/" . $d[3];
   }
 
 }
