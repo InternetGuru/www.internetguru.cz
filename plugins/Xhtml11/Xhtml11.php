@@ -16,7 +16,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * Create XHTML 1.1 output from HTML+ content and own registers (JS/CSS)
    * @return void
    */
-  public function getOutput() {
+  public function getOutput(DOMDocument $content) {
     $cms = $this->subject->getCms();
     $lang = $cms->getLanguage();
     $title = $cms->getTitle();
@@ -48,10 +48,10 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $html->appendChild($head);
 
     // transform content and add as body element
-    $xsl = $cms->getDOM("Xhtml11","xsl");
+    $xsl = $cms->buildDOM("Xhtml11","xsl");
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
-    $body = $proc->transformToDoc($cms->getContent());
+    $body = $proc->transformToDoc($content);
     $body->encoding="utf-8";
     $body = $doc->importNode($body->documentElement,true);
     $html->appendChild($body);

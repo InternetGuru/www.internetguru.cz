@@ -19,6 +19,7 @@ define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 
+#print_r($_SERVER);
 
 // --------------------------------------------------------------------
 // GLOBAL FUNCTIONS

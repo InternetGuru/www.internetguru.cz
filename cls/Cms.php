@@ -4,9 +4,10 @@ class Cms {
 
   private $domBuilder; // DOMBuilder
   private $config; // DOMDocument
+  private $contentFull = null; // DOMDocument
   private $content = null; // DOMDocument
   private $outputStrategy = null; // OutputStrategyInterface
-  private $contentStrategy = null; // ContentStrategyInterface
+  private $contentStrategy = array(); // ContentStrategyInterface
   private $link = null;
 
   function __construct() {
@@ -48,24 +49,40 @@ class Cms {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }
 
-  public function getDOM($plugin,$ext="xml") {
+  public function buildDOM($plugin,$ext="xml") {
     return $this->domBuilder->build($plugin,$ext);
   }
 
   #public function getStructure() {}
 
   public function getTitle() {
-    $h = $this->getContent()->getElementsByTagName("h")->item(0);
-    if($h->hasAttribute("short")) return $h->getAttribute("short");
-    return $h->nodeValue;
+    $queries = array("/body/h");
+    $title = array();
+    // add queries using strategies
+    foreach($this->contentStrategy as $cs) {
+      $queries = $cs->getTitle($queries);
+    }
+    // execute queries
+    $xpath = new DOMXPath($this->contentFull);
+    foreach($queries as $q) {
+      $r = $xpath->query($q)->item(0);
+      if($r->hasAttribute("short")) $title[] = $r->getAttribute("short");
+      else $title[] = $r->nodeValue;
+    }
+    return implode(" - ",$title);
   }
 
   public function getDescription() {
-    return $this->getContent()->getElementsByTagName("description")->item(0)->nodeValue;
+    $query = "/body/description";
+    foreach($this->contentStrategy as $cs) {
+      $query = $cs->getDescription($query);
+    }
+    $xpath = new DOMXPath($this->contentFull);
+    return $xpath->query($query)->item(0)->nodeValue;
   }
 
   public function getLanguage() {
-    $h = $this->content->getElementsByTagName("body");
+    $h = $this->contentFull->getElementsByTagName("body");
     return $h->item(0)->getAttribute("lang");
   }
 
@@ -73,13 +90,23 @@ class Cms {
     return $this->config;
   }
 
-  public function getContent() {
-    if(!is_null($this->contentStrategy)) return $this->contentStrategy->getContent($this->content);
-    return $this->content;
+  public function getContentFull() {
+    return $this->contentFull;
   }
 
-  public function setContentStrategy(ContentStrategyInterface $strategy) {
-    $this->contentStrategy = $strategy;
+  private function getContent() {
+    if(!is_null($this->content)) return $this->content;
+    $tmpContent = $this->contentFull;
+    ksort($this->contentStrategy);
+    foreach($this->contentStrategy as $cs) {
+      $tmpContent = $cs->getContent($tmpContent);
+    }
+    $this->content = $tmpContent;
+    return $tmpContent;
+  }
+
+  public function setContentStrategy(ContentStrategyInterface $strategy, $pos=10) {
+    $this->contentStrategy[$pos] = $strategy;
   }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
@@ -92,13 +119,14 @@ class Cms {
     #todo: validation
     if ($content->documentElement->tagName != "body")
       throw new Exception("Content DOM is invalid!");
-    $this->content = $content;
+    $this->contentFull = $content;
   }
 
   public function getOutput() {
-    if(is_null($this->content)) throw new Exception("Content not set");
-    if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput();
-    return $this->getContent()->saveXML();
+    if(is_null($this->contentFull)) throw new Exception("Content not set");
+    $content = $this->getContent();
+    if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput($content);
+    return $content->saveXML();
   }
 
   public function getOutputStrategy() {
@@ -108,11 +136,13 @@ class Cms {
 }
 
 interface OutputStrategyInterface {
-  public function getOutput();
+  public function getOutput(DOMDocument $content);
 }
 
 interface ContentStrategyInterface {
   public function getContent(DOMDocument $content);
+  public function getTitle(Array $queries);
+  public function getDescription($query);
 }
 
 ?>

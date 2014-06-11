@@ -12,4 +12,4 @@ RewriteRule   ^(.+)\/$               %{ENV:RB}$1  [R=301,L]
 
 # create _GET parameters
 RewriteCond   %{REQUEST_FILENAME}    !-f
-RewriteRule   .*                     %{ENV:RB}index.php?page=$0
+RewriteRule   .*                     %{ENV:RB}index.php?page=$0 [QSA]
