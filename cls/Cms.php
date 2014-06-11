@@ -55,13 +55,13 @@ class Cms {
   #public function getStructure() {}
 
   public function getTitle() {
-    $h = $this->content->getElementsByTagName("h")->item(0);
+    $h = $this->getContent()->getElementsByTagName("h")->item(0);
     if($h->hasAttribute("short")) return $h->getAttribute("short");
     return $h->nodeValue;
   }
 
   public function getDescription() {
-    return $this->content->getElementsByTagName("description")->item(0)->nodeValue;
+    return $this->getContent()->getElementsByTagName("description")->item(0)->nodeValue;
   }
 
   public function getLanguage() {

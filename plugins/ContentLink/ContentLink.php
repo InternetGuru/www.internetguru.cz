@@ -1,7 +1,8 @@
 <?php
 
-class ContentStrategy implements SplObserver, ContentStrategyInterface {
+class ContentLink implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
+  private $content = null;
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
@@ -11,11 +12,12 @@ class ContentStrategy implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(DOMDocument $origContent) {
+    if(!is_null($this->content)) return $this->content;
     $cms = $this->subject->getCms();
     if(!strlen($cms->getLink())) return $origContent;
-    $content = new DOMDocument("1.0","utf-8");
-    $content->formatOutput = true;
-    $body = $content->appendChild($content->createElement("body"));
+    $this->content = new DOMDocument("1.0","utf-8");
+    $this->content->formatOutput = true;
+    $body = $this->content->appendChild($this->content->createElement("body"));
     $headings = $origContent->getElementsByTagName("h");
     foreach($headings as $h) {
       if(!$h->hasAttribute("link")) continue;
@@ -24,7 +26,7 @@ class ContentStrategy implements SplObserver, ContentStrategyInterface {
         break;
       }
     }
-    return $content;
+    return $this->content;
   }
 
   private function appendUntil(DOMElement $e,DOMElement $into) {
