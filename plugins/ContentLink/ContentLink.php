@@ -18,19 +18,19 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   }
 
   public function getTitle(Array $queries) {
-    if(empty($this->titleQueries)) return $queries;
+    #if(empty($this->titleQueries)) return $queries;
     return $this->titleQueries;
   }
 
-  public function getDescription($q) {
-    if(is_null($this->descriptionQuery)) return $q;
+  public function getDescription($query) {
+    #if(is_null($this->descriptionQuery)) return $query;
     return $this->descriptionQuery;
   }
 
   public function getContent(DOMDocument $origContent) {
     if(!is_null($this->content)) return $this->content;
     $cms = $this->subject->getCms();
-    if(!strlen($cms->getLink())) return $origContent;
+    #if(!strlen($cms->getLink())) return $origContent;
     $this->content = new DOMDocument("1.0","utf-8");
     $this->content->formatOutput = true;
     $body = $this->content->appendChild($this->content->createElement("body"));
