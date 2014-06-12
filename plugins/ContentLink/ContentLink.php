@@ -7,6 +7,10 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   private $descriptionQuery = null;
 
   public function update(SplSubject $subject) {
+    if(!strlen($subject->getCms()->getLink())) {
+      $subject->detach($this);
+      return;
+    }
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
       $subject->getCms()->setContentStrategy($this);

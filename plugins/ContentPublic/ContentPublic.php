@@ -5,7 +5,10 @@ class ContentPublic implements SplObserver, ContentStrategyInterface {
   private $content = null;
 
   public function update(SplSubject $subject) {
-    if(!isset($_GET["public"])) return;
+    if(!isset($_GET["public"])) {
+      $subject->detach($this);
+      return;
+    }
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
       $subject->getCms()->setContentStrategy($this,20);
