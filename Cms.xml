@@ -3,10 +3,13 @@
   <!-- environmental -->
   <error_reporting readonly="readonly">E_ERROR</error_reporting>
   <timezone readonly="readonly">Europe/Prague</timezone>
+  <display_errors>0</display_errors>
 
   <!-- environmental DEV -->
-  <error_reporting subdom="dev localhost" />
+  <error_reporting subdom="dev localhost"/>
   <error_reporting subdom="dev localhost">E_ALL</error_reporting>
+  <display_errors subdom="dev localhost"/>
+  <display_errors subdom="dev localhost">1</display_errors>
 
   <!-- visual -->
   <stylesheet readonly="readonly">cms-basic.css</stylesheet>

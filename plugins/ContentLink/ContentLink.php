@@ -14,10 +14,12 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   }
 
   public function getTitle(Array $queries) {
+    if(empty($this->titleQueries)) return $queries;
     return $this->titleQueries;
   }
 
   public function getDescription($q) {
+    if(is_null($this->descriptionQuery)) return $q;
     return $this->descriptionQuery;
   }
 

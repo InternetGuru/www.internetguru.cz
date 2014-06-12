@@ -25,15 +25,14 @@ class Cms {
     $this->config = $this->domBuilder->build();
     $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
     if(@constant($er) === null) // keep outside if to check value
-      throw new Exception("Undefined constatnt '$er' used in error_reporting.");
-    if(isAtLocalhost()) {
-      error_reporting(E_ALL);
-      ini_set("display_errors", 1);
-    } else {
-      error_reporting(constant($er));
-    }
+      throw new Exception("Undefined constatnt '$er' used in error_reporting");
+    error_reporting(constant($er));
+    $er = $this->config->getElementsByTagName("display_errors")->item(0)->nodeValue;
+    if(ini_set("display_errors", 1) === false)
+      throw new Exception("Unable to set display_errors to value '$er'");
     $tz = $this->config->getElementsByTagName("timezone")->item(0)->nodeValue;
-    date_default_timezone_set($tz);
+    if(!date_default_timezone_set($tz))
+      throw new Exception("Unable to set date_default_timezone to value '$er'");
   }
 
   private function addStylesheets() {
@@ -96,7 +95,7 @@ class Cms {
 
   private function getContent() {
     if(!is_null($this->content)) return $this->content;
-    $tmpContent = $this->contentFull;
+    $tmpContent = $this->contentFull->cloneNode(true);
     ksort($this->contentStrategy);
     foreach($this->contentStrategy as $cs) {
       $tmpContent = $cs->getContent($tmpContent);
