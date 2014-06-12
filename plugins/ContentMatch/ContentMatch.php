@@ -31,6 +31,7 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
       throw new Exception("Link not unique");
     if($exactMatch->length == 0) {
       $link = $this->findSimilar($xpath,$cms->getLink());
+      throw new Exception ("Redir to $link");
       $this->redirToLink($link);
     }
     return $origContent;
@@ -38,14 +39,34 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
 
   private function findSimilar(DOMXPath $xpath,$link) {
     $link = mb_convert_encoding($link,"ASCII","UTF-8");
-    $headings = $xpath->query("//h[@link]");
-    $simil = array();
-    foreach($headings as $h) {
-      $simil[$h->getAttribute("link")] = similar_text($h->getAttribute("link"),$link);
+    $links = array();
+    foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
+    // closest substring
+    if(($newLink = $this->similarPos($links,$link)) !== false) return $newLink;
+    // max typo
+    if(($newLink = $this->bestLeven($links,$link,3)) !== false) return $newLink;
+    // else go to homepage
+    return ".";
+  }
+
+  private function similarPos(Array $links,$link) {
+    $linkpos = array();
+    foreach ($links as $l) {
+      $pos = strpos($l, $link);
+      if($pos === false) continue;
+      $linkpos[$l] = $pos;
     }
-    arsort($simil);
-    if(strlen($link) - reset($simil) < 3) return key($simil);
-    return "";
+    asort($linkpos);
+    if(!empty($linkpos)) return key($linkpos);
+    return false;
+  }
+
+  private function bestLeven(Array $links,$link,$limit) {
+    $leven = array();
+    foreach ($links as $l) $leven[$l] = levenshtein($l, $link);
+    asort($leven);
+    if(reset($leven) <= $limit) return key($leven);
+    return false;
   }
 
   private function redirToLink($link) {
