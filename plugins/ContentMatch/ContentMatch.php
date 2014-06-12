@@ -31,7 +31,6 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
       throw new Exception("Link not unique");
     if($exactMatch->length == 0) {
       $link = $this->findSimilar($xpath,$cms->getLink());
-      throw new Exception ("Redir to $link");
       $this->redirToLink($link);
     }
     return $origContent;
