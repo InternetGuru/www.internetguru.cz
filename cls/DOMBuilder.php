@@ -24,11 +24,12 @@ class DOMBuilder {
 
   /**
    * Create DOM from XML file and update its values from appropriate adm/usr files
-   * @param  string $path Path to XML file (plugin name)
-   * @param  string $ext  XML file extension
+   * @param  string  $path    Path to XML file (plugin name)
+   * @param  boolean $replace Replace DOM instead of updating
+   * @param  string  $ext     XML file extension
    * @return DOMDocument  Updated DOM
    */
-  public function build($path="Cms",$ext="xml") {
+  public function build($path="Cms",$replace=false,$ext="xml") {
     if(!is_string($path)) throw new Exception('Variable type: not string.');
 
     // create DOM from default config xml (Cms root or Plugin dir)
@@ -36,20 +37,34 @@ class DOMBuilder {
     else $filePath = PLUGIN_FOLDER . "/$path/$path.$ext";
     if(!is_file($filePath)) $filePath = "../" . CMS_FOLDER . "/$filePath";
 
+    $files = array($filePath => true,ADMIN_FOLDER."/$path.$ext" => true,USER_FOLDER."/$path.$ext" => false);
+    if($replace) return $this->getFirstDOM(array_reverse($files));
+    return $this->updateAll($files);
+  }
+
+  private function updateAll(Array $files) {
+    if(!is_file(key($files)))
+      throw new Exception("File not found");
     $doc = new DOMDocument("1.0","utf-8");
-    $this->updateDom($doc,$filePath);
     if(self::DEBUG) $doc->formatOutput = true;
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
-
-    // update DOM by admin data (all of them)
-    if(is_file(ADMIN_FOLDER."/$path.$ext")) $this->updateDom($doc,ADMIN_FOLDER."/$path.$ext");
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
-
-    // update DOM by user data (except readonly)
-    if(is_file(USER_FOLDER."/$path.$ext")) $this->updateDom($doc,USER_FOLDER."/$path.$ext",false);
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
-
+    foreach($files as $f => $ignoreReadonly) {
+      if(!is_file($f)) continue;
+      $this->updateDOM($doc,$f,$ignoreReadonly);
+      if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
+    }
     return $doc;
+  }
+
+  private function getFirstDOM(Array $files) {
+    $doc = new DOMDocument("1.0","utf-8");
+    foreach($files as $f => $ignoreReadonly) {
+      if(is_file($f)) {
+        if(!@$doc->load($f))
+          throw new Exception(sprintf('Unable to load DOM from file %s',$f));
+        return $doc;
+      }
+    }
+    throw new Exception("Cannot load DOM '$f'");
   }
 
   /**
@@ -60,7 +75,7 @@ class DOMBuilder {
    * @return void
    * @throws Exception   if unable to load XML file incl. backup file
    */
-  private function updateDom(DOMDocument $outDoc,$filePath,$ignoreReadonly=true) {
+  private function updateDOM(DOMDocument $outDoc,$filePath,$ignoreReadonly=false) {
     $doc = new DOMDocument("1.0","utf-8");
     if(@$doc->load($filePath)) {
       if($this->backupStrategy !== null) {

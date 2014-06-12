@@ -10,7 +10,7 @@ class Slider implements SplObserver {
   }
 
   private function init() {
-    $cfg = $this->cms->getDOM("Slider");
+    $cfg = $this->cms->buildDOM("Slider");
     $setters = array();
     // get resources (readonly)
     foreach($cfg->getElementsByTagName("resources")->item(0)->childNodes as $r) {

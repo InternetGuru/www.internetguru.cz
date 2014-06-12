@@ -48,8 +48,8 @@ class Cms {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }
 
-  public function buildDOM($plugin,$ext="xml") {
-    return $this->domBuilder->build($plugin,$ext);
+  public function buildDOM($plugin,$replace=false,$ext="xml") {
+    return $this->domBuilder->build($plugin,$replace,$ext);
   }
 
   #public function getStructure() {}

@@ -48,7 +48,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $html->appendChild($head);
 
     // transform content and add as body element
-    $xsl = $cms->buildDOM("Xhtml11","xsl");
+    $xsl = $cms->buildDOM("Xhtml11",true,"xsl");
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $body = $proc->transformToDoc($content);
