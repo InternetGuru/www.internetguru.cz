@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentAdmin>
+  <body lang="cs">
+    <h>{ContentAdmin:heading} (administrace)</h>
+    <description/>
+    <form action="{ContentAdmin:link}?admin" method="post"><div>
+      <textarea name="content" rows="10" cols="40">{ContentAdmin:content}</textarea>
+      <input type="submit" value="Uložit" />
+    </div></form>
+  </body>
+</ContentAdmin>

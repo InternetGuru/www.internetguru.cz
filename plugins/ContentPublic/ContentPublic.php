@@ -1,5 +1,7 @@
 <?php
 
+#TODO: valid HTML+ notation (attribute public is invalid)
+
 class ContentPublic implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
   private $content = null;
