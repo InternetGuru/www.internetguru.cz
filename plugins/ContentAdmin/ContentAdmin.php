@@ -21,7 +21,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       if(!$this->isValidPost()) $contentValue = $_POST["content"];
       else {
         $this->savePost();
-        header("Location: " . $this->subject->getCms()->getLink());
+        $redir = $this->subject->getCms()->getLink();
+        header("Location: " . (strlen($redir) ? $redir : "."));
         exit;
       }
     } else $contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);

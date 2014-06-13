@@ -12,7 +12,7 @@ class Cms {
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
-    if(isset($_GET["page"])) $this->link = $_GET["page"]; // todo: linkStrategy
+    if(isset($_GET["page"])) $this->link = $_GET["page"];
     #error_log("CMS created:0",0);
     #error_log("CMS created:3",3,"aaa.log");
   }
