@@ -18,6 +18,7 @@ define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
+define('TEMPLATE_FOLDER', 'template'); // where templates are stored
 
 #print_r($_SERVER);
 

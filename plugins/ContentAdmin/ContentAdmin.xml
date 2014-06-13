@@ -3,9 +3,11 @@
   <body lang="cs">
     <h>{ContentAdmin:heading} (administrace)</h>
     <description/>
+    <div class="error">{ContentAdmin:errors}</div>
     <form action="{ContentAdmin:link}?admin" method="post"><div>
       <textarea name="content" rows="10" cols="40">{ContentAdmin:content}</textarea>
-      <input type="submit" value="Uložit" />
+      <input type="hidden" value="{ContentAdmin:filehash}" name="filehash"/>
+      <input type="submit" value="Uložit"/>
     </div></form>
   </body>
 </ContentAdmin>

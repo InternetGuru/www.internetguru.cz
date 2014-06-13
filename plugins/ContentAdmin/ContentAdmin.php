@@ -1,6 +1,7 @@
 <?php
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
+  const HASH_FILE_ALGO = 'crc32b';
   private $subject; // SplSubject
   private $content = null;
 
@@ -17,23 +18,38 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   public function getContent(DOMDocument $content) {
     $cms = $this->subject->getCms();
+    $errors = array();
     if(isset($_POST["content"])) {
-      if(!$this->isValidPost()) $contentValue = $_POST["content"];
-      else {
+      if($this->isValidPost($errors)) {
         $this->savePost();
         $redir = $this->subject->getCms()->getLink();
         header("Location: " . (strlen($redir) ? $redir : "."));
         exit;
       }
-    } else $contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
+      $contentValue = $_POST["content"];
+    } else {
+      $contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
+    }
     $newContent = $cms->buildDOM("ContentAdmin");
     $this->setVar($newContent,"heading",$content->getElementsByTagName("h")->item(0)->nodeValue);
+    $this->setVar($newContent,"errors",$errors);
     $this->setVar($newContent,"link",$cms->getLink());
     $this->setVar($newContent,"content",$contentValue);
+    $this->setVar($newContent,"filehash",$this->getFileHash());
     return $newContent;
   }
 
-  private function isValidPost() {
+  private function getFileHash() {
+    return hash_file(self::HASH_FILE_ALGO,USER_FOLDER."/Content.xml");
+  }
+
+  private function isValidPost(Array &$errors) {
+    $doc = new DOMDocument();
+    if(!@$doc->loadXML($_POST["content"]))
+      $errors[] = "Document is not valid";
+    if($_POST["filehash"] != $this->getFileHash())
+      $errors[] = "File has changed during your administration";
+    if(!empty($errors)) return false;
     return true;
   }
 
@@ -51,15 +67,25 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $var = "{ContentAdmin:$varName}";
     $where = $xpath->query("//text()[contains(.,'$var')]");
     foreach($where as $e) {
-      $e->nodeValue = str_replace($var, $varValue, $e->nodeValue);
-    }
-    $where = $xpath->query("//*[contains(@*,'$var')]");
-    foreach($where as $e) {
-      foreach($e->attributes as $attrName => $attrNode) {
-        if(strpos($attrNode->nodeValue,$var) === false) continue;
-        $attrNode->nodeValue = str_replace($var, $varValue, $attrNode->nodeValue);
+      if(is_string($varValue)) $e->nodeValue = str_replace($var, $varValue, $e->nodeValue);
+      if(is_array($varValue)) {
+        $e->nodeValue = str_replace($var, "", $e->nodeValue);
+        if(!empty($varValue)) {
+          $this->insertList($e, $varValue);
+          continue;
+        }
       }
+      if($e->nodeValue == "") $e->parentNode->parentNode->removeChild($e->parentNode);
     }
+    $where = $xpath->query("//@*[contains(.,'$var')]");
+    foreach($where as $attr) {
+      $attr->nodeValue = str_replace($var, $varValue, $attr->nodeValue);
+    }
+  }
+
+  private function insertList(DOMNode $e, Array $items) {
+    $ul = $e->parentNode->appendChild($e->ownerDocument->createElement("ul"));
+    foreach($items as $i) $ul->appendChild($e->ownerDocument->createElement("li",$i));
   }
 
   public function getTitle(Array $q) {
