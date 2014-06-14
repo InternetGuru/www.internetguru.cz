@@ -36,6 +36,9 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $this->setVar($newContent,"link",$cms->getLink());
     $this->setVar($newContent,"content",$contentValue);
     $this->setVar($newContent,"filehash",$this->getFileHash());
+    $old = $newContent->getElementsByTagName("ContentAdmin")->item(0);
+    $new = $newContent->getElementsByTagName("body")->item(0);
+    $newContent->replaceChild($new,$old);
     return $newContent;
   }
 
