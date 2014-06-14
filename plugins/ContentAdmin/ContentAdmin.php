@@ -30,7 +30,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     } else {
       $contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
     }
-    $newContent = $cms->buildDOM("ContentAdmin");
+    $newContent = $cms->buildDOM("ContentAdmin",true);
     $this->setVar($newContent,"heading",$content->getElementsByTagName("h")->item(0)->nodeValue);
     $this->setVar($newContent,"errors",$errors);
     $this->setVar($newContent,"link",$cms->getLink());
