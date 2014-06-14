@@ -4,9 +4,10 @@
 // TODOS
 // --------------------------------------------------------------------
 
-# plugin subset when run from a common core
 # log warnings and errors (plugin)
 # e-mail errors (plugin)
+# Content not a plugin
+# HTMLPlusDocument extends DOMDocument
 
 
 // --------------------------------------------------------------------

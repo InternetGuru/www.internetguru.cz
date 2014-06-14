@@ -1,5 +1,9 @@
 <?php
 
+#TODO: formatOutput
+#TODO: uložit a zůstat
+#TODO: dont save if the same
+
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
   const HASH_FILE_ALGO = 'crc32b';
   private $subject; // SplSubject
@@ -23,6 +27,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       if($this->isValidPost($errors)) {
         $this->savePost();
         $redir = $this->subject->getCms()->getLink();
+        if(isset($_POST["saveandstay"])) $redir .= "?admin";
         header("Location: " . (strlen($redir) ? $redir : "."));
         exit;
       }

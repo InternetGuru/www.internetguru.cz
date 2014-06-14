@@ -7,7 +7,8 @@
     <form action="{ContentAdmin:link}?admin" method="post"><div>
       <textarea name="content" rows="10" cols="40">{ContentAdmin:content}</textarea>
       <input type="hidden" value="{ContentAdmin:filehash}" name="filehash"/>
-      <input type="submit" value="Uložit"/>
+      <input type="submit" value="Uložit a přejít" name="saveandgo"/>
+      <input type="submit" value="Uložit" name="saveandstay"/>
     </div></form>
   </body>
 </ContentAdmin>
