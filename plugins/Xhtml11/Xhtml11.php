@@ -166,8 +166,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
 
   private function getSubdom() {
     if(!isAtLocalhost()) return;
-    $d = explode("/", $_SERVER["SCRIPT_FILENAME"]);
-    return "/" . $d[3];
+    $d = explode("/", $_SERVER["SCRIPT_NAME"]);
+    return "/" . $d[1];
   }
 
 }

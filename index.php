@@ -30,7 +30,8 @@ define('TEMPLATE_FOLDER', 'template'); // where templates are stored
 function isAtLocalhost() {
   if($_SERVER["REMOTE_ADDR"] == "127.0.0.1"
   || substr($_SERVER["REMOTE_ADDR"],0,8) == "192.168."
-  || substr($_SERVER["REMOTE_ADDR"],0,3) == "10.") {
+  || substr($_SERVER["REMOTE_ADDR"],0,3) == "10."
+  || $_SERVER["REMOTE_ADDR"] == "::1") {
     return true;
   }
   return false;
