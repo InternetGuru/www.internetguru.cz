@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentAdmin>
-  <body lang="cs">
-    <h>{ContentAdmin:heading} (administrace)</h>
-    <description/>
-    <div class="error">{ContentAdmin:errors}</div>
-    <form action="{ContentAdmin:link}?admin" method="post"><div>
-      <textarea name="content" rows="10" cols="40">{ContentAdmin:content}</textarea>
-      <input type="hidden" value="{ContentAdmin:filehash}" name="filehash"/>
-      <input type="submit" value="Uložit a přejít" name="saveandgo"/>
-      <input type="submit" value="Uložit" name="saveandstay"/>
-    </div></form>
-  </body>
-</ContentAdmin>
+<body lang="cs">
+  <h>{ContentAdmin:heading} (administrace)</h>
+  <description/>
+  <div class="error">{ContentAdmin:errors}</div>
+  <form action="{ContentAdmin:link}?admin" method="post">
+    <div>
+      <textarea cols="40" name="content" rows="10">{ContentAdmin:content}</textarea>
+      <input name="filehash" type="hidden" value="{ContentAdmin:filehash}"/>
+      <input name="saveandgo" type="submit" value="Uložit a odejít"/>
+      <input name="saveandstay" type="submit" value="Uložit"/>
+    </div>
+  </form>
+</body>

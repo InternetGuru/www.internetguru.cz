@@ -22,7 +22,7 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
     return $q;
   }
 
-  public function getContent(DOMDocument $origContent) {
+  public function getContent(HTMLPlus $origContent) {
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());
     $q = "//h[@link='" . $cms->getLink() . "']";
