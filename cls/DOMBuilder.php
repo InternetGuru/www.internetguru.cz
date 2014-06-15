@@ -46,7 +46,7 @@ class DOMBuilder {
     if(!is_file(key($files)))
       throw new Exception("File not found");
     $doc = new DOMDocument("1.0","utf-8");
-    if(self::DEBUG) $doc->formatOutput = true;
+    $doc->formatOutput = true;
     foreach($files as $f => $ignoreReadonly) {
       if(!is_file($f)) continue;
       $this->updateDOM($doc,$f,$ignoreReadonly);
@@ -57,6 +57,7 @@ class DOMBuilder {
 
   private function getFirstDOM(Array $files) {
     $doc = new DOMDocument("1.0","utf-8");
+    $doc->formatOutput = true;
     foreach($files as $f => $ignoreReadonly) {
       if(is_file($f)) {
         if(!@$doc->load($f))
@@ -77,6 +78,7 @@ class DOMBuilder {
    */
   private function updateDOM(DOMDocument $outDoc,$filePath,$ignoreReadonly=false) {
     $doc = new DOMDocument("1.0","utf-8");
+    $doc->formatOutput = true;
     if(@$doc->load($filePath)) {
       if($this->backupStrategy !== null) {
         $this->backupStrategy->doBackup($filePath);

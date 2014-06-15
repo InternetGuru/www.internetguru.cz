@@ -16,7 +16,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * Create XHTML 1.1 output from HTML+ content and own registers (JS/CSS)
    * @return void
    */
-  public function getOutput(DOMDocument $content) {
+  public function getOutput(HTMLPlus $content) {
     $cms = $this->subject->getCms();
     $lang = $cms->getLanguage();
     $title = $cms->getTitle();

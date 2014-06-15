@@ -17,7 +17,7 @@ class ContentPublic implements SplObserver, ContentStrategyInterface {
     }
   }
 
-  public function getContent(DOMDocument $content) {
+  public function getContent(HTMLPlus $content) {
     $this->filterPublic($content->documentElement);
     return $content;
   }

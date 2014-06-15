@@ -5,7 +5,7 @@
 #TODO: dont save if the same
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
-  const HASH_FILE_ALGO = 'crc32b';
+  const HASH_ALGO = 'crc32b';
   private $subject; // SplSubject
   private $content = null;
 
@@ -20,17 +20,12 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     }
   }
 
-  public function getContent(DOMDocument $content) {
+  public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
     $errors = array();
     if(isset($_POST["content"])) {
-      if($this->isValidPost($errors)) {
-        $this->savePost();
-        $redir = $this->subject->getCms()->getLink();
-        if(isset($_POST["saveandstay"])) $redir .= "?admin";
-        header("Location: " . (strlen($redir) ? $redir : "."));
-        exit;
-      }
+      $this->proceedPost($errors);
+      if(empty($errors)) $this->redir();
       $contentValue = $_POST["content"];
     } else {
       $contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
@@ -41,29 +36,41 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $this->setVar($newContent,"link",$cms->getLink());
     $this->setVar($newContent,"content",$contentValue);
     $this->setVar($newContent,"filehash",$this->getFileHash());
-    $old = $newContent->getElementsByTagName("ContentAdmin")->item(0);
-    $new = $newContent->getElementsByTagName("body")->item(0);
-    $newContent->replaceChild($new,$old);
-    return $newContent;
+    return new HTMLPlus($newContent);
   }
 
   private function getFileHash() {
-    return hash_file(self::HASH_FILE_ALGO,USER_FOLDER."/Content.xml");
+    return hash_file(self::HASH_ALGO,USER_FOLDER."/Content.xml");
   }
 
-  private function isValidPost(Array &$errors) {
-    $doc = new DOMDocument();
-    if(!@$doc->loadXML($_POST["content"]))
-      $errors[] = "Document is not valid";
-    if($_POST["filehash"] != $this->getFileHash())
-      $errors[] = "File has changed during your administration";
-    if(!empty($errors)) return false;
-    return true;
+  private function proceedPost(Array &$errors) {
+    try {
+      if($_POST["filehash"] == hash(self::HASH_ALGO,$_POST["content"]))
+        throw new Exception("No changes made");
+      if($_POST["filehash"] != $this->getFileHash())
+        throw new Exception("Source file has changed during administration");
+      $doc = new DOMDocument("1.0","utf-8");
+      if(!@$doc->loadXML($_POST["content"]))
+        throw new Exception("String is not a valid XML");
+      $this->savePost(new HTMLPlus($doc));
+      // further validation including non-blocking ... $error[] = xy
+      #$errors[] = "test error";
+      #throw new Exception("test exception");
+    } catch (Exception $e) {
+      $errors[] = $e->getMessage();
+    }
+  }
+
+  private function redir() {
+    $redir = $this->subject->getCms()->getLink();
+    if(isset($_POST["saveandstay"])) $redir .= "?admin";
+    header("Location: " . (strlen($redir) ? $redir : "."));
+    exit;
   }
 
   private function savePost() {
     $file = USER_FOLDER."/Content.xml";
-    $content = '<?xml version="1.0" encoding="utf-8" ?><Content>'.$_POST["content"].'</Content>';
+    $content = '<?xml version="1.0" encoding="utf-8" ?>'.$_POST["content"];
     if(file_put_contents("$file.new",$content) === false)
       throw new Exception("Unable to save content");
     if(!copy($file,"$file.old") || !rename("$file.new",$file))

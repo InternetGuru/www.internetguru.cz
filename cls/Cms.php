@@ -4,8 +4,8 @@ class Cms {
 
   private $domBuilder; // DOMBuilder
   private $config; // DOMDocument
-  private $contentFull = null; // DOMDocument
-  private $content = null; // DOMDocument
+  private $contentFull = null; // HTMLPlus
+  private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
   private $contentStrategy = array(); // ContentStrategyInterface
   private $link = null;
@@ -95,7 +95,7 @@ class Cms {
 
   private function getContent() {
     if(!is_null($this->content)) return $this->content;
-    $tmpContent = $this->contentFull->cloneNode(true);
+    $tmpContent = new HTMLPlus ($this->contentFull->cloneNode(true));
     ksort($this->contentStrategy);
     foreach($this->contentStrategy as $cs) {
       $tmpContent = $cs->getContent($tmpContent);
@@ -113,11 +113,7 @@ class Cms {
     $this->addStylesheets();
   }
 
-  public function setContent(DOMDocument $content) {
-    // must be in HTML+ format, see HTML+ specification
-    #todo: validation
-    if ($content->documentElement->tagName != "body")
-      throw new Exception("Content DOM is invalid!");
+  public function setContent(HTMLPlus $content) {
     $this->contentFull = $content;
   }
 
@@ -135,11 +131,11 @@ class Cms {
 }
 
 interface OutputStrategyInterface {
-  public function getOutput(DOMDocument $content);
+  public function getOutput(HTMLPlus $content);
 }
 
 interface ContentStrategyInterface {
-  public function getContent(DOMDocument $content);
+  public function getContent(HTMLPlus $content);
   public function getTitle(Array $queries);
   public function getDescription($query);
 }
