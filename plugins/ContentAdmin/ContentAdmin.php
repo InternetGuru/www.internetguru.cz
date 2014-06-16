@@ -30,13 +30,13 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     } else {
       $contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
     }
-    $newContent = $cms->buildDOM("ContentAdmin",true);
+    $newContent = $cms->buildHTML("ContentAdmin",true);
     $this->setVar($newContent,"heading",$content->getElementsByTagName("h")->item(0)->nodeValue);
     $this->setVar($newContent,"errors",$errors);
     $this->setVar($newContent,"link",$cms->getLink());
     $this->setVar($newContent,"content",$contentValue);
     $this->setVar($newContent,"filehash",$this->getFileHash());
-    return new HTMLPlus($newContent);
+    return $newContent;
   }
 
   private function getFileHash() {
@@ -49,10 +49,10 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         throw new Exception("No changes made");
       if($_POST["filehash"] != $this->getFileHash())
         throw new Exception("Source file has changed during administration");
-      $doc = new DOMDocument("1.0","utf-8");
+      $doc = new HTMLPlus();
       if(!@$doc->loadXML($_POST["content"]))
         throw new Exception("String is not a valid XML");
-      $this->savePost(new HTMLPlus($doc));
+      $this->savePost($doc);
       // further validation including non-blocking ... $error[] = xy
       #$errors[] = "test error";
       #throw new Exception("test exception");

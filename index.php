@@ -6,8 +6,6 @@
 
 # log warnings and errors (plugin)
 # e-mail errors (plugin)
-# Content not a plugin
-# HTMLPlus extends DOMDocument
 
 
 // --------------------------------------------------------------------

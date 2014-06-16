@@ -27,20 +27,19 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $origContent) {
-    if($runAlready) throw new Exception("Should not run twice");
-    else $runAlready = true;
+    if(!is_null($this->descriptionQuery)) throw new Exception("Should not run twice");
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());
     $q = "//h[@link='" . $cms->getLink() . "']";
     $exactMatch = $xpath->query($q);
     if($exactMatch->length != 1)
       throw new Exception("No unique exact match found for link '{$cms->getLink()}'");
-    $content = new DOMDocument("1.0","utf-8");
+    $content = new HTMLPlus();
     $content->formatOutput = true;
     $body = $content->appendChild($content->createElement("body"));
     $this->addTitleQueries($exactMatch->item(0));
     $this->appendUntil($exactMatch->item(0),$body);
-    return new HTMLPlus($content);
+    return $content;
   }
 
   private function addTitleQueries(DOMElement $h) {

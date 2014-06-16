@@ -22,7 +22,7 @@ class Cms {
   }
 
   public function init() {
-    $this->config = $this->domBuilder->build();
+    $this->config = $this->buildDOM("Cms");
     $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
     if(@constant($er) === null) // keep outside if to check value
       throw new Exception("Undefined constatnt '$er' used in error_reporting");
@@ -33,6 +33,7 @@ class Cms {
     $tz = $this->config->getElementsByTagName("timezone")->item(0)->nodeValue;
     if(!date_default_timezone_set($tz))
       throw new Exception("Unable to set date_default_timezone to value '$er'");
+    $this->loadContent();
   }
 
   private function addStylesheets() {
@@ -48,8 +49,12 @@ class Cms {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }
 
-  public function buildDOM($plugin,$replace=false,$ext="xml") {
-    return $this->domBuilder->build($plugin,$replace,$ext);
+  public function buildDOM($plugin,$replace=false,$filename="") {
+    return $this->domBuilder->buildDOM($plugin,$replace,$filename);
+  }
+
+  public function buildHTML($plugin,$replace=false,$filename="") {
+    return $this->domBuilder->buildHTML($plugin,$replace,$filename);
   }
 
   #public function getStructure() {}
@@ -93,15 +98,13 @@ class Cms {
     return $this->contentFull;
   }
 
-  private function getContent() {
-    if(!is_null($this->content)) return $this->content;
-    $tmpContent = new HTMLPlus ($this->contentFull->cloneNode(true));
+  private function buildContent() {
+    if(!is_null($this->content)) throw new Exception("Should not run twice");
+    $this->content = $this->contentFull->cloneNode(true);
     ksort($this->contentStrategy);
     foreach($this->contentStrategy as $cs) {
-      $tmpContent = $cs->getContent($tmpContent);
+      $this->content = $cs->getContent($this->content);
     }
-    $this->content = $tmpContent;
-    return $tmpContent;
   }
 
   public function setContentStrategy(ContentStrategyInterface $strategy, $pos=10) {
@@ -113,15 +116,15 @@ class Cms {
     $this->addStylesheets();
   }
 
-  public function setContent(HTMLPlus $content) {
-    $this->contentFull = $content;
+  private function loadContent() {
+    $this->contentFull = $this->buildHTML("Cms",true,"Content.xml");
   }
 
   public function getOutput() {
     if(is_null($this->contentFull)) throw new Exception("Content not set");
-    $content = $this->getContent();
-    if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput($content);
-    return $content->saveXML();
+    $this->buildContent();
+    if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput($this->content);
+    return $this->content->saveXML();
   }
 
   public function getOutputStrategy() {
