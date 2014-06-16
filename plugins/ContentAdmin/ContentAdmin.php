@@ -22,6 +22,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
+    $cms->getOutputStrategy()->addCssFile("admin.css","ContentAdmin");
     $errors = array();
     if(isset($_POST["content"])) {
       $this->proceedPost($errors);
