@@ -69,8 +69,8 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
   }
 
   private function redirToLink($link) {
-    header("HTTP/1.0 404 Not Found");
-    header("Location: $link");
+    header("Location: $link",true,404);
+    header("Refresh: 0; url=$link");
     exit();
   }
 
