@@ -1,5 +1,7 @@
 <?php
 
+#TODO: singleton contentXpath, contentFullXpath
+
 class Cms {
 
   private $domBuilder; // DOMBuilder
@@ -8,11 +10,12 @@ class Cms {
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
   private $contentStrategy = array(); // ContentStrategyInterface
-  private $link = null;
+  private $link = ".";
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
     if(isset($_GET["page"])) $this->link = $_GET["page"];
+    if(!strlen(trim($this->link))) $this->link = ".";
     #error_log("CMS created:0",0);
     #error_log("CMS created:3",3,"aaa.log");
   }
@@ -59,6 +62,45 @@ class Cms {
 
   #public function getStructure() {}
 
+  public function insertVar($varName,$varValue,$plugin="") {
+    $xpath = new DOMXPath($this->content);
+    if($plugin == "") $plugin = "Cms";
+    $var = "{".$plugin.":".$varName."}";
+    if(is_string($varValue)) {
+      $where = $xpath->query("//@*[contains(.,'$var')]");
+      $this->insertVarString($var,$varValue,$where);
+    }
+    $where = $xpath->query("//text()[contains(.,'$var')]");
+    if($where->length == 0) return;
+    $type = gettype($varValue);
+    if($type == "object") $type = get_class($varValue);
+    switch($type) {
+      case "string":
+      $this->insertVarString($var,$varValue,$where);
+      break;
+      case "array":
+      $this->insertVarArray($var,$varValue,$where);
+      break;
+      default:
+      throw new Exception("Unsupported type '$type'");
+    }
+  }
+
+  private function insertVarString($varName,$varValue,DOMNodeList $where) {
+    foreach($where as $e) {
+      $e->nodeValue = str_replace($varName, $varValue, $e->nodeValue);
+    }
+  }
+
+  private function insertVarArray($varName,Array $varValue,DOMNodeList $where) {
+    foreach($where as $e) {
+      $e->nodeValue = str_replace($varName, "", $e->nodeValue);
+      if(empty($varValue)) continue;
+      $ul = $e->parentNode->appendChild($e->ownerDocument->createElement("ul"));
+      foreach($varValue as $i) $ul->appendChild($e->ownerDocument->createElement("li",$i));
+    }
+  }
+
   public function getTitle() {
     $queries = array("/body/h");
     $title = array();
@@ -98,7 +140,8 @@ class Cms {
     return $this->contentFull;
   }
 
-  private function buildContent() {
+  public function buildContent() {
+    if(is_null($this->contentFull)) throw new Exception("Content not set");
     if(!is_null($this->content)) throw new Exception("Should not run twice");
     $this->content = $this->contentFull->cloneNode(true);
     ksort($this->contentStrategy);
@@ -121,8 +164,7 @@ class Cms {
   }
 
   public function getOutput() {
-    if(is_null($this->contentFull)) throw new Exception("Content not set");
-    $this->buildContent();
+    if(is_null($this->content)) throw new Exception("Content not set");
     if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput($this->content);
     return $this->content->saveXML();
   }

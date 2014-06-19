@@ -70,6 +70,8 @@ try {
   $plugins->setStatus("init");
   $plugins->notify();
 
+  $cms->buildContent();
+
   // notify plugins, status process
   $plugins->setStatus("process");
   $plugins->notify();

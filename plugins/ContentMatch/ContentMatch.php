@@ -4,7 +4,7 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
 
   public function update(SplSubject $subject) {
-    if(!strlen($subject->getCms()->getLink())) {
+    if($subject->getCms()->getLink() == ".") {
       $subject->detach($this);
       return;
     }

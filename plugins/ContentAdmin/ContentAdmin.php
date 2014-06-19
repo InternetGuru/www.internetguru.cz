@@ -1,13 +1,14 @@
 <?php
 
-#TODO: formatOutput
-#TODO: uložit a zůstat
+#TODO: formatOutput at save
 #TODO: dont save if the same
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
   const HASH_ALGO = 'crc32b';
   private $subject; // SplSubject
   private $content = null;
+  private $errors = array();
+  private $contentValue = null;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -17,34 +18,39 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
       $subject->getCms()->setContentStrategy($this,100);
+      $this->proceedPost();
+      return;
+    }
+    if($subject->getStatus() == "process") {
+      $this->insertVars();
+      return;
     }
   }
 
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
     $cms->getOutputStrategy()->addCssFile("admin.css","ContentAdmin");
-    $errors = array();
-    if(isset($_POST["content"])) {
-      $this->proceedPost($errors);
-      if(empty($errors)) $this->redir();
-      $contentValue = $_POST["content"];
-    } else {
-      $contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
+    return $cms->buildHTML("ContentAdmin",true);
+  }
+
+  private function insertVars() {
+    $cms = $this->subject->getCms();
+    if(is_null($this->contentValue)) {
+      $this->contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
     }
-    $newContent = $cms->buildHTML("ContentAdmin",true);
-    $this->setVar($newContent,"heading",$content->getElementsByTagName("h")->item(0)->nodeValue);
-    $this->setVar($newContent,"errors",$errors);
-    $this->setVar($newContent,"link",$cms->getLink());
-    $this->setVar($newContent,"content",$contentValue);
-    $this->setVar($newContent,"filehash",$this->getFileHash());
-    return $newContent;
+    $cms->insertVar("heading",$cms->getTitle(),"ContentAdmin");
+    $cms->insertVar("errors",$this->errors,"ContentAdmin");
+    $cms->insertVar("link",$cms->getLink(),"ContentAdmin");
+    $cms->insertVar("content",$this->contentValue,"ContentAdmin");
+    $cms->insertVar("filehash",$this->getFileHash(),"ContentAdmin");
   }
 
   private function getFileHash() {
     return hash_file(self::HASH_ALGO,USER_FOLDER."/Content.xml");
   }
 
-  private function proceedPost(Array &$errors) {
+  private function proceedPost() {
+    if(!isset($_POST["content"])) return;
     try {
       if($_POST["filehash"] == hash(self::HASH_ALGO,$_POST["content"]))
         throw new Exception("No changes made");
@@ -54,12 +60,14 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       if(!@$doc->loadXML($_POST["content"]))
         throw new Exception("String is not a valid XML");
       $this->savePost($doc);
-      // further validation including non-blocking ... $error[] = xy
-      #$errors[] = "test error";
+      // further validation including non-blocking ... $this->error[] = xy
+      #$this->errors[] = "test error";
       #throw new Exception("test exception");
     } catch (Exception $e) {
-      $errors[] = $e->getMessage();
+      $this->errors[] = $e->getMessage();
     }
+    if(empty($this->errors)) $this->redir();
+    $this->contentValue = $_POST["content"];
   }
 
   private function redir() {
@@ -76,32 +84,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       throw new Exception("Unable to save content");
     if(!copy($file,"$file.old") || !rename("$file.new",$file))
       throw new Exception("Unable to rename data file");
-  }
-
-  private function setVar(DOMDocument $doc,$varName,$varValue) {
-    $xpath = new DOMXPath($doc);
-    $var = "{ContentAdmin:$varName}";
-    $where = $xpath->query("//text()[contains(.,'$var')]");
-    foreach($where as $e) {
-      if(is_string($varValue)) $e->nodeValue = str_replace($var, $varValue, $e->nodeValue);
-      if(is_array($varValue)) {
-        $e->nodeValue = str_replace($var, "", $e->nodeValue);
-        if(!empty($varValue)) {
-          $this->insertList($e, $varValue);
-          continue;
-        }
-      }
-      if($e->nodeValue == "") $e->parentNode->parentNode->removeChild($e->parentNode);
-    }
-    $where = $xpath->query("//@*[contains(.,'$var')]");
-    foreach($where as $attr) {
-      $attr->nodeValue = str_replace($var, $varValue, $attr->nodeValue);
-    }
-  }
-
-  private function insertList(DOMNode $e, Array $items) {
-    $ul = $e->parentNode->appendChild($e->ownerDocument->createElement("ul"));
-    foreach($items as $i) $ul->appendChild($e->ownerDocument->createElement("li",$i));
   }
 
   public function getTitle(Array $q) {
