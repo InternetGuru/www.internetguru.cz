@@ -82,10 +82,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($fileName,$plugin = "",$priority = 10) {
-    $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
-    if(!is_file($f)) $f = "../" . CMS_FOLDER . "/" . $f;
-    if(!is_file($f)) $this->jsFiles[$fileName] = null;
-    else $this->jsFiles[$f] = $priority;
+    if(($f = $this->findFilePath($fileName,$plugin,false)) !== false) {
+      $this->jsFiles[$f] = $priority;
+      return;
+    }
+    $this->jsFiles[$fileName] = null;
   }
 
   /**
@@ -106,10 +107,20 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($fileName,$plugin = "", $priority = 10) {
+    if(($f = $this->findFilePath($fileName,$plugin)) !== false) {
+      $this->cssFiles[$f] = $priority;
+      return;
+    }
+    $this->cssFiles[$fileName] = null;
+  }
+
+  private function findFilePath($fileName,$plugin,$userFolder=true) {
     $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
-    if(!is_file($f)) $f = "../" . CMS_FOLDER . "/" . $f;
-    if(!is_file($f)) $this->cssFiles[$fileName] = null;
-    else $this->cssFiles[$f] = $priority;
+    if($userFolder && is_file(USER_FOLDER ."/". $f)) return USER_FOLDER ."/". $f;
+    if(is_file(ADMIN_FOLDER ."/". $f)) return ADMIN_FOLDER ."/". $f;
+    if(is_file($f)) return $f;
+    if(is_file("../" . CMS_FOLDER . "/" . $f)) return "../" . CMS_FOLDER . "/" . $f;
+    return false;
   }
 
   /**

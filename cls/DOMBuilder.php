@@ -1,7 +1,5 @@
 <?php
 
-#TODO: use for any files (eg. css)
-
 /**
  * Create DOM from XML file and update elements from adm/usr directories.
  * Add by default; empty element to delete all elements with same nodeName.
