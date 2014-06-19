@@ -62,6 +62,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       if($_POST["filehash"] != $this->getFileHash($this->dataFile))
         throw new Exception("Source file has changed during administration");
       $doc = new HTMLPlus();
+      $doc->formatOutput = true;
+      $doc->preserveWhiteSpace = false;
       if(!@$doc->loadXML($_POST["content"]))
         throw new Exception("String is not a valid XML");
       $this->savePost($doc);
@@ -82,9 +84,9 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     exit;
   }
 
-  private function savePost() {
+  private function savePost($doc) {
     $file = USER_FOLDER."/Content.xml";
-    if(file_put_contents("$file.new",$_POST["content"]) === false)
+    if(file_put_contents("$file.new",$doc->saveXML()) === false)
       throw new Exception("Unable to save content");
     if(!copy($file,"$file.old") || !rename("$file.new",$file))
       throw new Exception("Unable to rename data file");
