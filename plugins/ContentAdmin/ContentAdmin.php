@@ -1,7 +1,6 @@
 <?php
 
 #TODO: formatOutput at save
-#TODO: dont save if the same
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
   const HASH_ALGO = 'crc32b';
@@ -9,6 +8,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private $content = null;
   private $errors = array();
   private $contentValue = null;
+  private $dataFile;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -17,6 +17,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     }
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
+      $this->dataFile = USER_FOLDER . "/Content.xml";
       $subject->getCms()->setContentStrategy($this,100);
       $this->proceedPost();
       return;
@@ -36,25 +37,29 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private function insertVars() {
     $cms = $this->subject->getCms();
     if(is_null($this->contentValue)) {
-      $this->contentValue = $cms->getContentFull()->saveXML($cms->getContentFull()->documentElement);
+      $this->contentValue = file_get_contents($this->dataFile);
     }
     $cms->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $cms->insertVar("errors",$this->errors,"ContentAdmin");
     $cms->insertVar("link",$cms->getLink(),"ContentAdmin");
     $cms->insertVar("content",$this->contentValue,"ContentAdmin");
-    $cms->insertVar("filehash",$this->getFileHash(),"ContentAdmin");
+    $cms->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
   }
 
-  private function getFileHash() {
-    return hash_file(self::HASH_ALGO,USER_FOLDER."/Content.xml");
+  private function getHash($data) {
+    return hash(self::HASH_ALGO,$data);
+  }
+
+  private function getFileHash($filePath) {
+    return hash_file(self::HASH_ALGO,$filePath);
   }
 
   private function proceedPost() {
     if(!isset($_POST["content"])) return;
     try {
-      if($_POST["filehash"] == hash(self::HASH_ALGO,$_POST["content"]))
+      if($_POST["filehash"] == $this->getHash($_POST["content"]))
         throw new Exception("No changes made");
-      if($_POST["filehash"] != $this->getFileHash())
+      if($_POST["filehash"] != $this->getFileHash($this->dataFile))
         throw new Exception("Source file has changed during administration");
       $doc = new HTMLPlus();
       if(!@$doc->loadXML($_POST["content"]))
@@ -79,8 +84,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   private function savePost() {
     $file = USER_FOLDER."/Content.xml";
-    $content = '<?xml version="1.0" encoding="utf-8" ?>'.$_POST["content"];
-    if(file_put_contents("$file.new",$content) === false)
+    if(file_put_contents("$file.new",$_POST["content"]) === false)
       throw new Exception("Unable to save content");
     if(!copy($file,"$file.old") || !rename("$file.new",$file))
       throw new Exception("Unable to rename data file");
