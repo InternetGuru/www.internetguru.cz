@@ -57,7 +57,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private function proceedPost() {
     if(!isset($_POST["content"])) return;
     try {
-      if($_POST["filehash"] == $this->getHash($_POST["content"]))
+      if($_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
         throw new Exception("No changes made");
       if($_POST["filehash"] != $this->getFileHash($this->dataFile))
         throw new Exception("Source file has changed during administration");
@@ -67,9 +67,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       if(!@$doc->loadXML($_POST["content"]))
         throw new Exception("String is not a valid XML");
       $this->savePost($doc);
-      // further validation including non-blocking ... $this->error[] = xy
-      #$this->errors[] = "test error";
-      #throw new Exception("test exception");
+      // validation may include non-blocking errors
+      #$this->errors[] = "non-blocking error";
     } catch (Exception $e) {
       $this->errors[] = $e->getMessage();
     }
