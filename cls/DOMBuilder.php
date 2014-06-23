@@ -28,6 +28,7 @@ class DOMBuilder {
 
   public function buildDOM($path="Cms",$replace=false,$filename="") {
     $this->doc = new DOMDocument("1.0","utf-8");
+    $this->doc->formatOutput = true;
     $this->path = $path;
     $this->replace = $replace;
     $this->filename = ($filename == "" ? "$path.xml" : $filename);
@@ -112,10 +113,27 @@ class DOMBuilder {
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
         }
         foreach($remove as $d) $d->parentNode->removeChild($d);
+      } elseif($n->hasAttribute("id")) {
+        $sameIdElement = $this->getElementById($n->getAttribute("id"));
+        if(is_null($sameIdElement)) {
+          $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
+          continue;
+        }
+        if($sameIdElement->nodeName != $n->nodeName)
+          throw new Exception ("Id conflict with " . $n->nodeName);
+        if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
+        $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
       } else {
         $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
       }
     }
+  }
+
+  private function getElementById($id) {
+    $xpath = new DOMXPath($this->doc);
+    $q = $xpath->query("//*[@id='$id']");
+    if($q->length == 0) return null;
+    return $q->item(0);
   }
 
   private function ignoreElement(DOMElement $e) {
