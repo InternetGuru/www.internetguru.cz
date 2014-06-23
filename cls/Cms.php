@@ -48,6 +48,14 @@ class Cms {
     }
   }
 
+  public function insertCmsVars() {
+    if(is_null($this->content)) throw new Exception("Content not set");
+    foreach($this->config->getElementsByTagName("var") as $var) {
+      if(!$var->hasAttribute("id")) throw new Exception ("Var is missing id");
+      $this->insertVar($var->getAttribute("id"),$var);
+    }
+  }
+
   public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }
@@ -81,6 +89,9 @@ class Cms {
       case "array":
       $this->insertVarArray($var,$varValue,$where);
       break;
+      case "DOMElement":
+      $this->insertVarDOMElement($var,$varValue,$where);
+      break;
       default:
       throw new Exception("Unsupported type '$type'");
     }
@@ -98,6 +109,29 @@ class Cms {
       if(empty($varValue)) continue;
       $ul = $e->parentNode->appendChild($e->ownerDocument->createElement("ul"));
       foreach($varValue as $i) $ul->appendChild($e->ownerDocument->createElement("li",$i));
+    }
+  }
+
+  private function insertVarDOMElement($varName,DOMElement $varValue,DOMNodeList $where) {
+    foreach($where as $e) {
+      $newParent = $e->parentNode->cloneNode();
+      foreach($e->parentNode->childNodes as $ch) {
+        if(!$ch->isSameNode($e)) {
+          $newParent->appendChild($ch);
+          continue;
+        }
+        $parts = explode($varName,$ch->nodeValue);
+        foreach($parts as $id => $part) {
+          $newParent->appendChild($e->ownerDocument->createTextNode($part));
+          if((count($parts)-1) == $id) continue;
+          foreach($varValue->childNodes as $n) {
+            $newParent->appendChild($e->ownerDocument->importNode($n,true));
+          }
+        }
+      }
+      $e->parentNode->parentNode->replaceChild($e->ownerDocument->importNode($newParent),$e->parentNode);
+      #$e->nodeValue = str_replace($varName, $varValue->ownerDocument->saveXML($varValue), $e->nodeValue);
+      #$e->parentNode->appendChild($e->ownerDocument->importNode($varValue));
     }
   }
 

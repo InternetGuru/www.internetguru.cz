@@ -22,7 +22,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       $this->proceedPost();
       return;
     }
-    if($subject->getStatus() == "process") {
+    if($subject->getStatus() == "postprocess") {
       $this->insertVars();
       return;
     }

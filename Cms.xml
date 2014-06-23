@@ -14,4 +14,9 @@
   <!-- visual -->
   <stylesheet readonly="readonly">cms-basic.css</stylesheet>
   <stylesheet media="print">cms-print.css</stylesheet>
+
+  <!-- variables -->
+  <var id="test"><ul><li>a</li><li>b</li></ul></var>
+  <var id="test2">textcontent</var>
+  <var id="test3">x<ul><li>a</li><li>b</li></ul>y</var>
 </Cms>

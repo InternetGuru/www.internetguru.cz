@@ -58,22 +58,19 @@ try {
   // register core variables
   $cms = new Cms();
   $plugins = new Plugins($cms);
-
-  // notify plugins, status init
   $plugins->setStatus("preinit");
   $plugins->notify();
 
-  // init CMS
   $cms->init();
-
-  // notify plugins, status init
   $plugins->setStatus("init");
   $plugins->notify();
 
   $cms->buildContent();
-
-  // notify plugins, status process
   $plugins->setStatus("process");
+  $plugins->notify();
+
+  $cms->insertCmsVars();
+  $plugins->setStatus("postprocess");
   $plugins->notify();
 
   echo $cms->getOutput();
