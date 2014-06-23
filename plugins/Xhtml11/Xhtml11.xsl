@@ -28,6 +28,13 @@
     </div>
   </xsl:template>
 
+<!--   <xsl:template match="//p/u">
+    <p>
+      <xsl:apply-templates/>
+    </p>
+  </xsl:template> -->
+
+
   <xsl:template match="node()|@*">
     <xsl:copy>
       <xsl:apply-templates select="node()|@*"/>
