@@ -104,12 +104,14 @@ class Cms {
   }
 
   private function insertVarArray($varName,Array $varValue,DOMNodeList $where) {
-    foreach($where as $e) {
-      $e->nodeValue = str_replace($varName, "", $e->nodeValue);
-      if(empty($varValue)) continue;
-      $ul = $e->parentNode->appendChild($e->ownerDocument->createElement("ul"));
-      foreach($varValue as $i) $ul->appendChild($e->ownerDocument->createElement("li",$i));
+    if(empty($varValue)) {
+      $this->insertVarString($varName,"",$where);
+      return;
     }
+    $doc = new DOMDocument();
+    $ul = $doc->createElement("ul");
+    foreach($varValue as $i) $ul->appendChild($doc->createElement("li",$i));
+    $this->insertVarDOMElement($varName,$ul,$where);
   }
 
   private function insertVarDOMElement($varName,DOMElement $varValue,DOMNodeList $where) {
@@ -130,8 +132,6 @@ class Cms {
         }
       }
       $e->parentNode->parentNode->replaceChild($e->ownerDocument->importNode($newParent),$e->parentNode);
-      #$e->nodeValue = str_replace($varName, $varValue->ownerDocument->saveXML($varValue), $e->nodeValue);
-      #$e->parentNode->appendChild($e->ownerDocument->importNode($varValue));
     }
   }
 
