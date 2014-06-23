@@ -115,9 +115,13 @@ class Cms {
   }
 
   private function insertVarDOMElement($varName,DOMElement $varValue,DOMNodeList $where) {
-    foreach($where as $e) {
+    $into = array();
+    foreach($where as $e) $into[] = $e;
+    foreach($into as $e) {
       $newParent = $e->parentNode->cloneNode();
-      foreach($e->parentNode->childNodes as $ch) {
+      $children = array();
+      foreach($e->parentNode->childNodes as $ch) $children[] = $ch;
+      foreach($children as $ch) {
         if(!$ch->isSameNode($e)) {
           $newParent->appendChild($ch);
           continue;
@@ -126,7 +130,9 @@ class Cms {
         foreach($parts as $id => $part) {
           $newParent->appendChild($e->ownerDocument->createTextNode($part));
           if((count($parts)-1) == $id) continue;
-          foreach($varValue->childNodes as $n) {
+          $appendInto = array();
+          foreach($varValue->childNodes as $n) $appendInto[] = $n;
+          foreach($appendInto as $n) {
             $newParent->appendChild($e->ownerDocument->importNode($n,true));
           }
         }
