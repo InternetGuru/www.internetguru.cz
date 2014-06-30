@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:strip-space elements="p description"/>
+
   <xsl:template match="body">
     <body>
       <xsl:apply-templates/>
@@ -15,10 +17,12 @@
   </xsl:template>
 
   <xsl:template match="//description">
-    <p class="description">
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates/>
-    </p>
+    <xsl:if test="* or normalize-space()">
+      <p class="description">
+        <xsl:copy-of select="@*"/>
+        <xsl:apply-templates/>
+      </p>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="//section">
@@ -28,12 +32,50 @@
     </div>
   </xsl:template>
 
-<!--   <xsl:template match="//p/u">
-    <p>
-      <xsl:apply-templates/>
-    </p>
-  </xsl:template> -->
+  <xsl:template match="//p[count(ul|ol|dl)>0]">
+    <div>
+    <xsl:copy-of select="@*"/>
+    <xsl:for-each select="node()">
+      <xsl:variable name="pos" select="position()"/>
+      <xsl:variable name="prev" select="name(../node()[($pos)-1])"/>
+      <xsl:variable name="next" select="name(../node()[($pos)+1])"/>
+      <!--xsl:value-of select="concat($pos,':',name(),'|',$prev,':')"/-->
+      <xsl:if test="not(self::ul) and not(self::ol) and not(self::dl)
+                    and (
+                        $prev='ul' or $prev='ol' or $prev = 'dl'
+                        or position()=1
+                        )
+                    ">
+                    <!--or not(preceding-sibling::*)-->
+                    <!--preceding-sibling::ul[position()=($pos)-1]-->
+        <xsl:text disable-output-escaping="yes">&lt;p></xsl:text>
+      </xsl:if>
+      <xsl:copy>
+        <xsl:apply-templates select="node()|@*"/>
+      </xsl:copy>
+      <xsl:if test="not(self::ul) and not(self::ol) and not(self::dl)
+                    and (
+                        $next='ul' or $next='ol' or $next = 'dl'
+                        or position()=count(../node())
+                        )
+                    ">
+        <xsl:text disable-output-escaping="yes">&lt;/p></xsl:text>
+      </xsl:if>
+    </xsl:for-each>
+    </div>
+  </xsl:template>
 
+  <!--xsl:template match="//p/ul">
+    <xsl:text disable-output-escaping="yes">&lt;/p></xsl:text><ul>
+      <ul><xsl:apply-templates/></ul>
+    </ul><xsl:text disable-output-escaping="yes">&lt;p></xsl:text>
+  </xsl:template-->
+
+  <!--xsl:template match="following-sibling:://p/node()">
+    <xsl:text disable-output-escaping="yes">&lt;/p></xsl:text>
+    <xsl:copy><xsl:apply-templates select="node()|@*"/></xsl:copy>
+    <xsl:text disable-output-escaping="yes">&lt;p></xsl:text>
+  </xsl:template-->
 
   <xsl:template match="node()|@*">
     <xsl:copy>
