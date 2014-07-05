@@ -139,7 +139,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   private function appendJsFiles(DOMElement $parent) {
-    asort($this->jsFiles);
+    $this->stableSort($this->jsFiles);
     foreach($this->jsFiles as $f => $p) {
       if(is_null($p)) {
         $parent->appendChild(new DOMComment(" JS file '$f' not found "));
@@ -161,7 +161,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   private function appendCssFiles(DOMElement $parent) {
-    asort($this->cssFiles);
+    $this->stableSort($this->cssFiles);
     foreach($this->cssFiles as $f => $p) {
       if(is_null($p)) {
         $parent->appendChild(new DOMComment(" CSS file '$f' not found "));
@@ -180,6 +180,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     if(!isAtLocalhost()) return;
     $d = explode("/", $_SERVER["SCRIPT_NAME"]);
     return "/" . $d[1];
+  }
+
+  private function stableSort(Array &$a) {
+    $order = range(1,count($a));
+    array_multisort($a,SORT_ASC,$order,SORT_ASC);
   }
 
 }
