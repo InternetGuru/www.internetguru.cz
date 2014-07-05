@@ -1,6 +1,7 @@
 <?php
 
 #TODO: formatOutput at save
+#TODO: admin=Cms etc...
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
   const HASH_ALGO = 'crc32b';

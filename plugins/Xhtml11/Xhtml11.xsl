@@ -39,15 +39,12 @@
       <xsl:variable name="pos" select="position()"/>
       <xsl:variable name="prev" select="name(../node()[($pos)-1])"/>
       <xsl:variable name="next" select="name(../node()[($pos)+1])"/>
-      <!--xsl:value-of select="concat($pos,':',name(),'|',$prev,':')"/-->
       <xsl:if test="not(self::ul) and not(self::ol) and not(self::dl)
                     and (
                         $prev='ul' or $prev='ol' or $prev = 'dl'
                         or position()=1
                         )
                     ">
-                    <!--or not(preceding-sibling::*)-->
-                    <!--preceding-sibling::ul[position()=($pos)-1]-->
         <xsl:text disable-output-escaping="yes">&lt;p></xsl:text>
       </xsl:if>
       <xsl:copy>

@@ -1,1 +1,4 @@
-body {background-color:#ddf}
+h1, h2, h3 {page-break-after: avoid; page-break-inside: avoid;}
+p, ul, ol, dl, div:not(.section) {page-break-inside: avoid;}
+body {font-size:10pt;}
+@page {size: auto; margin: 21mm 20mm;}
