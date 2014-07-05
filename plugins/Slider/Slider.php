@@ -5,11 +5,11 @@ class Slider implements SplObserver {
 
   public function update(SplSubject $subject) {
     $this->cms = $subject->getCms();
+    if($subject->getStatus() != "process") return;
     if(is_null($this->cms->getOutputStrategy())) {
       $subject->detach($this);
       return;
     }
-    if($subject->getStatus() != "process") return;
     $this->init();
   }
 
