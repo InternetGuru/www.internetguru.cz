@@ -149,7 +149,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
       if(is_numeric($f)) $content = $this->jsContent[$f];
       $e = $parent->ownerDocument->createElement("script",$content);
       $e->setAttribute("type","text/javascript");
-      if(!is_numeric($f)) $e->setAttribute("src",$this->getSubdom() . $f);
+      if(!is_numeric($f)) $e->setAttribute("src",$this->getSubdom() ."/". $f);
       $parent->appendChild($e);
     }
   }
