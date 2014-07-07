@@ -61,17 +61,18 @@
         if(numSlides == -1)
           throw "no slides loaded";
 
-        addCSS(Config.styleSheet);
-
-        $(".slide").css("max-width",$(win).outerWidth(true));
-
         var e = null;
         var width = 0;
         for (var i = 0; i < numSlides; i++) {
           e = $('#slide'+i);
           width += e.outerWidth(true);
         }
+
+        addCSS(Config.styleSheet);
+
+        $(".slide").css("max-width",$(win).outerWidth(true));
         $("#slides").css("width",width);
+
         win.setTimeout(function(){
           setSlide(win.location.hash);
         }, 100);
@@ -181,6 +182,33 @@
 
         arrowLeft.click(slideLeft);
         arrowRight.click(slideRight);
+
+        //Init touch swipe
+        $("#slider").swipe( {
+          triggerOnTouchEnd : true,
+          swipeStatus : swipeStatus,
+          allowPageScroll:"vertical"
+        });
+      }
+
+      swipeStatus = function(event, phase, direction, distance, fingers){
+        switch(phase) {
+          case "start":
+            // $("#slider").css("cursor", "-webkit-grabbing");
+          break;
+          case "move":
+          break;
+          case "cancel":
+
+          break;
+          case "end":
+            // $("#slider").css("cursor", "default");
+            if (direction == "right")
+              slideRight();
+            else if (direction == "left")
+              slideLeft();
+          break;
+        }
       }
 
 
@@ -188,11 +216,17 @@
 
       return {
 
-         version : "1.0",
+         /**
+          * - initial version
+          */
+         // version : "1.0",
 
-         mode : function() {
-            return Config.mode;
-         },
+         /**
+          * - remove mode
+          * - support mobile dragging
+          * - refreshing bug fixed
+          */
+         version : "1.1",
 
          init : function() {
             initStructure();

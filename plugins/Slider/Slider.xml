@@ -2,6 +2,7 @@
 <Slider>
   <resources readonly="readonly">
     <jsLib absolute="absolute">lib/jquery-2.1.1.min.js</jsLib>
+    <jsLib absolute="absolute">lib/jquery.touchSwipe.min.js</jsLib>
     <setCss>slider.css</setCss>
   </resources>
   <parameters>
