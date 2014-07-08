@@ -1,11 +1,12 @@
 @media screen {
 
   body {
-    overflow-x: hidden;
+    /*overflow-x: hidden;*/
   }
 
   #slider {
     width: 100%;
+    overflow: hidden;
   }
 
   #slides {
