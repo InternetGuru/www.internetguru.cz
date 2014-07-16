@@ -27,7 +27,7 @@ class DOMBuilder {
   }
 
   public function buildDOM($path="Cms",$replace=false,$filename="") {
-    $this->doc = new DOMDocument("1.0","utf-8");
+    $this->doc = new DOMDocumentPlus();
     $this->doc->formatOutput = true;
     $this->path = $path;
     $this->replace = $replace;
@@ -87,7 +87,7 @@ class DOMBuilder {
    * @throws Exception   if unable to load XML file incl. backup file
    */
   private function updateDOM($filePath,$ignoreReadonly=false) {
-    $doc = new DOMDocument("1.0","utf-8");
+    $doc = new DOMDocumentPlus();
     if(@$doc->load($filePath)) {
       if($this->backupStrategy !== null) {
         $this->backupStrategy->doBackup($filePath);
@@ -108,7 +108,7 @@ class DOMBuilder {
       if(get_class($n) != "DOMElement") continue;
       if($this->ignoreElement($n)) continue;
       if($n->hasAttribute("id")) {
-        $sameIdElement = $this->getElementById($n->getAttribute("id"));
+        $sameIdElement = $this->doc->getElementById($n->getAttribute("id"));
         if(is_null($sameIdElement)) {
           $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
           continue;
@@ -133,12 +133,12 @@ class DOMBuilder {
     }
   }
 
-  private function getElementById($id) {
-    $xpath = new DOMXPath($this->doc);
-    $q = $xpath->query("//*[@id='$id']");
-    if($q->length == 0) return null;
-    return $q->item(0);
-  }
+  #private function getElementById($id) {
+  #  $xpath = new DOMXPath($this->doc);
+  #  $q = $xpath->query("//*[@id='$id']");
+  #  if($q->length == 0) return null;
+  #  return $q->item(0);
+  #}
 
   private function ignoreElement(DOMElement $e) {
     if(!$e->hasAttribute("subdom")) return false;

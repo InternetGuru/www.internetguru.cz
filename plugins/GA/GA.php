@@ -13,7 +13,7 @@ class GA implements SplObserver {
 
   private function init(SplSubject $subject) {
     $cfg = $subject->getCms()->buildDOM("GA");
-    $ga_id = $this->getElementById($cfg,"ga_id")->nodeValue;
+    $ga_id = $cfg->getElementById("ga_id")->nodeValue;
     if($ga_id == "") {
       $subject->detach($this);
       return;
@@ -22,13 +22,6 @@ class GA implements SplObserver {
     foreach($cfg->getElementsByTagName("jsFile") as $jsFile) {
       $subject->getCms()->getOutputStrategy()->addJsFile($jsFile->nodeValue,"GA",1,"body");
     }
-  }
-
-  private function getElementById(DOMDocument $doc,$id) {
-    $xpath = new DOMXPath($doc);
-    $q = $xpath->query("//*[@id='$id']");
-    if($q->length == 0) return null;
-    return $q->item(0);
   }
 
 }
