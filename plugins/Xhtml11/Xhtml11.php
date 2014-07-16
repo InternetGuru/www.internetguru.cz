@@ -53,10 +53,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $html->appendChild($head);
 
     // transform content and add as body element
-    $xsl = $cms->buildDOM("Xhtml11",true,"Xhtml11.xsl");
-    $proc = new XSLTProcessor();
-    $proc->importStylesheet($xsl);
-    $body = $proc->transformToDoc($content);
+    $cfg = $cms->buildDOM("Xhtml11");
+    $body = $content;
+    foreach($cfg->getElementsByTagName("xslt") as $xslt) {
+      $body = $this->transform($body,$xslt->nodeValue,$xslt->hasAttribute("absolute"));
+    }
     $body->encoding="utf-8";
     $body = $doc->importNode($body->documentElement,true);
     $html->appendChild($body);
@@ -64,6 +65,13 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
 
     // and that's it
     return $doc->saveXML();
+  }
+
+  private function transform(DOMDocument $content,$fileName,$absolute=false) {
+    $xsl = $this->subject->getCms()->buildDOM(($absolute ? "Cms" : "Xhtml11"),true,$fileName);
+    $proc = new XSLTProcessor();
+    $proc->importStylesheet($xsl);
+    return $proc->transformToDoc($content);
   }
 
   /**
