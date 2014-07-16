@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Cms>
+
   <!-- environmental -->
   <error_reporting readonly="readonly">E_ERROR</error_reporting>
   <timezone readonly="readonly">Europe/Prague</timezone>

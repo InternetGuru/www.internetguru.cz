@@ -3,7 +3,12 @@
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $subject; // SplSubject
   private $jsFiles = array(); // String filename => Int priority
+  private $jsFilesBody = array(); // String filename => Int priority
+  private $jsContent = array();
+  private $jsContentBody = array();
   private $cssFiles = array(); // String filename => Int priority
+  const APPEND_HEAD = "head";
+  const APPEND_BODY = "body";
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
@@ -55,6 +60,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $body->encoding="utf-8";
     $body = $doc->importNode($body->documentElement,true);
     $html->appendChild($body);
+    $this->appendJsFiles($body,self::APPEND_BODY);
 
     // and that's it
     return $doc->saveXML();
@@ -81,12 +87,14 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param string  $plugin   Plugin name (no plugin by default)
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addJsFile($fileName,$plugin = "",$priority = 10) {
+  public function addJsFile($fileName,$plugin = "",$priority = 10,$append = self::APPEND_HEAD) {
     if(($f = $this->findFilePath($fileName,$plugin,false)) !== false) {
-      $this->jsFiles[$f] = $priority;
+      if($append == self::APPEND_HEAD) $this->jsFiles[$f] = $priority;
+      else $this->jsFilesBody[$f] = $priority;
       return;
     }
-    $this->jsFiles[$fileName] = null;
+    if($append == self::APPEND_HEAD) $this->jsFiles[$fileName] = null;
+    else $this->jsFilesBody[$fileName] = null;
   }
 
   /**
@@ -94,10 +102,16 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param string  $content  JS to be added
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addJs($content,$priority = 10) {
-    $this->jsFiles[] = $priority;
-    end($this->jsFiles);
-    $this->jsContent[key($this->jsFiles)] = $content;
+  public function addJs($content,$priority = 10,$append = self::APPEND_HEAD) {
+    if($append == self::APPEND_HEAD) {
+      $this->jsFiles[] = $priority;
+      end($this->jsFiles);
+      $this->jsContent[key($this->jsFiles)] = $content;
+    } else {
+      $this->jsFilesBody[] = $priority;
+      end($this->jsFilesBody);
+      $this->jsContentBody[key($this->jsFilesBody)] = $content;
+    }
   }
 
   /**
@@ -138,15 +152,22 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param  DOMElement $parent Element to append JS files to
    * @return void
    */
-  private function appendJsFiles(DOMElement $parent) {
-    $this->stableSort($this->jsFiles);
-    foreach($this->jsFiles as $f => $p) {
+  private function appendJsFiles(DOMElement $parent,$append = self::APPEND_HEAD) {
+    if($append == self::APPEND_HEAD) {
+      $jsFiles = $this->jsFiles;
+      $jsContent = $this->jsContent;
+    } else {
+      $jsFiles = $this->jsFilesBody;
+      $jsContent = $this->jsContentBody;
+    }
+    $this->stableSort($jsFiles);
+    foreach($jsFiles as $f => $p) {
       if(is_null($p)) {
         $parent->appendChild(new DOMComment(" JS file '$f' not found "));
         continue;
       }
       $content = "";
-      if(is_numeric($f)) $content = $this->jsContent[$f];
+      if(is_numeric($f)) $content = $jsContent[$f];
       $e = $parent->ownerDocument->createElement("script");
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
@@ -183,6 +204,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   }
 
   private function stableSort(Array &$a) {
+    if(count($a) < 2) return;
     $order = range(1,count($a));
     array_multisort($a,SORT_ASC,$order,SORT_ASC);
   }

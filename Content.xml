@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <body lang="en">
-  <h id="h.someidxxxxxx" link="link1" style="color:red" title="def-title-short">Long default title</h>
-  <description>Some paragraph...</description>
-  <h id="h.someidxxxxxx" link="link2" style="color:red" title="def-title-short">Long default title</h>
+  <h>Long default title</h>
   <description>Some paragraph...</description>
   <section lang="en">
     <h>Subheading</h>

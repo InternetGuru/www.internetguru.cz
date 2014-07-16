@@ -107,13 +107,7 @@ class DOMBuilder {
     foreach($doc->documentElement->childNodes as $n) {
       if(get_class($n) != "DOMElement") continue;
       if($this->ignoreElement($n)) continue;
-      if($n->nodeValue == "") {
-        $remove = array();
-        foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
-          if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
-        }
-        foreach($remove as $d) $d->parentNode->removeChild($d);
-      } elseif($n->hasAttribute("id")) {
+      if($n->hasAttribute("id")) {
         $sameIdElement = $this->getElementById($n->getAttribute("id"));
         if(is_null($sameIdElement)) {
           $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
@@ -123,6 +117,16 @@ class DOMBuilder {
           throw new Exception ("Id conflict with " . $n->nodeName);
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
         $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
+      } elseif($n->nodeValue == "") {
+        $remove = array();
+        foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
+          if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
+        }
+        #if(!count($remove)) {
+        #  $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
+        #  continue;
+        #}
+        foreach($remove as $d) $d->parentNode->removeChild($d);
       } else {
         $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
       }
