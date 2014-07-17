@@ -11,6 +11,7 @@ class Cms {
   private $outputStrategy = null; // OutputStrategyInterface
   private $contentStrategy = array(); // ContentStrategyInterface
   private $link = ".";
+  private $titleQueries = array("/body/h");
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
@@ -142,17 +143,11 @@ class Cms {
   }
 
   public function getTitle() {
-    $queries = array("/body/h");
     $title = array();
-    // add queries using strategies
-    foreach($this->contentStrategy as $cs) {
-      $queries = $cs->getTitle($queries);
-    }
-    // execute queries
     $xpath = new DOMXPath($this->contentFull);
-    foreach($queries as $q) {
+    foreach($this->titleQueries as $q) {
       $r = $xpath->query($q)->item(0);
-      if($r->hasAttribute("short")) $title[] = $r->getAttribute("short");
+      if($r->hasAttribute("short") && count($this->titleQueries) > 1) $title[] = $r->getAttribute("short");
       else $title[] = $r->nodeValue;
     }
     return implode(" - ",$title);
@@ -185,6 +180,9 @@ class Cms {
     if(!is_null($this->content)) throw new Exception("Should not run twice");
     $this->content = $this->contentFull->cloneNode(true);
     ksort($this->contentStrategy);
+    foreach($this->contentStrategy as $cs) {
+      $this->titleQueries = $cs->getTitle($this->titleQueries);
+    }
     foreach($this->contentStrategy as $cs) {
       $this->content = $cs->getContent($this->content);
     }

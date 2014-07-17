@@ -4,7 +4,6 @@
 
 class ContentPublic implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
-  private $content = null;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["public"])) {
