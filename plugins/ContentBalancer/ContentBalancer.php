@@ -25,17 +25,18 @@ class ContentBalancer implements SplObserver, ContentStrategyInterface {
       foreach($xpath->query($e->getNodePath() . "/h") as $h) $hs[] = $h;
       $ul = $content->createElement("ul");
       foreach($hs as $h) {
-        $li = $content->createElement("li");
-        $a = $content->createElement("a",$h->nodeValue);
         if($h->hasAttribute("link")) $href = $h->getAttribute("link");
         else {
           $parentHeading = $this->getParentHeading($e);
           if($parentHeading->hasAttribute("link") && $h->hasAttribute("id")) {
             $href = $parentHeading->getAttribute("link") . "#" . $h->getAttribute("id");
           } else {
-            throw new Exception("Unable to find link for {$h->nodeValue}");
+            #throw new Exception("Unable to build link for {$h->nodeValue}");
+            continue 2;
           }
         }
+        $li = $content->createElement("li");
+        $a = $content->createElement("a",$h->nodeValue);
         $a->setAttribute("href",$href);
         $li->appendChild($a);
         $ul->appendChild($li);
