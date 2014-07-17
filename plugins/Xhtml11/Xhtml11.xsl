@@ -11,7 +11,7 @@
   <xsl:template match="//h">
     <xsl:variable name="level" select="count(ancestor::section)"/>
     <xsl:element name="h{$level+1}">
-      <xsl:copy-of select="@*[name()!='short' and name()!='link' and name()!='keywords']"/>
+      <xsl:copy-of select="@*[name()!='short' and name()!='link' and name()!='keywords' and name()!='public']"/>
       <xsl:apply-templates/>
     </xsl:element>
   </xsl:template>

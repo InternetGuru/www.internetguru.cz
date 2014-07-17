@@ -28,7 +28,8 @@ class ContentBreadcrumb implements SplObserver, ContentStrategyInterface {
   }
 
   private function getBreadcrumb(DOMXPath $xpath, HTMLPlus $content) {
-    $ul = $content->createElement("ul");
+    $ol = $content->createElement("ol");
+    $ol->setAttribute("class","breadcrumb");
     foreach(array_reverse($this->titleQueries) as $k => $q) {
       $i = $xpath->query($q)->item(0);
       $li = $content->createElement("li");
@@ -46,9 +47,9 @@ class ContentBreadcrumb implements SplObserver, ContentStrategyInterface {
       } else {
         $li->nodeValue = $text;
       }
-      $ul->appendChild($li);
+      $ol->appendChild($li);
     }
-    return $ul;
+    return $ol;
   }
 
 }
