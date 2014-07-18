@@ -70,6 +70,7 @@ h3, h4, h5, h6 {
   padding: 0;
   margin-top: -2rem;
   padding-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
 #header ol.cms-breadcrumb li:not(:first-child) {
@@ -233,7 +234,6 @@ div.ul ul li a {
   color: white;
   text-decoration: none;
   font-weight: 100;
-  border: 0.1em solid #89E4A3;
 }
 
 strong {

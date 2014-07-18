@@ -40,12 +40,14 @@ class ContentMenu implements SplObserver, ContentStrategyInterface {
       if($n->nodeName != "h" || !$n->hasAttribute("link")) continue;
       $li = $content->createElement("li");
       $link = $n->getAttribute("link");
+      $text = $n->nodeValue;
+      if($n->hasAttribute("short")) $text = $n->getAttribute("short");
       if($this->subject->getCms()->getLink() != $link) {
-        $a = $content->createElement("a",$n->nodeValue);
+        $a = $content->createElement("a",$text);
         $a->setAttribute("href",$link);
         $li->appendChild($a);
       } else {
-        $li->nodeValue = $n->nodeValue;
+        $li->nodeValue = $text;
       }
       $ul->appendChild($li);
     }
