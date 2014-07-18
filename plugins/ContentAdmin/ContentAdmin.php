@@ -66,7 +66,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       $doc->formatOutput = true;
       $doc->preserveWhiteSpace = false;
       if(!@$doc->loadXML($_POST["content"]))
-        throw new Exception("String is not a valid XML");
+        throw new Exception("String is not valid XML");
+      $doc->validate(true);
       $this->savePost($doc);
       // validation may include non-blocking errors
       #$this->errors[] = "non-blocking error";
