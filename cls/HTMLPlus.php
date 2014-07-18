@@ -3,6 +3,7 @@
 class HTMLPlus extends DOMDocumentPlus {
   private $hid = array();
   private $hnoid = array();
+  const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);
@@ -20,7 +21,12 @@ class HTMLPlus extends DOMDocumentPlus {
     if($i>3) throw new Exception ("Maximum repair cycles exceeded");
     try {
       $this->doValidate();
-      return true;
+      if(!($f = findFilePath(self::RNG_FILE,"",false)))
+        throw new Exception ("Unable to find HTMLPlus RNG schema");
+      if(!$this->relaxNGValidate($f)) {
+        throw new Exception ("Document is not HTMLPlus schema valid");
+      }
+      return;
     } catch (Exception $e) {
       if(!$repair) throw $e;
       switch ($e->getCode()) {

@@ -54,6 +54,15 @@ function stableSort(Array &$a) {
   array_multisort($a,SORT_ASC,$order,SORT_ASC);
 }
 
+function findFilePath($fileName,$plugin="",$userFolder=true) {
+  $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
+  if($userFolder && is_file(USER_FOLDER ."/". $f)) return USER_FOLDER ."/". $f;
+  if(is_file(ADMIN_FOLDER ."/". $f)) return ADMIN_FOLDER ."/". $f;
+  if(is_file($f)) return $f;
+  if(is_file("../" . CMS_FOLDER . "/" . $f)) return "../" . CMS_FOLDER . "/" . $f;
+  return false;
+}
+
 // --------------------------------------------------------------------
 // CORE
 // --------------------------------------------------------------------

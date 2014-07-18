@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
+
+  <start>
+    <element name="body">
+      <attribute name="lang">
+        <text/>
+      </attribute>
+      <ref name="contentBlock"/>
+    </element>
+  </start>
+
+  <define name="contentBlock">
+    <ref name="h"/>
+    <ref name="description"/>
+    <optional>
+      <ref name="contentElements"/>
+    </optional>
+    <optional>
+      <element name="section">
+        <oneOrMore>
+          <ref name="contentBlock"/>
+        </oneOrMore>
+      </element>
+    </optional>
+  </define>
+
+  <define name="h">
+    <element name="h">
+      <ref name="CommonIdRequired.attrib"/>
+      <optional>
+        <attribute name="short">
+          <text/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="link">
+          <text/>
+        </attribute>
+      </optional>
+      <text/>
+    </element>
+  </define>
+
+  <define name="description">
+    <element name="description">
+      <ref name="p.attlist"/>
+      <ref name="Inline.model"/>
+    </element>
+  </define>
+
+  <define name="contentElements">
+    <interleave>
+      <zeroOrMore>
+        <ref name="pExtended"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="ul"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="ol"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="dl"/>
+      </zeroOrMore>
+    </interleave>
+  </define>
+
+  <define name="pExtended">
+    <element name="p">
+      <ref name="p.attlist"/>
+      <ref name="Inline.model"/>
+      <interleave>
+        <zeroOrMore>
+          <ref name="ul"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="ol"/>
+        </zeroOrMore>
+        <zeroOrMore>
+          <ref name="dl"/>
+        </zeroOrMore>
+      </interleave>
+    </element>
+  </define>
+
+  <include href="xhtml/datatypes.rng"/>
+  <include href="xhtml/text.rng"/>
+  <include href="xhtml/attribs.rng"/>
+  <include href="xhtml/hypertext.rng"/>
+  <include href="xhtml/list.rng"/>
+
+</grammar>
