@@ -1,0 +1,241 @@
+/*
+ * TODO: scroll to top (like php.net);
+ */
+
+@import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600,700&subset=latin,latin-ext);
+
+h1,h2,h3,h4,h5,h6,p,ol,ul,dt,dd {
+  max-width: 60rem;
+  margin-right: auto;
+  margin-left: auto;
+  line-height: 1.3em;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+li {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+body {
+  font-family: 'Open Sans', Tahoma, sans-serif;
+  color: #555;
+  margin:0;
+  line-height: 1.45em;
+  font-size:1.2em;
+}
+
+h1 {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 1.8em 2em;
+  font-weight: 100;
+  text-transform: uppercase;
+}
+
+h2 {
+  color: #6BBD83;
+  font-weight: 100;
+  text-transform: uppercase;
+  font-size: 1.8em;
+  margin-top: 2em;
+  margin-bottom: 1.5em;
+  text-align: center;
+}
+
+h3, h4, h5, h6 {
+  color: #222;
+  font-weight: normal;
+  margin-top: 1.5em;
+}
+
+#header > div:first-child {
+  background: #8BE6A5;
+  color: #fff;
+}
+
+#header > div+div {
+  padding: 2em 2em;
+  font-weight: 100;
+  font-size: 1.2em;
+  line-height: 1.4em;
+  color: black;
+}
+
+#header ol.cms-breadcrumb {
+  list-style: none;
+  padding: 0;
+  margin-top: -2rem;
+  padding-bottom: 0.5rem;
+}
+
+#header ol.cms-breadcrumb li:not(:first-child) {
+  margin-left: 1.5rem;
+}
+
+#header ol.cms-breadcrumb li {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+}
+
+#header ol.cms-breadcrumb li a {
+  display: inline-block;
+  font-size: 1rem;
+  padding: 0.5rem 0.3rem 0.5rem 0.4rem;
+  background: #EAF2F5;
+  color: #6BBD83;
+  text-decoration: none;
+}
+
+#header ol.cms-breadcrumb li:first-child a {
+  padding-left: 0.8rem;
+}
+
+#header ol.cms-breadcrumb li:last-child {
+  padding-left: 0.2rem;
+}
+
+#header ol.cms-breadcrumb li:not(:first-child) a:before,
+#header ol.cms-breadcrumb li a:after {
+  border-width: 1.25rem 0 1.25rem 1.25rem;
+  content: '';
+  position: absolute;
+  height: 0;
+  width: 0;
+  border-style: solid;
+  top: 0;
+}
+
+#header ol.cms-breadcrumb li a:after {
+  border-color: transparent #EAF2F5;
+  z-index: 1;
+  right: -1.25rem;
+}
+
+#header ol.cms-breadcrumb li:not(:first-child) a:before {
+  border-color: #EAF2F5 transparent;
+  left: -1.25rem;
+}
+
+#footer {
+  padding: 1.5em 2em;
+  text-align: center;
+  margin-top: 1em;
+  margin-bottom: 0;
+}
+
+#footer ul {
+  list-style: none;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#footer li {
+  display: inline-block;
+  padding: 0.5em;
+}
+
+#header p {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+div.section dd {
+  font-style: italic;
+}
+
+div.section div.section,
+dl, div.ul {
+  background: #EAF2F5;
+  margin-top: 2.5em;
+  padding-top: 1em;
+  padding-bottom: 2em;
+}
+
+dl {
+  margin-top: 0;
+}
+
+dt {
+  color: #222;
+  font-size: 1.15em;
+  font-weight: normal;
+  margin-top: 1.2em;
+  margin-bottom: 1em;
+}
+
+dd {
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  padding-left: 3em;
+}
+
+div.dl {
+  background: #EAF2F5;
+}
+
+div.dl div {
+  display: table;
+  width: 100%;
+  max-width: 70em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+div.dl dl {
+  display: table-cell;
+  text-align: center;
+}
+
+div.section div.dl dt {
+  display: block;
+  margin-top: 1.2em;
+  margin-bottom: 1em;
+  font-size: 1.2rem;
+}
+
+div.section div.dl dd {
+  color: #222;
+  font-size: 1.15em;
+  font-weight: normal;
+  padding-left: 0;
+  padding-right: 0;
+  margin-left: 0;
+  margin-top: 0.2em;
+  margin-bottom: 0.2em;
+  font-style: normal;
+}
+
+div.ul {
+  /*background: #8BE6A5;*/
+}
+
+div.ul ul {
+  list-style: none;
+  text-align: center;
+}
+
+div.ul ul li {
+  display: inline-block;
+}
+
+div.ul ul li a {
+  font-size: 1.2em;
+  text-transform: uppercase;
+  display: inline-block;
+  margin: 0.3em;
+  padding: 1em;
+  background: #8BE6A5;
+  color: white;
+  text-decoration: none;
+  font-weight: 100;
+  border: 0.1em solid #89E4A3;
+}
+
+strong {
+  font-weight: 600;
+}

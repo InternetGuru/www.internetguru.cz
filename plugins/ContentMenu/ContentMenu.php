@@ -22,6 +22,7 @@ class ContentMenu implements SplObserver, ContentStrategyInterface {
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());
     $menu = $this->getMenu($content,$xpath->query("/body/section")->item(0));
+    $menu->setAttribute("class","cms-menu");
     if(!is_null($menu)) $content->documentElement->appendChild($menu);
     return $content;
   }

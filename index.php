@@ -48,6 +48,11 @@ function __autoload($className) {
     throw new Exception("Unable to find class $className");
 }
 
+function stableSort(Array &$a) {
+  if(count($a) < 2) return;
+  $order = range(1,count($a));
+  array_multisort($a,SORT_ASC,$order,SORT_ASC);
+}
 
 // --------------------------------------------------------------------
 // CORE

@@ -4,6 +4,7 @@ class Plugins implements SplSubject {
   private $status = null;
   private $cms;
   private $observers = array(); // list of observers
+  private $observerPriority = array();
   private $disabledObservers = array(); // dirs starting with a dot
 
   public function __construct(Cms $cms) {
@@ -44,22 +45,23 @@ class Plugins implements SplSubject {
     return $this->status;
   }
 
-  public function attach(SplObserver $observer) {
+  public function attach(SplObserver $observer,$priority=10) {
     $this->observers[get_class($observer)] = $observer;
+    $this->observerPriority[get_class($observer)] = $priority;
   }
 
   public function detach(SplObserver $observer) {
-        $key = array_search($observer,$this->observers, true);
-        if($key){
-            unset($this->observers[$key]);
-        }
+    $o = get_class($observer);
+    if(array_key_exists($o,$this->observers)) unset($this->observers[$o]);
+    if(array_key_exists($o,$this->observerPriority)) unset($this->observerPriority[$o]);
   }
 
   public function notify() {
-        foreach ($this->observers as $value) {
-            $value->update($this);
-        }
-        $this->status = null;
+    stableSort($this->observerPriority);
+    foreach ($this->observerPriority as $key => $value) {
+      $this->observers[$key]->update($this);
+    }
+    $this->status = null;
   }
 
 }

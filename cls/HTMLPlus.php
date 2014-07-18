@@ -77,6 +77,9 @@ class HTMLPlus extends DOMDocumentPlus {
     }
     if(count($this->hnoid))
       throw new Exception ("Missing ID in " . count($this->hnoid) . " element(s) 'h'",2);
+    $xpath = new DOMXPath($this);
+    if($xpath->query("/body/*[1]")->item(0)->nodeName != "h")
+      throw new Exception ("Missing main heading (/body/h)");
   }
 
 }

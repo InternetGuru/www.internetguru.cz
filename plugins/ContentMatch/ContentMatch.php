@@ -4,17 +4,21 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
 
   public function update(SplSubject $subject) {
+    if($subject->getStatus() == "preinit") {
+      $subject->detach($this);
+      $subject->attach($this,1);
+    }
     if($subject->getCms()->getLink() == ".") {
       $subject->detach($this);
       return;
     }
-    if($subject->getStatus() == "init") {
-      $this->subject = $subject;
-      $subject->getCms()->setContentStrategy($this,1);
-    }
+    if($subject->getStatus() != "init") return;
+    $this->subject = $subject;
+    $subject->getCms()->setContentStrategy($this,1);
   }
 
   public function getTitle(Array $q) {
+    $this->proceed();
     return $q;
   }
 
@@ -23,17 +27,22 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $origContent) {
+    return $origContent;
+  }
+
+  private function proceed() {
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());
     $q = "//h[@link='" . $cms->getLink() . "']";
     $exactMatch = $xpath->query($q);
     if($exactMatch->length > 1)
       throw new Exception("Link not unique");
-    if($exactMatch->length == 0) {
-      $link = $this->findSimilar($xpath,$cms->getLink());
-      $this->redirToLink($link);
+    if($exactMatch->length == 1) {
+      $this->subject->detach($this);
+      return;
     }
-    return $origContent;
+    $link = $this->findSimilar($xpath,$cms->getLink());
+    $this->redirToLink($link);
   }
 
   private function findSimilar(DOMXPath $xpath,$link) {

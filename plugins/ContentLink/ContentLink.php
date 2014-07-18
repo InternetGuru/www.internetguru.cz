@@ -13,8 +13,7 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    $subject->getCms()->setContentStrategy($this);
-    $this->build();
+    $subject->getCms()->setContentStrategy($this,2);
   }
 
   private function build() {
@@ -32,6 +31,7 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   }
 
   public function getTitle(Array $queries) {
+    $this->build();
     return $this->titleQueries;
   }
 

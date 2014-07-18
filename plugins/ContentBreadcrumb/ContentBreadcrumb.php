@@ -29,7 +29,7 @@ class ContentBreadcrumb implements SplObserver, ContentStrategyInterface {
 
   private function getBreadcrumb(DOMXPath $xpath, HTMLPlus $content) {
     $ol = $content->createElement("ol");
-    $ol->setAttribute("class","breadcrumb");
+    $ol->setAttribute("class","cms-breadcrumb");
     foreach(array_reverse($this->titleQueries) as $k => $q) {
       $i = $xpath->query($q)->item(0);
       $li = $content->createElement("li");

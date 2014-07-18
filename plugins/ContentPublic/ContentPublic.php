@@ -18,6 +18,7 @@ class ContentPublic implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     $this->filterPublic($content->documentElement);
+    $content->validate();
     return $content;
   }
 
@@ -26,6 +27,7 @@ class ContentPublic implements SplObserver, ContentStrategyInterface {
     foreach($nodes as $e) {
       if($e->nodeName == "section") {
         $this->filterPublic($e);
+        if(!$e->hasChildNodes()) $parent->removeChild($e);
         continue;
       }
       if(!$e->hasAttribute("public")) $parent->removeChild($e);
