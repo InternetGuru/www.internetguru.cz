@@ -5,7 +5,7 @@
   <div class="error">{ContentAdmin:errors}</div>
   <form action="{ContentAdmin:link}?admin" method="post">
     <div>
-      <textarea cols="40" name="content" rows="10">{ContentAdmin:content}</textarea>
+      <textarea cols="40" name="content" rows="20" id="adminForm">{ContentAdmin:content}</textarea>
       <input name="filehash" type="hidden" value="{ContentAdmin:filehash}"/>
       <input name="saveandgo" type="submit" value="Uložit a odejít"/>
       <input name="saveandstay" type="submit" value="Uložit"/>
