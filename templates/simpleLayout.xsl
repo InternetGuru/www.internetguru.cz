@@ -24,7 +24,7 @@
         self::ul[contains(@class,'cms-menu')] )]" />
       <div id="footer">
         <xsl:copy-of select="ul[contains(@class,'cms-menu')]"/>
-        <ul><li>©2014 internetguru.cz</li></ul>
+        <ul><li><a href="?admin">Administrace</a></li><li>©2014 internetguru.cz</li></ul>
       </div>
     </body>
   </xsl:template>

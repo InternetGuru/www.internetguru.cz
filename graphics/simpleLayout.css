@@ -1,6 +1,16 @@
 /*
  * TODO: scroll to top (like php.net);
+
+header bg:
+6ADA8A
+3DAF5E
+0DA238
+00912A
+48AA64
+
  */
+
+
 
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600,700&subset=latin,latin-ext);
 
@@ -16,6 +26,11 @@ h1,h2,h3,h4,h5,h6,p,ol,ul,dt,dd {
   line-height: 1.3em;
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+p {
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
 }
 
 li {
@@ -42,7 +57,7 @@ h1 {
 }
 
 h2 {
-  color: #6BBD83;
+  color: #48AA64;
   font-weight: 100;
   text-transform: uppercase;
   font-size: 1.8em;
@@ -58,12 +73,12 @@ h3, h4, h5, h6 {
 }
 
 #header > div:first-child {
-  background: #8BE6A5;
+  background: #48AA64;
+
   color: #fff;
 }
 
 #header > div+div {
-  padding: 2em 0;
   font-weight: 100;
   font-size: 1.2em;
   line-height: 1.4em;
@@ -152,13 +167,8 @@ div.section dd {
 div.section div.section,
 dl, div.ul {
   background: #EAF2F5;
-  margin-top: 2.5em;
   padding-top: 1em;
   padding-bottom: 2em;
-}
-
-dl {
-  margin-top: 0;
 }
 
 dt {
@@ -177,6 +187,7 @@ dd {
 
 div.dl {
   background: #EAF2F5;
+  margin-top: 2.5em;
 }
 
 div.dl div {
@@ -212,7 +223,7 @@ div.section div.dl dd {
 }
 
 div.ul {
-  /*background: #8BE6A5;*/
+  /*background: #48AA64;*/
 }
 
 div.ul ul {
@@ -230,7 +241,7 @@ div.ul ul li a {
   display: inline-block;
   margin: 0.3em;
   padding: 1em;
-  background: #8BE6A5;
+  background: #48AA64;
   color: white;
   text-decoration: none;
   font-weight: 100;
