@@ -1,13 +1,5 @@
 /*
  * TODO: scroll to top (like php.net);
-
-header bg:
-6ADA8A
-3DAF5E
-0DA238
-00912A
-48AA64
-
  */
 
 
@@ -78,7 +70,7 @@ h3, h4, h5, h6 {
   color: #fff;
 }
 
-#content > div+div {
+#content > div:first-child + div {
   font-weight: 100;
   font-size: 1.2em;
   line-height: 1.4em;
