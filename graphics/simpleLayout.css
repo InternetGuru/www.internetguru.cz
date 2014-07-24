@@ -72,20 +72,20 @@ h3, h4, h5, h6 {
   margin-top: 1.5em;
 }
 
-#header > div:first-child {
+#content > div:first-child {
   background: #48AA64;
 
   color: #fff;
 }
 
-#header > div+div {
+#content > div+div {
   font-weight: 100;
   font-size: 1.2em;
   line-height: 1.4em;
   color: black;
 }
 
-#header ol.cms-breadcrumb {
+#content ol.cms-breadcrumb {
   list-style: none;
   padding: 0;
   margin-top: -2rem;
@@ -93,17 +93,17 @@ h3, h4, h5, h6 {
   margin-bottom: 0;
 }
 
-#header ol.cms-breadcrumb li:not(:first-child) {
+#content ol.cms-breadcrumb li:not(:first-child) {
   margin-left: 1.5rem;
 }
 
-#header ol.cms-breadcrumb li {
+#content ol.cms-breadcrumb li {
   position: relative;
   display: inline-block;
   margin: 0;
 }
 
-#header ol.cms-breadcrumb li a {
+#content ol.cms-breadcrumb li a {
   display: inline-block;
   font-size: 1rem;
   padding: 0.5rem 0.3rem 0.5rem 0.4rem;
@@ -112,16 +112,16 @@ h3, h4, h5, h6 {
   text-decoration: none;
 }
 
-#header ol.cms-breadcrumb li:first-child a {
+#content ol.cms-breadcrumb li:first-child a {
   padding-left: 0.8rem;
 }
 
-#header ol.cms-breadcrumb li:last-child {
+#content ol.cms-breadcrumb li:last-child {
   padding-left: 0.2rem;
 }
 
-#header ol.cms-breadcrumb li:not(:first-child) a:before,
-#header ol.cms-breadcrumb li a:after {
+#content ol.cms-breadcrumb li:not(:first-child) a:before,
+#content ol.cms-breadcrumb li a:after {
   border-width: 1.25rem 0 1.25rem 1.25rem;
   content: '';
   position: absolute;
@@ -131,13 +131,13 @@ h3, h4, h5, h6 {
   top: 0;
 }
 
-#header ol.cms-breadcrumb li a:after {
+#content ol.cms-breadcrumb li a:after {
   border-color: transparent #EAF2F5;
   z-index: 1;
   right: -1.25rem;
 }
 
-#header ol.cms-breadcrumb li:not(:first-child) a:before {
+#content ol.cms-breadcrumb li:not(:first-child) a:before {
   border-color: #EAF2F5 transparent;
   left: -1.25rem;
 }

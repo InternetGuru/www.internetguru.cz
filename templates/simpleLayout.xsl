@@ -3,7 +3,9 @@
 
   <xsl:template match="/body">
     <body>
-      <div id="header">
+
+      <div id="content">
+
         <div>
           <div>
             <xsl:copy-of select="/body/h1" />
@@ -12,20 +14,24 @@
             </xsl:if>
           </div>
         </div>
+
         <xsl:if test="/body/p[contains(@class,'description') and string-length(text()) > 0]">
           <div><xsl:copy-of select="/body/p[contains(@class,'description')]" /></div>
         </xsl:if>
+
+        <xsl:apply-templates select="/body/*[not(
+          self::h1 or
+          self::p[contains(@class,'description')] or
+          self::ol[contains(@class,'cms-breadcrumb')] or
+          self::ul[contains(@class,'cms-menu')] )]" />
+
       </div>
 
-      <xsl:apply-templates select="/body/*[not(
-        self::h1 or
-        self::p[contains(@class,'description')] or
-        self::ol[contains(@class,'cms-breadcrumb')] or
-        self::ul[contains(@class,'cms-menu')] )]" />
       <div id="footer">
         <xsl:copy-of select="ul[contains(@class,'cms-menu')]"/>
         <ul><li><a href="?admin">Administrace</a></li><li>©2014 internetguru.cz</li></ul>
       </div>
+
     </body>
   </xsl:template>
 
