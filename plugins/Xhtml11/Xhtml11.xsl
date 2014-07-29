@@ -17,12 +17,12 @@
   </xsl:template>
 
   <xsl:template match="//description">
-    <xsl:if test="* or normalize-space()">
+    <!-- <xsl:if test="* or normalize-space()"> -->
       <p class="description">
         <xsl:copy-of select="@*"/>
         <xsl:apply-templates/>
       </p>
-    </xsl:if>
+    <!-- </xsl:if> -->
   </xsl:template>
 
   <xsl:template match="//section">
@@ -33,7 +33,7 @@
   </xsl:template>
 
   <xsl:template match="//p[count(ul|ol|dl)>0]">
-    <div>
+    <div class="paragraph">
     <xsl:copy-of select="@*"/>
     <xsl:for-each select="node()">
       <xsl:variable name="pos" select="position()"/>

@@ -2,8 +2,6 @@
  * TODO: scroll to top (like php.net);
  */
 
-
-
 @import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600,700&subset=latin,latin-ext);
 
 * {
@@ -11,48 +9,43 @@
   padding: 0;
 }
 
-h1,h2,h3,h4,h5,h6,p,ol,ul,dt,dd {
+strong {
+  font-weight: 600;
+}
+
+h1,h2,h3,h4,h5,h6,p,ul,ol,dl {
   max-width: 60rem;
-  margin-right: auto;
-  margin-left: auto;
-  line-height: 1.3em;
+  margin: 1em auto;
   padding-left: 1rem;
   padding-right: 1rem;
 }
 
-p {
-  padding-top: 1.5em;
-  padding-bottom: 1.5em;
-}
-
-li {
-  margin-top: 0.2em;
-  margin-bottom: 0.2em;
-  padding-left: 0;
-  padding-right: 0;
+div.list ul,
+div.list ol,
+div.list dl,
+div.cms-balancer ul {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 body {
   font-family: 'Open Sans', Tahoma, sans-serif;
   color: #555;
-  margin:0;
-  line-height: 1.45em;
-  font-size:1.2em;
 }
 
 h1 {
   margin-top: 0;
   margin-bottom: 0;
-  padding: 1.8em 1rem;
+  padding-top: 1.5em;
+  padding-bottom: 1.8em;
   font-weight: 100;
   text-transform: uppercase;
 }
 
 h2 {
-  color: #48AA64;
+  color: #249E47;
   font-weight: 100;
   text-transform: uppercase;
-  font-size: 1.8em;
   margin-top: 2em;
   margin-bottom: 1.5em;
   text-align: center;
@@ -61,60 +54,56 @@ h2 {
 h3, h4, h5, h6 {
   color: #222;
   font-weight: normal;
-  margin-top: 1.5em;
 }
 
 #content > div:first-child {
-  background: #48AA64;
-
+  background: #66C982;
   color: #fff;
 }
 
-#content > div:first-child + div {
-  font-weight: 100;
-  font-size: 1.2em;
-  line-height: 1.4em;
-  color: black;
-}
+/* breadcrumb navigation */
 
-#content ol.cms-breadcrumb {
+ol.cms-breadcrumb {
   list-style: none;
   padding: 0;
   margin-top: -2rem;
   padding-bottom: 0.5rem;
   margin-bottom: 0;
+  padding-left: 1rem;
+  max-width: 61rem;
 }
 
-#content ol.cms-breadcrumb li:not(:first-child) {
+ol.cms-breadcrumb li:not(:first-child) {
   margin-left: 1.5rem;
 }
 
-#content ol.cms-breadcrumb li {
+ol.cms-breadcrumb li {
   position: relative;
   display: inline-block;
   margin: 0;
 }
 
-#content ol.cms-breadcrumb li a {
+ol.cms-breadcrumb li a {
   display: inline-block;
-  font-size: 1rem;
   padding: 0.5rem 0.3rem 0.5rem 0.4rem;
   background: #EAF2F5;
-  color: #6BBD83;
+  color: #249E47;
   text-decoration: none;
 }
 
-#content ol.cms-breadcrumb li:first-child a {
+ol.cms-breadcrumb li:first-child a {
   padding-left: 0.8rem;
 }
 
-#content ol.cms-breadcrumb li:last-child {
+ol.cms-breadcrumb li:last-child {
   padding-left: 0.2rem;
+  /*text-transform: uppercase;*/
+  /*font-weight: 600;*/
 }
 
-#content ol.cms-breadcrumb li:not(:first-child) a:before,
-#content ol.cms-breadcrumb li a:after {
-  border-width: 1.25rem 0 1.25rem 1.25rem;
+ol.cms-breadcrumb li:not(:first-child) a:before,
+ol.cms-breadcrumb li a:after {
+  border-width: 1.2rem 0 1.2rem 1.25rem;
   content: '';
   position: absolute;
   height: 0;
@@ -123,66 +112,53 @@ h3, h4, h5, h6 {
   top: 0;
 }
 
-#content ol.cms-breadcrumb li a:after {
+ol.cms-breadcrumb li a:after {
   border-color: transparent #EAF2F5;
   z-index: 1;
   right: -1.25rem;
 }
 
-#content ol.cms-breadcrumb li:not(:first-child) a:before {
+ol.cms-breadcrumb li:not(:first-child) a:before {
   border-color: #EAF2F5 transparent;
   left: -1.25rem;
 }
 
-#footer {
-  padding: 1.5em 2em;
-  text-align: center;
-  margin-top: 1em;
-  margin-bottom: 0;
-}
-
-#footer ul {
-  list-style: none;
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
-#footer li {
-  display: inline-block;
-  padding: 0.5em;
-}
-
-div.section dd {
-  font-style: italic;
-}
-
-div.section div.section,
-dl, div.ul {
+#content > div:first-child + div,
+div.list, div.cms-balancer {
   background: #EAF2F5;
   padding-top: 1em;
-  padding-bottom: 2em;
+  padding-bottom: 1em;
+}
+
+#content > div:first-child + div {
+  /*font-weight: 100;*/
+  /*line-height: 1.4em;*/
+  margin-top: 0;
+  color: black;
+}
+
+#content > div:first-child + div p {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 dt {
   color: #222;
   font-size: 1.15em;
   font-weight: normal;
-  margin-top: 1.2em;
-  margin-bottom: 1em;
+}
+
+li,dd {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  margin-left: 2em;
 }
 
 dd {
-  margin-top: 0.2em;
-  margin-bottom: 0.2em;
-  padding-left: 3em;
+  font-style: italic;
 }
 
-div.dl {
-  background: #EAF2F5;
-  margin-top: 2.5em;
-}
-
-div.dl div {
+div.list.multiple div {
   display: table;
   width: 100%;
   max-width: 70em;
@@ -190,55 +166,86 @@ div.dl div {
   margin-right: auto;
 }
 
-div.dl dl {
+div.list.multiple ul,
+div.list.multiple ol,
+div.list.multiple dl {
   display: table-cell;
   text-align: center;
 }
 
-div.section div.dl dt {
-  display: block;
-  margin-top: 1.2em;
-  margin-bottom: 1em;
-  font-size: 1.2rem;
-}
-
-div.section div.dl dd {
-  color: #222;
-  font-size: 1.15em;
-  font-weight: normal;
-  padding-left: 0;
-  padding-right: 0;
+div.list.multiple dd {
   margin-left: 0;
-  margin-top: 0.2em;
-  margin-bottom: 0.2em;
-  font-style: normal;
 }
 
-div.ul {
-  /*background: #48AA64;*/
-}
-
-div.ul ul {
+div.cms-balancer ul {
   list-style: none;
   text-align: center;
 }
 
-div.ul ul li {
+div.cms-balancer li {
   display: inline-block;
+  margin: 0;
 }
 
-div.ul ul li a {
-  font-size: 1.2em;
+div.cms-balancer a {
   text-transform: uppercase;
-  display: inline-block;
-  margin: 0.3em;
   padding: 1em;
-  background: #48AA64;
+  font-weight: 100;
+  margin: 0.3em;
+  background: #66C982;
+  display: inline-block;
   color: white;
   text-decoration: none;
+}
+
+#footer {
+  background: #66C982;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  color: white;
+  text-align: center;
   font-weight: 100;
 }
 
-strong {
+#footer a {
+  color: white;
+}
+
+#footer > ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  text-align: left;
+  list-style: none;
+}
+
+#footer ul ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+}
+
+#footer ul ul li {
+  margin: 0;
+}
+
+#footer > ul.cms-menu > li a {
+  text-decoration: none;
+  font-weight: 100;
+  text-transform: none;
+}
+
+#footer > ul.cms-menu > li li {
+  text-transform: none;
+  margin: 0.2em 0;
+}
+
+#footer > ul.cms-menu > li {
+  text-transform: uppercase;
   font-weight: 600;
+}
+
+#footer > ul.cms-menu > li > a {
+  text-transform: uppercase;
 }

@@ -23,7 +23,9 @@ class ContentBalancer implements SplObserver, ContentStrategyInterface {
     foreach($nodes as $e) {
       $hs = array();
       foreach($xpath->query($e->getNodePath() . "/h") as $h) $hs[] = $h;
-      $ul = $content->createElement("ul");
+      $div = $content->createElement("div");
+      $div->setAttribute("class","cms-balancer");
+      $ul = $div->appendChild($content->createElement("ul"));
       foreach($hs as $h) {
         if($h->hasAttribute("link")) $href = $h->getAttribute("link");
         else {
@@ -41,7 +43,7 @@ class ContentBalancer implements SplObserver, ContentStrategyInterface {
         $li->appendChild($a);
         $ul->appendChild($li);
       }
-      $e->parentNode->replaceChild($ul,$e);
+      $e->parentNode->replaceChild($div,$e);
     }
   }
 
