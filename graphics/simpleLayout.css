@@ -160,6 +160,7 @@ dd {
 }
 
 div.list.multiple div {
+  display: -webkit-flex;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -210,6 +211,7 @@ div.cms-balancer a {
 }
 
 #footer > ul {
+  display: -webkit-flex;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

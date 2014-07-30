@@ -7,6 +7,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $jsContent = array();
   private $jsContentBody = array();
   private $cssFiles = array(); // String filename => Int priority
+  private $cssFilesPriority = array();
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
 
@@ -23,8 +24,10 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    */
   public function getOutput(HTMLPlus $content) {
     $cms = $this->subject->getCms();
+    $cfg = $cms->buildDOM("Xhtml11");
     $lang = $cms->getLanguage();
     $title = $cms->getTitle();
+    $favicon = false;
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
@@ -48,12 +51,13 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $this->appendMetaElement($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMetaElement($head,"Content-Language", $lang);
     $this->appendMetaElement($head,"description", $cms->getDescription());
+    foreach($cfg->getElementsByTagName("favicon") as $fav) $favicon = $fav->nodeValue;
+    $this->appendLinkElement($head,$favicon,"Xhtml11","shortcut icon");
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
 
     // transform content and add as body element
-    $cfg = $cms->buildDOM("Xhtml11");
     $body = $content;
     foreach($cfg->getElementsByTagName("xslt") as $xslt) {
       $body = $this->transform($body,$xslt->nodeValue,$xslt->hasAttribute("absolute"));
@@ -87,6 +91,20 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"),$nameValue);
     $meta->setAttribute("content",$contentValue);
     $e->appendChild($meta);
+  }
+
+  private function appendLinkElement(DOMElement $parent,$file,$plugin,$rel,$type=false,$media=false) {
+    $f = findFilePath($file,$plugin);
+    if(!$f) {
+      $parent->appendChild(new DOMComment(" CSS file '$file' not found "));
+      return;
+    }
+    $e = $parent->ownerDocument->createElement("link");
+    if($type) $e->setAttribute("type",$type);
+    if($rel) $e->setAttribute("rel",$rel);
+    if($media) $e->setAttribute("media",$media);
+    $e->setAttribute("href",$this->getSubdom() ."/". $f);
+    $parent->appendChild($e);
   }
 
   /**
@@ -128,22 +146,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param string  $plugin   Plugin name (no plugin by default)
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addCssFile($fileName,$plugin = "", $priority = 10) {
-    if(($f = findFilePath($fileName,$plugin)) !== false) {
-      $this->cssFiles[$f] = $priority;
-      return;
-    }
-    $this->cssFiles[$fileName] = null;
-  }
-
-  /**
-   * Set media attribute for a specific CSS file
-   * @param string $fileName CSS file name (eg. style.css)
-   * @param string $media    Attribute media value (eg. print, all, screen)
-   */
-  public function setCssMedia($fileName,$media) {
-    if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
-    $this->cssMedia[$fileName] = $media;
+  public function addCssFile($fileName,$plugin = "", $media = false, $priority = 10) {
+    $key = "k" . count($this->cssFiles);
+    $this->cssFilesPriority[$key] = $priority;
+    $this->cssFiles[$key] = array("priority" => $priority, "file" => $fileName,
+      "plugin" => $plugin, "media" => $media);
   }
 
   /**
@@ -181,18 +188,11 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   private function appendCssFiles(DOMElement $parent) {
-    stableSort($this->cssFiles);
-    foreach($this->cssFiles as $f => $p) {
-      if(is_null($p)) {
-        $parent->appendChild(new DOMComment(" CSS file '$f' not found "));
-        continue;
-      }
-      $e = $parent->ownerDocument->createElement("link");
-      $e->setAttribute("type","text/css");
-      $e->setAttribute("rel","stylesheet");
-      $e->setAttribute("href",$this->getSubdom() ."/". $f);
-      if(isset($this->cssMedia[$f])) $e->setAttribute("media",$this->cssMedia[$f]);
-      $parent->appendChild($e);
+    stableSort($this->cssFilesPriority);
+    foreach($this->cssFilesPriority as $k => $v) {
+      $this->appendLinkElement($parent, $this->cssFiles[$k]["file"],
+        $this->cssFiles[$k]["plugin"],"stylesheet","text/css",
+        $this->cssFiles[$k]["media"]);
     }
   }
 

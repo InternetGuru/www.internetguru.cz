@@ -51,7 +51,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function generateUniqueId() {
-    $id = "h." . substr(md5(microtime()),0,12);
+    $id = "h." . substr(md5(microtime()),0,3);
     if(!$this->isValidId($id)) return $this->generateUniqueId();
     if(array_key_exists($id,$this->hid)) return $this->generateUniqueId();
     return $id;

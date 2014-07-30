@@ -42,10 +42,8 @@ class Cms {
 
   private function addStylesheets() {
     foreach($this->config->getElementsByTagName("stylesheet") as $css) {
-      $this->outputStrategy->addCssFile($css->nodeValue);
-      if($css->hasAttribute("media")) {
-        $this->outputStrategy->setCssMedia($css->nodeValue,$css->getAttribute("media"));
-      }
+      $media = ($css->hasAttribute("media") ? $css->getAttribute("media") : false);
+      $this->outputStrategy->addCssFile($css->nodeValue,"",$media);
     }
   }
 
