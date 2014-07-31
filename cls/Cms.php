@@ -26,7 +26,7 @@ class Cms {
   }
 
   public function init() {
-    $this->config = $this->buildDOM("Cms");
+    $this->config = $this->buildDOM();
     $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
     if(@constant($er) === null) // keep outside if to check value
       throw new Exception("Undefined constatnt '$er' used in error_reporting");
@@ -38,6 +38,13 @@ class Cms {
     if(!date_default_timezone_set($tz))
       throw new Exception("Unable to set date_default_timezone to value '$er'");
     $this->loadContent();
+  }
+
+  private function addJsFiles() {
+    foreach($this->config->getElementsByTagName("jsFile") as $jsFile) {
+      if($jsFile->nodeValue == "") continue;
+      $this->outputStrategy->addJsFile($jsFile->nodeValue,"",1);
+    }
   }
 
   private function addStylesheets() {
@@ -59,11 +66,11 @@ class Cms {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }
 
-  public function buildDOM($plugin,$replace=false,$filename="") {
+  public function buildDOM($plugin="",$replace=false,$filename="") {
     return $this->domBuilder->buildDOM($plugin,$replace,$filename);
   }
 
-  public function buildHTML($plugin,$replace=false,$filename="") {
+  public function buildHTML($plugin="",$replace=false,$filename="") {
     return $this->domBuilder->buildHTML($plugin,$replace,$filename);
   }
 
@@ -193,10 +200,11 @@ class Cms {
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
     $this->outputStrategy = $strategy;
     $this->addStylesheets();
+    $this->addJsFiles();
   }
 
   private function loadContent() {
-    $this->contentFull = $this->buildHTML("Cms",true,"Content.xml");
+    $this->contentFull = $this->buildHTML("",true,"Content.xml");
   }
 
   public function getOutput() {

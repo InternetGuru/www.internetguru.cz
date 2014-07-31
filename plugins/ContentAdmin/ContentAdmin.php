@@ -8,7 +8,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
   private $content = null;
   private $errors = array();
-  private $contentValue = null;
+  private $contentValue = "";
   private $dataFile;
 
   public function update(SplSubject $subject) {
@@ -20,7 +20,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       $this->subject = $subject;
       $this->dataFile = USER_FOLDER . "/Content.xml";
       $subject->getCms()->setContentStrategy($this,100);
-      $this->proceedPost();
+      $this->validateAndRepair();
       return;
     }
     if($subject->getStatus() == "postprocess") {
@@ -51,9 +51,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   private function insertVars() {
     $cms = $this->subject->getCms();
-    if(is_null($this->contentValue)) {
-      $this->contentValue = file_get_contents($this->dataFile);
-    }
     $cms->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $cms->insertVar("errors",$this->errors,"ContentAdmin");
     $cms->insertVar("link",$cms->getLink(),"ContentAdmin");
@@ -69,23 +66,38 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     return hash_file(self::HASH_ALGO,$filePath);
   }
 
-  private function proceedPost() {
-    if(!isset($_POST["content"])) return;
+  private function validateAndRepair() {
+
+    $post = false;
+    if(isset($_POST["content"],$_POST["filehash"])) $post = true;
+
     try {
-      if($_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
+
+      if($post && $_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
         throw new Exception("No changes made");
-      if($_POST["filehash"] != $this->getFileHash($this->dataFile))
+      if($post && $_POST["filehash"] != $this->getFileHash($this->dataFile))
         throw new Exception("Source file has changed during administration");
+
       $doc = new HTMLPlus();
       $doc->formatOutput = true;
       $doc->preserveWhiteSpace = false;
-      if(!@$doc->loadXML($_POST["content"]))
-        throw new Exception("String is not valid XML");
+
+      if($post) {
+        if(!@$doc->loadXML($_POST["content"])) throw new Exception("String is not valid XML");
+      } elseif(!@$doc->load($this->dataFile)) {
+        if(!($this->contentValue = @file_get_contents($this->dataFile)))
+          throw new Exception("Unable to load content from '{$this->dataFile}'");
+        $this->errors[] = "File is not valid XML";
+        return;
+      }
+
       libxml_use_internal_errors(true);
-      $doc->validate(true);
-      $this->savePost($doc);
+      $i = $doc->validate(true);
+      if($post) $this->savePost($doc);
+      elseif($i > 0) $this->errors[] = "Note: file has been autocorrected";
       // validation may include non-blocking errors
       #$this->errors[] = "non-blocking error";
+
     } catch (Exception $e) {
       $internal_errors = libxml_get_errors();
       if(count($internal_errors)) {
@@ -95,9 +107,13 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         $this->errors[] = $e->getMessage();
       }
     }
+
     libxml_use_internal_errors(false);
-    if(empty($this->errors)) $this->redir();
-    $this->contentValue = $_POST["content"];
+    if($post) {
+      if(empty($this->errors)) $this->redir();
+      $this->contentValue = $_POST["content"];
+    } else $this->contentValue = $doc->saveXML();
+
   }
 
   private function redir() {

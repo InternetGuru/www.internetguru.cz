@@ -26,7 +26,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$this->relaxNGValidate($f)) {
         throw new Exception ("Document is not HTMLPlus schema valid");
       }
-      return;
+      return $i;
     } catch (Exception $e) {
       if(!$repair) throw $e;
       switch ($e->getCode()) {
@@ -41,7 +41,6 @@ class HTMLPlus extends DOMDocumentPlus {
       }
       return $this->validate($repair,++$i);
     }
-
   }
 
   private function addHeadingIds() {

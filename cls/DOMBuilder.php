@@ -16,7 +16,7 @@ class DOMBuilder {
   const DEBUG = false;
   private $backupStrategy = null;
   private $doc; // DOMDocument (HTMLPlus)
-  private $path;
+  private $plugin;
   private $replace; // bool
   private $filename;
 
@@ -26,57 +26,60 @@ class DOMBuilder {
     $this->backupStrategy = $backupStrategy;
   }
 
-  public function buildDOM($path="Cms",$replace=false,$filename="") {
+  public function buildDOM($plugin="",$replace=false,$filename="") {
     $this->doc = new DOMDocumentPlus();
-    $this->doc->formatOutput = true;
-    $this->path = $path;
-    $this->replace = $replace;
-    $this->filename = ($filename == "" ? "$path.xml" : $filename);
-    $this->build();
+    $this->build($plugin,$replace,$filename);
     return $this->doc;
   }
 
-  public function buildHTML($path="Cms",$replace=false,$filename="") {
+  public function buildHTML($plugin="",$replace=false,$filename="") {
     $this->doc = new HTMLPlus();
-    $this->path = $path;
-    $this->replace = $replace;
-    $this->filename = ($filename == "" ? "$path.xml" : $filename);
-    $this->build();
+    $this->build($plugin,$replace,$filename);
     return $this->doc;
   }
 
-  private function build() {
-    if(!is_string($this->path)) throw new Exception('Variable type: not string.');
+  private function build($plugin,$replace,$filename) {
 
-    // create DOM from default config xml (Cms root or Plugin dir)
-    if($this->path == "Cms") $filePath = $this->filename;
-    else $filePath = PLUGIN_FOLDER ."/". $this->path ."/". $this->filename;
-    if(!is_file($filePath)) $filePath = "../" . CMS_FOLDER . "/$filePath";
+    if(!is_string($plugin)) throw new Exception('Variable type: not string.');
+    if($filename == "" && $plugin == "") $filename = "Cms.xml";
+    elseif($filename == "") $filename = "$plugin.xml";
 
-    $files = array($filePath => true,ADMIN_FOLDER."/".$this->filename => true,USER_FOLDER."/".$this->filename => false);
-    if($this->replace) $this->loadFirstDOM(array_reverse($files));
-    else $this->updateAll($files);
-  }
-
-  private function updateAll(Array $files) {
-    if(!is_file(key($files)))
-      throw new Exception(sprintf("File %s not found",key($file)));
-    foreach($files as $f => $ignoreReadonly) {
-      if(!is_file($f)) continue;
-      $this->updateDOM($f,$ignoreReadonly);
-      if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+    if($replace) {
+      if(!@$this->doc->load(findFilePath($filename,$plugin)))
+        throw new Exception(sprintf('Unable to load DOM from file %s',$filename));
+      #FIXME:backup
+      return;
     }
+
+    if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $plugin . ".xml";
+
+    $this->loadDOM(findFilePath($filename,"",false,false),$this->doc);
+
+    #if(!@$this->doc->load($f))
+    #  throw new Exception(sprintf('Unable to load DOM from file %s',$filename));
+    #if($this->backupStrategy !== null) $this->backupStrategy->doBackup($f);
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+
+    $f = ADMIN_FOLDER . "/$filename";
+    if(is_file($f)) $this->updateDOM($f,true);
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+
+    $f = USER_FOLDER . "/$filename";
+    if(is_file($f)) $this->updateDOM($f);
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
   }
 
-  private function loadFirstDOM(Array $files) {
-    foreach($files as $f => $ignoreReadonly) {
-      if(is_file($f)) {
-        if(!@$this->doc->load($f))
-          throw new Exception(sprintf('Unable to load DOM from file %s',$f));
-        return;
+  private function loadDOM($filename,DOMDocumentPlus $doc) {
+    if(@$doc->load($filename)) {
+      if($this->backupStrategy !== null) $this->backupStrategy->doBackup($filename);
+    } elseif($this->backupStrategy !== null) {
+      $this->backupStrategy->restoreNewestBackup($filename);
+      if(!@$doc->load($filename)) {
+        throw new Exception(sprintf('Unable to load restored XML file %s',$filename));
       }
+    } else {
+      throw new Exception(sprintf('Unable to load XML file %s',$filename));
     }
-    throw new Exception("Cannot load DOM '$f'");
   }
 
   /**
@@ -88,18 +91,7 @@ class DOMBuilder {
    */
   private function updateDOM($filePath,$ignoreReadonly=false) {
     $doc = new DOMDocumentPlus();
-    if(@$doc->load($filePath)) {
-      if($this->backupStrategy !== null) {
-        $this->backupStrategy->doBackup($filePath);
-      }
-    } elseif($this->backupStrategy !== null) {
-      $this->backupStrategy->restoreNewestBackup($filePath);
-      if(!@$doc->load($filePath)) {
-        throw new Exception(sprintf('Unable to load restored XML file %s',$filePath));
-      }
-    } else {
-      throw new Exception(sprintf('Unable to load XML file %s',$filePath));
-    }
+    $this->loadDOM($filePath,$doc);
     // create root element if not exists
     if(is_null($this->doc->documentElement)) {
       $this->doc->appendChild($this->doc->importNode($doc->documentElement));
@@ -128,6 +120,10 @@ class DOMBuilder {
         #}
         foreach($remove as $d) $d->parentNode->removeChild($d);
       } else {
+        // if empty && readonly => user cannot modify
+        foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
+          if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
+        }
         $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
       }
     }

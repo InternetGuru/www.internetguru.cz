@@ -16,6 +16,9 @@
   <stylesheet readonly="readonly">cms-basic.css</stylesheet>
   <stylesheet media="print">cms-print.css</stylesheet>
 
+  <!-- javascript (js) -->
+  <jsFile readonly="readonly" />
+
   <!-- default variables -->
   <var id="example" readonly="readonly">example value</var>
 

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!-- Image Module -->
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+
+  <define name="img">
+    <element name="img">
+      <ref name="img.attlist"/>
+    </element>
+  </define>
+
+  <define name="img.attlist">
+    <attribute name="src">
+      <ref name="URI.datatype"/>
+    </attribute>
+    <attribute name="alt"/>
+    <ref name="Common.attrib"/>
+    <optional>
+      <attribute name="width">
+        <ref name="Pixels.datatype"/>
+      </attribute>
+    </optional>
+    <optional>
+      <attribute name="height">
+        <ref name="Pixels.datatype"/>
+      </attribute>
+    </optional>
+  </define>
+
+  <define name="Inline.class" combine="choice">
+    <ref name="img"/>
+  </define>
+
+</grammar>

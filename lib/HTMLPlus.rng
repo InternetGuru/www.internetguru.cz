@@ -84,6 +84,7 @@
     </element>
   </define>
 
+  <include href="xhtml/img.rng"/>
   <include href="xhtml/datatypes.rng"/>
   <include href="xhtml/text.rng"/>
   <include href="xhtml/attribs.rng"/>
