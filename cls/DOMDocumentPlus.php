@@ -15,5 +15,18 @@ class DOMDocumentPlus extends DOMDocument {
     return $q->item(0);
   }
 
+  public function renameElement($node, $name) {
+    $newnode = $this->createElement($name);
+    foreach ($node->childNodes as $child) {
+      $child = $this->importNode($child, true);
+      $newnode->appendChild($child);
+    }
+    foreach ($node->attributes as $attrName => $attrNode) {
+      $newnode->setAttribute($attrName, $attrNode);
+    }
+    $node->parentNode->replaceChild($newnode, $node);
+    return $newnode;
+  }
+
 }
 ?>

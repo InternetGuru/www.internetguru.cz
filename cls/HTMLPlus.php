@@ -3,6 +3,7 @@
 class HTMLPlus extends DOMDocumentPlus {
   private $hid = array();
   private $hnoid = array();
+  private $hnodesc = array();
   const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
@@ -35,6 +36,7 @@ class HTMLPlus extends DOMDocumentPlus {
         #break;
         case 2:
         $this->addHeadingIds();
+        $this->addDescriptions();
         break;
         default:
         throw $e;
@@ -47,6 +49,18 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->hnoid as $h) {
       $h->setAttribute("id",$this->generateUniqueId());
     }
+    $this->hnoid = array();
+  }
+
+  private function addDescriptions() {
+    foreach($this->hnodesc as $h) {
+      if($h->nextSibling->nodeName == "p") {
+        $h->ownerDocument->renameElement($h->nextSibling,"description");
+      } else {
+        $h->parentNode->insertBefore($h->ownerDocument->createElement("description"),$h->nextSibling);
+      }
+    }
+    $this->hnodesc = array();
   }
 
   private function generateUniqueId() {
@@ -66,6 +80,8 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->hid = array();
     $this->hnoid = array();
     foreach($this->getElementsByTagName("h") as $h) {
+      if($h->nextSibling->nodeName != "description")
+        $this->hnodesc[] = $h;
       if(!$h->hasAttribute("id")) {
         $this->hnoid[] = $h;
         continue;
@@ -80,8 +96,8 @@ class HTMLPlus extends DOMDocumentPlus {
         throw new Exception ("Duplicit id found, value '$id'");
       $this->hid[$id] = null;
     }
-    if(count($this->hnoid))
-      throw new Exception ("Missing ID in " . count($this->hnoid) . " element(s) 'h'",2);
+    if(count($this->hnoid) || count($this->hnodesc))
+      throw new Exception ("Missing element h ID or description",2);
     $xpath = new DOMXPath($this);
     if($xpath->query("/body/*[1]")->item(0)->nodeName != "h")
       throw new Exception ("Missing main heading (/body/h)");

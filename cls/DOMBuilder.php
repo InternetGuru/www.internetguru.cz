@@ -45,19 +45,13 @@ class DOMBuilder {
     elseif($filename == "") $filename = "$plugin.xml";
 
     if($replace) {
-      if(!@$this->doc->load(findFilePath($filename,$plugin)))
-        throw new Exception(sprintf('Unable to load DOM from file %s',$filename));
-      #FIXME:backup
+      $this->loadDOM(findFilePath($filename,$plugin),$this->doc);
+      if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
       return;
     }
 
     if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $plugin . ".xml";
-
     $this->loadDOM(findFilePath($filename,"",false,false),$this->doc);
-
-    #if(!@$this->doc->load($f))
-    #  throw new Exception(sprintf('Unable to load DOM from file %s',$filename));
-    #if($this->backupStrategy !== null) $this->backupStrategy->doBackup($f);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$filename";
