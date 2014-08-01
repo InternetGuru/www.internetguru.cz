@@ -1,6 +1,6 @@
 <?php
 
-class ContentHighliter implements SplObserver, ContentStrategyInterface {
+class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
 
   public function update(SplSubject $subject) {
@@ -43,7 +43,7 @@ class ContentHighliter implements SplObserver, ContentStrategyInterface {
     $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
     $os->addJsFile("lib/codemirror/addon/fold/foldcode.js");
 
-    $os->addJsFile('ContentHighliter.js','ContentHighliter', 10, "body");
+    $os->addJsFile('ContentCodeMirror.js','ContentCodeMirror', 10, "body");
 
     return $content;
   }
