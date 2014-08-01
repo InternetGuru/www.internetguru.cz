@@ -7,8 +7,12 @@
     <div>
       <textarea class="xml" cols="40" name="content" rows="20">{ContentAdmin:content}</textarea>
       <input name="filehash" type="hidden" value="{ContentAdmin:filehash}"/>
-      <input name="saveandgo" type="submit" value="Uložit a odejít"/>
-      <input name="saveandstay" type="submit" value="Uložit"/>
+      <ul>
+        <li><input name="saveandgo" type="submit" value="Uložit a odejít (Ctrl+Shift+S)"/></li>
+        <li><input name="saveandstay" type="submit" value="Uložit (Ctrl+S)"/></li>
+        <li><a href="{ContentAdmin:link}?admin">Zahodit změny</a></li>
+        <li><a href="{ContentAdmin:link}">Zahodit změny a odejít</a></li>
+      </ul>
     </div>
   </form>
 </body>

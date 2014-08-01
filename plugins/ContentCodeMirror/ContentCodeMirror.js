@@ -7,7 +7,13 @@ for (var i = 0; i < ta.length; i++) {
         lineNumbers: true,
         mode:"xml",
         width:"100%",
-        lineWrapping: true
+        lineWrapping: true,
+        tabSize: 2,
+        extraKeys: {
+        "Tab": function(cm){
+           cm.replaceSelection("   " , "end");
+         }
+        }
       }
     );
   }

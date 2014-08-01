@@ -31,6 +31,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
+    $cms->getOutputStrategy()->addJsFile('ContentAdmin.js','ContentAdmin', 10, "body");
     return $cms->buildHTML("ContentAdmin",true);
   }
 
