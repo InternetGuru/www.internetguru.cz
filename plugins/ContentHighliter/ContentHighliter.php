@@ -10,6 +10,24 @@ class ContentHighliter implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $content) {
+
+    // detach and return if no textarea or blockcode
+    $ta = $content->getElementsByTagName("textarea");
+    if($ta->length == 0) {
+      $this->subject->detach($this);
+      return $content;
+    }
+
+    // supported syntax only
+    $detach = true;
+    foreach($ta as $t) {
+      if($t->hasAttribute("class") && in_array("xml", explode(" ",$t->getAttribute("class")))) $detach = false;
+    }
+    if($detach) {
+      $this->subject->detach($this);
+      return $content;
+    }
+
     $cms = $this->subject->getCms();
     $os = $cms->getOutputStrategy();
 
@@ -25,7 +43,7 @@ class ContentHighliter implements SplObserver, ContentStrategyInterface {
     $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
     $os->addJsFile("lib/codemirror/addon/fold/foldcode.js");
 
-    $os->addJs('var editor = CodeMirror.fromTextArea(document.getElementById("adminForm"),{keyMap:"sublime",theme:"monokai",lineNumbers: true,mode:"xml", width:"100%",  lineWrapping: true});', 10, "body");
+    $os->addJsFile('ContentHighliter.js','ContentHighliter', 10, "body");
 
     return $content;
   }
