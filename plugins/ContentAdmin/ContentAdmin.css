@@ -1,0 +1,8 @@
+fieldset {
+  min-width: initial;
+  border: none;
+}
+textarea {
+  width: 100%;
+  height: 60%;
+}
