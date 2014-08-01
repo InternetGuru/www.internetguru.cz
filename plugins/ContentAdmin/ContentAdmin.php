@@ -23,25 +23,19 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       $this->validateAndRepair();
       return;
     }
-    if($subject->getStatus() == "postprocess") {
-      $this->insertVars();
-      return;
-    }
   }
 
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
+    $cms->getOutputStrategy()->addCssFile('ContentAdmin.css','ContentAdmin');
     $cms->getOutputStrategy()->addJsFile('ContentAdmin.js','ContentAdmin', 10, "body");
-    return $cms->buildHTML("ContentAdmin",true);
-  }
-
-  private function insertVars() {
-    $cms = $this->subject->getCms();
-    $cms->insertVar("heading",$cms->getTitle(),"ContentAdmin");
-    $cms->insertVar("errors",$this->errors,"ContentAdmin");
-    $cms->insertVar("link",$cms->getLink(),"ContentAdmin");
-    $cms->insertVar("content",$this->contentValue,"ContentAdmin");
-    $cms->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
+    $newContent = $cms->buildHTML("ContentAdmin",true);
+    $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
+    $newContent->insertVar("errors",$this->errors,"ContentAdmin");
+    $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
+    $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
+    $newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
+    return $newContent;
   }
 
   private function getHash($data) {
@@ -66,7 +60,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
       $doc = new HTMLPlus();
       $doc->formatOutput = true;
-      $doc->preserveWhiteSpace = false;
 
       if($post) {
         if(!@$doc->loadXML($_POST["content"])) throw new Exception("String is not valid XML");
@@ -77,7 +70,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         return;
       }
 
-      libxml_use_internal_errors(true);
       $i = $doc->validate(true);
       if($post) $this->savePost($doc);
       elseif($i > 0) $this->errors[] = "Note: file has been autocorrected";
@@ -85,16 +77,9 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       #$this->errors[] = "non-blocking error";
 
     } catch (Exception $e) {
-      $internal_errors = libxml_get_errors();
-      if(count($internal_errors)) {
-        foreach($internal_errors as $e) $this->errors[] = $e->message;
-        libxml_clear_errors();
-      } else {
-        $this->errors[] = $e->getMessage();
-      }
+      $this->errors[] = $e->getMessage();
     }
 
-    libxml_use_internal_errors(false);
     if($post) {
       if(empty($this->errors)) $this->redir();
       $this->contentValue = $_POST["content"];

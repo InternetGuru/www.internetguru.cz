@@ -11,7 +11,7 @@ for (var i = 0; i < ta.length; i++) {
         tabSize: 2,
         extraKeys: {
         "Tab": function(cm){
-           cm.replaceSelection("   " , "end");
+           cm.replaceSelection("  " , "end");
          }
         }
       }

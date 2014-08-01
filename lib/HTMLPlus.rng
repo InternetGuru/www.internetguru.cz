@@ -69,6 +69,9 @@
       <zeroOrMore>
         <ref name="htmlplus.dl"/>
       </zeroOrMore>
+      <zeroOrMore>
+        <ref name="form"/>
+      </zeroOrMore>
     </interleave>
   </define>
 
@@ -163,10 +166,11 @@
   </define>
 
   <include href="xhtml/img.rng"/>
+  <include href="xhtml/list.rng"/>
   <include href="xhtml/datatypes.rng"/>
   <include href="xhtml/text.rng"/>
   <include href="xhtml/attribs.rng"/>
   <include href="xhtml/hypertext.rng"/>
-  <include href="xhtml/list.rng"/>
+  <include href="xhtml/xhtml-form-1.rng"/>
 
 </grammar>

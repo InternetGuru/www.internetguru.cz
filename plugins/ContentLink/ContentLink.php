@@ -5,6 +5,7 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   private $titleQueries = array();
   private $descriptionQuery = null;
   private $content;
+  private $lang = null;
 
   public function update(SplSubject $subject) {
     if($subject->getCms()->getLink() == ".") {
@@ -28,6 +29,8 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
     $body = $this->content->appendChild($this->content->createElement("body"));
     $this->appendUntil($exactMatch->item(0),$body);
     $this->addTitleQueries($exactMatch->item(0));
+    if(is_null($this->lang)) $cms->getContentFull()->documentElement->getAttribute("lang");
+    $body->setAttribute("lang",$this->lang);
   }
 
   public function getTitle(Array $queries) {
@@ -46,11 +49,16 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   private function addTitleQueries(DOMElement $h) {
     $this->titleQueries[] = $h->getNodePath();
     $e = $h->parentNode;
-    if($e->nodeName == "section") while(($e = $e->previousSibling) !== null) {
-      if($e->nodeName != "h") continue;
-      if(!$e->hasAttribute("link")) continue;
-      $this->addTitleQueries($e);
-      break;
+    if($e->nodeName == "section") {
+      if(is_null($this->lang) && $e->hasAttribute("lang")) {
+        $this->lang = $e->getAttribute("lang");
+      }
+      while(($e = $e->previousSibling) !== null) {
+        if($e->nodeName != "h") continue;
+        if(!$e->hasAttribute("link")) continue;
+        $this->addTitleQueries($e);
+        break;
+      }
     }
     if(is_null($e)) $this->titleQueries[] = "/body/h";
   }

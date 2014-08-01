@@ -8,6 +8,7 @@ class HTMLPlus extends DOMDocumentPlus {
 
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);
+    $this->preserveWhiteSpace = false;
   }
 
   public function cloneNode($deep=false) {
@@ -24,9 +25,22 @@ class HTMLPlus extends DOMDocumentPlus {
       $this->doValidate();
       if(!($f = findFilePath(self::RNG_FILE,"",false)))
         throw new Exception ("Unable to find HTMLPlus RNG schema");
-      if(!$this->relaxNGValidate($f)) {
-        throw new Exception ("Document is not HTMLPlus schema valid");
+
+      try {
+        libxml_use_internal_errors(true);
+        if(!$this->relaxNGValidate($f))
+          throw new Exception("relaxNGValidate internal error occured");
+      } catch (Exception $e) {
+        $internal_errors = libxml_get_errors();
+        if(count($internal_errors)) {
+          #print_r($e);
+          $e = new Exception(current($internal_errors)->message);
+        }
       }
+      libxml_clear_errors();
+      libxml_use_internal_errors(false);
+      if(isset($e)) throw $e;
+
       return $i;
     } catch (Exception $e) {
       if(!$repair) throw $e;
@@ -79,6 +93,7 @@ class HTMLPlus extends DOMDocumentPlus {
       throw new Exception("Root element must be 'body'",1);
     $this->hid = array();
     $this->hnoid = array();
+    $this->hnodesc = array();
     foreach($this->getElementsByTagName("h") as $h) {
       if($h->nextSibling->nodeName != "description")
         $this->hnodesc[] = $h;
@@ -96,8 +111,9 @@ class HTMLPlus extends DOMDocumentPlus {
         throw new Exception ("Duplicit id found, value '$id'");
       $this->hid[$id] = null;
     }
-    if(count($this->hnoid) || count($this->hnodesc))
+    if(count($this->hnoid) || count($this->hnodesc)) {
       throw new Exception ("Missing element h ID or description",2);
+    }
     $xpath = new DOMXPath($this);
     if($xpath->query("/body/*[1]")->item(0)->nodeName != "h")
       throw new Exception ("Missing main heading (/body/h)");

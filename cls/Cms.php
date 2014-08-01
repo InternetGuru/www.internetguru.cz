@@ -9,8 +9,6 @@ class Cms {
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
-#  private $contentStrategy = array(); // ContentStrategyInterface
-#  private $contentStrategyPriority = array(); // ContentStrategyInterface
   private $link = ".";
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
@@ -64,7 +62,7 @@ class Cms {
     if(is_null($this->content)) throw new Exception("Content not set");
     foreach($this->config->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id")) throw new Exception ("Var is missing id");
-      $this->insertVar($var->getAttribute("id"),$var);
+      $this->content->insertVar($var->getAttribute("id"),$var);
     }
   }
 
@@ -81,77 +79,6 @@ class Cms {
   }
 
   #public function getStructure() {}
-
-  public function insertVar($varName,$varValue,$plugin="") {
-    $xpath = new DOMXPath($this->content);
-    if($plugin == "") $plugin = "Cms";
-    $var = "{".$plugin.":".$varName."}";
-    if(is_string($varValue)) {
-      $where = $xpath->query("//@*[contains(.,'$var')]");
-      $this->insertVarString($var,$varValue,$where);
-    }
-    $where = $xpath->query("//text()[contains(.,'$var')]");
-    if($where->length == 0) return;
-    $type = gettype($varValue);
-    if($type == "object") $type = get_class($varValue);
-    switch($type) {
-      case "string":
-      $this->insertVarString($var,$varValue,$where);
-      break;
-      case "array":
-      $this->insertVarArray($var,$varValue,$where);
-      break;
-      case "DOMElement":
-      $this->insertVarDOMElement($var,$varValue,$where);
-      break;
-      default:
-      throw new Exception("Unsupported type '$type'");
-    }
-  }
-
-  private function insertVarString($varName,$varValue,DOMNodeList $where) {
-    foreach($where as $e) {
-      $e->nodeValue = str_replace($varName, $varValue, $e->nodeValue);
-    }
-  }
-
-  private function insertVarArray($varName,Array $varValue,DOMNodeList $where) {
-    if(empty($varValue)) {
-      $this->insertVarString($varName,"",$where);
-      return;
-    }
-    $doc = new DOMDocument();
-    $ul = $doc->createElement("ul");
-    foreach($varValue as $i) $ul->appendChild($doc->createElement("li",$i));
-    $this->insertVarDOMElement($varName,$ul,$where);
-  }
-
-  private function insertVarDOMElement($varName,DOMElement $varValue,DOMNodeList $where) {
-    $into = array();
-    foreach($where as $e) $into[] = $e;
-    foreach($into as $e) {
-      $newParent = $e->parentNode->cloneNode();
-      $children = array();
-      foreach($e->parentNode->childNodes as $ch) $children[] = $ch;
-      foreach($children as $ch) {
-        if(!$ch->isSameNode($e)) {
-          $newParent->appendChild($ch);
-          continue;
-        }
-        $parts = explode($varName,$ch->nodeValue);
-        foreach($parts as $id => $part) {
-          $newParent->appendChild($e->ownerDocument->createTextNode($part));
-          if((count($parts)-1) == $id) continue;
-          $appendInto = array();
-          foreach($varValue->childNodes as $n) $appendInto[] = $n;
-          foreach($appendInto as $n) {
-            $newParent->appendChild($e->ownerDocument->importNode($n,true));
-          }
-        }
-      }
-      $e->parentNode->parentNode->replaceChild($e->ownerDocument->importNode($newParent),$e->parentNode);
-    }
-  }
 
   public function getTitle() {
     $title = array();
@@ -194,8 +121,18 @@ class Cms {
     foreach($contentStrategies as $cs) {
       $this->titleQueries = $cs->getTitle($this->titleQueries);
     }
-    foreach($contentStrategies as $cs) {
-      $this->content = $cs->getContent($this->content);
+    try {
+      $cs = null;
+      $this->content->validate();
+      foreach($contentStrategies as $cs) {
+        $c = $cs->getContent($this->content);
+        $c->validate();
+        $this->content = $c;
+      }
+    } catch (Exception $e) {
+      #var_dump($cs);
+      #echo $this->content->saveXML();
+      throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }
 

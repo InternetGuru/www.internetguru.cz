@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <body lang="cs">
-  <h>{ContentAdmin:heading} (administrace)</h>
+  <h id="h.adf">{ContentAdmin:heading} (administrace)</h>
   <description/>
-  <div class="error">{ContentAdmin:errors}</div>
+  <p class="error">{ContentAdmin:errors}</p>
   <form action="{ContentAdmin:link}?admin" method="post">
-    <div>
+    <fieldset><legend>Datový soubor ve formátu HTMLPlus</legend>
+    <!-- <div> -->
       <textarea class="xml" cols="40" name="content" rows="20">{ContentAdmin:content}</textarea>
       <input name="filehash" type="hidden" value="{ContentAdmin:filehash}"/>
       <ul>
@@ -13,6 +14,7 @@
         <li><a href="{ContentAdmin:link}?admin">Zahodit změny</a></li>
         <li><a href="{ContentAdmin:link}">Zahodit změny a odejít</a></li>
       </ul>
-    </div>
+    <!-- </div> -->
+    </fieldset>
   </form>
 </body>

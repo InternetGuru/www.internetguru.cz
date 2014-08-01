@@ -23,7 +23,9 @@ class ContentBreadcrumb implements SplObserver, ContentStrategyInterface {
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());
-    $content->documentElement->appendChild($this->getBreadcrumb($xpath,$content));
+    #$content->documentElement->appendChild($this->getBreadcrumb($xpath,$content));
+    $s = $content->documentElement->getElementsByTagName("section")->item(0);
+    $content->documentElement->insertBefore($this->getBreadcrumb($xpath,$content),$s);
     return $content;
   }
 

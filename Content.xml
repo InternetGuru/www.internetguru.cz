@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <body lang="en">
-  <h>Long default title</h>
+  <h id="h.abc">Long default title</h>
   <description>Some paragraph...</description>
   <section lang="en">
-    <h>Subheading</h>
-    <p class="a">Another paragraph...</p>
-    <h>Subheading2</h>
-    <p>Another paragraph...</p>
-    <h>Subheading3</h>
-    <p>Another paragraph...</p>
+    <h id="h.def">Subheading</h>
+    <description/>
   </section>
 </body>
