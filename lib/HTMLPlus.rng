@@ -52,35 +52,113 @@
   <define name="contentElements">
     <interleave>
       <zeroOrMore>
-        <ref name="pExtended"/>
+        <ref name="htmlplus.p"/>
       </zeroOrMore>
       <zeroOrMore>
-        <ref name="ul"/>
+        <ref name="htmlplus.blockcode"/>
       </zeroOrMore>
       <zeroOrMore>
-        <ref name="ol"/>
+        <ref name="htmlplus.blockquote"/>
       </zeroOrMore>
       <zeroOrMore>
-        <ref name="dl"/>
+        <ref name="htmlplus.ul"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="htmlplus.ol"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="htmlplus.dl"/>
       </zeroOrMore>
     </interleave>
   </define>
 
-  <define name="pExtended">
+  <define name="htmlplus.p">
     <element name="p">
       <ref name="p.attlist"/>
       <ref name="Inline.model"/>
-      <interleave>
+      <ref name="htmlplus.list"/>
+    </element>
+  </define>
+
+  <define name="htmlplus.blockquote">
+    <element name="blockquote">
+      <ref name="blockquote.attlist"/>
+      <ref name="Inline.model"/>
+    </element>
+  </define>
+
+  <define name="htmlplus.blockcode">
+    <element name="blockcode">
+      <ref name="pre.attlist"/>
+      <ref name="Inline.model"/>
+    </element>
+  </define>
+
+  <define name="htmlplus.list">
+    <interleave>
+      <zeroOrMore>
+        <ref name="htmlplus.ul"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="htmlplus.ol"/>
+      </zeroOrMore>
+      <zeroOrMore>
+        <ref name="htmlplus.dl"/>
+      </zeroOrMore>
+    </interleave>
+  </define>
+
+  <define name="htmlplus.ul">
+    <element name="ul">
+      <ref name="ul.attlist"/>
+      <oneOrMore>
+        <ref name="htmlplus.li"/>
+      </oneOrMore>
+    </element>
+  </define>
+
+  <define name="htmlplus.ol">
+    <element name="ol">
+      <ref name="ol.attlist"/>
+      <oneOrMore>
+        <ref name="htmlplus.li"/>
+      </oneOrMore>
+    </element>
+  </define>
+
+  <define name="htmlplus.dl">
+    <element name="dl">
+      <ref name="dl.attlist"/>
+      <oneOrMore>
+        <ref name="htmlplus.dt"/>
         <zeroOrMore>
-          <ref name="ul"/>
+          <ref name="htmlplus.dd"/>
         </zeroOrMore>
-        <zeroOrMore>
-          <ref name="ol"/>
-        </zeroOrMore>
-        <zeroOrMore>
-          <ref name="dl"/>
-        </zeroOrMore>
-      </interleave>
+      </oneOrMore>
+    </element>
+  </define>
+
+  <define name="htmlplus.li">
+    <element name="li">
+      <ref name="li.attlist"/>
+      <ref name="Inline.model"/>
+      <ref name="htmlplus.list"/>
+    </element>
+  </define>
+
+  <define name="htmlplus.dt">
+    <element name="dt">
+      <ref name="dt.attlist"/>
+      <ref name="Inline.model"/>
+      <ref name="htmlplus.list"/>
+    </element>
+  </define>
+
+  <define name="htmlplus.dd">
+    <element name="dd">
+      <ref name="dd.attlist"/>
+      <ref name="Inline.model"/>
+      <ref name="htmlplus.list"/>
     </element>
   </define>
 
