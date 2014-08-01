@@ -9,8 +9,10 @@ class Cms {
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
-  private $contentStrategy = array(); // ContentStrategyInterface
+#  private $contentStrategy = array(); // ContentStrategyInterface
+#  private $contentStrategyPriority = array(); // ContentStrategyInterface
   private $link = ".";
+  private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
 
   function __construct() {
@@ -19,6 +21,10 @@ class Cms {
     if(!strlen(trim($this->link))) $this->link = ".";
     #error_log("CMS created:0",0);
     #error_log("CMS created:3",3,"aaa.log");
+  }
+
+  public function setPlugins(SplSubject $p) {
+    $this->plugins = $p;
   }
 
   public function getLink() {
@@ -160,7 +166,7 @@ class Cms {
 
   public function getDescription() {
     $query = "/body/description";
-    foreach($this->contentStrategy as $cs) {
+    foreach($this->plugins->getContentStrategies() as $cs) {
       $query = $cs->getDescription($query);
     }
     $xpath = new DOMXPath($this->contentFull);
@@ -184,18 +190,27 @@ class Cms {
     if(is_null($this->contentFull)) throw new Exception("Content not set");
     if(!is_null($this->content)) throw new Exception("Should not run twice");
     $this->content = $this->contentFull->cloneNode(true);
-    ksort($this->contentStrategy);
-    foreach($this->contentStrategy as $cs) {
+    $contentStrategies = $this->plugins->getContentStrategies();
+    foreach($contentStrategies as $cs) {
       $this->titleQueries = $cs->getTitle($this->titleQueries);
     }
-    foreach($this->contentStrategy as $cs) {
+    foreach($contentStrategies as $cs) {
       $this->content = $cs->getContent($this->content);
     }
   }
 
-  public function setContentStrategy(ContentStrategyInterface $strategy, $pos=10) {
-    $this->contentStrategy[$pos] = $strategy;
-  }
+/*  public function setContentStrategy(ContentStrategyInterface $strategy, $priority=10) {
+    $s = get_class($strategy);
+    $this->contentStrategy[$s] = $strategy;
+    $this->contentStrategyPriority[$s] = $priority;
+  }*/
+
+/*  public function setContentStrategyPriority(ContentStrategyInterface $strategy, $priority) {
+    $s = get_class($strategy);
+    if(!array_key_exists($s,$this->contentStrategy))
+      throw new Exception("Strategy '$s' not attached");
+    $this->contentStrategyPriority[$s] = $priority;
+  }*/
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
     $this->outputStrategy = $strategy;
@@ -221,12 +236,6 @@ class Cms {
 
 interface OutputStrategyInterface {
   public function getOutput(HTMLPlus $content);
-}
-
-interface ContentStrategyInterface {
-  public function getContent(HTMLPlus $content);
-  public function getTitle(Array $queries);
-  public function getDescription($query);
 }
 
 ?>

@@ -14,7 +14,7 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    $subject->getCms()->setContentStrategy($this,1);
+    $subject->setPriority($this,1);
   }
 
   public function getTitle(Array $q) {

@@ -72,6 +72,7 @@ try {
   // register core variables
   $cms = new Cms();
   $plugins = new Plugins($cms);
+  $cms->setPlugins($plugins);
   $plugins->setStatus("preinit");
   $plugins->notify();
 

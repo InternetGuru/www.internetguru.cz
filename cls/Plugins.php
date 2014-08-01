@@ -46,8 +46,16 @@ class Plugins implements SplSubject {
   }
 
   public function attach(SplObserver $observer,$priority=10) {
-    $this->observers[get_class($observer)] = $observer;
-    $this->observerPriority[get_class($observer)] = $priority;
+    $o = get_class($observer);
+    $this->observers[$o] = $observer;
+    $this->observerPriority[$o] = $priority;
+  }
+
+  public function setPriority(SplObserver $observer,$priority) {
+    $o = get_class($observer);
+    if(!array_key_exists($o,$this->observers))
+      throw new Exception("Observer '$o' not attached");
+    $this->observerPriority[$o] = $priority;
   }
 
   public function detach(SplObserver $observer) {
@@ -64,6 +72,22 @@ class Plugins implements SplSubject {
     $this->status = null;
   }
 
+  public function getContentStrategies() {
+    $contentStrategies = array();
+    stableSort($this->observerPriority);
+    foreach ($this->observerPriority as $key => $p) {
+      if(!$this->observers[$key] instanceOf ContentStrategyInterface) continue;
+      $contentStrategies[$key] = $this->observers[$key];
+    }
+    return $contentStrategies;
+  }
+
+}
+
+interface ContentStrategyInterface {
+  public function getContent(HTMLPlus $content);
+  public function getTitle(Array $queries);
+  public function getDescription($query);
 }
 
 ?>

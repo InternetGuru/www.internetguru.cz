@@ -7,7 +7,7 @@ class ContentBalancer implements SplObserver, ContentStrategyInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
-      $subject->getCms()->setContentStrategy($this,10);
+      $subject->setPriority($this,10);
     }
   }
 

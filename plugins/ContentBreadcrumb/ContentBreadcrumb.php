@@ -7,7 +7,7 @@ class ContentBreadcrumb implements SplObserver, ContentStrategyInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
-      $subject->getCms()->setContentStrategy($this,50);
+      $subject->setPriority($this,50);
     }
   }
 

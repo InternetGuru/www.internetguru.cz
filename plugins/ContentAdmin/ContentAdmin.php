@@ -19,7 +19,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
       $this->dataFile = USER_FOLDER . "/Content.xml";
-      $subject->getCms()->setContentStrategy($this,100);
+      $subject->setPriority($this,100);
       $this->validateAndRepair();
       return;
     }
@@ -31,21 +31,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
-
-    $cms->getOutputStrategy()->addCssFile("admin.css","ContentAdmin");
-    $cms->getOutputStrategy()->addCssFile("lib/codemirror/lib/codemirror.css");
-    $cms->getOutputStrategy()->addCssFile("lib/codemirror/theme/monokai.css");
-    $cms->getOutputStrategy()->addJsFile("lib/codemirror/lib/codemirror.js");
-    $cms->getOutputStrategy()->addJsFile("lib/codemirror/mode/xml/xml.js");
-    $cms->getOutputStrategy()->addJsFile("lib/codemirror/keymap/sublime.js");
-
-    $cms->getOutputStrategy()->addJsFile("lib/codemirror/addon/search/searchcursor.js");
-    $cms->getOutputStrategy()->addJsFile("lib/codemirror/addon/comment/comment.js");
-    $cms->getOutputStrategy()->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
-    $cms->getOutputStrategy()->addJsFile("lib/codemirror/addon/fold/foldcode.js");
-
-    $cms->getOutputStrategy()->addJs('var editor = CodeMirror.fromTextArea(document.getElementById("adminForm"),{keyMap:"sublime",theme:"monokai",lineNumbers: true,mode:"xml", width:"100%",  lineWrapping: true});', 10, "body");
-
     return $cms->buildHTML("ContentAdmin",true);
   }
 

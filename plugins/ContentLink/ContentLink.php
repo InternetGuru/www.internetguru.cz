@@ -13,7 +13,7 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    $subject->getCms()->setContentStrategy($this,2);
+    $subject->setPriority($this,2);
   }
 
   private function build() {
