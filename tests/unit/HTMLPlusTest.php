@@ -52,14 +52,37 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertNotNull($e,"HTMLPlus accepted h with no description");
     }
 
+    public function testHNoIdRepair()
+    {
+      $e = null;
+      $this->doc->loadXML('<body lang="en"><h>x</h><description/></body>');
+      try {
+        $this->doc->validate(true);
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertTrue(is_null($e),$e);
+    }
+
+    public function testHNoDescRepair()
+    {
+      $e = null;
+      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h></body>');
+      try {
+        $this->doc->validate(true);
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertTrue(is_null($e),$e);
+    }
+
     public function testBodyNoLang()
     {
       $e = null;
       $this->doc->loadXML('<body><h id="h.abc">x</h><description/></body>');
       try {
         $this->doc->validate();
-      } catch (Exception $e) {
-      }
+      } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted body with no lang");
     }
 
@@ -103,7 +126,8 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     {
       $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/></body>');
       $s1 = $this->doc->C14N(true,false);
-      $s2 = $this->doc->clone()->C14N(true,false);
+      $doc = clone $this->doc;
+      $s2 = $doc->C14N(true,false);
       $this->assertTrue($s1 == $s2, 'Clones are not equal');
     }
 

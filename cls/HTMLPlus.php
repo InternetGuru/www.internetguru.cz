@@ -11,7 +11,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->preserveWhiteSpace = false;
   }
 
-  public function clone() {
+  public function __clone() {
     $doc = new HTMLPlus();
     $root = $doc->importNode($this->documentElement,true);
     $doc->appendChild($root);
@@ -67,7 +67,7 @@ class HTMLPlus extends DOMDocumentPlus {
 
   private function addDescriptions() {
     foreach($this->hnodesc as $h) {
-      if($h->nextSibling->nodeName == "p") {
+      if(!is_null($h->nextSibling) && $h->nextSibling->nodeName == "p") {
         $h->ownerDocument->renameElement($h->nextSibling,"description");
       } else {
         $h->parentNode->insertBefore($h->ownerDocument->createElement("description"),$h->nextSibling);
@@ -94,7 +94,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->hnoid = array();
     $this->hnodesc = array();
     foreach($this->getElementsByTagName("h") as $h) {
-      if($h->nextSibling->nodeName != "description")
+      if(is_null($h->nextSibling) || $h->nextSibling->nodeName != "description")
         $this->hnodesc[] = $h;
       if(!$h->hasAttribute("id")) {
         $this->hnoid[] = $h;

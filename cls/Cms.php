@@ -116,7 +116,7 @@ class Cms {
   public function buildContent() {
     if(is_null($this->contentFull)) throw new Exception("Content not set");
     if(!is_null($this->content)) throw new Exception("Should not run twice");
-    $this->content = $this->contentFull->clone();
+    $this->content = clone $this->contentFull;
     $contentStrategies = $this->plugins->getContentStrategies();
     foreach($contentStrategies as $cs) {
       $this->titleQueries = $cs->getTitle($this->titleQueries);
