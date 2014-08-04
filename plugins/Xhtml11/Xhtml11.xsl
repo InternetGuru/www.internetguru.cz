@@ -17,12 +17,19 @@
   </xsl:template>
 
   <xsl:template match="//description">
-    <!-- <xsl:if test="* or normalize-space()"> -->
       <p class="description">
         <xsl:copy-of select="@*"/>
         <xsl:apply-templates/>
       </p>
-    <!-- </xsl:if> -->
+  </xsl:template>
+
+  <xsl:template match="//ul[contains(@class,'cms-balancer')]">
+    <xsl:element name="div">
+      <xsl:copy-of select="@*"/>
+      <ul>
+        <xsl:apply-templates/>
+      </ul>
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="//section">

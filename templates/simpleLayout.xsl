@@ -41,43 +41,6 @@
   <!-- delete remaining empty descriptions -->
   <xsl:template match="//p[contains(@class,'description') and not(string-length(text()))]"/>
 
-  <!-- first list from a group of lists -->
-  <xsl:template match="//*[parent::div[contains(@class,'section')] and
-    (self::ul or self::ol or self::dl) and
-    not(preceding-sibling::*[1][self::ul or self::ol or self::dl]) and
-    following-sibling::*[1][self::ul or self::ol or self::dl]]">
-    <xsl:text disable-output-escaping="yes">&lt;div class="list multiple">&lt;div></xsl:text>
-    <xsl:element name="{name()}">
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates/>
-    </xsl:element>
-  </xsl:template>
-
-  <!-- last list from a group of lists -->
-  <xsl:template match="//*[parent::div[contains(@class,'section')] and
-    (self::ul or self::ol or self::dl) and
-    preceding-sibling::*[1][self::ul or self::ol or self::dl] and
-    not(following-sibling::*[1][self::ul or self::ol or self::dl])]">
-    <xsl:element name="{name()}">
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates/>
-    </xsl:element>
-    <xsl:text disable-output-escaping="yes">&lt;/div>&lt;/div></xsl:text>
-  </xsl:template>
-
-  <!-- orphan list -->
-  <xsl:template match="//*[parent::div[contains(@class,'section')] and
-    (self::ul or self::ol or self::dl) and
-    not(preceding-sibling::*[1][self::ul or self::ol or self::dl]) and
-    not(following-sibling::*[1][self::ul or self::ol or self::dl])]">
-    <div class="list">
-      <xsl:element name="{name()}">
-        <xsl:copy-of select="@*"/>
-        <xsl:apply-templates/>
-      </xsl:element>
-    </div>
-  </xsl:template>
-
   <xsl:template match="node()|@*">
     <xsl:copy>
       <xsl:apply-templates select="node()|@*"/>

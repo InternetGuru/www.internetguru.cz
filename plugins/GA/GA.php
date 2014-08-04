@@ -4,7 +4,7 @@ class GA implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "process") return;
-    if(is_null($subject->getCms()->getOutputStrategy())) {
+    if(isAtLocalhost() || is_null($subject->getCms()->getOutputStrategy())) {
       $subject->detach($this);
       return;
     }
