@@ -2,3 +2,4 @@ log.txt
 bak/*
 .DS_Store
 *.corrupted
+tests/_output/*

@@ -89,7 +89,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function doValidate() {
-    if($this->documentElement->nodeName != "body")
+    if(is_null($this->documentElement) || $this->documentElement->nodeName != "body")
       throw new Exception("Root element must be 'body'",1);
     $this->hid = array();
     $this->hnoid = array();
