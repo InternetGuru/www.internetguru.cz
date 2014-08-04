@@ -64,6 +64,18 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
     }
 
+    public function testHEmptyIdAdd()
+    {
+      $e = null;
+      $this->doc->loadXML('<body lang="en"><h id=" ">x</h><description/></body>');
+      try {
+        $this->doc->validate(true);
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertTrue(is_null($e),$e);
+    }
+
     public function testHNoDescAdd()
     {
       $e = null;
