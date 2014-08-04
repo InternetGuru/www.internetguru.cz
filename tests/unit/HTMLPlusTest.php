@@ -99,4 +99,12 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertNotNull($e,"HTMLPlus accepted empty h");
     }
 
+    public function testClone()
+    {
+      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/></body>');
+      $s1 = $this->doc->C14N(true,false);
+      $s2 = $this->doc->clone()->C14N(true,false);
+      $this->assertTrue($s1 == $s2, 'Clones are not equal');
+    }
+
 }

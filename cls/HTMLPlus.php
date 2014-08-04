@@ -11,8 +11,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->preserveWhiteSpace = false;
   }
 
-  public function cloneNode($deep=false) {
-    if(!$deep) return parent::cloneNode(false);
+  public function clone() {
     $doc = new HTMLPlus();
     $root = $doc->importNode($this->documentElement,true);
     $doc->appendChild($root);
