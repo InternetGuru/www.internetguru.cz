@@ -10,9 +10,11 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     * @var \UnitTester
     */
     protected $tester;
+    private $doc;
 
     protected function _before()
     {
+      $this->doc = new HTMLPlus();
     }
 
     protected function _after()
@@ -20,46 +22,81 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     }
 
     // tests
-    public function testValidity()
+
+    public function testEmpty()
     {
-
-      // create and test empty HTMLPlus
       $e = null;
-      $doc = new HTMLPlus();
       try {
-        $doc->validate();
-      } catch (Exception $e) {
-      }
+        $this->doc->validate();
+      } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted empty doc");
+    }
 
-      // fill with invalid XML (missing h.ID)
+    public function testHNoId()
+    {
       $e = null;
-      $doc->loadXML('<body lang="en"><h>x</h><description/></body>');
+      $this->doc->loadXML('<body lang="en"><h>x</h><description/></body>');
       try {
-        $doc->validate();
-      } catch (Exception $e) {
-      }
+        $this->doc->validate();
+      } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted h with no ID");
+    }
 
-      // fill with invalid XML (missing body.lang)
+    public function testHNoDesc()
+    {
       $e = null;
-      $doc->loadXML('<body><h id="h.abc">x</h><description/></body>');
+      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h></body>');
       try {
-        $doc->validate();
+        $this->doc->validate();
+      } catch (Exception $e) {}
+      $this->assertNotNull($e,"HTMLPlus accepted h with no description");
+    }
+
+    public function testBodyNoLang()
+    {
+      $e = null;
+      $this->doc->loadXML('<body><h id="h.abc">x</h><description/></body>');
+      try {
+        $this->doc->validate();
       } catch (Exception $e) {
       }
       $this->assertNotNull($e,"HTMLPlus accepted body with no lang");
+    }
 
-      // fill with valid XML
+    public function testValidXML()
+    {
       $e = null;
-      $doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/></body>');
+      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/></body>');
       try {
-        $doc->validate();
+        $this->doc->validate();
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
       $this->assertTrue(is_null($e),$e);
+    }
 
+    public function testH1InForm()
+    {
+      $e = null;
+      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/><form action="." method="post"><div><h1/></div></form></body>');
+      try {
+        $this->doc->validate();
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertNotNull($e,"HTMLPlus accepted h1 in form (known issue #1)");
+    }
+
+    public function testHEmpty()
+    {
+      $e = null;
+      $this->doc->loadXML('<body lang="en"><h id="h.abc"/><description/></body>');
+      try {
+        $this->doc->validate();
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertNotNull($e,"HTMLPlus accepted empty h");
     }
 
 }

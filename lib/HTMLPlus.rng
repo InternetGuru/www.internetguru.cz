@@ -3,12 +3,16 @@
 
   <start>
     <element name="body">
-      <attribute name="lang">
-        <text/>
-      </attribute>
+      <ref name="lang.attr"/>
       <ref name="contentBlock"/>
     </element>
   </start>
+
+  <define name="lang.attr">
+      <attribute name="lang">
+        <ref name="LanguageCode.datatype"/>
+      </attribute>
+  </define>
 
   <define name="contentBlock">
     <ref name="h"/>
@@ -18,6 +22,9 @@
     </optional>
     <optional>
       <element name="section">
+        <optional>
+          <ref name="lang.attr"/>
+        </optional>
         <oneOrMore>
           <ref name="contentBlock"/>
         </oneOrMore>
@@ -38,7 +45,9 @@
           <text/>
         </attribute>
       </optional>
-      <text/>
+      <data type="string">
+        <param name="minLength">1</param>
+      </data>
     </element>
   </define>
 

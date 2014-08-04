@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<body lang="en">
+<body lang="fr">
   <h id="h.abc">Long default title</h>
   <description>Some paragraph...</description>
-  <section lang="en">
-    <h id="h.def">Subheading</h>
+  <section lang="en-us">
+    <h id="h.def">Podnadpis</h>
     <description/>
   </section>
 </body>

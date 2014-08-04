@@ -29,7 +29,9 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
     $body = $this->content->appendChild($this->content->createElement("body"));
     $this->appendUntil($exactMatch->item(0),$body);
     $this->addTitleQueries($exactMatch->item(0));
-    if(is_null($this->lang)) $cms->getContentFull()->documentElement->getAttribute("lang");
+    if(is_null($this->lang)) {
+      $this->lang = $cms->getContentFull()->documentElement->getAttribute("lang");
+    }
     $body->setAttribute("lang",$this->lang);
   }
 
