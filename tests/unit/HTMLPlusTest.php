@@ -52,7 +52,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertNotNull($e,"HTMLPlus accepted h with no description");
     }
 
-    public function testHNoIdRepair()
+    public function testHNoIdAdd()
     {
       $e = null;
       $this->doc->loadXML('<body lang="en"><h>x</h><description/></body>');
@@ -64,7 +64,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
     }
 
-    public function testHNoDescRepair()
+    public function testHNoDescAdd()
     {
       $e = null;
       $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h></body>');
@@ -74,6 +74,23 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
         $e = $e->getMessage();
       }
       $this->assertTrue(is_null($e),$e);
+    }
+
+    public function testHNoDescRename()
+    {
+      $e = null;
+      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><p>test</p></body>');
+      try {
+        $this->doc->validate(true);
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertTrue(is_null($e),$e);
+      $s1 = $this->doc->C14N(true,false);
+      $doc = new HTMLPlus();
+      $doc->loadXML('<body lang="en"><h id="h.abc">x</h><description>test</description></body>');
+      $s2 = $doc->C14N(true,false);
+      $this->assertTrue($s1 == $s2, 'Failed to rename paragraph to description');
     }
 
     public function testBodyNoLang()
