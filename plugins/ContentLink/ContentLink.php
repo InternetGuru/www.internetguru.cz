@@ -24,15 +24,23 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
     $exactMatch = $xpath->query("//h[@link='" . $cms->getLink() . "']");
     if($exactMatch->length != 1)
       throw new Exception("No unique exact match found for link '{$cms->getLink()}'");
+    if($exactMatch->item(0)->parentNode->nodeName != "section") {
+      $this->content = $cms->getContentFull();
+      return;
+    }
     $this->content = new HTMLPlus();
     $this->content->formatOutput = true;
     $body = $this->content->appendChild($this->content->createElement("body"));
+    foreach($exactMatch->item(0)->parentNode->attributes as $attName => $attNode) {
+      $body->setAttribute($attName,$attNode->nodeValue);
+    }
     $this->appendUntil($exactMatch->item(0),$body);
     $this->addTitleQueries($exactMatch->item(0));
+    if($body->hasAttribute("xml:lang")) return;
     if(is_null($this->lang)) {
-      $this->lang = $cms->getContentFull()->documentElement->getAttribute("lang");
+      $this->lang = $cms->getContentFull()->documentElement->getAttribute("xml:lang");
     }
-    $body->setAttribute("lang",$this->lang);
+    $body->setAttribute("xml:lang",$this->lang);
   }
 
   public function getTitle(Array $queries) {
@@ -52,8 +60,8 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
     $this->titleQueries[] = $h->getNodePath();
     $e = $h->parentNode;
     if($e->nodeName == "section") {
-      if(is_null($this->lang) && $e->hasAttribute("lang")) {
-        $this->lang = $e->getAttribute("lang");
+      if(is_null($this->lang) && $e->hasAttribute("xml:lang")) {
+        $this->lang = $e->getAttribute("xml:lang");
       }
       while(($e = $e->previousSibling) !== null) {
         if($e->nodeName != "h") continue;

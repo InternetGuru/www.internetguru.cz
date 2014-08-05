@@ -3,16 +3,12 @@
 
   <start>
     <element name="body">
-      <ref name="lang.attr"/>
+      <attribute name="xml:lang">
+        <ref name="LanguageCode.datatype"/>
+      </attribute>
       <ref name="contentBlock"/>
     </element>
   </start>
-
-  <define name="lang.attr">
-      <attribute name="lang">
-        <ref name="LanguageCode.datatype"/>
-      </attribute>
-  </define>
 
   <define name="contentBlock">
     <ref name="h"/>
@@ -22,9 +18,7 @@
     </optional>
     <optional>
       <element name="section">
-        <optional>
-          <ref name="lang.attr"/>
-        </optional>
+        <ref name="Common.attrib"/>
         <oneOrMore>
           <ref name="contentBlock"/>
         </oneOrMore>

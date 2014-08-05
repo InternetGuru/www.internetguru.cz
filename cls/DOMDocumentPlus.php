@@ -17,12 +17,16 @@ class DOMDocumentPlus extends DOMDocument {
 
   public function renameElement($node, $name) {
     $newnode = $this->createElement($name);
+    $children = array();
     foreach ($node->childNodes as $child) {
+      $children[] = $child;
+    }
+    foreach ($children as $child) {
       $child = $this->importNode($child, true);
       $newnode->appendChild($child);
     }
     foreach ($node->attributes as $attrName => $attrNode) {
-      $newnode->setAttribute($attrName, $attrNode);
+      $newnode->setAttribute($attrName, $attrNode->nodeValue);
     }
     $node->parentNode->replaceChild($newnode, $node);
     return $newnode;
@@ -48,7 +52,10 @@ class DOMDocumentPlus extends DOMDocument {
       $this->insertVarArray($var,$varValue,$where);
       break;
       case "DOMElement":
-      $this->insertVarDOMElement($var,$varValue,$where);
+      $varxpath = new DOMXPath($varValue->ownerDocument);
+      $varValue = $varxpath->query("/*");
+      case "DOMNodeList":
+      $this->insertVarDOMNodeList($var,$varValue,$where);
       break;
       default:
       throw new Exception("Unsupported type '$type'");
@@ -67,16 +74,19 @@ class DOMDocumentPlus extends DOMDocument {
       return;
     }
     $doc = new DOMDocument();
-    $ul = $doc->createElement("ul");
-    foreach($varValue as $i) $ul->appendChild($doc->createElement("li",$i));
-    $this->insertVarDOMElement($varName,$ul,$where);
+    $list = $doc->appendChild($doc->createElement("ol"));
+    foreach($varValue as $i) $list->appendChild($doc->createElement("li",$i));
+    $varxpath = new DOMXPath($doc);
+    $varValue = $varxpath->query("/*");
+    $this->insertVarDOMNodeList($varName,$varValue,$where);
   }
 
-  private function insertVarDOMElement($varName,DOMElement $varValue,DOMNodeList $where) {
+  private function insertVarDOMNodeList($varName,DOMNodeList $varValue,DOMNodeList $where) {
     $into = array();
     foreach($where as $e) $into[] = $e;
     foreach($into as $e) {
       $newParent = $e->parentNode->cloneNode();
+      $e->ownerDocument->importNode($newParent);
       $children = array();
       foreach($e->parentNode->childNodes as $ch) $children[] = $ch;
       foreach($children as $ch) {
@@ -87,15 +97,17 @@ class DOMDocumentPlus extends DOMDocument {
         $parts = explode($varName,$ch->nodeValue);
         foreach($parts as $id => $part) {
           $newParent->appendChild($e->ownerDocument->createTextNode($part));
-          if((count($parts)-1) == $id) continue;
-          $appendInto = array();
-          foreach($varValue->childNodes as $n) $appendInto[] = $n;
-          foreach($appendInto as $n) {
+          if((count($parts)-1) == $id) continue; // (not here) txt1 (here) txt2 (here) txt3 (not here)
+          $append = array();
+          foreach($varValue as $n) {
+            if($n->nodeType === 1) $append[] = $n;
+          }
+          foreach($append as $n) {
             $newParent->appendChild($e->ownerDocument->importNode($n,true));
           }
         }
       }
-      $e->parentNode->parentNode->replaceChild($e->ownerDocument->importNode($newParent),$e->parentNode);
+      $e->parentNode->parentNode->replaceChild($newParent,$e->parentNode);
     }
   }
 

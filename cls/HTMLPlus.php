@@ -4,6 +4,7 @@ class HTMLPlus extends DOMDocumentPlus {
   private $hid = array();
   private $hnoid = array();
   private $hnodesc = array();
+  private $badLang = null; // DOMNodeList
   const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
@@ -32,14 +33,13 @@ class HTMLPlus extends DOMDocumentPlus {
       } catch (Exception $e) {
         $internal_errors = libxml_get_errors();
         if(count($internal_errors)) {
-          #print_r($e);
           $e = new Exception(current($internal_errors)->message);
         }
       }
+      // finally
       libxml_clear_errors();
       libxml_use_internal_errors(false);
       if(isset($e)) throw $e;
-
       return $i;
     } catch (Exception $e) {
       if(!$repair) throw $e;
@@ -51,10 +51,20 @@ class HTMLPlus extends DOMDocumentPlus {
         $this->addHeadingIds();
         $this->addDescriptions();
         break;
+        case 3:
+        $this->renameLang();
+        break;
         default:
         throw $e;
       }
       return $this->validate($repair,++$i);
+    }
+  }
+
+  private function renameLang() {
+    foreach($this->badLang as $n) {
+      $n->setAttribute("xml:lang", $n->getAttribute("lang"));
+      $n->removeAttribute("lang");
     }
   }
 
@@ -67,11 +77,8 @@ class HTMLPlus extends DOMDocumentPlus {
 
   private function addDescriptions() {
     foreach($this->hnodesc as $h) {
-      if(!is_null($h->nextSibling) && $h->nextSibling->nodeName == "p") {
-        $h->ownerDocument->renameElement($h->nextSibling,"description");
-      } else {
-        $h->parentNode->insertBefore($h->ownerDocument->createElement("description"),$h->nextSibling);
-      }
+      $desc = $h->ownerDocument->createElement("description");
+      $h->parentNode->insertBefore($desc,$h->nextSibling);
     }
     $this->hnodesc = array();
   }
@@ -116,6 +123,9 @@ class HTMLPlus extends DOMDocumentPlus {
     $xpath = new DOMXPath($this);
     if($xpath->query("/body/*[1]")->item(0)->nodeName != "h")
       throw new Exception ("Missing main heading (/body/h)");
+    $this->badLang = $xpath->query("//*[@lang]");
+    if($this->badLang->length)
+      throw new Exception ("Lang attribute without xml namespace",3);
   }
 
 }

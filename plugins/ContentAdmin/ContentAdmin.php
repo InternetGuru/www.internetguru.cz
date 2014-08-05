@@ -19,7 +19,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
       $this->dataFile = USER_FOLDER . "/Content.xml";
-      $subject->setPriority($this,100);
+      $subject->setPriority($this,1);
       $this->validateAndRepair();
       return;
     }
@@ -69,7 +69,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         $this->errors[] = "File is not valid XML";
         return;
       }
-
       $i = $doc->validate(true);
       if($post) $this->savePost($doc);
       elseif($i > 0) $this->errors[] = "Note: file has been autocorrected";

@@ -1,8 +1,8 @@
 <?php
 
-include('cls/globals.php');
-include('cls/DOMDocumentPlus.php');
-include('cls/HTMLPlus.php');
+include_once('cls/globals.php');
+include_once('cls/DOMDocumentPlus.php');
+include_once('cls/HTMLPlus.php');
 
 class HTMLPlusTest extends \Codeception\TestCase\Test
 {

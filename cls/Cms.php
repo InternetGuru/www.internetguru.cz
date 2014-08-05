@@ -62,7 +62,9 @@ class Cms {
     if(is_null($this->content)) throw new Exception("Content not set");
     foreach($this->config->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id")) throw new Exception ("Var is missing id");
-      $this->content->insertVar($var->getAttribute("id"),$var);
+      $id = $var->getAttribute("id");
+      if(get_class($var) == "DOMElement") $var = $var->childNodes;
+      $this->content->insertVar($id,$var);
     }
   }
 
@@ -123,15 +125,17 @@ class Cms {
     }
     try {
       $cs = null;
-      $this->content->validate();
+      #$this->content->validate();
       foreach($contentStrategies as $cs) {
         $c = $cs->getContent($this->content);
+        #echo $c->saveXML(); die();
         $c->validate();
         $this->content = $c;
       }
     } catch (Exception $e) {
       #var_dump($cs);
       #echo $this->content->saveXML();
+      #echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }
