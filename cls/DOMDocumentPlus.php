@@ -36,13 +36,17 @@ class DOMDocumentPlus extends DOMDocument {
 
   public function insertVar($varName,$varValue,$plugin="") {
     $xpath = new DOMXPath($this);
+    $noparse = "*[not(contains(@class,'noparse')) and ancestor::*[not(contains(@class,'noparse'))]]/";
     if($plugin == "") $plugin = "Cms";
     $var = "{".$plugin.":".$varName."}";
     if(is_string($varValue)) {
-      $where = $xpath->query("//@*[contains(.,'$var')]");
+      #$where = $xpath->query("//@*[contains(.,'$var') and not(contains(node()/@class,'noparse')) and ancestor::*[not(contains(@class,'noparse'))]]/@*");
+      $where = $xpath->query(sprintf("//%s@*[contains(.,'%s')]",$noparse,$var));
+      #$where = $xpath->query("//*[contains(@*,'$var') and not(contains(@class,'noparse')) and ancestor::*[not(contains(@class,'noparse'))]]/@*");
       $this->insertVarString($var,$varValue,$where);
     }
-    $where = $xpath->query("//text()[contains(.,'$var')]");
+    $where = $xpath->query(sprintf("//%stext()[contains(.,'%s')]",$noparse,$var));
+    #$where = $xpath->query("//*[contains(text(),'$var') and ancestor-or-self::*[not(contains(@class,'noparse'))]]/text()");
     if($where->length == 0) return;
     $type = gettype($varValue);
     if($type == "object") $type = get_class($varValue);
