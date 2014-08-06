@@ -108,5 +108,25 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue($s1 == $s2);
     }
 
+    public function testInsertVarDOMNoparse()
+    {
+      $e = null;
+      $this->doc->loadXML('<a><b/><c id="c" class="noparse">{somePlugin:someVar}</c></a>');
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML('<d><e/><f/></d>');
+      try {
+        $n = $this->doc->insertVar("someVar",$doc->documentElement,"somePlugin");
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertTrue(is_null($e),$e);
+      $s1 = $this->doc->C14N(true,false);
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML('<a><b/><c id="c" class="noparse">{somePlugin:someVar}</c></a>');
+      $s2 = $doc->C14N(true,false);
+      #echo "\n$s1\n$s2"; die();
+      $this->assertTrue($s1 == $s2);
+    }
+
 
 }
