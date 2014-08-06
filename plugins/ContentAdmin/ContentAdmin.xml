@@ -6,7 +6,7 @@
   <form action="{ContentAdmin:link}?admin" method="post">
     <fieldset><legend>Datový soubor ve formátu HTMLPlus</legend>
     <!-- <div> -->
-      <textarea class="xml" cols="40" name="content" rows="20">{ContentAdmin:content}</textarea>
+      <textarea class="xml {ContentAdmin:np}" cols="40" name="content" rows="20">{ContentAdmin:content}</textarea>
       <input name="filehash" type="hidden" value="{ContentAdmin:filehash}"/>
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít (Ctrl+Shift+S)"/></li>

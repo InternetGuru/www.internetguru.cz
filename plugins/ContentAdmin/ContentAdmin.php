@@ -34,6 +34,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
+    $newContent->insertVar("np","noparse","ContentAdmin");
     $newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
     return $newContent;
   }
