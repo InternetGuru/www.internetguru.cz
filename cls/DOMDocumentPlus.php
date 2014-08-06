@@ -4,6 +4,8 @@ class DOMDocumentPlus extends DOMDocument {
 
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);
+    $this->preserveWhiteSpace = false;
+    $this->formatOutput = true;
   }
 
   public function getElementById($id) {
@@ -49,7 +51,7 @@ class DOMDocumentPlus extends DOMDocument {
       $this->insertVarString($var,$varValue,$where);
       break;
       case "array":
-      $this->insertVarArray($var,$varValue,$where);
+      $this->insertVarArray($var,$varValue,$where,$varName);
       break;
       case "DOMElement":
       $varxpath = new DOMXPath($varValue->ownerDocument);
@@ -62,19 +64,28 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
+  public function saveRewrite($filepath) {
+    $b = $this->save("$filepath.new");
+    if($b === false) return false;
+    if(!copy($filepath,"$filepath.old")) return false;
+    if(!rename("$filepath.new",$filepath)) return false;
+    return $b;
+  }
+
   private function insertVarString($varName,$varValue,DOMNodeList $where) {
     foreach($where as $e) {
       $e->nodeValue = str_replace($varName, $varValue, $e->nodeValue);
     }
   }
 
-  private function insertVarArray($varName,Array $varValue,DOMNodeList $where) {
+  private function insertVarArray($varName,Array $varValue,DOMNodeList $where, $var) {
     if(empty($varValue)) {
       $this->insertVarString($varName,"",$where);
       return;
     }
     $doc = new DOMDocument();
     $list = $doc->appendChild($doc->createElement("ol"));
+    $list->setAttribute("class",$var);
     foreach($varValue as $i) $list->appendChild($doc->createElement("li",$i));
     $varxpath = new DOMXPath($doc);
     $varValue = $varxpath->query("/*");

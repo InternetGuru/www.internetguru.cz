@@ -35,7 +35,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHNoId()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h>x</h><description/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h>x</h><description/></body>');
       try {
         $this->doc->validate();
       } catch (Exception $e) {}
@@ -45,7 +45,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHNoDesc()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h></body>');
       try {
         $this->doc->validate();
       } catch (Exception $e) {}
@@ -55,7 +55,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHNoIdAdd()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h>x</h><description/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h>x</h><description/></body>');
       try {
         $this->doc->validate(true);
       } catch (Exception $e) {
@@ -67,7 +67,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHEmptyIdAdd()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h id=" ">x</h><description/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id=" ">x</h><description/></body>');
       try {
         $this->doc->validate(true);
       } catch (Exception $e) {
@@ -79,7 +79,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHNoDescAdd()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h></body>');
       try {
         $this->doc->validate(true);
       } catch (Exception $e) {
@@ -91,7 +91,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHNoDescRename()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><p>test</p></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><p>test</p></body>');
       try {
         $this->doc->validate(true);
       } catch (Exception $e) {
@@ -100,7 +100,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
       $s1 = $this->doc->C14N(true,false);
       $doc = new HTMLPlus();
-      $doc->loadXML('<body lang="en"><h id="h.abc">x</h><description>test</description></body>');
+      $doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><description>test</description></body>');
       $s2 = $doc->C14N(true,false);
       $this->assertTrue($s1 == $s2, 'Failed to rename paragraph to description');
     }
@@ -118,7 +118,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testValidXML()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><description/></body>');
       try {
         $this->doc->validate();
       } catch (Exception $e) {
@@ -130,7 +130,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testH1InForm()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/><form action="." method="post"><div><h1/></div></form></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><description/><form action="." method="post"><div><h1/></div></form></body>');
       try {
         $this->doc->validate();
       } catch (Exception $e) {
@@ -142,7 +142,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHEmpty()
     {
       $e = null;
-      $this->doc->loadXML('<body lang="en"><h id="h.abc"/><description/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc"/><description/></body>');
       try {
         $this->doc->validate();
       } catch (Exception $e) {
@@ -153,7 +153,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
     public function testClone()
     {
-      $this->doc->loadXML('<body lang="en"><h id="h.abc">x</h><description/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><description/></body>');
       $s1 = $this->doc->C14N(true,false);
       $doc = clone $this->doc;
       $s2 = $doc->C14N(true,false);

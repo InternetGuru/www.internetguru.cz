@@ -19,6 +19,7 @@ class DOMBuilder {
   private $plugin;
   private $replace; // bool
   private $filename;
+  private $validate = true;
 
   public function __construct() {}
 
@@ -32,8 +33,9 @@ class DOMBuilder {
     return $this->doc;
   }
 
-  public function buildHTML($plugin="",$replace=false,$filename="") {
+  public function buildHTML($plugin="",$replace=true,$filename="",$validate=true) {
     $this->doc = new HTMLPlus();
+    $this->validate = $validate;
     $this->build($plugin,$replace,$filename);
     return $this->doc;
   }
@@ -63,17 +65,29 @@ class DOMBuilder {
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
   }
 
-  private function loadDOM($filename,DOMDocumentPlus $doc) {
-    if(@$doc->load($filename)) {
-      if($this->backupStrategy !== null) $this->backupStrategy->doBackup($filename);
-    } elseif($this->backupStrategy !== null) {
-      $this->backupStrategy->restoreNewestBackup($filename);
-      if(!@$doc->load($filename)) {
-        throw new Exception(sprintf('Unable to load restored XML file %s',$filename));
+  private function loadDOM($filename, DOMDocumentPlus $doc, $backup=true) {
+    try {
+      // load
+      if(!@$doc->load($filename))
+        throw new Exception("Unable to load DOM from file '$filename'");
+      // validate if htmlplus
+      try {
+        if($doc instanceof HTMLPlus && $this->validate) $doc->validate();
+      } catch(Exception $e) {
+        $doc->validate(true);
+        $doc->saveRewrite($filename);
       }
-    } else {
-      throw new Exception(sprintf('Unable to load XML file %s',$filename));
+    } catch(Exception $e) {
+      // restore file if backupstrategy && $backup
+      if(!is_null($this->backupStrategy) && $backup)
+        $this->backupStrategy->restoreNewestBackup($filename);
+      else throw $e;
+      // loadDOM(false)
+      $this->loadDOM($filename,$doc,false);
     }
+    // do backup if $backup
+    if(!is_null($this->backupStrategy) && $backup)
+      $this->backupStrategy->doBackup($filename);
   }
 
   /**

@@ -76,8 +76,8 @@ class Cms {
     return $this->domBuilder->buildDOM($plugin,$replace,$filename);
   }
 
-  public function buildHTML($plugin="",$replace=false,$filename="") {
-    return $this->domBuilder->buildHTML($plugin,$replace,$filename);
+  public function buildHTML($plugin="",$replace=false,$filename="",$validate=true) {
+    return $this->domBuilder->buildHTML($plugin,$replace,$filename,$validate);
   }
 
   #public function getStructure() {}
@@ -125,10 +125,11 @@ class Cms {
     }
     try {
       $cs = null;
-      #$this->content->validate();
       foreach($contentStrategies as $cs) {
         $c = $cs->getContent($this->content);
         #echo $c->saveXML(); die();
+        if(!($c instanceof HTMLPlus))
+          throw new Exception("Content must be an instance of HTMLPlus");
         $c->validate();
         $this->content = $c;
       }

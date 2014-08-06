@@ -29,7 +29,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $cms = $this->subject->getCms();
     $cms->getOutputStrategy()->addCssFile('ContentAdmin.css','ContentAdmin');
     $cms->getOutputStrategy()->addJsFile('ContentAdmin.js','ContentAdmin', 10, "body");
-    $newContent = $cms->buildHTML("ContentAdmin",true);
+    $newContent = $cms->buildHTML("ContentAdmin",true,"",false);
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
@@ -70,7 +70,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         return;
       }
       $i = $doc->validate(true);
-      if($post) $this->savePost($doc);
+      if($post) $doc->saveRewrite(USER_FOLDER."/Content.xml");
       elseif($i > 0) $this->errors[] = "Note: file has been autocorrected";
       // validation may include non-blocking errors
       #$this->errors[] = "non-blocking error";
@@ -91,14 +91,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     if(isset($_POST["saveandstay"])) $redir .= "?admin";
     header("Location: " . (strlen($redir) ? $redir : "."));
     exit;
-  }
-
-  private function savePost($doc) {
-    $file = USER_FOLDER."/Content.xml";
-    if(file_put_contents("$file.new",$doc->saveXML()) === false)
-      throw new Exception("Unable to save content");
-    if(!copy($file,"$file.old") || !rename("$file.new",$file))
-      throw new Exception("Unable to rename data file");
   }
 
   public function getTitle(Array $q) {

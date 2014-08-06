@@ -2,7 +2,7 @@
 <body xml:lang="cs">
   <h id="h.adf">{ContentAdmin:heading} (administrace)</h>
   <description/>
-  <p class="error">{ContentAdmin:errors}</p>
+  {ContentAdmin:errors}
   <form action="{ContentAdmin:link}?admin" method="post">
     <fieldset><legend>Datový soubor ve formátu HTMLPlus</legend>
     <!-- <div> -->

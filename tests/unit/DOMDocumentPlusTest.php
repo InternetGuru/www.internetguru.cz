@@ -82,7 +82,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
       $s1 = $this->doc->C14N(true,false);
       $doc = new DOMDocumentPlus();
-      $doc->loadXML('<a><b></b><c id="c"><ol><li>var1</li><li>var2</li></ol></c></a>');
+      $doc->loadXML('<a><b></b><c id="c"><ol class="someVar"><li>var1</li><li>var2</li></ol></c></a>');
       $s2 = $doc->C14N(true,false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);
