@@ -8,12 +8,12 @@ class DOMDocumentPlus extends DOMDocument {
     $this->formatOutput = true;
   }
 
-  public function getElementById($id) {
+  public function getElementById($id,$attribute="id") {
     $xpath = new DOMXPath($this);
-    $q = $xpath->query("//*[@id='$id']");
+    $q = $xpath->query("//*[@$attribute='$id']");
     if($q->length == 0) return null;
     if($q->length > 1)
-      throw new Exception("Duplicit ID found for value '$id'");
+      throw new Exception("Duplicit $attribute found for value '$id'");
     return $q->item(0);
   }
 

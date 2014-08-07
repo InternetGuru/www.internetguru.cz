@@ -11,7 +11,7 @@
   </start>
 
   <define name="contentBlock">
-    <ref name="h"/>
+    <ref name="htmlplus.h"/>
     <ref name="description"/>
     <optional>
       <ref name="contentElements"/>
@@ -26,21 +26,25 @@
     </optional>
   </define>
 
-  <define name="h">
+  <define name="htmlplus.h">
     <element name="h">
       <ref name="CommonIdRequired.attrib"/>
       <optional>
         <attribute name="short">
-          <text/>
+          <data type="string">
+            <param name="pattern">.*\S.*</param>
+          </data>
         </attribute>
       </optional>
       <optional>
         <attribute name="link">
-          <text/>
+          <data type="string">
+            <param name="pattern">[a-z][a-z0-9_/-]*</param>
+          </data>
         </attribute>
       </optional>
       <data type="string">
-        <param name="minLength">1</param>
+        <param name="pattern">.*\S.*</param>
       </data>
     </element>
   </define>

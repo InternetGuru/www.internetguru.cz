@@ -55,4 +55,13 @@ function findFilePath($fileName,$plugin="",$userFolder=true,$adminFolder=true) {
   return false;
 }
 
+function normalize($s) {
+  $s = mb_strtolower($s,"utf-8");
+  $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
+  $s = strtolower($s);
+  $s = str_replace(" ","_",$s);
+  $s = preg_replace("~[^a-z0-9/_-]~","",$s);
+  return $s;
+}
+
 ?>

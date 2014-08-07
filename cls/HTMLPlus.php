@@ -1,10 +1,7 @@
 <?php
 
 class HTMLPlus extends DOMDocumentPlus {
-  private $hid = array();
-  private $hnoid = array();
-  private $hnodesc = array();
-  private $badLang = null; // DOMNodeList
+  private $headings = array();
   const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
@@ -18,113 +15,112 @@ class HTMLPlus extends DOMDocumentPlus {
     return $doc;
   }
 
-  public function validate($repair=false,$i=0) {
-    if($i>3) throw new Exception ("Maximum repair cycles exceeded");
+  public function relaxNGValidatePlus() {
+    if(!($f = findFilePath(self::RNG_FILE,"",false)))
+      throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
     try {
-      $this->doValidate();
-      if(!($f = findFilePath(self::RNG_FILE,"",false)))
-        throw new Exception ("Unable to find HTMLPlus RNG schema");
-
-      try {
-        libxml_use_internal_errors(true);
-        if(!$this->relaxNGValidate($f))
-          throw new Exception("relaxNGValidate internal error occured");
-      } catch (Exception $e) {
-        $internal_errors = libxml_get_errors();
-        if(count($internal_errors)) {
-          $e = new Exception(current($internal_errors)->message);
-        }
-      }
-      // finally
-      libxml_clear_errors();
-      libxml_use_internal_errors(false);
-      if(isset($e)) throw $e;
-      return $i;
+      libxml_use_internal_errors(true);
+      if(!$this->relaxNGValidate($f))
+        throw new Exception("relaxNGValidate internal error occured");
     } catch (Exception $e) {
-      if(!$repair) throw $e;
-      switch ($e->getCode()) {
-        #case 1:
-        #fix error 1
-        #break;
-        case 2:
-        $this->addHeadingIds();
-        $this->addDescriptions();
-        break;
-        case 3:
-        $this->renameLang();
-        break;
-        default:
-        throw $e;
+      $internal_errors = libxml_get_errors();
+      if(count($internal_errors)) {
+        $e = new Exception(current($internal_errors)->message);
       }
-      return $this->validate($repair,++$i);
     }
+    // finally
+    libxml_clear_errors();
+    libxml_use_internal_errors(false);
+    if(isset($e)) throw $e;
+    return true;
   }
 
-  private function renameLang() {
-    foreach($this->badLang as $n) {
-      $n->setAttribute("xml:lang", $n->getAttribute("lang"));
+  public function validate($repair=false) {
+    $this->headings = $this->getElementsByTagName("h");
+    $this->validateRoot();
+    $this->validateLang($repair);
+    $this->validateHId($repair);
+    $this->validateHDesc($repair);
+    $this->validateHLink($repair);
+    $this->relaxNGValidatePlus();
+    return true;
+  }
+
+  private function validateRoot() {
+    if(is_null($this->documentElement) || $this->documentElement->nodeName != "body")
+      throw new Exception("Root element must be 'body'",1);
+  }
+
+  private function validateLang($repair) {
+    $xpath = new DOMXPath($this);
+    $langs = $xpath->query("//*[@lang]");
+    if($langs->length && !$repair)
+      throw new Exception ("Lang attribute without xml namespace",3);
+    foreach($langs as $n) {
+      if(!$n->hasAttribute("xml:lang"))
+        $n->setAttribute("xml:lang", $n->getAttribute("lang"));
       $n->removeAttribute("lang");
     }
   }
 
-  private function addHeadingIds() {
-    foreach($this->hnoid as $h) {
-      $h->setAttribute("id",$this->generateUniqueId());
+  private function validateHId($repair) {
+    foreach($this->headings as $h) {
+      if(!$h->hasAttribute("id")) {
+        if(!$repair) throw new Exception ("Missing id attribute in element h");
+        $h->setAttribute("id",$this->generateUniqueId());
+        continue;
+      }
+      $id = $h->getAttribute("id");
+      if(!$this->isValidId($id)) {
+        if(!$repair || trim($id) != "")
+          throw new Exception ("Invalid ID value '$id'");
+        $h->setAttribute("id",$this->generateUniqueId());
+        continue;
+      }
     }
-    $this->hnoid = array();
   }
 
-  private function addDescriptions() {
-    foreach($this->hnodesc as $h) {
-      $desc = $h->ownerDocument->createElement("description");
-      $h->parentNode->insertBefore($desc,$h->nextSibling);
+  private function validateHDesc($repair) {
+    foreach($this->headings as $h) {
+      if(is_null($h->nextSibling) || $h->nextSibling->nodeName != "description") {
+        if(!$repair) throw new Exception ("Missing description element");
+        $desc = $h->ownerDocument->createElement("description");
+        $h->parentNode->insertBefore($desc,$h->nextSibling);
+      }
     }
-    $this->hnodesc = array();
+  }
+
+  private function validateHLink($repair) {
+    foreach($this->headings as $h) {
+      if(!$h->hasAttribute("link")) continue;
+      $link = normalize($h->getAttribute("link"));
+      if(trim($link) == "") {
+        if($link != $h->getAttribute("link"))
+          throw new Exception ("Normalize link leads to empty value '{$h->getAttribute("link")}'");
+        throw new Exception ("Empty link found");
+      }
+      if($this->getElementById($link,"link")) {
+        if($link != $h->getAttribute("link"))
+          throw new Exception ("Normalize link leads to duplicit value '{$h->getAttribute("link")}'");
+        throw new Exception ("Duplicit link found, value '$link'");
+      }
+      if($link != $h->getAttribute("link")) {
+        if(!$repair) throw new Exception ("Invalid link value found '{$h->getAttribute("link")}'");
+        $h->setAttribute("link",$link);
+      }
+    }
   }
 
   private function generateUniqueId() {
     $id = "h." . substr(md5(microtime()),0,3);
     if(!$this->isValidId($id)) return $this->generateUniqueId();
-    if(array_key_exists($id,$this->hid)) return $this->generateUniqueId();
+    if(!is_null($this->getElementById($id)))
+      return $this->generateUniqueId();
     return $id;
   }
 
   private function isValidId($id) {
     return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/",$id);
-  }
-
-  private function doValidate() {
-    if(is_null($this->documentElement) || $this->documentElement->nodeName != "body")
-      throw new Exception("Root element must be 'body'",1);
-    $this->hid = array();
-    $this->hnoid = array();
-    $this->hnodesc = array();
-    foreach($this->getElementsByTagName("h") as $h) {
-      if(is_null($h->nextSibling) || $h->nextSibling->nodeName != "description")
-        $this->hnodesc[] = $h;
-      if(!$h->hasAttribute("id")) {
-        $this->hnoid[] = $h;
-        continue;
-      }
-      $id = $h->getAttribute("id");
-      if(!$this->isValidId($id)) {
-        if(trim($id) != "")
-          throw new Exception ("Invalid ID value '$id'");
-        $this->hnoid[] = $h;
-      }
-      if(array_key_exists($id,$this->hid))
-        throw new Exception ("Duplicit id found, value '$id'");
-      $this->hid[$id] = null;
-    }
-    if(count($this->hnoid) || count($this->hnodesc)) {
-      throw new Exception ("Missing element h ID or description",2);
-    }
-    $xpath = new DOMXPath($this);
-    if($xpath->query("/body/*[1]")->item(0)->nodeName != "h")
-      throw new Exception ("Missing main heading (/body/h)");
-    $this->badLang = $xpath->query("//*[@lang]");
-    if($this->badLang->length)
-      throw new Exception ("Lang attribute without xml namespace",3);
   }
 
 }

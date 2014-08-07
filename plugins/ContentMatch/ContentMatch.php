@@ -41,7 +41,7 @@ class ContentMatch implements SplObserver, ContentStrategyInterface {
       $this->subject->detach($this);
       return;
     }
-    $link = mb_convert_encoding($cms->getLink(),"ASCII","UTF-8");
+    $link = normalize($cms->getLink());
     $links = array();
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
     $linkId = $this->findSimilar($links,$link);
