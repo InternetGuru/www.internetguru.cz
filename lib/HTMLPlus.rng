@@ -3,6 +3,7 @@
 
   <start>
     <element name="body">
+      <ref name="Core.attrib"/>
       <attribute name="xml:lang">
         <ref name="LanguageCode.datatype"/>
       </attribute>

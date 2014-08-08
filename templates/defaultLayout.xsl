@@ -3,6 +3,7 @@
 
   <xsl:template match="/body">
     <body>
+      <xsl:copy-of select="@*"/>
       <div id="header">
         <xsl:if test="count(ol[contains(@class,'cms-breadcrumb')]/li)>1">
           <xsl:copy-of select="ol[contains(@class,'cms-breadcrumb')]"/>

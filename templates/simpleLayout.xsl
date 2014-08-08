@@ -3,6 +3,7 @@
 
   <xsl:template match="/body">
     <body>
+      <xsl:copy-of select="@*"/>
 
       <div id="content">
 
