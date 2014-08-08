@@ -46,7 +46,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
       $doc->save($this->html[0]);
       $doc->loadXML('<body xml:lang="en"><h id="h.abc"></h><description/></body>');
       $doc->save($this->html[1]);
-      $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="">3</h><description/></body>');
+      $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="3">Three</h><description/></body>');
       $doc->save($this->html[2]);
 
     }
@@ -75,7 +75,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
       $doc = $this->builder->buildHTML("",true,$this->html[0]);
       $s1 = $doc->C14N(true,false);
       $doc = new HTMLPlus();
-      $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="">3</h><description/></body>');
+      $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="3">Three</h><description/></body>');
       $s2 = $doc->C14N(true,false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);

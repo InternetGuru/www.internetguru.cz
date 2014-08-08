@@ -37,7 +37,9 @@ class ContentBalancer implements SplObserver, ContentStrategyInterface {
           }
         }
         $li = $content->createElement("li");
-        $a = $content->createElement("a",$h->nodeValue);
+        $textContent = $h->nodeValue;
+        if($h->hasAttribute("short")) $textContent = $h->getAttribute("short");
+        $a = $content->createElement("a",$textContent);
         $a->setAttribute("href",$href);
         $li->appendChild($a);
         $ul->appendChild($li);

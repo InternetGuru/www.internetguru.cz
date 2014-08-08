@@ -93,19 +93,18 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHLink($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("link")) continue;
+      $this->getElementById($h->getAttribute("link"),"link");
       $link = normalize($h->getAttribute("link"));
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))
           throw new Exception ("Normalize link leads to empty value '{$h->getAttribute("link")}'");
         throw new Exception ("Empty link found");
       }
-      if($this->getElementById($link,"link")) {
-        if($link != $h->getAttribute("link"))
-          throw new Exception ("Normalize link leads to duplicit value '{$h->getAttribute("link")}'");
-        throw new Exception ("Duplicit link found, value '$link'");
-      }
       if($link != $h->getAttribute("link")) {
         if(!$repair) throw new Exception ("Invalid link value found '{$h->getAttribute("link")}'");
+        if(!is_null($this->getElementById($link,"link"))) {
+          throw new Exception ("Normalize link leads to duplicit value '{$h->getAttribute("link")}'");
+        }
         $h->setAttribute("link",$link);
       }
     }

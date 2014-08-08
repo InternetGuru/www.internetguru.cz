@@ -32,7 +32,7 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
     $this->content->formatOutput = true;
     $body = $this->content->appendChild($this->content->createElement("body"));
     foreach($exactMatch->item(0)->parentNode->attributes as $attName => $attNode) {
-      $body->setAttribute($attName,$attNode->nodeValue);
+      $body->setAttributeNode($this->content->importNode($attNode));
     }
     $this->appendUntil($exactMatch->item(0),$body);
     $this->addTitleQueries($exactMatch->item(0));
@@ -49,6 +49,7 @@ class ContentLink implements SplObserver, ContentStrategyInterface {
   }
 
   public function getDescription($query) {
+    if(is_null($his->descriptionQuery)) return "/body/description";
     return $this->descriptionQuery;
   }
 

@@ -165,7 +165,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testValidXML()
     {
       $e = null;
-      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" short="x">xx xx</h><description/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" link="x" short="x">xx xx</h><description/></body>');
       try {
         $this->doc->validate();
       } catch (Exception $e) {
@@ -282,7 +282,9 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $e = null;
       try {
         $this->doc->validate(true);
-      } catch (Exception $e) {}
+      } catch (Exception $e) {
+        echo $e->getMessage();die();
+      }
       $s1 = $this->doc->C14N(true,false);
       $doc = new HTMLPlus();
       $doc->loadXML('<body xml:lang="en"><h id="h.abc" link="a_be">x</h><description/></body>');
