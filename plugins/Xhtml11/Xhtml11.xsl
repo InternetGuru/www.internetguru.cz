@@ -4,7 +4,7 @@
 
   <xsl:template match="body">
     <body>
-      <xsl:copy-of select="@*"/>
+      <xsl:copy-of select="@*[name()!='xml:lang']"/>
       <xsl:apply-templates/>
     </body>
   </xsl:template>

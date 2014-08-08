@@ -26,7 +26,23 @@ class ContentMenu implements SplObserver, ContentStrategyInterface {
     $menu->setAttribute("class","cms-menu");
     $s = $content->documentElement->getElementsByTagName("section")->item(0);
     $content->documentElement->insertBefore($menu,$s);
+    $this->trimList($menu);
     return $content;
+  }
+
+  private function trimList(DOMElement $ul) {
+    $currentLink = false;
+    $deepLink = false;
+    $children = array();
+    foreach($ul->childNodes as $li) {
+      foreach($li->childNodes as $n) {
+        if($n->nodeName == "a") $currentLink = true;
+        if($n->nodeName == "ul") $deepLink = $this->trimList($n);
+      }
+    }
+    if($currentLink || $deepLink) return true;
+    $ul->parentNode->removeChild($ul);
+    return false;
   }
 
   private function getMenu(HTMLPlus $content, DOMElement $section) {
@@ -36,17 +52,20 @@ class ContentMenu implements SplObserver, ContentStrategyInterface {
       if($n->nodeType != 1) continue;
       if($n->nodeName == "section") {
         $menu = $this->getMenu($content,$n);
-        if(!is_null($menu)) $li->appendChild($menu);
+        if(!is_null($menu)) {
+          $li->appendChild($menu);
+        }
         continue;
       }
-      if($n->nodeName != "h" || !$n->hasAttribute("link")) continue;
+      if($n->nodeName != "h") continue;
       $li = $content->createElement("li");
-      $link = $n->getAttribute("link");
+      $link = null;
+      if($n->hasAttribute("link")) $link = $n->getAttribute("link");
       $text = $n->nodeValue;
       if($n->hasAttribute("short")) $text = $n->getAttribute("short");
-      if($this->subject->getCms()->getLink() != $link) {
+      if(!is_null($link)) {
         $a = $content->createElement("a",$text);
-        $a->setAttribute("href",$link);
+        if($this->subject->getCms()->getLink() != $link) $a->setAttribute("href",$link);
         $li->appendChild($a);
       } else {
         $li->nodeValue = $text;

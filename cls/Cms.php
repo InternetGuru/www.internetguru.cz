@@ -103,8 +103,9 @@ class Cms {
   }
 
   public function getLanguage() {
-    $h = $this->contentFull->getElementsByTagName("body");
-    return $h->item(0)->getAttribute("xml:lang");
+    if(!is_null($this->content)) $h = $this->content;
+    else $h = $this->contentFull;
+    return $h->getElementsByTagName("body")->item(0)->getAttribute("xml:lang");
   }
 
   public function getConfig() {
