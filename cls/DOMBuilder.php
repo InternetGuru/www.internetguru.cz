@@ -80,7 +80,8 @@ class DOMBuilder {
     } catch(Exception $e) {
       // restore file if backupstrategy && $backup
       if(!is_null($this->backupStrategy) && $backup)
-        $this->backupStrategy->restoreNewestBackup($filename);
+        #$this->backupStrategy->restoreNewestBackup($filename);
+        $filename = $this->backupStrategy->getNewestBackupFilePath($filename);
       else throw $e;
       // loadDOM(false)
       $this->loadDOM($filename,$doc,false);
@@ -160,7 +161,8 @@ class DOMBuilder {
 
 interface BackupStrategyInterface {
     public function doBackup($filePath);
-    public function restoreNewestBackup($filePath);
+    #public function restoreNewestBackup($filePath);
+    public function getNewestBackupFilePath($filePath);
 }
 
 ?>
