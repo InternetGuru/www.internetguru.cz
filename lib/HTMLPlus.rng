@@ -89,8 +89,10 @@
   <define name="htmlplus.p">
     <element name="p">
       <ref name="p.attlist"/>
-      <ref name="Inline.model"/>
-      <ref name="htmlplus.list"/>
+      <interleave>
+        <ref name="Inline.model"/>
+        <ref name="htmlplus.list"/>
+      </interleave>
     </element>
   </define>
 
@@ -109,7 +111,17 @@
   </define>
 
   <define name="htmlplus.list">
-    <interleave>
+    <zeroOrMore>
+      <choice>
+        <ref name="htmlplus.ul"/>
+        <ref name="htmlplus.ol"/>
+        <ref name="htmlplus.dl"/>
+      </choice>
+    </zeroOrMore>
+  </define>
+
+  <define name="xhtmlplus.list">
+    <choice>
       <zeroOrMore>
         <ref name="htmlplus.ul"/>
       </zeroOrMore>
@@ -119,7 +131,7 @@
       <zeroOrMore>
         <ref name="htmlplus.dl"/>
       </zeroOrMore>
-    </interleave>
+    </choice>
   </define>
 
   <define name="htmlplus.ul">

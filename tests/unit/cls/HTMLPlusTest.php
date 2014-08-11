@@ -191,6 +191,18 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertNotNull($e,"RelaxNG schema accepted h1 in form (known issue #1)");
     }
 
+    public function testListInPar()
+    {
+      $e = null;
+      $this->doc->loadXML('<body xml:lang="en"><h id="hx">x</h><description/><p>a<dl><dt/></dl>b<ul><li/></ul>c</p></body>');
+      try {
+        $this->doc->validate();
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertTrue(is_null($e),$e);
+    }
+
     public function testHEmpty()
     {
       $this->doc->loadXML('<body xml:lang="en"><h id="h.abc"/><description/></body>');

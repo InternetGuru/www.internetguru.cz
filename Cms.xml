@@ -20,6 +20,6 @@
   <jsFile readonly="readonly" />
 
   <!-- default variables -->
-  <var id="example" readonly="readonly">example value</var>
+  <var id="example" readonly="readonly">example <em>value</em></var>
 
 </Cms>

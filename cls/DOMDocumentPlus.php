@@ -43,7 +43,7 @@ class DOMDocumentPlus extends DOMDocument {
     // find elements with current var
     $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$var));
     $where = array();
-    // check for attributes and substring
+    // check for attributes and real match (xpath accepts substrings)
     foreach($matches as $e) {
       $vars = explode(" ",$e->getAttribute("var"));
       $keep = array();
@@ -75,10 +75,7 @@ class DOMDocumentPlus extends DOMDocument {
         else $this->insertVarArray($varValue,$e);
         break;
         case "DOMElement":
-        $varxpath = new DOMXPath($varValue->ownerDocument);
-        $varValue = $varxpath->query("/*");
-        case "DOMNodeList":
-        $this->insertVarDOMNodeList($var,$varValue,$e);
+        $this->insertVarDOMElement($varValue,$e);
         break;
         default:
         throw new Exception("Unsupported type '$type'");
@@ -125,34 +122,46 @@ class DOMDocumentPlus extends DOMDocument {
       $p->parentNode->removeChild($p);
   }
 
-  private function insertVarDOMNodeList($varName,DOMNodeList $varValue,DOMNodeList $where) {
-    $into = array();
-    foreach($where as $e) $into[] = $e;
-    foreach($into as $e) {
-      $newParent = $e->parentNode->cloneNode();
-      $e->ownerDocument->importNode($newParent);
-      $children = array();
-      foreach($e->parentNode->childNodes as $ch) $children[] = $ch;
-      foreach($children as $ch) {
-        if(!$ch->isSameNode($e)) {
-          $newParent->appendChild($ch);
-          continue;
+  // full replace only
+  private function insertVarDOMElement(DOMElement $varValue,DOMElement $e) {
+    // clear destination element
+    $children = array();
+    foreach($e->childNodes as $n) $children[] = $n;
+    foreach($children as $n) $e->removeChild($n);
+    // fill destination element
+    $var = $e->ownerDocument->importNode($varValue,true);
+    $children = array();
+    foreach($var->childNodes as $n) $children[] = $n;
+    foreach($children as $n) {
+      #$e->ownerDocument->importNode($n,true);
+      $e->appendChild($n);
+    }
+  }
+
+  private function XinsertVarDOMElement(DOMElement $varValue,DOMElement $e) {
+    $newParent = $e->parentNode->cloneNode();
+    $e->ownerDocument->importNode($newParent);
+    $children = array();
+    foreach($e->parentNode->childNodes as $ch) $children[] = $ch;
+    foreach($children as $ch) {
+      if(!$ch->isSameNode($e)) {
+        $newParent->appendChild($ch);
+        continue;
+      }
+      $parts = explode($varName,$ch->nodeValue);
+      foreach($parts as $id => $part) {
+        $newParent->appendChild($e->ownerDocument->createTextNode($part));
+        if((count($parts)-1) == $id) continue; // (not here) txt1 (here) txt2 (here) txt3 (not here)
+        $append = array();
+        foreach($varValue as $n) {
+          if($n->nodeType === 1) $append[] = $n;
         }
-        $parts = explode($varName,$ch->nodeValue);
-        foreach($parts as $id => $part) {
-          $newParent->appendChild($e->ownerDocument->createTextNode($part));
-          if((count($parts)-1) == $id) continue; // (not here) txt1 (here) txt2 (here) txt3 (not here)
-          $append = array();
-          foreach($varValue as $n) {
-            if($n->nodeType === 1) $append[] = $n;
-          }
-          foreach($append as $n) {
-            $newParent->appendChild($e->ownerDocument->importNode($n,true));
-          }
+        foreach($append as $n) {
+          $newParent->appendChild($e->ownerDocument->importNode($n,true));
         }
       }
-      $e->parentNode->parentNode->replaceChild($newParent,$e->parentNode);
     }
+    $e->parentNode->parentNode->replaceChild($newParent,$e->parentNode);
   }
 
 }

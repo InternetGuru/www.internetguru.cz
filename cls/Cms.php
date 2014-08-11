@@ -61,9 +61,8 @@ class Cms {
   public function insertCmsVars() {
     if(is_null($this->content)) throw new Exception("Content not set");
     foreach($this->config->getElementsByTagName("var") as $var) {
-      if(!$var->hasAttribute("id")) throw new Exception ("Var is missing id");
+      if(!$var->hasAttribute("id")) throw new Exception ("Missing id in element var");
       $id = $var->getAttribute("id");
-      if(get_class($var) == "DOMElement") $var = $var->childNodes;
       $this->content->insertVar($id,$var);
     }
   }
