@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <body xml:lang="cs">
-  <h id="h.adf">{ContentAdmin:heading} (administrace)</h>
+  <h id="h.adf" var="ContentAdmin:heading">Administrace</h>
   <description/>
-  {ContentAdmin:errors}
-  <form action="{ContentAdmin:link}?admin" method="post">
+  <ol class="errors">
+    <li var="ContentAdmin:errors"/>
+  </ol>
+  <form action="" method="post">
     <fieldset><legend>Datový soubor ve formátu HTMLPlus</legend>
-    <!-- <div> -->
-      <textarea class="xml {ContentAdmin:np}" cols="40" name="content" rows="20">{ContentAdmin:content}</textarea>
-      <input name="filehash" type="hidden" value="{ContentAdmin:filehash}"/>
+      <textarea class="xml" cols="40" name="content" rows="20" var="ContentAdmin:content">n/a</textarea>
+      <input name="filehash" type="hidden" value=""/>
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít (Ctrl+Shift+S)"/></li>
         <li><input name="saveandstay" type="submit" value="Uložit (Ctrl+S)"/></li>
-        <li><a href="{ContentAdmin:link}?admin">Zahodit změny</a></li>
-        <li><a href="{ContentAdmin:link}">Zahodit změny a odejít</a></li>
+        <li><a href="" var="ContentAdmin:linkAdmin@href">Zahodit změny</a></li>
+        <li><a href="" var="ContentAdmin:link@href">Zahodit změny a odejít</a></li>
       </ul>
-    <!-- </div> -->
     </fieldset>
   </form>
 </body>

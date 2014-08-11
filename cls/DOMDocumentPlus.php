@@ -34,35 +34,55 @@ class DOMDocumentPlus extends DOMDocument {
     return $newnode;
   }
 
-  public function insertVar($varName,$varValue,$plugin="") {
+  public function insertVar($varName,$varValue,$prefix="") {
     $xpath = new DOMXPath($this);
-    $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]/";
-    #$noparse = "*/";
-    if($plugin == "") $plugin = "Cms";
-    $var = "{".$plugin.":".$varName."}";
-    if(is_string($varValue)) {
-      $where = $xpath->query(sprintf("//%s@*[contains(.,'%s')]",$noparse,$var));
-      $this->insertVarString($var,$varValue,$where);
+    $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";
+    #$noparse = "*";
+    if($prefix == "") $prefix = "Cms";
+    $var = $prefix.":".$varName;
+    // find elements with current var
+    $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$var));
+    $where = array();
+    // check for attributes and substring
+    foreach($matches as $e) {
+      $vars = explode(" ",$e->getAttribute("var"));
+      $keep = array();
+      foreach($vars as $v) {
+        $p = explode("@",$v);
+        if($var != $p[0]) {
+          $keep[] = $v;
+          continue;
+        }
+        if(isset($p[1])) $where[$p[1]] = $e;
+        else $where[] = $e;
+      }
+      if(empty($keep)) {
+        $e->removeAttribute("var");
+        continue;
+      }
+      $e->setAttribute("var",implode(" ",$keep));
     }
-    $where = $xpath->query(sprintf("//%stext()[contains(.,'%s')]",$noparse,$var));
-    if($where->length == 0) return;
+    if(!count($where)) return;
     $type = gettype($varValue);
     if($type == "object") $type = get_class($varValue);
-    switch($type) {
-      case "string":
-      $this->insertVarString($var,$varValue,$where);
-      break;
-      case "array":
-      $this->insertVarArray($var,$varValue,$where,$varName);
-      break;
-      case "DOMElement":
-      $varxpath = new DOMXPath($varValue->ownerDocument);
-      $varValue = $varxpath->query("/*");
-      case "DOMNodeList":
-      $this->insertVarDOMNodeList($var,$varValue,$where);
-      break;
-      default:
-      throw new Exception("Unsupported type '$type'");
+    foreach($where as $a => $e) {
+      switch($type) {
+        case "string":
+        $this->insertVarString($varValue,$e,$a);
+        break;
+        case "array":
+        if(empty($varValue)) $this->emptyVarArray($e);
+        else $this->insertVarArray($varValue,$e);
+        break;
+        case "DOMElement":
+        $varxpath = new DOMXPath($varValue->ownerDocument);
+        $varValue = $varxpath->query("/*");
+        case "DOMNodeList":
+        $this->insertVarDOMNodeList($var,$varValue,$e);
+        break;
+        default:
+        throw new Exception("Unsupported type '$type'");
+      }
     }
   }
 
@@ -74,24 +94,35 @@ class DOMDocumentPlus extends DOMDocument {
     return $b;
   }
 
-  private function insertVarString($varName,$varValue,DOMNodeList $where) {
-    foreach($where as $e) {
-      $e->nodeValue = str_replace($varName, $varValue, $e->nodeValue);
-    }
-  }
-
-  private function insertVarArray($varName,Array $varValue,DOMNodeList $where, $var) {
-    if(empty($varValue)) {
-      $this->insertVarString($varName,"",$where);
+  private function insertVarString($varValue,DOMElement $e,$attr="") {
+    if(strlen($attr) && !is_numeric($attr)) {
+      if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
+        $e->setAttribute($attr,$varValue);
+        return;
+      }
+      $e->setAttribute($attr,$e->getAttribute($attr)." ".$varValue);
       return;
     }
-    $doc = new DOMDocument();
-    $list = $doc->appendChild($doc->createElement("ol"));
-    $list->setAttribute("class",$var);
-    foreach($varValue as $i) $list->appendChild($doc->createElement("li",$i));
-    $varxpath = new DOMXPath($doc);
-    $varValue = $varxpath->query("/*");
-    $this->insertVarDOMNodeList($varName,$varValue,$where);
+    $new = sprintf($e->nodeValue,$varValue);
+    if($new != $e->nodeValue) $e->nodeValue = $new;
+    else $e->nodeValue = $varValue;
+  }
+
+  private function insertVarArray(Array $varValue,DOMElement $e) {
+    $p = $e->parentNode;
+    foreach($varValue as $v) {
+      $li = $p->appendChild($e->cloneNode());
+      $li->nodeValue = $v;
+    }
+    $p->removeChild($e);
+  }
+
+  private function emptyVarArray(DOMElement $e) {
+    if($e->nodeValue != "") return;
+    $p = $e->parentNode;
+    $p->removeChild($e);
+    if($p->childNodes->length == 0)
+      $p->parentNode->removeChild($p);
   }
 
   private function insertVarDOMNodeList($varName,DOMNodeList $varValue,DOMNodeList $where) {

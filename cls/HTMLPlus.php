@@ -2,6 +2,7 @@
 
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
+  private $autocorrected = false;
   const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
@@ -13,6 +14,10 @@ class HTMLPlus extends DOMDocumentPlus {
     $root = $doc->importNode($this->documentElement,true);
     $doc->appendChild($root);
     return $doc;
+  }
+
+  public function isAutocorrected() {
+    return $this->autocorrected;
   }
 
   public function relaxNGValidatePlus() {
@@ -60,6 +65,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$n->hasAttribute("xml:lang"))
         $n->setAttribute("xml:lang", $n->getAttribute("lang"));
       $n->removeAttribute("lang");
+      $this->autocorrected = true;
     }
   }
 
@@ -75,6 +81,7 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair || trim($id) != "")
           throw new Exception ("Invalid ID value '$id'");
         $h->setAttribute("id",$this->generateUniqueId());
+        $this->autocorrected = true;
         continue;
       }
     }
@@ -86,6 +93,7 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair) throw new Exception ("Missing description element");
         $desc = $h->ownerDocument->createElement("description");
         $h->parentNode->insertBefore($desc,$h->nextSibling);
+        $this->autocorrected = true;
       }
     }
   }
@@ -106,6 +114,7 @@ class HTMLPlus extends DOMDocumentPlus {
           throw new Exception ("Normalize link leads to duplicit value '{$h->getAttribute("link")}'");
         }
         $h->setAttribute("link",$link);
+        $this->autocorrected = true;
       }
     }
   }

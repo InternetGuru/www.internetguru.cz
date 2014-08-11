@@ -311,7 +311,19 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->assertNotNull($e,"RelaxNG schema accepted invalid link value");
     }
 
-    public function testClone()
+    public function testListNoItems()
+    {
+      $e = null;
+      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><description/><ol/></body>');
+      try {
+        $this->doc->validate();
+      } catch (Exception $e) {
+        #echo $e->getMessage();die();
+      }
+      $this->assertNotNull($e,"RelaxNG schema accepted list with no items");
+    }
+
+   public function testClone()
     {
       $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><description/></body>');
       $s1 = $this->doc->C14N(true,false);

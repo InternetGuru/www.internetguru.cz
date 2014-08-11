@@ -29,13 +29,17 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $cms = $this->subject->getCms();
     $cms->getOutputStrategy()->addCssFile('ContentAdmin.css','ContentAdmin');
     $cms->getOutputStrategy()->addJsFile('ContentAdmin.js','ContentAdmin', 10, "body");
-    $newContent = $cms->buildHTML("ContentAdmin",true,"",false);
+
+    #$this->errors = array("a","b","c");
+
+    $newContent = $cms->buildHTML("ContentAdmin");
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
+    $newContent->insertVar("linkAdmin",$cms->getLink()."?admin","ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
-    $newContent->insertVar("np","noparse","ContentAdmin");
-    $newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
+    #$newContent->insertVar("np","noparse","ContentAdmin");
+    #$newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
     return $newContent;
   }
 
@@ -70,9 +74,11 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         $this->errors[] = "File is not valid XML";
         return;
       }
-      $i = $doc->validate(true);
+      $doc->validate(true);
       if($post) $doc->saveRewrite(USER_FOLDER."/Content.xml");
-      elseif($i > 0) $this->errors[] = "Note: file has been autocorrected";
+
+      if($doc->isAutocorrected())
+        $this->errors[] = "Note: file has been autocorrected";
       // validation may include non-blocking errors
       #$this->errors[] = "non-blocking error";
 

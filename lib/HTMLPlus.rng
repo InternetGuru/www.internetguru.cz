@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<grammar datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes" xmlns="http://relaxng.org/ns/structure/1.0">
+<grammar
+  datatypeLibrary="http://www.w3.org/2001/XMLSchema-datatypes"
+      xmlns="http://relaxng.org/ns/structure/1.0">
 
   <start>
     <element name="body">
@@ -30,6 +32,7 @@
   <define name="htmlplus.h">
     <element name="h">
       <ref name="CommonIdRequired.attrib"/>
+      <ref name="htmlplus.var"/>
       <optional>
         <attribute name="short">
           <data type="string">
@@ -171,6 +174,16 @@
       <ref name="Inline.model"/>
       <ref name="htmlplus.list"/>
     </element>
+  </define>
+
+  <define name="Core.attrib" combine="interleave">
+    <ref name="htmlplus.var"/>
+  </define>
+
+  <define name="htmlplus.var">
+    <optional>
+      <attribute name="var"/>
+    </optional>
   </define>
 
   <include href="xhtml/img.rng"/>
