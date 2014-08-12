@@ -131,10 +131,7 @@ class DOMDocumentPlus extends DOMDocument {
     $var = $e->ownerDocument->importNode($varValue,true);
     $children = array();
     foreach($var->childNodes as $n) $children[] = $n;
-    foreach($children as $n) {
-      #$e->ownerDocument->importNode($n,true);
-      $e->appendChild($n);
-    }
+    foreach($children as $n) $e->appendChild($n);
   }
 
   private function XinsertVarDOMElement(DOMElement $varValue,DOMElement $e) {
