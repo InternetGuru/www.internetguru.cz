@@ -1,3 +1,5 @@
+// CodeMirror Configuration
+// http://codemirror.net/doc/manual.html
 var ta = document.getElementsByTagName("textarea");
 for (var i = 0; i < ta.length; i++) {
   if(ta[i].className.match(/\bxml\b/)) {
