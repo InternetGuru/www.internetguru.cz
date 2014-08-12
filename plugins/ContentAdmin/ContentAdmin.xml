@@ -8,7 +8,7 @@
   <form action="" method="post">
     <fieldset><legend>Datový soubor ve formátu HTMLPlus</legend>
       <textarea class="xml" cols="40" name="content" rows="20" var="ContentAdmin:content">n/a</textarea>
-      <input name="filehash" type="hidden" value=""/>
+      <input name="filehash" type="hidden" value="" var="ContentAdmin:filehash@value"/>
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít (Ctrl+Shift+S)"/></li>
         <li><input name="saveandstay" type="submit" value="Uložit (Ctrl+S)"/></li>

@@ -38,8 +38,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
     $newContent->insertVar("linkAdmin",$cms->getLink()."?admin","ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
-    #$newContent->insertVar("np","noparse","ContentAdmin");
-    #$newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
+    #$newContent->insertVar("noparse","noparse","ContentAdmin");
+    $newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
     return $newContent;
   }
 
@@ -60,6 +60,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
       if($post && $_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
         throw new Exception("No changes made");
+      if($post && (!is_writable(dirname($this->dataFile)) || !is_writable($this->dataFile)))
+        throw new Exception("Unable to save changes. File is probably locked (update in progress).");
       if($post && $_POST["filehash"] != $this->getFileHash($this->dataFile))
         throw new Exception("Source file has changed during administration");
 
