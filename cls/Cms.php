@@ -58,15 +58,6 @@ class Cms {
     }
   }
 
-  public function insertCmsVars() {
-    if(is_null($this->content)) throw new Exception("Content not set");
-    foreach($this->config->getElementsByTagName("var") as $var) {
-      if(!$var->hasAttribute("id")) throw new Exception ("Missing id in element var");
-      $id = $var->getAttribute("id");
-      $this->content->insertVar($id,$var);
-    }
-  }
-
   public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }

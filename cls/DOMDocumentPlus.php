@@ -38,10 +38,9 @@ class DOMDocumentPlus extends DOMDocument {
     $xpath = new DOMXPath($this);
     $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";
     #$noparse = "*";
-    if($prefix == "") $prefix = "Cms";
-    $var = $prefix.":".$varName;
+    if($prefix != "") $varName = $prefix.":".$varName;
     // find elements with current var
-    $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$var));
+    $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$varName));
     $where = array();
     // check for attributes and real match (xpath accepts substrings)
     foreach($matches as $e) {
@@ -49,7 +48,7 @@ class DOMDocumentPlus extends DOMDocument {
       $keep = array();
       foreach($vars as $v) {
         $p = explode("@",$v);
-        if($var != $p[0]) {
+        if($varName != $p[0]) {
           $keep[] = $v;
           continue;
         }

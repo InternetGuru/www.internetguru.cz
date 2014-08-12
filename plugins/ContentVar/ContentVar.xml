@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentVar>
+
+  <var id="wherewhen">V Praze, 15. července 2014</var>
+
+  <var id="supp-name">Jan Pospíšil</var>
+  <var id="supp-addr">Na Břevnovské pláni 23, 169 00 Praha 6</var>
+  <var id="supp-ic">86989782</var>
+  <var id="supp-bu">2800426615/2010</var>
+
+  <!--
+  <var id="supp-name">Pavel Petržela</var>
+  <var id="supp-addr">Nerudova 20/18, 568 02 Svitavy</var>
+  <var id="supp-ic">88363163</var>
+  <var id="supp-bu">2200369581/2010</var>
+  -->
+
+  <var id="client-name">Anna Zímová <!-- Bohuslav Zíma --></var>
+  <var id="client-addr">Keblice 133, 410 02 Lovosice</var>
+  <var id="client-ic">46721436</var>
+  <var id="client-dic">CZ486210276</var>
+
+  <var id="tarif">PROFI</var>
+  <var id="domain">www.kobercekaplicka.cz</var>
+  <var id="updates">ano</var>
+  <var id="requests">2</var>
+  <var id="fee-total">600 Kč</var>
+
+  <var id="fee-hour">500 Kč</var>
+
+  <!--var id="client-name">Vojtěch Gerhardt</var>
+  <var id="client">
+    <ul>
+      <li>Vojtěch Gerhardt</li>
+      <li>Pazderna 337, Červený Kostelec, 549 41</li>
+      <li>IČ: 88672051, DIČ: CZ9004260441</li>
+    </ul>
+  </var>
+  <var id="client-summary">
+    <ol>
+      <li>PROFI: podobleceni.cz (0 / 1)</li>
+    </ol>
+  </var>
+  <var id="client-fee-total">250 Kč</var>
+  <var id="client-fee">
+    <ol>
+      <li>Tarif PROFI: 250 Kč</li>
+    </ol>
+  </var>
+  <var id="client-hour">600 Kč</var>
+  <var id="client-hour-discount">
+    <ol>
+      <li>Tarif PROFI: 400 Kč</li>
+    </ol>
+  </var-->
+
+  <!--var id="client-name">PhDr. Pavel Fabini</var>
+  <var id="client">
+    <ul>
+      <li>Fabini finance, s.r.o.</li>
+      <li>Pražského 637/32, Praha Hlubočepy, 152 00</li>
+      <li>IČ: 28548264, DIČ: CZ28548264</li>
+    </ul>
+  </var>
+  <var id="client-summary">
+    <ol>
+      <li>PROFI: fabinifinance.com (1 / 2)</li>
+    </ol>
+  </var>
+  <var id="client-fee-total">300 Kč</var>
+  <var id="client-fee">
+    <ol>
+      <li>Tarif PROFI s aktualizací: 500 Kč (sleva 40 %)</li>
+    </ol>
+  </var>
+  <var id="client-hour">700 Kč</var>
+  <var id="client-hour-discount">
+    <ol>
+      <li>Tarif PROFI: 450 Kč</li>
+    </ol>
+  </var-->
+
+  <!--var id="client-name">Miloš Svoboda</var>
+  <var id="client">
+    <ul>
+      <li>Miloš Svoboda</li>
+      <li>Pomezí 4, 569 71 Polička-Pomezí</li>
+      <li>IČ: 87530333, DIČ: CZ8304253320</li>
+    </ul>
+  </var>
+  <var id="client-summary">
+    <ol>
+      <li>BASIC: mivepo.cz (0 / 0)</li>
+      <li>PROFI: kvalitniloznice.cz (1 / 2)</li>
+    </ol>
+  </var>
+  <var id="client-fee-total">340 Kč</var>
+  <var id="client-fee">
+    <ol>
+      <li>Tarif BASIC: 50 Kč</li>
+      <li>Tarif PROFI s aktualizací: 290 Kč</li>
+    </ol>
+  </var>
+  <var id="client-hour">680 Kč</var>
+  <var id="client-hour-discount">
+    <ol>
+      <li>Tarif BASIC: 578 Kč</li>
+      <li>Tarif PROFI s aktualizaci: 442 Kč</li>
+    </ol>
+  </var-->
+
+</ContentVar>

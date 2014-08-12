@@ -30,7 +30,6 @@ try {
   $plugins->setStatus("process");
   $plugins->notify();
 
-  $cms->insertCmsVars();
   $plugins->setStatus("postprocess");
   $plugins->notify();
 
