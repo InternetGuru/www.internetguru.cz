@@ -34,15 +34,15 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
       $this->setSchema($defaultFile);
       $this->dataFile = USER_FOLDER . "/$fileName";
+      $this->type = pathinfo($defaultFile,PATHINFO_EXTENSION);
+      if(!in_array($this->type, array("xml","css")))
+        throw new Exception("Unsupported extension '{$this->type}'");
       if(isset($_GET["restore"])) {
         $this->restoreDefault($defaultFile);
         $this->errors[] = "Note: data file has been restored";
       }
       if(!file_exists($this->dataFile))
         throw new Exception("User file '{$this->dataFile}' not found");
-      $this->type = pathinfo($defaultFile,PATHINFO_EXTENSION);
-      if(!in_array($this->type, array("xml")))
-        throw new Extension("Unsupported extension '$extension'");
       $subject->setPriority($this,1);
       $this->processAdmin();
       return;
@@ -50,23 +50,29 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   }
 
   private function restoreDefault($file) {
-    switch($this->schema) {
-      case self::HTMLPLUS_SCHEMA:
-      $this->restoreFile($this->dataFile,$file);
-      break;
-      case null:
+    switch($this->type) {
+      case "xml":
+      case "xsl":
       $this->restoreXml($this->dataFile,$file);
       break;
+      case "css":
+      case "txt":
+      $this->restoreFile($this->dataFile,false,$file);
+      break;
       default:
-      throw new Exception("Unsupported schema '{$this->schema}'");
+      throw new Exception("Unsupported type '{$this->type}'");
     }
   }
 
   private function restoreXml($dest,$src) {
-    $doc = new DOMDocumentPlus();
-    $doc->load($src);
-    $doc->removeNodes("//*[@readonly]");
-    $this->restoreFile($dest,$doc->saveXml());
+    if($this->schema != self::HTMLPLUS_SCHEMA) {
+      $doc = new DOMDocumentPlus();
+      $doc->load($src);
+      $doc->removeNodes("//*[@readonly]");
+      $this->restoreFile($dest,$doc->saveXml());
+      return;
+    }
+    $this->restoreFile($dest,false,$src);
   }
 
   private function restoreFile($dest,$content=false,$src=false) {
@@ -96,6 +102,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $cms->getOutputStrategy()->addJsFile('ContentAdmin.js','ContentAdmin', 10, "body");
 
     #$this->errors = array("a","b","c");
+    $format = $this->type;
+    if(!is_null($this->schema)) $format .= " ({$this->schema})";
 
     $newContent = $cms->buildHTML("ContentAdmin");
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
@@ -105,7 +113,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("linkAdmin",$this->adminLink,"ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
     $newContent->insertVar("filename",$this->dataFile,"ContentAdmin");
-    $newContent->insertVar("schema",$this->schema,"ContentAdmin");
+    $newContent->insertVar("schema",$format,"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
 
@@ -134,60 +142,47 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private function processAdmin() {
 
     $post = false;
-    if(isset($_POST["content"],$_POST["filehash"])) $post = true;
-
-    if($post) try {
+    if(isset($_POST["content"],$_POST["filehash"])) {
+      $post = true;
+      $this->contentValue = $_POST["content"];
       if($_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
-        throw new Exception("No changes made");
+        $this->errors[] = "No changes made";
       if(!is_writable(dirname($this->dataFile)) || !is_writable($this->dataFile))
-        throw new Exception("Unable to save changes. File is probably locked (update in progress).");
+        $this->errors[] = "Unable to save changes. File is probably locked (update in progress).";
       if($_POST["filehash"] != $this->getFileHash($this->dataFile))
-        throw new Exception("Source file has changed during administration");
-    } catch(Exception $e) {
-      $this->errors[] = $e->getMessage();
+        $this->errors[] = "Source file has changed during administration";
+    } else {
+      if(!($this->contentValue = @file_get_contents($this->dataFile)))
+        throw new Exception("Unable to load content from '{$this->dataFile}'");
     }
 
     switch($this->type) {
       case "xml":
       case "xsl":
-      $doc = $this->createDoc($this->schema);
-      $this->proceedXml($post, $doc);
-      $this->saveAndRedir($post,$doc->saveXML());
+      $this->proceedXml();
+      case "css":
+      case "txt":
+      if($post) $this->saveAndRedir();
       break;
-      #case "css":
-      #case "txt":
-      #proceedTxt
-      #break;
       default:
       throw new Exception("Unsupported type '{$this->type}'");
     }
   }
 
-  private function saveAndRedir($post,$s) {
-    if(!$post) {
-      $this->contentValue = $s;
-      return;
-    }
-    if($this->saveRewrite($s) === false)
+  private function saveAndRedir() {
+    if($this->saveRewrite($this->contentValue) === false)
       throw new Exception("Unable to save changes");
     if(empty($this->errors)) $this->redir();
     $this->contentValue = $_POST["content"];
   }
 
-  private function proceedXml($post, DOMDocumentPlus $doc) {
-    try {
-      if($post) {
-        if(!@$doc->loadXML($_POST["content"])) throw new Exception("String is not valid XML");
-      } elseif(!@$doc->load($this->dataFile)) {
-        if(!($this->contentValue = @file_get_contents($this->dataFile)))
-          throw new Exception("Unable to load content from '{$this->dataFile}'");
-        $this->errors[] = "File is not valid XML";
+  private function proceedXml() {
+    $doc = $this->createDoc($this->schema);
+    if(!@$doc->loadXML($this->contentValue)) {
+        $this->errors[] = "Invalid XML syntax";
         return;
-      }
-      $this->validateXml($doc,$this->schema);
-    } catch (Exception $e) {
-      $this->errors[] = $e->getMessage();
     }
+    $this->validateXml($doc,$this->schema);
   }
 
   private function saveRewrite($s) {
