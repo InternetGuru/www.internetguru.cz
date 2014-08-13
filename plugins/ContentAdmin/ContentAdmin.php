@@ -6,6 +6,7 @@
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
   const HASH_ALGO = 'crc32b';
+  const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
   private $subject; // SplSubject
   private $content = null;
   private $errors = array();
@@ -30,17 +31,36 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       #$fileName = "plugins/ContentAdmin/ContentAdmin.xml";
       if(!($defaultFile = findFilePath($fileName,"",false,false)))
         throw new Exception("Default file '$fileName' not found");
+
+      $this->setScheme($defaultFile);
       $this->dataFile = USER_FOLDER . "/$fileName";
+      if(isset($_GET["restore"])) {
+        $this->restoreDefault($defaultFile);
+        $this->errors[] = "Note: data file has been restored";
+      }
       if(!file_exists($this->dataFile))
         throw new Exception("User file '{$this->dataFile}' not found");
       $extension = pathinfo($defaultFile,PATHINFO_EXTENSION);
       if(!in_array($extension, array("xml")))
         throw new Extension("Unsupported extension '$extension'");
       $subject->setPriority($this,1);
-      $this->setScheme($defaultFile);
       $this->validateAndRepair();
       return;
     }
+  }
+
+  private function restoreDefault($file) {
+    if($this->scheme == self::HTMLPLUS_SCHEMA) {
+      if(file_exists($this->dataFile)) {
+        if(!@rename($this->dataFile, $this->dataFile.".old"))
+          throw new Exception("Unable to replace current user file '{$this->dataFile}'");
+      }
+      if(!@copy($file,$this->dataFile)) {
+        throw new Exception("Unable to copy default data file '{$this->dataFile}'");
+      }
+      return;
+    }
+    throw new Exception("Missing or unsupported schema");
   }
 
   public function getContent(HTMLPlus $content) {
@@ -54,6 +74,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
+    $newContent->insertVar("linkAdminRestore",$this->adminLink . "&restore","ContentAdmin");
     $newContent->insertVar("linkAdmin",$this->adminLink,"ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
     $newContent->insertVar("filename",$this->dataFile,"ContentAdmin");
@@ -77,7 +98,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $post = false;
     if(isset($_POST["content"],$_POST["filehash"])) $post = true;
 
-    if($this->scheme == "lib/HTMLPlus.rng") {
+    if($this->scheme == self::HTMLPLUS_SCHEMA) {
       $doc = new HTMLPlus();
     } else {
       throw new Exception("Unsupported or missing XML scheme");

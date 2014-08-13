@@ -13,6 +13,7 @@
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít (Ctrl+Shift+S)"/></li>
         <li><input name="saveandstay" type="submit" value="Uložit (Ctrl+S)"/></li>
+        <li><a href="" var="ContentAdmin:linkAdminRestore@href">Obnovit výchozí soubor</a></li>
         <li><a href="" var="ContentAdmin:linkAdmin@href">Zahodit změny</a></li>
         <li><a href="" var="ContentAdmin:link@href">Zahodit změny a odejít</a></li>
       </ul>
