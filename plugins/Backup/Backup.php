@@ -48,8 +48,7 @@ class Backup implements SplObserver, BackupStrategyInterface {
       foreach(scandir($fileInfo["backupdirname"],SCANDIR_SORT_DESCENDING) as $backupFileName) {
         if(!is_file($fileInfo["backupdirname"] ."/". $backupFileName)) continue;
         if(strpos($backupFileName,$fileInfo["filename"].self::BACKUP_FILENAME_SEPARATOR) === 0) {
-          #fixme: check extension
-          #if() continue;
+          if($fileInfo["extension"] != pathinfo($backupFileName,PATHINFO_EXTENSION)) continue;
           return $backupFileName;
         }
       }

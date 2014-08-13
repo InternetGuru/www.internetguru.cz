@@ -78,8 +78,8 @@ class DOMBuilder {
         $doc->saveRewrite($filename);
       }
     } catch(Exception $e) {
-      // restore file if backupstrategy && $backup
-      if(!is_null($this->backupStrategy) && $backup)
+      // restore file if backupstrategy && $backup && !atLocalhost
+      if(!isAtLocalhost() && !is_null($this->backupStrategy) && $backup)
         #$this->backupStrategy->restoreNewestBackup($filename);
         $filename = $this->backupStrategy->getNewestBackupFilePath($filename);
       else throw $e;
