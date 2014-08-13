@@ -55,7 +55,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
     public function testInsertVarString()
     {
       $e = null;
-      $this->doc->loadXML('<a><b/><c id="c" class="{somePlugin:someVar}">{somePlugin:someVar}</c></a>');
+      $this->doc->loadXML('<a><b/><c class="" var="somePlugin:someVar somePlugin:someVar@class"/></a>');
       try {
         $n = $this->doc->insertVar("someVar","someValue","somePlugin");
       } catch (Exception $e) {
@@ -64,7 +64,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
       $s1 = $this->doc->C14N(true,false);
       $doc = new DOMDocumentPlus();
-      $doc->loadXML('<a><b/><c id="c" class="someValue">someValue</c></a>');
+      $doc->loadXML('<a><b/><c class="someValue">someValue</c></a>');
       $s2 = $doc->C14N(true,false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);
@@ -73,7 +73,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
     public function testInsertVarStringRoot()
     {
       $e = null;
-      $this->doc->loadXML('<a><b/>{somePlugin:someVar}</a>');
+      $this->doc->loadXML('<a var="somePlugin:someVar"><b/>%s</a>');
       try {
         $n = $this->doc->insertVar("someVar","someValue","somePlugin");
       } catch (Exception $e) {
@@ -91,7 +91,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
     public function testInsertVarArray()
     {
       $e = null;
-      $this->doc->loadXML('<a><b/><c id="c">{somePlugin:someVar}</c></a>');
+      $this->doc->loadXML('<body><ul><li var="somePlugin:someVar"/></ul></body>');
       try {
         $n = $this->doc->insertVar("someVar",array("var1","var2"),"somePlugin");
       } catch (Exception $e) {
@@ -100,7 +100,25 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
       $s1 = $this->doc->C14N(true,false);
       $doc = new DOMDocumentPlus();
-      $doc->loadXML('<a><b></b><c id="c"><ol class="someVar"><li>var1</li><li>var2</li></ol></c></a>');
+      $doc->loadXML('<body><ul><li>var1</li><li>var2</li></ul></body>');
+      $s2 = $doc->C14N(true,false);
+      #echo "\n$s1\n$s2"; die();
+      $this->assertTrue($s1 == $s2);
+    }
+
+    public function testInsertVarArrayEmpty()
+    {
+      $e = null;
+      $this->doc->loadXML('<body><ul><li var="somePlugin:someVar"/></ul></body>');
+      try {
+        $n = $this->doc->insertVar("someVar",array(),"somePlugin");
+      } catch (Exception $e) {
+        $e = $e->getMessage();
+      }
+      $this->assertTrue(is_null($e),$e);
+      $s1 = $this->doc->C14N(true,false);
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML('<body/>');
       $s2 = $doc->C14N(true,false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);
@@ -109,9 +127,9 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
     public function testInsertVarDOM()
     {
       $e = null;
-      $this->doc->loadXML('<a><b/><c id="c">{somePlugin:someVar}</c></a>');
+      $this->doc->loadXML('<a><b/><c var="somePlugin:someVar"><x/></c></a>');
       $doc = new DOMDocumentPlus();
-      $doc->loadXML('<d><e/><f/></d>');
+      $doc->loadXML('<var>someText<someTag/></var>');
       try {
         $n = $this->doc->insertVar("someVar",$doc->documentElement,"somePlugin");
       } catch (Exception $e) {
@@ -120,7 +138,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
       $s1 = $this->doc->C14N(true,false);
       $doc = new DOMDocumentPlus();
-      $doc->loadXML('<a><b/><c id="c"><d><e/><f/></d></c></a>');
+      $doc->loadXML('<a><b/><c>someText<someTag/></c></a>');
       $s2 = $doc->C14N(true,false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);
