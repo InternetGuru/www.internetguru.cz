@@ -82,14 +82,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function saveRewrite($filepath) {
-    $b = $this->save("$filepath.new");
-    if($b === false) return false;
-    if(!copy($filepath,"$filepath.old")) return false;
-    if(!rename("$filepath.new",$filepath)) return false;
-    return $b;
-  }
-
   private function insertVarString($varValue,DOMElement $e,$attr="") {
     if(strlen($attr) && !is_numeric($attr)) {
       if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
@@ -109,6 +101,35 @@ class DOMDocumentPlus extends DOMDocument {
       break;
     }
     if(!$replaced) $e->nodeValue = $varValue;
+  }
+
+  public function removeNodes($query) {
+    $xpath = new DOMXPath($this);
+    $toRemove = array();
+    foreach($xpath->query($query) as $n) $toRemove[] = $n;
+    foreach($toRemove as $n) {
+      $n->parentNode->removeChild($n);
+    }
+  }
+
+  public function relaxNGValidatePlus($f) {
+    if(!($f = findFilePath($f,"",false)))
+      throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
+    try {
+      libxml_use_internal_errors(true);
+      if(!$this->relaxNGValidate($f))
+        throw new Exception("relaxNGValidate internal error occured");
+    } catch (Exception $e) {
+      $internal_errors = libxml_get_errors();
+      if(count($internal_errors)) {
+        $e = new Exception(current($internal_errors)->message);
+      }
+    }
+    // finally
+    libxml_clear_errors();
+    libxml_use_internal_errors(false);
+    if(isset($e)) throw $e;
+    return true;
   }
 
   private function insertVarArray(Array $varValue,DOMElement $e) {

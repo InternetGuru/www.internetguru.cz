@@ -1,6 +1,5 @@
 <?php
 
-#TODO: $_GET["restore"] restore without readonly
 #TODO: specific schema validation support
 #TODO: no schema support
 
@@ -12,8 +11,9 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private $errors = array();
   private $contentValue = "";
   private $dataFile;
-  private $scheme = null;
+  private $schema = null;
   private $adminLink;
+  private $type;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -32,7 +32,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       if(!($defaultFile = findFilePath($fileName,"",false,false)))
         throw new Exception("Default file '$fileName' not found");
 
-      $this->setScheme($defaultFile);
+      $this->setSchema($defaultFile);
       $this->dataFile = USER_FOLDER . "/$fileName";
       if(isset($_GET["restore"])) {
         $this->restoreDefault($defaultFile);
@@ -40,27 +40,54 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       }
       if(!file_exists($this->dataFile))
         throw new Exception("User file '{$this->dataFile}' not found");
-      $extension = pathinfo($defaultFile,PATHINFO_EXTENSION);
-      if(!in_array($extension, array("xml")))
+      $this->type = pathinfo($defaultFile,PATHINFO_EXTENSION);
+      if(!in_array($this->type, array("xml")))
         throw new Extension("Unsupported extension '$extension'");
       $subject->setPriority($this,1);
-      $this->validateAndRepair();
+      $this->processAdmin();
       return;
     }
   }
 
   private function restoreDefault($file) {
-    if($this->scheme == self::HTMLPLUS_SCHEMA) {
-      if(file_exists($this->dataFile)) {
-        if(!@rename($this->dataFile, $this->dataFile.".old"))
-          throw new Exception("Unable to replace current user file '{$this->dataFile}'");
-      }
-      if(!@copy($file,$this->dataFile)) {
-        throw new Exception("Unable to copy default data file '{$this->dataFile}'");
+    switch($this->schema) {
+      case self::HTMLPLUS_SCHEMA:
+      $this->restoreFile($this->dataFile,$file);
+      break;
+      case null:
+      $this->restoreXml($this->dataFile,$file);
+      break;
+      default:
+      throw new Exception("Unsupported schema '{$this->schema}'");
+    }
+  }
+
+  private function restoreXml($dest,$src) {
+    $doc = new DOMDocumentPlus();
+    $doc->load($src);
+    $doc->removeNodes("//*[@readonly]");
+    $this->restoreFile($dest,$doc->saveXml());
+  }
+
+  private function restoreFile($dest,$content=false,$src=false) {
+    if(file_exists($dest)) {
+      if(!@rename($dest, $dest.".old"))
+        throw new Exception("Unable to replace current user file '$dest'");
+    }
+    if(!file_exists(dirname($dest))) {
+      if(!@mkdir(dirname($dest),0755,true))
+        throw new Exception("Unable to create directory structure");
+    }
+    if($src) {
+      if(!file_exists($src))
+        throw new Exception("Source file '$src' not found");
+      if(!@copy($src,$dest)) {
+        throw new Exception("Unable to copy default data file '$dest'");
       }
       return;
     }
-    throw new Exception("Missing or unsupported schema");
+    if(!@file_put_contents($dest,$content))
+      throw new Exception("Unable to save content into '$dest'");
   }
 
   public function getContent(HTMLPlus $content) {
@@ -78,7 +105,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("linkAdmin",$this->adminLink,"ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
     $newContent->insertVar("filename",$this->dataFile,"ContentAdmin");
-    $newContent->insertVar("scheme",$this->scheme,"ContentAdmin");
+    $newContent->insertVar("schema",$this->schema,"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
 
@@ -93,27 +120,62 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     return hash_file(self::HASH_ALGO,$filePath);
   }
 
-  private function validateAndRepair() {
+  private function createDoc($s) {
+    switch($s) {
+      case self::HTMLPLUS_SCHEMA:
+      return new HTMLPlus();
+      case null:
+      return new DOMDocumentPlus();
+      default:
+      throw new Exception("Unsupported XML schema");
+    }
+  }
+
+  private function processAdmin() {
 
     $post = false;
     if(isset($_POST["content"],$_POST["filehash"])) $post = true;
 
-    if($this->scheme == self::HTMLPLUS_SCHEMA) {
-      $doc = new HTMLPlus();
-    } else {
-      throw new Exception("Unsupported or missing XML scheme");
-      #$doc = new DOMDocumentPlus();
+    if($post) try {
+      if($_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
+        throw new Exception("No changes made");
+      if(!is_writable(dirname($this->dataFile)) || !is_writable($this->dataFile))
+        throw new Exception("Unable to save changes. File is probably locked (update in progress).");
+      if($_POST["filehash"] != $this->getFileHash($this->dataFile))
+        throw new Exception("Source file has changed during administration");
+    } catch(Exception $e) {
+      $this->errors[] = $e->getMessage();
     }
 
+    switch($this->type) {
+      case "xml":
+      case "xsl":
+      $doc = $this->createDoc($this->schema);
+      $this->proceedXml($post, $doc);
+      $this->saveAndRedir($post,$doc->saveXML());
+      break;
+      #case "css":
+      #case "txt":
+      #proceedTxt
+      #break;
+      default:
+      throw new Exception("Unsupported type '{$this->type}'");
+    }
+  }
+
+  private function saveAndRedir($post,$s) {
+    if(!$post) {
+      $this->contentValue = $s;
+      return;
+    }
+    if($this->saveRewrite($s) === false)
+      throw new Exception("Unable to save changes");
+    if(empty($this->errors)) $this->redir();
+    $this->contentValue = $_POST["content"];
+  }
+
+  private function proceedXml($post, DOMDocumentPlus $doc) {
     try {
-
-      if($post && $_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
-        throw new Exception("No changes made");
-      if($post && (!is_writable(dirname($this->dataFile)) || !is_writable($this->dataFile)))
-        throw new Exception("Unable to save changes. File is probably locked (update in progress).");
-      if($post && $_POST["filehash"] != $this->getFileHash($this->dataFile))
-        throw new Exception("Source file has changed during administration");
-
       if($post) {
         if(!@$doc->loadXML($_POST["content"])) throw new Exception("String is not valid XML");
       } elseif(!@$doc->load($this->dataFile)) {
@@ -122,34 +184,47 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         $this->errors[] = "File is not valid XML";
         return;
       }
-      $doc->validate(true);
-      if($post) $doc->saveRewrite($this->dataFile);
-
-      if($doc->isAutocorrected())
-        $this->errors[] = "Note: file has been autocorrected";
-      // validation may include non-blocking errors
-      #$this->errors[] = "non-blocking error";
-
+      $this->validateXml($doc,$this->schema);
     } catch (Exception $e) {
       $this->errors[] = $e->getMessage();
     }
-
-    if($post) {
-      if(empty($this->errors)) $this->redir();
-      $this->contentValue = $_POST["content"];
-    } else $this->contentValue = $doc->saveXML();
-
   }
 
-  private function setScheme($f) {
+  private function saveRewrite($s) {
+    $f = $this->dataFile;
+    $b = file_put_contents("$f.new", $s);
+    if($b === false) return false;
+    if(!copy($f,"$f.old")) return false;
+    if(!rename("$f.new",$f)) return false;
+    return $b;
+  }
+
+  private function validateXml(DOMDocumentPlus $doc, $s) {
+    if(is_null($s)) return;
+    if(get_class($doc) == "HTMLPlus") {
+      $doc->validate(true);
+      if($doc->isAutocorrected())
+        $this->errors[] = "Note: file has been autocorrected";
+      return;
+    }
+    switch(pathinfo($s,PATHINFO_EXTENSION)) {
+      case "rng":
+      $doc->relaxNGValidatePlus($s);
+      break;
+      default:
+      throw new Exception("Unsupported schema '$s'");
+    }
+  }
+
+  private function setSchema($f) {
     $h = fopen($f,"r");
     fgets($h); // skip first line
     $line = str_replace("'",'"',fgets($h));
     fclose($h);
     if(!preg_match('<\?xml-model href="([^"]+)" ?\?>',$line,$m)) return;
-    $this->scheme = findFilePath($m[1],"",false,false);
-    if(!file_exists($this->scheme))
-      throw new Exception("Schema file '{$this->scheme}' not found");
+    $this->schema = findFilePath($m[1],"",false,false);
+    if(!file_exists($this->schema))
+      throw new Exception("Schema file '{$this->schema}' not found");
   }
 
   private function redir() {

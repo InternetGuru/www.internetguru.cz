@@ -13,6 +13,7 @@
   <display_errors subdom="dev localhost">1</display_errors>
 
   <!-- visual -->
+  <stylesheet/>
   <stylesheet readonly="readonly">cms-basic.css</stylesheet>
   <stylesheet media="print">cms-print.css</stylesheet>
 

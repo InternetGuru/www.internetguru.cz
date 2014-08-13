@@ -20,26 +20,6 @@ class HTMLPlus extends DOMDocumentPlus {
     return $this->autocorrected;
   }
 
-  public function relaxNGValidatePlus() {
-    if(!($f = findFilePath(self::RNG_FILE,"",false)))
-      throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
-    try {
-      libxml_use_internal_errors(true);
-      if(!$this->relaxNGValidate($f))
-        throw new Exception("relaxNGValidate internal error occured");
-    } catch (Exception $e) {
-      $internal_errors = libxml_get_errors();
-      if(count($internal_errors)) {
-        $e = new Exception(current($internal_errors)->message);
-      }
-    }
-    // finally
-    libxml_clear_errors();
-    libxml_use_internal_errors(false);
-    if(isset($e)) throw $e;
-    return true;
-  }
-
   public function validate($repair=false) {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot();
@@ -47,7 +27,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHId($repair);
     $this->validateHDesc($repair);
     $this->validateHLink($repair);
-    $this->relaxNGValidatePlus();
+    $this->relaxNGValidatePlus(self::RNG_FILE);
     return true;
   }
 
