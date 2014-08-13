@@ -47,6 +47,7 @@ function stableSort(Array &$a) {
 }
 
 function findFilePath($fileName,$plugin="",$userFolder=true,$adminFolder=true) {
+  if(strpos($fileName,"/") === 0) $fileName = substr($fileName,1); // remove trailing slash
   $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
   if($userFolder && is_file(USER_FOLDER ."/". $f)) return USER_FOLDER ."/". $f;
   if($adminFolder && is_file(ADMIN_FOLDER ."/". $f)) return ADMIN_FOLDER ."/". $f;

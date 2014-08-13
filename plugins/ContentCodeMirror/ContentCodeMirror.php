@@ -32,7 +32,7 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
     $os = $cms->getOutputStrategy();
 
     $os->addCssFile("lib/codemirror/lib/codemirror.css");
-    $os->addCssFile("lib/codemirror/theme/monokai.css");
+    $os->addCssFile("lib/codemirror/theme/tomorrow-night-eighties.css");
     $os->addCssFile('ContentCodeMirror.css','ContentCodeMirror');
 
     $os->addJsFile("lib/codemirror/lib/codemirror.js");

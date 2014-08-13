@@ -1,7 +1,8 @@
 <?php
 
-#TODO: formatOutput at save
-#TODO: admin=Cms etc...
+#TODO: $_GET["restore"] restore without readonly
+#TODO: specific schema validation support
+#TODO: no schema support
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {
   const HASH_ALGO = 'crc32b';
@@ -10,6 +11,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private $errors = array();
   private $contentValue = "";
   private $dataFile;
+  private $scheme = null;
+  private $adminLink;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -18,8 +21,23 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     }
     if($subject->getStatus() == "init") {
       $this->subject = $subject;
-      $this->dataFile = USER_FOLDER . "/Content.xml";
+      $fileName = "Content.xml";
+      $this->adminLink = $subject->getCms()->getLink()."?admin";
+      if(strlen($_GET["admin"])) {
+        $fileName = $_GET["admin"];
+        $this->adminLink .= "=" . $_GET["admin"];
+      }
+      #$fileName = "plugins/ContentAdmin/ContentAdmin.xml";
+      if(!($defaultFile = findFilePath($fileName,"",false,false)))
+        throw new Exception("Default file '$fileName' not found");
+      $this->dataFile = USER_FOLDER . "/$fileName";
+      if(!file_exists($this->dataFile))
+        throw new Exception("User file '{$this->dataFile}' not found");
+      $extension = pathinfo($defaultFile,PATHINFO_EXTENSION);
+      if(!in_array($extension, array("xml")))
+        throw new Extension("Unsupported extension '$extension'");
       $subject->setPriority($this,1);
+      $this->setScheme($defaultFile);
       $this->validateAndRepair();
       return;
     }
@@ -36,10 +54,13 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
-    $newContent->insertVar("linkAdmin",$cms->getLink()."?admin","ContentAdmin");
+    $newContent->insertVar("linkAdmin",$this->adminLink,"ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
+    $newContent->insertVar("filename",$this->dataFile,"ContentAdmin");
+    $newContent->insertVar("scheme",$this->scheme,"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("filehash",$this->getFileHash($this->dataFile),"ContentAdmin");
+
     return $newContent;
   }
 
@@ -56,6 +77,13 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $post = false;
     if(isset($_POST["content"],$_POST["filehash"])) $post = true;
 
+    if($this->scheme == "lib/HTMLPlus.rng") {
+      $doc = new HTMLPlus();
+    } else {
+      throw new Exception("Unsupported or missing XML scheme");
+      #$doc = new DOMDocumentPlus();
+    }
+
     try {
 
       if($post && $_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
@@ -64,9 +92,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         throw new Exception("Unable to save changes. File is probably locked (update in progress).");
       if($post && $_POST["filehash"] != $this->getFileHash($this->dataFile))
         throw new Exception("Source file has changed during administration");
-
-      $doc = new HTMLPlus();
-      $doc->formatOutput = true;
 
       if($post) {
         if(!@$doc->loadXML($_POST["content"])) throw new Exception("String is not valid XML");
@@ -77,7 +102,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         return;
       }
       $doc->validate(true);
-      if($post) $doc->saveRewrite(USER_FOLDER."/Content.xml");
+      if($post) $doc->saveRewrite($this->dataFile);
 
       if($doc->isAutocorrected())
         $this->errors[] = "Note: file has been autocorrected";
@@ -95,9 +120,20 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   }
 
+  private function setScheme($f) {
+    $h = fopen($f,"r");
+    fgets($h); // skip first line
+    $line = str_replace("'",'"',fgets($h));
+    fclose($h);
+    if(!preg_match('<\?xml-model href="([^"]+)" ?\?>',$line,$m)) return;
+    $this->scheme = findFilePath($m[1],"",false,false);
+    if(!file_exists($this->scheme))
+      throw new Exception("Schema file '{$this->scheme}' not found");
+  }
+
   private function redir() {
     $redir = $this->subject->getCms()->getLink();
-    if(isset($_POST["saveandstay"])) $redir .= "?admin";
+    if(isset($_POST["saveandstay"])) $redir = $this->adminLink;
     header("Location: " . (strlen($redir) ? $redir : "."));
     exit;
   }

@@ -77,7 +77,7 @@ class DOMDocumentPlus extends DOMDocument {
         $this->insertVarDOMElement($varValue,$e);
         break;
         default:
-        throw new Exception("Unsupported type '$type'");
+        throw new Exception("Unsupported type '$type' for '$varName'");
       }
     }
   }

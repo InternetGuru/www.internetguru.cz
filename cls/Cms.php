@@ -66,7 +66,7 @@ class Cms {
     return $this->domBuilder->buildDOM($plugin,$replace,$filename);
   }
 
-  public function buildHTML($plugin="",$replace=false,$filename="",$validate=true) {
+  public function buildHTML($plugin="",$replace=true,$filename="",$validate=true) {
     return $this->domBuilder->buildHTML($plugin,$replace,$filename,$validate);
   }
 

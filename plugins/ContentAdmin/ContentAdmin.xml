@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<?xml-model href="/lib/HTMLPlus.rng"?>
 <body xml:lang="cs">
   <h id="h.adf" var="ContentAdmin:heading">Administrace</h>
   <description/>
   <ol class="errors">
     <li var="ContentAdmin:errors"/>
   </ol>
-  <form action="" method="post">
-    <fieldset><legend>Datový soubor ve formátu HTMLPlus</legend>
+  <form action="" method="post" var="ContentAdmin:linkAdmin@action">
+    <fieldset><legend>Datový soubor <samp var="ContentAdmin:filename"/> ve formátu <samp var="ContentAdmin:scheme"/></legend>
       <textarea class="xml" cols="40" name="content" rows="20" var="ContentAdmin:content">n/a</textarea>
       <input name="filehash" type="hidden" value="" var="ContentAdmin:filehash@value"/>
       <ul>

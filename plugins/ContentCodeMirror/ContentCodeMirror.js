@@ -5,7 +5,7 @@ for (var i = 0; i < ta.length; i++) {
   if(ta[i].className.match(/\bxml\b/)) {
     CodeMirror.fromTextArea(ta[i],{
         keyMap:"sublime",
-        theme:"monokai",
+        theme:"tomorrow-night-eighties",
         lineNumbers: true,
         mode:"xml",
         width:"100%",
