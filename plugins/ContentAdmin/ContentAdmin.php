@@ -69,8 +69,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   private function restoreXml($dest,$src) {
     if($this->schema != self::HTMLPLUS_SCHEMA) {
-      $doc = new DOMDocumentPlus();
-      $doc->load($src);
+      $db = $this->subject->getCms()->getDomBuilder();
+      $doc = $db->buildDOMPlus($dest,false,false);
       if($doc->removeNodes("//*[@readonly]")) {
         $doc->formatOutput = true;
         $this->restoreFile($dest,$doc->saveXml());

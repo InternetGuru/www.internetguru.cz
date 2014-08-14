@@ -46,6 +46,16 @@ function stableSort(Array &$a) {
   array_multisort($a,SORT_ASC,$order,SORT_ASC);
 }
 
+function findFile($filePath,$userFolder=true,$adminFolder=true) {
+  if(strpos($filePath,"/") === 0) $filePath = substr($filePath,1); // remove trailing slash
+  if($userFolder && is_file(USER_FOLDER ."/". $filePath)) return USER_FOLDER ."/". $filePath;
+  if($adminFolder && is_file(ADMIN_FOLDER ."/". $filePath)) return ADMIN_FOLDER ."/". $filePath;
+  if(is_file($filePath)) return $filePath;
+  if(is_file("../" . CMS_FOLDER . "/" . $filePath)) return "../" . CMS_FOLDER . "/" . $filePath;
+  return false;
+}
+
+#DEPRECATED
 function findFilePath($fileName,$plugin="",$userFolder=true,$adminFolder=true) {
   if(strpos($fileName,"/") === 0) $fileName = substr($fileName,1); // remove trailing slash
   $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;

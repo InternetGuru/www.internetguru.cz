@@ -19,7 +19,6 @@ class DOMBuilder {
   private $plugin;
   private $replace; // bool
   private $filename;
-  private $validate = true;
 
   public function __construct() {}
 
@@ -27,68 +26,64 @@ class DOMBuilder {
     $this->backupStrategy = $backupStrategy;
   }
 
-  public function buildDOM($plugin="",$replace=false,$filename="") {
+  public function buildDOMPlus($filePath,$replace=false,$user=true) {
     $this->doc = new DOMDocumentPlus();
-    $this->build($plugin,$replace,$filename);
+    $this->build($filePath,$replace,$user);
     return $this->doc;
   }
 
-  public function buildHTML($plugin="",$replace=true,$filename="",$validate=true) {
+  public function buildHTMLPlus($filePath,$replace=true,$user=true) {
     $this->doc = new HTMLPlus();
-    $this->validate = $validate;
-    $this->build($plugin,$replace,$filename);
+    $this->build($filePath,$replace,$user);
     return $this->doc;
   }
 
-  private function build($plugin,$replace,$filename) {
-
-    if(!is_string($plugin)) throw new Exception('Variable type: not string.');
-    if($filename == "" && $plugin == "") $filename = "Cms.xml";
-    elseif($filename == "") $filename = "$plugin.xml";
+  private function build($filePath,$replace,$user) {
 
     if($replace) {
-      $this->loadDOM(findFilePath($filename,$plugin),$this->doc);
+      $this->loadDOM(findFile($filePath,$user),$this->doc);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
       return;
     }
 
-    if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $plugin . ".xml";
-    $this->loadDOM(findFilePath($filename,"",false,false),$this->doc);
+    $this->loadDOM(findFile($filePath,false,false),$this->doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
-    $f = ADMIN_FOLDER . "/$filename";
+    $f = ADMIN_FOLDER . "/$filePath";
     if(is_file($f)) $this->updateDOM($f,true);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
-    $f = USER_FOLDER . "/$filename";
+    if(!$user) return;
+
+    $f = USER_FOLDER . "/$filePath";
     if(is_file($f)) $this->updateDOM($f);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
   }
 
-  private function loadDOM($filename, DOMDocumentPlus $doc, $backup=true) {
+  private function loadDOM($filePath, DOMDocumentPlus $doc, $backup=true) {
     try {
       // load
-      if(!@$doc->load($filename))
-        throw new Exception("Unable to load DOM from file '$filename'");
+      if(!@$doc->load($filePath))
+        throw new Exception("Unable to load DOM from file '$filePath'");
       // validate if htmlplus
       try {
-        if($doc instanceof HTMLPlus && $this->validate) $doc->validate();
+        if($doc instanceof HTMLPlus) $doc->validate();
       } catch(Exception $e) {
         $doc->validate(true);
-        saveRewrite($filename, $doc->saveXML());
+        saveRewrite($filePath, $doc->saveXML());
       }
     } catch(Exception $e) {
       // restore file if backupstrategy && $backup && !atLocalhost
       if(!isAtLocalhost() && !is_null($this->backupStrategy) && $backup)
-        #$this->backupStrategy->restoreNewestBackup($filename);
-        $filename = $this->backupStrategy->getNewestBackupFilePath($filename);
+        #$this->backupStrategy->restoreNewestBackup($filePath);
+        $filePath = $this->backupStrategy->getNewestBackupFilePath($filePath);
       else throw $e;
       // loadDOM(false)
-      $this->loadDOM($filename,$doc,false);
+      $this->loadDOM($filePath,$doc,false);
     }
     // do backup if $backup
     if(!is_null($this->backupStrategy) && $backup)
-      $this->backupStrategy->doBackup($filename);
+      $this->backupStrategy->doBackup($filePath);
   }
 
   /**

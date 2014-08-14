@@ -29,6 +29,10 @@ class Cms {
     return $this->link;
   }
 
+  public function getDomBuilder() {
+    return $this->domBuilder;
+  }
+
   public function init() {
     $this->config = $this->buildDOM();
     $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
@@ -62,12 +66,20 @@ class Cms {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }
 
-  public function buildDOM($plugin="",$replace=false,$filename="") {
-    return $this->domBuilder->buildDOM($plugin,$replace,$filename);
+  #DEPRECATED
+  public function buildDOM($plugin="",$replace=false,$filename="",$usr=true) {
+    if($filename == "" && $plugin == "") $filename = "Cms.xml";
+    elseif($filename == "") $filename = "$plugin.xml";
+    if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $filename;
+    return $this->domBuilder->buildDOMPlus($filename,$replace,$usr);
   }
 
-  public function buildHTML($plugin="",$replace=true,$filename="",$validate=true) {
-    return $this->domBuilder->buildHTML($plugin,$replace,$filename,$validate);
+  #DEPRECATED
+  public function buildHTML($plugin="",$replace=true,$filename="",$usr=true) {
+    if($filename == "" && $plugin == "") $filename = "Cms.xml";
+    elseif($filename == "") $filename = "$plugin.xml";
+    if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $filename;
+    return $this->domBuilder->buildHTMLPlus($filename,$replace,$usr);
   }
 
   #public function getStructure() {}
@@ -152,7 +164,9 @@ class Cms {
   }
 
   private function loadContent() {
-    $this->contentFull = $this->buildHTML("",true,"Content.xml");
+    $this->contentFull = $this->domBuilder->buildHTMLPlus("Content.xml");
+    #$this->contentFull = $this->buildHTML("",true,"Content.xml");
+    #echo $this->contentFull->saveXML();
   }
 
   public function getOutput() {
