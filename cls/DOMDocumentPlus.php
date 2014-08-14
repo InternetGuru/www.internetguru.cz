@@ -5,7 +5,7 @@ class DOMDocumentPlus extends DOMDocument {
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);
     $this->preserveWhiteSpace = false;
-    $this->formatOutput = true;
+    #$this->formatOutput = true;
   }
 
   public function getElementById($id,$attribute="id") {
@@ -110,6 +110,7 @@ class DOMDocumentPlus extends DOMDocument {
     foreach($toRemove as $n) {
       $n->parentNode->removeChild($n);
     }
+    return count($toRemove);
   }
 
   public function relaxNGValidatePlus($f) {

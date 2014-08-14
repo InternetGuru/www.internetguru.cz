@@ -35,7 +35,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       $this->setSchema($defaultFile);
       $this->dataFile = USER_FOLDER . "/$fileName";
       $this->type = pathinfo($defaultFile,PATHINFO_EXTENSION);
-      if(!in_array($this->type, array("xml","css")))
+      if(!in_array($this->type, array("xml","css","xsl","txt")))
         throw new Exception("Unsupported extension '{$this->type}'");
       if(isset($_GET["restore"])) {
         $this->restoreDefault($defaultFile);
@@ -71,9 +71,11 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     if($this->schema != self::HTMLPLUS_SCHEMA) {
       $doc = new DOMDocumentPlus();
       $doc->load($src);
-      $doc->removeNodes("//*[@readonly]");
-      $this->restoreFile($dest,$doc->saveXml());
-      return;
+      if($doc->removeNodes("//*[@readonly]")) {
+        $doc->formatOutput = true;
+        $this->restoreFile($dest,$doc->saveXml());
+        return;
+      }
     }
     $this->restoreFile($dest,false,$src);
   }
@@ -184,9 +186,14 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $doc = $this->createDoc($this->schema);
     if(!@$doc->loadXML($this->contentValue))
       throw new Exception("Invalid XML syntax");
-    $this->contentValue = $doc->saveXML();
+    // format every xml file
+    #$doc->formatOutput = true;
+    #$this->contentValue = $doc->saveXML();
     if(is_null($this->schema)) return;
     if(get_class($doc) == "HTMLPlus") {
+      // format only HTMLPlus file
+      $doc->formatOutput = true;
+      $this->contentValue = $doc->saveXML();
       $doc->validate(true);
       if($doc->isAutocorrected()) {
         $this->contentValue = $doc->saveXML();
