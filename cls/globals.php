@@ -65,4 +65,12 @@ function normalize($s) {
   return $s;
 }
 
+function saveRewrite($f,$s) {
+  $b = file_put_contents("$f.new", $s);
+  if($b === false) return false;
+  if(!copy($f,"$f.old")) return false;
+  if(!rename("$f.new",$f)) return false;
+  return $b;
+}
+
 ?>

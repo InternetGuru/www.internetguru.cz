@@ -75,7 +75,7 @@ class DOMBuilder {
         if($doc instanceof HTMLPlus && $this->validate) $doc->validate();
       } catch(Exception $e) {
         $doc->validate(true);
-        $doc->saveRewrite($filename);
+        saveRewrite($filename, $doc->saveXML());
       }
     } catch(Exception $e) {
       // restore file if backupstrategy && $backup && !atLocalhost

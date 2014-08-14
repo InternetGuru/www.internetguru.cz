@@ -44,8 +44,11 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       if(!file_exists($this->dataFile))
         throw new Exception("User file '{$this->dataFile}' not found");
       $subject->setPriority($this,1);
-      $this->processAdmin();
-      return;
+      try {
+        $this->processAdmin();
+      } catch (Exception $e) {
+        $this->errors[] = $e->getMessage();
+      }
     }
   }
 
@@ -131,11 +134,12 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private function createDoc($s) {
     switch($s) {
       case self::HTMLPLUS_SCHEMA:
+      case "../cms/" . self::HTMLPLUS_SCHEMA:
       return new HTMLPlus();
       case null:
       return new DOMDocumentPlus();
       default:
-      throw new Exception("Unsupported XML schema");
+      throw new Exception("Unsupported XML schema '$s'");
     }
   }
 
@@ -146,11 +150,11 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       $post = true;
       $this->contentValue = $_POST["content"];
       if($_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
-        $this->errors[] = "No changes made";
+        throw new Exception("No changes made");
       if(!is_writable(dirname($this->dataFile)) || !is_writable($this->dataFile))
-        $this->errors[] = "Unable to save changes. File is probably locked (update in progress).";
+        throw new Exception("Unable to save changes. File is probably locked (update in progress).");
       if($_POST["filehash"] != $this->getFileHash($this->dataFile))
-        $this->errors[] = "Source file has changed during administration";
+        throw new Exception("Source file has changed during administration");
     } else {
       if(!($this->contentValue = @file_get_contents($this->dataFile)))
         throw new Exception("Unable to load content from '{$this->dataFile}'");
@@ -159,7 +163,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     switch($this->type) {
       case "xml":
       case "xsl":
-      $this->proceedXml();
+      $this->validateXml();
       case "css":
       case "txt":
       if($post) $this->saveAndRedir();
@@ -167,47 +171,35 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       default:
       throw new Exception("Unsupported type '{$this->type}'");
     }
+
   }
 
   private function saveAndRedir() {
-    if($this->saveRewrite($this->contentValue) === false)
+    if(saveRewrite($this->dataFile,$this->contentValue) === false)
       throw new Exception("Unable to save changes");
     if(empty($this->errors)) $this->redir();
-    $this->contentValue = $_POST["content"];
   }
 
-  private function proceedXml() {
+  private function validateXml() {
     $doc = $this->createDoc($this->schema);
-    if(!@$doc->loadXML($this->contentValue)) {
-        $this->errors[] = "Invalid XML syntax";
-        return;
-    }
-    $this->validateXml($doc,$this->schema);
-  }
-
-  private function saveRewrite($s) {
-    $f = $this->dataFile;
-    $b = file_put_contents("$f.new", $s);
-    if($b === false) return false;
-    if(!copy($f,"$f.old")) return false;
-    if(!rename("$f.new",$f)) return false;
-    return $b;
-  }
-
-  private function validateXml(DOMDocumentPlus $doc, $s) {
-    if(is_null($s)) return;
+    if(!@$doc->loadXML($this->contentValue))
+      throw new Exception("Invalid XML syntax");
+    $this->contentValue = $doc->saveXML();
+    if(is_null($this->schema)) return;
     if(get_class($doc) == "HTMLPlus") {
       $doc->validate(true);
-      if($doc->isAutocorrected())
+      if($doc->isAutocorrected()) {
+        $this->contentValue = $doc->saveXML();
         $this->errors[] = "Note: file has been autocorrected";
+      }
       return;
     }
-    switch(pathinfo($s,PATHINFO_EXTENSION)) {
+    switch(pathinfo($this->schema,PATHINFO_EXTENSION)) {
       case "rng":
-      $doc->relaxNGValidatePlus($s);
+      $doc->relaxNGValidatePlus($this->schema);
       break;
       default:
-      throw new Exception("Unsupported schema '$s'");
+      throw new Exception("Unsupported schema '{$this->schema}'");
     }
   }
 
