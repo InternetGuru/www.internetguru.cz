@@ -40,7 +40,9 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
     $os->addJsFile("lib/codemirror/keymap/sublime.js");
 
     $os->addJsFile("lib/codemirror/addon/search/searchcursor.js");
+    $os->addJsFile("lib/codemirror/addon/selection/active-line.js");
     $os->addJsFile("lib/codemirror/addon/comment/comment.js");
+    $os->addJsFile("lib/codemirror/addon/edit/closetag.js");
     $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
     $os->addJsFile("lib/codemirror/addon/fold/foldcode.js");
 

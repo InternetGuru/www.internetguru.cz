@@ -11,6 +11,9 @@ for (var i = 0; i < ta.length; i++) {
         width:"100%",
         lineWrapping: true,
         tabSize: 2,
+        styleActiveLine: true,
+        autoCloseTags: true,
+        // viewportMargin: Infinity,
         extraKeys: {
         "Tab": function(cm){
            cm.replaceSelection("  " , "end");
