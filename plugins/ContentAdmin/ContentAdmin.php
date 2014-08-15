@@ -39,10 +39,12 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         throw new Exception("Unsupported extension '{$this->type}'");
       if(isset($_GET["restore"])) {
         $this->restoreDefault($defaultFile);
-        $this->errors[] = "Note: data file has been restored";
+        $this->errors[] = "Note: user file has been restored";
       }
-      if(!file_exists($this->dataFile))
-        throw new Exception("User file '{$this->dataFile}' not found");
+      if(!file_exists($this->dataFile)) {
+        $this->restoreDefault($defaultFile);
+        $this->errors[] = "Note: user file has been created";
+      }
       $subject->setPriority($this,1);
       try {
         $this->processAdmin();
@@ -70,7 +72,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private function restoreXml($dest,$src) {
     if($this->schema != self::HTMLPLUS_SCHEMA) {
       $db = $this->subject->getCms()->getDomBuilder();
-      $doc = $db->buildDOMPlus($dest,false,false);
+      $doc = $db->buildDOMPlus($src,false,false);
       if($doc->removeNodes("//*[@readonly]")) {
         $doc->formatOutput = true;
         $this->restoreFile($dest,$doc->saveXml());
