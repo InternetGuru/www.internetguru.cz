@@ -58,21 +58,24 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $html->appendChild($head);
 
     // transform content and add as body element
-    $body = $content;
+    $defaultXsl = PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl";
+    $content = $this->transform($content,$defaultXsl,false);
     foreach($cfg->getElementsByTagName("xslt") as $xslt) {
-      $body = $this->transform($body,$xslt->nodeValue,$xslt->hasAttribute("absolute"));
+      $user = !$xslt->hasAttribute("readonly");
+      $content = $this->transform($content,$xslt->nodeValue,$user);
     }
-    $body->encoding="utf-8";
-    $body = $doc->importNode($body->documentElement,true);
-    $html->appendChild($body);
-    $this->appendJsFiles($body,self::APPEND_BODY);
+    $content->encoding="utf-8";
+    $content = $doc->importNode($content->documentElement,true);
+    $html->appendChild($content);
+    $this->appendJsFiles($content,self::APPEND_BODY);
 
     // and that's it
     return $doc->saveXML();
   }
 
-  private function transform(DOMDocument $content,$fileName,$absolute=false) {
-    $xsl = $this->subject->getCms()->buildDOM(($absolute ? "" : "Xhtml11"),true,$fileName);
+  private function transform(DOMDocument $content,$fileName,$user) {
+    $db = $this->subject->getCms()->getDomBuilder();
+    $xsl = $db->buildDOMPlus($fileName,true,$user);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     return $proc->transformToDoc($content);

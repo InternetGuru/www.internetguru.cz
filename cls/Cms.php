@@ -75,11 +75,11 @@ class Cms {
   }
 
   #DEPRECATED
-  public function buildHTML($plugin="",$replace=true,$filename="",$usr=true) {
+  public function xbuildHTML($plugin="",$replace=true,$filename="",$usr=true) {
     if($filename == "" && $plugin == "") $filename = "Cms.xml";
     elseif($filename == "") $filename = "$plugin.xml";
     if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $filename;
-    return $this->domBuilder->buildHTMLPlus($filename,$replace,$usr);
+    return $this->domBuilder->buildHTMLPlus($filename,$usr);
   }
 
   #public function getStructure() {}
@@ -139,7 +139,7 @@ class Cms {
     } catch (Exception $e) {
       #var_dump($cs);
       #echo $this->content->saveXML();
-      #echo $c->saveXML();
+      echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }

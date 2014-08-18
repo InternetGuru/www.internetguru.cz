@@ -27,8 +27,12 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHId($repair);
     $this->validateHDesc($repair);
     $this->validateHLink($repair);
-    $this->relaxNGValidatePlus(self::RNG_FILE);
+    $this->relaxNGValidatePlus();
     return true;
+  }
+
+  public function relaxNGValidatePlus() {
+    return parent::relaxNGValidatePlus(self::RNG_FILE);
   }
 
   private function validateRoot() {

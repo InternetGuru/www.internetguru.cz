@@ -29,7 +29,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         $this->adminLink .= "=" . $_GET["admin"];
       }
       #$fileName = "plugins/ContentAdmin/ContentAdmin.xml";
-      if(!($defaultFile = findFilePath($fileName,"",false,false)))
+      if(!($defaultFile = findFile($fileName,false,false)))
         throw new Exception("Default file '$fileName' not found");
 
       $this->setSchema($defaultFile);
@@ -112,7 +112,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $format = $this->type;
     if(!is_null($this->schema)) $format .= " ({$this->schema})";
 
-    $newContent = $cms->buildHTML("ContentAdmin");
+    $newContent = $cms->getDomBuilder()->buildHTMLPlus("ContentAdmin");
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
@@ -218,7 +218,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $line = str_replace("'",'"',fgets($h));
     fclose($h);
     if(!preg_match('<\?xml-model href="([^"]+)" ?\?>',$line,$m)) return;
-    $this->schema = findFilePath($m[1],"",false,false);
+    $this->schema = findFile($m[1],false,false);
     if(!file_exists($this->schema))
       throw new Exception("Schema file '{$this->schema}' not found");
   }

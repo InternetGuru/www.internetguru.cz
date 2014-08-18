@@ -61,7 +61,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
 
     public function testBuildDOM()
     {
-      $doc = $this->builder->buildDOM("",false,$this->xml[0]);
+      $doc = $this->builder->buildDOMPlus($this->xml[0]);
       $s1 = $doc->C14N(true,false);
       $doc = new DOMDocumentPlus();
       $doc->loadXML('<test><a>1</a><d id="d" readonly="readonly">2</d><c readonly="readonly">2</c><b>3</b><c>3</c></test>');
@@ -72,7 +72,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
 
     public function testBuildHTML()
     {
-      $doc = $this->builder->buildHTML("",true,$this->html[0]);
+      $doc = $this->builder->buildHTMLPlus($this->html[0]);
       $s1 = $doc->C14N(true,false);
       $doc = new HTMLPlus();
       $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="3">Three</h><description/></body>');

@@ -29,12 +29,27 @@ class DOMBuilder {
   public function buildDOMPlus($filePath,$replace=false,$user=true) {
     $this->doc = new DOMDocumentPlus();
     $this->build($filePath,$replace,$user);
+    if($replace) return $this->doc;
+    $this->globalReadonly();
     return $this->doc;
   }
 
-  public function buildHTMLPlus($filePath,$replace=true,$user=true) {
+  private function globalReadonly() {
+    $nodes = array();
+    foreach($this->doc->documentElement->childNodes as $n) {
+      if($n->nodeValue == "" && $n->hasAttribute("readonly")) $nodes[] = $n;
+    }
+    foreach($nodes as $n) {
+      foreach($n->ownerDocument->getElementsByTagName($n->nodeName) as $e) {
+        $e->setAttribute("readonly","readonly");
+      }
+      $n->parentNode->removeChild($n);
+    }
+  }
+
+  public function buildHTMLPlus($filePath,$user=true) {
     $this->doc = new HTMLPlus();
-    $this->build($filePath,$replace,$user);
+    $this->build($filePath,true,$user);
     return $this->doc;
   }
 
@@ -101,6 +116,10 @@ class DOMBuilder {
       $this->doc->appendChild($this->doc->importNode($doc->documentElement));
     }
     foreach($doc->documentElement->childNodes as $n) {
+      // if empty && readonly => user cannot modify
+      foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
+        if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
+      }
       if(get_class($n) != "DOMElement") continue;
       if($this->ignoreElement($n)) continue;
       if($n->hasAttribute("id")) {
@@ -124,10 +143,6 @@ class DOMBuilder {
         #}
         foreach($remove as $d) $d->parentNode->removeChild($d);
       } else {
-        // if empty && readonly => user cannot modify
-        foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
-          if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
-        }
         $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
       }
     }

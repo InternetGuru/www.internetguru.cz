@@ -114,7 +114,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function relaxNGValidatePlus($f) {
-    if(!($f = findFilePath($f,"",false)))
+    if(!($f = findFile($f,false,false)))
       throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
     try {
       libxml_use_internal_errors(true);
