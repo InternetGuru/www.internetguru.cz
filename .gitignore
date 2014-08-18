@@ -1,5 +1,6 @@
 log.txt
 bak/*
+usr/*
 .DS_Store
 *.corrupted
 tests/_output/*
