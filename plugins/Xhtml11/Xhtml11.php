@@ -118,7 +118,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     if($type) $e->setAttribute("type",$type);
     if($rel) $e->setAttribute("rel",$rel);
     if($media) $e->setAttribute("media",$media);
-    $e->setAttribute("href",$this->getSubdom() ."/". $file);
+    $e->setAttribute("href", getRoot() . $file);
     $parent->appendChild($e);
   }
 
@@ -179,7 +179,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
       if(!is_null($this->jsFiles[$k]["file"])) {
-        $e->setAttribute("src",$this->getSubdom() ."/". $this->jsFiles[$k]["file"]);
+        $e->setAttribute("src", getRoot() . $this->jsFiles[$k]["file"]);
       }
       $parent->appendChild($e);
     }
@@ -195,12 +195,6 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
       $this->appendLinkElement($parent, $this->cssFiles[$k]["file"], "stylesheet",
         "text/css", $this->cssFiles[$k]["media"]);
     }
-  }
-
-  private function getSubdom() {
-    if(!isAtLocalhost()) return;
-    $d = explode("/", $_SERVER["SCRIPT_NAME"]);
-    return "/" . $d[1];
   }
 
 }

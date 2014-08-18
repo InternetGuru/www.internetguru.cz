@@ -26,6 +26,7 @@ class Slider implements SplObserver {
     // set css
     $fileName = findFile(PLUGIN_FOLDER ."/". get_class($this) . "/Slider.css");
     if($fileName === false) throw new Exception("CSS file not found");
+    $fileName = getRoot().$fileName;
     $setters["setCss"] = "Slider.setCss('$fileName');";
     // get parameters
     foreach($cfg->getElementsByTagName("parameters")->item(0)->childNodes as $r) {

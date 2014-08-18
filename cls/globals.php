@@ -46,6 +46,12 @@ function stableSort(Array &$a) {
   array_multisort($a,SORT_ASC,$order,SORT_ASC);
 }
 
+function getRoot() {
+  if(!isAtLocalhost()) return "/";
+  $d = explode("/", $_SERVER["SCRIPT_NAME"]);
+  return "/{$d[1]}/";
+}
+
 function findFile($filePath,$userFolder=true,$adminFolder=true) {
   if(strpos($filePath,"/") === 0) $filePath = substr($filePath,1); // remove trailing slash
   if($userFolder && is_file(USER_FOLDER ."/". $filePath)) return USER_FOLDER ."/". $filePath;
