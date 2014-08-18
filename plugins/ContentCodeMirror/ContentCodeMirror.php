@@ -33,7 +33,7 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
 
     $os->addCssFile("lib/codemirror/lib/codemirror.css");
     $os->addCssFile("lib/codemirror/theme/tomorrow-night-eighties.css");
-    $os->addCssFile('ContentCodeMirror.css','ContentCodeMirror');
+    $os->addCssFile(PLUGIN_FOLDER ."/". get_class($this) .'/ContentCodeMirror.css');
 
     $os->addJsFile("lib/codemirror/lib/codemirror.js");
     $os->addJsFile("lib/codemirror/mode/xml/xml.js");
@@ -46,7 +46,7 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
     $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
     $os->addJsFile("lib/codemirror/addon/fold/foldcode.js");
 
-    $os->addJsFile('ContentCodeMirror.js','ContentCodeMirror', 10, "body");
+    $os->addJsFile(PLUGIN_FOLDER ."/". get_class($this) .'/ContentCodeMirror.js', 10, "body");
 
     return $content;
   }

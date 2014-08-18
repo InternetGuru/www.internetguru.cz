@@ -51,14 +51,14 @@ class Cms {
   private function addJsFiles() {
     foreach($this->config->getElementsByTagName("jsFile") as $jsFile) {
       if($jsFile->nodeValue == "") continue;
-      $this->outputStrategy->addJsFile($jsFile->nodeValue,"",1);
+      $this->outputStrategy->addJsFile($jsFile->nodeValue,1);
     }
   }
 
   private function addStylesheets() {
     foreach($this->config->getElementsByTagName("stylesheet") as $css) {
       $media = ($css->hasAttribute("media") ? $css->getAttribute("media") : false);
-      $this->outputStrategy->addCssFile($css->nodeValue,"",$media);
+      $this->outputStrategy->addCssFile($css->nodeValue,$media);
     }
   }
 
@@ -139,7 +139,7 @@ class Cms {
     } catch (Exception $e) {
       #var_dump($cs);
       #echo $this->content->saveXML();
-      echo $c->saveXML();
+      #echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }

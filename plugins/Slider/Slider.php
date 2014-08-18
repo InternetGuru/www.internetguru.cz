@@ -1,5 +1,7 @@
 <?php
 
+# disable if admin
+
 class Slider implements SplObserver {
   private $cms;
 
@@ -16,25 +18,22 @@ class Slider implements SplObserver {
   private function init() {
     $cfg = $this->cms->buildDOM("Slider");
     $setters = array();
-    // get resources (readonly)
-    foreach($cfg->getElementsByTagName("resources")->item(0)->childNodes as $r) {
-      switch ($r->nodeName) {
-        case "jsLib" :
-        $this->cms->getOutputStrategy()->addJsFile($r->nodeValue,($r->hasAttribute("absolute") ? "" : "Slider"));
-        continue;
-        case "setCss" :
-        $fileName = PLUGIN_FOLDER . "/Slider/" . $r->nodeValue;
-        if(!is_file($fileName)) $fileName = "../" . CMS_FOLDER . "/$fileName";
-        $setters[$r->nodeName] = "Slider." . $r->nodeName . "('$fileName');";
-        continue;
-      }
+    // get js resources
+    foreach($cfg->getElementsByTagName("jsLib") as $r) {
+      $user = !$r->hasAttribute("readonly");
+      $this->cms->getOutputStrategy()->addJsFile($r->nodeValue,10,"head",$user);
     }
+    // set css
+    $fileName = findFile(PLUGIN_FOLDER ."/". get_class($this) . "/Slider.css");
+    if($fileName === false) throw new Exception("CSS file not found");
+    $setters["setCss"] = "Slider.setCss('$fileName');";
     // get parameters
     foreach($cfg->getElementsByTagName("parameters")->item(0)->childNodes as $r) {
       if($r->nodeType != 1) continue;
       $setters[$r->nodeName] = "Slider." . $r->nodeName . "('" . $r->nodeValue . "');";
     }
-    $this->cms->getOutputStrategy()->addJsFile("Slider.js","Slider");
+    $f = PLUGIN_FOLDER ."/". get_class($this) ."/Slider.js";
+    $this->cms->getOutputStrategy()->addJsFile($f,10,"head",false);
     $this->cms->getOutputStrategy()->addJs(implode($setters),20);
   }
 

@@ -20,7 +20,9 @@ class GA implements SplObserver {
     }
     $subject->getCms()->getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
     foreach($cfg->getElementsByTagName("jsFile") as $jsFile) {
-      $subject->getCms()->getOutputStrategy()->addJsFile($jsFile->nodeValue,"GA",1,"body");
+      $user = !$jsFile->hasAttribute("readonly");
+      $f = PLUGIN_FOLDER ."/". get_class($this) ."/". $jsFile->nodeValue;
+      $subject->getCms()->getOutputStrategy()->addJsFile($f,1,"body",$user);
     }
   }
 

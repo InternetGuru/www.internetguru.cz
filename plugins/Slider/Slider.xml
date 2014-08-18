@@ -1,10 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Slider>
-  <resources readonly="readonly">
-    <jsLib absolute="absolute">lib/jquery-2.1.1.min.js</jsLib>
-    <jsLib absolute="absolute">lib/jquery.touchSwipe.min.js</jsLib>
-    <setCss>slider.css</setCss>
-  </resources>
+  <jsLib>lib/jquery-2.1.1.min.js</jsLib>
+  <jsLib>lib/jquery.touchSwipe.min.js</jsLib>
   <parameters>
     <setAnimationSpeed>1000</setAnimationSpeed>
     <setLeftArrow>&#171;</setLeftArrow>

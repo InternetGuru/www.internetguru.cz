@@ -26,9 +26,9 @@ class ContentHighlight implements SplObserver, ContentStrategyInterface {
     $os = $cms->getOutputStrategy();
 
     $os->addCssFile("lib/highlight/styles/default.css");
-    $os->addCssFile("ContentHighlight.css","ContentHighlight");
+    $os->addCssFile(PLUGIN_FOLDER ."/". get_class($this) ."ContentHighlight.css");
     $os->addJsFile("lib/highlight/highlight.pack.js");
-    $os->addJsFile('ContentHighlight.js','ContentHighlight', 10, "body");
+    $os->addJsFile(PLUGIN_FOLDER ."/". get_class($this) .'ContentHighlight.js', 10, "body");
 
     return $content;
   }

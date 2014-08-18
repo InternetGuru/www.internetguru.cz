@@ -3,7 +3,7 @@
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $subject; // SplSubject
   private $jsFiles = array(); // String filename => Int priority
-  private $jsFilesBody = array(); // String filename => Int priority
+  private $jsFilesPriority = array(); // String filename => Int priority
   private $jsContent = array();
   private $jsContentBody = array();
   private $cssFiles = array(); // String filename => Int priority
@@ -27,7 +27,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $cfg = $cms->buildDOM("Xhtml11");
     $lang = $cms->getLanguage();
     $title = $cms->getTitle();
-    $favicon = false;
+    stableSort($this->cssFilesPriority);
+    stableSort($this->jsFilesPriority);
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
@@ -51,8 +52,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $this->appendMetaElement($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMetaElement($head,"Content-Language", $lang);
     $this->appendMetaElement($head,"description", $cms->getDescription());
-    foreach($cfg->getElementsByTagName("favicon") as $fav) $favicon = $fav->nodeValue;
-    $this->appendLinkElement($head,$favicon,"Xhtml11","shortcut icon");
+    $this->appendLinkElement($head,$this->getFavicon($cfg),"shortcut icon");
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
@@ -71,6 +71,19 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
 
     // and that's it
     return $doc->saveXML();
+  }
+
+  private function getFavicon(DOMDocumentPlus $cfg) {
+    $icons = array(PLUGIN_FOLDER ."/". get_class($this) ."/favicon.ico");
+    foreach($cfg->getElementsByTagName("favicon") as $n) {
+      $icons[] = $n->nodeValue;
+    }
+    foreach(array_reverse($icons) as $f) {
+      $f = findFile($f);
+      if(!$f) continue;
+      return $f;
+    }
+    return false;
   }
 
   private function transform(DOMDocument $content,$fileName,$user) {
@@ -96,34 +109,30 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $e->appendChild($meta);
   }
 
-  private function appendLinkElement(DOMElement $parent,$file,$plugin,$rel,$type=false,$media=false) {
-    $f = findFilePath($file,$plugin);
-    if(!$f) {
-      $parent->appendChild(new DOMComment(" CSS file '$file' not found "));
+  private function appendLinkElement(DOMElement $parent,$file,$rel,$type=false,$media=false) {
+    if($file === false || !file_exists($file)) {
+      $parent->appendChild(new DOMComment(" [$rel] file '$file' not found "));
       return;
     }
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type",$type);
     if($rel) $e->setAttribute("rel",$rel);
     if($media) $e->setAttribute("media",$media);
-    $e->setAttribute("href",$this->getSubdom() ."/". $f);
+    $e->setAttribute("href",$this->getSubdom() ."/". $file);
     $parent->appendChild($e);
   }
 
   /**
    * Add unique JS file into register with priority
-   * @param string  $fileName JS file to be registered
-   * @param string  $plugin   Plugin name (no plugin by default)
+   * @param string  $filePath JS file to be registered
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addJsFile($fileName,$plugin = "",$priority = 10,$append = self::APPEND_HEAD) {
-    if(($f = findFilePath($fileName,$plugin,false)) !== false) {
-      if($append == self::APPEND_HEAD) $this->jsFiles[$f] = $priority;
-      else $this->jsFilesBody[$f] = $priority;
-      return;
-    }
-    if($append == self::APPEND_HEAD) $this->jsFiles[$fileName] = null;
-    else $this->jsFilesBody[$fileName] = null;
+  public function addJsFile($filePath,$priority = 10,$append = self::APPEND_HEAD,$user=false) {
+    $this->jsFiles[$filePath] = array(
+      "file" => findFile($filePath,$user),
+      "append" => $append,
+      "content" => "" );
+    $this->jsFilesPriority[$filePath] = $priority;
   }
 
   /**
@@ -132,28 +141,25 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJs($content,$priority = 10,$append = self::APPEND_HEAD) {
-    if($append == self::APPEND_HEAD) {
-      $this->jsFiles[] = $priority;
-      end($this->jsFiles);
-      $this->jsContent[key($this->jsFiles)] = $content;
-    } else {
-      $this->jsFilesBody[] = $priority;
-      end($this->jsFilesBody);
-      $this->jsContentBody[key($this->jsFilesBody)] = $content;
-    }
+    $key = "k" . count($this->jsFiles);
+    $this->jsFiles[$key] = array(
+      "file" => null,
+      "append" => $append,
+      "content" => $content);
+    $this->jsFilesPriority[$key] = $priority;
   }
 
   /**
    * Add unique CSS file into register with priority
    * @param string  $fileName JS file to be registered
-   * @param string  $plugin   Plugin name (no plugin by default)
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addCssFile($fileName,$plugin = "", $media = false, $priority = 10) {
-    $key = "k" . count($this->cssFiles);
-    $this->cssFilesPriority[$key] = $priority;
-    $this->cssFiles[$key] = array("priority" => $priority, "file" => $fileName,
-      "plugin" => $plugin, "media" => $media);
+  public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
+    $this->cssFiles[$filePath] = array(
+      "priority" => $priority,
+      "file" => findFile($filePath,$user),
+      "media" => $media);
+    $this->cssFilesPriority[$filePath] = $priority;
   }
 
   /**
@@ -162,25 +168,19 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   private function appendJsFiles(DOMElement $parent,$append = self::APPEND_HEAD) {
-    if($append == self::APPEND_HEAD) {
-      $jsFiles = $this->jsFiles;
-      $jsContent = $this->jsContent;
-    } else {
-      $jsFiles = $this->jsFilesBody;
-      $jsContent = $this->jsContentBody;
-    }
-    stableSort($jsFiles);
-    foreach($jsFiles as $f => $p) {
-      if(is_null($p)) {
-        $parent->appendChild(new DOMComment(" JS file '$f' not found "));
+    foreach($this->jsFilesPriority as $k => $v) {
+      if($append != $this->jsFiles[$k]["append"]) continue;
+      if($this->jsFiles[$k]["file"] === false) {
+        $parent->appendChild(new DOMComment(" JS file '$k' not found "));
         continue;
       }
-      $content = "";
-      if(is_numeric($f)) $content = $jsContent[$f];
+      $content = $this->jsFiles[$k]["content"];
       $e = $parent->ownerDocument->createElement("script");
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
-      if(!is_numeric($f)) $e->setAttribute("src",$this->getSubdom() ."/". $f);
+      if(!is_null($this->jsFiles[$k]["file"])) {
+        $e->setAttribute("src",$this->getSubdom() ."/". $this->jsFiles[$k]["file"]);
+      }
       $parent->appendChild($e);
     }
   }
@@ -191,11 +191,9 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   private function appendCssFiles(DOMElement $parent) {
-    stableSort($this->cssFilesPriority);
     foreach($this->cssFilesPriority as $k => $v) {
-      $this->appendLinkElement($parent, $this->cssFiles[$k]["file"],
-        $this->cssFiles[$k]["plugin"],"stylesheet","text/css",
-        $this->cssFiles[$k]["media"]);
+      $this->appendLinkElement($parent, $this->cssFiles[$k]["file"], "stylesheet",
+        "text/css", $this->cssFiles[$k]["media"]);
     }
   }
 

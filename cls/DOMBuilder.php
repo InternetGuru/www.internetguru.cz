@@ -56,12 +56,12 @@ class DOMBuilder {
   private function build($filePath,$replace,$user) {
 
     if($replace) {
-      $this->loadDOM(findFile($filePath,$user),$this->doc);
+      $this->loadDOM($this->findFile($filePath,$user),$this->doc);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
       return;
     }
 
-    $this->loadDOM(findFile($filePath,false,false),$this->doc);
+    $this->loadDOM($this->findFile($filePath,false,false),$this->doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$filePath";
@@ -73,6 +73,12 @@ class DOMBuilder {
     $f = USER_FOLDER . "/$filePath";
     if(is_file($f)) $this->updateDOM($f);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+  }
+
+  private function findFile($filePath,$user=true,$admin=true) {
+    $f = findFile($filePath,$user,$admin);
+    if($f === false) throw new Exception("File '$filePath' not found");
+    return $f;
   }
 
   private function loadDOM($filePath, DOMDocumentPlus $doc, $backup=true) {
