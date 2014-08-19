@@ -46,7 +46,9 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $e = null;
       try {
         $this->doc->validatePlus();
-      } catch (Exception $e) {}
+      } catch (Exception $e) {
+        #echo $e->getMessage();die();
+      }
       $this->assertNotNull($e,"HTMLPlus accepted duplicit ID");
 
       $e = null;

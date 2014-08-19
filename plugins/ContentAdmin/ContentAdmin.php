@@ -126,7 +126,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
         $doc->validatePlus(true);
         if($doc->isAutocorrected()) $this->contentValue = $doc->saveXML();
       } else {
-        var_dump($doc->validatePlus());
+        $doc->validatePlus();
         if(!$usrFile && $doc->removeNodes("//*[@readonly]"))
           $this->contentValue = $doc->saveXML();
         $this->validateXml($doc);
