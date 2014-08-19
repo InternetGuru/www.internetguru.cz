@@ -1,16 +1,11 @@
 // CodeMirror Configuration
 // http://codemirror.net/doc/manual.html
-var ta = document.getElementsByTagName("textarea");
-for (var i = 0; i < ta.length; i++) {
-  var myTextArea = ta[i];
-  var myCodeMirror = CodeMirror(function(elt) {
-    myTextArea.parentNode.replaceChild(elt, myTextArea);
-  }, {
-    value: myTextArea.value,
+var TextArea = document.getElementsByTagName("textarea")[0];
+var myCodeMirror = CodeMirror.fromTextArea(TextArea,{
     keyMap:"sublime",
     theme:"tomorrow-night-eighties",
     lineNumbers: true,
-    mode: myTextArea.className,
+    mode: TextArea.className,
     width:"100%",
     lineWrapping: true,
     tabSize: 2,
@@ -20,5 +15,4 @@ for (var i = 0; i < ta.length; i++) {
     extraKeys: {
       "Tab": function(cm){cm.replaceSelection("  " , "end");}
     }
-  });
-}
+});

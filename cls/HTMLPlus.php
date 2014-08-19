@@ -20,10 +20,12 @@ class HTMLPlus extends DOMDocumentPlus {
     return $this->autocorrected;
   }
 
-  public function validate($repair=false) {
+  public function validatePlus($repair=false) {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot();
     $this->validateLang($repair);
+    #$this->validateId();
+    #$this->validateId("link");
     $this->validateHId($repair);
     $this->validateHDesc($repair);
     $this->validateHLink($repair);
@@ -86,7 +88,7 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHLink($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("link")) continue;
-      $this->getElementById($h->getAttribute("link"),"link");
+      #$this->getElementById($h->getAttribute("link"),"link");
       $link = normalize($h->getAttribute("link"));
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))

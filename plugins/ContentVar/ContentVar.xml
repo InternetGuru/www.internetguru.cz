@@ -2,6 +2,6 @@
 <ContentVar>
 
   <!-- default variables -->
-  <var id="example" readonly="readonly">example <em>value</em></var>
+  <var id="example">example <em>value</em></var>
 
 </ContentVar>

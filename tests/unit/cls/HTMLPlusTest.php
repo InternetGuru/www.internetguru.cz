@@ -27,7 +27,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     {
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted empty XML");
 
@@ -45,7 +45,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted duplicit ID");
 
@@ -63,8 +63,10 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
-      } catch (Exception $e) {}
+        $this->doc->validatePlus();
+      } catch (Exception $e) {
+        #echo $e->getMessage();die();
+      }
       $this->assertNotNull($e,"HTMLPlus accepted duplicit link");
 
       $e = null;
@@ -80,7 +82,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted h with no ID");
 
@@ -97,7 +99,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted h with no description");
 
@@ -114,7 +116,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate(true);
+        $this->doc->validatePlus(true);
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
@@ -126,7 +128,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $e = null;
       $this->doc->loadXML('<body xml:lang="en"><h id=" ">x</h><description/></body>');
       try {
-        $this->doc->validate(true);
+        $this->doc->validatePlus(true);
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
@@ -138,7 +140,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $e = null;
       $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h></body>');
       try {
-        $this->doc->validate(true);
+        $this->doc->validatePlus(true);
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
@@ -151,7 +153,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted body with no lang");
 
@@ -167,7 +169,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $e = null;
       $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" link="x" short="x">xx xx</h><description/></body>');
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
@@ -180,7 +182,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted h1 in form (known issue #1)");
 
@@ -196,7 +198,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $e = null;
       $this->doc->loadXML('<body xml:lang="en"><h id="hx">x</h><description/><p>a<dl><dt/></dl>b<ul><li/></ul>c</p></body>');
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
@@ -209,7 +211,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted empty h");
 
@@ -226,7 +228,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted white-spaced h (known issue #2)");
 
@@ -243,7 +245,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted h with empty attr short");
 
@@ -260,7 +262,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted h with empty attr link");
 
@@ -277,7 +279,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus accepted invalid link value");
 
@@ -293,7 +295,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" link="á bé">x</h><description/></body>');
       $e = null;
       try {
-        $this->doc->validate(true);
+        $this->doc->validatePlus(true);
       } catch (Exception $e) {
         echo $e->getMessage();die();
       }
@@ -312,7 +314,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
       $e = null;
       try {
-        $this->doc->validate(true);
+        $this->doc->validatePlus(true);
       } catch (Exception $e) {}
       $this->assertNotNull($e,"HTMLPlus invalid link repair (?)");
 
@@ -328,7 +330,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       $e = null;
       $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><description/><ol/></body>');
       try {
-        $this->doc->validate();
+        $this->doc->validatePlus();
       } catch (Exception $e) {
         #echo $e->getMessage();die();
       }

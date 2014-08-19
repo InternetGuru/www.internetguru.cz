@@ -78,7 +78,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   private function processAdmin() {
 
-
     $f = USER_FOLDER . "/" . self::DEFAULT_FILE;
     if(strlen($_GET["admin"])) $f = $_GET["admin"];
     if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
@@ -98,8 +97,10 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $post = false;
     if(isset($_POST["content"],$_POST["filehash"])) {
       $post = true;
-      $this->contentValue = $_POST["content"];
-      if($_POST["filehash"] == $this->getHash(str_replace("\r\n", "\n", $_POST["content"])))
+      $post_n = str_replace("\r\n", "\n", $_POST["content"]);
+      $post_rn = str_replace("\n", "\r\n", $post_n);
+      $this->contentValue = $post_n;
+      if(in_array($_POST["filehash"],array($this->getHash($post_n),$this->getHash($post_rn))))
         throw new Exception("No changes made");
       if($_POST["filehash"] != $this->getFileHash($this->destinationFile))
         throw new Exception("User file '{$this->destinationFile}' has changed during administration");
@@ -122,9 +123,10 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
       } else $doc = $this->loadXml($f,$df);
       $doc->formatOutput = true;
       if($this->isHtmlPlus()) {
-        $doc->validate(true);
+        $doc->validatePlus(true);
         if($doc->isAutocorrected()) $this->contentValue = $doc->saveXML();
       } else {
+        var_dump($doc->validatePlus());
         if(!$usrFile && $doc->removeNodes("//*[@readonly]"))
           $this->contentValue = $doc->saveXML();
         $this->validateXml($doc);
@@ -138,7 +140,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
     if(file_exists($f)) {
       $file = $f;
-      $user = true;
+      $user = false;
     }
     elseif(file_exists($def)) {
       $file = $def;
@@ -157,7 +159,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
     if(file_exists($f)) {
       $file = $f;
-      $user = true;
+      $user = false;
     }
     elseif(file_exists($def)) {
       $file = $def;

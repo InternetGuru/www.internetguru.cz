@@ -96,7 +96,7 @@ function saveRewriteFile($dest,$src) {
 }
 
 function saveRewrite($dest,$content) {
-  #if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0755,true)) return false;
+  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0755,true)) return false;
   if(!file_exists($dest)) return file_put_contents($dest, $content);
   $b = file_put_contents("$dest.new", $content);
   if($b === false) return false;

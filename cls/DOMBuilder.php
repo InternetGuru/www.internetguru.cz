@@ -88,9 +88,10 @@ class DOMBuilder {
         throw new Exception("Unable to load DOM from file '$filePath'");
       // validate if htmlplus
       try {
-        if($doc instanceof HTMLPlus) $doc->validate();
+        $doc->validatePlus();
       } catch(Exception $e) {
-        $doc->validate(true);
+        if(!($doc instanceof HTMLPlus)) throw $e;
+        $doc->validatePlus(true);
         saveRewrite($filePath, $doc->saveXML());
       }
     } catch(Exception $e) {

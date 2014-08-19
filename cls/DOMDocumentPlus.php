@@ -113,6 +113,23 @@ class DOMDocumentPlus extends DOMDocument {
     return count($toRemove);
   }
 
+  public function validatePlus() {
+    $this->validateId();
+    return true;
+  }
+
+  protected function validateId($attr="id") {
+    $xpath = new DOMXPath($this);
+    $ids = array();
+    foreach($xpath->query("//*[@$attr]") as $e) {
+      $id = $e->getAttribute($attr);
+      if(array_key_exists($id, $ids))
+        throw new Exception("Duplicit $attr attribute '$id' found");
+      $ids[$id] = null;
+    }
+    return true;
+  }
+
   public function relaxNGValidatePlus($f) {
     if(!($f = findFile($f,false,false)))
       throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");

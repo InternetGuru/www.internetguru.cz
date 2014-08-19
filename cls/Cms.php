@@ -133,7 +133,7 @@ class Cms {
         #echo $c->saveXML(); die();
         if(!($c instanceof HTMLPlus))
           throw new Exception("Content must be an instance of HTMLPlus");
-        $c->validate();
+        $c->validatePlus();
         $this->content = $c;
       }
     } catch (Exception $e) {

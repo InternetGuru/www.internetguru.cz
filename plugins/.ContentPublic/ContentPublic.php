@@ -18,7 +18,7 @@ class ContentPublic implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     $this->filterPublic($content->documentElement);
-    $content->validate();
+    $content->validatePlus();
     return $content;
   }
 
