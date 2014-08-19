@@ -19,11 +19,22 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
     }
 
     // supported syntax only
-    $detach = true;
+    $modes = array(
+      "xml" => "lib/codemirror/mode/xml/xml.js",
+      "xsl" => "lib/codemirror/mode/xml/xml.js",
+      "css" => "lib/codemirror/mode/css/css.js",
+      );
+    $libs = array();
     foreach($ta as $t) {
-      if($t->hasAttribute("class") && in_array("xml", explode(" ",$t->getAttribute("class")))) $detach = false;
+      if(!$t->hasAttribute("class")) continue;
+      foreach(explode(" ",$t->getAttribute("class")) as $c) {
+        if(array_key_exists($c, $modes)) {
+          $libs[] = $modes[$c];
+          break;
+        }
+      }
     }
-    if($detach) {
+    if(empty($libs)) {
       $this->subject->detach($this);
       return $content;
     }
@@ -36,7 +47,7 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
     $os->addCssFile(PLUGIN_FOLDER ."/". get_class($this) .'/ContentCodeMirror.css');
 
     $os->addJsFile("lib/codemirror/lib/codemirror.js");
-    $os->addJsFile("lib/codemirror/mode/xml/xml.js");
+    foreach($libs as $l) $os->addJsFile($l);
     $os->addJsFile("lib/codemirror/keymap/sublime.js");
 
     $os->addJsFile("lib/codemirror/addon/search/searchcursor.js");

@@ -81,11 +81,27 @@ function normalize($s) {
   return $s;
 }
 
-function saveRewrite($f,$s) {
-  $b = file_put_contents("$f.new", $s);
+function saveRewriteFile($dest,$src) {
+  if(!file_exists($src))
+    throw new Exception("Source file '$src' not found");
+  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0755,true))
+    throw new Exception("Unable to create directory structure");
+  if(!touch($dest))
+    throw new Exception("Unable to touch destination file");
+  if(!copy($dest,"$dest.old"))
+    throw new Exception("Unable to backup destination file");
+  if(!rename("$dest.new",$dest))
+    throw new Exception("Unable to rename new file to destination");
+  return true;
+}
+
+function saveRewrite($dest,$content) {
+  #if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0755,true)) return false;
+  if(!file_exists($dest)) return file_put_contents($dest, $content);
+  $b = file_put_contents("$dest.new", $content);
   if($b === false) return false;
-  if(!copy($f,"$f.old")) return false;
-  if(!rename("$f.new",$f)) return false;
+  if(!copy($dest,"$dest.old")) return false;
+  if(!rename("$dest.new",$dest)) return false;
   return $b;
 }
 

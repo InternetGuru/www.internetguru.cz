@@ -1,5 +1,7 @@
 <?php
 
+#TODO: links getRoot()
+
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $subject; // SplSubject
   private $jsFiles = array(); // String filename => Int priority

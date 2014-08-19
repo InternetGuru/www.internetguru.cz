@@ -31,7 +31,7 @@
       <div id="footer">
         <xsl:copy-of select="ul[contains(@class,'cms-menu')]"/>
         <ul>
-          <li>©2014 <a href="http://www.internetguru.cz">Internet Guru</a></li>
+          <li>©2014 <a href="http://www.internetguru.cz">InternetGuru</a></li>
         </ul>
       </div>
 

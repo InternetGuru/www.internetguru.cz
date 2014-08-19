@@ -1,5 +1,7 @@
 <?php
 
+# detach if admin
+
 class GA implements SplObserver {
 
   public function update(SplSubject $subject) {

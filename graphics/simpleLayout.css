@@ -16,7 +16,7 @@ strong {
 h1,h2,h3,h4,h5,h6,p,ul,ol,dl,
 div.list.multiple div {
   max-width: 60rem;
-  margin: 1em auto;
+  margin: 1.5em auto;
   padding-left: 1rem;
   padding-right: 1rem;
 }
@@ -127,8 +127,8 @@ ol.cms-breadcrumb li:not(:first-child) a:before {
 #content > div:first-child + div,
 div.list, div.cms-balancer {
   background: #EAF2F5;
-  padding-top: 1em;
-  padding-bottom: 1em;
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
 }
 
 #content > div:first-child + div {
@@ -141,6 +141,14 @@ div.list, div.cms-balancer {
 #content > div:first-child + div p {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+a {
+  color:#1D7436;
+}
+
+a:visited {
+  color: #555;
 }
 
 dt {

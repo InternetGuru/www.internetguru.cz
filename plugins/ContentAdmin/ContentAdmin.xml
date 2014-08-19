@@ -7,13 +7,13 @@
     <li var="ContentAdmin:errors"/>
   </ol>
   <form action="" method="post" var="ContentAdmin:linkAdmin@action">
-    <fieldset><legend>Datový soubor <samp var="ContentAdmin:filename"/> ve formátu <samp var="ContentAdmin:schema"/></legend>
-      <textarea class="xml" cols="40" name="content" rows="20" var="ContentAdmin:content">n/a</textarea>
+    <fieldset><legend>Cílový datový soubor: <samp var="ContentAdmin:filename"/> ve formátu <samp var="ContentAdmin:schema"/></legend>
+      <textarea cols="40" name="content" rows="20" var="ContentAdmin:mode@class ContentAdmin:content">n/a</textarea>
       <input name="filehash" type="hidden" value="" var="ContentAdmin:filehash@value"/>
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít (Ctrl+Shift+S)"/></li>
         <li><input name="saveandstay" type="submit" value="Uložit (Ctrl+S)"/></li>
-        <li><a href="" var="ContentAdmin:linkAdminRestore@href">Obnovit výchozí soubor</a></li>
+        <li><a href="" var="ContentAdmin:linkAdminDefault@href">Zobrazit výchozí soubor</a></li>
         <li><a href="" var="ContentAdmin:linkAdmin@href">Zahodit změny</a></li>
         <li><a href="" var="ContentAdmin:link@href">Zahodit změny a odejít</a></li>
       </ul>

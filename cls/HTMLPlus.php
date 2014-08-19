@@ -58,6 +58,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$h->hasAttribute("id")) {
         if(!$repair) throw new Exception ("Missing id attribute in element h");
         $h->setAttribute("id",$this->generateUniqueId());
+        $this->autocorrected = true;
         continue;
       }
       $id = $h->getAttribute("id");
