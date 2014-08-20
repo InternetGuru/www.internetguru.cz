@@ -1,0 +1,29 @@
+h2 {
+  color: #249E47;
+}
+
+div.cms-balancer a,
+#content > div:first-child {
+  background: #66C982;
+}
+
+#content > div:first-child + div,
+div.list, div.cms-balancer {
+  /*background-image: url('ticks.png');*/
+}
+
+ol.cms-breadcrumb li a {
+  color: #249E47;
+}
+
+a:link {
+  color: #1D7436;
+}
+
+a:visited {
+  color: #555;
+}
+
+#footer {
+  background: #66C982;
+}
