@@ -12,6 +12,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $jsContentBody = array();
   private $cssFiles = array(); // String filename => Int priority
   private $cssFilesPriority = array();
+  private $transformations = array();
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
 
@@ -31,20 +32,9 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $cfg = $cms->buildDOM("Xhtml11");
     $lang = $cms->getLanguage();
     $title = $cms->getTitle();
+    $this->registerThemes($cfg);
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
-
-    // add css from cfg
-    foreach($cfg->getElementsByTagName("jsFile") as $jsFile) {
-      if($jsFile->nodeValue == "") continue;
-      $this->addJsFile($jsFile->nodeValue);
-    }
-
-    // add js from cfg
-    foreach($cfg->getElementsByTagName("stylesheet") as $css) {
-      $media = ($css->hasAttribute("media") ? $css->getAttribute("media") : false);
-      $this->addCssFile($css->nodeValue,$media);
-    }
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
@@ -74,11 +64,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $html->appendChild($head);
 
     // transform content and add as body element
-    $defaultXsl = PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl";
-    $content = $this->transform($content,$defaultXsl,false);
-    foreach($cfg->getElementsByTagName("xslt") as $xslt) {
-      $user = !$xslt->hasAttribute("readonly");
-      $content = $this->transform($content,$xslt->nodeValue,$user);
+    foreach($this->transformations as $xslt => $user) {
+      $content = $this->transform($content,$xslt,$user);
     }
     $content->encoding="utf-8";
     $content = $doc->importNode($content->documentElement,true);
@@ -87,6 +74,47 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
 
     // and that's it
     return $doc->saveXML();
+  }
+
+  private function registerThemes(DOMDocumentPlus $cfg) {
+
+    // add default xsl
+    $this->transformations[PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl"] = false;
+
+    // add template files
+    $xpath = new DOMXPath($cfg);
+    $theme = $xpath->query("theme[last()]");
+    if($theme->length) {
+      $themeId = $theme->item(0)->nodeValue;
+      $t = $cfg->getElementById($themeId);
+      if(!is_null($t)) $this->addThemeFiles($t);
+    }
+
+    // add root template files
+    $this->addThemeFiles($cfg->documentElement);
+
+  }
+
+  private function addThemeFiles(DOMElement $e) {
+    foreach($e->childNodes as $n) {
+      if($n->nodeValue == "") continue;
+      switch ($n->nodeName) {
+        case "xslt":
+        $user = !$n->hasAttribute("readonly");
+        $this->transformations[$n->nodeValue] = $user;
+        break;
+        case "jsFile":
+        $user = !$n->hasAttribute("readonly");
+        $append = self::APPEND_HEAD;
+        if($n->hasAttribute("append")) $append = $n->getAttribute("append");
+        $this->addJsFile($n->nodeValue,10,$append,$user);
+        break;
+        case "stylesheet":
+        $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
+        $this->addCssFile($n->nodeValue,$media);
+        break;
+      }
+    }
   }
 
   private function getFavicon(DOMDocumentPlus $cfg) {
