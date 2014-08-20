@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<body xml:lang="en">
-  <h id="h.abc">Long default title</h>
-  <description>Some paragraph...</description>
-  <section>
-    <h id="h.def">Podnadpis</h>
-    <description/>
-  </section>
-</body>

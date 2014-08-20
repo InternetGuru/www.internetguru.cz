@@ -1,9 +1,8 @@
 <?php
 
-#TODO: what about adm/ ?
+#TODO: ?superadmin
 #TODO: de/activate
 #TODO: success message
-#TODO: syntax highlight
 #TODO: select file
 
 class ContentAdmin implements SplObserver, ContentStrategyInterface {

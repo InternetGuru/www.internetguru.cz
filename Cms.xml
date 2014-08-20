@@ -12,11 +12,4 @@
   <display_errors subdom="dev localhost"/>
   <display_errors subdom="dev localhost">1</display_errors>
 
-  <!-- visual -->
-  <stylesheet readonly="readonly">cms-basic.css</stylesheet>
-  <stylesheet media="print">cms-print.css</stylesheet>
-
-  <!-- javascript (js) -->
-  <jsFile readonly="readonly" />
-
 </Cms>

@@ -1,5 +1,7 @@
 <?php
 
+#TODO: more textarea support (js)
+
 class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
   private $subject; // SplSubject
 

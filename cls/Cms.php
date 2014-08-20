@@ -48,20 +48,6 @@ class Cms {
     $this->loadContent();
   }
 
-  private function addJsFiles() {
-    foreach($this->config->getElementsByTagName("jsFile") as $jsFile) {
-      if($jsFile->nodeValue == "") continue;
-      $this->outputStrategy->addJsFile($jsFile->nodeValue,1);
-    }
-  }
-
-  private function addStylesheets() {
-    foreach($this->config->getElementsByTagName("stylesheet") as $css) {
-      $media = ($css->hasAttribute("media") ? $css->getAttribute("media") : false);
-      $this->outputStrategy->addCssFile($css->nodeValue,$media);
-    }
-  }
-
   public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
     $this->domBuilder->setBackupStrategy($backupStrategy);
   }
@@ -159,8 +145,6 @@ class Cms {
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
     $this->outputStrategy = $strategy;
-    $this->addStylesheets();
-    $this->addJsFiles();
   }
 
   private function loadContent() {

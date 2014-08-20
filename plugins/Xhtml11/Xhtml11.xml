@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Xhtml11>
+
+  <!-- transformation -->
   <xslt readonly="readonly"/>
+
+  <!-- visual -->
+  <stylesheet readonly="readonly">themes/cms-basic.css</stylesheet>
+  <stylesheet media="print">themes/cms-print.css</stylesheet>
+
+  <!-- javascript (js) -->
+  <jsFile readonly="readonly" />
+
+  <!-- favicon -->
   <favicon/>
+
 </Xhtml11>

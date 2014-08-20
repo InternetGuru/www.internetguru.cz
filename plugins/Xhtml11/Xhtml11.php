@@ -1,6 +1,8 @@
 <?php
 
 #TODO: links getRoot()
+#TODO: css and js (instead of csm.xml)
+#TODO: themes definition and selection
 
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $subject; // SplSubject
@@ -31,6 +33,18 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $title = $cms->getTitle();
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
+
+    // add css from cfg
+    foreach($cfg->getElementsByTagName("jsFile") as $jsFile) {
+      if($jsFile->nodeValue == "") continue;
+      $this->addJsFile($jsFile->nodeValue);
+    }
+
+    // add js from cfg
+    foreach($cfg->getElementsByTagName("stylesheet") as $css) {
+      $media = ($css->hasAttribute("media") ? $css->getAttribute("media") : false);
+      $this->addCssFile($css->nodeValue,$media);
+    }
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
