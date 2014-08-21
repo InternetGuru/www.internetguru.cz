@@ -13,19 +13,12 @@
     <theme id="custom"/>
   </themes>
 
-  <!-- selected theme -->
+  <!-- available themes: default or simple -->
   <theme>default</theme>
 
-  <!-- transformation -->
   <xslt readonly="readonly"/>
-
-  <!-- visual -->
   <stylesheet media="print">themes/cms-print.css</stylesheet>
-
-  <!-- javascript (js) -->
   <jsFile readonly="readonly" />
-
-  <!-- favicon -->
   <favicon/>
 
 </Xhtml11>

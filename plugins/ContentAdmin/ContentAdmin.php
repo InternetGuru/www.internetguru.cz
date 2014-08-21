@@ -1,5 +1,7 @@
 <?php
 
+#TODO: list of available themes
+#TODO: GET no extension -> plugins/GET/GET.xml
 #TODO: ?superadmin
 #TODO: de/activate
 #TODO: success message
@@ -13,7 +15,6 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private $content = null;
   private $errors = array();
   private $contentValue = "";
-  #private $dataFile;
   private $destinationFile = null;
   private $schema = null;
   private $adminLink;
@@ -91,6 +92,11 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     }
     $this->destinationFile = USER_FOLDER."/".$this->defaultFile;
     $this->type = pathinfo($this->defaultFile,PATHINFO_EXTENSION);
+    if($this->type == "") {
+      $pluginFile = PLUGIN_FOLDER."/{$this->defaultFile}/{$this->defaultFile}.xml";
+      if(!findFile($pluginFile)) $this->redir();
+      $this->redir(USER_FOLDER."/$pluginFile");
+    }
     $df = findFile($this->defaultFile,false,false);
 
     $post = false;
@@ -175,7 +181,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
   private function save() {
     if(saveRewrite($this->destinationFile,$this->contentValue) === false)
       throw new Exception("Unable to save changes, administration may be locked (update in progress)");
-    if(empty($this->errors)) $this->redir();
+    if(empty($this->errors)) $this->redir($this->destinationFile);
   }
 
   private function isHtmlPlus() {
@@ -205,11 +211,11 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     return $schema;
   }
 
-  private function redir() {
+  private function redir($f="") {
+    if(strlen($f)) $f = "=$f";
     $redir = $this->subject->getCms()->getLink();
-    if(isset($_POST["saveandstay"])) {
-      $redir = $this->adminLink . "=" . $this->destinationFile;
-    }
+    #FIXME: different admin variations (admin, superadmin, viewonly)
+    if(!isset($_POST["saveandgo"])) $redir .= "?admin" . $f;
     header("Location: " . (strlen($redir) ? $redir : "."));
     exit;
   }

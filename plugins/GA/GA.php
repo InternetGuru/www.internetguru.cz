@@ -1,6 +1,7 @@
 <?php
 
-# detach if admin
+#TODO: detach if admin logged
+#TODO: detach if no id or no default domain basket id
 
 class GA implements SplObserver {
 

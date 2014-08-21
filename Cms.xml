@@ -12,4 +12,21 @@
   <display_errors subdom="dev localhost"/>
   <display_errors subdom="dev localhost">1</display_errors>
 
+  <!-- default enabled plugins -->
+  <plugin readonly="readonly" />
+  <!-- <plugin>Backup</plugin> -->
+  <plugin>ContentAdmin</plugin>
+  <plugin>ContentBalancer</plugin>
+  <plugin>ContentBreadcrumb</plugin>
+  <plugin>ContentCodeMirror</plugin>
+  <plugin>ContentHighlight</plugin>
+  <plugin>ContentLink</plugin>
+  <plugin>ContentMatch</plugin>
+  <plugin>ContentMenu</plugin>
+  <!-- <plugin>ContentPublic</plugin> -->
+  <plugin>ContentVar</plugin>
+  <plugin>GA</plugin>
+  <!-- <plugin>Slider</plugin> -->
+  <plugin>Xhtml11</plugin>
+
 </Cms>

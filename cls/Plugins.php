@@ -1,5 +1,7 @@
 <?php
 
+#TODO: attach only enabled plugins (from cms.xml)
+
 class Plugins implements SplSubject {
   private $status = null;
   private $cms;
@@ -9,6 +11,7 @@ class Plugins implements SplSubject {
 
   public function __construct(Cms $cms) {
     $this->cms = $cms;
+    #$cms->getEnabledPlugins
     $this->attachPlugins(PLUGIN_FOLDER);
     $this->attachPlugins("../" . CMS_FOLDER . "/" . PLUGIN_FOLDER);
   }

@@ -3,6 +3,7 @@
 #TODO: links getRoot()
 #TODO: css and js (instead of csm.xml)
 #TODO: themes definition and selection
+#TODO: delete resting vars (comment?)
 
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $subject; // SplSubject
