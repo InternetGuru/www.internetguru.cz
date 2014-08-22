@@ -1,28 +1,25 @@
-
-var isCtrl = false;
-document.onkeyup=function(e){
-    if(e.keyCode == 17|| e.metaKey) isCtrl=false;
-}
-
 document.onkeydown=function(e){
 
-    if(e.keyCode == 17|| e.metaKey) isCtrl=true;
-    if(e.keyCode == 83 && isCtrl == true) {
+  // letter s and ctrl or meta
+  if(e.keyCode != 83) return true;
+  if(!e.ctrlKey && !e.metaKey) return true;
 
-        // parent is form?
-        var p = e.target.parentNode;
-        while(true) {
-          if(p == null) return true;
-          if(p.nodeName.toLowerCase() == "form") break;
-          p = p.parentNode;
-        }
+  // parent is form
+  var p = e.target.parentNode;
+  while(true) {
+    if(p == null) return true;
+    if(p.nodeName.toLowerCase() == "form") break;
+    p = p.parentNode;
+  }
 
-        // save and exit
-        if(e.shiftKey){
-          p['saveandgo'].click();
-          return false;
-        }
-        p['saveandstay'].click();
-        return false;
-    }
+  // save and exit if shift
+  if(e.shiftKey) {
+    p['saveandgo'].click();
+    return false;
+  }
+
+  // save and stay
+  p['saveandstay'].click();
+  return false;
+
 }
