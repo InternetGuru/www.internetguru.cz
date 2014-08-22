@@ -34,7 +34,7 @@ class Cms {
   }
 
   public function init() {
-    $this->config = $this->buildDOM();
+    $this->config = $this->domBuilder->buildDOMPlus("Cms.xml");
     $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
     if(@constant($er) === null) // keep outside if to check value
       throw new Exception("Undefined constatnt '$er' used in error_reporting");
@@ -50,22 +50,6 @@ class Cms {
 
   public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
     $this->domBuilder->setBackupStrategy($backupStrategy);
-  }
-
-  #DEPRECATED
-  public function buildDOM($plugin="",$replace=false,$filename="",$usr=true) {
-    if($filename == "" && $plugin == "") $filename = "Cms.xml";
-    elseif($filename == "") $filename = "$plugin.xml";
-    if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $filename;
-    return $this->domBuilder->buildDOMPlus($filename,$replace,$usr);
-  }
-
-  #DEPRECATED
-  public function xbuildHTML($plugin="",$replace=true,$filename="",$usr=true) {
-    if($filename == "" && $plugin == "") $filename = "Cms.xml";
-    elseif($filename == "") $filename = "$plugin.xml";
-    if($plugin != "") $filename = PLUGIN_FOLDER . "/" . $plugin . "/" . $filename;
-    return $this->domBuilder->buildHTMLPlus($filename,$usr);
   }
 
   #public function getStructure() {}

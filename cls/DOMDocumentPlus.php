@@ -74,7 +74,7 @@ class DOMDocumentPlus extends DOMDocument {
         else $this->insertVarArray($varValue,$e);
         break;
         case "DOMElement":
-        $this->insertVarDOMElement($varValue,$e);
+        $this->insertVarDOMElement($varValue,$e,$a);
         break;
         default:
         throw new Exception("Unsupported variable type '$type' for '$varName'");
@@ -82,8 +82,8 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  private function insertVarString($varValue,DOMElement $e,$attr="") {
-    if(strlen($attr) && !is_numeric($attr)) {
+  private function insertVarString($varValue,DOMElement $e,$attr=null) {
+    if(!is_null($attr) && !is_numeric($attr)) {
       if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
         $e->setAttribute($attr,$varValue);
         return;
@@ -168,7 +168,11 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   // full replace only
-  private function insertVarDOMElement(DOMElement $varValue,DOMElement $e) {
+  private function insertVarDOMElement(DOMElement $varValue,DOMElement $e,$attr=null) {
+    if(!is_null($attr) && !is_numeric($attr)) {
+      $this->insertVarstring($varValue->nodeValue,$e,$attr);
+      return;
+    }
     // clear destination element
     $children = array();
     foreach($e->childNodes as $n) $children[] = $n;

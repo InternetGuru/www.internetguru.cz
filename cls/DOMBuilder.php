@@ -92,6 +92,7 @@ class DOMBuilder {
       } catch(Exception $e) {
         if(!($doc instanceof HTMLPlus)) throw $e;
         $doc->validatePlus(true);
+        $doc->formatOutput = true;
         saveRewrite($filePath, $doc->saveXML());
       }
     } catch(Exception $e) {
@@ -141,7 +142,8 @@ class DOMBuilder {
         $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
       } elseif($n->nodeValue == "") {
         $remove = array();
-        foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
+        foreach($this->doc->documentElement->childNOdes as $d) {
+          if($d->nodeType =! 1 || $d->nodeName != $n->nodeName) continue;
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
         }
         #if(!count($remove)) {

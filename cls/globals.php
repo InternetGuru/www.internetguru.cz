@@ -4,12 +4,13 @@
 // GLOBAL CONSTANTS
 // --------------------------------------------------------------------
 
-define('CMS_FOLDER', "cms");
-define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
-define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
-define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
-define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
-define('TEMPLATE_FOLDER', 'template'); // where templates are stored
+@define('CMS_FOLDER', "../cms");
+@define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
+@define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
+@define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
+@define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
+@define('THEMES_FOLDER', 'themes'); // where templates are stored
+@define('BACKUP_FOLDER', 'bak'); // where backup files are stored
 
 #print_r($_SERVER);
 
@@ -28,14 +29,10 @@ function isAtLocalhost() {
 }
 
 function __autoload($className) {
-  if(is_file(CLASS_FOLDER . "/$className.php"))
-    include CLASS_FOLDER . "/$className.php";
-  elseif(is_file(PLUGIN_FOLDER . "/$className/$className.php"))
-    include PLUGIN_FOLDER . "/$className/$className.php";
-  elseif(is_file("../" . CMS_FOLDER . "/". CLASS_FOLDER . "/$className.php"))
-    include "../" . CMS_FOLDER . "/". CLASS_FOLDER . "/$className.php";
-  elseif(is_file("../" . CMS_FOLDER . "/". PLUGIN_FOLDER . "/$className/$className.php"))
-    include "../" . CMS_FOLDER . "/". PLUGIN_FOLDER . "/$className/$className.php";
+  if(is_file(CMS_FOLDER ."/". PLUGIN_FOLDER . "/$className/$className.php"))
+    include CMS_FOLDER ."/". PLUGIN_FOLDER . "/$className/$className.php";
+  elseif(is_file(CMS_FOLDER ."/". CLASS_FOLDER . "/$className.php"))
+    include CMS_FOLDER ."/". CLASS_FOLDER . "/$className.php";
   else
     throw new Exception("Unable to find class $className");
 }
@@ -57,18 +54,7 @@ function findFile($filePath,$userFolder=true,$adminFolder=true) {
   if($userFolder && is_file(USER_FOLDER ."/". $filePath)) return USER_FOLDER ."/". $filePath;
   if($adminFolder && is_file(ADMIN_FOLDER ."/". $filePath)) return ADMIN_FOLDER ."/". $filePath;
   if(is_file($filePath)) return $filePath;
-  if(is_file("../" . CMS_FOLDER . "/" . $filePath)) return "../" . CMS_FOLDER . "/" . $filePath;
-  return false;
-}
-
-#DEPRECATED
-function findFilePath($fileName,$plugin="",$userFolder=true,$adminFolder=true) {
-  if(strpos($fileName,"/") === 0) $fileName = substr($fileName,1); // remove trailing slash
-  $f = ($plugin == "" ? "" : PLUGIN_FOLDER . "/$plugin/" ) . $fileName;
-  if($userFolder && is_file(USER_FOLDER ."/". $f)) return USER_FOLDER ."/". $f;
-  if($adminFolder && is_file(ADMIN_FOLDER ."/". $f)) return ADMIN_FOLDER ."/". $f;
-  if(is_file($f)) return $f;
-  if(is_file("../" . CMS_FOLDER . "/" . $f)) return "../" . CMS_FOLDER . "/" . $f;
+  if(is_file(CMS_FOLDER . "/" . $filePath)) return CMS_FOLDER . "/" . $filePath;
   return false;
 }
 

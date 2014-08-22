@@ -4,6 +4,7 @@
 #TODO: css and js (instead of csm.xml)
 #TODO: themes definition and selection
 #TODO: delete resting vars (comment?)
+#TODO: meta keywords
 
 class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private $subject; // SplSubject
@@ -30,7 +31,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    */
   public function getOutput(HTMLPlus $content) {
     $cms = $this->subject->getCms();
-    $cfg = $cms->buildDOM("Xhtml11");
+    $cfg = $cms->getDomBuilder()->buildDOMPlus(PLUGIN_FOLDER ."/". get_class($this) ."/". get_class($this) .".xml");
     $lang = $cms->getLanguage();
     $title = $cms->getTitle();
     $this->registerThemes($cfg);
@@ -80,7 +81,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->transformations[PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl"] = false;
+    $this->transformations[CMS_FOLDER ."/". PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl"] = false;
 
     // add template files
     $xpath = new DOMXPath($cfg);
@@ -99,20 +100,21 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private function addThemeFiles(DOMElement $e) {
     foreach($e->childNodes as $n) {
       if($n->nodeValue == "") continue;
+      $filePath = CMS_FOLDER ."/". THEMES_FOLDER ."/". $n->nodeValue;
       switch ($n->nodeName) {
         case "xslt":
         $user = !$n->hasAttribute("readonly");
-        $this->transformations[$n->nodeValue] = $user;
+        $this->transformations[$filePath] = $user;
         break;
         case "jsFile":
         $user = !$n->hasAttribute("readonly");
         $append = self::APPEND_HEAD;
         if($n->hasAttribute("append")) $append = $n->getAttribute("append");
-        $this->addJsFile($n->nodeValue,10,$append,$user);
+        $this->addJsFile($filePath,10,$append,$user);
         break;
         case "stylesheet":
         $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
-        $this->addCssFile($n->nodeValue,$media);
+        $this->addCssFile($filePath,$media);
         break;
       }
     }

@@ -3,12 +3,12 @@
 
   <themes readonly="readonly">
     <theme id="default">
-      <xslt>themes/defaultLayout.xsl</xslt>
+      <xslt>defaultLayout.xsl</xslt>
     </theme>
     <theme id="simple">
-      <xslt>themes/lists.xsl</xslt>
-      <xslt>themes/simpleLayout.xsl</xslt>
-      <stylesheet media="screen">themes/simpleLayout.css</stylesheet>
+      <xslt>lists.xsl</xslt>
+      <xslt>simpleLayout.xsl</xslt>
+      <stylesheet media="screen">simpleLayout.css</stylesheet>
     </theme>
     <theme id="custom"/>
   </themes>
@@ -17,7 +17,7 @@
   <theme>default</theme>
 
   <xslt readonly="readonly"/>
-  <stylesheet media="print">themes/cms-print.css</stylesheet>
+  <stylesheet media="print">cms-print.css</stylesheet>
   <jsFile readonly="readonly" />
   <favicon/>
 

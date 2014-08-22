@@ -12,7 +12,8 @@ class ContentVar implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $content) {
-    $cfg = $this->subject->getCms()->buildDOM("ContentVar");
+    $db = $this->subject->getCms()->getDomBuilder();
+    $cfg = $db->buildDOMPlus(PLUGIN_FOLDER ."/". get_class($this) ."/". get_class($this) .".xml");
     foreach($cfg->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id")) throw new Exception ("Missing id in element var");
       $id = $var->getAttribute("id");

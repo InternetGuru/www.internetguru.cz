@@ -12,8 +12,7 @@ class Plugins implements SplSubject {
   public function __construct(Cms $cms) {
     $this->cms = $cms;
     #$cms->getEnabledPlugins
-    $this->attachPlugins(PLUGIN_FOLDER);
-    $this->attachPlugins("../" . CMS_FOLDER . "/" . PLUGIN_FOLDER);
+    $this->attachPlugins(CMS_FOLDER . "/". PLUGIN_FOLDER);
   }
 
   private function attachPlugins($dir) {
