@@ -19,7 +19,6 @@
 // --------------------------------------------------------------------
 
 function isAtLocalhost() {
-  return false;
   if($_SERVER["REMOTE_ADDR"] == "127.0.0.1"
   || substr($_SERVER["REMOTE_ADDR"],0,8) == "192.168."
   || substr($_SERVER["REMOTE_ADDR"],0,3) == "10."
@@ -48,6 +47,17 @@ function getRoot() {
   if(!isAtLocalhost()) return "/";
   $d = explode("/", $_SERVER["SCRIPT_NAME"]);
   return "/{$d[1]}/";
+}
+
+function getSubdom() {
+  $d = explode(".",$_SERVER["HTTP_HOST"]);
+  return $d[0];
+}
+
+function getDomain() {
+  $d = explode(".",$_SERVER["HTTP_HOST"]);
+  while(count($d) > 2) array_shift($d);
+  return implode(".",$d);
 }
 
 function findFile($filePath,$userFolder=true,$adminFolder=true) {

@@ -16,18 +16,30 @@ class GA extends Plugin implements SplObserver {
   }
 
   private function init(SplSubject $subject) {
-    $cfg = $this->getDOM();
-    $ga_id = $cfg->getElementById("ga_id")->nodeValue;
-    if($ga_id == "") {
+    $ga_id = $this->getDOM()->getElementById("ga_id");
+    if(is_null($ga_id)) {
+      $ga_id = $this->getDOM()->getElementById(getDomain());
+    }
+    if(is_null($ga_id)) {
+      $subject->detach($this);
+      return;
+    }
+    $ga_id = $ga_id->nodeValue;
+    if(!$this->isValidId($ga_id)) {
+      $subject->getCms()->getOutputStrategy()->addJs("// invalid ga_id format '$ga_id'",1,"body");
       $subject->detach($this);
       return;
     }
     $subject->getCms()->getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
-    foreach($cfg->getElementsByTagName("jsFile") as $jsFile) {
+    foreach($this->getDOM()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
       $f = $this->getDir() ."/". $jsFile->nodeValue;
       $subject->getCms()->getOutputStrategy()->addJsFile($f,1,"body",$user);
     }
+  }
+
+  private function isValidId($id) {
+    return preg_match("/^UA-\d+-\d+$/",$id);
   }
 
 }

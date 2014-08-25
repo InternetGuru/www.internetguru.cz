@@ -168,14 +168,7 @@ class DOMBuilder {
 
   private function ignoreElement(DOMElement $e) {
     if(!$e->hasAttribute("subdom")) return false;
-    return !in_array($this->getSubdom(),explode(" ",$e->getAttribute("subdom")));
-  }
-
-  private function getSubdom() {
-    if(isAtLocalhost()) return "localhost";
-    // eg => /subdom/private/server.php
-    $d = explode("/",$_SERVER["SCRIPT_NAME"]);
-    return $d[2];
+    return !in_array(getSubdom(),explode(" ",$e->getAttribute("subdom")));
   }
 
 }
