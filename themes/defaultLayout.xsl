@@ -4,10 +4,15 @@
   <xsl:template match="/body">
     <body>
       <xsl:copy-of select="@*"/>
-      <div id="header"><!-- hack -->
-        <xsl:if test="count(ol[contains(@class,'cms-breadcrumb')]/li)>1">
-          <xsl:copy-of select="ol[contains(@class,'cms-breadcrumb')]"/>
-        </xsl:if>
+      <div id="header">
+        <xsl:choose>
+          <xsl:when test="count(ol[contains(@class,'cms-breadcrumb')]/li)>1">
+            <xsl:copy-of select="ol[contains(@class,'cms-breadcrumb')]"/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="yes">&lt;!-- empty --&gt;</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
       </div>
       <div id="content">
         <xsl:apply-templates select="*[not(self::ol[contains(@class,'cms-breadcrumb')] or self::ul[contains(@class,'cms-menu')])]" />
