@@ -104,7 +104,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private function addThemeFiles(DOMElement $e) {
     foreach($e->childNodes as $n) {
       if($n->nodeValue == "") continue;
-      $filePath = CMS_FOLDER ."/". THEMES_FOLDER ."/". $n->nodeValue;
+      $filePath = THEMES_FOLDER ."/". $n->nodeValue;
       switch ($n->nodeName) {
         case "xslt":
         $user = !$n->hasAttribute("readonly");
