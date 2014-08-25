@@ -1,0 +1,8 @@
+samp {
+  border: 0.1em solid #bbb;
+  font-family: "Emilbus Mono","Lucida Console",monospace;
+  /*background-color: #eee;*/
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  padding: 0.2em 0.3em;
+}
