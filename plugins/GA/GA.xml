@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <GA>
-  <jsFile readonly="readonly">GA.js</jsFile>
+  <jsFile readonly="readonly"/>
+  <jsFile>GA.js</jsFile>
   <var id="ga_id" readonly="readonly"/>
 </GA>

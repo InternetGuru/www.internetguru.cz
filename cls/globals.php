@@ -19,6 +19,7 @@
 // --------------------------------------------------------------------
 
 function isAtLocalhost() {
+  return false;
   if($_SERVER["REMOTE_ADDR"] == "127.0.0.1"
   || substr($_SERVER["REMOTE_ADDR"],0,8) == "192.168."
   || substr($_SERVER["REMOTE_ADDR"],0,3) == "10."
