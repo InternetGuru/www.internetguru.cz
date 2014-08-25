@@ -32,11 +32,9 @@ class ContentMenu implements SplObserver, ContentStrategyInterface {
 
   private function trimList(DOMElement $ul) {
     $currentLink = false;
-    $deepLink = false;
-    $children = array();
     foreach($ul->childNodes as $li) {
       foreach($li->childNodes as $n) {
-        if($n->nodeName == "a") $currentLink = true;
+        if($this->isProperLink($n)) $currentLink = true;
         if($n->nodeName == "ul") $deepLink = $this->trimList($n);
       }
     }
@@ -45,13 +43,19 @@ class ContentMenu implements SplObserver, ContentStrategyInterface {
     return false;
   }
 
-  private function getMenu(HTMLPlus $content, DOMElement $section) {
+  private function isProperLink(DOMElement $n) {
+    if($n->nodeName != "a") return false;
+    if($n->hasAttribute("class") && $n->getAttribute("class") == "fragment") return false;
+    return true;
+  }
+
+  private function getMenu(HTMLPlus $content, DOMElement $section, $parentLink = ".") {
     $ul = $content->createElement("ul");
     $li = null;
     foreach($section->childNodes as $n) {
       if($n->nodeType != 1) continue;
       if($n->nodeName == "section") {
-        $menu = $this->getMenu($content,$n);
+        $menu = $this->getMenu($content,$n,$parentLink);
         if(!is_null($menu)) {
           $li->appendChild($menu);
         }
@@ -60,16 +64,23 @@ class ContentMenu implements SplObserver, ContentStrategyInterface {
       if($n->nodeName != "h") continue;
       $li = $content->createElement("li");
       $link = null;
-      if($n->hasAttribute("link")) $link = $n->getAttribute("link");
+      if($n->hasAttribute("link")) {
+        $link = $n->getAttribute("link");
+        $parentLink = $link;
+      }
       $text = $n->nodeValue;
       if($n->hasAttribute("short")) $text = $n->getAttribute("short");
-      if(!is_null($link)) {
-        $a = $content->createElement("a",$text);
-        if($this->subject->getCms()->getLink() != $link) $a->setAttribute("href",$link);
-        $li->appendChild($a);
+      $a = $content->createElement("a",$text);
+      if($this->subject->getCms()->getLink() == $link) {
+        $a->setAttribute("class","current");
       } else {
-        $li->nodeValue = $text;
+        if(!is_null($link)) $a->setAttribute("href",$link);
+        else {
+          $a->setAttribute("href","$parentLink#".$n->getAttribute("id"));
+          $a->setAttribute("class","fragment");
+        }
       }
+      $li->appendChild($a);
       $ul->appendChild($li);
     }
     if(is_null($li)) return null;
