@@ -44,6 +44,7 @@ class ContentBreadcrumb implements SplObserver, ContentStrategyInterface {
         $a = $content->createElement("a",$text);
         if($k == 0) $href = ".";
         else $href = $i->getAttribute("link");
+        if($i->hasAttribute("title")) $a->setAttribute("title",$i->getAttribute("title"));
         $a->setAttribute("href",$href);
         $li->appendChild($a);
       } else {
