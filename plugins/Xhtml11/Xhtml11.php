@@ -57,9 +57,13 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     // add head element
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title",$title));
-    $this->appendMetaElement($head,"Content-Type","text/html; charset=utf-8");
-    $this->appendMetaElement($head,"Content-Language", $lang);
-    $this->appendMetaElement($head,"description", $cms->getDescription());
+    // Firefox localhost hack: <meta charset="utf-8"/>
+    // from https://github.com/webpack/webpack-dev-server/issues/1
+    // $this->appendMeta($head,"encoding","utf-8"); // not helping
+    $this->appendMetaCharset($head,"utf-8");
+    $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
+    $this->appendMeta($head,"Content-Language", $lang);
+    $this->appendMeta($head,"description", $cms->getDescription());
     $this->appendLinkElement($head,$this->getFavicon($cfg),"shortcut icon");
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
@@ -149,10 +153,16 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    * @param  boolean    $httpEquiv    Use attr. http-equiv instead of name
    * @return void
    */
-  private function appendMetaElement(DOMElement $e,$nameValue,$contentValue,$httpEquiv=false) {
+  private function appendMeta(DOMElement $e,$nameValue,$contentValue,$httpEquiv=false) {
     $meta = $e->ownerDocument->createElement("meta");
     $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"),$nameValue);
     $meta->setAttribute("content",$contentValue);
+    $e->appendChild($meta);
+  }
+
+  private function appendMetaCharset(DOMElement $e,$charset) {
+    $meta = $e->ownerDocument->createElement("meta");
+    $meta->setAttribute("charset",$charset);
     $e->appendChild($meta);
   }
 
