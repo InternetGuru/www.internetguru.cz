@@ -1,7 +1,6 @@
 <?php
 
-class ContentMenu implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {

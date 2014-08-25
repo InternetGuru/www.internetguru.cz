@@ -2,8 +2,7 @@
 
 #TODO: more textarea support (js)
 
-class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "preinit") return;
@@ -46,7 +45,7 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
 
     $os->addCssFile("lib/codemirror/lib/codemirror.css");
     $os->addCssFile("lib/codemirror/theme/tomorrow-night-eighties.css");
-    $os->addCssFile(PLUGIN_FOLDER ."/". get_class($this) .'/ContentCodeMirror.css');
+    $os->addCssFile($this->getDir() .'/ContentCodeMirror.css');
 
     $os->addJsFile("lib/codemirror/lib/codemirror.js");
     foreach($libs as $l) $os->addJsFile($l);
@@ -59,7 +58,7 @@ class ContentCodeMirror implements SplObserver, ContentStrategyInterface {
     $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
     $os->addJsFile("lib/codemirror/addon/fold/foldcode.js");
 
-    $os->addJsFile(PLUGIN_FOLDER ."/". get_class($this) .'/ContentCodeMirror.js', 10, "body");
+    $os->addJsFile($this->getDir() .'/ContentCodeMirror.js', 10, "body");
 
     return $content;
   }

@@ -6,8 +6,7 @@
 #TODO: delete resting vars (comment?)
 #TODO: meta keywords
 
-class Xhtml11 implements SplObserver, OutputStrategyInterface {
-  private $subject; // SplSubject
+class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $jsFiles = array(); // String filename => Int priority
   private $jsFilesPriority = array(); // String filename => Int priority
   private $jsContent = array();
@@ -31,7 +30,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
    */
   public function getOutput(HTMLPlus $content) {
     $cms = $this->subject->getCms();
-    $cfg = $cms->getDomBuilder()->buildDOMPlus(PLUGIN_FOLDER ."/". get_class($this) ."/". get_class($this) .".xml");
+    $cfg = $this->getDOMPlus();
     $lang = $cms->getLanguage();
     $title = $cms->getTitle();
     $this->registerThemes($cfg);
@@ -85,7 +84,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->transformations[CMS_FOLDER ."/". PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl"] = false;
+    #$this->transformations[CMS_FOLDER ."/". PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl"] = false;
+    $this->transformations[$this->getDir() ."/Xhtml11.xsl"] = false;
 
     // add template files
     $xpath = new DOMXPath($cfg);
@@ -125,7 +125,7 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
   }
 
   private function getFavicon(DOMDocumentPlus $cfg) {
-    $icons = array(PLUGIN_FOLDER ."/". get_class($this) ."/favicon.ico");
+    $icons = array($this->getDir() ."/favicon.ico");
     foreach($cfg->getElementsByTagName("favicon") as $n) {
       $icons[] = $n->nodeValue;
     }

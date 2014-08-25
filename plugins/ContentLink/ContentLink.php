@@ -1,7 +1,6 @@
 <?php
 
-class ContentLink implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface {
   private $titleQueries = array();
   private $descriptionQuery = null;
   private $content;

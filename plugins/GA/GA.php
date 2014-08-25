@@ -1,7 +1,6 @@
 <?php
 
 #TODO: detach if admin logged
-#TODO: detach if no id or no default domain basket id
 
 class GA extends Plugin implements SplObserver {
 
@@ -16,9 +15,9 @@ class GA extends Plugin implements SplObserver {
   }
 
   private function init(SplSubject $subject) {
-    $ga_id = $this->getDOM()->getElementById("ga_id");
+    $ga_id = $this->getDOMPlus()->getElementById("ga_id");
     if(is_null($ga_id)) {
-      $ga_id = $this->getDOM()->getElementById(getDomain());
+      $ga_id = $this->getDOMPlus()->getElementById(getDomain());
     }
     if(is_null($ga_id)) {
       $subject->detach($this);
@@ -31,7 +30,7 @@ class GA extends Plugin implements SplObserver {
       return;
     }
     $subject->getCms()->getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
-    foreach($this->getDOM()->getElementsByTagName("jsFile") as $jsFile) {
+    foreach($this->getDOMPlus()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
       $f = $this->getDir() ."/". $jsFile->nodeValue;
       $subject->getCms()->getOutputStrategy()->addJsFile($f,1,"body",$user);

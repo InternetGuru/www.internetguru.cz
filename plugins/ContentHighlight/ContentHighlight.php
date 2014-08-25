@@ -3,8 +3,7 @@
  * How to use highlight.js
  * http://highlightjs.org/usage/
  */
-class ContentHighlight implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentHighlight extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "preinit") return;
@@ -26,9 +25,9 @@ class ContentHighlight implements SplObserver, ContentStrategyInterface {
     $os = $cms->getOutputStrategy();
 
     $os->addCssFile("lib/highlight/styles/default.css");
-    $os->addCssFile(PLUGIN_FOLDER ."/". get_class($this) ."ContentHighlight.css");
+    $os->addCssFile($this->getDir() ."ContentHighlight.css");
     $os->addJsFile("lib/highlight/highlight.pack.js");
-    $os->addJsFile(PLUGIN_FOLDER ."/". get_class($this) .'ContentHighlight.js', 10, "body");
+    $os->addJsFile($this->getDir() .'ContentHighlight.js', 10, "body");
 
     return $content;
   }

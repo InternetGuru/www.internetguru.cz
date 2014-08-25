@@ -7,11 +7,10 @@
 #TODO: success message
 #TODO: select file
 
-class ContentAdmin implements SplObserver, ContentStrategyInterface {
+class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HASH_ALGO = 'crc32b';
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
   const DEFAULT_FILE = "Content.xml";
-  private $subject; // SplSubject
   private $content = null;
   private $errors = array();
   private $contentValue = "";
@@ -40,8 +39,8 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
-    $cms->getOutputStrategy()->addCssFile(PLUGIN_FOLDER ."/". get_class($this) .'/ContentAdmin.css');
-    $cms->getOutputStrategy()->addJsFile(PLUGIN_FOLDER ."/". get_class($this) .'/ContentAdmin.js', 10, "body");
+    $cms->getOutputStrategy()->addCssFile($this->getDir() . '/ContentAdmin.css');
+    $cms->getOutputStrategy()->addJsFile($this->getDir() . '/ContentAdmin.js', 10, "body");
 
     #$this->errors = array("a","b","c");
     $format = $this->type;
@@ -50,9 +49,7 @@ class ContentAdmin implements SplObserver, ContentStrategyInterface {
     $lad = $this->adminLink ."=". $this->defaultFile;
     $la = $this->adminLink ."=". $this->destinationFile;
 
-    $f = PLUGIN_FOLDER."/".get_class($this)."/ContentAdmin.xml";
-
-    $newContent = $cms->getDomBuilder()->buildHTMLPlus($f);
+    $newContent = $this->getHTMLPlus();
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");

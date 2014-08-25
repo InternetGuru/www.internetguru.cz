@@ -1,7 +1,6 @@
 <?php
 
-class ContentMatch implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "preinit") {

@@ -1,7 +1,6 @@
 <?php
 
-class ContentVar implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
 
   public function update(SplSubject $subject) {
@@ -12,9 +11,7 @@ class ContentVar implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $content) {
-    $db = $this->subject->getCms()->getDomBuilder();
-    $cfg = $db->buildDOMPlus(PLUGIN_FOLDER ."/". get_class($this) ."/". get_class($this) .".xml");
-    foreach($cfg->getElementsByTagName("var") as $var) {
+    foreach($this->getDOMPlus()->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id")) throw new Exception ("Missing id in element var");
       $id = $var->getAttribute("id");
       $content->insertVar($id,$var);

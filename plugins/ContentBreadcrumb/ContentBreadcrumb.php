@@ -1,7 +1,6 @@
 <?php
 
-class ContentBreadcrumb implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentBreadcrumb extends Plugin implements SplObserver, ContentStrategyInterface {
   private $titleQueries = array();
 
   public function update(SplSubject $subject) {

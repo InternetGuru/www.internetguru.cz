@@ -1,6 +1,6 @@
 <?php
 
-class Backup implements SplObserver, BackupStrategyInterface {
+class Backup extends Plugin implements SplObserver, BackupStrategyInterface {
 
   const HASH_FILE_ALGO = 'crc32b';
   const BACKUP_FILENAME_SEPARATOR = "~";

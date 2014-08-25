@@ -1,7 +1,6 @@
 <?php
 
-class ContentBalancer implements SplObserver, ContentStrategyInterface {
-  private $subject; // SplSubject
+class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
 
   public function update(SplSubject $subject) {
