@@ -11,22 +11,24 @@ class Plugins implements SplSubject {
 
   public function __construct(Cms $cms) {
     $this->cms = $cms;
-    #$cms->getEnabledPlugins
-    $this->attachPlugins(CMS_FOLDER . "/". PLUGIN_FOLDER);
+    $this->attachPlugins();
   }
 
-  private function attachPlugins($dir) {
-    if(!is_dir($dir)) return;
-    foreach(scandir($dir,SCANDIR_SORT_ASCENDING) as $plugin) { // dots first
-      if(!is_dir($dir."/".$plugin) || $plugin == "." || $plugin == "..") continue;
+  private function attachPlugins() {
+    $dir = CMS_FOLDER . "/". PLUGIN_FOLDER;
+    if(!is_dir($dir))
+      throw new Exception("Missing plugin folder '$dir'");
+    $cfg = $this->cms->getDomBuilder()->buildDOMPlus("Cms.xml");
+    $plugins = $cfg->getElementsByTagName("plugin");
+    foreach($plugins as $plugin) {
+      $p = $plugin->nodeValue;
       // disable plugins starting with a dot
-      if(substr($plugin,0,1) == ".") {
-        $this->disabledObservers[substr($plugin,1)] = null;
+      if(is_dir("$dir/.$p")) {
+        $this->disabledObservers[$p] = null;
         continue;
       }
-      if(array_key_exists($plugin,$this->observers)) continue;
-      if(array_key_exists($plugin,$this->disabledObservers)) continue;
-      $this->attach(new $plugin);
+      if(array_key_exists($p,$this->observers)) continue;
+      $this->attach(new $p);
     }
   }
 

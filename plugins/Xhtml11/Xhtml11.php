@@ -59,8 +59,8 @@ class Xhtml11 implements SplObserver, OutputStrategyInterface {
     $head->appendChild($doc->createElement("title",$title));
     // Firefox localhost hack: <meta charset="utf-8"/>
     // from https://github.com/webpack/webpack-dev-server/issues/1
-    // $this->appendMeta($head,"encoding","utf-8"); // not helping
-    $this->appendMetaCharset($head,"utf-8");
+    #$this->appendMeta($head,"charset","utf-8"); // not helping
+    #$this->appendMetaCharset($head,"utf-8"); // helping, but invalid
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"Content-Language", $lang);
     $this->appendMeta($head,"description", $cms->getDescription());
