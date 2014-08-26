@@ -20,13 +20,13 @@ class Backup extends Plugin implements SplObserver, BackupStrategyInterface {
    */
   private function getFileInfo($filePath) {
     $fileInfo = pathinfo($filePath);
-    $backupDirs = explode("/",$fileInfo["dirname"]);
-    if($backupDirs[0] == "..") {
-      unset($backupDirs[0]);
-      unset($backupDirs[1]);
+    $backupDir = null;
+    if(strpos($filePath, ADMIN_FOLDER) === 0) {
+      $backupDir = str_replace(ADMIN_FOLDER,ADMIN_BACKUP,$fileInfo["dirname"]);
+    } elseif(strpos($filePath, USER_FOLDER) === 0) {
+      $backupDir = str_replace(USER_FOLDER,USER_BACKUP,$fileInfo["dirname"]);
     }
-    array_unshift($backupDirs,BACKUP_FOLDER);
-    $fileInfo["backupdirname"] = implode("/",$backupDirs);
+    $fileInfo["backupdirname"] = $backupDir;
     return $fileInfo;
   }
 
@@ -74,6 +74,7 @@ class Backup extends Plugin implements SplObserver, BackupStrategyInterface {
    */
   public function doBackup($filePath) {
     $fileInfo = $this->getFileInfo($filePath);
+    if(is_null($fileInfo["backupdirname"])) return;
     $fileHash = hash_file(self::HASH_FILE_ALGO,$filePath);
     try {
       $newestBackupFile = $this->getNewestBackupFileName($filePath);

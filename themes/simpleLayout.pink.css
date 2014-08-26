@@ -4,7 +4,7 @@ h2 {
 
 div.cms-balancer a,
 #content > div:first-child {
-  background: #FF1493;
+  background: #E42E91;
 }
 
 #content > div:first-child + div,
@@ -25,5 +25,5 @@ a:visited {
 }
 
 #footer {
-  background: #FF1493;
+  background: #E42E91;
 }

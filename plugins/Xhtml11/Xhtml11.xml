@@ -4,12 +4,12 @@
   <themes readonly="readonly"/>
   <themes>
     <theme id="default">
-      <xslt>defaultLayout.xsl</xslt>
+      <xslt>themes/defaultLayout.xsl</xslt>
     </theme>
     <theme id="simple">
-      <xslt>lists.xsl</xslt>
-      <xslt>simpleLayout.xsl</xslt>
-      <stylesheet media="screen">simpleLayout.css</stylesheet>
+      <xslt>themes/lists.xsl</xslt>
+      <xslt>themes/simpleLayout.xsl</xslt>
+      <stylesheet media="screen">themes/simpleLayout.css</stylesheet>
     </theme>
     <theme id="custom"/>
   </themes>
@@ -18,9 +18,9 @@
   <theme>default</theme>
 
   <xslt readonly="readonly"/>
-  <stylesheet>cms-default.css</stylesheet>
-  <stylesheet media="print">cms-print.css</stylesheet>
+  <stylesheet>themes/cms-default.css</stylesheet>
+  <stylesheet media="print">themes/cms-print.css</stylesheet>
   <jsFile readonly="readonly" />
-  <favicon/>
+  <favicon>themes/igcms.ico</favicon>
 
 </Xhtml11>

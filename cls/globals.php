@@ -4,13 +4,16 @@
 // GLOBAL CONSTANTS
 // --------------------------------------------------------------------
 
-@define('CMS_FOLDER', "../cms");
-@define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
-@define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
-@define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
-@define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
-@define('THEMES_FOLDER', 'themes'); // where templates are stored
-@define('BACKUP_FOLDER', 'bak'); // where backup files are stored
+if(!defined('CMS_FOLDER')) define('CMS_FOLDER', "../cms");
+if(!defined('ADMIN_BACKUP')) define('ADMIN_BACKUP', 'adm.bak'); // where backup files are stored
+if(!defined('ADMIN_FOLDER')) define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
+if(!defined('USER_FOLDER')) define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
+if(!defined('USER_BACKUP')) define('USER_BACKUP', 'usr.bak'); // where backup files are stored
+if(!defined('THEMES_FOLDER')) define('THEMES_FOLDER', 'themes'); // where templates are stored
+if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where res files are stored
+
+define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
+define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 
 #print_r($_SERVER);
 
@@ -28,13 +31,26 @@ function isAtLocalhost() {
   return false;
 }
 
+function getRes($res,$dest=null) {
+  if(!RES_FOLDER) return $res;
+  if(is_null($dest)) $dest = $res;
+  $newRes = RES_FOLDER . "/$dest";
+  $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
+  if(!is_dir($newDir)) mkdir($newDir,0755,true);
+  if(file_exists($newRes)) {
+    if(filectime($newRes) >= filectime($res)) return $newRes;
+  }
+  if(!copy($res, $newRes))
+    throw new Exception("Unable to copy resource file to '$newRes'");
+  return $newRes;
+}
+
 function __autoload($className) {
-  if(is_file(CMS_FOLDER ."/". PLUGIN_FOLDER . "/$className/$className.php"))
-    include CMS_FOLDER ."/". PLUGIN_FOLDER . "/$className/$className.php";
-  elseif(is_file(CMS_FOLDER ."/". CLASS_FOLDER . "/$className.php"))
-    include CMS_FOLDER ."/". CLASS_FOLDER . "/$className.php";
-  else
-    throw new Exception("Unable to find class $className");
+  $fp = CMS_FOLDER ."/". PLUGIN_FOLDER . "/$className/$className.php";
+  if(@include $fp) return;
+  $fc = CMS_FOLDER ."/". CLASS_FOLDER . "/$className.php";
+  if(@include $fc) return;
+  throw new Exception("Unable to find class '$className' in '$fp' nor '$fc'");
 }
 
 function stableSort(Array &$a) {
@@ -60,12 +76,16 @@ function getDomain() {
   return implode(".",$d);
 }
 
-function findFile($filePath,$userFolder=true,$adminFolder=true) {
-  if(strpos($filePath,"/") === 0) $filePath = substr($filePath,1); // remove trailing slash
-  if($userFolder && is_file(USER_FOLDER ."/". $filePath)) return USER_FOLDER ."/". $filePath;
-  if($adminFolder && is_file(ADMIN_FOLDER ."/". $filePath)) return ADMIN_FOLDER ."/". $filePath;
-  if(is_file($filePath)) return $filePath;
-  if(is_file(CMS_FOLDER . "/" . $filePath)) return CMS_FOLDER . "/" . $filePath;
+function findFile($file,$user=true,$admin=true,$res=false) {
+  if(strpos($file,"/") === 0) $file = substr($file,1); // remove trailing slash
+  $f = USER_FOLDER . "/$file";
+  if($user && is_file($f)) return ($res ? getRes($f,$file) : $f);
+  $f = ADMIN_FOLDER . "/$file";
+  if($admin && is_file($f)) return ($res ? getRes($f,$file) : $f);
+  $f = $file;
+  if(is_file($f)) return ($res ? getRes($f) : $f);
+  $f = CMS_FOLDER . "/$file";
+  if(is_file($f)) return ($res ? getRes($f,$file) : $f);
   return false;
 }
 

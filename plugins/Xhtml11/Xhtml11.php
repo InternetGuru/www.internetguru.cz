@@ -1,8 +1,5 @@
 <?php
 
-#TODO: links getRoot()
-#TODO: css and js (instead of csm.xml)
-#TODO: themes definition and selection
 #TODO: delete resting vars (comment?)
 #TODO: meta keywords
 
@@ -63,7 +60,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"Content-Language", $lang);
     $this->appendMeta($head,"description", $cms->getDescription());
-    $this->appendLinkElement($head,$this->getFavicon($cfg),"shortcut icon");
+    $fav = $this->getFavicon($cfg);
+    if($fav) $this->appendLinkElement($head,$fav,"shortcut icon");
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
@@ -104,7 +102,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function addThemeFiles(DOMElement $e) {
     foreach($e->childNodes as $n) {
       if($n->nodeValue == "") continue;
-      $filePath = THEMES_FOLDER ."/". $n->nodeValue;
+      $filePath = $n->nodeValue;
       switch ($n->nodeName) {
         case "xslt":
         $user = !$n->hasAttribute("readonly");
@@ -125,16 +123,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function getFavicon(DOMDocumentPlus $cfg) {
-    $icons = array($this->getDir() ."/favicon.ico");
-    foreach($cfg->getElementsByTagName("favicon") as $n) {
-      $icons[] = $n->nodeValue;
-    }
-    foreach(array_reverse($icons) as $f) {
-      $f = findFile($f);
-      if(!$f) continue;
-      return $f;
-    }
-    return false;
+    $xpath = new DOMXPath($cfg);
+    $theme = $xpath->query("favicon[last()]");
+    if(!$theme->length) return false;
+    return $theme->item(0)->nodeValue;
   }
 
   private function transform(DOMDocument $content,$fileName,$user) {
@@ -166,8 +158,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $e->appendChild($meta);
   }
 
-  private function appendLinkElement(DOMElement $parent,$file,$rel,$type=false,$media=false) {
-    if($file === false || !file_exists($file)) {
+  private function appendLinkElement(DOMElement $parent,$file,$rel,$type=false,$media=false,$user=true) {
+    $f = findFile($file,$user,true,true);
+    if($f === false) {
       $parent->appendChild(new DOMComment(" [$rel] file '$file' not found "));
       return;
     }
@@ -175,7 +168,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($type) $e->setAttribute("type",$type);
     if($rel) $e->setAttribute("rel",$rel);
     if($media) $e->setAttribute("media",$media);
-    $e->setAttribute("href", getRoot() . $file);
+    $e->setAttribute("href", getRoot() . $f);
     $parent->appendChild($e);
   }
 
@@ -186,9 +179,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    */
   public function addJsFile($filePath,$priority = 10,$append = self::APPEND_HEAD,$user=false) {
     $this->jsFiles[$filePath] = array(
-      "file" => findFile($filePath,$user),
+      "file" => $filePath,
       "append" => $append,
-      "content" => "" );
+      "content" => "",
+      "user" => $user);
     $this->jsFilesPriority[$filePath] = $priority;
   }
 
@@ -214,8 +208,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
     $this->cssFiles[$filePath] = array(
       "priority" => $priority,
-      "file" => findFile($filePath,$user),
-      "media" => $media);
+      "file" => $filePath,
+      "media" => $media,
+      "user" => $user);
     $this->cssFilesPriority[$filePath] = $priority;
   }
 
@@ -227,7 +222,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function appendJsFiles(DOMElement $parent,$append = self::APPEND_HEAD) {
     foreach($this->jsFilesPriority as $k => $v) {
       if($append != $this->jsFiles[$k]["append"]) continue;
-      if($this->jsFiles[$k]["file"] === false) {
+      $f = findFile($this->jsFiles[$k]["file"],$this->jsFiles[$k]["user"],true,true);
+      if(!is_null($this->jsFiles[$k]["file"]) && $f === false) {
         $parent->appendChild(new DOMComment(" JS file '$k' not found "));
         continue;
       }
@@ -236,7 +232,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
       if(!is_null($this->jsFiles[$k]["file"])) {
-        $e->setAttribute("src", getRoot() . $this->jsFiles[$k]["file"]);
+        $e->setAttribute("src", getRoot() . $f);
       }
       $parent->appendChild($e);
     }
@@ -250,7 +246,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function appendCssFiles(DOMElement $parent) {
     foreach($this->cssFilesPriority as $k => $v) {
       $this->appendLinkElement($parent, $this->cssFiles[$k]["file"], "stylesheet",
-        "text/css", $this->cssFiles[$k]["media"]);
+        "text/css", $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"]);
     }
   }
 

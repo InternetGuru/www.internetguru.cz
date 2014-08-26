@@ -63,7 +63,7 @@ class DOMBuilder {
       return;
     }
 
-    $this->loadDOM($this->findFile($filePath,false,false),$this->doc);
+    $this->loadDOM($this->findFile($filePath,false,false),$this->doc); // no backup
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$filePath";
@@ -83,7 +83,7 @@ class DOMBuilder {
     return $f;
   }
 
-  private function loadDOM($filePath, DOMDocumentPlus $doc, $backup=true) {
+  private function loadDOM($filePath, DOMDocumentPlus $doc, $backup = true) {
     try {
       // load
       if(!@$doc->load($filePath))
