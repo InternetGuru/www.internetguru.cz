@@ -221,6 +221,11 @@ div.cms-balancer a {
 
 }
 
+#footer ul li {
+  margin-left: 1em;
+  margin-right: 1em;
+}
+
 #footer ul ul li {
   margin: 0;
 }
