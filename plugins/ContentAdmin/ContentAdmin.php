@@ -17,6 +17,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $schema = null;
   private $adminLink;
   private $type;
+  private $replace = true;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -49,6 +50,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
     $la = $this->adminLink ."=". $this->defaultFile;
     $usrDestHash = $this->getFileHash(USER_FOLDER ."/". $this->defaultFile)."";
+    $mode = $this->replace ? "replace" : "modify";
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
@@ -58,11 +60,28 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
     $newContent->insertVar("filename",$this->defaultFile,"ContentAdmin");
     $newContent->insertVar("schema",$format,"ContentAdmin");
-    $newContent->insertVar("mode",$this->type,"ContentAdmin");
+    $newContent->insertVar("mode",$mode,"ContentAdmin");
+    $newContent->insertVar("type",$this->type,"ContentAdmin");
+    $newContent->insertVar("defaultContent",$this->getDefContent(),"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("userfilehash",$usrDestHash,"ContentAdmin");
 
     return $newContent;
+  }
+
+  private function getDefContent() {
+
+    if(!in_array($this->type,array("xml","xsl"))) {
+      $df = findFile($this->defaultFile,false);
+      if(!$df) return "n/a";
+      return file_get_contents($df);
+    }
+
+    $doc = $this->getDOMPlus($this->defaultFile,false,false);
+    $doc->removeNodes("//*[@readonly]");
+    $doc->formatOutput = true;
+    return $doc->saveXML();
+
   }
 
   private function getHash($data) {
@@ -144,6 +163,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $doc->validatePlus(true);
       if($doc->isAutocorrected()) $this->contentValue = $doc->saveXML();
     } else {
+      $this->replace = false;
       $doc->validatePlus();
       if($df && $doc->removeNodes("//*[@readonly]"))
         $this->contentValue = $doc->saveXML();

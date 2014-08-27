@@ -91,7 +91,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($theme->length) {
       $themeId = $theme->item(0)->nodeValue;
       $t = $cfg->getElementById($themeId);
-      if(!is_null($t)) $this->addThemeFiles($t);
+      if(is_null($t)) throw new Exception("Theme '$themeId' not found");
+      $this->addThemeFiles($t);
     }
 
     // add root template files
@@ -102,21 +103,20 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function addThemeFiles(DOMElement $e) {
     foreach($e->childNodes as $n) {
       if($n->nodeValue == "") continue;
-      $filePath = $n->nodeValue;
       switch ($n->nodeName) {
         case "xslt":
         $user = !$n->hasAttribute("readonly");
-        $this->transformations[$filePath] = $user;
+        $this->transformations[$n->nodeValue] = $user;
         break;
         case "jsFile":
         $user = !$n->hasAttribute("readonly");
         $append = self::APPEND_HEAD;
         if($n->hasAttribute("append")) $append = $n->getAttribute("append");
-        $this->addJsFile($filePath,10,$append,$user);
+        $this->addJsFile($n->nodeValue,10,$append,$user);
         break;
         case "stylesheet":
         $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
-        $this->addCssFile($filePath,$media);
+        $this->addCssFile($n->nodeValue,$media);
         break;
       }
     }

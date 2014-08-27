@@ -25,9 +25,9 @@ class ContentHighlight extends Plugin implements SplObserver, ContentStrategyInt
     $os = $cms->getOutputStrategy();
 
     $os->addCssFile("lib/highlight/styles/default.css");
-    $os->addCssFile($this->getDir() ."ContentHighlight.css");
+    $os->addCssFile($this->getDir() ."/ContentHighlight.css");
     $os->addJsFile("lib/highlight/highlight.pack.js");
-    $os->addJsFile($this->getDir() .'ContentHighlight.js', 10, "body");
+    $os->addJsFile($this->getDir() .'/ContentHighlight.js', 10, "body");
 
     return $content;
   }

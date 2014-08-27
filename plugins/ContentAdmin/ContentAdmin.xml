@@ -2,13 +2,16 @@
 <?xml-model href="/lib/HTMLPlus.rng"?>
 <body xml:lang="cs">
   <h id="h.adf" var="ContentAdmin:heading">Administrace</h>
-  <description/>
+  <description>Administrace souboru <samp var="ContentAdmin:filename"/> ve formátu <samp var="ContentAdmin:schema"/></description>
   <ol class="errors">
     <li var="ContentAdmin:errors"/>
   </ol>
   <form action="" method="post" var="ContentAdmin:linkAdmin@action">
-    <fieldset><legend>Cílový datový soubor: <samp var="ContentAdmin:filename"/> ve formátu <samp var="ContentAdmin:schema"/></legend>
-      <textarea cols="40" name="content" rows="20" var="ContentAdmin:mode@class ContentAdmin:content">n/a</textarea>
+    <fieldset><legend>Výchozí soubor</legend>
+      <blockcode var="ContentAdmin:defaultContent">n/a</blockcode>
+    </fieldset>
+    <fieldset><legend>Uživatelský soubor, mód <samp var="ContentAdmin:mode"/></legend>
+      <textarea cols="40" name="content" rows="20" var="ContentAdmin:type@class ContentAdmin:content">n/a</textarea>
       <input name="userfilehash" type="hidden" value="" var="ContentAdmin:userfilehash@value"/>
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít (Ctrl+Shift+S)"/></li>

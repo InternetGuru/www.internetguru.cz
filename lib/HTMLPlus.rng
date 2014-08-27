@@ -184,7 +184,7 @@
     <element name="dd">
       <ref name="dd.attlist"/>
       <ref name="Inline.model"/>
-      <ref name="htmlplus.list"/>
+      <!-- <ref name="htmlplus.list"/> really? -->
     </element>
   </define>
 
@@ -195,6 +195,12 @@
   <define name="htmlplus.var">
     <optional>
       <attribute name="var"/>
+    </optional>
+  </define>
+
+  <define name="Flow.model" combine="interleave">
+    <optional>
+      <ref name="htmlplus.blockcode"/>
     </optional>
   </define>
 
