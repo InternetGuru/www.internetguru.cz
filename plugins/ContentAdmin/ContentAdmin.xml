@@ -2,7 +2,7 @@
 <?xml-model href="/lib/HTMLPlus.rng"?>
 <body xml:lang="cs">
   <h id="h.adf" var="ContentAdmin:heading">Administrace</h>
-  <description>Administrace souboru <samp var="ContentAdmin:filename"/> ve formátu <samp var="ContentAdmin:schema"/></description>
+  <desc>Administrace souboru <samp var="ContentAdmin:filename"/> ve formátu <samp var="ContentAdmin:schema"/></desc>
   <ol class="errors">
     <li var="ContentAdmin:errors"/>
   </ol>

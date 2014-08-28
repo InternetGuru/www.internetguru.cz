@@ -27,7 +27,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateId();
     $this->validateId("link");
     $this->validateHId($repair);
-    $this->validateHDesc($repair);
+    $this->validateDesc($repair);
     $this->validateHLink($repair);
     $this->relaxNGValidatePlus();
     return true;
@@ -74,14 +74,24 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  private function validateHDesc($repair) {
+  private function validateDesc($repair) {
+    if($repair) $this->repairDesc();
     foreach($this->headings as $h) {
-      if(is_null($h->nextSibling) || $h->nextSibling->nodeName != "description") {
-        if(!$repair) throw new Exception ("Missing description element");
-        $desc = $h->ownerDocument->createElement("description");
+      if(is_null($h->nextSibling) || $h->nextSibling->nodeName != "desc") {
+        if(!$repair) throw new Exception ("Missing element 'desc'");
+        $desc = $h->ownerDocument->createElement("desc");
         $h->parentNode->insertBefore($desc,$h->nextSibling);
         $this->autocorrected = true;
       }
+    }
+  }
+
+  private function repairDesc() {
+    $desc = array();
+    foreach($this->getElementsByTagName("description") as $d) $desc[] = $d;
+    foreach($desc as $d) {
+      $this->renameElement($d,"desc");
+      $this->autocorrected = true;
     }
   }
 

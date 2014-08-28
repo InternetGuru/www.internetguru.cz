@@ -2,9 +2,9 @@
 <?xml-model href="/lib/HTMLPlus.rng"?>
 <body xml:lang="en">
   <h id="h.abc">Long default title</h>
-  <description>Some paragraph...</description>
+  <desc>Some paragraph...</desc>
   <section>
     <h id="h.def">Podnadpis</h>
-    <description/>
+    <desc/>
   </section>
 </body>

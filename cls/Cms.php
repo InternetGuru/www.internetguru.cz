@@ -66,7 +66,7 @@ class Cms {
   }
 
   public function getDescription() {
-    $query = "/body/description";
+    $query = "/body/desc";
     foreach($this->plugins->getContentStrategies() as $cs) {
       $query = $cs->getDescription($query);
     }

@@ -48,7 +48,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getDescription($query) {
-    if(is_null($his->descriptionQuery)) return "/body/description";
+    if(is_null($his->descriptionQuery)) return "/body/desc";
     return $this->descriptionQuery;
   }
 
@@ -85,7 +85,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     $e = $d->parentNode;
     if($e->nodeName == "section") while(($e = $e->previousSibling) !== null) {
-      if($e->nodeName != "description") continue;
+      if($e->nodeName != "desc") continue;
       $this->createDescription($e);
       break;
     }
@@ -96,7 +96,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $into->appendChild($doc->importNode($e,true));
     $untilName = $e->nodeName;
     while(($e = $e->nextSibling) !== null) {
-      if($e->nodeName == "description") $this->createDescription($e);
+      if($e->nodeName == "desc") $this->createDescription($e);
       if($e->nodeName == $untilName) break;
       $into->appendChild($doc->importNode($e,true));
     }

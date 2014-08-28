@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
-  <xsl:strip-space elements="p description"/>
+  <xsl:strip-space elements="p desc"/>
 
   <xsl:template match="body">
     <body>
@@ -17,7 +17,7 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="//description">
+  <xsl:template match="//desc">
       <p class="description">
         <xsl:copy-of select="@*"/>
         <xsl:apply-templates/>
