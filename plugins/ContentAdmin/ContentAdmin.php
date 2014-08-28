@@ -15,6 +15,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $adminLink;
   private $type;
   private $replace = true;
+  private $dataFile = null;
+  private $disabled = false;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -28,8 +30,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $this->subject = $subject;
     $this->adminLink = $subject->getCms()->getLink()."?admin";
     try {
-
       $this->setDefaultFile();
+      $this->setDataFile();
       $this->processAdmin();
     } catch (Exception $e) {
       $this->errors[] = $e->getMessage();
@@ -46,14 +48,17 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if(!is_null($this->schema)) $format .= " ({$this->schema})";
 
     $la = $this->adminLink ."=". $this->defaultFile;
-    $usrDestHash = $this->getFileHash(USER_FOLDER ."/". $this->defaultFile)."";
+    $las = $la ."&". ($this->disabled ? "activate" : "deactivate");
+    $usrDestHash = $this->getFileHash($this->dataFile);
     $mode = $this->replace ? "replace" : "modify";
+    $status = $this->disabled ? "inactive" : "active";
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
     $newContent->insertVar("linkAdmin",$la,"ContentAdmin");
+    $newContent->insertVar("linkAdminStatus",$las,"ContentAdmin");
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
     $newContent->insertVar("filename",$this->defaultFile,"ContentAdmin");
     $newContent->insertVar("schema",$format,"ContentAdmin");
@@ -61,6 +66,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("type",$this->type,"ContentAdmin");
     $newContent->insertVar("defaultContent",$this->getDefContent(),"ContentAdmin");
     $newContent->insertVar("resultContent",$this->getResContent(),"ContentAdmin");
+    $newContent->insertVar("status",$status,"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("userfilehash",$usrDestHash,"ContentAdmin");
 
@@ -95,6 +101,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   }
 
   private function getFileHash($filePath) {
+    if(!file_exists($filePath)) return "";
     return hash_file(self::HASH_ALGO,$filePath);
   }
 
@@ -145,6 +152,18 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
   }
 
+  private function setDataFile() {
+    $f = USER_FOLDER ."/". $this->defaultFile;
+    $fd = pathinfo($f,PATHINFO_DIRNAME) ."/.". pathinfo($f,PATHINFO_BASENAME);
+    if(isset($_GET["activate"]) && file_exists($fd)) rename($fd,$f);
+    if(isset($_GET["deactivate"]) && file_exists($f)) rename($f,$fd);
+    if(!file_exists($f) && file_exists($fd)) {
+      $f = $fd;
+      $this->disabled = true;
+    }
+    $this->dataFile = $f;
+  }
+
   private function processXml($post) {
     if(!in_array($this->type,array("xml","xsl"))) return;
 
@@ -153,8 +172,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->schema = $this->getSchema($df);
     }
     // get user schema if default schema not exists
-    if(is_null($this->schema) && file_exists(USER_FOLDER ."/". $this->defaultFile)) {
-      $this->schema = $this->getSchema(USER_FOLDER ."/". $this->defaultFile);
+    if(is_null($this->schema) && file_exists($this->dataFile)) {
+      $this->schema = $this->getSchema($this->dataFile);
     }
 
     if($post) {
@@ -162,7 +181,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       else $doc = new DOMDocumentPlus();
       if(!@$doc->loadXml($this->contentValue))
         throw new Exception("Invalid XML syntax");
-    } else $doc = $this->loadXml(USER_FOLDER ."/". $this->defaultFile);
+    } else $doc = $this->loadXml($this->dataFile);
 
     $doc->formatOutput = true;
     if($this->isHtmlPlus()) {
@@ -187,15 +206,15 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->contentValue = $post_n;
       if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn))))
         throw new Exception("No changes made");
-      if($_POST["userfilehash"] != $this->getFileHash(USER_FOLDER ."/". $this->defaultFile))
+      if($_POST["userfilehash"] != $this->getFileHash($this->dataFile))
         throw new Exception("User file '{$this->defaultFile}' has changed during administration");
     } else {
-      $this->contentValue = $this->loadFile(USER_FOLDER . "/" . $this->defaultFile);
+      $this->contentValue = $this->loadFile($this->dataFile);
     }
 
     $this->processXml($post);
 
-    if($post) $this->save(USER_FOLDER ."/". $this->defaultFile, $this->contentValue);
+    if($post) $this->save($this->dataFile, $this->contentValue);
   }
 
   private function loadFile($file) {
