@@ -122,6 +122,7 @@ class DOMBuilder {
     }
     foreach($sect as $s) {
       $files = $this->parseImportValue($s->getAttribute("import"),$dir);
+      $s->removeAttribute("import");
       if(!count($files)) continue;
       $s->ownerDocument->removeChildNodes($s);
       foreach($files as $f) $this->insertHtmlPlus($s,$f);
@@ -133,14 +134,24 @@ class DOMBuilder {
     $values = explode(" ",$value);
     foreach($values as $val) {
       $f = "$dir/$val";
-      #fixme: parse * sign
-      if(file_exists($f)) $files[] = $f;
+      if(file_exists($f)) {
+        $files[] = $f;
+        continue;
+      }
+      if(strpos($val,"*") !== false) {
+        $d = pathinfo($f ,PATHINFO_DIRNAME);
+        if(!file_exists($d)) continue;
+        $fp = str_replace("\*",".*",preg_quote(pathinfo($f ,PATHINFO_BASENAME)));
+        foreach(scandir($d) as $f) {
+          if(!preg_match("/^$fp$/", $f)) continue;
+          $files[] = "$d/$f";
+        }
+      }
     }
     return $files;
   }
 
   private function insertHtmlPlus(DOMElement $e, $file) {
-    #fixme: setAttrs
     if(in_array($file, $this->imported))
       throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$e->getAttribute("import")));
     $doc = new HTMLPlus();
@@ -148,6 +159,9 @@ class DOMBuilder {
     $doc->validatePlus(true);
     foreach($doc->documentElement->childNodes as $n) {
       $e->appendChild($e->ownerDocument->importNode($n,true));
+    }
+    foreach($doc->documentElement->attributes as $a) {
+      $e->setAttribute($a->nodeName,$a->nodeValue);
     }
     $e->ownerDocument->validateId("id",true);
     $e->ownerDocument->validateId("link",true);
