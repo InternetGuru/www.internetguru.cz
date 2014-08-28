@@ -41,7 +41,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
     $cms->getOutputStrategy()->addCssFile($this->getDir() . '/ContentAdmin.css');
-    $cms->getOutputStrategy()->addJsFile($this->getDir() . '/ContentAdmin.js', 10, "body");
+    $cms->getOutputStrategy()->addJsFile($this->getDir() . '/ContentAdmin.js', 100, "body");
 
     #$this->errors = array("a","b","c");
     $format = $this->type;

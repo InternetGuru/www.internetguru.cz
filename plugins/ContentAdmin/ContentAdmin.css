@@ -6,3 +6,6 @@ textarea {
   width: 100%;
   height: 60%;
 }
+.hide {
+  display: none;
+}
