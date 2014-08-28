@@ -48,7 +48,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getDescription($query) {
-    if(is_null($his->descriptionQuery)) return "/body/desc";
+    if(is_null($this->descriptionQuery)) return "/body/desc";
     return $this->descriptionQuery;
   }
 

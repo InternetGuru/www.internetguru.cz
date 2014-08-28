@@ -103,6 +103,12 @@ class DOMDocumentPlus extends DOMDocument {
     if(!$replaced) $e->nodeValue = $varValue;
   }
 
+  public function removeChildNodes(DOMElement $e) {
+    $r = array();
+    foreach($e->childNodes as $n) $r[] = $n;
+    foreach($r as $n) $e->removeChild($n);
+  }
+
   public function removeNodes($query) {
     $xpath = new DOMXPath($this);
     $toRemove = array();
@@ -118,13 +124,16 @@ class DOMDocumentPlus extends DOMDocument {
     return true;
   }
 
-  protected function validateId($attr="id") {
+  public function validateId($attr="id",$repair=false) {
     $xpath = new DOMXPath($this);
     $ids = array();
     foreach($xpath->query("//*[@$attr]") as $e) {
       $id = $e->getAttribute($attr);
-      if(array_key_exists($id, $ids))
-        throw new Exception("Duplicit $attr attribute '$id' found");
+      if(array_key_exists($id, $ids)) {
+        if(!$repair) throw new Exception("Duplicit $attr attribute '$id' found");
+        $id = $id."1";
+        $e->setAttribute("id",$id);
+      }
       $ids[$id] = null;
     }
     return true;

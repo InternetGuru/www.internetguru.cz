@@ -9,6 +9,9 @@
       <attribute name="xml:lang">
         <ref name="LanguageCode.datatype"/>
       </attribute>
+      <optional>
+        <attribute name="import"/>
+      </optional>
       <ref name="contentBlock"/>
     </element>
   </start>

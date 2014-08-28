@@ -18,7 +18,7 @@ class DOMBuilder {
   private $doc; // DOMDocument (HTMLPlus)
   private $plugin;
   private $replace; // bool
-  private $filename;
+  private $imported = array();
 
   public function __construct() {}
 
@@ -109,6 +109,50 @@ class DOMBuilder {
     // do backup if $backup
     if(!is_null($this->backupStrategy) && $backup)
       $this->backupStrategy->doBackup($filePath);
+    if(!($doc instanceof HTMLPlus)) return;
+    $this->insertImports($doc,$filePath);
+  }
+
+  private function insertImports(HTMLPlus $doc,$filePath) {
+    $this->imported[] = $filePath;
+    $sect = array();
+    $dir = pathinfo($filePath, PATHINFO_DIRNAME);
+    foreach($doc->getElementsByTagName("section") as $s) {
+      if($s->hasAttribute("import")) $sect[] = $s;
+    }
+    foreach($sect as $s) {
+      $files = $this->parseImportValue($s->getAttribute("import"),$dir);
+      if(!count($files)) continue;
+      $s->ownerDocument->removeChildNodes($s);
+      foreach($files as $f) $this->insertHtmlPlus($s,$f);
+    }
+  }
+
+  private function parseImportValue($value, $dir) {
+    $files = array();
+    $values = explode(" ",$value);
+    foreach($values as $val) {
+      $f = "$dir/$val";
+      #fixme: parse * sign
+      if(file_exists($f)) $files[] = $f;
+    }
+    return $files;
+  }
+
+  private function insertHtmlPlus(DOMElement $e, $file) {
+    #fixme: setAttrs
+    if(in_array($file, $this->imported))
+      throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$e->getAttribute("import")));
+    $doc = new HTMLPlus();
+    $this->loadDOM($file, $doc);
+    $doc->validatePlus(true);
+    foreach($doc->documentElement->childNodes as $n) {
+      $e->appendChild($e->ownerDocument->importNode($n,true));
+    }
+    $e->ownerDocument->validateId("id",true);
+    $e->ownerDocument->validateId("link",true);
+    $e->ownerDocument->validatePlus(true);
+    $this->imported[] = $file;
   }
 
   /**
