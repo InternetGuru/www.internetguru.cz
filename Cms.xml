@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Cms>
 
-  <!-- environmental -->
-  <error_reporting readonly="readonly">E_ERROR</error_reporting>
-  <timezone readonly="readonly">Europe/Prague</timezone>
-  <display_errors>0</display_errors>
-
-  <!-- environmental DEV -->
-  <error_reporting subdom="dev localhost"/>
-  <error_reporting subdom="dev localhost">E_ALL</error_reporting>
-  <display_errors subdom="dev localhost"/>
-  <display_errors subdom="dev localhost">1</display_errors>
+  <environmental readonly="readonly"/>
+  <environmental>
+    <error_reporting>E_ALL</error_reporting>
+    <!-- <error_reporting>E_ERROR</error_reporting> -->
+    <timezone>Europe/Prague</timezone>
+    <display_errors>1</display_errors>
+    <!-- <display_errors>0</display_errors> -->
+  </environmental>
 
   <!-- <plugin readonly="readonly"/> -->
   <plugin>Backup</plugin>

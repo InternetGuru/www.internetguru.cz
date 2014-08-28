@@ -1,6 +1,7 @@
 <?php
 
 class Plugin {
+  const HASH_ALGO = 'crc32b';
   private $doms = array();
   protected $subject = null;
 
@@ -19,17 +20,24 @@ class Plugin {
 
   protected function getDOMPlus($filePath=null, $htmlPlus=false, $user=true) {
     if(is_null($filePath)) return $this->getDOMExt(null,$htmlPlus,$user);
-    if(!array_key_exists($filePath,$this->doms)) $this->buildDOMPlus($filePath,$htmlPlus,$user);
-    return $this->doms[$filePath];
+    $key = $this->getKey($filePath,$htmlPlus,$user);
+    if(array_key_exists($key,$this->doms)) return $this->doms[$key];
+    return $this->buildDOMPlus($filePath,$htmlPlus,$user);
+  }
+
+  private function getKey($a,$b=null,$c=null) {
+    return hash(self::HASH_ALGO, $a.$b.$c);
   }
 
   private function buildDOMPlus($filePath, $htmlPlus, $user) {
     if(is_null($this->subject)) throw new Exception("SplSubject not set");
     $db = $this->subject->getCms()->getDombuilder();
+    $key = $this->getKey($filePath,$htmlPlus,$user);
     if($htmlPlus)
-      $this->doms[$filePath] = $db->buildHTMLPlus($filePath,$user);
+      $this->doms[$key] = $db->buildHTMLPlus($filePath,$user);
     else
-      $this->doms[$filePath] = $db->buildDOMPlus($filePath,false,$user);
+      $this->doms[$key] = $db->buildDOMPlus($filePath,false,$user);
+    return $this->doms[$key];
   }
 
 }

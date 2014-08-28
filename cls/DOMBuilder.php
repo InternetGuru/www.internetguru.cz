@@ -131,7 +131,7 @@ class DOMBuilder {
         if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
       }
       if(get_class($n) != "DOMElement") continue;
-      if($this->ignoreElement($n)) continue;
+      #if($this->ignoreElement($n)) continue;
       if($n->nodeValue == "") {
         $remove = array();
         foreach($this->doc->documentElement->childNodes as $d) {
@@ -166,6 +166,7 @@ class DOMBuilder {
   #  return $q->item(0);
   #}
 
+  #DEPRECATED
   private function ignoreElement(DOMElement $e) {
     if(!$e->hasAttribute("subdom")) return false;
     return !in_array(getSubdom(),explode(" ",$e->getAttribute("subdom")));

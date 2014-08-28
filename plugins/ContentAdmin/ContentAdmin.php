@@ -1,14 +1,11 @@
 <?php
 
-#TODO: list of available themes
-#TODO: GET no extension -> plugins/GET/GET.xml
 #TODO: ?superadmin
 #TODO: de/activate
 #TODO: success message
 #TODO: select file
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
-  const HASH_ALGO = 'crc32b';
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
   const DEFAULT_FILE = "Content.xml";
   private $content = null;
@@ -63,21 +60,30 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("mode",$mode,"ContentAdmin");
     $newContent->insertVar("type",$this->type,"ContentAdmin");
     $newContent->insertVar("defaultContent",$this->getDefContent(),"ContentAdmin");
+    $newContent->insertVar("resultContent",$this->getResContent(),"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("userfilehash",$usrDestHash,"ContentAdmin");
 
     return $newContent;
   }
 
-  private function getDefContent() {
+  private function getResContent() {
+    return $this->showContent(true);
+  }
 
-    if(!in_array($this->type,array("xml","xsl"))) {
-      $df = findFile($this->defaultFile,false);
+  private function getDefContent() {
+    return $this->showContent(false);
+  }
+
+  private function showContent($user) {
+
+    if($this->replace) {
+      $df = findFile($this->defaultFile,$user);
       if(!$df) return "n/a";
       return file_get_contents($df);
     }
 
-    $doc = $this->getDOMPlus($this->defaultFile,false,false);
+    $doc = $this->getDOMPlus($this->defaultFile,false,$user);
     $doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();
@@ -199,22 +205,10 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     return $s;
   }
 
-  private function loadXml($f,$def) {
-
-    if(file_exists($f)) {
-      $file = $f;
-      $user = false;
-    }
-    elseif(file_exists($def)) {
-      $file = $def;
-      $user = false;
-    } else {
-      return new DOMDocumentPlus();
-    }
-
-    $db = $this->subject->getCms()->getDomBuilder();
-    if($this->isHtmlPlus()) return $db->buildHTMLPlus($file,$user);
-    return $db->buildDOMPlus($file,false,$user);
+  private function loadXml($file) {
+    if(!file_exists($file)) new DOMDocumentPlus();
+    if($this->isHtmlPlus()) return $this->getHTMLPlus($file,false);
+    return $this->getDOMPlus($file,false,false);
   }
 
   private function save($dest,$content) {

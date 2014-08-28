@@ -20,5 +20,8 @@
         <li><a href="" var="ContentAdmin:link@href">Zahodit změny a odejít</a></li>
       </ul>
     </fieldset>
+    <fieldset><legend>Výsledek, mód <samp var="ContentAdmin:mode"/></legend>
+      <blockcode var="ContentAdmin:resultContent">n/a</blockcode>
+    </fieldset>
   </form>
 </body>

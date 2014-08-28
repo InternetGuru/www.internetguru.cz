@@ -31,6 +31,7 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function trimList(DOMElement $ul) {
     $currentLink = false;
+    $deepLink = false;
     foreach($ul->childNodes as $li) {
       foreach($li->childNodes as $n) {
         if($this->isProperLink($n)) $currentLink = true;
