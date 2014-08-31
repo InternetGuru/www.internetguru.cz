@@ -98,6 +98,7 @@ class DOMDocumentPlus extends DOMDocument {
       $e->setAttribute($attr,$e->getAttribute($attr)." ".$varValue);
       return;
     }
+    $varValue = htmlspecialchars($varValue);
     $replaced = false;
     foreach($e->childNodes as $n) {
       if($n->nodeType != 3) continue;

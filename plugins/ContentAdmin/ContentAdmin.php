@@ -82,12 +82,12 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("schema",$format,"ContentAdmin");
     $newContent->insertVar("mode",$mode,"ContentAdmin");
     $newContent->insertVar("classType",$type,"ContentAdmin");
-    $newContent->insertVar("defaultContent","yyyy","ContentAdmin");
     $newContent->insertVar("defaultContent",$this->getDefContent(),"ContentAdmin");
     $newContent->insertVar("resultContent",$this->getResContent(),"ContentAdmin");
     $newContent->insertVar("status",$this->dataFileStatus,"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("userfilehash",$usrDestHash,"ContentAdmin");
+
     return $newContent;
   }
 
@@ -104,7 +104,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if($this->replace) {
       $df = findFile($this->defaultFile,$user);
       if(!$df) return "n/a";
-      return htmlentities(file_get_contents($df));
+      return file_get_contents($df);
     }
 
     $doc = $this->getDOMPlus($this->defaultFile,false,$user);
@@ -244,7 +244,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private function setContent() {
     $f = $this->dataFile;
     if(!file_exists($f)) $f = findFile($this->defaultFile);
-    if($f && !($this->contentValue = htmlentities(file_get_contents($f))))
+    if($f && !($this->contentValue = file_get_contents($f)))
       throw new Exception ("Unable to get contents from '{$this->dataFile}'");
   }
 

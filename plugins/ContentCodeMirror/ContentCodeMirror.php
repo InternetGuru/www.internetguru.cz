@@ -1,6 +1,12 @@
 <?php
 
 #TODO: more textarea support (js)
+#TODO: ctrl+e delete line
+#TODO: end na konec radku opticky (nikoli k entru)
+#TODO: alt+. to end an element
+#TODO: search dialog background
+#TODO: search results highlight
+#TODO: syntax error highlight
 
 class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
