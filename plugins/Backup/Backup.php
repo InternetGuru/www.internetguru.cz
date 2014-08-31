@@ -17,6 +17,7 @@ class Backup extends Plugin implements SplObserver {
   }
 
   private function backupFilesDeep($dir,$backupDir) {
+    if(!is_dir($dir)) return;
     $cfg = $this->getDOMPlus();
     $xpath = new DOMXPath($cfg);
     $deny = array();
