@@ -12,6 +12,11 @@ class Plugins implements SplSubject {
     $this->attachPlugins();
   }
 
+  public function printObservers() {
+    stableSort($this->observerPriority);
+    print_r($this->observerPriority);
+  }
+
   private function attachPlugins() {
     $dir = CMS_FOLDER . "/". PLUGIN_FOLDER;
     if(!is_dir($dir))

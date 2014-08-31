@@ -1,6 +1,5 @@
 <?php
 
-#TODO: fix /page/?admin not working
 #TODO: edit (create?) user file with no default files
 #TODO: ?superadmin
 #TODO: success message
@@ -16,13 +15,14 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   const FILE_ENABLE = "enable";
   private $content = null;
   private $errors = array();
-  private $contentValue = "";
+  private $contentValue = "n/a";
   private $schema = null;
   private $adminLink;
-  private $type;
+  private $type = "unknown";
   private $replace = true;
   private $dataFile = null;
-  private $dataFileStatus;
+  private $dataFileStatus = "unknown";
+  private $defaultFile = "n/a";
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -30,7 +30,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       return;
     }
     if($subject->getStatus() == "preinit") {
-      $subject->setPriority($this,1);
+      $subject->setPriority($this,3);
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
@@ -73,7 +73,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("linkAdmin",$la,"ContentAdmin");
     $newContent->insertVar("linkAdminStatus","$la&$statusChange","ContentAdmin");
 
-    if($this->dataFileStatus == self::FILE_NEW)
+    if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown")
       $newContent->insertVar("statusChange",null,"ContentAdmin");
 
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
@@ -140,6 +140,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $f = self::DEFAULT_FILE;
     if(strlen($_GET["admin"])) $f = $_GET["admin"];
     if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
+    if(!preg_match("~^([\w-]+/)*([\w-]+\.)+[A-Za-z]{3,4}$~", $f))
+      throw new Exception("Unsupported file name format '$f'");
 
     // direct user/admin file input is disallowed
     if(strpos($f,USER_FOLDER."/") === 0) {
@@ -160,13 +162,12 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
 
     // no direct match with extension [and path]
-    if(!findFile($f,false)) {
-      // check/redir to plugin dir
-      if(findFile(PLUGIN_FOLDER . "/$f",false))
-        $this->redir(PLUGIN_FOLDER . "/$f");
-      // file not found. create user file?
-      throw new Exception("File '$f' not found. Cannot create user file.");
-    }
+    if(findFile($f,false)) return;
+    // check/redir to plugin dir
+    if(!findFile(PLUGIN_FOLDER . "/$f",false)) return;
+    // found plugin file
+    $this->redir(PLUGIN_FOLDER . "/$f");
+
   }
 
   private function getDataFile() {

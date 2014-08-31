@@ -23,7 +23,7 @@ class Backup extends Plugin implements SplObserver {
     $deny = array();
     foreach($xpath->query("deny/ext") as $e) $deny[] = $e->nodeValue;
     foreach(scandir($dir) as $file) {
-      if($file == "." || $file == "..") continue;
+      if(strpos($file, ".") === 0) continue;
       if(is_dir("$dir/$file")) {
         $this->backupFilesDeep("$dir/$file","$backupDir/$file");
         continue;

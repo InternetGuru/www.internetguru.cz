@@ -32,9 +32,10 @@ function isAtLocalhost() {
   return false;
 }
 
-function getRes($res,$dest=null,$resFolder) {
+function getRes($res,$dest,$resFolder) {
   if(!$resFolder) return $res;
-  if(is_null($dest)) $dest = $res;
+  if(strpos(pathinfo($res,PATHINFO_FILENAME), ".") === 0)
+    throw new Exception("Forbidden file name");
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
   if(!is_dir($newDir)) mkdir($newDir,0755,true);

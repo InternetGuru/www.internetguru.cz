@@ -3,10 +3,6 @@
 class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "preinit") {
-      $subject->detach($this);
-      $subject->attach($this,1);
-    }
     if($subject->getCms()->getLink() == ".") {
       $subject->detach($this);
       return;
@@ -36,10 +32,7 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     $exactMatch = $xpath->query($q);
     if($exactMatch->length > 1)
       throw new Exception("Link not unique");
-    if($exactMatch->length == 1) {
-      $this->subject->detach($this);
-      return;
-    }
+    if($exactMatch->length == 1) return;
     $link = normalize($cms->getLink());
     $links = array();
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
