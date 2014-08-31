@@ -141,8 +141,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $f = self::DEFAULT_FILE;
     if(strlen($_GET["admin"])) $f = $_GET["admin"];
     if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
-    if(!preg_match("~^([\w-]+/)*([\w-]+\.)+[A-Za-z]{3,4}$~", $f))
-      throw new Exception("Unsupported file name format '$f'");
 
     // direct user/admin file input is disallowed
     if(strpos($f,USER_FOLDER."/") === 0) {
@@ -152,15 +150,18 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->redir(substr($f,strlen(ADMIN_FOLDER)+1));
     }
 
-    $this->defaultFile = $f;
-
-    // redir to plugin if no extension
-    $this->type = pathinfo($f,PATHINFO_EXTENSION);
-    if($this->type == "") {
+    // redir to plugin if no path or extension
+    if(preg_match("~^[\w-]+$~", $f)) {
       $pluginFile = PLUGIN_FOLDER."/$f/$f.xml";
       if(!findFile($pluginFile)) $this->redir("$f.xml");
       $this->redir($pluginFile);
     }
+
+    if(!preg_match("~^([\w-]+/)*([\w-]+\.)+[A-Za-z]{3,4}$~", $f))
+      throw new Exception("Unsupported file name format '$f'");
+
+    $this->defaultFile = $f;
+    $this->type = pathinfo($f,PATHINFO_EXTENSION);
 
     // no direct match with extension [and path]
     if(findFile($f,false)) return;
