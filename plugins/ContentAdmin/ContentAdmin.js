@@ -3,8 +3,8 @@
 
   var EXPAND = "[+]";
   var COLLAPSE = "[-]";
-  var HIDE_CLASS = "hide";
-  var NO_HIDE_CLASS = "nohide";
+  var HIDE_CLASS = "contentadmin-hide";
+  var NO_HIDE_CLASS = "contentadmin-nohide";
 
   function dynamicFieldset() {
     var fieldsets = document.getElementsByTagName("fieldset");
@@ -12,10 +12,10 @@
       var l = fieldsets[i].getElementsByTagName("legend")[0];
       var link = document.createElement("code");
       link.innerHTML = COLLAPSE;
-      link.style.cursor = "pointer";
+      link.classList.add("contentadmin-switch")
       link.addEventListener("click",toggle,false);
-      l.innerHTML += " ";
-      l.appendChild(link);
+      l.innerHTML = " " + l.innerHTML;
+      l.insertBefore(link,l.firstChild);
       if(fieldsets[i].classList.contains(NO_HIDE_CLASS)) continue;
       toggleElement(link);
     }

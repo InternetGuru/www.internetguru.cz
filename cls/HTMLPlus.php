@@ -34,7 +34,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function relaxNGValidatePlus() {
-    return parent::relaxNGValidatePlus(self::RNG_FILE);
+    return parent::relaxNGValidatePlus(CMS_FOLDER . "/" . self::RNG_FILE);
   }
 
   private function validateRoot() {

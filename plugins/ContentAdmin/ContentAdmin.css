@@ -1,11 +1,14 @@
-fieldset {
-  min-width: initial;
-  border: none;
-}
-textarea {
-  width: 100%;
-  height: 60%;
-}
-.hide {
+.contentadmin-hide {
   display: none;
+}
+.contentadmin-switch {
+  cursor: pointer;
+  font-family: "Emilbus Mono","Lucida Console",monospace;
+  font-weight: bold;
+  color: black;
+}
+ol.errors {
+  border: 0.2em solid rgb(255, 137, 137);
+  background: rgb(255, 186, 186);
+  color: black;
 }

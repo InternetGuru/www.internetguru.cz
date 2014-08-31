@@ -40,7 +40,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         '-//W3C//DTD XHTML 1.1//EN',
         'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
     $doc = $imp->createDocument(null, null, $dtd);
-    $doc->formatOutput = true;
+    #$doc->formatOutput = true;
     $doc->encoding="utf-8";
 
     // add root element
@@ -222,18 +222,19 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function appendJsFiles(DOMElement $parent,$append = self::APPEND_HEAD) {
     foreach($this->jsFilesPriority as $k => $v) {
       if($append != $this->jsFiles[$k]["append"]) continue;
-      $f = findFile($this->jsFiles[$k]["file"],$this->jsFiles[$k]["user"],true,true);
-      if(!is_null($this->jsFiles[$k]["file"]) && $f === false) {
-        $parent->appendChild(new DOMComment(" JS file '$k' not found "));
-        continue;
+      $f = false;
+      if(!is_null($this->jsFiles[$k]["file"])) {
+        $f = findFile($this->jsFiles[$k]["file"],$this->jsFiles[$k]["user"],true,true);
+        if($f === false) {
+          $parent->appendChild(new DOMComment(" JS file '$k' not found "));
+          continue;
+        }
       }
       $content = $this->jsFiles[$k]["content"];
       $e = $parent->ownerDocument->createElement("script");
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
-      if(!is_null($this->jsFiles[$k]["file"])) {
-        $e->setAttribute("src", getRoot() . $f);
-      }
+      if($f !== false) $e->setAttribute("src", getRoot() . $f);
       $parent->appendChild($e);
     }
   }

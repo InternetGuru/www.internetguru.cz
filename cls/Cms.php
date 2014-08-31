@@ -48,12 +48,6 @@ class Cms {
     $this->loadContent();
   }
 
-  public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
-    $this->domBuilder->setBackupStrategy($backupStrategy);
-  }
-
-  #public function getStructure() {}
-
   public function getTitle() {
     $title = array();
     $xpath = new DOMXPath($this->contentFull);

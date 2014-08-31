@@ -2,6 +2,28 @@ div.CodeMirror {
   font-family: "Emilbus Mono","Lucida Console",monospace;
   line-height: 120%;
 }
-.cm-s-tomorrow-night-eighties .CodeMirror-cursor {border-left: 0.15em solid #888 !important;}
 
-.cm-s-tomorrow-night-eighties .CodeMirror-activeline-background {background: #161616 !important;}
+.cm-s-tomorrow-night-eighties .CodeMirror-cursor {
+  border-left: 0.15em solid #888 !important;
+}
+
+.cm-s-tomorrow-night-eighties .CodeMirror-selectedtext,
+.cm-s-tomorrow-night-eighties .CodeMirror-activeline .CodeMirror-linenumber {
+  background: rgb(60,60,60) !important;
+}
+
+.cm-s-tomorrow-night-eighties .CodeMirror-activeline-background {
+  /*background: rgb(50,50,50) !important;*/
+  background: transparent !important;
+}
+
+.cm-s-tomorrow-night-eighties .CodeMirror-linenumber {
+  color: #7c7c7c;
+}
+
+.cm-s-tomorrow-night-eighties .CodeMirror-gutters {
+  background: transparent !important;
+}
+.cm-s-tomorrow-night-eighties.CodeMirror {
+  background: rgb(25,25,25);
+}

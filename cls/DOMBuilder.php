@@ -14,17 +14,12 @@
 class DOMBuilder {
 
   const DEBUG = false;
-  private $backupStrategy = null;
   private $doc; // DOMDocument (HTMLPlus)
   private $plugin;
   private $replace; // bool
   private $imported = array();
 
   public function __construct() {}
-
-  public function setBackupStrategy(BackupStrategyInterface $backupStrategy) {
-    $this->backupStrategy = $backupStrategy;
-  }
 
   public function buildDOMPlus($filePath,$replace=false,$user=true) {
     $this->doc = new DOMDocumentPlus();
@@ -63,7 +58,7 @@ class DOMBuilder {
       return;
     }
 
-    $this->loadDOM($this->findFile($filePath,false,false),$this->doc); // no backup
+    $this->loadDOM($this->findFile($filePath,false,false),$this->doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$filePath";
@@ -83,32 +78,20 @@ class DOMBuilder {
     return $f;
   }
 
-  private function loadDOM($filePath, DOMDocumentPlus $doc, $backup = true) {
+  private function loadDOM($filePath, DOMDocumentPlus $doc) {
+    // load
+    if(!@$doc->load($filePath))
+      throw new Exception("Unable to load DOM from file '$filePath'");
+    // validate if htmlplus
     try {
-      // load
-      if(!@$doc->load($filePath))
-        throw new Exception("Unable to load DOM from file '$filePath'");
-      // validate if htmlplus
-      try {
-        $doc->validatePlus();
-      } catch(Exception $e) {
-        if(!($doc instanceof HTMLPlus)) throw $e;
-        $doc->validatePlus(true);
-        $doc->formatOutput = true;
-        saveRewrite($filePath, $doc->saveXML());
-      }
+      $doc->validatePlus();
     } catch(Exception $e) {
-      // restore file if backupstrategy && $backup && !atLocalhost
-      if(!isAtLocalhost() && !is_null($this->backupStrategy) && $backup)
-        #$this->backupStrategy->restoreNewestBackup($filePath);
-        $filePath = $this->backupStrategy->getNewestBackupFilePath($filePath);
-      else throw $e;
-      // loadDOM(false)
-      $this->loadDOM($filePath,$doc,false);
+      if(!($doc instanceof HTMLPlus)) throw $e;
+      $doc->validatePlus(true);
+      $doc->formatOutput = true;
+      saveRewrite($filePath, $doc->saveXML());
     }
-    // do backup if $backup
-    if(!is_null($this->backupStrategy) && $backup)
-      $this->backupStrategy->doBackup($filePath);
+    // HTMLPlus import
     if(!($doc instanceof HTMLPlus)) return;
     $this->insertImports($doc,$filePath);
   }
@@ -189,7 +172,6 @@ class DOMBuilder {
         if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
       }
       if(get_class($n) != "DOMElement") continue;
-      #if($this->ignoreElement($n)) continue;
       if($n->nodeValue == "") {
         $remove = array();
         foreach($this->doc->documentElement->childNodes as $d) {
@@ -217,25 +199,6 @@ class DOMBuilder {
     }
   }
 
-  #private function getElementById($id) {
-  #  $xpath = new DOMXPath($this->doc);
-  #  $q = $xpath->query("//*[@id='$id']");
-  #  if($q->length == 0) return null;
-  #  return $q->item(0);
-  #}
-
-  #DEPRECATED
-  private function ignoreElement(DOMElement $e) {
-    if(!$e->hasAttribute("subdom")) return false;
-    return !in_array(getSubdom(),explode(" ",$e->getAttribute("subdom")));
-  }
-
-}
-
-interface BackupStrategyInterface {
-    public function doBackup($filePath);
-    #public function restoreNewestBackup($filePath);
-    public function getNewestBackupFilePath($filePath);
 }
 
 ?>

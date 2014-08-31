@@ -10,6 +10,7 @@ if(!defined('ADMIN_FOLDER')) define('ADMIN_FOLDER', 'adm'); // where admin cfg x
 if(!defined('USER_FOLDER')) define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 if(!defined('USER_BACKUP')) define('USER_BACKUP', 'usr.bak'); // where backup files are stored
 if(!defined('THEMES_FOLDER')) define('THEMES_FOLDER', 'themes'); // where templates are stored
+if(!defined('CMSRES_FOLDER')) define('CMSRES_FOLDER', false); // where cmsres files are stored
 if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where res files are stored
 
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
@@ -31,10 +32,10 @@ function isAtLocalhost() {
   return false;
 }
 
-function getRes($res,$dest=null) {
-  if(!RES_FOLDER) return $res;
+function getRes($res,$dest=null,$resFolder) {
+  if(!$resFolder) return $res;
   if(is_null($dest)) $dest = $res;
-  $newRes = RES_FOLDER . "/$dest";
+  $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
   if(!is_dir($newDir)) mkdir($newDir,0755,true);
   if(file_exists($newRes)) {
@@ -79,13 +80,13 @@ function getDomain() {
 function findFile($file,$user=true,$admin=true,$res=false) {
   if(strpos($file,"/") === 0) $file = substr($file,1); // remove trailing slash
   $f = USER_FOLDER . "/$file";
-  if($user && is_file($f)) return ($res ? getRes($f,$file) : $f);
+  if($user && is_file($f)) return ($res ? getRes($f,$file,RES_FOLDER) : $f);
   $f = ADMIN_FOLDER . "/$file";
-  if($admin && is_file($f)) return ($res ? getRes($f,$file) : $f);
+  if($admin && is_file($f)) return ($res ? getRes($f,$file,RES_FOLDER) : $f);
   $f = $file;
-  if(is_file($f)) return ($res ? getRes($f) : $f);
+  if(is_file($f)) return ($res ? getRes($f,$file,RES_FOLDER) : $f);
   $f = CMS_FOLDER . "/$file";
-  if(is_file($f)) return ($res ? getRes($f,$file) : $f);
+  if(is_file($f)) return ($res ? getRes($f,$file,CMSRES_FOLDER) : $f);
   return false;
 }
 

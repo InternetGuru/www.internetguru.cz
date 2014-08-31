@@ -64,22 +64,29 @@ class DOMDocumentPlus extends DOMDocument {
     if(!count($where)) return;
     $type = gettype($varValue);
     if($type == "object") $type = get_class($varValue);
-    foreach($where as $a => $e) {
+    foreach($where as $attr => $e) {
       switch($type) {
+        case "NULL":
+        $this->removeVarElement($e);
+        break;
         case "string":
-        $this->insertVarString($varValue,$e,$a);
+        $this->insertVarString($varValue,$e,$attr);
         break;
         case "array":
         if(empty($varValue)) $this->emptyVarArray($e);
         else $this->insertVarArray($varValue,$e);
         break;
         case "DOMElement":
-        $this->insertVarDOMElement($varValue,$e,$a);
+        $this->insertVarDOMElement($varValue,$e,$attr);
         break;
         default:
         throw new Exception("Unsupported variable type '$type' for '$varName'");
       }
     }
+  }
+
+  private function removeVarElement($e) {
+    $e->parentNode->removeChild($e);
   }
 
   private function insertVarString($varValue,DOMElement $e,$attr=null) {
@@ -140,7 +147,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function relaxNGValidatePlus($f) {
-    if(!($f = findFile($f,false,false)))
+    if(!file_exists($f))
       throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
     try {
       libxml_use_internal_errors(true);

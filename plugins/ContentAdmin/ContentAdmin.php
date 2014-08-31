@@ -1,13 +1,19 @@
 <?php
 
+#TODO: fix /page/?admin not working
+#TODO: edit (create?) user file with no default files
 #TODO: ?superadmin
-#TODO: de/activate
 #TODO: success message
 #TODO: select file
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
   const DEFAULT_FILE = "Content.xml";
+  const FILE_NEW = "new file";
+  const FILE_DISABLED = "inactive";
+  const FILE_ENABLED = "active";
+  const FILE_DISABLE = "disable";
+  const FILE_ENABLE = "enable";
   private $content = null;
   private $errors = array();
   private $contentValue = "";
@@ -16,7 +22,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $type;
   private $replace = true;
   private $dataFile = null;
-  private $disabled = false;
+  private $dataFileStatus;
 
   public function update(SplSubject $subject) {
     if(!isset($_GET["admin"])) {
@@ -31,11 +37,19 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $this->adminLink = $subject->getCms()->getLink()."?admin";
     try {
       $this->setDefaultFile();
-      $this->setDataFile();
-      $this->processAdmin();
+      $this->dataFile = $this->getDataFile();
+      if($this->isPost()) $this->processPost();
+      else $this->setContent();
+      $this->processXml();
+      if(!$this->isPost()) return;
+      $this->savePost();
     } catch (Exception $e) {
       $this->errors[] = $e->getMessage();
     }
+  }
+
+  private function isPost() {
+    return isset($_POST["content"],$_POST["userfilehash"]);
   }
 
   public function getContent(HTMLPlus $content) {
@@ -45,28 +59,31 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
     #$this->errors = array("a","b","c");
     $format = $this->type;
-    if(!is_null($this->schema)) $format .= " ({$this->schema})";
+    if(!is_null($this->schema)) $format .= " (" . pathinfo($this->schema,PATHINFO_BASENAME) . ")";
 
     $la = $this->adminLink ."=". $this->defaultFile;
-    $las = $la ."&". ($this->disabled ? "activate" : "deactivate");
+    $statusChange = $this->dataFileStatus == self::FILE_DISABLED ? self::FILE_ENABLE : self::FILE_DISABLE;
     $usrDestHash = $this->getFileHash($this->dataFile);
     $mode = $this->replace ? "replace" : "modify";
-    $status = $this->disabled ? "inactive" : "active";
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
     $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
     $newContent->insertVar("linkAdmin",$la,"ContentAdmin");
-    $newContent->insertVar("linkAdminStatus",$las,"ContentAdmin");
+    $newContent->insertVar("linkAdminStatus","$la&$statusChange","ContentAdmin");
+
+    if($this->dataFileStatus == self::FILE_NEW)
+      $newContent->insertVar("statusChange",null,"ContentAdmin");
+
     $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
     $newContent->insertVar("filename",$this->defaultFile,"ContentAdmin");
     $newContent->insertVar("schema",$format,"ContentAdmin");
     $newContent->insertVar("mode",$mode,"ContentAdmin");
-    $newContent->insertVar("type",$this->type,"ContentAdmin");
+    $newContent->insertVar("type",($this->type == "xsl" ? "xml" : $this->type),"ContentAdmin");
     $newContent->insertVar("defaultContent",$this->getDefContent(),"ContentAdmin");
     $newContent->insertVar("resultContent",$this->getResContent(),"ContentAdmin");
-    $newContent->insertVar("status",$status,"ContentAdmin");
+    $newContent->insertVar("status",$this->dataFileStatus,"ContentAdmin");
     #$newContent->insertVar("noparse","noparse","ContentAdmin");
     $newContent->insertVar("userfilehash",$usrDestHash,"ContentAdmin");
 
@@ -115,7 +132,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
    * Xhtml11 -> plugins/Xhtml11/Xhtml11.xml (F default plugin config)
    * Xhtml11/Xhtml11.xsl -> plugins/Xhtml11/Xhtml11.xsl (dir/F.ext plugin)
    * Cms.xml -> Cms.xml (F.ext direct match)
-   * themes/SimpleLayout.css -> themes/SimpleLayout.css (dir/F.ext direct)
+   * themes/simpleLayout.css -> themes/simpleLayout.css (dir/F.ext direct)
    * themes/userFile.css -> usr/themes/userFile.css (dir/F.ext user)
    */
   private function setDefaultFile() {
@@ -124,7 +141,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if(strlen($_GET["admin"])) $f = $_GET["admin"];
     if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
 
-    // direct user/admin file input is disabled
+    // direct user/admin file input is disallowed
     if(strpos($f,USER_FOLDER."/") === 0) {
       $this->redir(substr($f,strlen(USER_FOLDER)+1));
     }
@@ -134,7 +151,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
     $this->defaultFile = $f;
 
-    // no extension
+    // redir to plugin if no extension
     $this->type = pathinfo($f,PATHINFO_EXTENSION);
     if($this->type == "") {
       $pluginFile = PLUGIN_FOLDER."/$f/$f.xml";
@@ -152,19 +169,22 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
   }
 
-  private function setDataFile() {
+  private function getDataFile() {
     $f = USER_FOLDER ."/". $this->defaultFile;
     $fd = pathinfo($f,PATHINFO_DIRNAME) ."/.". pathinfo($f,PATHINFO_BASENAME);
-    if(isset($_GET["activate"]) && file_exists($fd)) rename($fd,$f);
-    if(isset($_GET["deactivate"]) && file_exists($f)) rename($f,$fd);
-    if(!file_exists($f) && file_exists($fd)) {
-      $f = $fd;
-      $this->disabled = true;
+    if(isset($_GET[self::FILE_ENABLE]) && file_exists($fd)) rename($fd,$f);
+    if(isset($_GET[self::FILE_DISABLE]) && file_exists($f)) rename($f,$fd);
+    $this->dataFileStatus = self::FILE_ENABLED;
+    if(file_exists($f)) return $f;
+    if(file_exists($fd)) {
+      $this->dataFileStatus = self::FILE_DISABLED;
+      return $fd;
     }
-    $this->dataFile = $f;
+    $this->dataFileStatus = self::FILE_NEW;
+    return $f;
   }
 
-  private function processXml($post) {
+  private function processXml() {
     if(!in_array($this->type,array("xml","xsl"))) return;
 
     // get default schema
@@ -176,68 +196,60 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->schema = $this->getSchema($this->dataFile);
     }
 
-    if($post) {
-      if($this->isHtmlPlus()) $doc = new HTMLPlus();
-      else $doc = new DOMDocumentPlus();
-      if(!@$doc->loadXml($this->contentValue))
-        throw new Exception("Invalid XML syntax");
-    } else $doc = $this->loadXml($this->dataFile);
+    if($this->isHtmlPlus()) $doc = new HTMLPlus();
+    else $doc = new DOMDocumentPlus();
+    if($this->contentValue == "") {
+      $this->contentValue = $doc->saveXML();
+      return;
+    }
+    if(!@$doc->loadXml($this->contentValue))
+      throw new Exception("Invalid XML syntax");
 
-    $doc->formatOutput = true;
     if($this->isHtmlPlus()) {
+      $doc->formatOutput = true;
       $doc->validatePlus(true);
       if($doc->isAutocorrected()) $this->contentValue = $doc->saveXML();
-    } else {
-      $this->replace = false;
-      $doc->validatePlus();
-      if($df && $doc->removeNodes("//*[@readonly]"))
-        $this->contentValue = $doc->saveXML();
-      $this->validateXml($doc);
-    }
-  }
-
-  private function processAdmin() {
-
-    $post = false;
-    if(isset($_POST["content"],$_POST["userfilehash"])) {
-      $post = true;
-      $post_n = str_replace("\r\n", "\n", $_POST["content"]);
-      $post_rn = str_replace("\n", "\r\n", $post_n);
-      $this->contentValue = $post_n;
-      if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn))))
-        throw new Exception("No changes made");
-      if($_POST["userfilehash"] != $this->getFileHash($this->dataFile))
-        throw new Exception("User file '{$this->defaultFile}' has changed during administration");
-    } else {
-      $this->contentValue = $this->loadFile($this->dataFile);
+      return;
     }
 
-    $this->processXml($post);
+    $doc->validatePlus();
+    if($this->type != "xml") return;
 
-    if($post) $this->save($this->dataFile, $this->contentValue);
+    $this->replace = false;
+    if($this->dataFileStatus == self::FILE_NEW) {
+      $doc->removeChildNodes($doc->documentElement);
+      $this->contentValue = $doc->saveXML();
+    }
+    if($df && $doc->removeNodes("//*[@readonly]"))
+      $this->contentValue = $doc->saveXML();
+    $this->validateXml($doc);
   }
 
-  private function loadFile($file) {
-    if(!file_exists($file)) return "";
-    if(!($s = @file_get_contents($file)))
-      throw new Exception ("Unable to get contents from '$file'");
-    return $s;
+  private function processPost() {
+    $post_n = str_replace("\r\n", "\n", $_POST["content"]);
+    $post_rn = str_replace("\n", "\r\n", $post_n);
+    $this->contentValue = $post_n;
+    if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn))))
+      throw new Exception("No changes made");
+    if($_POST["userfilehash"] != $this->getFileHash($this->dataFile))
+      throw new Exception("User file '{$this->defaultFile}' has changed during administration");
   }
 
-  private function loadXml($file) {
-    if(!file_exists($file)) new DOMDocumentPlus();
-    if($this->isHtmlPlus()) return $this->getHTMLPlus($file,false);
-    return $this->getDOMPlus($file,false,false);
+  private function setContent() {
+    $f = $this->dataFile;
+    if(!file_exists($f)) $f = findFile($this->defaultFile);
+    if($f && !($this->contentValue = @file_get_contents($f)))
+      throw new Exception ("Unable to get contents from '{$this->dataFile}'");
   }
 
-  private function save($dest,$content) {
-    if(saveRewrite($dest,$content) === false)
+  private function savePost() {
+    if(saveRewrite($this->dataFile, $this->contentValue) === false)
       throw new Exception("Unable to save changes, administration may be locked (update in progress)");
     if(empty($this->errors)) $this->redir($this->defaultFile);
   }
 
   private function isHtmlPlus() {
-    return in_array($this->schema,array(self::HTMLPLUS_SCHEMA, "../cms/" . self::HTMLPLUS_SCHEMA));
+    return in_array($this->schema,array(self::HTMLPLUS_SCHEMA, CMS_FOLDER ."/". self::HTMLPLUS_SCHEMA));
   }
 
   private function validateXml(DOMDocumentPlus $doc) {

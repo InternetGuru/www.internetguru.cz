@@ -22,7 +22,7 @@ class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyIn
     // supported syntax only
     $modes = array(
       "xml" => "lib/codemirror/mode/xml/xml.js",
-      "xsl" => "lib/codemirror/mode/xml/xml.js",
+      #"xsl" => "lib/codemirror/mode/xml/xml.js",
       "css" => "lib/codemirror/mode/css/css.js",
       );
     $libs = array();
@@ -52,7 +52,12 @@ class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyIn
     $os->addJsFile("lib/codemirror/keymap/sublime.js");
 
     $os->addJsFile("lib/codemirror/addon/search/searchcursor.js");
+    $os->addJsFile("lib/codemirror/addon/search/search.js");
+    $os->addJsFile("lib/codemirror/addon/dialog/dialog.js");
+    $os->addCssFile("lib/codemirror/addon/dialog/dialog.css");
+
     $os->addJsFile("lib/codemirror/addon/selection/active-line.js");
+    $os->addJsFile("lib/codemirror/addon/selection/mark-selection.js");
     $os->addJsFile("lib/codemirror/addon/comment/comment.js");
     $os->addJsFile("lib/codemirror/addon/edit/closetag.js");
     $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");

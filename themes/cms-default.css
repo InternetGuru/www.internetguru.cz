@@ -1,8 +1,45 @@
-samp {
-  border: 0.1em solid #bbb;
+code, samp, textarea {
   font-family: "Emilbus Mono","Lucida Console",monospace;
-  /*background-color: #eee;*/
+}
+
+input[type="submit"] {
+  font-size: inherit;
+  /*color: black;*/
+  padding: 0.15em 0.3em;
+}
+
+samp, pre, textarea,
+p code, li code, dt code, dd code {
+  border: 0.15em solid #e5e5e5;
+  box-sizing: border-box;
+  background:#f0f0f0;
+  font-size: inherit;
+  color: black;
+  white-space: pre-wrap;
+}
+
+pre, textarea {
+  padding: 0.3em;
+  line-height: 1.5em;
+}
+
+samp, p code, li code, dt code, dd code {
   padding-left: 0.3em;
   padding-right: 0.3em;
-  padding: 0.2em 0.3em;
+}
+
+legend+* {
+  margin-top: 0.5em;
+}
+
+fieldset {
+  min-width: initial;
+  border: none;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+textarea {
+  width: 100%;
+  height: 60%;
 }

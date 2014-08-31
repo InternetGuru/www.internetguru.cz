@@ -1,5 +1,6 @@
 code.hljs {
   display: inline;
+  font-family: "Emilbus Mono","Lucida Console",monospace;
 }
 
 pre code.hljs {

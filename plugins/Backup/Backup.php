@@ -1,6 +1,8 @@
 <?php
 
-class Backup extends Plugin implements SplObserver, BackupStrategyInterface {
+#TODO: change implementation...
+
+class Backup extends Plugin implements SplObserver {
 
   const HASH_FILE_ALGO = 'crc32b';
   const BACKUP_FILENAME_SEPARATOR = "~";
@@ -61,9 +63,8 @@ class Backup extends Plugin implements SplObserver, BackupStrategyInterface {
    * @return void
    */
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "preinit") {
-      $subject->getCms()->setBackupStrategy($this);
-    }
+    if($subject->getStatus() != "preinit") return;
+    #todo: do backup!
   }
 
   /**
