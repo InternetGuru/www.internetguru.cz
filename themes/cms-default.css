@@ -43,3 +43,7 @@ textarea {
   width: 100%;
   height: 60%;
 }
+
+ol ol li {
+  list-style-type: lower-latin;
+}

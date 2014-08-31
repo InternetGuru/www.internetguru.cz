@@ -38,7 +38,8 @@ function getRes($res,$dest,$resFolder) {
     throw new Exception("Forbidden file name");
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
-  if(!is_dir($newDir)) mkdir($newDir,0755,true);
+  if(!is_dir($newDir) && !@mkdir($newDir,0755,true))
+    throw new Exception("Unable to create directory structure '$newDir'");
   if(file_exists($newRes)) {
     if(filectime($newRes) >= filectime($res)) return $newRes;
   }
