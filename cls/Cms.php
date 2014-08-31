@@ -126,9 +126,7 @@ class Cms {
   }
 
   private function loadContent() {
-    $this->contentFull = $this->domBuilder->buildHTMLPlus("Content.xml");
-    #$this->contentFull = $this->buildHTML("",true,"Content.xml");
-    #echo $this->contentFull->saveXML();
+    $this->contentFull = $this->domBuilder->buildHTMLPlus("Content.html");
   }
 
   public function getOutput() {

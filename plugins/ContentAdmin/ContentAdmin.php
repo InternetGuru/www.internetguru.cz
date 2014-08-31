@@ -7,7 +7,7 @@
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
-  const DEFAULT_FILE = "Content.xml";
+  const DEFAULT_FILE = "Content.html";
   const FILE_NEW = "new file";
   const FILE_DISABLED = "inactive";
   const FILE_ENABLED = "active";
@@ -59,12 +59,14 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
     #$this->errors = array("a","b","c");
     $format = $this->type;
+    if($this->type == "html") $format = "html+";
     if(!is_null($this->schema)) $format .= " (" . pathinfo($this->schema,PATHINFO_BASENAME) . ")";
 
     $la = $this->adminLink ."=". $this->defaultFile;
     $statusChange = $this->dataFileStatus == self::FILE_DISABLED ? self::FILE_ENABLE : self::FILE_DISABLE;
     $usrDestHash = $this->getFileHash($this->dataFile);
     $mode = $this->replace ? "replace" : "modify";
+    $type = (in_array($this->type,array("html","xsl")) ? "xml" : $this->type);
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
@@ -80,7 +82,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("filename",$this->defaultFile,"ContentAdmin");
     $newContent->insertVar("schema",$format,"ContentAdmin");
     $newContent->insertVar("mode",$mode,"ContentAdmin");
-    $newContent->insertVar("type",($this->type == "xsl" ? "xml" : $this->type),"ContentAdmin");
+    $newContent->insertVar("classType",$type,"ContentAdmin");
     $newContent->insertVar("defaultContent",$this->getDefContent(),"ContentAdmin");
     $newContent->insertVar("resultContent",$this->getResContent(),"ContentAdmin");
     $newContent->insertVar("status",$this->dataFileStatus,"ContentAdmin");
@@ -186,7 +188,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   }
 
   private function processXml() {
-    if(!in_array($this->type,array("xml","xsl"))) return;
+    if(!in_array($this->type,array("xml","xsl","html"))) return;
 
     // get default schema
     if($df = findFile($this->defaultFile,false)) {
@@ -197,9 +199,12 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->schema = $this->getSchema($this->dataFile);
     }
 
-    if($this->isHtmlPlus()) $doc = new HTMLPlus();
-    else $doc = new DOMDocumentPlus();
-    if($this->contentValue == "") {
+    if($this->isHtmlPlus()) {
+      $doc = new HTMLPlus();
+      $doc->load(findFile("Content.html",false,false));
+      $doc->formatOutput = true;
+    } else $doc = new DOMDocumentPlus();
+    if($this->contentValue == "n/a") {
       $this->contentValue = $doc->saveXML();
       return;
     }
@@ -250,7 +255,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   }
 
   private function isHtmlPlus() {
-    return in_array($this->schema,array(self::HTMLPLUS_SCHEMA, CMS_FOLDER ."/". self::HTMLPLUS_SCHEMA));
+    return $this->type == "html";
+    #return in_array($this->schema,array(self::HTMLPLUS_SCHEMA, CMS_FOLDER ."/". self::HTMLPLUS_SCHEMA));
   }
 
   private function validateXml(DOMDocumentPlus $doc) {

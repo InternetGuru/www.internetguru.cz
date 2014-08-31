@@ -80,7 +80,7 @@ class DOMBuilder {
 
   private function loadDOM($filePath, DOMDocumentPlus $doc) {
     // load
-    if(!@$doc->load($filePath))
+    if(!$doc->load($filePath))
       throw new Exception("Unable to load DOM from file '$filePath'");
     // validate if htmlplus
     try {

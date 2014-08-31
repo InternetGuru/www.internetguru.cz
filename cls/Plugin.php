@@ -10,6 +10,7 @@ class Plugin {
   }
 
   protected function getHTMLPlus($filePath=null, $user=true) {
+    if(is_null($filePath)) return $this->getDOMExt("html",true,$user);
     return $this->getDOMPlus($filePath,true,$user);
   }
 
