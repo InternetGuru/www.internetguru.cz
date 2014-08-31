@@ -1,6 +1,5 @@
 <?php
 
-#TODO: edit (create?) user file with no default files
 #TODO: ?superadmin
 #TODO: success message
 #TODO: select file

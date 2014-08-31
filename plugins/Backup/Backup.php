@@ -43,7 +43,7 @@ class Backup extends Plugin implements SplObserver {
     $destDir = pathinfo($dest,PATHINFO_DIRNAME);
     if(is_dir($destDir)) foreach(scandir($destDir) as $f) {
       if(pathinfo($f,PATHINFO_FILENAME) != pathinfo($src,PATHINFO_BASENAME)) continue;
-      if(filectime($f) > time() - 60*60) return;
+      if(filectime("$destDir/$f") > time() - 60*60) return;
     }
     if(!is_dir($destDir) && !mkdir($destDir,0755,true))
       throw new Exception("Unable to create backup directory '$destDir'");
