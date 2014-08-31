@@ -1,7 +1,5 @@
 <?php
 
-#TODO: attach only enabled plugins (from cms.xml)
-
 class Plugins implements SplSubject {
   private $status = null;
   private $cms;

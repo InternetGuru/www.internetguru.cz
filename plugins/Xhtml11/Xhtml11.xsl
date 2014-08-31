@@ -91,7 +91,7 @@
 
   <xsl:template match="node()|@*">
     <xsl:copy>
-      <xsl:apply-templates select="node()|@*"/>
+      <xsl:apply-templates select="node()|@*[name()!='var']"/>
     </xsl:copy>
   </xsl:template>
 
