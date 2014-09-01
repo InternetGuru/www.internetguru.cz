@@ -1,5 +1,7 @@
 <?php
 
+#TODO: title
+
 class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
@@ -68,9 +70,11 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
         $link = $n->getAttribute("link");
         $parentLink = $link;
       }
-      $text = $n->nodeValue;
-      if($n->hasAttribute("short")) $text = $n->getAttribute("short");
-      $a = $content->createElement("a",$text);
+      $a = $content->createElement("a",$n->nodeValue);
+      if($n->hasAttribute("short")) {
+        $a->nodeValue = $n->getAttribute("short");
+        $a->setAttribute("title",$n->nodeValue);
+      }
       if($this->subject->getCms()->getLink() == $link) {
         $a->setAttribute("class","current");
       } else {

@@ -3,7 +3,7 @@
   // CodeMirror Configuration
   // http://codemirror.net/doc/manual.html
   var TextArea = document.getElementsByTagName("textarea")[0];
-  var myCodeMirror = CodeMirror.fromTextArea(TextArea,{
+  var cm = CodeMirror.fromTextArea(TextArea,{
       tabMode: "default",
       keyMap:"sublime",
       theme:"tomorrow-night-eighties",
@@ -14,10 +14,16 @@
       //tabSize: 2,
       styleActiveLine: true,
       styleSelectedText: true,
-      autoCloseTags: true,
+      autoCloseTags: {
+        whenClosing: true,
+        whenOpening: false
+      },
       extraKeys: {
         "Tab": false,
-        "Shift-Tab": false
+        "Shift-Tab": false,
+        "Ctrl-E": "deleteLine",
+        "End": "goLineRight",
+        "Home": "goLineLeft"
       }
   });
 

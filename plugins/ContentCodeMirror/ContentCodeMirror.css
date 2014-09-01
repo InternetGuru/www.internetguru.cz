@@ -9,7 +9,7 @@ div.CodeMirror {
 
 .cm-s-tomorrow-night-eighties .CodeMirror-selectedtext,
 .cm-s-tomorrow-night-eighties .CodeMirror-activeline .CodeMirror-linenumber {
-  background: rgb(60,60,60) !important;
+  background: rgb(60,60,60);
 }
 
 .cm-s-tomorrow-night-eighties .CodeMirror-activeline-background {
@@ -24,6 +24,33 @@ div.CodeMirror {
 .cm-s-tomorrow-night-eighties .CodeMirror-gutters {
   background: transparent !important;
 }
+
 .cm-s-tomorrow-night-eighties.CodeMirror {
   background: rgb(25,25,25);
+}
+
+.cm-s-tomorrow-night-eighties span.cm-searching {
+  background: #fbc862;
+  color: rgb(25,25,25);
+}
+
+.cm-s-tomorrow-night-eighties .CodeMirror-selectedtext.cm-searching {
+  background: #ccc;
+}
+
+.cm-s-tomorrow-night-eighties span.cm-error {
+  background: rgb(105,0,0);
+  color: inherit;
+}
+
+.cm-s-tomorrow-night-eighties .CodeMirror-dialog.CodeMirror-dialog-top {
+  background: black;
+  color: #ccc;
+  padding: 0.3em 0.5em !important;
+  border-color: #ffcc66;
+}
+.cm-s-tomorrow-night-eighties .CodeMirror-dialog.CodeMirror-dialog-top * {
+  font-family: inherit !important;
+  color: inherit !important;
+  font-size: inherit !important;
 }
