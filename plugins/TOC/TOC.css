@@ -1,4 +1,15 @@
-#generated-toc dd {
+#contenttoc dd {
   margin-left: 0em;
   font-style: normal;
+}
+.contenttoc-hide {
+  display: none;
+}
+.contenttoc-switch {
+  cursor: pointer;
+  font-family: "Emilbus Mono","Lucida Console",monospace;
+  color: inherit;
+  background: transparent;
+  padding: 0;
+  border: none;
 }

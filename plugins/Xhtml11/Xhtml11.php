@@ -191,7 +191,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param string  $content  JS to be added
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addJs($content,$priority = 10,$append = self::APPEND_HEAD) {
+  public function addJs($content,$priority = 10,$append = self::APPEND_BODY) {
     $key = "k" . count($this->jsFiles);
     $this->jsFiles[$key] = array(
       "file" => null,
