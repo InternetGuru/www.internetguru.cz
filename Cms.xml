@@ -23,6 +23,7 @@
   <!-- <plugin>ContentPublic</plugin> -->
   <plugin>ContentVar</plugin>
   <plugin>GA</plugin>
+  <plugin>TOC</plugin>
   <!-- <plugin>Slider</plugin> -->
   <plugin>Xhtml11</plugin>
 

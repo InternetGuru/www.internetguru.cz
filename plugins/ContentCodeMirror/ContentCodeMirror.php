@@ -2,6 +2,8 @@
 
 #TODO: more textarea support (js)
 #TODO: alt+. to end an element
+#TODO: search result jump to first occurence
+#TODO: search zero match found message!
 
 class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 

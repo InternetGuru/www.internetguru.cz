@@ -10,11 +10,29 @@ strong {
 }
 
 h1,h2,h3,h4,h5,h6,p,ul,ol,dl,
-div.list.multiple div {
+div.list.multiple div,
+div.paragraph {
   max-width: 60rem;
   margin: 1.5em auto;
   padding-left: 1rem;
   padding-right: 1rem;
+}
+
+div.paragraph > p,
+div.paragraph > ul,
+div.paragraph > ol,
+div.paragraph > dl {
+  padding-left: 0;
+  padding-right: 0;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul ul, ul ol, ul dl,
+ol ul, ol ol, ol dl,
+dl ul, dl ol, dl dl {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
 }
 
 div.list ul,
