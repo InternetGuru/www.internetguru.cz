@@ -1,4 +1,4 @@
-#contenttoc dd {
+.contenttoc-wrapper dd {
   margin-left: 0em;
   font-style: normal;
 }
@@ -7,9 +7,11 @@
 }
 .contenttoc-switch {
   cursor: pointer;
-  font-family: "Emilbus Mono","Lucida Console",monospace;
+  /*font-family: "Lucida Console",monospace;*/
+  font-family: inherit;
   color: inherit;
   background: transparent;
   padding: 0;
   border: none;
+  font-weight: bold;
 }

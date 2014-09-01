@@ -140,11 +140,9 @@ class DOMBuilder {
     $doc = new HTMLPlus();
     $this->loadDOM($file, $doc);
     $doc->validatePlus(true);
+    #todo: validate imported file language
     foreach($doc->documentElement->childNodes as $n) {
       $e->appendChild($e->ownerDocument->importNode($n,true));
-    }
-    foreach($doc->documentElement->attributes as $a) {
-      $e->setAttribute($a->nodeName,$a->nodeValue);
     }
     $e->ownerDocument->validateId("id",true);
     $e->ownerDocument->validateId("link",true);

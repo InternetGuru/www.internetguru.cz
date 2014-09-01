@@ -5,8 +5,7 @@
   Config.show = "[+]";
   Config.hide = "[-]";
   Config.tocTitle = "Table of contents";
-  Config.hideClass = "contenttoc-hide";
-  Config.topLevel = 2;
+  Config.tocNS = "contenttoc";
 
    var TOC = function() {
 
@@ -16,6 +15,7 @@
       hElements = [],
       hLevels = [],
       headingsPatt = null,
+      tocRoot = null,
       initCfg = function(cfg) {
         if(typeof cfg === 'undefined') return;
         for(var attr in cfg) {
@@ -25,25 +25,23 @@
       },
       createTocWrapper = function() {
         var d = document.getElementsByTagName("div");
-        var f = false;
         var i = 0;
         for(; i<d.length; i++) {
-          if(!d[i].classList.contains("section")) continue;
-          f = true;
+          if(!d[i].classList.contains(Config.tocNS)) continue;
+          tocRoot = d[i];
           break;
         }
-        if(!f) throw "Unable to find div.section";
+        if(tocRoot == null) throw "Unable to find div." + Config.tocNS;
         var div = document.createElement("div");
         div.className = "list";
         tocWrapper = document.createElement("dl");
-        tocWrapper.id = "contenttoc";
+        tocWrapper.className = Config.tocNS + "-wrapper";
         div.appendChild(tocWrapper);
-        d[i].parentNode.insertBefore(div,d[i]);
+        tocRoot.parentNode.insertBefore(div,tocRoot);
       },
       getHeadings = function(e) {
         var l = e.nodeName.toLowerCase().match(headingsPatt);
         if(l !== null) {
-          // TODO check / generate id
           hElements.push(e);
           hLevels.push(parseInt(l[1]));
           return;
@@ -75,11 +73,11 @@
       },
       toggleToc = function(e) {
         var dd = e.parentNode.nextSibling;
-        if(dd.classList.contains(Config.hideClass)) {
-          dd.classList.remove(Config.hideClass);
+        if(dd.classList.contains(Config.tocNS + "-hide")) {
+          dd.classList.remove(Config.tocNS + "-hide");
           e.innerHTML = Config.hide;
         } else {
-          dd.classList.add(Config.hideClass);
+          dd.classList.add(Config.tocNS + "-hide");
           e.innerHTML = Config.show;
         }
       }
@@ -90,8 +88,8 @@
           // create toc
           createTocWrapper();
           initCfg(cfg);
-          headingsPatt = new RegExp("h([" + Config.topLevel + "-6])");
-          getHeadings(win.document.body);
+          headingsPatt = new RegExp("h([1-6])");
+          getHeadings(tocRoot);
           var ol = win.document.createElement('ol');
           createTOC(0, ol);
 
@@ -99,7 +97,7 @@
           var dt = document.createElement("dt");
           dt.innerHTML = " " + Config.tocTitle;
           var sw = document.createElement("code");
-          sw.className = "contenttoc-switch";
+          sw.className = Config.tocNS + "-switch";
           sw.innerHTML = Config.hide;
           dt.insertBefore(sw,dt.firstChild);
           tocWrapper.appendChild(dt);

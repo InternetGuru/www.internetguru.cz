@@ -34,10 +34,15 @@
   </xsl:template>
 
   <xsl:template match="//section">
-    <div class="section">
+    <xsl:element name="div">
+    <!-- <div class="section"> -->
       <xsl:copy-of select="@*"/>
+      <xsl:attribute name="class">
+        <xsl:value-of select="concat(@class,' section')"/>
+      </xsl:attribute>
       <xsl:apply-templates/>
-    </div>
+    <!-- </div> -->
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="//blockcode">
