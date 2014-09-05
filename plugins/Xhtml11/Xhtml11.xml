@@ -20,6 +20,8 @@
   <xslt readonly="readonly"/>
   <stylesheet>themes/cms-default.css</stylesheet>
   <stylesheet media="print">themes/cms-print.css</stylesheet>
+  <!-- <stylesheet>themes/document.css</stylesheet> -->
+
   <jsFile readonly="readonly" />
   <favicon>themes/igcms.ico</favicon>
 

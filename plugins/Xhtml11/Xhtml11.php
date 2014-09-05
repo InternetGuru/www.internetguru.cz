@@ -1,6 +1,5 @@
 <?php
 
-#TODO: delete resting vars (comment?)
 #TODO: meta keywords
 
 class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {

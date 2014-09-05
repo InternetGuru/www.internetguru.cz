@@ -12,6 +12,7 @@ if(!defined('USER_BACKUP')) define('USER_BACKUP', 'usr.bak'); // where backup fi
 if(!defined('THEMES_FOLDER')) define('THEMES_FOLDER', 'themes'); // where templates are stored
 if(!defined('CMSRES_FOLDER')) define('CMSRES_FOLDER', false); // where cmsres files are stored
 if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where res files are stored
+if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are stored
 
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
