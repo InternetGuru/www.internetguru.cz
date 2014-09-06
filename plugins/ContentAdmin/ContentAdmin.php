@@ -160,7 +160,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->redir($pluginFile);
     }
 
-    if(!preg_match("~^([\w-]+/)*([\w-]+\.)+[A-Za-z]{3,4}$~", $f))
+    if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{3,4}$~", $f))
       throw new Exception("Unsupported file name format '$f'");
 
     $this->defaultFile = $f;

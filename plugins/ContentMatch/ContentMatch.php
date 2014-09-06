@@ -38,7 +38,7 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
     $linkId = $this->findSimilar($links,$link);
 
-    if($linkId === false) $link = ".";
+    if(is_null($linkId)) $link = ".";
     else $link = $links[$linkId];
     $this->redirToLink($link);
   }
@@ -48,7 +48,7 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
    * call: aa/b/cc/dd -> find aa/bb/cc/dd (not aa/dd)
    */
   private function findSimilar(Array $links,$link) {
-    if(!strlen($link)) return false;
+    if(!strlen($link)) return null;
     // zero pos substring
     if(($newLink = $this->minPos($links,$link,0)) !== false) return $newLink;
     // low levenstein first

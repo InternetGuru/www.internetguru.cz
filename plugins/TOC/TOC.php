@@ -1,5 +1,7 @@
 <?php
 
+#TODO: detect lang & editable language pack
+
 class TOC extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {

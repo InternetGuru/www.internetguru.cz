@@ -5,6 +5,9 @@
 #TODO: search result jump to first occurence
 #TODO: search zero match found message!
 
+#fixme: moving up/down changes word wrapping (issue 13)
+#https://bitbucket.org/igwr/cms/issue/13/codemirror-changing-word-wrap
+
 class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
