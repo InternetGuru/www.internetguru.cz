@@ -3,6 +3,8 @@
 #TODO: ?superadmin
 #TODO: success message
 #TODO: select file
+#TODO: save and go not saving (Cms.xml)
+#TODO: default parameter podle getu
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
@@ -63,7 +65,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
     $la = $this->adminLink ."=". $this->defaultFile;
     $statusChange = $this->dataFileStatus == self::FILE_DISABLED ? self::FILE_ENABLE : self::FILE_DISABLE;
-    $usrDestHash = $this->getFileHash($this->dataFile);
+    $usrDestHash = getFileHash($this->dataFile);
     $mode = $this->replace ? "replace" : "modify";
     $type = (in_array($this->type,array("html","xsl")) ? "xml" : $this->type);
 
@@ -115,12 +117,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   }
 
   private function getHash($data) {
-    return hash(self::HASH_ALGO,$data);
-  }
-
-  private function getFileHash($filePath) {
-    if(!file_exists($filePath)) return "";
-    return hash_file(self::HASH_ALGO,$filePath);
+    return hash(FILE_HASH_ALGO,$data);
   }
 
   /**
@@ -219,7 +216,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
 
     $doc->validatePlus();
-    if($this->type != "xml") return;
+    if($this->type != "xml" || $this->isPost()) return;
 
     $this->replace = false;
     if($this->dataFileStatus == self::FILE_NEW) {
@@ -237,7 +234,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $this->contentValue = $post_n;
     if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn))))
       throw new Exception("No changes made");
-    if($_POST["userfilehash"] != $this->getFileHash($this->dataFile))
+    if($_POST["userfilehash"] != getFileHash($this->dataFile))
       throw new Exception("User file '{$this->defaultFile}' has changed during administration");
   }
 

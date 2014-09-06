@@ -103,13 +103,15 @@ class DOMBuilder {
     foreach($doc->getElementsByTagName("section") as $s) {
       if($s->hasAttribute("import")) $sect[] = $s;
     }
+    if(!count($sect)) return;
+    $l = new Logger("Importing HTML+",null,false);
     foreach($sect as $s) {
       $files = $this->parseImportValue($s->getAttribute("import"),$dir);
       $s->removeAttribute("import");
       if(!count($files)) continue;
-      $s->ownerDocument->removeChildNodes($s);
       foreach($files as $f) $this->insertHtmlPlus($s,$f);
     }
+    $l->finished();
   }
 
   private function parseImportValue($value, $dir) {
@@ -127,7 +129,7 @@ class DOMBuilder {
         $fp = str_replace("\*",".*",preg_quote(pathinfo($f ,PATHINFO_BASENAME)));
         foreach(scandir($d) as $f) {
           if(!preg_match("/^$fp$/", $f)) continue;
-          $files[] = "$d/$f";
+          $files[getFileHash("$d/$f")] = "$d/$f"; // disallowe import same content
         }
       }
     }
@@ -138,15 +140,25 @@ class DOMBuilder {
     if(in_array($file, $this->imported))
       throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$e->getAttribute("import")));
     $doc = new HTMLPlus();
-    $this->loadDOM($file, $doc);
-    $doc->validatePlus(true);
+    $l = new Logger("loadDOM",false,false);
+    #if(usesImport($file)) $this->loadDOM($file, $doc);
+    #if($this->isCached()) return $doc->load(cache);
+    #else
+    $doc->load($file);
+    $l->finished();
+    $e->ownerDocument->removeChildNodes($e);
     #todo: validate imported file language
+    $l = new Logger("appends",false,false);
     foreach($doc->documentElement->childNodes as $n) {
       $e->appendChild($e->ownerDocument->importNode($n,true));
     }
+    $l->finished();
+
+    $l = new Logger("validate(result)",false,false);
     $e->ownerDocument->validateId("id",true);
     $e->ownerDocument->validateId("link",true);
     $e->ownerDocument->validatePlus(true);
+    $l->finished();
     $this->imported[] = $file;
   }
 

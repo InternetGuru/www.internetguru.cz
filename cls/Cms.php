@@ -1,6 +1,8 @@
 <?php
 
 #TODO: singleton contentXpath, contentFullXpath
+#TODO: outputStrategy interface
+#TODO: default outputStrategy (ignore methods)
 
 class Cms {
 

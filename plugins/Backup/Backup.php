@@ -2,8 +2,6 @@
 
 class Backup extends Plugin implements SplObserver {
 
-  const HASH_FILE_ALGO = 'crc32b';
-
   /**
    * Observer update method
    * @param  SplSubject $subject Subject with observer collection
@@ -35,7 +33,7 @@ class Backup extends Plugin implements SplObserver {
 
   private function getBackupFileName($filePath) {
     $pi = pathinfo($filePath);
-    return sprintf("%s.%s",$pi["basename"],$this->getFileHash($filePath));
+    return sprintf("%s.%s",$pi["basename"],getFileHash($filePath));
   }
 
   private function doBackup($src,$dest) {
@@ -50,10 +48,6 @@ class Backup extends Plugin implements SplObserver {
     if(!copy($src,$dest)) {
       throw new Exception("Unable to create backup '$dest'");
     }
-  }
-
-  private function getFileHash($filePath) {
-    return hash_file(self::HASH_FILE_ALGO,$filePath);
   }
 
   #UNUSED (restore)

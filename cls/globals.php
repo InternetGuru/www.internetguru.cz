@@ -16,6 +16,7 @@ if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are s
 
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
+define('FILE_HASH_ALGO', 'crc32b');
 
 #print_r($_SERVER);
 
@@ -124,6 +125,11 @@ function saveRewrite($dest,$content) {
   if(!copy($dest,"$dest.old")) return false;
   if(!rename("$dest.new",$dest)) return false;
   return $b;
+}
+
+function getFileHash($filePath) {
+  if(!file_exists($filePath)) return "";
+  return hash_file(FILE_HASH_ALGO,$filePath);
 }
 
 ?>
