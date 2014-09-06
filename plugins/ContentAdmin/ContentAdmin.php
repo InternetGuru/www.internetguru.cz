@@ -122,11 +122,13 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   /**
    * LOGIC (-> == redir if exists)
+   * null -> [current_link].html -> Content.html
    * F -> plugins/$0/$0.xml -> $0.xml
    * [dir/]+F -> $0.xml
    * [dir/]*F.ext (direct match) -> plugins/$0
    *
    * EXAMPLES
+   * /about?admin -> /about?admin=about.html -> /about?admin=Content.html
    * Xhtml11 -> plugins/Xhtml11/Xhtml11.xml (F default plugin config)
    * Xhtml11/Xhtml11.xsl -> plugins/Xhtml11/Xhtml11.xsl (dir/F.ext plugin)
    * Cms.xml -> Cms.xml (F.ext direct match)
@@ -135,9 +137,13 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
    */
   private function setDefaultFile() {
 
-    $f = self::DEFAULT_FILE;
-    if(strlen($_GET["admin"])) $f = $_GET["admin"];
+    $f = $_GET["admin"];
     if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
+    if(!strlen($f)) {
+      $l = $this->subject->getCms()->getLink();
+      if(findFile("$l.html")) $f = "$l.html";
+      else $f = self::DEFAULT_FILE;
+    }
 
     // direct user/admin file input is disallowed
     if(strpos($f,USER_FOLDER."/") === 0) {

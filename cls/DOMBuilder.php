@@ -14,6 +14,7 @@
 class DOMBuilder {
 
   const DEBUG = false;
+  const USE_CACHE = true;
   private $doc; // DOMDocument (HTMLPlus)
   private $plugin;
   private $replace; // bool
@@ -49,6 +50,13 @@ class DOMBuilder {
   }
 
   private function build($filePath,$replace,$user) {
+    /*
+    $dc = new DOMCache(hash(FILE_HASH_ALGO,"$filePath,$replace,$user"));
+    if($dc->isValid()) return $dc->getCache();
+    $dc->addSurceFile($filePath);
+    $dc->addSurceFile(ADMIN_FOLDER . "/$filePath");
+    $dc->addSurceFile(USER_FOLDER . "/$filePath");
+    */
 
     if(self::DEBUG) $this->doc->formatOutput = true;
 
@@ -109,6 +117,7 @@ class DOMBuilder {
       $files = $this->parseImportValue($s->getAttribute("import"),$dir);
       $s->removeAttribute("import");
       if(!count($files)) continue;
+      $s->ownerDocument->removeChildNodes($s);
       foreach($files as $f) $this->insertHtmlPlus($s,$f);
     }
     $l->finished();
@@ -140,25 +149,14 @@ class DOMBuilder {
     if(in_array($file, $this->imported))
       throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$e->getAttribute("import")));
     $doc = new HTMLPlus();
-    $l = new Logger("loadDOM",false,false);
-    #if(usesImport($file)) $this->loadDOM($file, $doc);
-    #if($this->isCached()) return $doc->load(cache);
-    #else
-    $doc->load($file);
-    $l->finished();
-    $e->ownerDocument->removeChildNodes($e);
+    $this->loadDOM($file, $doc);
     #todo: validate imported file language
-    $l = new Logger("appends",false,false);
     foreach($doc->documentElement->childNodes as $n) {
       $e->appendChild($e->ownerDocument->importNode($n,true));
     }
-    $l->finished();
-
-    $l = new Logger("validate(result)",false,false);
     $e->ownerDocument->validateId("id",true);
     $e->ownerDocument->validateId("link",true);
     $e->ownerDocument->validatePlus(true);
-    $l->finished();
     $this->imported[] = $file;
   }
 
