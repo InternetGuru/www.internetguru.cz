@@ -1,5 +1,7 @@
 <?php
 
+#TODO: cache
+
 /**
  * Create DOM from XML file and update elements from adm/usr directories.
  * Add by default; empty element to delete all elements with same nodeName.

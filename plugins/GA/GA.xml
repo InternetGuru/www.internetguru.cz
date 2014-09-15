@@ -9,5 +9,6 @@
   <groupId readonly="readonly"/>
   <groupId id="internetguru.cz">UA-52883188-3</groupId>
   <groupId id="ezakladna.cz">UA-52883188-4</groupId>
+  <groupId id="other">UA-52883188-5</groupId>
 
 </GA>
