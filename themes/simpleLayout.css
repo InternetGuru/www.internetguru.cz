@@ -176,7 +176,9 @@ dd {
 div.list.multiple div {
   display: -webkit-flex;
   display: flex;
+  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-justify-content: center;
   justify-content: center;
   list-style: none;
 }
@@ -227,7 +229,9 @@ div.cms-balancer a {
 #footer > ul {
   display: -webkit-flex;
   display: flex;
+  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
+  -webkit-justify-content: center;
   justify-content: center;
   list-style: none;
 }
