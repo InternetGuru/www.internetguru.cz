@@ -116,35 +116,13 @@ class DOMBuilder {
     if(!count($sect)) return;
     $l = new Logger("Importing HTML+",null,false);
     foreach($sect as $s) {
-      $files = $this->parseImportValue($s->getAttribute("import"),$dir);
+      $files = matchFiles($s->getAttribute("import"),$dir);
       $s->removeAttribute("import");
       if(!count($files)) continue;
       $s->ownerDocument->removeChildNodes($s);
       foreach($files as $f) $this->insertHtmlPlus($s,$f);
     }
     $l->finished();
-  }
-
-  private function parseImportValue($value, $dir) {
-    $files = array();
-    $values = explode(" ",$value);
-    foreach($values as $val) {
-      $f = "$dir/$val";
-      if(file_exists($f)) {
-        $files[] = $f;
-        continue;
-      }
-      if(strpos($val,"*") !== false) {
-        $d = pathinfo($f ,PATHINFO_DIRNAME);
-        if(!file_exists($d)) continue;
-        $fp = str_replace("\*",".*",preg_quote(pathinfo($f ,PATHINFO_BASENAME)));
-        foreach(scandir($d) as $f) {
-          if(!preg_match("/^$fp$/", $f)) continue;
-          $files[getFileHash("$d/$f")] = "$d/$f"; // disallowe import same content
-        }
-      }
-    }
-    return $files;
   }
 
   private function insertHtmlPlus(DOMElement $e, $file) {
@@ -182,7 +160,7 @@ class DOMBuilder {
         if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
       }
       if(get_class($n) != "DOMElement") continue;
-      if($n->nodeValue == "") {
+      if($this->doRemove($n)) {
         $remove = array();
         foreach($this->doc->documentElement->childNodes as $d) {
           if($d->nodeType != 1 || $d->nodeName != $n->nodeName) continue;
@@ -207,6 +185,13 @@ class DOMBuilder {
         $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
       }
     }
+  }
+
+  private function doRemove(DOMElement $n) {
+    if($n->nodeValue != "") return false;
+    if($n->attributes->length > 1) return false;
+    if($n->attributes->length == 1 && !$n->hasAttribute("readonly")) return false;
+    return true;
   }
 
 }

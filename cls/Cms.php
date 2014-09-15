@@ -19,8 +19,6 @@ class Cms {
     $this->domBuilder = new DOMBuilder();
     if(isset($_GET["page"])) $this->link = $_GET["page"];
     if(!strlen(trim($this->link))) $this->link = ".";
-    #error_log("CMS created:0",0);
-    #error_log("CMS created:3",3,"aaa.log");
   }
 
   public function setPlugins(SplSubject $p) {

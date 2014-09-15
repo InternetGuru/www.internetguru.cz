@@ -14,6 +14,7 @@ if(!defined('CMSRES_FOLDER')) define('CMSRES_FOLDER', false); // where cmsres fi
 if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where res files are stored
 if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are stored
 if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files are stored
+if(!defined('FILES_FOLDER')) define('FILES_FOLDER', 'files'); // where web files are stored
 
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
@@ -132,5 +133,29 @@ function getFileHash($filePath) {
   if(!file_exists($filePath)) return "";
   return hash_file(FILE_HASH_ALGO,$filePath);
 }
+
+function matchFiles($pattern, $dir) {
+  $files = array();
+  $values = explode(" ",$pattern);
+  foreach($values as $val) {
+    $f = "$dir/$val";
+    if(file_exists($f)) {
+      $files[] = $f;
+      continue;
+    }
+    if(strpos($val,"*") !== false) {
+      $d = pathinfo($f ,PATHINFO_DIRNAME);
+      if(!file_exists($d)) continue;
+      $fp = str_replace("\*",".*",preg_quote(pathinfo($f ,PATHINFO_BASENAME)));
+      foreach(scandir($d) as $f) {
+        if(!preg_match("/^$fp$/", $f)) continue;
+        $files[getFileHash("$d/$f")] = "$d/$f"; // disallowe import same content
+      }
+    }
+  }
+  return $files;
+}
+
+
 
 ?>

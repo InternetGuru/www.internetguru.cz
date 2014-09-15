@@ -18,6 +18,7 @@
   <plugin>ContentBreadcrumb</plugin>
   <plugin>ContentCodeMirror</plugin>
   <plugin>ContentHighlight</plugin>
+  <plugin>ContentImg</plugin>
   <plugin>ContentLink</plugin>
   <plugin>ContentMatch</plugin>
   <plugin>ContentMenu</plugin>
