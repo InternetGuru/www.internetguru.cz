@@ -51,3 +51,8 @@ textarea {
 ol ol li {
   list-style-type: lower-latin;
 }
+
+ol.img li, ul.img li {
+  display: inline-block;
+  list-style-type: none;
+}

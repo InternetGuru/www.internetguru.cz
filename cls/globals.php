@@ -14,8 +14,8 @@ if(!defined('CMSRES_FOLDER')) define('CMSRES_FOLDER', false); // where cmsres fi
 if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where res files are stored
 if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are stored
 if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files are stored
-if(!defined('FILES_FOLDER')) define('FILES_FOLDER', 'files'); // where web files are stored
 
+define('FILES_FOLDER', 'files'); // where web files are stored
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 define('FILE_HASH_ALGO', 'crc32b');

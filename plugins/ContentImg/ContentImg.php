@@ -15,11 +15,11 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
     foreach($this->getDOMPlus()->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id")) throw new Exception ("Missing id attr in element var");
       if(!$var->hasAttribute("pattern")) throw new Exception ("Missing pattern attr in element var");
-      $id = $var->getAttribute("id");
       $images = matchFiles($var->getAttribute("pattern"),FILES_FOLDER . "/thumbs");
+      if(!count($images)) continue;
+      $id = $var->getAttribute("id");
       $dom = new DOMDocumentPlus();
       $ul = $dom->createElement("ul");
-      if(!count($images)) continue;
       $limit = 100;
       if($var->hasAttribute("limit"))
         $limit = (int) $var->getAttribute("limit");
