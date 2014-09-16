@@ -17,7 +17,16 @@ class Logger {
     $this->m[] = http_response_code();
     $this->m[] = normalize($type);
     $this->m[] = '"'. $message .'"';
+    $this->m[] = '['. $this->getCaller() .']';
     if($doLog) $this->log();
+  }
+
+  private function getCaller() {
+    $callers = debug_backtrace();
+    $c = array();
+    if(isset($callers[2]['class'])) $c[] = $callers[2]['class'];
+    if(isset($callers[2]['function'])) $c[] = $callers[2]['function'];
+    return implode(".",$c);
   }
 
   public function finished() {

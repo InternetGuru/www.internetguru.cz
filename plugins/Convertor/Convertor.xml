@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<GA>
+
+  <jsFile readonly="readonly"/>
+  <jsFile>GA.js</jsFile>
+
+  <var id="ga_id" readonly="readonly"/>
+
+  <groupId readonly="readonly"/>
+  <groupId id="internetguru.cz">UA-52883188-3</groupId>
+  <groupId id="ezakladna.cz">UA-52883188-4</groupId>
+  <groupId id="other">UA-52883188-5</groupId>
+
+</GA>
