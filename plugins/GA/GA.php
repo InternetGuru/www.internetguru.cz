@@ -11,10 +11,10 @@ class GA extends Plugin implements SplObserver {
       $subject->detach($this);
       return;
     }
-    $this->init($subject);
+    $this->init();
   }
 
-  private function init(SplSubject $subject) {
+  private function init() {
     $ga_id = $this->getDOMPlus()->getElementById("ga_id");
     if(is_null($ga_id)) {
       $ga_id = $this->getDOMPlus()->getElementById(getDomain());
@@ -24,15 +24,15 @@ class GA extends Plugin implements SplObserver {
     }
     $ga_id = $ga_id->nodeValue;
     if(!$this->isValidId($ga_id)) {
-      $subject->getCms()->getOutputStrategy()->addJs("// invalid ga_id format '$ga_id'",1,"body");
-      $subject->detach($this);
+      $this->subject->getCms()->getOutputStrategy()->addJs("// invalid ga_id format '$ga_id'",1,"body");
+      $this->subject->detach($this);
       return;
     }
-    $subject->getCms()->getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
+    $this->subject->getCms()->getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
     foreach($this->getDOMPlus()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
       $f = $this->getDir() ."/". $jsFile->nodeValue;
-      $subject->getCms()->getOutputStrategy()->addJsFile($f,1,"body",$user);
+      $this->subject->getCms()->getOutputStrategy()->addJsFile($f,1,"body",$user);
     }
   }
 
