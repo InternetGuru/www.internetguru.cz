@@ -24,20 +24,19 @@
 
 
 <xsl:template match="/">
-        <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="cs" lang="cs">
-            <head>
-                <meta http-equiv="Content-Type" content="application/xhtml; charset=utf-8" />
-                <meta http-equiv="Content-Language" content="cs" />
-                <title>XML soubor</title> <!-- TODO: nazev dokumentu -->
-            </head>
-            <settings />
-            <body>
-                <!-- TODO prejmenovat jen na header a footer-->
-                <xsl:if test="$headerFile"><header><xsl:apply-templates select="$header"/></header></xsl:if>
-                <xsl:if test="$footerFile"><footer><xsl:apply-templates select="$footer"/></footer></xsl:if>
-                <xsl:apply-templates />
-            </body>
-        </html>
+  <body xml:lang="cs">
+
+    <!-- TODO prejmenovat jen na header a footer-->
+    <!-- <xsl:if test="$headerFile"><header><xsl:apply-templates select="$header"/></header></xsl:if> -->
+    <!-- <xsl:if test="$footerFile"><footer><xsl:apply-templates select="$footer"/></footer></xsl:if> -->
+
+    <xsl:call-template name="h">
+      <xsl:with-param name="pos" select="1"/>
+      <xsl:with-param name="lvl" select="1"/>
+      <xsl:with-param name="sec" select="0"/>
+    </xsl:call-template>
+
+  </body>
 </xsl:template>
 
 <!-- Template pro zachovani formatovani z dokumentu header.xml
@@ -48,42 +47,97 @@
 </xsl:template>
 -->
 
+<!--
+pro vsechny skupiny nadpisu konkretni urovne (napr. title, heading1...)
+napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
+ -->
 
-<xsl:template match="p">
-	<xsl:variable name="bookmarkId" select="descendant::bookmarkStart/@name"/>
-	<xsl:variable name="pStyleVal" select="./pPr/pStyle/@val" />
 
-        <xsl:variable name="rootElement">
-		<xsl:choose>
-			<xsl:when test="$pStyleVal='Title'">h1</xsl:when>
-                        <xsl:when test="$pStyleVal='Subtitle'">h1</xsl:when>
-                        <xsl:when test="$pStyleVal='Heading1'">h2</xsl:when>
-                        <xsl:when test="$pStyleVal='Heading2'">h3</xsl:when>
-                        <xsl:when test="$pStyleVal='Heading3'">h4</xsl:when>
-                        <xsl:when test="$pStyleVal='Heading4'">h5</xsl:when>
-                        <xsl:when test="$pStyleVal='Heading5'">h6</xsl:when>
-                        <xsl:when test="$pStyleVal='Heading6'">h6</xsl:when>
-			<xsl:otherwise>p</xsl:otherwise>
-		</xsl:choose>
-	</xsl:variable>
+<xsl:template name="h">
 
-	<xsl:element name="{$rootElement}">
-		<!-- Has element bookmark? -->
-		<xsl:if test="$bookmarkId">
-			<xsl:attribute name="id">
-                            <xsl:value-of select="$bookmarkId" />
-			</xsl:attribute>
-		</xsl:if>
+  <xsl:param name="pos"/>
+  <xsl:param name="lvl"/>
+  <xsl:param name="sec"/>
+  <xsl:variable name="bookmarkId" select="descendant::bookmarkStart/@name"/>
+  <xsl:variable name="h" select="//p[pPr/pStyle[@val='Title' or @val='Heading1' or @val='Heading2' or @val='Heading3']]"/>
 
-		<!-- is heading?-->
-		<xsl:if test="$pStyleVal">
-			<xsl:attribute name="class">
-                            <xsl:value-of select="$pStyleVal" />
-			</xsl:attribute>
-		</xsl:if>
+  <xsl:choose>
 
-		<xsl:apply-templates />
-	</xsl:element>
+    <xsl:when test="not($h[$pos]) and $sec > 0">
+        <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+        <xsl:call-template name="h">
+          <xsl:with-param name="lvl" select="$lvl"/>
+          <xsl:with-param name="pos" select="$pos"/>
+          <xsl:with-param name="sec" select="$sec -1"/>
+        </xsl:call-template>
+    </xsl:when>
+
+    <xsl:otherwise>
+
+      <xsl:variable name="curLvl">
+        <xsl:choose>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Title'">1</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Subtitle'">2</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading1'">3</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading2'">4</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading3'">5</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading4'">6</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading5'">7</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading6'">8</xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+
+      <!-- na urovni vypise h a next -->
+      <xsl:if test="$curLvl = $lvl">
+        <xsl:element name="h">
+          <xsl:if test="$bookmarkId">
+            <xsl:attribute name="id">
+              <xsl:value-of select="$bookmarkId" />
+            </xsl:attribute>
+          </xsl:if>
+          <xsl:apply-templates select="$h[$pos]"/>
+        </xsl:element>
+
+        <xsl:variable name="currentPosition" select="count($h[$pos]/preceding-sibling::*)" />
+
+        <xsl:variable name="position" select="count(//p[pPr/pStyle[@val='Title' or @val='Heading1' or @val='Heading2' or @val='Heading3']][$pos+1]/preceding-sibling::*)" />
+
+        <!-- currentPosition <xsl:value-of select="$currentPosition"/> lt <xsl:value-of select="$position"/>
+        x -->
+
+
+        <xsl:apply-templates select="//p[position() &gt; $currentPosition+1 and (position() &lt; $position+1 or $position=0)]"/>
+
+        <xsl:call-template name="h">
+          <xsl:with-param name="lvl" select="$curLvl"/>
+          <xsl:with-param name="pos" select="$pos+1"/>
+          <xsl:with-param name="sec" select="$sec"/>
+        </xsl:call-template>
+      </xsl:if>
+
+      <!-- vnoreni otevre section a next -->
+      <xsl:if test="$curLvl &gt; $lvl">
+        <xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
+        <xsl:call-template name="h">
+          <xsl:with-param name="lvl" select="$curLvl"/>
+          <xsl:with-param name="pos" select="$pos"/>
+          <xsl:with-param name="sec" select="$sec+1"/>
+        </xsl:call-template>
+      </xsl:if>
+
+      <!-- vynoreni uzavre section a next -->
+      <xsl:if test="$curLvl &lt; $lvl">
+        <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+        <xsl:call-template name="h">
+          <xsl:with-param name="lvl" select="$curLvl"/>
+          <xsl:with-param name="pos" select="$pos"/>
+          <xsl:with-param name="sec" select="$sec -1"/>
+        </xsl:call-template>
+      </xsl:if>
+
+    </xsl:otherwise>
+  </xsl:choose>
+
 </xsl:template>
 
 <xsl:template match="t" priority="1">
@@ -153,32 +207,32 @@
                     </xsl:choose>
 		</xsl:variable>
 
-<!--
+
  		<xsl:choose>
 		<xsl:when test='not(preceding-sibling::*[1][self::p][descendant::pPr/numPr/numId/@val = $theNumId])'>
                     <xsl:element name="{$listType}">
                         <xsl:for-each select='. | following-sibling::p[descendant::pPr/numPr/numId/@val = $theNumId and descendant::pPr/numPr/ilvl/@val = $theLevel]'>
-                            <xsl:variable name="bookmarkId" select="descendant::bookmarkStart/@name"/>
+                            <!-- <xsl:variable name="bookmarkId" select="descendant::bookmarkStart/@name"/> -->
                             <xsl:choose>
                                 <xsl:when test='not( (following-sibling::p[1]/pPr/numPr/ilvl/@val) = $theLevel )'>
                                     <xsl:element name="li">
-                                        <xsl:if test="$bookmarkId">
+                                        <!-- <xsl:if test="$bookmarkId">
                                             <xsl:attribute name="id">
                                                 <xsl:value-of select="$bookmarkId" />
                                             </xsl:attribute>
-                                        </xsl:if>
+                                        </xsl:if> -->
                                         <xsl:apply-templates />
                                         <xsl:apply-templates select="following-sibling::p[1]" mode='restOfList' />
                                     </xsl:element>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <xsl:variable name="bookmarkId" select="descendant::bookmarkStart/@name"/>
+                                    <!-- <xsl:variable name="bookmarkId" select="descendant::bookmarkStart/@name"/> -->
                                     <xsl:element name="li">
-                                        <xsl:if test="$bookmarkId">
+                                        <!-- <xsl:if test="$bookmarkId">
                                             <xsl:attribute name="id">
                                                 <xsl:value-of select="$bookmarkId" />
                                             </xsl:attribute>
-                                        </xsl:if>
+                                        </xsl:if> -->
                                            <xsl:apply-templates />
                                     </xsl:element>
                                 </xsl:otherwise>
@@ -187,7 +241,7 @@
                     </xsl:element>
 		</xsl:when>
 		</xsl:choose>
- -->
+
     </xsl:template>
 
 <xsl:template match="p[pPr/numPr]" mode="restOfList">

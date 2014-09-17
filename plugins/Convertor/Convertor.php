@@ -70,17 +70,42 @@ class Convertor extends Plugin implements SplObserver {
     return true;
   }
 
+
   private function transformFile($f) {
     $content = new DOMDocumentPlus();
     $content->loadXML($this->readZippedXML($f, "word/document.xml"));
+
+    $varFiles = array(
+      "headerFile" => "word/header1.xml",
+      "footerFile" => "word/footer1.xml",
+      "numberingFile" => "word/numbering.xml",
+      "footnotesFile" => "word/footnotes.xml",
+      "relationsFile" => "word/_rels/document.xml.rels"
+    );
+    $variables = array();
+    foreach($varFiles as $varName => $p) {
+     try{
+        $fileSuffix = pathinfo($p, PATHINFO_BASENAME);
+        $file = $f."_$fileSuffix";
+        file_put_contents($file, $this->readZippedXML($f, $p));
+        $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
+      } catch(Exception $e){}
+    }
+    //print_r($variables); die();
+
     $content = $this->transform("removePrefix.xsl",$content);
-    return $this->transform("docx2html.xsl",$content);
+    $content = $this->transform("docx2html.xsl",$content, $variables);
+    //$content = $this->transform("headings.xsl",$content);
+    return $content;
   }
 
-  private function transform($xslFile, DOMDocument $content) {
+  private function transform($xslFile, DOMDocument $content, $vars = null) {
     $xsl = $this->getDOMPlus($this->getDir() ."/$xslFile",false,false);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
+    if(!is_null($vars)) foreach($vars as $varName => $path) {
+      $proc->setParameter('', $varName, $path);
+    }
     return $proc->transformToDoc($content);
   }
 
