@@ -2,7 +2,7 @@
 
 class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
-  private $mime = array("image/jpeg","image/png","image/gif");
+  private $mime = array("image/jpeg","image/png","image/gif","image/svg+xml");
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {

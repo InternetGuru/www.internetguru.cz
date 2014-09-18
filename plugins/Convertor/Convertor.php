@@ -72,8 +72,7 @@ class Convertor extends Plugin implements SplObserver {
 
 
   private function transformFile($f) {
-    $content = new DOMDocumentPlus();
-    $content->loadXML($this->readZippedXML($f, "word/document.xml"));
+    $dom = new DOMDocumentPlus();
 
     $varFiles = array(
       "headerFile" => "word/header1.xml",
@@ -84,19 +83,23 @@ class Convertor extends Plugin implements SplObserver {
     );
     $variables = array();
     foreach($varFiles as $varName => $p) {
-     try{
+      try{
         $fileSuffix = pathinfo($p, PATHINFO_BASENAME);
         $file = $f."_$fileSuffix";
-        file_put_contents($file, $this->readZippedXML($f, $p));
+        $dom->loadXML($this->readZippedXML($f, $p));
+        $dom = $this->transform("removePrefix.xsl",$dom);
+        file_put_contents($file, $dom->saveXML());
         $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
       } catch(Exception $e){}
     }
     //print_r($variables); die();
 
-    $content = $this->transform("removePrefix.xsl",$content);
-    $content = $this->transform("docx2html.xsl",$content, $variables);
-    //$content = $this->transform("headings.xsl",$content);
-    return $content;
+    $dom->loadXML($this->readZippedXML($f, "word/document.xml"));
+    $dom = $this->transform("removePrefix.xsl",$dom);
+    file_put_contents($f."_document.xml", $dom->saveXML()); // just for debug
+    $dom = $this->transform("docx2html.xsl",$dom, $variables);
+    //$dom = $this->transform("headings.xsl",$dom);
+    return $dom;
   }
 
   private function transform($xslFile, DOMDocument $content, $vars = null) {
@@ -106,7 +109,9 @@ class Convertor extends Plugin implements SplObserver {
     if(!is_null($vars)) foreach($vars as $varName => $path) {
       $proc->setParameter('', $varName, $path);
     }
-    return $proc->transformToDoc($content);
+    $dom = $proc->transformToDoc($content);
+    $dom->encoding = "utf-8";
+    return $dom;
   }
 
   private function readZippedXML($archiveFile, $dataFile) {

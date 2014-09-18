@@ -1,141 +1,211 @@
-<xsl:stylesheet version="1.0"
+<?xml version="1.0" encoding="utf-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<!-- <xsl:stylesheet version="1.0"
   xmlns:xhtml="http://www.w3.org/1999/xhtml"
   xmlns="http://www.w3.org/1999/xhtml"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-  xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"
-  exclude-result-prefixes="xhtml xsl xs w m">
-
-<!--<xsl:output method="xml" version="1.0" encoding="UTF-8" doctype-public="-//W3C//DTD XHTML 1.1//EN" doctype-system="http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd" indent="no"/>-->
-<xsl:output method="xml" version="1.0" encoding="UTF-8" indent="no"/>
+  xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math"> -->
 
 <!-- deklarovani parametru poslane transformatorem -->
 <xsl:param name="headerFile" />
 <xsl:param name="footerFile" />
-<xsl:param name="numberingFile" /> <!-- TODO osetrit, pokud soubor nebude existovat -->
+<xsl:param name="numberingFile" />
 <xsl:param name="footnotesFile" />
-<xsl:param name="relationsFile" /> <!-- TODO osetrit, pokud soubor nebude existovat -->
+<xsl:param name="relationsFile" />
 
-<!--<xsl:param name="header" select="document('system-property('user.home')/gdgenerator/source-docx/word/header1.xml')//w:p"/>-->
-
-<xsl:param name="header" select="document($headerFile)//w:p"/>
-<xsl:param name="footer" select="document($footerFile)//w:p"/>
-
+<!-- <xsl:param name="header" select="document($headerFile)//p"/> -->
+<!-- <xsl:param name="footer" select="document($footerFile)//p"/> -->
 
 <xsl:template match="/">
   <body xml:lang="cs">
 
-    <!-- TODO prejmenovat jen na header a footer-->
     <!-- <xsl:if test="$headerFile"><header><xsl:apply-templates select="$header"/></header></xsl:if> -->
     <!-- <xsl:if test="$footerFile"><footer><xsl:apply-templates select="$footer"/></footer></xsl:if> -->
 
-    <xsl:call-template name="h">
-      <xsl:with-param name="pos" select="1"/>
-      <xsl:with-param name="lvl" select="1"/>
-      <xsl:with-param name="sec" select="0"/>
-    </xsl:call-template>
+    <xsl:call-template name="headingStructure"/>
 
   </body>
 </xsl:template>
 
 <!-- Template pro zachovani formatovani z dokumentu header.xml
-<xsl:template match="w:p">
+<xsl:template match="p">
     <xsl:copy>
         <xsl:apply-templates />
     </xsl:copy>
 </xsl:template>
 -->
 
-<!--
-pro vsechny skupiny nadpisu konkretni urovne (napr. title, heading1...)
-napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
- -->
+<xsl:template name="headingStructure">
 
-
-<xsl:template name="h">
-
-  <xsl:param name="pos"/>
-  <xsl:param name="lvl"/>
-  <xsl:param name="sec"/>
-  <xsl:variable name="bookmarkId" select="descendant::bookmarkStart/@name"/>
-  <xsl:variable name="h" select="//p[pPr/pStyle[@val='Title' or @val='Heading1' or @val='Heading2' or @val='Heading3']]"/>
+  <!-- params and variables declaration -->
+  <xsl:param name="pos" select="1"/>
+  <xsl:param name="lvl" select="0"/>
+  <xsl:param name="sec" select="0"/>
+  <xsl:param name="correct" select="1"/>
+  <xsl:variable name="h" select="//p[pPr/pStyle[
+    @val='Title' or @val='Název' or
+    @val='Subtitle' or @val='Podtitul' or
+    @val='Heading1' or @val='Nadpis1' or
+    @val='Heading2' or @val='Nadpis2' or
+    @val='Heading3' or @val='Nadpis3' or
+    @val='Heading4' or @val='Nadpis4' or
+    @val='Heading5' or @val='Nadpis5' or
+    @val='Heading6' or @val='Nadpis6'
+    ]]"/>
+  <xsl:variable name="bookmarkId" select="$h[$pos]/descendant::bookmarkStart/@name"/>
 
   <xsl:choose>
-
-    <xsl:when test="not($h[$pos]) and $sec > 0">
-        <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
-        <xsl:call-template name="h">
-          <xsl:with-param name="lvl" select="$lvl"/>
-          <xsl:with-param name="pos" select="$pos"/>
-          <xsl:with-param name="sec" select="$sec -1"/>
-        </xsl:call-template>
-    </xsl:when>
-
-    <xsl:otherwise>
-
+    <!-- if heading exists -->
+    <xsl:when test="$h[$pos]">
+      <!-- heading levels -->
       <xsl:variable name="curLvl">
         <xsl:choose>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Title'">1</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Název'">1</xsl:when>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Subtitle'">2</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Podtitul'">2</xsl:when>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading1'">3</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Nadpis1'">3</xsl:when>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading2'">4</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Nadpis2'">4</xsl:when>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading3'">5</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Nadpis3'">5</xsl:when>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading4'">6</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Nadpis4'">6</xsl:when>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading5'">7</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Nadpis5'">7</xsl:when>
           <xsl:when test="$h[$pos]/pPr/pStyle/@val='Heading6'">8</xsl:when>
+          <xsl:when test="$h[$pos]/pPr/pStyle/@val='Nadpis6'">8</xsl:when>
         </xsl:choose>
       </xsl:variable>
 
-      <!-- na urovni vypise h a next -->
-      <xsl:if test="$curLvl = $lvl">
-        <xsl:element name="h">
-          <xsl:if test="$bookmarkId">
-            <xsl:attribute name="id">
-              <xsl:value-of select="$bookmarkId" />
-            </xsl:attribute>
+      <xsl:choose>
+
+        <!-- find initial heading level -->
+        <xsl:when test="$lvl=0">
+          <xsl:call-template name="headingStructure">
+            <xsl:with-param name="lvl" select="$curLvl"/>
+            <xsl:with-param name="pos" select="$pos"/>
+            <xsl:with-param name="sec" select="$sec"/>
+          </xsl:call-template>
+        </xsl:when>
+
+        <!-- same level -->
+        <xsl:when test="$curLvl = $lvl or not($correct)">
+          <!-- generate heading -->
+          <xsl:if test="$correct">
+            <xsl:element name="h">
+              <xsl:if test="$bookmarkId">
+                <xsl:attribute name="id">
+                  <xsl:value-of select="$bookmarkId" />
+                </xsl:attribute>
+              </xsl:if>
+              <!-- <xsl:copy-of select="$h[$pos]/r/t/text()"/> -->
+              <xsl:apply-templates select="$h[$pos]/r"/>
+            </xsl:element>
           </xsl:if>
-          <xsl:apply-templates select="$h[$pos]"/>
-        </xsl:element>
+          <xsl:if test="not($correct)">
+            <xsl:text disable-output-escaping="yes">&lt;!-- mismatch heading structure ignored --></xsl:text>
+            <xsl:apply-templates select="$h[$pos]"/>
+          </xsl:if>
+          <!-- content between this and next heading -->
+          <xsl:variable name="curHPos" select="count($h[$pos]/preceding-sibling::*)+1" />
+          <xsl:variable name="nextHPos" select="count($h[$pos+1]/preceding-sibling::*)+1" />
+          <xsl:if test="$correct">
+             <xsl:choose>
+              <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and $nextHPos - $curHPos &gt; 1">
+                <desc>
+                  <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
+                </desc>
+              </xsl:when>
+              <xsl:otherwise>
+                <desc>
+                  <xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text>
+                </desc>
+                <xsl:if test="$nextHPos - $curHPos &gt; 1">
+                  <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
+                </xsl:if>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+          <xsl:apply-templates select="//p[position() &gt; $curHPos+$correct and (position() &lt; $nextHPos or $nextHPos=0)]"/>
+          <!-- next heading (pos+1) -->
+          <xsl:if test="$correct">
+            <xsl:call-template name="headingStructure">
+              <xsl:with-param name="lvl" select="$curLvl"/>
+              <xsl:with-param name="pos" select="$pos+1"/>
+              <xsl:with-param name="sec" select="$sec"/>
+            </xsl:call-template>
+          </xsl:if>
+          <xsl:if test="not($correct)">
+            <xsl:call-template name="headingStructure">
+              <xsl:with-param name="lvl" select="$lvl"/>
+              <xsl:with-param name="pos" select="$pos+1"/>
+              <xsl:with-param name="sec" select="$sec"/>
+            </xsl:call-template>
+          </xsl:if>
+        </xsl:when>
 
-        <xsl:variable name="currentPosition" select="count($h[$pos]/preceding-sibling::*)" />
+        <!-- mismatched heading structure detected -->
+        <xsl:when test="$curLvl &gt; 3 and $curLvl - $lvl &gt; 1">
+          <xsl:call-template name="headingStructure">
+            <xsl:with-param name="lvl" select="$lvl"/>
+            <xsl:with-param name="pos" select="$pos"/>
+            <xsl:with-param name="sec" select="$sec"/>
+            <xsl:with-param name="correct" select="0"/>
+          </xsl:call-template>
+        </xsl:when>
 
-        <xsl:variable name="position" select="count(//p[pPr/pStyle[@val='Title' or @val='Heading1' or @val='Heading2' or @val='Heading3']][$pos+1]/preceding-sibling::*)" />
+        <!-- lower level -->
+        <xsl:when test="$curLvl &gt; $lvl">
+          <!-- open section -->
+          <xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
+          <!-- call current-level heading -->
+          <xsl:call-template name="headingStructure">
+            <xsl:with-param name="lvl" select="$curLvl"/>
+            <xsl:with-param name="pos" select="$pos"/>
+            <xsl:with-param name="sec" select="$sec+1"/>
+          </xsl:call-template>
+        </xsl:when>
 
-        <!-- currentPosition <xsl:value-of select="$currentPosition"/> lt <xsl:value-of select="$position"/>
-        x -->
+        <!-- 2+ higher level -->
+        <xsl:when test="$lvl - $curLvl &gt; 1">
+          <!-- close section -->
+          <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+          <!-- call current-level heading keeping level -->
+          <xsl:call-template name="headingStructure">
+            <xsl:with-param name="lvl" select="$lvl -1"/>
+            <xsl:with-param name="pos" select="$pos"/>
+            <xsl:with-param name="sec" select="$sec -1"/>
+          </xsl:call-template>
+        </xsl:when>
 
+        <!-- higher level -->
+        <xsl:when test="$curLvl &lt; $lvl">
+          <!-- close section -->
+          <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+          <!-- call current-level heading -->
+          <xsl:call-template name="headingStructure">
+            <xsl:with-param name="lvl" select="$curLvl"/>
+            <xsl:with-param name="pos" select="$pos"/>
+            <xsl:with-param name="sec" select="$sec -1"/>
+          </xsl:call-template>
+        </xsl:when>
+      </xsl:choose>
 
-        <xsl:apply-templates select="//p[position() &gt; $currentPosition+1 and (position() &lt; $position+1 or $position=0)]"/>
-
-        <xsl:call-template name="h">
-          <xsl:with-param name="lvl" select="$curLvl"/>
-          <xsl:with-param name="pos" select="$pos+1"/>
-          <xsl:with-param name="sec" select="$sec"/>
-        </xsl:call-template>
-      </xsl:if>
-
-      <!-- vnoreni otevre section a next -->
-      <xsl:if test="$curLvl &gt; $lvl">
-        <xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
-        <xsl:call-template name="h">
-          <xsl:with-param name="lvl" select="$curLvl"/>
-          <xsl:with-param name="pos" select="$pos"/>
-          <xsl:with-param name="sec" select="$sec+1"/>
-        </xsl:call-template>
-      </xsl:if>
-
-      <!-- vynoreni uzavre section a next -->
-      <xsl:if test="$curLvl &lt; $lvl">
-        <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
-        <xsl:call-template name="h">
-          <xsl:with-param name="lvl" select="$curLvl"/>
-          <xsl:with-param name="pos" select="$pos"/>
-          <xsl:with-param name="sec" select="$sec -1"/>
-        </xsl:call-template>
-      </xsl:if>
-
-    </xsl:otherwise>
+    </xsl:when>
+    <!-- close all opened section if no further heading -->
+    <xsl:when test="$sec > 0">
+      <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+      <xsl:call-template name="headingStructure">
+        <xsl:with-param name="lvl" select="$lvl"/>
+        <xsl:with-param name="pos" select="$pos"/>
+        <xsl:with-param name="sec" select="$sec -1"/>
+      </xsl:call-template>
+    </xsl:when>
   </xsl:choose>
 
 </xsl:template>
@@ -143,7 +213,7 @@ napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
 <xsl:template match="t" priority="1">
 	<xsl:variable name="bold" select="preceding-sibling::rPr[1]/b"/>
 	<xsl:variable name="italic" select="preceding-sibling::rPr[1]/i"/>
-        <xsl:variable name="strike" select="preceding-sibling::rPr[1]/strike"/>
+  <xsl:variable name="strike" select="preceding-sibling::rPr[1]/strike"/>
 	<xsl:variable name="sup" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'superscript')"/>
 	<xsl:variable name="sub" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'subscript')"/>
 
@@ -191,13 +261,19 @@ napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
 </xsl:template>
 
 
-<xsl:template match="p[pPr/numPr]">
-        <xsl:variable name="styleName" select="./pPr/pStyle/@val"/>
-        <xsl:variable name="theLevel" select="./pPr/numPr/ilvl/@val"/>
-        <xsl:variable name="theNumId" select="./pPr/numPr/numId/@val"/>
+<xsl:template match="p">
+  <p>
+    <xsl:apply-templates select="r"/>
+  </p>
+</xsl:template>
 
-        <xsl:variable name="abstractNumber" select="document($numberingFile)//w:num[@w:numId=$theNumId]/w:abstractNumId/@w:val"/>
-        <xsl:variable name="indentType" select="document($numberingFile)//w:abstractNum[@w:abstractNumId=$abstractNumber]/w:lvl[@w:ilvl=$theLevel]/w:numFmt/@w:val"/>
+<xsl:template match="p[pPr/numPr]">
+  <xsl:variable name="styleName" select="./pPr/pStyle/@val"/>
+  <xsl:variable name="theLevel" select="./pPr/numPr/ilvl/@val"/>
+  <xsl:variable name="theNumId" select="./pPr/numPr/numId/@val"/>
+
+  <xsl:variable name="abstractNumber" select="document($numberingFile)//num[@numId=$theNumId]/abstractNumId/@val"/>
+  <xsl:variable name="indentType" select="document($numberingFile)//abstractNum[@abstractNumId=$abstractNumber]/lvl[@ilvl=$theLevel]/numFmt/@val"/>
 
 
 		<xsl:variable name="listType">
@@ -222,7 +298,7 @@ napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
                                             </xsl:attribute>
                                         </xsl:if> -->
                                         <xsl:apply-templates />
-                                        <xsl:apply-templates select="following-sibling::p[1]" mode='restOfList' />
+                                        <xsl:apply-templates select="following-sibling::p[pPr/numPr][1]" mode='restOfList' />
                                     </xsl:element>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -250,8 +326,8 @@ napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
 
         <xsl:variable name="theLevel" select="./pPr/numPr/ilvl/@val"/>
         <xsl:variable name="theNumId" select="./pPr/numPr/numId/@val"/>
-	<xsl:variable name="abstractNumber" select="document($numberingFile)//w:num[@w:numId=$theNumId]/w:abstractNumId/@w:val"/>
-	<xsl:variable name="indentType" select="document($numberingFile)//w:abstractNum[@w:abstractNumId=$abstractNumber]/w:lvl[@w:ilvl=$theLevel]/w:numFmt/@w:val"/>
+	<xsl:variable name="abstractNumber" select="document($numberingFile)//num[@numId=$theNumId]/abstractNumId/@val"/>
+	<xsl:variable name="indentType" select="document($numberingFile)//abstractNum[@abstractNumId=$abstractNumber]/lvl[@ilvl=$theLevel]/numFmt/@val"/>
 
         <xsl:variable name="listType">
             <xsl:choose>
@@ -315,14 +391,14 @@ napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
 </xsl:template>
 
 <!--
-    <w:hyperlink r:id="rId4" w:history="true">
-        <w:r>
-            <w:rPr>
-                <w:rStyle w:val="Hyperlink"/>
-            </w:rPr>
-            <w:t>hyperlink</w:t>
-        </w:r>
-    </w:hyperlink>
+    <hyperlink r:id="rId4" history="true">
+        <r>
+            <rPr>
+                <rStyle val="Hyperlink"/>
+            </rPr>
+            <t>hyperlink</t>
+        </r>
+    </hyperlink>
 -->
 <!-- Template for hyperlinks -->
   <xsl:template match="hyperlink">
@@ -348,20 +424,20 @@ napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
   </xsl:template>
 
 <!--
-    <w:tbl>
-        <w:tblPr>
-            <w:tblStyle w:val="TableGrid"/>
-            <w:tblW w:type="auto" w:w="0"/>
-            <w:tblLook w:val="04A0"/>
-        </w:tblPr>
-        <w:tblGrid>
-            <w:gridCol w:w="3561"/>
-            <w:gridCol w:w="3561"/>
-            <w:gridCol w:w="3561"/>
-        </w:tblGrid>
-        <w:tr>
-            <w:tc>
-                <w:tcPr>
+    <tbl>
+        <tblPr>
+            <tblStyle val="TableGrid"/>
+            <tblW type="auto" w="0"/>
+            <tblLook val="04A0"/>
+        </tblPr>
+        <tblGrid>
+            <gridCol w="3561"/>
+            <gridCol w="3561"/>
+            <gridCol w="3561"/>
+        </tblGrid>
+        <tr>
+            <tc>
+                <tcPr>
 
  -->
 
@@ -401,7 +477,7 @@ napis <section><h>..</h> ... </section><section><h>..</h> ... </section>
     <xsl:if test="$footnotesFile">
         <xsl:variable name="referenceId" select="@id"/>
         <xsl:variable name="fi" select="document($footnotesFile)"/>
-        <footnote><xsl:value-of select="$fi//w:footnote[@w:id=$referenceId]/w:p//w:r//w:t"/></footnote>
+        <footnote><xsl:value-of select="$fi//footnote[@id=$referenceId]/p//r//t"/></footnote>
     </xsl:if>
 </xsl:template>
 
