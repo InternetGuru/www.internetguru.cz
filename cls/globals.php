@@ -16,6 +16,9 @@ if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are s
 if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files are stored
 
 define('FILES_FOLDER', 'files'); // where web files are stored
+define('IMPORT_FOLDER', FILES_FOLDER .'/import'); // where imported files are stored
+define('THUMBS_FOLDER', FILES_FOLDER .'/thumbs'); // where thumbs files are stored
+define('PICTURES_FOLDER', FILES_FOLDER .'/pictures'); // where pictures files are stored
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 define('FILE_HASH_ALGO', 'crc32b');
@@ -137,22 +140,24 @@ function getFileHash($filePath) {
 function matchFiles($pattern, $dir) {
   $files = array();
   $values = explode(" ",$pattern);
+
   foreach($values as $val) {
-    $f = "$dir/$val";
-    if(file_exists($f)) {
+    $f = findFile($val);
+    if($f) {
       $files[] = $f;
       continue;
     }
-    if(strpos($val,"*") !== false) {
-      $d = pathinfo($f ,PATHINFO_DIRNAME);
-      if(!file_exists($d)) continue;
-      $fp = str_replace("\*",".*",preg_quote(pathinfo($f ,PATHINFO_BASENAME)));
-      foreach(scandir($d) as $f) {
-        if(!preg_match("/^$fp$/", $f)) continue;
-        $files[getFileHash("$d/$f")] = "$d/$f"; // disallowe import same content
-      }
+    if(strpos($val,"*") === false) continue;
+    $f = "$dir/$val";
+    $d = pathinfo($f ,PATHINFO_DIRNAME);
+    if(!file_exists($d)) continue;
+    $fp = str_replace("\*",".*",preg_quote(pathinfo($f ,PATHINFO_BASENAME)));
+    foreach(scandir($d) as $f) {
+      if(!preg_match("/^$fp$/", $f)) continue;
+      $files[getFileHash("$d/$f")] = "$d/$f"; // disallowe import same content
     }
   }
+
   return $files;
 }
 

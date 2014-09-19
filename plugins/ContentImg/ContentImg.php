@@ -15,7 +15,7 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
     foreach($this->getDOMPlus()->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id")) throw new Exception ("Missing id attr in element var");
       if(!$var->hasAttribute("pattern")) throw new Exception ("Missing pattern attr in element var");
-      $images = matchFiles($var->getAttribute("pattern"),FILES_FOLDER . "/thumbs");
+      $images = matchFiles($var->getAttribute("pattern"),THUMBS_FOLDER);
       if(!count($images)) continue;
       $id = $var->getAttribute("id");
       $dom = new DOMDocumentPlus();
@@ -30,7 +30,7 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
           $desc[] = $d->nodeValue;
           continue;
         }
-        $descFor[FILES_FOLDER . "/thumbs/" . $d->getAttribute("for")] = $d->nodeValue;
+        $descFor[THUMBS_FOLDER . "/" . $d->getAttribute("for")] = $d->nodeValue;
       }
       foreach($images as $i) {
         if(--$limit < 0) break;
@@ -51,7 +51,7 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
         $obj->setAttribute("type",$imgInfo["mime"]);
         $obj->setAttribute("title",$title);
 
-        $pic = FILES_FOLDER . "/pictures/" . pathinfo($i,PATHINFO_BASENAME);
+        $pic = PICTURES_FOLDER . "/" . pathinfo($i,PATHINFO_BASENAME);
         if(file_exists($pic) && $this->isSupportedImg($pic)) {
           $a = $dom->createElement("a");
           $a->appendChild($obj);

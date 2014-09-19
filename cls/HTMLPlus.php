@@ -32,7 +32,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHId($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
-    $this->relaxNGValidatePlus();
+    #$this->relaxNGValidatePlus();
     return true;
   }
 

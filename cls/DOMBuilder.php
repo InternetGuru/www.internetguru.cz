@@ -90,7 +90,7 @@ class DOMBuilder {
 
   private function loadDOM($filePath, DOMDocumentPlus $doc) {
     // load
-    if(!$doc->load($filePath))
+    if(!@$doc->load($filePath))
       throw new Exception("Unable to load DOM from file '$filePath'");
     // validate if htmlplus
     try {
@@ -125,18 +125,24 @@ class DOMBuilder {
     $l->finished();
   }
 
-  private function insertHtmlPlus(DOMElement $e, $file) {
+  private function insertHtmlPlus(DOMElement $section, $file) {
     if(in_array($file, $this->imported))
-      throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$e->getAttribute("import")));
+      throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$section->getAttribute("import")));
     $doc = new HTMLPlus();
-    $this->loadDOM($file, $doc);
+    try {
+      $this->loadDOM($file, $doc);
+    } catch(Exception $e) {
+      $doc->loadXML('<?xml version="1.0" encoding="utf-8"?>
+        <body xml:lang="en"><h id="h.abc">Invalid import document</h>
+        <desc/></body>');
+    }
     #todo: validate imported file language
     foreach($doc->documentElement->childNodes as $n) {
-      $e->appendChild($e->ownerDocument->importNode($n,true));
+      $section->appendChild($section->ownerDocument->importNode($n,true));
     }
-    $e->ownerDocument->validateId("id",true);
-    $e->ownerDocument->validateId("link",true);
-    $e->ownerDocument->validatePlus(true);
+    $section->ownerDocument->validateId("id",true);
+    $section->ownerDocument->validateId("link",true);
+    $section->ownerDocument->validatePlus(true);
     $this->imported[] = $file;
   }
 

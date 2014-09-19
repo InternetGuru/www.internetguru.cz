@@ -6,13 +6,19 @@ class Convertor extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     $this->subject = $subject;
-    if($subject->getStatus() != "process") return;
+    if($subject->getStatus() != "preinit") return;
     if(!isset($_GET["import"])) return;
     try {
       $f = $this->getFile();
-      $doc = $this->transformFile($f);
+      $xml = $this->transformFile($f);
+      $doc = new DOMDocumentPlus();
+      $doc->formatOutput = true;
+      $doc->loadXML($xml);
+      #echo $xml;
       echo $doc->saveXML();
-      die();
+      $doc->save("$f.html");
+      #header("Location: ?admin=$f.html");
+      exit();
     } catch(Exception $e) {
       new Logger($e->getMessage(),"warning");
       die($e->getMessage());
@@ -40,8 +46,8 @@ class Convertor extends Plugin implements SplObserver {
       throw new Exception("Invalid link");
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header,$url);
-    if(!is_dir(FILES_FOLDER . "/tmp")) mkdir(FILES_FOLDER . "/tmp");
-    $f = FILES_FOLDER . "/tmp/$filename";
+    if(!is_dir(IMPORT_FOLDER)) mkdir(IMPORT_FOLDER, 0755, true);
+    $f = IMPORT_FOLDER ."/$filename";
     file_put_contents($f, $data);
     return $f;
   }
@@ -72,8 +78,7 @@ class Convertor extends Plugin implements SplObserver {
 
 
   private function transformFile($f) {
-    $dom = new DOMDocumentPlus();
-
+    $dom = new DOMDocument();
     $varFiles = array(
       "headerFile" => "word/header1.xml",
       "footerFile" => "word/footer1.xml",
@@ -83,35 +88,33 @@ class Convertor extends Plugin implements SplObserver {
     );
     $variables = array();
     foreach($varFiles as $varName => $p) {
-      try{
-        $fileSuffix = pathinfo($p, PATHINFO_BASENAME);
-        $file = $f."_$fileSuffix";
-        $dom->loadXML($this->readZippedXML($f, $p));
-        $dom = $this->transform("removePrefix.xsl",$dom);
-        file_put_contents($file, $dom->saveXML());
-        $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
-      } catch(Exception $e){}
+      $fileSuffix = pathinfo($p, PATHINFO_BASENAME);
+      $file = $f."_$fileSuffix";
+      $xml = $this->readZippedXML($f, $p);
+      if(is_null($xml)) continue;
+      $dom->loadXML($xml);
+      $xml = $this->transform("removePrefix.xsl",$dom);
+      file_put_contents($file,$xml);
+      $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
     }
-    //print_r($variables); die();
-
-    $dom->loadXML($this->readZippedXML($f, "word/document.xml"));
-    $dom = $this->transform("removePrefix.xsl",$dom);
-    file_put_contents($f."_document.xml", $dom->saveXML()); // just for debug
-    $dom = $this->transform("docx2html.xsl",$dom, $variables);
-    //$dom = $this->transform("headings.xsl",$dom);
-    return $dom;
+    $xml = $this->readZippedXML($f, "word/document.xml");
+    if(is_null($xml))
+      throw new Exception("Unable to locate word/document.xml in docx");
+    $dom->loadXML($xml);
+    $xml = $this->transform("removePrefix.xsl",$dom);
+    file_put_contents($f."_document.xml",$xml); // just for debug
+    $dom->loadXML($xml);
+    return $this->transform("docx2html.xsl",$dom, $variables);
   }
 
-  private function transform($xslFile, DOMDocument $content, $vars = null) {
+  private function transform($xslFile, DOMDocument $content, $vars = array()) {
     $xsl = $this->getDOMPlus($this->getDir() ."/$xslFile",false,false);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
-    if(!is_null($vars)) foreach($vars as $varName => $path) {
+    foreach($vars as $varName => $path) {
       $proc->setParameter('', $varName, $path);
     }
-    $dom = $proc->transformToDoc($content);
-    $dom->encoding = "utf-8";
-    return $dom;
+    return $proc->transformToXML($content);
   }
 
   private function readZippedXML($archiveFile, $dataFile) {
@@ -121,8 +124,7 @@ class Convertor extends Plugin implements SplObserver {
     if (!$zip->open($archiveFile))
       throw new Exception("Unable to open file");
     // If done, search for the data file in the archive
-    if (!($index = $zip->locateName($dataFile)))
-      throw new Exception("Unable to find data in file");
+    if (!($index = $zip->locateName($dataFile))) return null;
     // If found, read it to the string
     $data = $zip->getFromIndex($index);
     // Close archive file
