@@ -109,7 +109,7 @@
             <xsl:variable name="nextHPos" select="count($h[$pos+1]/preceding-sibling::*)+1" />
             <xsl:if test="$correct">
                <xsl:choose>
-                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and $nextHPos - $curHPos &gt; 1">
+                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">
                   <desc>
                     <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
                   </desc>
@@ -123,7 +123,7 @@
               </xsl:choose>
             </xsl:if>
             <!-- content between headings -->
-            <xsl:apply-templates select="//p[position() &gt; $curHPos+$correct and (position() &lt; $nextHPos or $nextHPos=0)]"/>
+            <xsl:apply-templates select="//p[position() &gt; $curHPos+$correct and (position() &lt; $nextHPos or $nextHPos = $curHPos)]"/>
             <!-- next heading (pos+1) -->
             <xsl:if test="$correct">
               <xsl:call-template name="headingStructure">
