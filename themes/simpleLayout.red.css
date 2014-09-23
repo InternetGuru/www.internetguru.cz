@@ -1,10 +1,10 @@
 h2 {
-  color: #E74C3C;
+  color: #FA573C;
 }
 
 div.cms-balancer a,
 #content > div:first-child {
-  background: #EB6C5F;
+  background: #fa644c;
 }
 
 #content > div:first-child + div,
@@ -13,11 +13,11 @@ div.list, div.cms-balancer {
 }
 
 ol.cms-breadcrumb li a {
-  color: #E74C3C;
+  color: #FA573C;
 }
 
 a:link {
-  color: #CA4638;
+  color: #FA573C;
 }
 
 a:visited {
@@ -25,5 +25,5 @@ a:visited {
 }
 
 #footer {
-  background: #EB6C5F;
+  background: #fa644c;
 }

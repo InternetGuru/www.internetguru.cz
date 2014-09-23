@@ -56,3 +56,13 @@ ol.img li, ul.img li {
   display: inline-block;
   list-style-type: none;
 }
+
+object {
+  max-width: auto;
+  width: 100%;
+}
+
+p object {
+  display: block;
+  margin: 1em auto;
+}
