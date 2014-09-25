@@ -23,6 +23,7 @@
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
   <jsFile readonly="readonly" />
+  <jsFile append="body">plugins/Xhtml11/headingFragment.js</jsFile>
   <favicon>themes/igcms.ico</favicon>
 
 </Xhtml11>
