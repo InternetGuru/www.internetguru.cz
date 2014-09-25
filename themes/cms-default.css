@@ -2,6 +2,10 @@ html {
   -webkit-text-size-adjust: none; /* Never autoresize text */
 }
 
+body {
+  word-wrap: break-word;
+}
+
 code, samp, textarea {
   font-family: "Emilbus Mono","Lucida Console",monospace;
 }

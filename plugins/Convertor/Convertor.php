@@ -1,5 +1,6 @@
 <?php
 
+#bug: infinite loop if gd ends with a list item
 #todo: export
 
 class Convertor extends Plugin implements SplObserver {
@@ -15,9 +16,9 @@ class Convertor extends Plugin implements SplObserver {
       $doc->formatOutput = true;
       $doc->loadXML($xml);
       #echo $xml;
-      echo $doc->saveXML();
+      #echo $doc->saveXML();
       $doc->save("$f.html");
-      #header("Location: ?admin=$f.html");
+      header("Location: ?admin=$f.html");
       exit();
     } catch(Exception $e) {
       new Logger($e->getMessage(),"warning");
