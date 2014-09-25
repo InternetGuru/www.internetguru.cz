@@ -252,18 +252,55 @@
       <xsl:when test="pPr/numPr">
         <!-- mind first list item only -->
         <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)] or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0)">
-          <xsl:call-template name="buildList">
-            <xsl:with-param name="ilvlActual" select="0"/>
-            <xsl:with-param name="i" select="0"/>
-            <xsl:with-param name="ilvl" select="pPr/numPr/ilvl/@val"/>
-            <xsl:with-param name="numId" select="pPr/numPr/numId/@val"/>
-          </xsl:call-template>
+          <xsl:choose>
+            <xsl:when test="count(r) = 1 and r/rPr/b">
+              <!-- definition list if first is bold -->
+              <dl>
+                <dt>
+                  <xsl:copy-of select="r/t/text()"/>
+                </dt>
+                <xsl:call-template name="insertDefListItem">
+                  <xsl:with-param name="i" select="1"/>
+                </xsl:call-template>
+              </dl>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="buildList">
+                <xsl:with-param name="ilvlActual" select="0"/>
+                <xsl:with-param name="i" select="0"/>
+                <xsl:with-param name="ilvl" select="pPr/numPr/ilvl/@val"/>
+                <xsl:with-param name="numId" select="pPr/numPr/numId/@val"/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
         </xsl:if>
       </xsl:when>
       <xsl:otherwise>
         <p><xsl:apply-templates select="r"/></p>
       </xsl:otherwise>
     </xsl:choose>
+  </xsl:template>
+
+  <xsl:template name="insertDefListItem">
+    <xsl:param name="i"/>
+    <xsl:variable name="item" select="following-sibling::p[$i]"/>
+    <xsl:choose>
+      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ((count($item/r) = 1 and $item/r/rPr/b) or (following-sibling::p[$i+1]/pPr/numPr/ilvl/@val > $item/pPr/numPr/ilvl/@val))">
+        <dt>
+          <xsl:copy-of select="$item/r/t/text()"/>
+        </dt>
+      </xsl:when>
+      <xsl:otherwise>
+        <dd>
+          <xsl:apply-templates select="$item/r/t"/>
+        </dd>
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:if test="following-sibling::p[$i+1]/pPr/numPr/numId/@val = $item/pPr/numPr/numId/@val">
+      <xsl:call-template name="insertDefListItem">
+        <xsl:with-param name="i" select="$i+1"/>
+      </xsl:call-template>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template name="buildList">
@@ -326,7 +363,7 @@
         <xsl:element name="li">
           <xsl:choose>
             <xsl:when test="$i=0">
-              <xsl:copy-of select="r/t/text()"/>
+              <xsl:apply-templates select="r/t"/>
             </xsl:when>
             <xsl:otherwise>
               <xsl:copy-of select="following-sibling::p[$i]/r/t/text()"/>
