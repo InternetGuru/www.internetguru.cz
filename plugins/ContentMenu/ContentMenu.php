@@ -65,6 +65,7 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
       }
       if($n->nodeName != "h") continue;
       $li = $content->createElement("li");
+      $parentLink = getRoot();
       $link = null;
       if($n->hasAttribute("link")) {
         $link = $n->getAttribute("link");
