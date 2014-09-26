@@ -117,8 +117,6 @@ ol.cms-breadcrumb li:first-child a {
 
 ol.cms-breadcrumb li:last-child {
   padding-left: 0.2rem;
-  /*text-transform: uppercase;*/
-  /*font-weight: 600;*/
 }
 
 ol.cms-breadcrumb li:not(:first-child) a:before,
@@ -151,8 +149,6 @@ div.list, div.cms-balancer {
 }
 
 #content > div:first-child + div {
-  /*font-weight: 100;*/
-  /*line-height: 1.4em;*/
   margin-top: 0;
   color: black;
 }
@@ -260,4 +256,5 @@ div.cms-balancer a {
 
 #footer > ul.cms-menu > li a:not([href]) {
   background: #EAF2F5;
+  font-weight: 500;
 }
