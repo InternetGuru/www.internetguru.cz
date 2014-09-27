@@ -1,5 +1,5 @@
 *,*:before,*:after {color: black !important; background: transparent !important;}
-h1, h2, h3 {page-break-after: avoid; page-break-inside: avoid;}
+h1, h2, h3 { font-weight: normal; page-break-after: avoid; page-break-inside: avoid;}
 p, ul, ol, dl, div:not(.section) {page-break-inside: avoid;}
 body {font-size:10pt; font-family: Charter, Georgia, sans;}
 @page {size: auto; margin: 21mm 20mm;}
