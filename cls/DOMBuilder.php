@@ -108,41 +108,44 @@ class DOMBuilder {
 
   private function insertImports(HTMLPlus $doc,$filePath) {
     $this->imported[] = $filePath;
-    $sect = array();
+    $headings = array();
     $dir = pathinfo($filePath, PATHINFO_DIRNAME);
-    foreach($doc->getElementsByTagName("section") as $s) {
-      if($s->hasAttribute("import")) $sect[] = $s;
+    foreach($doc->getElementsByTagName("h") as $h) {
+      if($h->hasAttribute("import")) $headings[] = $h;
     }
-    if(!count($sect)) return;
+    if(!count($headings)) return;
     $l = new Logger("Importing HTML+",null,false);
-    foreach($sect as $s) {
-      $files = matchFiles($s->getAttribute("import"),$dir);
-      $s->removeAttribute("import");
+    foreach($headings as $h) {
+      $files = matchFiles($h->getAttribute("import"),$dir);
+      $h->removeAttribute("import");
       if(!count($files)) continue;
-      $s->ownerDocument->removeChildNodes($s);
-      foreach($files as $f) $this->insertHtmlPlus($s,$f);
+      $before = count($this->imported);
+      foreach($files as $f) $this->insertHtmlPlus($h,$f);
+      if($before < count($this->imported)) {
+        $h->ownerDocument->removeUntilSame($h);
+      }
     }
     $l->finished();
   }
 
-  private function insertHtmlPlus(DOMElement $section, $file) {
+  private function insertHtmlPlus(DOMElement $h, $file) {
     if(in_array($file, $this->imported))
-      throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$section->getAttribute("import")));
+      throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$h->getAttribute("import")));
     $doc = new HTMLPlus();
     try {
       $this->loadDOM($file, $doc);
     } catch(Exception $e) {
-      $doc->loadXML('<?xml version="1.0" encoding="utf-8"?>
-        <body xml:lang="en"><h id="h.abc">Invalid import document</h>
-        <desc/></body>');
+      $c = new DOMComment(" invalid import file '$file' ");
+      $h->parentNode->insertBefore($c,$h);
+      return;
     }
     #todo: validate imported file language
     foreach($doc->documentElement->childNodes as $n) {
-      $section->appendChild($section->ownerDocument->importNode($n,true));
+      $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
     }
-    $section->ownerDocument->validateId("id",true);
-    $section->ownerDocument->validateId("link",true);
-    $section->ownerDocument->validatePlus(true);
+    $h->ownerDocument->validateId("id",true);
+    $h->ownerDocument->validateId("link",true);
+    $h->ownerDocument->validatePlus(true);
     $this->imported[] = $file;
   }
 

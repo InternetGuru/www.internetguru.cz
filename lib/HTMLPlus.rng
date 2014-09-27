@@ -9,9 +9,6 @@
       <attribute name="xml:lang">
         <ref name="LanguageCode.datatype"/>
       </attribute>
-      <optional>
-        <attribute name="import"/>
-      </optional>
       <ref name="contentBlock"/>
     </element>
   </start>
@@ -25,9 +22,6 @@
     <optional>
       <element name="section">
         <ref name="Common.attrib"/>
-        <optional>
-          <attribute name="import"/>
-        </optional>
         <oneOrMore>
           <ref name="contentBlock"/>
         </oneOrMore>
@@ -52,6 +46,9 @@
             <param name="pattern">[a-z][a-z0-9_/-]*</param>
           </data>
         </attribute>
+      </optional>
+      <optional>
+        <attribute name="import"/>
       </optional>
       <data type="string">
         <param name="pattern">.*\S.*</param>

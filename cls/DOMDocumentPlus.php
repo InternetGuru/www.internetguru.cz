@@ -147,6 +147,20 @@ class DOMDocumentPlus extends DOMDocument {
     return true;
   }
 
+  public function removeUntilSame(DOMElement $e) {
+    $name = $e->nodeName;
+    $toRemove = array();
+    while(true) {
+      $toRemove[] = $e;
+      $e = $e->nextSibling;
+      if(is_null($e)) break;
+      if($e->nodeName == $name) break;
+    }
+    foreach($toRemove as $e) {
+      $e->parentNode->removeChild($e);
+    }
+  }
+
   public function relaxNGValidatePlus($f) {
     if(!file_exists($f))
       throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
