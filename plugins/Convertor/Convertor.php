@@ -2,6 +2,7 @@
 
 #bug: infinite loop if gd ends with a list item
 #todo: export
+#todo: check document type/mime
 
 class Convertor extends Plugin implements SplObserver {
 
