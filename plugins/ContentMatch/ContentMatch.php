@@ -52,13 +52,14 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->redirToLink($link,$code);
     }
     if($exactMatch->length == 1) return;
-    $link = normalize($link);
+    $newLink = normalize($link);
     $links = array();
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
-    $linkId = $this->findSimilar($links,$link);
-    if(is_null($linkId)) $link = getRoot();
-    else $link = $links[$linkId];
-    $this->redirToLink($link,$code);
+    $linkId = $this->findSimilar($links,$newLink);
+    if(is_null($linkId)) $newLink = getRoot();
+    else $newLink = $links[$linkId];
+    new Logger("Not found (404) redir '$link' to '$newLink'","warning");
+    $this->redirToLink($newLink,$code);
   }
 
   /**
