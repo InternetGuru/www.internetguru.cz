@@ -5,6 +5,14 @@ class Plugin {
   private $doms = array();
   protected $subject = null;
 
+  protected function detachIfNotOS($pluginName) {
+    $os = get_class($this->subject->getCms()->getOutputStrategy());
+    if($os == $pluginName) return false;
+    $this->subject->detach($this);
+    new Logger("Detaching ".get_class($this)." due to unsupported output strategy","warning");
+    return true;
+  }
+
   protected function getDir() {
     return PLUGIN_FOLDER ."/". get_class($this);
   }

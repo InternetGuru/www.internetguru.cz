@@ -2,12 +2,12 @@
 
 # disable if admin
 
-class Slider implements SplObserver {
-  private $cms;
+class Slider extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
-    $this->cms = $subject->getCms();
     if($subject->getStatus() != "process") return;
+    $this->subject = $subject;
+    if($this->detachIfNotOS("Xhtml11")) return;
     if(is_null($this->cms->getOutputStrategy())) {
       $subject->detach($this);
       return;
@@ -16,6 +16,7 @@ class Slider implements SplObserver {
   }
 
   private function init() {
+    #FIXME $this->cms deleted
     $cfg = $this->cms->buildDOM("Slider");
     $setters = array();
     // get js resources

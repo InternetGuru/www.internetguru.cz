@@ -9,6 +9,7 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
+    if($this->detachIfNotOS("Xhtml11")) return;
     $subject->setPriority($this,1);
   }
 

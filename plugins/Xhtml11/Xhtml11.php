@@ -14,7 +14,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   const APPEND_BODY = "body";
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "init") {
+    if($subject->getStatus() == "preinit") {
       $this->subject = $subject;
       $subject->getCms()->setOutputStrategy($this);
     }

@@ -5,8 +5,9 @@
 class GA extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
-    $this->subject = $subject;
     if($subject->getStatus() != "process") return;
+    $this->subject = $subject;
+    if($this->detachIfNotOS("Xhtml11")) return;
     if(isAtLocalhost() || is_null($subject->getCms()->getOutputStrategy())) {
       $subject->detach($this);
       return;
