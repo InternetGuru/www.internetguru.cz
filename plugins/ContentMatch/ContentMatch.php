@@ -3,18 +3,26 @@
 class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
-    if($subject->getCms()->getLink() == "/") {
-      $subject->detach($this);
-      return;
-    }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
     if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
-    $subject->setPriority($this,1);
+    $link = $subject->getCms()->getLink();
+    $this->cfgRedir($link);
+    if($link == "/") {
+      $subject->detach($this);
+      return;
+    }
+    $this->proceed($link);
+  }
+
+  private function cfgRedir($link) {
+    $cfg = $this->getDOMPlus();
+    $dest = $cfg->getElementById($link,"link");
+    if(is_null($dest)) return;
+    $this->proceed($dest->nodeValue,true);
   }
 
   public function getTitle(Array $q) {
-    $this->proceed();
     return $q;
   }
 
@@ -26,20 +34,26 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     return $origContent;
   }
 
-  private function proceed() {
-    $cms = $this->subject->getCms();
-    $xpath = new DOMXPath($cms->getContentFull());
-    $q = "//h[@link='" . $cms->getLink() . "']";
+  private function proceed($link,$cfgRedir=false) {
+    $xpath = new DOMXPath($this->subject->getCms()->getContentFull());
+    $q = "//h[@link='" . $link . "']";
     $exactMatch = $xpath->query($q);
     if($exactMatch->length > 1)
       throw new Exception("Link not unique");
+    if($cfgRedir) {
+      if($exactMatch->length != 1) {
+        new Logger("Destination redir link '$link' not found","warning");
+        if($this->subject->getCms()->getLink() == "/") return;
+        $link = getRoot();
+      }
+      $this->redirToLink($link);
+    }
     if($exactMatch->length == 1) return;
-    $link = normalize($cms->getLink());
+    $link = normalize($link);
     $links = array();
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
     $linkId = $this->findSimilar($links,$link);
-
-    if(is_null($linkId)) $link = "/";
+    if(is_null($linkId)) $link = getRoot();
     else $link = $links[$linkId];
     $this->redirToLink($link);
   }
