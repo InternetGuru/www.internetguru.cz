@@ -51,7 +51,7 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
     return true;
   }
 
-  private function getMenu(HTMLPlus $content, DOMElement $section, $parentLink = ".") {
+  private function getMenu(HTMLPlus $content, DOMElement $section, $parentLink = "/") {
     $ul = $content->createElement("ul");
     $li = null;
     foreach($section->childNodes as $n) {

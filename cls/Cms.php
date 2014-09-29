@@ -11,14 +11,14 @@ class Cms {
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
-  private $link = ".";
+  private $link;
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
     if(isset($_GET["page"])) $this->link = $_GET["page"];
-    if(!strlen(trim($this->link))) $this->link = ".";
+    if(!strlen(trim($this->link))) $this->link = "/";
   }
 
   public function setPlugins(SplSubject $p) {

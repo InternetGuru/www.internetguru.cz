@@ -5,12 +5,11 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private $descriptionQuery = null;
   private $content;
   private $lang = null;
+  private $isRoot;
 
   public function update(SplSubject $subject) {
-    if($subject->getCms()->getLink() == ".") {
-      $subject->detach($this);
-      return;
-    }
+    $this->isRoot = $subject->getCms()->getLink() == "/";
+    if($this->isRoot) return;
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
     if($this->detachIfNotAttached("Xhtml11")) return;
@@ -44,16 +43,19 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getTitle(Array $queries) {
+    if($this->isRoot) return $queries;
     $this->build();
     return $this->titleQueries;
   }
 
   public function getDescription($query) {
+    if($this->isRoot) return $query;
     if(is_null($this->descriptionQuery)) return "/body/desc";
     return $this->descriptionQuery;
   }
 
   public function getContent(HTMLPlus $content) {
+    if($this->isRoot) return $content;
     return $this->content;
   }
 

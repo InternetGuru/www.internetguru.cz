@@ -3,7 +3,7 @@
 class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
-    if($subject->getCms()->getLink() == ".") {
+    if($subject->getCms()->getLink() == "/") {
       $subject->detach($this);
       return;
     }
@@ -39,7 +39,7 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
     $linkId = $this->findSimilar($links,$link);
 
-    if(is_null($linkId)) $link = ".";
+    if(is_null($linkId)) $link = "/";
     else $link = $links[$linkId];
     $this->redirToLink($link);
   }
