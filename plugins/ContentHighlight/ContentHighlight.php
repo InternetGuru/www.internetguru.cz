@@ -11,7 +11,7 @@ class ContentHighlight extends Plugin implements SplObserver, ContentStrategyInt
       $subject->setPriority($this,100);
     }
     if($subject->getStatus() == "init") {
-      $this->detachIfNotOS("Xhtml11");
+      $this->detachIfNotAttached("Xhtml11");
       return;
     }
   }

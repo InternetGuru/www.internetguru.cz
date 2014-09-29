@@ -7,7 +7,7 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    if($this->detachIfNotOS("Xhtml11")) return;
+    if($this->detachIfNotAttached("Xhtml11")) return;
     $subject->setPriority($this,60);
   }
 

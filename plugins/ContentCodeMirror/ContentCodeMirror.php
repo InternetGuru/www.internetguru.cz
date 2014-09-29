@@ -16,7 +16,7 @@ class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyIn
       $subject->setPriority($this,100);
     }
     if($subject->getStatus() == "init") {
-      $this->detachIfNotOS("Xhtml11");
+      $this->detachIfNotAttached("Xhtml11");
       return;
     }
   }

@@ -12,6 +12,10 @@ class Plugins implements SplSubject {
     $this->attachPlugins();
   }
 
+  public function isAttachedPlugin($pluginName) {
+    return array_key_exists($pluginName,$this->observers);
+  }
+
   public function printObservers() {
     stableSort($this->observerPriority);
     print_r($this->observerPriority);
@@ -30,7 +34,7 @@ class Plugins implements SplSubject {
         $this->disabledObservers[$p] = null;
         continue;
       }
-      if(array_key_exists($p,$this->observers)) continue;
+      if($this->isAttachedPlugin($p)) continue;
       $this->attach(new $p);
     }
   }

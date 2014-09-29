@@ -25,6 +25,10 @@ class Cms {
     $this->plugins = $p;
   }
 
+  public function isAttachedPlugin($pluginName) {
+    return $this->plugins->isAttachedPlugin($pluginName);
+  }
+
   public function getLink() {
     return $this->link;
   }
