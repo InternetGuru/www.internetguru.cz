@@ -19,7 +19,10 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     $cfg = $this->getDOMPlus();
     $dest = $cfg->getElementById($link,"link");
     if(is_null($dest)) return;
-    $this->proceed($dest->nodeValue,true);
+    $code = 302;
+    if($dest->hasAttribute("code") && $dest->getAttribute("code") == "permanent")
+      $code = 301;
+    $this->proceed($dest->nodeValue,$code);
   }
 
   public function getTitle(Array $q) {
@@ -34,19 +37,19 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     return $origContent;
   }
 
-  private function proceed($link,$cfgRedir=false) {
+  private function proceed($link,$code=404) {
     $xpath = new DOMXPath($this->subject->getCms()->getContentFull());
     $q = "//h[@link='" . $link . "']";
     $exactMatch = $xpath->query($q);
     if($exactMatch->length > 1)
       throw new Exception("Link not unique");
-    if($cfgRedir) {
+    if($code != 404) {
       if($exactMatch->length != 1) {
         new Logger("Destination redir link '$link' not found","warning");
         if($this->subject->getCms()->getLink() == "/") return;
         $link = getRoot();
       }
-      $this->redirToLink($link);
+      $this->redirToLink($link,$code);
     }
     if($exactMatch->length == 1) return;
     $link = normalize($link);
@@ -55,7 +58,7 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     $linkId = $this->findSimilar($links,$link);
     if(is_null($linkId)) $link = getRoot();
     else $link = $links[$linkId];
-    $this->redirToLink($link);
+    $this->redirToLink($link,$code);
   }
 
   /**
@@ -116,8 +119,8 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     return $this->minLev($sublinks,$link,$limit);
   }
 
-  private function redirToLink($link) {
-    header("Location: $link",true,404);
+  private function redirToLink($link,$code) {
+    header("Location: $link",true,$code);
     header("Refresh: 0; url=$link");
     exit();
   }
