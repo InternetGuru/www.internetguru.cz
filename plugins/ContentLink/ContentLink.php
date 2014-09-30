@@ -8,7 +8,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private $isRoot;
 
   public function update(SplSubject $subject) {
-    $this->isRoot = $subject->getCms()->getLink() == "/";
+    $this->isRoot = $subject->getCms()->getLink() == getRoot();
     if($this->isRoot) return;
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;

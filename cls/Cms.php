@@ -17,8 +17,8 @@ class Cms {
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
-    if(isset($_GET["page"])) $this->link = $_GET["page"];
-    if(!strlen(trim($this->link))) $this->link = "/";
+    $this->link = getRoot();
+    if(isset($_GET["page"])) $this->link .= $_GET["page"];
   }
 
   public function setPlugins(SplSubject $p) {

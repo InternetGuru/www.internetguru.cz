@@ -8,7 +8,7 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
     $link = $subject->getCms()->getLink();
     $this->cfgRedir($link);
-    if($link == "/") {
+    if($link == getRoot()) {
       $subject->detach($this);
       return;
     }
