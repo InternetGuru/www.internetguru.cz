@@ -205,7 +205,7 @@
   <xsl:template match="t" priority="1">
   	<xsl:variable name="bold" select="preceding-sibling::rPr[1]/b"/>
   	<xsl:variable name="italic" select="preceding-sibling::rPr[1]/i"/>
-    <xsl:variable name="strike" select="preceding-sibling::rPr[1]/strike"/>
+    <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike"/>
   	<xsl:variable name="sup" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'superscript')"/>
   	<xsl:variable name="sub" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'subscript')"/>
 
@@ -219,28 +219,28 @@
        -->
 
   	<xsl:choose>
-  		<xsl:when test="$sup and $bold and $italic and $strike"><sup><strike><strong><em><xsl:apply-templates/></em></strong></strike></sup></xsl:when>
-  		<xsl:when test="$sub and $bold and $italic and $strike"><sub><strike><strong><em><xsl:apply-templates /></em></strong></strike></sub></xsl:when>
+  		<xsl:when test="$sup and $bold and $italic and $del"><sup><del><strong><em><xsl:apply-templates/></em></strong></del></sup></xsl:when>
+  		<xsl:when test="$sub and $bold and $italic and $del"><sub><del><strong><em><xsl:apply-templates /></em></strong></del></sub></xsl:when>
   		<xsl:when test="$sup and $bold and $italic"><sup><strong><em><xsl:apply-templates/></em></strong></sup></xsl:when>
   		<xsl:when test="$sub and $bold and $italic"><sub><strong><em><xsl:apply-templates /></em></strong></sub></xsl:when>
-      <xsl:when test="$sup and $bold and $strike"><sup><strong><strike><xsl:apply-templates/></strike></strong></sup></xsl:when>
-  		<xsl:when test="$sub and $bold and $strike"><sub><strong><strike><xsl:apply-templates /></strike></strong></sub></xsl:when>
-      <xsl:when test="$sup and $strike and $italic"><sup><em><strike><xsl:apply-templates/></strike></em></sup></xsl:when>
-  		<xsl:when test="$sub and $strike and $italic"><sub><em><strike><xsl:apply-templates /></strike></em></sub></xsl:when>
+      <xsl:when test="$sup and $bold and $del"><sup><strong><del><xsl:apply-templates/></del></strong></sup></xsl:when>
+  		<xsl:when test="$sub and $bold and $del"><sub><strong><del><xsl:apply-templates /></del></strong></sub></xsl:when>
+      <xsl:when test="$sup and $del and $italic"><sup><em><del><xsl:apply-templates/></del></em></sup></xsl:when>
+  		<xsl:when test="$sub and $del and $italic"><sub><em><del><xsl:apply-templates /></del></em></sub></xsl:when>
   		<xsl:when test="$bold and $italic"><strong><em><xsl:apply-templates /></em></strong></xsl:when>
   		<xsl:when test="$sup and $bold"><sup><strong><xsl:apply-templates /></strong></sup></xsl:when>
   		<xsl:when test="$sub and $bold"><sub><strong><xsl:apply-templates /></strong></sub></xsl:when>
-      <xsl:when test="$bold and $strike"><strong><strike><xsl:apply-templates /></strike></strong></xsl:when>
-  		<xsl:when test="$strike and $italic"><em><strike><xsl:apply-templates /></strike></em></xsl:when>
+      <xsl:when test="$bold and $del"><strong><del><xsl:apply-templates /></del></strong></xsl:when>
+  		<xsl:when test="$del and $italic"><em><del><xsl:apply-templates /></del></em></xsl:when>
   		<xsl:when test="$sup and $italic"><sup><em><xsl:apply-templates /></em></sup></xsl:when>
   		<xsl:when test="$sub and $italic"><sub><em><xsl:apply-templates /></em></sub></xsl:when>
-      <xsl:when test="$strike and $sup"><sup><strike><xsl:apply-templates /></strike></sup></xsl:when>
-  		<xsl:when test="$strike and $sub"><sub><strike><xsl:apply-templates /></strike></sub></xsl:when>
+      <xsl:when test="$del and $sup"><sup><del><xsl:apply-templates /></del></sup></xsl:when>
+  		<xsl:when test="$del and $sub"><sub><del><xsl:apply-templates /></del></sub></xsl:when>
   		<xsl:when test="$bold"><strong><xsl:apply-templates /></strong></xsl:when>
       <xsl:when test="$italic"><em><xsl:apply-templates /></em></xsl:when>
   		<xsl:when test="$sup"><sup><xsl:apply-templates /></sup></xsl:when>
   		<xsl:when test="$sub"><sub><xsl:apply-templates /></sub></xsl:when>
-      <xsl:when test="$strike"><strike><xsl:apply-templates /></strike></xsl:when>
+      <xsl:when test="$del"><del><xsl:apply-templates /></del></xsl:when>
   		<xsl:otherwise><xsl:apply-templates /></xsl:otherwise>
   		<!--<xsl:otherwise><xsl:value-of select="." disable-output-escaping="yes"/></xsl:otherwise>-->
   	</xsl:choose>

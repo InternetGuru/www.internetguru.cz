@@ -56,6 +56,28 @@
     </element>
   </define>
 
+  <!-- <define name="del">
+    <element name="del">
+      <ref name="del.attlist"/>
+      <ref name="Inline.model"/>
+    </element>
+  </define>
+
+  <define name="del.attlist">
+    <ref name="Common.attrib"/>
+  </define>
+
+  <define name="ins">
+    <element name="ins">
+      <ref name="ins.attlist"/>
+      <ref name="Inline.model"/>
+    </element>
+  </define>
+
+  <define name="ins.attlist">
+    <ref name="Common.attrib"/>
+  </define> -->
+
   <define name="desc">
     <element name="desc">
       <ref name="p.attlist"/>
@@ -86,6 +108,7 @@
       <zeroOrMore>
         <ref name="form"/>
       </zeroOrMore>
+
     </interleave>
   </define>
 
