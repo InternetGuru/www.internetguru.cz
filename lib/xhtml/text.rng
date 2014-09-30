@@ -37,6 +37,17 @@
   <ref name="Common.attrib"/>
 </define>
 
+<define name="ins">
+  <element name="ins">
+    <ref name="ins.attlist"/>
+    <ref name="Inline.model"/>
+  </element>
+</define>
+
+<define name="ins.attlist">
+  <ref name="Common.attrib"/>
+</define>
+
 <!-- end IG edit -->
 
 <define name="abbr">
@@ -304,8 +315,13 @@
 
 <define name="Inline.class">
   <choice>
-    <!-- IG edit -->
+    <!--
+      IG edit
+      http://www.w3.org/TR/xhtml1/dtds.html#a_dtd_XHTML-1.0-Strict
+      search: <!ENTITY % misc.inline "ins | del | script">
+    -->
     <ref name="del"/>
+    <ref name="ins"/>
     <!-- end IG edit -->
     <ref name="abbr"/>
     <ref name="acronym"/>
