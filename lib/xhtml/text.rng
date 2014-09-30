@@ -24,6 +24,21 @@
   <ref name="Common.attrib"/>
 </define>
 
+<!-- IG edit -->
+
+<define name="del">
+  <element name="del">
+    <ref name="del.attlist"/>
+    <ref name="Inline.model"/>
+  </element>
+</define>
+
+<define name="del.attlist">
+  <ref name="Common.attrib"/>
+</define>
+
+<!-- end IG edit -->
+
 <define name="abbr">
   <element name="abbr">
     <ref name="abbr.attlist"/>
@@ -221,28 +236,28 @@
     <ref name="Heading.content"/>
   </element>
 </define>
- 
+
 <define name="h2">
   <element name="h2">
     <ref name="Heading.attrib"/>
     <ref name="Heading.content"/>
   </element>
 </define>
- 
+
 <define name="h3">
   <element name="h3">
     <ref name="Heading.attrib"/>
     <ref name="Heading.content"/>
   </element>
 </define>
- 
+
 <define name="h4">
   <element name="h4">
     <ref name="Heading.attrib"/>
     <ref name="Heading.content"/>
   </element>
 </define>
- 
+
 <define name="h5">
   <element name="h5">
     <ref name="Heading.attrib"/>
@@ -260,7 +275,7 @@
 <define name="Heading.attrib">
   <ref name="Common.attrib"/>
 </define>
- 
+
 <define name="Heading.content">
   <ref name="Inline.model"/>
 </define>
@@ -289,6 +304,9 @@
 
 <define name="Inline.class">
   <choice>
+    <!-- IG edit -->
+    <ref name="del"/>
+    <!-- end IG edit -->
     <ref name="abbr"/>
     <ref name="acronym"/>
     <ref name="br"/>
