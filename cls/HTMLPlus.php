@@ -33,6 +33,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateDesc($repair);
     $this->validateHLink($repair);
     $this->validateDates($repair);
+    $this->validateAuthor($repair);
     $this->relaxNGValidatePlus();
     return true;
   }
@@ -120,7 +121,17 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  // mtime > ctime
+  private function validateAuthor($repair) {
+    foreach($this->headings as $h) {
+      if(!$h->hasAttribute("author")) continue;
+      if(strlen(trim($h->getAttribute("author")))) continue;
+      if(!$repair) throw new Exception("Attr 'author' cannot be empty");
+      $h->parentNode->insertBefore(new DOMComment(" empty attr 'author' removed "),$h);
+      $h->removeAttribute("author");
+      $this->autocorrected = true;
+    }
+  }
+
   private function validateDates($repair) {
     foreach($this->headings as $h) {
       $ctime = null;
@@ -132,12 +143,14 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair) throw new Exception("Attribute 'mtime' requires 'ctime'");
         $ctime = $mtime;
         $h->setAttribute("ctime",$ctime);
+        $this->autocorrected = true;
       }
       $ctime_date = $this->createDate($ctime);
       if(is_null($ctime_date)) {
         if(!$repair) throw new Exception("Invalid 'ctime' attribute format");
         $h->parentNode->insertBefore(new DOMComment(" invalid ctime='$ctime' "),$h);
         $h->removeAttribute("ctime");
+        $this->autocorrected = true;
       }
       if(is_null($mtime)) return;
       $mtime_date = $this->createDate($mtime);
@@ -145,11 +158,13 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair) throw new Exception("Invalid 'mtime' attribute format");
         $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
         $h->removeAttribute("mtime");
+        $this->autocorrected = true;
       }
       if($mtime_date < $ctime_date) {
         if(!$repair) throw new Exception("'mtime' cannot be lower than 'ctime'");
         $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
         $h->removeAttribute("mtime");
+        $this->autocorrected = true;
       }
     }
   }
