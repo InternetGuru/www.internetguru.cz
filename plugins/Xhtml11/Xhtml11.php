@@ -59,6 +59,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"viewport","initial-scale=1");
     $this->appendMeta($head,"Content-Language", $lang);
+    $this->appendMeta($head,"author", "[authorName]");
     $this->appendMeta($head,"description", $cms->getDescription());
     $fav = $this->getFavicon($cfg);
     if($fav) $this->appendLinkElement($head,$fav,"shortcut icon");
