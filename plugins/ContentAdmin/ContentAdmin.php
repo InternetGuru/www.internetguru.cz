@@ -35,7 +35,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    $this->adminLink = $subject->getCms()->getLink()."?admin";
+    $this->adminLink = getRoot().$subject->getCms()->getLink()."?admin";
     try {
       $this->setDefaultFile();
       $this->dataFile = $this->getDataFile();
@@ -72,7 +72,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("heading",$cms->getTitle(),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
-    $newContent->insertVar("link",$cms->getLink(),"ContentAdmin");
+    $newContent->insertVar("link",getRoot().$cms->getLink(),"ContentAdmin");
     $newContent->insertVar("linkAdmin",$la,"ContentAdmin");
     $newContent->insertVar("linkAdminStatus","$la&$statusChange","ContentAdmin");
 
