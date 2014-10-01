@@ -51,7 +51,9 @@
         <attribute name="import"/>
       </optional>
       <optional>
-        <attribute name="author"/>
+        <attribute name="author">
+          <param name="pattern">.*\S.*</param>
+        </attribute>
       </optional>
       <optional>
         <attribute name="mtime">
