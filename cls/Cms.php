@@ -11,14 +11,13 @@ class Cms {
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
-  private $link;
+  private $link = ""; // empty for no link
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
-    $this->link = getRoot();
-    if(isset($_GET["page"])) $this->link .= $_GET["page"];
+    if(isset($_GET["page"])) $this->link = $_GET["page"];
   }
 
   public function setPlugins(SplSubject $p) {
@@ -57,10 +56,21 @@ class Cms {
     $xpath = new DOMXPath($this->contentFull);
     foreach($this->titleQueries as $q) {
       $r = $xpath->query($q)->item(0);
-      if($r->hasAttribute("short") && count($this->titleQueries) > 1) $title[] = $r->getAttribute("short");
+      if($r->hasAttribute("short") && count($this->titleQueries) > 1)
+        $title[] = $r->getAttribute("short");
       else $title[] = $r->nodeValue;
     }
     return implode(" - ",$title);
+  }
+
+  public function getAuthor() {
+    $xpath = new DOMXPath($this->contentFull);
+    foreach($this->titleQueries as $q) {
+      $a = $xpath->query("$q/@author")->item(0);
+      if(is_null($a)) continue;
+      return $a->nodeValue;
+    }
+    return null;
   }
 
   public function getDescription() {
@@ -111,19 +121,6 @@ class Cms {
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }
-
-/*  public function setContentStrategy(ContentStrategyInterface $strategy, $priority=10) {
-    $s = get_class($strategy);
-    $this->contentStrategy[$s] = $strategy;
-    $this->contentStrategyPriority[$s] = $priority;
-  }*/
-
-/*  public function setContentStrategyPriority(ContentStrategyInterface $strategy, $priority) {
-    $s = get_class($strategy);
-    if(!array_key_exists($s,$this->contentStrategy))
-      throw new Exception("Strategy '$s' not attached");
-    $this->contentStrategyPriority[$s] = $priority;
-  }*/
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
     $this->outputStrategy = $strategy;

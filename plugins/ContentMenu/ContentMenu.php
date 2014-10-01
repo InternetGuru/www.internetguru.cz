@@ -76,7 +76,7 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
         $a->nodeValue = $n->getAttribute("short");
         $a->setAttribute("title",$n->nodeValue);
       }
-      if($this->subject->getCms()->getLink() == $link) {
+      if($this->subject->getCms()->getLink() === $link) {
         $a->setAttribute("class","current");
       } else {
         if(!is_null($link)) $a->setAttribute("href",$link);
