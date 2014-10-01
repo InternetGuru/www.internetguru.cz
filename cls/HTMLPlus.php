@@ -32,6 +32,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHId($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
+    $this->validateDates($repair);
     $this->relaxNGValidatePlus();
     return true;
   }
@@ -117,6 +118,49 @@ class HTMLPlus extends DOMDocumentPlus {
         $this->autocorrected = true;
       }
     }
+  }
+
+  // mtime > ctime
+  private function validateDates($repair) {
+    foreach($this->headings as $h) {
+      $ctime = null;
+      $mtime = null;
+      if($h->hasAttribute("ctime")) $ctime = $h->getAttribute("ctime");
+      if($h->hasAttribute("mtime")) $mtime = $h->getAttribute("mtime");
+      if(is_null($ctime) && is_null($mtime)) continue;
+      if(is_null($ctime)) {
+        if(!$repair) throw new Exception("Attribute 'mtime' requires 'ctime'");
+        $ctime = $mtime;
+        $h->setAttribute("ctime",$ctime);
+      }
+      $ctime_date = $this->createDate($ctime);
+      if(is_null($ctime_date)) {
+        if(!$repair) throw new Exception("Invalid 'ctime' attribute format");
+        $h->parentNode->insertBefore(new DOMComment(" invalid ctime='$ctime' "),$h);
+        $h->removeAttribute("ctime");
+      }
+      if(is_null($mtime)) return;
+      $mtime_date = $this->createDate($mtime);
+      if(is_null($mtime_date)) {
+        if(!$repair) throw new Exception("Invalid 'mtime' attribute format");
+        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
+        $h->removeAttribute("mtime");
+      }
+      if($mtime_date < $ctime_date) {
+        if(!$repair) throw new Exception("'mtime' cannot be lower than 'ctime'");
+        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
+        $h->removeAttribute("mtime");
+      }
+    }
+  }
+
+  private function createDate($d) {
+    $date = DateTime::createFromFormat(DateTime::W3C, $d);
+    $date_errors = DateTime::getLastErrors();
+    if($date_errors['warning_count'] + $date_errors['error_count'] > 0) {
+      return null;
+    }
+    return $date;
   }
 
   private function generateUniqueId() {

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<grammar xmlns="http://relaxng.org/ns/structure/1.0">
+
+  <define name="ins">
+    <element name="ins">
+      <ref name="ins.attlist"/>
+      <ref name="ins.content"/>
+    </element>
+  </define>
+  <define name="ins.attlist">
+    <ref name="Common.attrib"/>
+  </define>
+  <define name="ins.content">
+    <ref name="Inline.model"/>
+  </define>
+  <define name="del">
+    <element name="del">
+      <ref name="del.attlist"/>
+      <ref name="del.content"/>
+    </element>
+  </define>
+  <define name="del.attlist">
+    <ref name="Common.attrib"/>
+  </define>
+  <define name="del.content">
+    <ref name="Inline.model"/>
+  </define>
+  <define name="Inline.class" combine="choice">
+    <ref name="ins"/>
+    <ref name="del"/>
+  </define>
+
+</grammar>

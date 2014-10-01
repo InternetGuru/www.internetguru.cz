@@ -50,16 +50,39 @@
       <optional>
         <attribute name="import"/>
       </optional>
+      <optional>
+        <attribute name="author"/>
+      </optional>
+      <optional>
+        <attribute name="mtime">
+          <ref name="datetime"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="ctime">
+          <ref name="datetime"/>
+        </attribute>
+      </optional>
       <data type="string">
         <param name="pattern">.*\S.*</param>
       </data>
     </element>
   </define>
 
+  <define name="datetime">
+    <data type="string">
+      <!-- 2004-02-12T15:19:21+00:00 -->
+      <param name="pattern">(19|20)\d\d-(0[1-9]|1[012])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00</param>
+    </data>
+  </define>
+
   <define name="desc">
     <element name="desc">
       <ref name="p.attlist"/>
       <ref name="Inline.model"/>
+      <optional>
+        <attribute name="kw"/>
+      </optional>
     </element>
   </define>
 
