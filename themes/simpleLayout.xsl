@@ -20,11 +20,11 @@
           <div><xsl:copy-of select="/body/p[contains(@class,'description')]" /></div>
         </xsl:if>
 
-        <xsl:apply-templates select="/body/*[not(
+        <xsl:copy-of select="node()[not(
           self::h1 or
           self::p[contains(@class,'description')] or
           self::ol[contains(@class,'cms-breadcrumb')] or
-          self::ul[contains(@class,'cms-menu')] )]" />
+          self::ul[contains(@class,'cms-menu')] )]"/>
 
       </div>
 
@@ -38,13 +38,7 @@
     </body>
   </xsl:template>
 
-  <!-- delete remaining empty descriptions -->
-  <xsl:template match="//p[contains(@class,'description') and not(string-length(text()))]"/>
-
-  <xsl:template match="node()|@*">
-    <xsl:copy>
-      <xsl:apply-templates select="node()|@*"/>
-    </xsl:copy>
-  </xsl:template>
+  <!-- skip (delete) remaining empty descriptions -->
+  <!-- <xsl:template match="//p[contains(@class,'description') and not(string-length(text()))]"/> -->
 
 </xsl:stylesheet>
