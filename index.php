@@ -10,7 +10,7 @@ include('cls/globals.php');
 
 try {
 
-  $l = new Logger("CMS init");
+  $l = new Logger("CMS init " . dirname(__FILE__));
 
   // register core variables
   $cms = new Cms();
