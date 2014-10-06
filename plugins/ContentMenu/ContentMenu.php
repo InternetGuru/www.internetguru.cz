@@ -11,14 +11,6 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
     $subject->setPriority($this,60);
   }
 
-  public function getTitle(Array $queries) {
-    return $queries;
-  }
-
-  public function getDescription($query) {
-    return $query;
-  }
-
   public function getContent(HTMLPlus $content) {
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());

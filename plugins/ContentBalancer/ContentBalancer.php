@@ -58,27 +58,6 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     throw new Exception("Unable to find parent heading for {$h->nodeValue}");
   }
 
-  /*
-  private function filterPublic(DOMElement $parent) {
-    foreach($parent->childNodes as $e) if($e->nodeType == 1) $nodes[] = $e;
-    foreach($nodes as $e) {
-      if($e->nodeName == "section") {
-        $this->filterPublic($e);
-        continue;
-      }
-      if(!$e->hasAttribute("public")) $parent->removeChild($e);
-    }
-  }
-  */
-
-  public function getTitle(Array $queries) {
-    return $queries;
-  }
-
-  public function getDescription($q) {
-    return $q;
-  }
-
 }
 
 ?>

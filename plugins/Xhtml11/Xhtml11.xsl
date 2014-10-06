@@ -15,7 +15,6 @@
       <xsl:copy-of select="@*[
         name() != 'short' and
         name() != 'link' and
-        name() != 'keywords' and
         name() != 'public' and
         name() != 'author' and
         name() != 'ctime' and
@@ -26,7 +25,7 @@
 
   <xsl:template match="//desc">
       <p class="description">
-        <xsl:copy-of select="@*"/>
+      <xsl:copy-of select="@*[name() != 'kw']"/>
         <xsl:apply-templates/>
       </p>
   </xsl:template>

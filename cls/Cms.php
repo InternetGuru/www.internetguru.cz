@@ -51,43 +51,6 @@ class Cms {
     $this->loadContent();
   }
 
-  public function getTitle() {
-    $title = array();
-    $xpath = new DOMXPath($this->contentFull);
-    foreach($this->titleQueries as $q) {
-      $r = $xpath->query($q)->item(0);
-      if($r->hasAttribute("short") && count($this->titleQueries) > 1)
-        $title[] = $r->getAttribute("short");
-      else $title[] = $r->nodeValue;
-    }
-    return implode(" - ",$title);
-  }
-
-  public function getAuthor() {
-    $xpath = new DOMXPath($this->contentFull);
-    foreach($this->titleQueries as $q) {
-      $a = $xpath->query("$q/@author")->item(0);
-      if(is_null($a)) continue;
-      return $a->nodeValue;
-    }
-    return null;
-  }
-
-  public function getDescription() {
-    $query = "/body/desc";
-    foreach($this->plugins->getContentStrategies() as $cs) {
-      $query = $cs->getDescription($query);
-    }
-    $xpath = new DOMXPath($this->contentFull);
-    return $xpath->query($query)->item(0)->nodeValue;
-  }
-
-  public function getLanguage() {
-    if(!is_null($this->content)) $h = $this->content;
-    else $h = $this->contentFull;
-    return $h->getElementsByTagName("body")->item(0)->getAttribute("xml:lang");
-  }
-
   public function getConfig() {
     return $this->config;
   }
@@ -100,13 +63,13 @@ class Cms {
     if(is_null($this->contentFull)) throw new Exception("Content not set");
     if(!is_null($this->content)) throw new Exception("Should not run twice");
     $this->content = clone $this->contentFull;
-    $contentStrategies = $this->plugins->getContentStrategies();
-    foreach($contentStrategies as $cs) {
-      $this->titleQueries = $cs->getTitle($this->titleQueries);
-    }
+    #$contentStrategies = $this->plugins->getContentStrategies();
+    #foreach($contentStrategies as $cs) {
+    #  $this->titleQueries = $cs->getTitle($this->titleQueries);
+    #}
     try {
       $cs = null;
-      foreach($contentStrategies as $cs) {
+      foreach($this->plugins->getIsInterface("ContentStrategyInterface") as $cs) {
         $c = $cs->getContent($this->content);
         #echo $c->saveXML(); die();
         if(!($c instanceof HTMLPlus))
@@ -117,7 +80,7 @@ class Cms {
     } catch (Exception $e) {
       #var_dump($cs);
       #echo $this->content->saveXML();
-      #echo $c->saveXML();
+      echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }

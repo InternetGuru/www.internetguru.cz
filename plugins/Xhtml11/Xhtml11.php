@@ -27,11 +27,41 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   public function getOutput(HTMLPlus $content) {
     $cms = $this->subject->getCms();
     $cfg = $this->getDOMPlus();
-    $lang = $cms->getLanguage();
-    $title = $cms->getTitle();
     $this->registerThemes($cfg);
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
+
+    $h1 = $content->getElementsByTagName("h")->item(0);
+    $variables = array();
+    $isi = $this->subject->getIsInterface("InputStrategyInterface");
+    foreach($isi as $k => $o) {
+      $variables = array_merge($variables,$o->getVariables());
+    }
+    if(!array_key_exists("lang", $variables)) {
+      $body = $content->getElementsByTagName("body")->item(0);
+      $variable["lang"] = $body->getAttribute("xml:lang");
+    }
+    if(!array_key_exists("title", $variables)) {
+      if($h1->hasAttribute("short")) $variables["title"] = $h1->getAttribute("short");
+      else $variables["title"] = $h1->nodeValue;
+    }
+    if(!array_key_exists("author", $variables)) {
+      if($h1->hasAttribute("author")) $variables["author"] = $h1->getAttribute("author");
+    }
+    if(!array_key_exists("ctime", $variables)) {
+      if($h1->hasAttribute("ctime")) $variables["ctime"] = $h1->getAttribute("ctime");
+    }
+    if(!array_key_exists("mtime", $variables)) {
+      if($h1->hasAttribute("mtime")) $variables["mtime"] = $h1->getAttribute("mtime");
+    }
+    if(!array_key_exists("desc", $variables)) {
+      $d = $content->getElementsByTagName("desc")->item(0);
+      $variables["desc"] = $d->nodeValue;
+    }
+    if(!array_key_exists("kw", $variables)) {
+      $d = $content->getElementsByTagName("desc")->item(0);
+      if($d->hasAttribute("kw")) $variables["kw"] = $d->getAttribute("kw");
+    }
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
@@ -45,23 +75,26 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // add root element
     $html = $doc->createElement("html");
     $html->setAttribute("xmlns","http://www.w3.org/1999/xhtml");
-    $html->setAttribute("xml:lang",$lang);
-    $html->setAttribute("lang",$lang);
+    $html->setAttribute("xml:lang",$variable["lang"]);
+    $html->setAttribute("lang",$variable["lang"]);
     $doc->appendChild($html);
 
     // add head element
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title",$title));
+    $head->appendChild($doc->createElement("title",$variables["title"]));
     // Firefox localhost hack: <meta charset="utf-8"/>
     // from https://github.com/webpack/webpack-dev-server/issues/1
     #$this->appendMeta($head,"charset","utf-8"); // not helping
     #$this->appendMetaCharset($head,"utf-8"); // helping, but invalid
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"viewport","initial-scale=1");
-    $this->appendMeta($head,"Content-Language", $lang);
-    $author = $cms->getAuthor();
-    if(!is_null($author)) $this->appendMeta($head, "author", $author);
-    $this->appendMeta($head,"description", $cms->getDescription());
+    $this->appendMeta($head,"Content-Language", $variable["lang"]);
+    if(array_key_exists("author", $variables))
+      $this->appendMeta($head, "author", $variables["author"]);
+    if(array_key_exists("desc", $variables))
+      $this->appendMeta($head, "description", $variables["desc"]);
+    if(array_key_exists("kw", $variables))
+      $this->appendMeta($head, "keywords", $variables["kw"]);
     $fav = $this->getFavicon($cfg);
     if($fav) $this->appendLinkElement($head,$fav,"shortcut icon");
     $this->appendJsFiles($head);

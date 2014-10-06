@@ -37,14 +37,6 @@ class ContentHighlight extends Plugin implements SplObserver, ContentStrategyInt
     return $content;
   }
 
-  public function getTitle(Array $q) {
-    return $q;
-  }
-
-  public function getDescription($q) {
-    return $q;
-  }
-
 }
 
 ?>

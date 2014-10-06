@@ -1,6 +1,6 @@
 <?php
 
-class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterface {
+class ContentMatch extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "init") return;
@@ -23,18 +23,6 @@ class ContentMatch extends Plugin implements SplObserver, ContentStrategyInterfa
     if($dest->hasAttribute("code") && $dest->getAttribute("code") == "permanent")
       $code = 301;
     $this->proceed($dest->nodeValue,$code);
-  }
-
-  public function getTitle(Array $q) {
-    return $q;
-  }
-
-  public function getDescription($q) {
-    return $q;
-  }
-
-  public function getContent(HTMLPlus $origContent) {
-    return $origContent;
   }
 
   private function proceed($link,$code=404) {

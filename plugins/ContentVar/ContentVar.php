@@ -19,14 +19,6 @@ class ContentVar extends Plugin implements SplObserver, ContentStrategyInterface
     return $content;
   }
 
-  public function getTitle(Array $queries) {
-    return $queries;
-  }
-
-  public function getDescription($q) {
-    return $q;
-  }
-
 }
 
 ?>

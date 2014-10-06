@@ -1,11 +1,10 @@
 <?php
 
-class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $titleQueries = array();
-  private $descriptionQuery = null;
-  private $content;
+class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface, InputStrategyInterface {
   private $lang = null;
   private $isRoot;
+  private $variables = array();
+  private $headings;
 
   public function update(SplSubject $subject) {
     $this->isRoot = $subject->getCms()->getLink() == "";
@@ -16,49 +15,116 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $subject->setPriority($this,2);
   }
 
-  private function build() {
-    if(!is_null($this->descriptionQuery)) throw new Exception("Should not run twice");
-    $cms = $this->subject->getCms();
-    $xpath = new DOMXPath($cms->getContentFull());
-    $exactMatch = $xpath->query("//h[@link='" . $cms->getLink() . "']");
-    if($exactMatch->length != 1)
-      throw new Exception("No unique exact match found for link '{$cms->getLink()}'");
-    if($exactMatch->item(0)->parentNode->nodeName != "section") {
-      $this->content = $cms->getContentFull();
-      return;
+  public function getContent(HTMLPlus $c) {
+    if($this->isRoot) return $c;
+    $cf = $this->subject->getCms()->getContentFull();
+    $link = $this->subject->getCms()->getLink();
+    $curH = $cf->getElementById($link,"link");
+    if(is_null($curH))
+      throw new Exception("No unique exact match found for link '$link'");
+
+    $this->setPath($curH);
+    $this->setTitle();
+    $this->setBc($link);
+
+    $this->setAncestorAttribute($curH, "author");
+    $this->setAncestorAttribute($curH->parentNode, "xml:lang");
+    if(!$curH->parentNode->hasAttribute("xml:lang")) {
+      $bodyLang = $curH->ownerDocument->documentElement->getAttribute("xml:lang");
+      $curH->parentNode->setAttribute("xml:lang",$bodyLang);
     }
-    $this->content = new HTMLPlus();
-    $this->content->formatOutput = true;
-    $body = $this->content->appendChild($this->content->createElement("body"));
-    foreach($exactMatch->item(0)->parentNode->attributes as $attName => $attNode) {
-      $body->setAttributeNode($this->content->importNode($attNode));
+    $this->setAncestorAttribute($curH, "ctime");
+    $this->setAncestorAttribute($curH, "mtime");
+    $this->setAncestorValue($curH->nextSibling);
+    $this->setAncestorAttribute($curH->nextSibling, "kw");
+
+    $content = new HTMLPlus();
+    $content->formatOutput = true;
+    $body = $content->appendChild($content->createElement("body"));
+    foreach($curH->parentNode->attributes as $attName => $attNode) {
+      $body->setAttributeNode($content->importNode($attNode));
     }
-    $this->appendUntil($exactMatch->item(0),$body);
-    $this->addTitleQueries($exactMatch->item(0));
-    if($body->hasAttribute("xml:lang")) return;
-    if(is_null($this->lang)) {
-      $this->lang = $cms->getContentFull()->documentElement->getAttribute("xml:lang");
+    $this->appendUntilSame($curH,$body);
+
+    return $content;
+  }
+
+  private function setPath(DOMElement $h) {
+    while(!is_null($h)) {
+      $this->headings[] = $h;
+      $h = $h->ownerDocument->getParentSibling($h);
     }
-    $body->setAttribute("xml:lang",$this->lang);
   }
 
-  public function getTitle(Array $queries) {
-    if($this->isRoot) return $queries;
-    $this->build();
-    return $this->titleQueries;
+  private function setTitle() {
+    $subtitles = array();
+    foreach($this->headings as $h) {
+      if($h->hasAttribute("short")) {
+        $subtitles[] = $h->getAttribute("short");
+        continue;
+      }
+      $subtitles[] = $h->nodeValue;
+    }
+    $this->variables["title"] = implode(" - ", $subtitles);
   }
 
-  public function getDescription($query) {
-    if($this->isRoot) return $query;
-    if(is_null($this->descriptionQuery)) return "/body/desc";
-    return $this->descriptionQuery;
+  private function setBc($curLink) {
+    $first = true;
+    $bc = new DOMDocumentPlus();
+    $ol = $bc->appendChild($bc->createElement("ol"));
+    foreach(array_reverse($this->headings) as $h) {
+      $content = $h->nodeValue;
+      if($h->hasAttribute("short")) {
+        $content = $h->getAttribute("short");
+      }
+      $li = $ol->appendChild($bc->createElement("li"));
+      if(!$this->hasLink($first,$h,$curLink)) {
+        $li->nodeValue = $content;
+        continue;
+      }
+      if($first) {
+        $first = false;
+        $href = getRoot();
+      } else {
+        $href = getRoot() . $h->getAttribute("link");
+      }
+      $a = $li->appendChild($bc->createElement("a",$content));
+      $a->setAttribute("href",$href);
+      if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
+      else $a->setAttribute("title",$h->nodeValue);
+    }
+    $this->variables["breadcrumb"] = $bc;
   }
 
-  public function getContent(HTMLPlus $content) {
-    if($this->isRoot) return $content;
-    return $this->content;
+  private function hasLink($first,DOMElement $h, $curLink) {
+    if($first) return true;
+    if(!$h->hasAttribute("link")) return false;
+    return $h->getAttribute("link") != $curLink;
   }
 
+  private function setAncestorAttribute(DOMElement $e, $aName) {
+    while(!$e->hasAttribute($aName)) {
+      $ps = $e->ownerDocument->getParentSibling($e);
+      if(is_null($ps)) return;
+      if($ps->hasAttribute($aName)) $e->setAttribute($aName,$ps->getAttribute($aName));
+      $e = $ps;
+    }
+  }
+
+  private function setAncestorValue(DOMElement $e) {
+    while(!strlen($e->nodeValue)) {
+      $ps = $e->ownerDocument->getParentSibling($e);
+      if(is_null($ps)) return;
+      if(strlen($ps->nodeValue)) $e->nodeValue = $ps->nodeValue;
+      $e = $ps;
+    }
+  }
+
+  public function getVariables() {
+    return $this->variables;
+  }
+
+  /*
   private function addTitleQueries(DOMElement $h) {
     $this->titleQueries[] = $h->getNodePath();
     $e = $h->parentNode;
@@ -75,31 +141,13 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     if(is_null($e)) $this->titleQueries[] = "/body/h";
   }
+  */
 
-  /**
-   * Add first non-empty (parent) description
-   * @param  DOMElement $h starting level
-   * @return void
-   */
-  private function createDescription(DOMElement $d) {
-    if(strlen($d->nodeValue)) {
-      $this->descriptionQuery = $d->getNodePath();
-      return;
-    }
-    $e = $d->parentNode;
-    if($e->nodeName == "section") while(($e = $e->previousSibling) !== null) {
-      if($e->nodeName != "desc") continue;
-      $this->createDescription($e);
-      break;
-    }
-  }
-
-  private function appendUntil(DOMElement $e,DOMElement $into) {
+  private function appendUntilSame(DOMElement $e, DOMElement $into) {
     $doc = $into->ownerDocument;
     $into->appendChild($doc->importNode($e,true));
     $untilName = $e->nodeName;
     while(($e = $e->nextSibling) !== null) {
-      if($e->nodeName == "desc") $this->createDescription($e);
       if($e->nodeName == $untilName) break;
       $into->appendChild($doc->importNode($e,true));
     }

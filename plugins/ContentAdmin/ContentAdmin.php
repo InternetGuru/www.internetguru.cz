@@ -294,14 +294,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     exit;
   }
 
-  public function getTitle(Array $q) {
-    return $q;
-  }
-
-  public function getDescription($q) {
-    return $q;
-  }
-
 }
 
 ?>

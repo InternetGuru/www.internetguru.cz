@@ -35,14 +35,6 @@ class TOC extends Plugin implements SplObserver, ContentStrategyInterface {
     return $c;
   }
 
-  public function getTitle(Array $q) {
-    return $q;
-  }
-
-  public function getDescription($q) {
-    return $q;
-  }
-
 }
 
 ?>

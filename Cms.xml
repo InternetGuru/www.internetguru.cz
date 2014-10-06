@@ -15,17 +15,18 @@
   <plugin>Backup</plugin>
   <plugin>ContentAdmin</plugin>
   <plugin>ContentBalancer</plugin>
-  <plugin>ContentBreadcrumb</plugin>
+  <!-- <plugin>ContentBreadcrumb</plugin> -->
   <plugin>ContentCodeMirror</plugin>
   <plugin>ContentHighlight</plugin>
   <plugin>ContentImg</plugin>
   <plugin>ContentLink</plugin>
   <plugin>ContentMatch</plugin>
-  <plugin>ContentMenu</plugin>
+  <!-- <plugin>ContentMenu</plugin> -->
   <!-- <plugin>ContentPublic</plugin> -->
   <plugin>ContentVar</plugin>
   <plugin>Convertor</plugin>
   <plugin>GA</plugin>
+  <plugin>InputVar</plugin>
   <plugin>TOC</plugin>
   <!-- <plugin>Slider</plugin> -->
   <plugin>Xhtml11</plugin>

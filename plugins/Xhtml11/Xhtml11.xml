@@ -7,9 +7,9 @@
       <xslt>themes/defaultLayout.xsl</xslt>
     </theme>
     <theme id="simple">
-      <xslt>themes/lists.xsl</xslt>
-      <xslt>themes/simpleLayout.xsl</xslt>
-      <stylesheet media="screen">themes/simple.css</stylesheet>
+      <!-- <xslt>themes/lists.xsl</xslt> -->
+      <!-- <xslt>themes/simpleLayout.xsl</xslt> -->
+      <!-- <stylesheet media="screen">themes/simple.css</stylesheet> -->
     </theme>
     <theme id="custom"/>
   </themes>

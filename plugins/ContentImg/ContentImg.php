@@ -80,14 +80,6 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
     return true;
   }
 
-  public function getTitle(Array $queries) {
-    return $queries;
-  }
-
-  public function getDescription($q) {
-    return $q;
-  }
-
 }
 
 ?>

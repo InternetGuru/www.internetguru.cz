@@ -83,11 +83,11 @@ class Plugins implements SplSubject {
     $this->status = null;
   }
 
-  public function getContentStrategies() {
+  public function getIsInterface($itf) {
     $contentStrategies = array();
     stableSort($this->observerPriority);
     foreach ($this->observerPriority as $key => $p) {
-      if(!$this->observers[$key] instanceOf ContentStrategyInterface) continue;
+      if(!$this->observers[$key] instanceOf $itf) continue;
       $contentStrategies[$key] = $this->observers[$key];
     }
     return $contentStrategies;
@@ -97,8 +97,10 @@ class Plugins implements SplSubject {
 
 interface ContentStrategyInterface {
   public function getContent(HTMLPlus $content);
-  public function getTitle(Array $queries);
-  public function getDescription($query);
+}
+
+interface InputStrategyInterface {
+  public function getVariables();
 }
 
 ?>
