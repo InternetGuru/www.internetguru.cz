@@ -101,9 +101,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendCssFiles($head);
     $html->appendChild($head);
 
+    $proc = new XSLTProcessor();
+    $proc->setParameter('',$variables);
+
+
     // transform content and add as body element
     foreach($this->transformations as $xslt => $user) {
-      $content = $this->transform($content,$xslt,$user);
+      $content = $this->transform($content,$xslt,$user,$proc);
     }
     $content->encoding="utf-8";
     $content = $doc->importNode($content->documentElement,true);
@@ -164,10 +168,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     return $theme->item(0)->nodeValue;
   }
 
-  private function transform(DOMDocument $content,$fileName,$user) {
+  private function transform(DOMDocument $content,$fileName,$user, XSLTProcessor $proc) {
     $db = $this->subject->getCms()->getDomBuilder();
     $xsl = $db->buildDOMPlus($fileName,true,$user);
-    $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     return $proc->transformToDoc($content);
   }

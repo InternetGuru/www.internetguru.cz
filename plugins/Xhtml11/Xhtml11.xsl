@@ -2,8 +2,12 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
   <xsl:strip-space elements="p desc"/>
 
+  <xsl:param name="kw"/>
+  <xsl:param name="breadcrumb"/>
+
   <xsl:template match="body">
     <body>
+      <xsl:text disable-output-escaping="yes"><xsl:copy-of select="$breadcrumb"/></xsl:text>
       <xsl:copy-of select="@*[name()!='xml:lang']"/>
       <xsl:apply-templates/>
     </body>

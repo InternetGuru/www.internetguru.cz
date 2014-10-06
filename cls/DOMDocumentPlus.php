@@ -250,5 +250,9 @@ class DOMDocumentPlus extends DOMDocument {
     $e->parentNode->parentNode->replaceChild($newParent,$e->parentNode);
   }
 
+  public function __toString() {
+    return $this->saveXML();
+  }
+
 }
 ?>
