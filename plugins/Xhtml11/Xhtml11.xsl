@@ -24,12 +24,14 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="//desc">
+  <xsl:template match="//desc[string-length(text()) > 0]">
       <p class="description">
       <xsl:copy-of select="@*[name() != 'kw']"/>
         <xsl:apply-templates/>
       </p>
   </xsl:template>
+
+  <xsl:template match="//desc[string-length(text()) = 0]"/>
 
   <xsl:template match="//ul[contains(@class,'cms-balancer')]">
     <xsl:element name="div">
@@ -88,18 +90,6 @@
     </xsl:for-each>
     </div>
   </xsl:template>
-
-  <!--xsl:template match="//p/ul">
-    <xsl:text disable-output-escaping="yes">&lt;/p></xsl:text><ul>
-      <ul><xsl:apply-templates/></ul>
-    </ul><xsl:text disable-output-escaping="yes">&lt;p></xsl:text>
-  </xsl:template-->
-
-  <!--xsl:template match="following-sibling:://p/node()">
-    <xsl:text disable-output-escaping="yes">&lt;/p></xsl:text>
-    <xsl:copy><xsl:apply-templates select="node()|@*"/></xsl:copy>
-    <xsl:text disable-output-escaping="yes">&lt;p></xsl:text>
-  </xsl:template-->
 
   <xsl:template match="node()|@*">
     <xsl:copy>

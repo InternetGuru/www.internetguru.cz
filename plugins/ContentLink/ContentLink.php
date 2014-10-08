@@ -72,6 +72,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $first = true;
     $bc = new DOMDocumentPlus();
     $ol = $bc->appendChild($bc->createElement("ol"));
+    $ol->setAttribute("class","cms-breadcrumb");
     foreach(array_reverse($this->headings) as $h) {
       $content = $h->nodeValue;
       if($h->hasAttribute("short")) {

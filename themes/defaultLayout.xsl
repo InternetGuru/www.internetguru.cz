@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <xsl:param name="kw" select="."/>
-  <xsl:param name="breadcrumb" select="."/>
+  <xsl:param name="kw" select="''"/>
+  <xsl:param name="breadcrumb" select="''"/>
   <xsl:param name="menu" select="''"/>
 
   <xsl:template match="/body">
@@ -20,19 +20,6 @@
       </div>
     </body>
   </xsl:template>
-
-  <!-- <xsl:template name="menu_link">
-    <ul>
-    <xsl:for-each select="//h2">
-      <li>
-        <xsl:element name="a">
-          <xsl:attribute name="href">#<xsl:value-of select="@id"/></xsl:attribute>
-          <xsl:value-of select="@title"/>
-        </xsl:element>
-      </li>
-    </xsl:for-each>
-    </ul>
-  </xsl:template> -->
 
   <xsl:template match="node()|@*">
     <xsl:copy>
