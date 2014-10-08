@@ -251,7 +251,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function __toString() {
-    return $this->saveXML();
+    return $this->saveHTML();
   }
 
 }

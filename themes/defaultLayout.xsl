@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+  <xsl:param name="kw" select="."/>
+  <xsl:param name="breadcrumb" select="."/>
+  <xsl:param name="menu" select="''"/>
+
   <xsl:template match="/body">
     <body>
       <xsl:copy-of select="@*"/>
       <div id="header">
-        <xsl:choose>
-          <xsl:when test="count(ol[contains(@class,'cms-breadcrumb')]/li)>1">
-            <xsl:copy-of select="ol[contains(@class,'cms-breadcrumb')]"/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:text disable-output-escaping="yes">&lt;!-- empty --&gt;</xsl:text>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:value-of disable-output-escaping="yes" select="$breadcrumb"/>
       </div>
       <div id="content">
-        <xsl:apply-templates select="*[not(self::ol[contains(@class,'cms-breadcrumb')] or self::ul[contains(@class,'cms-menu')])]" />
+        <xsl:apply-templates/>
       </div>
       <div id="footer">
-        <xsl:copy-of select="ul[contains(@class,'cms-menu')]"/>
+        <xsl:value-of disable-output-escaping="yes" select="$menu"/>
         <ul><li>©2014 internetguru.cz</li></ul>
       </div>
     </body>
