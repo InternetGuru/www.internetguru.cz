@@ -3,7 +3,7 @@
 
   <xsl:param name="kw" select="''"/>
   <xsl:param name="breadcrumb" select="''"/>
-  <xsl:param name="menu" select="''"/>
+  <xsl:param name="menu" select="'xxxx'"/>
 
   <xsl:template match="/body">
     <body>

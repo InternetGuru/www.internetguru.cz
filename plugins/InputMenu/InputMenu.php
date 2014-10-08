@@ -2,7 +2,7 @@
 
 #TODO: title
 
-class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterface {
+class InputMenu extends Plugin implements SplObserver, InputStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "init") return;
@@ -11,16 +11,16 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
     $subject->setPriority($this,60);
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function getVariables() {
+    $doc = new DOMDocumentPlus();
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());
-    $menu = $this->getMenu($content,$xpath->query("/body/section")->item(0));
-    if(is_null($menu)) return $content;
+    $menu = $this->getMenu($doc,$xpath->query("/body/section")->item(0));
+    if(is_null($menu)) return array();
     $menu->setAttribute("class","cms-menu");
-    $s = $content->documentElement->getElementsByTagName("section")->item(0);
-    $content->documentElement->insertBefore($menu,$s);
     $this->trimList($menu);
-    return $content;
+    $doc->appendChild($menu);
+    return array("menu" => $doc);
   }
 
   private function trimList(DOMElement $ul) {
@@ -43,27 +43,28 @@ class ContentMenu extends Plugin implements SplObserver, ContentStrategyInterfac
     return true;
   }
 
-  private function getMenu(HTMLPlus $content, DOMElement $section, $parentLink = "/") {
-    $ul = $content->createElement("ul");
+  private function getMenu(DOMDocumentPlus $doc, DOMElement $section, $parentLink = null) {
+    if(is_null($parentLink)) $parentLink = getRoot();
+    $ul = $doc->createElement("ul");
     $li = null;
     foreach($section->childNodes as $n) {
       if($n->nodeType != 1) continue;
       if($n->nodeName == "section") {
-        $menu = $this->getMenu($content,$n,$parentLink);
+        $menu = $this->getMenu($doc,$n,$parentLink);
         if(!is_null($menu)) {
           $li->appendChild($menu);
         }
         continue;
       }
       if($n->nodeName != "h") continue;
-      $li = $content->createElement("li");
+      $li = $doc->createElement("li");
       $parentLink = getRoot();
       $link = null;
       if($n->hasAttribute("link")) {
         $link = $n->getAttribute("link");
         $parentLink = $link;
       }
-      $a = $content->createElement("a",$n->nodeValue);
+      $a = $doc->createElement("a",$n->nodeValue);
       if($n->hasAttribute("short")) {
         $a->nodeValue = $n->getAttribute("short");
         $a->setAttribute("title",$n->nodeValue);

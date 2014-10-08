@@ -104,7 +104,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $proc = new XSLTProcessor();
     $proc->setParameter('',$variables);
 
-
     // transform content and add as body element
     foreach($this->transformations as $xslt => $user) {
       $content = $this->transform($content,$xslt,$user,$proc);
