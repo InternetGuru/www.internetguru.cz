@@ -73,21 +73,25 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $bc = new DOMDocumentPlus();
     $ol = $bc->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class","cms-breadcrumb");
+    $parentLink = getRoot();
     foreach(array_reverse($this->headings) as $h) {
       $content = $h->nodeValue;
       if($h->hasAttribute("short")) {
         $content = $h->getAttribute("short");
       }
       $li = $ol->appendChild($bc->createElement("li"));
-      if(!$this->hasLink($first,$h,$curLink)) {
+      if($h->hasAttribute("link") && $h->getAttribute("link") == $curLink) {
         $li->nodeValue = $content;
         continue;
       }
       if($first) {
         $first = false;
         $href = getRoot();
-      } else {
+      } elseif($h->hasAttribute("link")) {
         $href = getRoot() . $h->getAttribute("link");
+        $parentLink = $href;
+      } else {
+        $href = $parentLink ."#". $h->getAttribute("id");
       }
       $a = $li->appendChild($bc->createElement("a",$content));
       $a->setAttribute("href",$href);
@@ -95,12 +99,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       else $a->setAttribute("title",$h->nodeValue);
     }
     $this->variables["breadcrumb"] = $bc;
-  }
-
-  private function hasLink($first,DOMElement $h, $curLink) {
-    if($first) return true;
-    if(!$h->hasAttribute("link")) return false;
-    return $h->getAttribute("link") != $curLink;
   }
 
   private function setAncestorAttribute(DOMElement $e, $aName) {
