@@ -1,5 +1,6 @@
 <?php
 
+#TODO: link2var
 #TODO: singleton contentXpath, contentFullXpath
 #TODO: outputStrategy interface
 #TODO: default outputStrategy (ignore methods)
@@ -14,6 +15,7 @@ class Cms {
   private $link = ""; // empty for no link
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
+  private $variables = array();
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
@@ -80,17 +82,50 @@ class Cms {
     } catch (Exception $e) {
       #var_dump($cs);
       #echo $this->content->saveXML();
-      echo $c->saveXML();
+      #echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
+    $this->loadVariables();
   }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
     $this->outputStrategy = $strategy;
   }
 
+  private function loadVariables() {
+    $this->loadDefaultVariables();
+    $isi = $this->plugins->getIsInterface("InputStrategyInterface");
+    foreach($isi as $k => $o) {
+      $this->variables = array_merge($this->variables,$o->getVariables());
+    }
+  }
+
+  private function loadDefaultVariables() {
+    $desc = $this->content->getElementsByTagName("desc")->item(0);
+    $h1 = $this->content->getElementsByTagName("h")->item(0);
+    $this->variables["cms-link"] = getRoot() . $this->getLink();
+    $this->variables["cms-lang"] = $this->content->getElementsByTagName("body")->item(0)->getAttribute("xml:lang");
+    $this->variables["cms-desc"] = $desc->nodeValue;
+    if($h1->hasAttribute("short")) $this->variables["cms-title"] = $h1->getAttribute("short");
+    else $this->variables["cms-title"] = $h1->nodeValue;
+    if($h1->hasAttribute("author")) $this->variables["cms-author"] = $h1->getAttribute("author");
+    if($desc->hasAttribute("kw")) $this->variables["cms-kw"] = $desc->getAttribute("author");
+    if($h1->hasAttribute("mtime")) $this->variables["cms-mtime"] = $h1->getAttribute("mtime");
+    if($h1->hasAttribute("ctime")) $this->variables["cms-ctime"] = $h1->getAttribute("ctime");
+    #TODO: load others
+  }
+
   private function loadContent() {
     $this->contentFull = $this->domBuilder->buildHTMLPlus("Content.html");
+  }
+
+  public function getVariable($name) {
+    if(!array_key_exists($name, $this->variables)) return null;
+    return $this->variables[$name];
+  }
+
+  public function getAllVariables() {
+    return $this->variables;
   }
 
   public function getOutput() {

@@ -20,7 +20,7 @@ class InputMenu extends Plugin implements SplObserver, InputStrategyInterface {
     $menu->setAttribute("class","cms-menu");
     $this->trimList($menu);
     $doc->appendChild($menu);
-    return array("menu" => $doc);
+    return array("cms-menu" => $doc);
   }
 
   private function trimList(DOMElement $ul) {

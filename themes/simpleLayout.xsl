@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <xsl:param name="kw" select="''"/>
-  <xsl:param name="breadcrumb" select="''"/>
-  <xsl:param name="menu" select="'xxxx'"/>
+  <xsl:param name="cms-title" select="''"/>
+  <xsl:param name="cms-breadcrumb" select="''"/>
+  <xsl:param name="cms-menu" select="''"/>
+  <xsl:param name="cms-lang" select="''"/>
+  <xsl:param name="cms-author" select="''"/>
+  <xsl:param name="cms-desc" select="''"/>
+  <xsl:param name="cms-kw" select="''"/>
+  <xsl:param name="cms-ctime" select="''"/>
+  <xsl:param name="cms-mtime" select="''"/>
+  <xsl:param name="cms-link" select="''"/>
 
   <xsl:template match="/body">
     <body>
@@ -12,7 +19,7 @@
         <xsl:apply-templates/>
       </div>
       <div id="footer">
-        <xsl:value-of disable-output-escaping="yes" select="$menu"/>
+        <xsl:value-of disable-output-escaping="yes" select="$cms-menu"/>
         <ul>
           <li>©2014 <a href="http://www.internetguru.cz">InternetGuru</a></li>
         </ul>
@@ -24,7 +31,7 @@
     <div>
       <div>
         <xsl:copy-of select="."/>
-        <xsl:value-of disable-output-escaping="yes" select="$breadcrumb"/>
+        <xsl:value-of disable-output-escaping="yes" select="$cms-breadcrumb"/>
       </div>
     </div>
   </xsl:template>

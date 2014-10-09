@@ -65,7 +65,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       }
       $subtitles[] = $h->nodeValue;
     }
-    $this->variables["title"] = implode(" - ", $subtitles);
+    $this->variables["cms-title"] = implode(" - ", $subtitles);
   }
 
   private function setBc($curLink) {
@@ -98,7 +98,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
       else $a->setAttribute("title",$h->nodeValue);
     }
-    $this->variables["breadcrumb"] = $bc;
+    $this->variables["cms-breadcrumb"] = $bc;
   }
 
   private function setAncestorAttribute(DOMElement $e, $aName) {
