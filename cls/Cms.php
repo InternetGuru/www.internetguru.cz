@@ -124,6 +124,10 @@ class Cms {
     return $this->variables[$name];
   }
 
+  public function setVariable($name, $value) {
+    $this->variables[$name] = $value;
+  }
+
   public function getAllVariables() {
     return $this->variables;
   }

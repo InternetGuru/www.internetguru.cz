@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
-  <var id="creation">$link na téma lékařství, $date:</var>
-
+  <var id="hash" fn="hash">$cms-author</var>
   <var id="link" fn="local_link" href="$hash">$cms-author</var>
   <var id="date" fn="date" format="m Y" date="$cms-ctime"/>
-  <var id="hash" fn="hash">$cms-author</var>
+
+  <var id="creation">$link na téma lékařství, $date:</var>
+
 </InputVar>

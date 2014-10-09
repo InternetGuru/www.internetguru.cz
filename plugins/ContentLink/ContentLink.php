@@ -1,9 +1,8 @@
 <?php
 
-class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface, InputStrategyInterface {
+class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface {
   private $lang = null;
   private $isRoot;
-  private $variables = array();
   private $headings;
 
   public function update(SplSubject $subject) {
@@ -65,7 +64,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       }
       $subtitles[] = $h->nodeValue;
     }
-    $this->variables["cms-title"] = implode(" - ", $subtitles);
+    $this->subject->getCms()->setVariable("cms-title", implode(" - ", $subtitles));
   }
 
   private function setBc($curLink) {
@@ -98,7 +97,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
       else $a->setAttribute("title",$h->nodeValue);
     }
-    $this->variables["cms-breadcrumb"] = $bc;
+    $this->subject->getCms()->setVariable("cms-breadcrumb", $bc);
   }
 
   private function setAncestorAttribute(DOMElement $e, $aName) {
@@ -117,10 +116,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       if(strlen($ps->nodeValue)) $e->nodeValue = $ps->nodeValue;
       $e = $ps;
     }
-  }
-
-  public function getVariables() {
-    return $this->variables;
   }
 
   /*

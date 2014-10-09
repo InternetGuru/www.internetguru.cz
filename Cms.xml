@@ -22,7 +22,7 @@
   <plugin>ContentLink</plugin>
   <plugin>ContentMatch</plugin>
   <!-- <plugin>ContentMenu</plugin> -->
-  <plugin>InputMenu</plugin>
+  <plugin>GlobalMenu</plugin>
   <!-- <plugin>ContentPublic</plugin> -->
   <plugin>ContentVar</plugin>
   <plugin>Convertor</plugin>
