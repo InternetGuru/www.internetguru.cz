@@ -13,39 +13,46 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function parseVar(DOMElement $var) {
-    // function
     if($var->hasAttribute("fn")) switch($var->getAttribute("fn")) {
       case "hash":
-      $value = hash("crc32b", $this->parse($var->nodeValue));
-      $this->subject->getCms()->setVariable($var->getAttribute("id"),$value);
+      $value = $this->fnHash($var);
       break;
       case "local_link":
-      $href = getRoot();
-      $title = null;
-      if($var->hasAttribute("href")) $href .= $this->parse($var->getAttribute("href"));
-      if($var->hasAttribute("title")) $title = $var->getAttribute("title");
-      $value = "<a href='$href'" . (is_null($title) ? "" : " title='$title'")
-      . ">" . $this->parse($var->nodeValue) . "</a>";
-      $this->subject->getCms()->setVariable($var->getAttribute("id"),$value);
+      $value = $this->fnLocal_link($var);
       break;
       case "date":
-      $format = "n/j/Y";
-      if($var->hasAttribute("format")) $format = $var->getAttribute("format");
-      $time = false;
-      if($var->hasAttribute("date")) $time = strtotime($this->parse($var->getAttribute("date")));
-      if(!$time) $date = strftime($format);
-      else $date = strftime($format,$time);
-      if($date === false) {
+      $value = $this->fnDate($var);
+      if($value === false) {
         new Logger("Unrecognized date value or format","error");
         return;
       }
-      $this->subject->getCms()->setVariable($var->getAttribute("id"),$date);
       break;
     } else {
       $value = $this->parse($var->nodeValue);
-      $this->subject->getCms()->setVariable($var->getAttribute("id"),$value);
     }
+    $this->subject->getCms()->setVariable($var->getAttribute("id"),$value);
+  }
 
+  private function fnHash(DOMElement $var) {
+    return hash("crc32b", $this->parse($var->nodeValue));
+  }
+
+  private function fnLocal_link(DOMElement $var) {
+    $href = getRoot();
+    $title = null;
+    if($var->hasAttribute("href")) $href .= $this->parse($var->getAttribute("href"));
+    if($var->hasAttribute("title")) $title = $var->getAttribute("title");
+    return "<a href='$href'" . (is_null($title) ? "" : " title='$title'")
+    . ">" . $this->parse($var->nodeValue) . "</a>";
+  }
+
+  private function fnDate(DOMElement $var) {
+    $format = "n/j/Y";
+    if($var->hasAttribute("format")) $format = $var->getAttribute("format");
+    $time = false;
+    if($var->hasAttribute("date")) $time = strtotime($this->parse($var->getAttribute("date")));
+    if(!$time) return strftime($format);
+    return strftime($format,$time);
   }
 
   private function parse($string) {
