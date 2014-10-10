@@ -9,6 +9,7 @@
     <display_errors>1</display_errors>
     <!-- <display_errors>0</display_errors> -->
     <use_cache>1</use_cache>
+    <locale cat="LC_ALL">cs_CZ.utf8</locale>
   </environmental>
 
   <!-- <plugin readonly="readonly"/> -->

@@ -50,6 +50,13 @@ class Cms {
     $tz = $this->config->getElementsByTagName("timezone")->item(0)->nodeValue;
     if(!date_default_timezone_set($tz))
       throw new Exception("Unable to set date_default_timezone to value '$er'");
+    $loc = $this->config->getElementsByTagName("locale")->item(0);
+    $cat = $loc->getAttribute("cat");
+    if(@constant($cat) === null)
+      throw new Exception("Undefined constatnt '$cat' used in locale");
+    setlocale(constant($cat), $loc->nodeValue);
+    if(isAtLocalhost() && $loc->nodeValue == 'cs_CZ.utf8')
+      setlocale(constant($cat), "czech");
     $this->loadContent();
   }
 

@@ -2,7 +2,7 @@
 <InputVar>
   <var id="hash" fn="hash">$cms-author</var>
   <var id="link" fn="local_link" href="$hash">$cms-author</var>
-  <var id="date" fn="date" format="m Y" date="$cms-ctime"/>
+  <var id="date" fn="date" format="%B %Y" date="$cms-ctime"/>
 
   <var id="creation">$link na téma lékařství, $date:</var>
 
