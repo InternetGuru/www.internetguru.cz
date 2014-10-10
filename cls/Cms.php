@@ -8,7 +8,6 @@
 class Cms {
 
   private $domBuilder; // DOMBuilder
-  private $config; // DOMDocument
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
@@ -39,29 +38,32 @@ class Cms {
   }
 
   public function init() {
-    $this->config = $this->domBuilder->buildDOMPlus("Cms.xml");
-    $er = $this->config->getElementsByTagName("error_reporting")->item(0)->nodeValue;
-    if(@constant($er) === null) // keep outside if to check value
+    $cfg = $this->domBuilder->buildDOMPlus("Cms.xml")->getElementsByTagName("environmental");
+    $env = null;
+    foreach($cfg as $e) {
+      if($e->hasAttribute("domain")) {
+        if($e->getAttribute("domain") == getDomain()) {
+          $env = $e;
+          break;
+        }
+      } else $env = $e;
+    }
+    $er = $env->getElementsByTagName("error_reporting")->item(0)->nodeValue;
+    if(@constant($er) === null)
       throw new Exception("Undefined constatnt '$er' used in error_reporting");
     error_reporting(constant($er));
-    $er = $this->config->getElementsByTagName("display_errors")->item(0)->nodeValue;
+    $er = $env->getElementsByTagName("display_errors")->item(0)->nodeValue;
     if(ini_set("display_errors", 1) === false)
       throw new Exception("Unable to set display_errors to value '$er'");
-    $tz = $this->config->getElementsByTagName("timezone")->item(0)->nodeValue;
+    $tz = $env->getElementsByTagName("timezone")->item(0)->nodeValue;
     if(!date_default_timezone_set($tz))
       throw new Exception("Unable to set date_default_timezone to value '$er'");
-    $loc = $this->config->getElementsByTagName("locale")->item(0);
+    $loc = $env->getElementsByTagName("locale")->item(0);
     $cat = $loc->getAttribute("cat");
     if(@constant($cat) === null)
       throw new Exception("Undefined constatnt '$cat' used in locale");
     setlocale(constant($cat), $loc->nodeValue);
-    if(isAtLocalhost() && $loc->nodeValue == 'cs_CZ.utf8')
-      setlocale(constant($cat), "czech");
     $this->loadContent();
-  }
-
-  public function getConfig() {
-    return $this->config;
   }
 
   public function getContentFull() {

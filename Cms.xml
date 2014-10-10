@@ -2,12 +2,17 @@
 <Cms>
 
   <environmental readonly="readonly"/>
-  <environmental>
+  <environmental domain="localhost">
     <error_reporting>E_ALL</error_reporting>
-    <!-- <error_reporting>E_ERROR</error_reporting> -->
     <timezone>Europe/Prague</timezone>
     <display_errors>1</display_errors>
-    <!-- <display_errors>0</display_errors> -->
+    <use_cache>1</use_cache>
+    <locale cat="LC_ALL">czech</locale><!-- http://myego.cz/item/php-setlocale-strftime-a-utf-8 -->
+  </environmental>
+  <environmental>
+    <error_reporting>E_ERROR</error_reporting>
+    <timezone>Europe/Prague</timezone>
+    <display_errors>0</display_errors>
     <use_cache>1</use_cache>
     <locale cat="LC_ALL">cs_CZ.utf8</locale>
   </environmental>
@@ -16,15 +21,12 @@
   <plugin>Backup</plugin>
   <plugin>ContentAdmin</plugin>
   <plugin>ContentBalancer</plugin>
-  <!-- <plugin>ContentBreadcrumb</plugin> -->
   <plugin>ContentCodeMirror</plugin>
   <plugin>ContentHighlight</plugin>
   <plugin>ContentImg</plugin>
   <plugin>ContentLink</plugin>
   <plugin>ContentMatch</plugin>
-  <!-- <plugin>ContentMenu</plugin> -->
   <plugin>GlobalMenu</plugin>
-  <!-- <plugin>ContentPublic</plugin> -->
   <plugin>ContentVar</plugin>
   <plugin>Convertor</plugin>
   <plugin>GA</plugin>
