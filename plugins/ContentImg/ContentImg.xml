@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentImg>
 
-  <!-- default variables -->
-  <var id="all" pattern="*.jpg">
-    <desc>Example description of first matched file</desc>
-    <desc for="a.jpg">Example description of file named a.jpg</desc>
-  </var>
+  <desc id="a.jpg">Example description of file named a.jpg</desc>
 
 </ContentImg>

@@ -17,10 +17,9 @@ class GlobalMenu extends Plugin implements SplObserver {
     $cms = $this->subject->getCms();
     $xpath = new DOMXPath($cms->getContentFull());
     $menu = $this->getMenu($doc,$xpath->query("/body/section")->item(0));
-    if(is_null($menu)) return array();
+    $doc->appendChild($menu);
     $menu->setAttribute("class","cms-menu");
     $this->trimList($menu);
-    $doc->appendChild($menu);
     $cms->setVariable("cms-menu", $doc);
   }
 
@@ -34,6 +33,7 @@ class GlobalMenu extends Plugin implements SplObserver {
       }
     }
     if($currentLink || $deepLink) return true;
+    if($ul->isSameNode($ul->ownerDocument->documentElement)) return true;
     $ul->parentNode->removeChild($ul);
     return false;
   }
