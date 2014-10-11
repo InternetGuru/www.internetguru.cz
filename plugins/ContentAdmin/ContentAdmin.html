@@ -5,18 +5,18 @@
   <ol class="errors">
     <li var="ContentAdmin:errors"/>
   </ol>
-  <form action="" method="post" var="ContentAdmin:linkAdmin@action">
+  <form action="#" method="post" var="ContentAdmin:linkAdmin@action">
     <fieldset><legend>Výchozí soubor</legend>
       <blockcode var="ContentAdmin:defaultContent">n/a</blockcode>
     </fieldset>
-    <fieldset class="contentadmin-nohide"><legend>Uživatelský soubor, mód <samp var="ContentAdmin:mode"/>, stav <samp var="ContentAdmin:status"/><span var="ContentAdmin:statusChange"> (<a href="" var="ContentAdmin:linkAdminStatus@href">změnit stav</a>)</span></legend>
+    <fieldset class="contentadmin-nohide"><legend>Uživatelský soubor, mód <samp var="ContentAdmin:mode"/>, stav <samp var="ContentAdmin:status"/><span var="ContentAdmin:statusChange"> (<a href="#" var="ContentAdmin:linkAdminStatus@href">změnit stav</a>)</span></legend>
       <textarea cols="40" name="content" rows="20" var="ContentAdmin:classType@class ContentAdmin:content">n/a</textarea>
       <input name="userfilehash" type="hidden" value="" var="ContentAdmin:userfilehash@value"/>
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít" title="Ctrl+Shift+S"/></li>
         <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
-        <li><a href="" var="ContentAdmin:linkAdmin@href">Zahodit změny</a></li>
-        <li><a href="" var="ContentAdmin:link@href">Zahodit změny a odejít</a></li>
+        <li><a href="#" var="ContentAdmin:linkAdmin@href">Zahodit změny</a></li>
+        <li><a href="#" var="ContentAdmin:link@href">Zahodit změny a odejít</a></li>
       </ul>
     </fieldset>
     <fieldset><legend>Výsledek, mód <samp var="ContentAdmin:mode"/></legend>

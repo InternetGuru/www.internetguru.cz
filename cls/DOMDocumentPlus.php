@@ -95,7 +95,8 @@ class DOMDocumentPlus extends DOMDocument {
         $e->setAttribute($attr,$varValue);
         return;
       }
-      $e->setAttribute($attr,$e->getAttribute($attr)." ".$varValue);
+      if($attr == "class") $varValue = $e->getAttribute($attr)." ".$varValue;
+      $e->setAttribute($attr,$varValue);
       return;
     }
     $varValue = htmlspecialchars($varValue);
@@ -223,36 +224,6 @@ class DOMDocumentPlus extends DOMDocument {
     foreach($var->childNodes as $n) $children[] = $n;
     foreach($children as $n) $e->appendChild($n);
   }
-
-  private function XinsertVarDOMElement(DOMElement $varValue,DOMElement $e) {
-    $newParent = $e->parentNode->cloneNode();
-    $e->ownerDocument->importNode($newParent);
-    $children = array();
-    foreach($e->parentNode->childNodes as $ch) $children[] = $ch;
-    foreach($children as $ch) {
-      if(!$ch->isSameNode($e)) {
-        $newParent->appendChild($ch);
-        continue;
-      }
-      $parts = explode($varName,$ch->nodeValue);
-      foreach($parts as $id => $part) {
-        $newParent->appendChild($e->ownerDocument->createTextNode($part));
-        if((count($parts)-1) == $id) continue; // (not here) txt1 (here) txt2 (here) txt3 (not here)
-        $append = array();
-        foreach($varValue as $n) {
-          if($n->nodeType === 1) $append[] = $n;
-        }
-        foreach($append as $n) {
-          $newParent->appendChild($e->ownerDocument->importNode($n,true));
-        }
-      }
-    }
-    $e->parentNode->parentNode->replaceChild($newParent,$e->parentNode);
-  }
-
-  #public function __toString() {
-  #  return $this->saveHTML();
-  #}
 
 }
 ?>

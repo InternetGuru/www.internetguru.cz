@@ -15,6 +15,7 @@ class Cms {
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
   private $variables = array();
+  const DEBUG = true;
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
@@ -91,7 +92,7 @@ class Cms {
     } catch (Exception $e) {
       #var_dump($cs);
       #echo $this->content->saveXML();
-      #echo $c->saveXML();
+      if(self::DEBUG) echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
     $this->loadVariables();
