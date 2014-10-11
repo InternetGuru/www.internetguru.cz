@@ -59,7 +59,7 @@ class GlobalMenu extends Plugin implements SplObserver {
       }
       if($n->nodeName != "h") continue;
       $li = $doc->createElement("li");
-      $parentLink = getRoot();
+      $parentLink = null;
       $link = null;
       if($n->hasAttribute("link")) {
         $link = $n->getAttribute("link");
@@ -73,9 +73,9 @@ class GlobalMenu extends Plugin implements SplObserver {
       if($this->subject->getCms()->getLink() === $link) {
         $a->setAttribute("class","current");
       } else {
-        if(!is_null($link)) $a->setAttribute("href",$link);
+        if(!is_null($link)) $a->setAttribute("href",getRoot().$link);
         else {
-          $a->setAttribute("href","$parentLink#".$n->getAttribute("id"));
+          $a->setAttribute("href",getRoot()."$parentLink#".$n->getAttribute("id"));
           $a->setAttribute("class","fragment");
         }
       }

@@ -37,7 +37,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         '-//W3C//DTD XHTML 1.1//EN',
         'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
     $doc = $imp->createDocument(null, null, $dtd);
-    #$doc->formatOutput = true;
     $doc->encoding="utf-8";
 
     // add root element
@@ -50,37 +49,31 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // add head element
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title",$cms->getVariable("cms-title")));
-    // Firefox localhost hack: <meta charset="utf-8"/>
-    // from https://github.com/webpack/webpack-dev-server/issues/1
-    #$this->appendMeta($head,"charset","utf-8"); // not helping
-    #$this->appendMetaCharset($head,"utf-8"); // helping, but invalid
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"viewport","initial-scale=1");
-    //
     $this->appendMeta($head,"Content-Language", $cms->getVariable("cms-lang"));
     $author = $cms->getVariable("cms-author");
     if(strlen($author)) $this->appendMeta($head, "author", $author);
-    //
     $desc = $cms->getVariable("cms-desc");
     if(strlen($desc)) $this->appendMeta($head, "description", $desc);
-    //
     $kw = $cms->getVariable("cms-kw");
     if(strlen($kw)) $this->appendMeta($head, "keywords", $kw);
-    //
     $fav = $this->getFavicon($cfg);
     if($fav) $this->appendLinkElement($head,$fav,"shortcut icon");
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
 
+    // apply transformations
     $proc = new XSLTProcessor();
     $proc->setParameter('',$cms->getAllVariables());
-
-    // transform content and add as body element
     foreach($this->transformations as $xslt => $user) {
       $content = $this->transform($content,$xslt,$user,$proc);
+      $content->encoding="utf-8";
+      #$content->loadXML($content->saveXML());
+      echo $content->saveXML();
     }
-    $content->encoding="utf-8";
+    die();
     $content = $doc->importNode($content->documentElement,true);
     $html->appendChild($content);
     $this->appendJsFiles($content,self::APPEND_BODY);
@@ -92,7 +85,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    #$this->transformations[CMS_FOLDER ."/". PLUGIN_FOLDER ."/". get_class($this) ."/Xhtml11.xsl"] = false;
     $this->transformations[$this->getDir() ."/Xhtml11.xsl"] = false;
 
     // add template files
@@ -108,6 +100,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
 
+    // add final xsl
+    $this->transformations[$this->getDir() ."/Xhtml11final.xsl"] = false;
   }
 
   private function addThemeFiles(DOMElement $e) {

@@ -11,6 +11,7 @@
   <xsl:param name="cms-kw" select="''"/>
   <xsl:param name="cms-ctime" select="''"/>
   <xsl:param name="cms-mtime" select="''"/>
+  <xsl:param name="cms-url" select="''"/>
   <xsl:param name="cms-link" select="''"/>
   <xsl:param name="creation" select="''"/>
 

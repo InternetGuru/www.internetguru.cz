@@ -114,6 +114,7 @@ class Cms {
     $h1 = $this->content->getElementsByTagName("h")->item(0);
     $this->variables["cms-ig"] = "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>";
     $this->variables["cms-ez"] = "<a href='http://www.ezakladna.cz'>E-Základna</a>";
+    $this->variables["cms-url"] = $_SERVER["HTTP_HOST"] . $_SERVER["REQUEST_URI"];
     $this->variables["cms-link"] = getRoot() . $this->getLink();
     $this->variables["cms-lang"] = $this->content->getElementsByTagName("body")->item(0)->getAttribute("xml:lang");
     $this->variables["cms-desc"] = $desc->nodeValue;
