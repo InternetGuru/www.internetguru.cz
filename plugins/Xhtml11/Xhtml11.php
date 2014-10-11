@@ -66,20 +66,40 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // apply transformations
     $proc = new XSLTProcessor();
-    $proc->setParameter('',$cms->getAllVariables());
+    $proc->setParameter('',$this->getProcParams($cms));
     foreach($this->transformations as $xslt => $user) {
-      $content = $this->transform($content,$xslt,$user,$proc);
-      $content->encoding="utf-8";
-      #$content->loadXML($content->saveXML());
-      echo $content->saveXML();
+      $newContent = $this->transform($content,$xslt,$user,$proc);
+      $newContent->encoding="utf-8";
+      if(!@$newContent->loadXML($newContent->saveXML())) {
+        new Logger("Invalid transformation or parameter in '$xslt'","error");
+        continue;
+      }
+      $content = $newContent;
+      #echo $content->saveXML();
     }
-    die();
+    #die();
     $content = $doc->importNode($content->documentElement,true);
     $html->appendChild($content);
     $this->appendJsFiles($content,self::APPEND_BODY);
 
     // and that's it
     return $doc->saveXML();
+  }
+
+  private function getProcParams(Cms $cms) {
+    $o = array();
+    foreach($cms->getAllVariables() as $k => $v) {
+      if($v instanceof DOMDocument) {
+        $o[$k] = html_entity_decode($v->saveHTML());
+        continue;
+      }
+      if(is_object($v) && !method_exists($v, '__toString')) {
+        new Logger("Unable to convert variable '$k' to string","error");
+        continue;
+      }
+      $o[$k] = html_entity_decode((string) $v);
+    }
+    return $o;
   }
 
   private function registerThemes(DOMDocumentPlus $cfg) {
