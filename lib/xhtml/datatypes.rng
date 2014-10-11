@@ -89,7 +89,9 @@
 
 <!-- a Uniform Resource Identifier, see [URI] -->
 <define name="URI.datatype">
-  <data type="anyURI"/>
+  <data type="anyURI">
+    <param name="pattern">(#|((https?|ftps?|mailto)://)).*</param>
+  </data>
 </define>
 
 <!-- a space-separated list of Uniform Resource Identifiers, see [URI] -->
