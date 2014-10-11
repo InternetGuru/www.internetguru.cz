@@ -239,8 +239,13 @@ div.cms-balancer a {
 }
 
 #footer ul li {
-  margin-left: 0.1em;
-  margin-right: 0.1em;
+  margin-left: 0.7em;
+  margin-right: 0.7em;
+}
+
+#footer > ul.cms-menu li {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 #footer ul ul li {

@@ -112,6 +112,8 @@ class Cms {
   private function loadDefaultVariables() {
     $desc = $this->content->getElementsByTagName("desc")->item(0);
     $h1 = $this->content->getElementsByTagName("h")->item(0);
+    $this->variables["cms-ig"] = "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>";
+    $this->variables["cms-ez"] = "<a href='http://www.ezakladna.cz'>E-Základna</a>";
     $this->variables["cms-link"] = getRoot() . $this->getLink();
     $this->variables["cms-lang"] = $this->content->getElementsByTagName("body")->item(0)->getAttribute("xml:lang");
     $this->variables["cms-desc"] = $desc->nodeValue;
@@ -121,7 +123,6 @@ class Cms {
     if($desc->hasAttribute("kw")) $this->variables["cms-kw"] = $desc->getAttribute("author");
     if($h1->hasAttribute("mtime")) $this->variables["cms-mtime"] = $h1->getAttribute("mtime");
     if($h1->hasAttribute("ctime")) $this->variables["cms-ctime"] = $h1->getAttribute("ctime");
-    #TODO: load others
   }
 
   private function loadContent() {
