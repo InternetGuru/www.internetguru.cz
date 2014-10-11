@@ -70,21 +70,24 @@ function stableSort(Array &$a) {
 }
 
 function getLocalLink($link=null,$force=false) {
+  if(strpos($link, "#") === 0) return $link;
   if(is_null($link)) $link = getCurLink();
   $parsedLink = parse_url($link);
+  if($parsedLink === false) throw new Exception("Unable to parse href '$link'");
   if(!$force && isset($parsedLink["scheme"])) return false;
   $localLink = array(""); // default is "/"
   if(isAtLocalhost()) {
     $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
     $localLink[] = $dir[1];
   }
-  if(!isset($parsedLink["path"])) return implode("/",$localLink);
-  foreach(explode("/",$parsedLink["path"]) as $pp) {
-    if(!strlen($pp)) continue; // "/mylink"
-    $localLink[] = $pp;
-  }
   $query = isset($parsedLink["query"]) ? "?" . $parsedLink["query"] : "";
   $fragment = isset($parsedLink["fragment"]) ? "#" . $parsedLink["fragment"] : "";
+  if(isset($parsedLink["path"])) {
+    foreach(explode("/",$parsedLink["path"]) as $pp) {
+      if(!strlen($pp)) continue; // "/mylink"
+      $localLink[] = $pp;
+    }
+  }
   return implode("/",$localLink) . $query . $fragment;
 }
 

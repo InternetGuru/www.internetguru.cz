@@ -48,7 +48,26 @@ class DOMBuilder {
   public function buildHTMLPlus($filePath,$user=true) {
     $this->doc = new HTMLPlus();
     $this->build($filePath,true,$user);
+    $this->correctLinks("a","href");
+    $this->correctLinks("form","action");
     return $this->doc;
+  }
+
+  private function correctLinks($eName,$aName) {
+    foreach($this->doc->getElementsByTagName($eName) as $e) {
+      if(!$e->hasAttribute($aName)) continue;
+      try {
+        $link = getLocalLink($e->getAttribute($aName));
+        if($link === false) continue;
+        $e->setAttribute($aName,$link);
+      } catch(Exception $ex) {
+        $comment = $e->ownerDocument->createComment($ex->getMessage());
+        $text = $e->ownerDocument->createTextNode($e->nodeValue);
+        $e->parentNode->insertBefore($comment,$e);
+        $e->parentNode->insertBefore($text,$e);
+        $e->parentNode->removeChild($e);
+      }
+    }
   }
 
   private function build($filePath,$replace,$user) {
