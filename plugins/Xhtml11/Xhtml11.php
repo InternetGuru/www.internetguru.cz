@@ -12,6 +12,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $transformations = array();
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
+  const DTD_FILE = 'lib/xhtml11-flat.dtd';
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "preinit") {
@@ -71,16 +72,15 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $newContent = $this->transform($content,$xslt,$user,$proc);
       $newContent->encoding="utf-8";
       if(!@$newContent->loadXML($newContent->saveXML())) {
-        new Logger("Invalid transformation or parameter in '$xslt'","error");
+        new Logger("Invalid transformation (or parameter) in '$xslt'","error");
         continue;
       }
       $content = $newContent;
-      #echo $content->saveXML();
     }
-    #die();
     $content = $doc->importNode($content->documentElement,true);
     $html->appendChild($content);
     $this->appendJsFiles($content,self::APPEND_BODY);
+    #var_dump($doc->schemaValidate(CMS_FOLDER . "/" . self::DTD_FILE));
 
     // and that's it
     return $doc->saveXML();
@@ -97,9 +97,26 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         new Logger("Unable to convert variable '$k' to string","error");
         continue;
       }
-      $o[$k] = html_entity_decode((string) $v);
+      $v = html_entity_decode((string) $v);
+      if(!$this->isValidInlineHTML($v)) {
+        new Logger("Input variable '$k' is not HTML valid","error");
+        continue;
+      }
+      $o[$k] = $v;
     }
     return $o;
+  }
+
+  private function isValidInlineHTML($v) {
+    $doc = new HTMLPlus();
+    $html = '<body xml:lang="en"><h id="x">x</h><desc>'.utf8_encode($v).'</desc></body>';
+    if(!@$doc->loadXML($html)) return false;
+    try {
+      $doc->validatePlus();
+    } catch(Exception $e) {
+      return false;
+    }
+    return true;
   }
 
   private function registerThemes(DOMDocumentPlus $cfg) {

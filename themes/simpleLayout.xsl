@@ -2,6 +2,7 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:param name="cms-ig" select="''"/>
+  <xsl:param name="cms-ez" select="''"/>
   <xsl:param name="cms-title" select="''"/>
   <xsl:param name="cms-breadcrumb" select="''"/>
   <xsl:param name="cms-menu" select="''"/>
