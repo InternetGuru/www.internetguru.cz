@@ -13,6 +13,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
+  const DEBUG = true;
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "preinit") {
@@ -71,8 +72,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     foreach($this->transformations as $xslt => $user) {
       $newContent = $this->transform($content,$xslt,$user,$proc);
       $newContent->encoding="utf-8";
-      if(!@$newContent->loadXML($newContent->saveXML())) {
+      $xml = $newContent->saveXML();
+      if(!@$newContent->loadXML($xml)) {
         new Logger("Invalid transformation (or parameter) in '$xslt'","error");
+        if(self::DEBUG) {
+          echo $xml;
+          die();
+        }
         continue;
       }
       $content = $newContent;
