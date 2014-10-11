@@ -6,7 +6,7 @@ class ContentMatch extends Plugin implements SplObserver {
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
     if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
-    $link = $subject->getCms()->getLink();
+    $link = getCurLink();
     $this->cfgRedir($link);
     if($link == "") {
       $subject->detach($this);
@@ -34,8 +34,8 @@ class ContentMatch extends Plugin implements SplObserver {
     if($code != 404) {
       if($exactMatch->length != 1) {
         new Logger("Destination redir link '$link' not found","warning");
-        if($this->subject->getCms()->getLink() == "/") return;
-        $link = getRoot();
+        if(getCurLink() == "") return;
+        $link = getLocalLink("");
       }
       $this->redirToLink($link,$code);
     }
@@ -44,7 +44,7 @@ class ContentMatch extends Plugin implements SplObserver {
     $links = array();
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
     $linkId = $this->findSimilar($links,$newLink);
-    if(is_null($linkId)) $newLink = getRoot();
+    if(is_null($linkId)) $newLink = getLocalLink("");
     else $newLink = $links[$linkId];
     new Logger("Not found (404) redir '$link' to '$newLink'","warning");
     $this->redirToLink($newLink,$code);
@@ -109,7 +109,7 @@ class ContentMatch extends Plugin implements SplObserver {
   }
 
   private function redirToLink($link,$code) {
-    $link = getRoot() . $link;
+    $link = getLocalLink($link);
     header("Location: $link",true,$code);
     header("Refresh: 0; url=$link");
     exit();

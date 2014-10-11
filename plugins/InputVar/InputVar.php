@@ -38,11 +38,11 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function fnLocal_link(DOMElement $var) {
-    $href = getRoot();
+    $href = "";
     $title = null;
-    if($var->hasAttribute("href")) $href .= $this->parse($var->getAttribute("href"));
+    if($var->hasAttribute("href")) $href = $this->parse($var->getAttribute("href"));
     if($var->hasAttribute("title")) $title = $var->getAttribute("title");
-    return "<a href='$href'" . (is_null($title) ? "" : " title='$title'")
+    return "<a href='" . getLocalLink($href) . "'" . (is_null($title) ? "" : " title='$title'")
     . ">" . $this->parse($var->nodeValue) . "</a>";
   }
 

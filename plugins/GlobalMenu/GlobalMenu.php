@@ -45,7 +45,7 @@ class GlobalMenu extends Plugin implements SplObserver {
   }
 
   private function getMenu(DOMDocumentPlus $doc, DOMElement $section, $parentLink = null) {
-    if(is_null($parentLink)) $parentLink = getRoot();
+    if(is_null($parentLink)) $parentLink = getLocalLink("");
     $ul = $doc->createElement("ul");
     $li = null;
     foreach($section->childNodes as $n) {
@@ -59,10 +59,10 @@ class GlobalMenu extends Plugin implements SplObserver {
       }
       if($n->nodeName != "h") continue;
       $li = $doc->createElement("li");
-      $parentLink = null;
+      $parentLink = getLocalLink("");
       $link = null;
       if($n->hasAttribute("link")) {
-        $link = $n->getAttribute("link");
+        $link = getLocalLink($n->getAttribute("link"));
         $parentLink = $link;
       }
       $a = $doc->createElement("a",$n->nodeValue);
@@ -70,12 +70,12 @@ class GlobalMenu extends Plugin implements SplObserver {
         $a->nodeValue = $n->getAttribute("short");
         $a->setAttribute("title",$n->nodeValue);
       }
-      if($this->subject->getCms()->getLink() === $link) {
+      if(getLocalLink(getCurLink()) === $link) {
         $a->setAttribute("class","current");
       } else {
-        if(!is_null($link)) $a->setAttribute("href",getRoot().$link);
+        if(!is_null($link)) $a->setAttribute("href",$link);
         else {
-          $a->setAttribute("href",getRoot()."$parentLink#".$n->getAttribute("id"));
+          $a->setAttribute("href","$parentLink#".$n->getAttribute("id"));
           $a->setAttribute("class","fragment");
         }
       }

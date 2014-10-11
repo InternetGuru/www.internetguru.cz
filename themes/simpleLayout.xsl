@@ -27,6 +27,7 @@
         <ul>
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-ig"/></li>
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
+            <li><xsl:value-of disable-output-escaping="yes" select="$cms-url"/><xsl:value-of disable-output-escaping="yes" select="$cms-link"/></li>
         </ul>
       </div>
     </body>

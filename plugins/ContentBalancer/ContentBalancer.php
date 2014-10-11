@@ -28,11 +28,11 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       $ul = $content->createElement("ul");
       $ul->setAttribute("class","cms-balancer");
       foreach($hs as $h) {
-        if($h->hasAttribute("link")) $href = $h->getAttribute("link");
+        if($h->hasAttribute("link")) $href = getLocalLink($h->getAttribute("link"));
         else {
           $parentHeading = $this->getParentHeading($e);
           if($parentHeading->hasAttribute("link") && $h->hasAttribute("id")) {
-            $href = $parentHeading->getAttribute("link") . "#" . $h->getAttribute("id");
+            $href = getLocalLink($parentHeading->getAttribute("link")) . "#" . $h->getAttribute("id");
           } else {
             #throw new Exception("Unable to build link for {$h->nodeValue}");
             continue 2;

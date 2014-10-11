@@ -35,7 +35,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    $this->adminLink = getRoot().$subject->getCms()->getLink()."?admin";
+    $this->adminLink = getLocalLink()."?admin";
     try {
       $this->setDefaultFile();
       $this->dataFile = $this->getDataFile();
@@ -72,7 +72,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("heading",$cms->getVariable("cms-title"),"ContentAdmin");
     $newContent->insertVar("errors",$this->errors,"ContentAdmin");
-    $newContent->insertVar("link",getRoot().$cms->getLink(),"ContentAdmin");
+    $newContent->insertVar("link",getLocalLink(),"ContentAdmin");
     $newContent->insertVar("linkAdmin",$la,"ContentAdmin");
     $newContent->insertVar("linkAdminStatus","$la&$statusChange","ContentAdmin");
 
@@ -140,8 +140,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $f = $_GET["admin"];
     if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
     if(!strlen($f)) {
-      $l = $this->subject->getCms()->getLink();
-      if(findFile("$l.html")) $f = "$l.html";
+      $l = getCurLink() . ".html";
+      if(findFile($l)) $f = $l;
       else $f = self::DEFAULT_FILE;
     }
 
@@ -287,7 +287,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   private function redir($f="") {
     if(strlen($f)) $f = "=$f";
-    $redir = getRoot() . $this->subject->getCms()->getLink();
+    $redir = getLocalLink();
     #FIXME: different admin variations (admin, superadmin, viewonly)
     if(!isset($_POST["saveandgo"])) $redir .= "?admin" . $f;
     header("Location: $redir");

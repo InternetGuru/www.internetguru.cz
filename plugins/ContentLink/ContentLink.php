@@ -6,7 +6,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private $headings;
 
   public function update(SplSubject $subject) {
-    $this->isRoot = $subject->getCms()->getLink() == "";
+    $this->isRoot = getCurLink() == "";
     if($this->isRoot) return;
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
@@ -17,7 +17,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   public function getContent(HTMLPlus $c) {
     if($this->isRoot) return $c;
     $cf = $this->subject->getCms()->getContentFull();
-    $link = $this->subject->getCms()->getLink();
+    $link = getCurLink();
     $curH = $cf->getElementById($link,"link");
     if(is_null($curH))
       throw new Exception("No unique exact match found for link '$link'");
@@ -72,7 +72,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $bc = new DOMDocumentPlus();
     $ol = $bc->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class","cms-breadcrumb");
-    $parentLink = getRoot();
+    $parentLink = getLocalLink("");
     foreach(array_reverse($this->headings) as $h) {
       $content = $h->nodeValue;
       if($h->hasAttribute("short")) {
@@ -85,9 +85,9 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       }
       if($first) {
         $first = false;
-        $href = getRoot();
+        $href = getLocalLink("");
       } elseif($h->hasAttribute("link")) {
-        $href = getRoot() . $h->getAttribute("link");
+        $href = getLocalLink($h->getAttribute("link"));
         $parentLink = $href;
       } else {
         $href = $parentLink ."#". $h->getAttribute("id");

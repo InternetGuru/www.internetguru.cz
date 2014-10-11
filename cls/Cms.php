@@ -11,7 +11,6 @@ class Cms {
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
-  private $link = ""; // empty for no link
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
   private $variables = array();
@@ -19,7 +18,6 @@ class Cms {
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
-    if(isset($_GET["page"])) $this->link = $_GET["page"];
   }
 
   public function setPlugins(SplSubject $p) {
@@ -28,10 +26,6 @@ class Cms {
 
   public function isAttachedPlugin($pluginName) {
     return $this->plugins->isAttachedPlugin($pluginName);
-  }
-
-  public function getLink() {
-    return $this->link;
   }
 
   public function getDomBuilder() {
@@ -116,7 +110,7 @@ class Cms {
     $this->variables["cms-ig"] = "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>";
     $this->variables["cms-ez"] = "<a href='http://www.ezakladna.cz'>E-Základna</a>";
     $this->variables["cms-url"] = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
-    $this->variables["cms-link"] = getRoot() . $this->getLink();
+    $this->variables["cms-link"] = getLocalLink();
     $this->variables["cms-lang"] = $this->content->getElementsByTagName("body")->item(0)->getAttribute("xml:lang");
     $this->variables["cms-desc"] = $desc->nodeValue;
     if($h1->hasAttribute("short")) $this->variables["cms-title"] = $h1->getAttribute("short");

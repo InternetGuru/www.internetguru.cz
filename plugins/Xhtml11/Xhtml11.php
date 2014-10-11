@@ -214,7 +214,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($type) $e->setAttribute("type",$type);
     if($rel) $e->setAttribute("rel",$rel);
     if($media) $e->setAttribute("media",$media);
-    $e->setAttribute("href", getRoot() . $f);
+    $e->setAttribute("href", getLocalLink($f));
     $parent->appendChild($e);
   }
 
@@ -280,7 +280,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $e = $parent->ownerDocument->createElement("script");
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
-      if($f !== false) $e->setAttribute("src", getRoot() . $f);
+      if($f !== false) $e->setAttribute("src", getLocalLink($f));
       $parent->appendChild($e);
     }
   }

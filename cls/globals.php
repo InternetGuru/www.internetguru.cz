@@ -69,10 +69,28 @@ function stableSort(Array &$a) {
   array_multisort($a,SORT_ASC,$order,SORT_ASC);
 }
 
-function getRoot() {
-  if(!isAtLocalhost()) return "/";
-  $d = explode("/", $_SERVER["SCRIPT_NAME"]);
-  return "/{$d[1]}/";
+function getLocalLink($link=null,$force=false) {
+  if(is_null($link)) $link = getCurLink();
+  $parsedLink = parse_url($link);
+  if(!$force && isset($parsedLink["scheme"])) return false;
+  $localLink = array(""); // default is "/"
+  if(isAtLocalhost()) {
+    $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
+    $localLink[] = $dir[1];
+  }
+  if(!isset($parsedLink["path"])) return implode("/",$localLink);
+  foreach(explode("/",$parsedLink["path"]) as $pp) {
+    if(!strlen($pp)) continue; // "/mylink"
+    $localLink[] = $pp;
+  }
+  $query = isset($parsedLink["query"]) ? "?" . $parsedLink["query"] : "";
+  $fragment = isset($parsedLink["fragment"]) ? "#" . $parsedLink["fragment"] : "";
+  return implode("/",$localLink) . $query . $fragment;
+}
+
+function getCurLink() {
+  if(isset($_GET["page"])) return $_GET["page"];
+  return "";
 }
 
 function getSubdom() {
