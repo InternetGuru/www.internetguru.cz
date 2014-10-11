@@ -75,6 +75,7 @@ function getLocalLink($link=null,$force=false) {
   $parsedLink = parse_url($link);
   if($parsedLink === false) throw new Exception("Unable to parse href '$link'");
   if(!$force && isset($parsedLink["scheme"])) return false;
+  #if(isset($parsedLink["fragment"])) return "#".$parsedLink["fragment"];
   $localLink = array(""); // default is "/"
   if(isAtLocalhost()) {
     $dir = explode("/", $_SERVER["SCRIPT_NAME"]);

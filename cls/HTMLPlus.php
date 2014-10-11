@@ -23,6 +23,25 @@ class HTMLPlus extends DOMDocumentPlus {
     return $this->autocorrected;
   }
 
+  public function fragToLinks(HTMLPlus $src) {
+    foreach($this->getElementsByTagName("a") as $a) {
+      if(!$a->hasAttribute("href")) continue;
+      if(strpos($a->getAttribute("href"),"#") !== 0) continue;
+      $frag = substr($a->getAttribute("href"),1);
+      $h = $this->getElementById($frag);
+      if(!is_null($h)) continue; // ignore visible headings
+      $h = $src->getElementById($frag);
+      if(is_null($h) || $h->nodeName != "h") continue;
+      if($h->hasAttribute("link")) {
+        $a->setAttribute("href",getLocalLink($h->getAttribute("link")));
+        continue;
+      }
+      $link = $src->getAncestorValue($h,"link");
+      if(is_null($link)) continue;
+      $a->setAttribute("href",getLocalLink($link)."#".$frag);
+    }
+  }
+
   public function validatePlus($repair=false) {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot();

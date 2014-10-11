@@ -15,6 +15,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
 
   public function getContent(HTMLPlus $content) {
     $this->filter($content);
+    $content->fragToLinks($this->subject->getCms()->getContentFull());
     return $content;
   }
 

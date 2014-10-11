@@ -116,7 +116,7 @@ class Cms {
     if($h1->hasAttribute("short")) $this->variables["cms-title"] = $h1->getAttribute("short");
     else $this->variables["cms-title"] = $h1->nodeValue;
     if($h1->hasAttribute("author")) $this->variables["cms-author"] = $h1->getAttribute("author");
-    if($desc->hasAttribute("kw")) $this->variables["cms-kw"] = $desc->getAttribute("author");
+    if($desc->hasAttribute("kw")) $this->variables["cms-kw"] = $desc->getAttribute("kw");
     if($h1->hasAttribute("mtime")) $this->variables["cms-mtime"] = $h1->getAttribute("mtime");
     if($h1->hasAttribute("ctime")) $this->variables["cms-ctime"] = $h1->getAttribute("ctime");
   }

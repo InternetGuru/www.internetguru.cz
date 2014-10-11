@@ -7,11 +7,11 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   public function update(SplSubject $subject) {
     $this->isRoot = getCurLink() == "";
+    $subject->setPriority($this,2);
     if($this->isRoot) return;
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    $subject->setPriority($this,2);
   }
 
   public function getContent(HTMLPlus $c) {
@@ -26,16 +26,16 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->setTitle();
     $this->setBc($link);
 
-    $this->setAncestorAttribute($curH, "author");
-    $this->setAncestorAttribute($curH->parentNode, "xml:lang");
+    $this->setAncestorValue($curH, "author");
+    $this->setAncestorValue($curH->parentNode, "xml:lang");
     if(!$curH->parentNode->hasAttribute("xml:lang")) {
-      $bodyLang = $curH->ownerDocument->documentElement->getAttribute("xml:lang");
+      $bodyLang = $cf->documentElement->getAttribute("xml:lang");
       $curH->parentNode->setAttribute("xml:lang",$bodyLang);
     }
-    $this->setAncestorAttribute($curH, "ctime");
-    $this->setAncestorAttribute($curH, "mtime");
+    $this->setAncestorValue($curH, "ctime");
+    $this->setAncestorValue($curH, "mtime");
     $this->setAncestorValue($curH->nextSibling);
-    $this->setAncestorAttribute($curH->nextSibling, "kw");
+    $this->setAncestorValue($curH->nextSibling, "kw");
 
     $content = new HTMLPlus();
     $content->formatOutput = true;
@@ -45,12 +45,13 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     $this->appendUntilSame($curH,$body);
 
+    $content->fragToLinks($cf);
     return $content;
   }
 
   private function setPath(DOMElement $h) {
     while(!is_null($h)) {
-      $this->headings[] = $h;
+      $this->headings[$h->getAttribute("id")] = $h;
       $h = $h->ownerDocument->getParentSibling($h);
     }
   }
@@ -100,22 +101,13 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->subject->getCms()->setVariable("cms-breadcrumb", $bc);
   }
 
-  private function setAncestorAttribute(DOMElement $e, $aName) {
-    while(!$e->hasAttribute($aName)) {
-      $ps = $e->ownerDocument->getParentSibling($e);
-      if(is_null($ps)) return;
-      if($ps->hasAttribute($aName)) $e->setAttribute($aName,$ps->getAttribute($aName));
-      $e = $ps;
-    }
-  }
-
-  private function setAncestorValue(DOMElement $e) {
-    while(!strlen($e->nodeValue)) {
-      $ps = $e->ownerDocument->getParentSibling($e);
-      if(is_null($ps)) return;
-      if(strlen($ps->nodeValue)) $e->nodeValue = $ps->nodeValue;
-      $e = $ps;
-    }
+  private function setAncestorValue(DOMElement $e, $aName=null) {
+    if(!is_null($aName) && $e->hasAttribute($aName)) return;
+    elseif(is_null($aName) && strlen($e->nodeValue)) return;
+    $v = $e->ownerDocument->getAncestorValue($e,$aName);
+    if(is_null($v)) return;
+    if(!is_null($aName)) $e->setAttribute($aName,$v);
+    else $e->nodeValue = $v;
   }
 
   /*

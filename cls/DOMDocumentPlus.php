@@ -171,6 +171,15 @@ class DOMDocumentPlus extends DOMDocument {
     return null;
   }
 
+  public function getAncestorValue(DOMElement $e, $aName=null) {
+    while(true) {
+      $e = $e->ownerDocument->getParentSibling($e);
+      if(is_null($e)) return null;
+      if(!is_null($aName) && $e->hasAttribute($aName)) return $e->getAttribute($aName);
+      if(is_null($aName) && strlen($e->nodeValue)) return $e->nodeValue;
+    }
+  }
+
   public function relaxNGValidatePlus($f) {
     if(!file_exists($f))
       throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
