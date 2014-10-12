@@ -2,6 +2,15 @@
 
 class DOMElementPlus extends DOMElement {
 
+  public function stripTag($comment = null) {
+    $text = $this->ownerDocument->createTextNode($this->nodeValue);
+    $this->parentNode->insertBefore($text,$this);
+    $this->parentNode->removeChild($this);
+    if(is_null($comment)) return;
+    $cmt = $this->ownerDocument->createComment(" $comment ");
+    $text->parentNode->insertBefore($cmt,$text);
+  }
+
   public function __get($name) {
     switch($name) {
       case "nextElement":

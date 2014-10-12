@@ -50,10 +50,12 @@ class DOMBuilder {
     $this->build($filePath,true,$user);
     $this->correctLinks("a","href");
     $this->correctLinks("form","action");
+    $this->cyclicLinks("a","href");
     return $this->doc;
   }
 
   private function correctLinks($eName,$aName) {
+    $toStrip = array();
     foreach($this->doc->getElementsByTagName($eName) as $e) {
       if(!$e->hasAttribute($aName)) continue;
       try {
@@ -61,13 +63,27 @@ class DOMBuilder {
         if($link === false) continue;
         $e->setAttribute($aName,$link);
       } catch(Exception $ex) {
-        $comment = $e->ownerDocument->createComment($ex->getMessage());
-        $text = $e->ownerDocument->createTextNode($e->nodeValue);
-        $e->parentNode->insertBefore($comment,$e);
-        $e->parentNode->insertBefore($text,$e);
-        $e->parentNode->removeChild($e);
+        $toStrip[] = array($e,$ex->getMessage());
       }
     }
+    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
+  }
+
+  private function cyclicLinks($eName,$aName) {
+    $toStrip = array();
+    foreach($this->doc->getElementsByTagName($eName) as $e) {
+      if(!$e->hasAttribute($aName)) continue;
+      $parsedVal = parse_url($e->getAttribute($aName));
+      if(isset($parsedVal["scheme"])) continue;
+      if(!isset($parsedVal["path"])) continue;
+      if($_SERVER["REQUEST_URI"] != $parsedVal["path"] . "/") continue;
+      if(!isset($parsedVal["fragment"])) {
+        $toStrip[] = $e;
+        continue;
+      }
+      $e->setAttribute($aName,"#".$parsedVal["fragment"]);
+    }
+    foreach($toStrip as $e) $e->stripTag("cyclic path found");
   }
 
   private function build($filePath,$replace,$user) {

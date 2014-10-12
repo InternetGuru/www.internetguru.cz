@@ -5,7 +5,7 @@
 #todo: check document type/mime
 
 class Convertor extends Plugin implements SplObserver {
-  const DEBUG = true;
+  const DEBUG = false;
 
   public function update(SplSubject $subject) {
     $this->subject = $subject;

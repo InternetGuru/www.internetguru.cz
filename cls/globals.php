@@ -85,7 +85,7 @@ function getLocalLink($link=null,$force=false) {
   $fragment = isset($parsedLink["fragment"]) ? "#" . $parsedLink["fragment"] : "";
   if(isset($parsedLink["path"])) {
     foreach(explode("/",$parsedLink["path"]) as $pp) {
-      if(!strlen($pp)) continue; // "/mylink"
+      if(!strlen($pp) || $pp == ".") continue; // "/mylink"
       $localLink[] = $pp;
     }
   }

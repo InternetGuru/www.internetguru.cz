@@ -24,12 +24,18 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function fragToLinks(HTMLPlus $src) {
+    $toStrip = array();
     foreach($this->getElementsByTagName("a") as $a) {
       if(!$a->hasAttribute("href")) continue;
       if(strpos($a->getAttribute("href"),"#") !== 0) continue;
       $frag = substr($a->getAttribute("href"),1);
       $h = $this->getElementById($frag);
-      if(!is_null($h)) continue; // ignore visible headings
+      if(!is_null($h)) {
+        if($this->getElementsByTagName("h")->item(0)->isSameNode($h)) {
+          $toStrip[] = $a;
+        }
+        continue; // ignore visible headings
+      }
       $h = $src->getElementById($frag);
       if(is_null($h) || $h->nodeName != "h") continue;
       if($h->hasAttribute("link")) {
@@ -40,6 +46,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(is_null($link)) continue;
       $a->setAttribute("href",getLocalLink($link)."#".$frag);
     }
+    foreach($toStrip as $e) $e->stripTag("cyclic fragment found");
   }
 
   public function validatePlus($repair=false) {
