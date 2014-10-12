@@ -86,12 +86,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function removeChildNodes(DOMElement $e) {
-    $r = array();
-    foreach($e->childNodes as $n) $r[] = $n;
-    foreach($r as $n) $e->removeChild($n);
-  }
-
   public function removeNodes($query) {
     $xpath = new DOMXPath($this);
     $toRemove = array();
@@ -241,7 +235,7 @@ class DOMDocumentPlus extends DOMDocument {
     // fill destination element
     $var = $e->ownerDocument->importNode($varValue,true);
     $children = array();
-    foreach($var->childElements as $n) $children[] = $n;
+    foreach($var->childNodes as $n) $children[] = $n;
     foreach($children as $n) $e->appendChild($n);
   }
 

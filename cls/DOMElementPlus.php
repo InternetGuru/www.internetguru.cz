@@ -11,6 +11,12 @@ class DOMElementPlus extends DOMElement {
     $text->parentNode->insertBefore($cmt,$text);
   }
 
+  public function removeChildNodes() {
+    $r = array();
+    foreach($this->childNodes as $n) $r[] = $n;
+    foreach($r as $n) $this->removeChild($n);
+  }
+
   public function __get($name) {
     switch($name) {
       case "nextElement":

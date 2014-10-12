@@ -226,7 +226,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
     $this->replace = false;
     if($this->dataFileStatus == self::FILE_NEW) {
-      $doc->removeChildNodes($doc->documentElement);
+      $doc->documentElement->removeChildNodes();
       $this->contentValue = $doc->saveXML();
     }
     if($df && $doc->removeNodes("//*[@readonly]"))
