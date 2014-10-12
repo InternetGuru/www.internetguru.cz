@@ -21,7 +21,7 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
         if(strpos($val,"ContentImg:") !== 0) continue;
         $pattern = substr($val,11);
         $this->getImages($list, $pattern, $cfg);
-        if($list->childNodes->length == 0) continue;
+        if($list->childElements->length == 0) continue;
         $content->insertVar($pattern,$list,"ContentImg");
       }
     }

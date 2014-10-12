@@ -34,7 +34,7 @@ class DOMBuilder {
 
   private function globalReadonly() {
     $nodes = array();
-    foreach($this->doc->documentElement->childNodes as $n) {
+    foreach($this->doc->documentElement->childElements as $n) {
       if($n->nodeValue == "" && $n->hasAttribute("readonly")) $nodes[] = $n;
     }
     foreach($nodes as $n) {
@@ -159,7 +159,7 @@ class DOMBuilder {
       return;
     }
     #todo: validate imported file language
-    foreach($doc->documentElement->childNodes as $n) {
+    foreach($doc->documentElement->childElements as $n) {
       $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
     }
     $h->ownerDocument->validateId("id",true);
@@ -182,16 +182,16 @@ class DOMBuilder {
     if(is_null($this->doc->documentElement)) {
       $this->doc->appendChild($this->doc->importNode($doc->documentElement));
     }
-    foreach($doc->documentElement->childNodes as $n) {
+    foreach($doc->documentElement->childElements as $n) {
       // if empty && readonly => user cannot modify
       foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
         if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
       }
-      if(get_class($n) != "DOMElement") continue;
+      if(!$n instanceof DOMElement) continue;
       if($this->doRemove($n)) {
         $remove = array();
-        foreach($this->doc->documentElement->childNodes as $d) {
-          if($d->nodeType != 1 || $d->nodeName != $n->nodeName) continue;
+        foreach($this->doc->documentElement->childElements as $d) {
+          if($d->nodeName != $n->nodeName) continue;
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
         }
         #if(!count($remove)) {

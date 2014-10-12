@@ -34,8 +34,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     $this->setAncestorValue($curH, "ctime");
     $this->setAncestorValue($curH, "mtime");
-    $this->setAncestorValue($curH->nextSibling);
-    $this->setAncestorValue($curH->nextSibling, "kw");
+    $this->setAncestorValue($curH->nextElement);
+    $this->setAncestorValue($curH->nextElement, "kw");
 
     $content = new HTMLPlus();
     $content->formatOutput = true;
@@ -110,30 +110,11 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     else $e->nodeValue = $v;
   }
 
-  /*
-  private function addTitleQueries(DOMElement $h) {
-    $this->titleQueries[] = $h->getNodePath();
-    $e = $h->parentNode;
-    if($e->nodeName == "section") {
-      if(is_null($this->lang) && $e->hasAttribute("xml:lang")) {
-        $this->lang = $e->getAttribute("xml:lang");
-      }
-      while(($e = $e->previousSibling) !== null) {
-        if($e->nodeName != "h") continue;
-        if(!$e->hasAttribute("link")) continue;
-        $this->addTitleQueries($e);
-        break;
-      }
-    }
-    if(is_null($e)) $this->titleQueries[] = "/body/h";
-  }
-  */
-
   private function appendUntilSame(DOMElement $e, DOMElement $into) {
     $doc = $into->ownerDocument;
     $into->appendChild($doc->importNode($e,true));
     $untilName = $e->nodeName;
-    while(($e = $e->nextSibling) !== null) {
+    while(($e = $e->nextElement) !== null) {
       if($e->nodeName == $untilName) break;
       $into->appendChild($doc->importNode($e,true));
     }

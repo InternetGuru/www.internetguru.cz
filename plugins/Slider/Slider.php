@@ -30,8 +30,7 @@ class Slider extends Plugin implements SplObserver {
     $fileName = getLocalLink("").$fileName;
     $setters["setCss"] = "Slider.setCss('$fileName');";
     // get parameters
-    foreach($cfg->getElementsByTagName("parameters")->item(0)->childNodes as $r) {
-      if($r->nodeType != 1) continue;
+    foreach($cfg->getElementsByTagName("parameters")->item(0)->childElements as $r) {
       $setters[$r->nodeName] = "Slider." . $r->nodeName . "('" . $r->nodeValue . "');";
     }
     $f = PLUGIN_FOLDER ."/". get_class($this) ."/Slider.js";

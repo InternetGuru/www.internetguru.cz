@@ -148,7 +148,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function addThemeFiles(DOMElement $e) {
-    foreach($e->childNodes as $n) {
+    foreach($e->childElements as $n) {
       if($n->nodeValue == "") continue;
       switch ($n->nodeName) {
         case "xslt":

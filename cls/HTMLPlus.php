@@ -101,10 +101,10 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateDesc($repair) {
     if($repair) $this->repairDesc();
     foreach($this->headings as $h) {
-      if(is_null($h->nextSibling) || $h->nextSibling->nodeName != "desc") {
+      if(is_null($h->nextElement) || $h->nextElement->nodeName != "desc") {
         if(!$repair) throw new Exception ("Missing element 'desc'");
         $desc = $h->ownerDocument->createElement("desc");
-        $h->parentNode->insertBefore($desc,$h->nextSibling);
+        $h->parentNode->insertBefore($desc,$h->nextElement);
         $this->autocorrected = true;
       }
     }

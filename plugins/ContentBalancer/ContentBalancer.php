@@ -53,7 +53,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
 
   private function getParentHeading(DOMElement $e) {
     $h = $e;
-    while( ($h = $h->previousSibling) != null) {
+    while( ($h = $h->previousElement) != null) {
       if($h->nodeName == "h") return $h;
     }
     throw new Exception("Unable to find parent heading for {$h->nodeValue}");

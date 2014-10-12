@@ -4,7 +4,8 @@ class DOMDocumentPlus extends DOMDocument {
 
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);
-    $this->preserveWhiteSpace = false;
+    $this->registerNodeClass("DOMElement","DOMElementPlus");
+    #$this->preserveWhiteSpace = false;
     #$this->formatOutput = true;
   }
 
@@ -20,7 +21,7 @@ class DOMDocumentPlus extends DOMDocument {
   public function renameElement($node, $name) {
     $newnode = $this->createElement($name);
     $children = array();
-    foreach ($node->childNodes as $child) {
+    foreach ($node->childElements as $child) {
       $children[] = $child;
     }
     foreach ($children as $child) {
@@ -63,7 +64,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
     if(!count($where)) return;
     $type = gettype($varValue);
-    if($type == "object") $type = get_class($varValue);
     foreach($where as $attr => $e) {
       switch($type) {
         case "NULL":
@@ -76,10 +76,11 @@ class DOMDocumentPlus extends DOMDocument {
         if(empty($varValue)) $this->emptyVarArray($e);
         else $this->insertVarArray($varValue,$e);
         break;
-        case "DOMElement":
-        $this->insertVarDOMElement($varValue,$e,$attr);
-        break;
         default:
+        if($varValue instanceof DOMElement) {
+          $this->insertVarDOMElement($varValue,$e,$attr);
+          break;
+        }
         throw new Exception("Unsupported variable type '$type' for '$varName'");
       }
     }
@@ -126,7 +127,7 @@ class DOMDocumentPlus extends DOMDocument {
     $toRemove = array();
     while(true) {
       $toRemove[] = $e;
-      $e = $e->nextSibling;
+      $e = $e->nextElement;
       if(is_null($e)) break;
       if($e->nodeName == $name) break;
     }
@@ -139,7 +140,7 @@ class DOMDocumentPlus extends DOMDocument {
     $p = $e->parentNode;
     while(!is_null($p)) {
       if($p->nodeName == $e->nodeName) return $p;
-      $p = $p->previousSibling;
+      $p = $p->previousElement;
     }
     return null;
   }
@@ -153,16 +154,10 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function getNextSiblingElement(DOMElement $e) {
-    while($e->nextSibling->nodeType != XML_ELEMENT_NODE) $e = $e->nextSibling;
-    return $e->nextSibling;
-  }
-
   public function relaxNGValidatePlus($f) {
     if(!file_exists($f))
       throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
     try {
-      #echo $this->saveXML();
       libxml_use_internal_errors(true);
       if(!$this->relaxNGValidate($f))
         throw new Exception("relaxNGValidate internal error occured");
@@ -231,7 +226,7 @@ class DOMDocumentPlus extends DOMDocument {
     if($e->nodeValue != "") return;
     $p = $e->parentNode;
     $p->removeChild($e);
-    if($p->childNodes->length == 0)
+    if($p->childElements->length == 0)
       $p->parentNode->removeChild($p);
   }
 
@@ -242,13 +237,11 @@ class DOMDocumentPlus extends DOMDocument {
       return;
     }
     // clear destination element
-    $children = array();
-    foreach($e->childNodes as $n) $children[] = $n;
-    foreach($children as $n) $e->removeChild($n);
+    $e->removeChildNodes();
     // fill destination element
     $var = $e->ownerDocument->importNode($varValue,true);
     $children = array();
-    foreach($var->childNodes as $n) $children[] = $n;
+    foreach($var->childElements as $n) $children[] = $n;
     foreach($children as $n) $e->appendChild($n);
   }
 
