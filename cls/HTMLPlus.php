@@ -83,7 +83,7 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("id")) {
         if(!$repair) throw new Exception ("Missing id attribute in element h");
-        $h->setAttribute("id",$this->generateUniqueId());
+        $this->setUniqueId($h);
         $this->autocorrected = true;
         continue;
       }
@@ -91,7 +91,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$this->isValidId($id)) {
         if(!$repair || trim($id) != "")
           throw new Exception ("Invalid ID value '$id'");
-        $h->setAttribute("id",$this->generateUniqueId());
+        $this->setUniqueId($h);
         $this->autocorrected = true;
         continue;
       }
@@ -195,18 +195,6 @@ class HTMLPlus extends DOMDocumentPlus {
       return null;
     }
     return $date;
-  }
-
-  private function generateUniqueId() {
-    $id = "h." . substr(md5(microtime()),0,3);
-    if(!$this->isValidId($id)) return $this->generateUniqueId();
-    if(!is_null($this->getElementById($id)))
-      return $this->generateUniqueId();
-    return $id;
-  }
-
-  private function isValidId($id) {
-    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/",$id);
   }
 
 }

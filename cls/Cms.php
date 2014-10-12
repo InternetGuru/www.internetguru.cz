@@ -59,6 +59,7 @@ class Cms {
       throw new Exception("Undefined constatnt '$cat' used in locale");
     setlocale(constant($cat), $loc->nodeValue);
     $this->loadContent();
+    $this->loadDefaultVariables($this->contentFull);
   }
 
   public function getContentFull() {
@@ -89,29 +90,29 @@ class Cms {
       if(self::DEBUG) echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
-    $this->loadVariables();
+    $this->loadDefaultVariables($this->content);
+    $this->loadInputVariables();
   }
 
-  public function setOutputStrategy(OutputStrategyInterface $strategy) {
-    $this->outputStrategy = $strategy;
-  }
-
-  private function loadVariables() {
-    $this->loadDefaultVariables();
+  private function loadInputVariables() {
     $isi = $this->plugins->getIsInterface("InputStrategyInterface");
     foreach($isi as $k => $o) {
       $this->variables = array_merge($this->variables,$o->getVariables());
     }
   }
 
-  private function loadDefaultVariables() {
-    $desc = $this->content->getElementsByTagName("desc")->item(0);
-    $h1 = $this->content->getElementsByTagName("h")->item(0);
+  public function setOutputStrategy(OutputStrategyInterface $strategy) {
+    $this->outputStrategy = $strategy;
+  }
+
+  private function loadDefaultVariables(HTMLPlus $doc) {
+    $desc = $doc->getElementsByTagName("desc")->item(0);
+    $h1 = $doc->getElementsByTagName("h")->item(0);
     $this->variables["cms-ig"] = "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>";
     $this->variables["cms-ez"] = "<a href='http://www.ezakladna.cz'>E-Základna</a>";
     $this->variables["cms-url"] = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
     $this->variables["cms-link"] = getLocalLink();
-    $this->variables["cms-lang"] = $this->content->getElementsByTagName("body")->item(0)->getAttribute("xml:lang");
+    $this->variables["cms-lang"] = $doc->documentElement->getAttribute("xml:lang");
     $this->variables["cms-desc"] = $desc->nodeValue;
     if($h1->hasAttribute("short")) $this->variables["cms-title"] = $h1->getAttribute("short");
     else $this->variables["cms-title"] = $h1->nodeValue;

@@ -205,7 +205,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if($this->isHtmlPlus()) {
       $doc = new HTMLPlus();
       $doc->load(findFile("Content.html",false,false));
-      $doc->formatOutput = true;
+      #$doc->formatOutput = true;
     } else $doc = new DOMDocumentPlus();
     if($this->contentValue == "n/a") {
       $this->contentValue = $doc->saveXML();
@@ -215,7 +215,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       throw new Exception("Invalid XML syntax");
 
     if($this->isHtmlPlus()) {
-      $doc->formatOutput = true;
+      #$doc->formatOutput = true;
       $doc->validatePlus(true);
       if($doc->isAutocorrected()) $this->contentValue = $doc->saveXML();
       return;

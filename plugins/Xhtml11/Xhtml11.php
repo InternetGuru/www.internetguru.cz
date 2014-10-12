@@ -13,7 +13,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
-  const DEBUG = true;
+  const DEBUG = false;
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "preinit") {

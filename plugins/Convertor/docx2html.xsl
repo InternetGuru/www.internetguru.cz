@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <xsl:output method="xml" version="1.0" encoding="utf-8" indent="no"/>
+  <xsl:output method="xml" version="1.0" encoding="utf-8" indent="yes"/>
+  <xsl:strip-space elements="*"/>
+  <xsl:preserve-space elements="t"/>
 
-  <!-- deklarovani parametru poslane transformatorem -->
   <xsl:param name="headerFile" />
   <xsl:param name="footerFile" />
   <xsl:param name="numberingFile" />
@@ -13,16 +14,8 @@
   <!-- <xsl:param name="header" select="document($headerFile)//p"/> -->
   <!-- <xsl:param name="footer" select="document($footerFile)//p"/> -->
 
-  <xsl:template match="/">
-    <body xml:lang="cs">
-
-      <!-- <xsl:if test="$headerFile"><header><xsl:apply-templates select="$header"/></header></xsl:if> -->
-      <!-- <xsl:if test="$footerFile"><footer><xsl:apply-templates select="$footer"/></footer></xsl:if> -->
-
-      <xsl:call-template name="headingStructure"/>
-
-    </body>
-  </xsl:template>
+  <xsl:template xml:space="preserve" match="/"><body xml:lang="cs"><xsl:call-template name="headingStructure"/>
+</body></xsl:template>
 
   <!-- Template pro zachovani formatovani z dokumentu header.xml
   <xsl:template match="p">
@@ -90,8 +83,8 @@
           <!-- same level -->
           <xsl:when test="$curLvl = $lvl or not($correct)">
             <!-- generate heading -->
-            <xsl:if test="$correct">
-              <xsl:element name="h">
+            <xsl:if test="$correct">&#160;
+  <xsl:element name="h">
                 <xsl:if test="$bookmarkId">
                   <xsl:attribute name="id">
                     <xsl:value-of select="$bookmarkId" />
@@ -109,13 +102,13 @@
             <xsl:variable name="nextHPos" select="count($h[$pos+1]/preceding-sibling::*)+1" />
             <xsl:if test="$correct">
                <xsl:choose>
-                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">
-                  <desc>
+                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">&#160;
+  <desc>
                     <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
                   </desc>
                 </xsl:when>
-                <xsl:otherwise>
-                  <desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
+                <xsl:otherwise>&#160;
+  <desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
                   <xsl:if test="$nextHPos - $curHPos &gt; 1">
                     <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
                   </xsl:if>
@@ -152,9 +145,8 @@
           </xsl:when>
 
           <!-- lower level -->
-          <xsl:when test="$curLvl &gt; $lvl">
-            <!-- open section -->
-            <xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
+          <xsl:when test="$curLvl &gt; $lvl">&#160;
+  <xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
             <!-- call current-level heading -->
             <xsl:call-template name="headingStructure">
               <xsl:with-param name="lvl" select="$curLvl"/>
@@ -203,20 +195,11 @@
   </xsl:template>
 
   <xsl:template match="t" priority="1">
-  	<xsl:variable name="bold" select="preceding-sibling::rPr[1]/b"/>
+    <xsl:variable name="bold" select="preceding-sibling::rPr[1]/b"/>
   	<xsl:variable name="italic" select="preceding-sibling::rPr[1]/i"/>
     <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike"/>
   	<xsl:variable name="sup" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'superscript')"/>
   	<xsl:variable name="sub" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'subscript')"/>
-
-      <!--
-  	<xsl:for-each select='preceding-sibling::rPr[1]'>
-  		<xsl:choose>
-  			<xsl:when test="b"><strong><xsl:value-of select="parent::*/t" /></strong></xsl:when>
-  			<xsl:when test="i"><em><xsl:value-of select="parent::*/t" /></em></xsl:when>
-  		</xsl:choose>
-  	</xsl:for-each>
-       -->
 
   	<xsl:choose>
   		<xsl:when test="$sup and $bold and $italic and $del"><sup><del><strong><em><xsl:apply-templates/></em></strong></del></sup></xsl:when>
@@ -253,10 +236,10 @@
         <!-- mind first list item only -->
         <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)] or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0)">
           <xsl:choose>
-            <xsl:when test="count(r) = 1 and r/rPr/b">
-              <!-- definition list if first is bold -->
-              <dl>
-                <dt>
+            <!-- definition list if first is bold -->
+            <xsl:when test="count(r) = 1 and r/rPr/b">&#160;
+  <dl>&#160;
+    <dt>
                   <xsl:copy-of select="r/t/text()"/>
                 </dt>
                 <xsl:call-template name="insertDefListItem">
@@ -275,8 +258,8 @@
           </xsl:choose>
         </xsl:if>
       </xsl:when>
-      <xsl:otherwise>
-        <p><xsl:apply-templates select="r"/></p>
+      <xsl:otherwise>&#160;
+  <p><xsl:apply-templates select="node()"/></p>
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
@@ -285,14 +268,15 @@
     <xsl:param name="i"/>
     <xsl:variable name="item" select="following-sibling::p[$i]"/>
     <xsl:choose>
-      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ((count($item/r) = 1 and $item/r/rPr/b) or (following-sibling::p[$i+1]/pPr/numPr/ilvl/@val > $item/pPr/numPr/ilvl/@val))">
-        <dt>
-          <xsl:copy-of select="$item/r/t/text()"/>
+      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ((count($item/r) = 1 and $item/r/rPr/b) or (following-sibling::p[$i+1]/pPr/numPr/ilvl/@val > $item/pPr/numPr/ilvl/@val))">&#160;
+    <dt>
+          <xsl:copy-of select="$item//t/text()"/>
+          <!-- <xsl:apply-templates select="$item/node()"/> -->
         </dt>
       </xsl:when>
-      <xsl:otherwise>
-        <dd>
-          <xsl:apply-templates select="$item/r/t"/>
+      <xsl:otherwise>&#160;
+    <dd>
+          <xsl:apply-templates select="$item/node()"/>
         </dd>
       </xsl:otherwise>
     </xsl:choose>
@@ -308,6 +292,8 @@
     <xsl:param name="i"/>
     <xsl:param name="ilvl"/>
     <xsl:param name="numId"/>
+    <xsl:param name="indent" select="'  '"/>
+
     <!-- set list type -->
     <xsl:variable name="abstractNumber" select="document($numberingFile)//num[@numId=$numId]/abstractNumId/@val"/>
     <xsl:variable name="indentType" select="document($numberingFile)//abstractNum[@abstractNumId=$abstractNumber]/lvl[@ilvl=$ilvlActual]/numFmt/@val"/>
@@ -316,15 +302,16 @@
         <xsl:when test="contains($indentType,'bullet')">ul</xsl:when>
         <xsl:otherwise>ol</xsl:otherwise>
       </xsl:choose>
-    </xsl:variable>
+    </xsl:variable>&#160;
+<xsl:copy-of select="$indent"/><xsl:element name="{$listType}">
     <!-- create list and insert items -->
-    <xsl:element name="{$listType}">
       <xsl:call-template name="insertListItem">
         <xsl:with-param name="i" select="$i"/>
         <xsl:with-param name="ilvl" select="$ilvl"/>
         <xsl:with-param name="ilvlActual" select="$ilvlActual"/>
-      </xsl:call-template>
-    </xsl:element>
+        <xsl:with-param name="indent" select="concat($indent,'  ')"/>
+      </xsl:call-template>&#160;
+<xsl:copy-of select="$indent"/></xsl:element>
   </xsl:template>
 
   <xsl:template name="insertListItem">
@@ -332,6 +319,8 @@
     <xsl:param name="ilvlActual"/>
     <xsl:param name="ilvl"/>
     <xsl:param name="ignore" select="0"/>
+    <xsl:param name="indent"/>
+
     <!-- set variables -->
     <xsl:variable name="ilvlAfter" select="following-sibling::p[$i+1]/pPr/numPr/ilvl/@val"/>
     <xsl:variable name="endRecursion">
@@ -355,18 +344,20 @@
             <xsl:with-param name="ilvlActual" select="$ilvlActual"/>
             <xsl:with-param name="ilvl" select="$ilvlAfter"/>
             <xsl:with-param name="ignore" select="$nextItemIsDescendant"/>
+            <xsl:with-param name="indent" select="$indent"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:when>
       <!-- else print item -->
-      <xsl:otherwise>
-        <xsl:element name="li">
+      <xsl:otherwise>&#160;
+<xsl:copy-of select="$indent"/><xsl:element name="li">
           <xsl:choose>
             <xsl:when test="$i=0">
-              <xsl:apply-templates select="r/t"/>
+              <xsl:apply-templates select="node()"/>
             </xsl:when>
             <xsl:otherwise>
-              <xsl:copy-of select="following-sibling::p[$i]/r/t/text()"/>
+              <!-- <xsl:copy-of select="following-sibling::p[$i]/r/t/text()"/> -->
+              <xsl:apply-templates select="following-sibling::p[$i]/node()"/>
             </xsl:otherwise>
           </xsl:choose>
           <!-- descendant list item -->
@@ -376,6 +367,7 @@
               <xsl:with-param name="ilvlActual" select="$ilvlActual + 1"/>
               <xsl:with-param name="ilvl" select="$ilvlAfter"/>
               <xsl:with-param name="numId" select="following-sibling::p[$i+1]/pPr/numPr/numId/@val"/>
+              <xsl:with-param name="indent" select="concat($indent,'  ')"/>
             </xsl:call-template>
           </xsl:if>
         </xsl:element>
@@ -386,6 +378,7 @@
             <xsl:with-param name="ilvlActual" select="$ilvlActual"/>
             <xsl:with-param name="ilvl" select="$ilvlAfter"/>
             <xsl:with-param name="ignore" select="$nextItemIsDescendant"/>
+            <xsl:with-param name="indent" select="$indent"/>
           </xsl:call-template>
         </xsl:if>
       </xsl:otherwise>
@@ -437,11 +430,10 @@
                       <xsl:variable name="idRelationship" select="@id"/>
                       <xsl:value-of select="$relationships//*[name() = 'Relationship' and @Id=$idRelationship]/@Target"/>
                   </xsl:when>
-                  <xsl:otherwise><xsl:value-of select="./r/t"/></xsl:otherwise>
+                  <xsl:otherwise><xsl:apply-templates select="node()"/></xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
-
-            <xsl:value-of select="./r/t"/>
+            <xsl:apply-templates select="node()"/>
       </xsl:element>
     </xsl:template>
 

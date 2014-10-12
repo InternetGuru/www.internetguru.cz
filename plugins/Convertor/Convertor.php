@@ -5,6 +5,7 @@
 #todo: check document type/mime
 
 class Convertor extends Plugin implements SplObserver {
+  const DEBUG = true;
 
   public function update(SplSubject $subject) {
     $this->subject = $subject;
@@ -14,17 +15,33 @@ class Convertor extends Plugin implements SplObserver {
       $f = $this->getFile();
       $xml = $this->transformFile($f);
       $doc = new DOMDocumentPlus();
-      $doc->formatOutput = true;
-      $doc->loadXML($xml);
-      #echo $xml;
-      #echo $doc->saveXML();
-      $doc->save("$f.html");
+      $doc->loadXML($xml->saveXML());
+      $ids = $this->regenerateIds($doc);
+      $str = $doc->saveXML();
+      foreach($ids as $old => $new) {
+        $str = str_replace($old,$new,$str);
+      }
+      file_put_contents("$f.html",$str);
+      if(self::DEBUG) {
+        echo $str;
+        die();
+      }
       header("Location: ?admin=$f.html");
       exit();
     } catch(Exception $e) {
       new Logger($e->getMessage(),"warning");
       die($e->getMessage());
     }
+  }
+
+  private function regenerateIds(DOMDocumentPlus $doc) {
+      $ids = array();
+      foreach($doc->getElementsByTagName("h") as $h) {
+        $oldId = $h->getAttribute("id");
+        $doc->setUniqueId($h);
+        $ids[$oldId] = $h->getAttribute("id");
+      }
+      return $ids;
   }
 
   private function getFile() {
@@ -95,17 +112,19 @@ class Convertor extends Plugin implements SplObserver {
       $xml = $this->readZippedXML($f, $p);
       if(is_null($xml)) continue;
       $dom->loadXML($xml);
-      $xml = $this->transform("removePrefix.xsl",$dom);
-      file_put_contents($file,$xml);
+      $dom = $this->transform("removePrefix.xsl",$dom);
+      #file_put_contents($file,$xml);
+      $dom->save($file);
       $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
     }
     $xml = $this->readZippedXML($f, "word/document.xml");
     if(is_null($xml))
       throw new Exception("Unable to locate word/document.xml in docx");
     $dom->loadXML($xml);
-    $xml = $this->transform("removePrefix.xsl",$dom);
-    file_put_contents($f."_document.xml",$xml); // just for debug
-    $dom->loadXML($xml);
+    $dom = $this->transform("removePrefix.xsl",$dom);
+    $dom->save($f."_document.xml"); // for debug purpose
+    #file_put_contents($f."_document.xml",$xml); // just for debug
+    #$dom->loadXML($xml);
     return $this->transform("docx2html.xsl",$dom, $variables);
   }
 
@@ -113,10 +132,8 @@ class Convertor extends Plugin implements SplObserver {
     $xsl = $this->getDOMPlus($this->getDir() ."/$xslFile",false,false);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
-    foreach($vars as $varName => $path) {
-      $proc->setParameter('', $varName, $path);
-    }
-    return $proc->transformToXML($content);
+    $proc->setParameter('', $vars);
+    return $proc->transformToDoc($content);
   }
 
   private function readZippedXML($archiveFile, $dataFile) {

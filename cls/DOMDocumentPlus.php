@@ -85,33 +85,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  private function removeVarElement($e) {
-    $e->parentNode->removeChild($e);
-  }
-
-  private function insertVarString($varValue,DOMElement $e,$attr=null) {
-    if(!is_null($attr) && !is_numeric($attr)) {
-      if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
-        $e->setAttribute($attr,$varValue);
-        return;
-      }
-      if($attr == "class") $varValue = $e->getAttribute($attr)." ".$varValue;
-      $e->setAttribute($attr,$varValue);
-      return;
-    }
-    $varValue = htmlspecialchars($varValue);
-    $replaced = false;
-    foreach($e->childNodes as $n) {
-      if($n->nodeType != 3) continue;
-      $new = sprintf($n->nodeValue,$varValue);
-      if($new == $n->nodeValue) continue;
-      $n->nodeValue = $new;
-      $replaced = true;
-      break;
-    }
-    if(!$replaced) $e->nodeValue = $varValue;
-  }
-
   public function removeChildNodes(DOMElement $e) {
     $r = array();
     foreach($e->childNodes as $n) $r[] = $n;
@@ -180,10 +153,16 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
+  public function getNextSiblingElement(DOMElement $e) {
+    while($e->nextSibling->nodeType != XML_ELEMENT_NODE) $e = $e->nextSibling;
+    return $e->nextSibling;
+  }
+
   public function relaxNGValidatePlus($f) {
     if(!file_exists($f))
       throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
     try {
+      #echo $this->saveXML();
       libxml_use_internal_errors(true);
       if(!$this->relaxNGValidate($f))
         throw new Exception("relaxNGValidate internal error occured");
@@ -199,6 +178,44 @@ class DOMDocumentPlus extends DOMDocument {
     libxml_use_internal_errors(false);
     if(isset($e)) throw $e;
     return true;
+  }
+
+  public function setUniqueId(DOMElement $e) {
+    $id = $e->nodeName .".". substr(md5(microtime()),0,3);
+    if(!$this->isValidId($id)) $this->setUniqueId($e);
+    if(!is_null($this->getElementById($id))) $this->setUniqueId($e);
+    $e->setAttribute("id",$id);
+  }
+
+  protected function isValidId($id) {
+    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/",$id);
+  }
+
+  private function removeVarElement($e) {
+    $e->parentNode->removeChild($e);
+  }
+
+  private function insertVarString($varValue,DOMElement $e,$attr=null) {
+    if(!is_null($attr) && !is_numeric($attr)) {
+      if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
+        $e->setAttribute($attr,$varValue);
+        return;
+      }
+      if($attr == "class") $varValue = $e->getAttribute($attr)." ".$varValue;
+      $e->setAttribute($attr,$varValue);
+      return;
+    }
+    $varValue = htmlspecialchars($varValue);
+    $replaced = false;
+    foreach($e->childNodes as $n) {
+      if($n->nodeType != 3) continue;
+      $new = sprintf($n->nodeValue,$varValue);
+      if($new == $n->nodeValue) continue;
+      $n->nodeValue = $new;
+      $replaced = true;
+      break;
+    }
+    if(!$replaced) $e->nodeValue = $varValue;
   }
 
   private function insertVarArray(Array $varValue,DOMElement $e) {
