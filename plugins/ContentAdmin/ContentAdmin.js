@@ -1,16 +1,20 @@
 
-(function(){
+(function(window){
 
+  var CHANGE = "* ";
   var EXPAND = "[+]";
   var COLLAPSE = "[-]";
   var HIDE_CLASS = "contentadmin-hide";
   var NO_HIDE_CLASS = "contentadmin-nohide";
+  var UNLOAD_MSG = "Changes have not been saved.";
+  var modified = false;
 
   function dynamicFieldset() {
     var fieldsets = document.getElementsByTagName("fieldset");
     for(var i = 0; i < fieldsets.length; i++) {
       var l = fieldsets[i].getElementsByTagName("legend")[0];
-      var link = document.createElement("code");
+      var link = document.createElement("a");
+      link.href = "";
       link.innerHTML = COLLAPSE;
       link.classList.add("contentadmin-switch")
       link.addEventListener("click",toggle,false);
@@ -23,6 +27,7 @@
 
   function toggle(e) {
     toggleElement(e.target);
+    e.preventDefault();
   }
 
   function toggleElement(link) {
@@ -56,6 +61,10 @@
         p = p.parentNode;
       }
 
+      p.onsubmit = function(){
+        modified = false;
+      }
+
       // save and exit if shift
       if(e.shiftKey) {
         p['saveandgo'].click();
@@ -68,7 +77,34 @@
     }
   }
 
+  function indicateChange(){
+    var areas = document.getElementsByTagName("textarea");
+    for(var i=0; i < areas.length; i++) {
+      areas[i].addEventListener('input', function() {
+        if(modified) return;
+        modified = true;
+        document.title = CHANGE + document.title;
+      }, false);
+    }
+  }
+
+
+
+  window.onbeforeunload = function(e) {
+    if(!modified) return;
+    e = e || window.event;
+    // For IE and Firefox
+    if (e) {
+      e.returnValue = UNLOAD_MSG;
+    }
+    // For Safari
+    return UNLOAD_MSG;
+  }
+
+
+
   setSaveEvents();
   dynamicFieldset();
+  indicateChange();
 
-})();
+})(window);
