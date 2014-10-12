@@ -44,7 +44,7 @@ fieldset {
   min-width: initial;
   border: none;
   margin-top: 1em;
-  margin-bottom: 1em;
+  /*margin-bottom: 1em;*/
 }
 
 textarea {
