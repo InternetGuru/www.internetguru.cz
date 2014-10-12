@@ -6,7 +6,7 @@
   display: none;
 }
 .contenttoc-switch {
-  cursor: pointer;
+  text-decoration: none;
   /*font-family: "Lucida Console",monospace;*/
   font-family: inherit;
   color: inherit;

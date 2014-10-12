@@ -96,7 +96,8 @@
           // insert title and toc
           var dt = document.createElement("dt");
           dt.innerHTML = " " + Config.tocTitle;
-          var sw = document.createElement("code");
+          var sw = document.createElement("a");
+          sw.href = "";
           sw.className = Config.tocNS + "-switch";
           sw.innerHTML = Config.hide;
           dt.insertBefore(sw,dt.firstChild);
@@ -108,6 +109,7 @@
           // register and run toggle
           sw.addEventListener("click", function(e){
             toggleToc(e.target);
+            e.preventDefault();
           });
         }
       }
