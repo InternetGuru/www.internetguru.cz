@@ -190,7 +190,8 @@ class DOMDocumentPlus extends DOMDocument {
     } catch (Exception $e) {
       $internal_errors = libxml_get_errors();
       if(count($internal_errors)) {
-        $e = new Exception(current($internal_errors)->message);
+        $note = " [Caution: this message may be misleading]";
+        $e = new Exception(current($internal_errors)->message . $note);
       }
     }
     // finally
