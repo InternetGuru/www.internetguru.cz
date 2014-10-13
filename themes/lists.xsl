@@ -6,7 +6,7 @@
   </xsl:template>
 
   <!-- first list from a group of lists -->
-  <xsl:template match="//*[not(parent::div[@class='paragraph']) and
+  <xsl:template match="//*[(parent::body or parent::div[contains(@class,'section')]) and
     (self::ul or self::ol or self::dl) and
     not(preceding-sibling::*[1][self::ul or self::ol or self::dl]) and
     following-sibling::*[1][self::ul or self::ol or self::dl]
@@ -19,7 +19,7 @@
   </xsl:template>
 
   <!-- last list from a group of lists -->
-  <xsl:template match="//*[not(parent::div[@class='paragraph']) and
+  <xsl:template match="//*[(parent::body or parent::div[contains(@class,'section')]) and
     (self::ul or self::ol or self::dl) and
     preceding-sibling::*[1][self::ul or self::ol or self::dl] and
     not(following-sibling::*[1][self::ul or self::ol or self::dl])
@@ -32,7 +32,7 @@
   </xsl:template>
 
   <!-- orphan list -->
-  <xsl:template match="//*[not(parent::div[@class='paragraph']) and
+  <xsl:template match="//*[(parent::body or parent::div[contains(@class,'section')]) and
     (self::ul or self::ol or self::dl) and
     not(preceding-sibling::*[1][self::ul or self::ol or self::dl]) and
     not(following-sibling::*[1][self::ul or self::ol or self::dl])]">
