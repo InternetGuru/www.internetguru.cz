@@ -144,7 +144,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->addThemeFiles($cfg->documentElement);
 
     // add final xsl
-    $this->transformations[$this->getDir() ."/Xhtml11final.xsl"] = false;
+    #$this->transformations[$this->getDir() ."/Xhtml11final.xsl"] = false;
   }
 
   private function addThemeFiles(DOMElement $e) {
