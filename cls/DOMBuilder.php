@@ -45,9 +45,48 @@ class DOMBuilder {
     }
   }
 
+  private function validateLink($elName,$attName) {
+    $toStrip = array();
+    foreach($this->doc->getElementsByTagName($elName) as $e) {
+      if(!$e->hasAttribute($attName)) continue;
+      $force = true;
+      $attVal = $e->getAttribute($attName);
+      $curUrl = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
+      if(strpos($attVal,$curUrl) !== 0) $force = false;
+      try {
+        $link = getLocalLink($e->getAttribute($attName),$force);
+        if($link === true) continue;
+        $e->setAttribute($attName,$link);
+      } catch(Exception $ex) {
+        $toStrip[] = array($e,$ex->getMessage());
+      }
+    }
+    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
+  }
+
+  private function cyclicLinks($eName,$aName) {
+    $toStrip = array();
+    foreach($this->doc->getElementsByTagName($eName) as $e) {
+      if(!$e->hasAttribute($aName)) continue;
+      $parsedVal = parse_url($e->getAttribute($aName));
+      if(isset($parsedVal["scheme"])) continue;
+      if(!isset($parsedVal["path"])) continue;
+      if($_SERVER["REQUEST_URI"] != $parsedVal["path"] . "/") continue;
+      if(!isset($parsedVal["fragment"])) {
+        $toStrip[] = $e;
+        continue;
+      }
+      $e->setAttribute($aName,"#".$parsedVal["fragment"]);
+    }
+    foreach($toStrip as $e) $e->stripTag("cyclic path found");
+  }
+
   public function buildHTMLPlus($filePath,$user=true) {
     $this->doc = new HTMLPlus();
     $this->build($filePath,true,$user);
+    $this->validateLink("a","href");
+    $this->validateLink("form","action");
+    $this->cyclicLinks("a","href");
     return $this->doc;
   }
 
