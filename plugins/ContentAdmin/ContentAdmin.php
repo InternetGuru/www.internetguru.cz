@@ -3,8 +3,7 @@
 #TODO: ?superadmin
 #TODO: success message
 #TODO: select file
-#TODO: save and go not saving (Cms.xml)
-#TODO: default parameter podle getu
+#TODO: validateLinks (add into validateplus(true)?) invalid/absolute/root (.,"" to "/")
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
