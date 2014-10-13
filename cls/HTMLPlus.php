@@ -29,24 +29,30 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$a->hasAttribute("href")) continue;
       if(strpos($a->getAttribute("href"),"#") !== 0) continue;
       $frag = substr($a->getAttribute("href"),1);
-      $h = $this->getElementById($frag);
-      if(!is_null($h)) {
-        if($this->getElementsByTagName("h")->item(0)->isSameNode($h)) {
-          $toStrip[] = $a;
+      $linkedElement = $this->getElementById($frag);
+      if(!is_null($linkedElement)) {
+        if($this->getElementsByTagName("h")->item(0)->isSameNode($linkedElement)) {
+          $toStrip[] = array($a,"cyclic fragment found");
         }
         continue; // ignore visible headings
       }
-      $h = $src->getElementById($frag);
-      if(is_null($h) || $h->nodeName != "h") continue;
-      if($h->hasAttribute("link")) {
-        $a->setAttribute("href",getLocalLink($h->getAttribute("link")));
-        continue;
+      $linkedElement = $src->getElementById($frag);
+      if(is_null($linkedElement)) {
+        $toStrip[] = array($a,"id '$frag' not found");
+        continue; // id not exists
       }
-      $link = $src->getAncestorValue($h,"link");
-      if(is_null($link)) continue;
-      $a->setAttribute("href",getLocalLink($link)."#".$frag);
+      if($linkedElement->nodeName == "h" && $linkedElement->hasAttribute("link")) {
+        $a->setAttribute("href",getLocalLink($linkedElement->getAttribute("link")));
+        continue; // is outter h1
+      }
+      $h = $linkedElement->getPreviousElement("h");
+      while(!is_null($h) && !$h->hasAttribute("link")) {
+        $h = $h->parentNode->getPreviousElement("h");
+      }
+      if(is_null($h)) continue; // no link till root
+      $a->setAttribute("href",getLocalLink($h->getAttribute("link"))."#".$frag);
     }
-    foreach($toStrip as $e) $e->stripTag("cyclic fragment found");
+    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
   }
 
   public function validatePlus($repair=false) {

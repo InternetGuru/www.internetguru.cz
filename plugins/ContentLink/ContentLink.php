@@ -52,7 +52,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private function setPath(DOMElement $h) {
     while(!is_null($h)) {
       $this->headings[$h->getAttribute("id")] = $h;
-      $h = $h->ownerDocument->getParentSibling($h);
+      $h = $h->parentNode->getPreviousElement("h");
     }
   }
 
@@ -101,13 +101,20 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->subject->getCms()->setVariable("cms-breadcrumb", $bc);
   }
 
-  private function setAncestorValue(DOMElement $e, $aName=null) {
-    if(!is_null($aName) && $e->hasAttribute($aName)) return;
-    elseif(is_null($aName) && strlen($e->nodeValue)) return;
-    $v = $e->ownerDocument->getAncestorValue($e,$aName);
-    if(is_null($v)) return;
-    if(!is_null($aName)) $e->setAttribute($aName,$v);
-    else $e->nodeValue = $v;
+  private function setAncestorValue(DOMElement $e, $attName=null) {
+    $ancestor = $e;
+    while(!is_null($ancestor)) {
+      if(!is_null($attName) && $ancestor->hasAttribute($attName)) {
+        $e->setAttribute($attName,$ancestor->getAttribute($attName));
+        break;
+      } elseif(is_null($attName) && strlen($ancestor->nodeValue)) {
+        $e->nodeValue = $ancestor->nodeValue;
+        break;
+      }
+      $ancestor = $ancestor->parentNode;
+      if(is_null($ancestor)) return;
+      $ancestor = $ancestor->getPreviousElement();
+    }
   }
 
   private function appendUntilSame(DOMElement $e, DOMElement $into) {

@@ -11,6 +11,17 @@ class DOMElementPlus extends DOMElement {
     $text->parentNode->insertBefore($cmt,$text);
   }
 
+  public function getPreviousElement($eName=null) {
+    if(is_null($eName)) $eName = $this->nodeName;
+    $e = $this->previousElement;
+    while($e instanceof DOMElement) {
+      if($e->nodeName == $eName) return $e;
+      if(!is_null($e->previousElement)) $e = $e->previousElement;
+      else $e = $e->parentNode;
+    }
+    return null;
+  }
+
   public function removeChildNodes() {
     $r = array();
     foreach($this->childNodes as $n) $r[] = $n;
@@ -28,21 +39,21 @@ class DOMElementPlus extends DOMElement {
       case "childElements":
       return $this->getChildElements();
       break;
-      default:
-      parent::__get($name);
+      #default:
+      #return parent::__get($name);
     }
   }
 
   private function getNextSiblingElement() {
-    $e = $this;
-    while(!is_null($e->nextSibling) && $e->nextSibling->nodeType != XML_ELEMENT_NODE) $e = $e->nextSibling;
-    return $e->nextSibling;
+    $e = $this->nextSibling;
+    while(!is_null($e) && $e->nodeType != XML_ELEMENT_NODE) $e = $e->nextSibling;
+    return $e;
   }
 
   private function getPreviousSiblingElement() {
-    $e = $this;
-    while(!is_null($e->previousSibling) && $e->previousSibling->nodeType != XML_ELEMENT_NODE) $e = $e->previousSibling;
-    return $e->previousSibling;
+    $e = $this->previousSibling;
+    while(!is_null($e) && $e->nodeType != XML_ELEMENT_NODE) $e = $e->previousSibling;
+    return $e;
   }
 
   private function getChildElements() {

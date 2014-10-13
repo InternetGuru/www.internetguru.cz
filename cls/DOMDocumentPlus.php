@@ -4,7 +4,7 @@ class DOMDocumentPlus extends DOMDocument {
 
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);
-    $this->registerNodeClass("DOMElement","DOMElementPlus");
+    $r = $this->registerNodeClass("DOMElement","DOMElementPlus");
     #$this->preserveWhiteSpace = false;
     #$this->formatOutput = true;
   }
@@ -127,24 +127,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
     foreach($toRemove as $e) {
       $e->parentNode->removeChild($e);
-    }
-  }
-
-  public function getParentSibling(DOMElement $e) {
-    $p = $e->parentNode;
-    while(!is_null($p)) {
-      if($p->nodeName == $e->nodeName) return $p;
-      $p = $p->previousElement;
-    }
-    return null;
-  }
-
-  public function getAncestorValue(DOMElement $e, $aName=null) {
-    while(true) {
-      $e = $e->ownerDocument->getParentSibling($e);
-      if(is_null($e)) return null;
-      if(!is_null($aName) && $e->hasAttribute($aName)) return $e->getAttribute($aName);
-      if(is_null($aName) && strlen($e->nodeValue)) return $e->nodeValue;
     }
   }
 
