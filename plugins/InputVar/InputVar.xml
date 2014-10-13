@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
-  <var id="month_num" fn="date" format="%b"/>
+  <var id="month_num" fn="date" format="%m"/>
   <var id="month_tr" fn="translate" name="$month_num">
     <cs name="01">ledna</cs>
     <cs name="02">února</cs>

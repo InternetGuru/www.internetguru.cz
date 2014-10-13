@@ -76,12 +76,12 @@ function getLocalLink($link=null,$force=false) {
   if($parsedLink === false) throw new Exception("Unable to parse href '$link'");
   if(!$force && isset($parsedLink["scheme"])) return true; // link is absolute
   if(isset($parsedLink["fragment"])) return "#".$parsedLink["fragment"];
-  $localLink = array(""); // default is "/"
+  $localLink = array();
   if(isAtLocalhost() && !isset($parsedLink["scheme"])) {
     $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
     $localLink[] = $dir[1];
   }
-  $root = implode("/",$localLink);
+  $root = "/".implode("/",$localLink);
   if(strpos($link,"$root/") === 0 || $link == $root) return true; // link is correct
   $query = isset($parsedLink["query"]) ? "?" . $parsedLink["query"] : "";
   $fragment = isset($parsedLink["fragment"]) ? "#" . $parsedLink["fragment"] : "";
@@ -91,7 +91,7 @@ function getLocalLink($link=null,$force=false) {
       $localLink[] = $pp;
     }
   }
-  return implode("/",$localLink) . $query . $fragment;
+  return "/".implode("/",$localLink) . $query . $fragment;
 }
 
 function getCurLink() {

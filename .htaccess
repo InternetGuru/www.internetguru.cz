@@ -1,15 +1,18 @@
 RewriteEngine  on
 
+##
 # set rewrite base
-RewriteRule . - [E=RB:/]
-RewriteCond  %{HTTP_HOST}  ^localhost$
-RewriteCond %{SCRIPT_FILENAME} www/([^/]+)
-RewriteRule . - [E=RB:/%1/]
+RewriteRule   .                      - [E=RB:/]
+RewriteCond   %{HTTP_HOST}           ^localhost$
+RewriteCond   %{SCRIPT_FILENAME}     www/([^/]+)
+RewriteRule   .                      - [E=RB:/%1/]
 
+##
 # remove trailing slash, eg. /mivepo/ -> /mivepo
 RewriteCond   %{REQUEST_FILENAME}    !-f
-RewriteRule   ^(.+)\/$               %{ENV:RB}$1  [R=301,L]
+RewriteRule   ^(.+)\/$               %{ENV:RB}$1 [R=301,L]
 
+##
 # create _GET parameters
 RewriteCond   %{REQUEST_FILENAME}    !-f
 RewriteRule   .*                     %{ENV:RB}index.php?page=$0 [QSA]
