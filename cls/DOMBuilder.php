@@ -49,10 +49,10 @@ class DOMBuilder {
     $toStrip = array();
     foreach($this->doc->getElementsByTagName($elName) as $e) {
       if(!$e->hasAttribute($attName)) continue;
-      $force = true;
+      $force = false;
       $attVal = $e->getAttribute($attName);
       $curUrl = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
-      if(strpos($attVal,$curUrl) !== 0) $force = false;
+      if(strpos($attVal,$curUrl) === 0) $force = true;
       try {
         $link = getLocalLink($e->getAttribute($attName),$force);
         if($link === true) continue;

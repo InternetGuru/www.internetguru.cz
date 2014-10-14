@@ -35,19 +35,19 @@ class ContentMatch extends Plugin implements SplObserver {
       if($exactMatch->length != 1) {
         new Logger("Destination redir link '$link' not found","warning");
         if(getCurLink() == "") return;
-        $link = getLocalLink("");
+        $link = ""; // redir to hp if page not found (and not at hp)
       }
-      $this->redirToLink($link,$code);
+      redirTo(getLocalLink($link),$code);
     }
     if($exactMatch->length == 1) return;
     $newLink = normalize($link);
     $links = array();
     foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
     $linkId = $this->findSimilar($links,$newLink);
-    if(is_null($linkId)) $newLink = getLocalLink("");
+    if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];
-    new Logger("Not found (404) redir '$link' to '$newLink'","warning");
-    $this->redirToLink($newLink,$code);
+    new Logger("Link '$link' not found, redir to '$newLink'","info");
+    redirTo(getLocalLink($newLink),$code);
   }
 
   /**
@@ -106,13 +106,6 @@ class ContentMatch extends Plugin implements SplObserver {
     }
     if(empty($sublinks)) return false;
     return $this->minLev($sublinks,$link,$limit);
-  }
-
-  private function redirToLink($link,$code) {
-    $link = getLocalLink($link);
-    header("Location: $link",true,$code);
-    header("Refresh: 0; url=$link");
-    exit();
   }
 
 }

@@ -39,19 +39,48 @@ function isAtLocalhost() {
   return false;
 }
 
+function absoluteLink($link=null) {
+  if(is_null($link)) $link = $_SERVER["REQUEST_URI"];
+  if(substr($link,0,1) == "/") $link = substr($link,1);
+  if(substr($link,-1) == "/") $link = substr($link,0,-1);
+  $pLink = parse_url($link);
+  if($pLink === false) throw new LoggerException("Unable to parse href '$link'");
+  $scheme = isset($pLink["scheme"]) ? $pLink["scheme"] : $_SERVER["REQUEST_SCHEME"];
+  $host = isset($pLink["host"]) ? $pLink["host"] : $_SERVER["HTTP_HOST"];
+  $path = isset($pLink["path"]) && $pLink["path"] != "" ? "/".$pLink["path"] : "";
+  $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
+  return "$scheme://$host$path$query";
+}
+
+function redirTo($link,$code=null,$force=false) {
+  if(!$force) {
+    $curLink = absoluteLink();
+    $absLink = absoluteLink($link);
+    if($curLink == $absLink)
+      throw new LoggerException("Cyclic redirection to '$link'");
+  }
+  if(is_null($code) || !is_numeric($code)) {
+    header("Location: $link");
+    exit();
+  }
+  header("Location: $link",true,$code);
+  header("Refresh: 0; url=$link");
+  exit();
+}
+
 function getRes($res,$dest,$resFolder) {
   if(!$resFolder) return $res;
   if(strpos(pathinfo($res,PATHINFO_FILENAME), ".") === 0)
-    throw new Exception("Forbidden file name");
+    throw new LoggerException("Forbidden file name");
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
   if(!is_dir($newDir) && !@mkdir($newDir,0755,true))
-    throw new Exception("Unable to create directory structure '$newDir'");
+    throw new LoggerException("Unable to create directory structure '$newDir'");
   if(file_exists($newRes)) {
     if(filectime($newRes) >= filectime($res)) return $newRes;
   }
   if(!copy($res, $newRes))
-    throw new Exception("Unable to copy resource file to '$newRes'");
+    throw new LoggerException("Unable to copy resource file to '$newRes'");
   return $newRes;
 }
 
@@ -60,7 +89,7 @@ function __autoload($className) {
   if(@include $fp) return;
   $fc = CMS_FOLDER ."/". CLASS_FOLDER . "/$className.php";
   if(@include $fc) return;
-  throw new Exception("Unable to find class '$className' in '$fp' nor '$fc'");
+  throw new LoggerException("Unable to find class '$className' in '$fp' nor '$fc'");
 }
 
 function stableSort(Array &$a) {
@@ -72,21 +101,21 @@ function stableSort(Array &$a) {
 function getLocalLink($link=null,$force=false) {
   if(strpos($link, "#") === 0) return $link;
   if(is_null($link)) $link = getCurLink();
-  $parsedLink = parse_url($link);
-  if($parsedLink === false) throw new Exception("Unable to parse href '$link'");
-  if(!$force && isset($parsedLink["scheme"])) return true; // link is absolute
-  if(isset($parsedLink["fragment"])) return "#".$parsedLink["fragment"];
+  $pLink = parse_url($link);
+  if($pLink === false) throw new LoggerException("Unable to parse href '$link'");
+  if(!$force && isset($pLink["scheme"])) return true; // link is absolute
+  if(isset($pLink["fragment"])) return "#".$pLink["fragment"];
   $localLink = array();
-  if(isAtLocalhost() && !isset($parsedLink["scheme"])) {
+  if(isAtLocalhost() && !isset($pLink["scheme"])) {
     $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
     $localLink[] = $dir[1];
   }
   $root = "/".implode("/",$localLink);
   if(strpos($link,"$root/") === 0 || $link == $root) return true; // link is correct
-  $query = isset($parsedLink["query"]) ? "?" . $parsedLink["query"] : "";
-  $fragment = isset($parsedLink["fragment"]) ? "#" . $parsedLink["fragment"] : "";
-  if(isset($parsedLink["path"])) {
-    foreach(explode("/",$parsedLink["path"]) as $pp) {
+  $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
+  $fragment = isset($pLink["fragment"]) ? "#" . $pLink["fragment"] : "";
+  if(isset($pLink["path"])) {
+    foreach(explode("/",$pLink["path"]) as $pp) {
       if(!strlen($pp) || $pp == ".") continue; // "/mylink"
       $localLink[] = $pp;
     }
@@ -134,15 +163,15 @@ function normalize($s) {
 
 function saveRewriteFile($dest,$src) {
   if(!file_exists($src))
-    throw new Exception("Source file '$src' not found");
+    throw new LoggerException("Source file '$src' not found");
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0755,true))
-    throw new Exception("Unable to create directory structure");
+    throw new LoggerException("Unable to create directory structure");
   if(!touch($dest))
-    throw new Exception("Unable to touch destination file");
+    throw new LoggerException("Unable to touch destination file");
   if(!copy($dest,"$dest.old"))
-    throw new Exception("Unable to backup destination file");
+    throw new LoggerException("Unable to backup destination file");
   if(!rename("$dest.new",$dest))
-    throw new Exception("Unable to rename new file to destination");
+    throw new LoggerException("Unable to rename new file to destination");
   return true;
 }
 

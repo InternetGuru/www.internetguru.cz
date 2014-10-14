@@ -26,8 +26,7 @@ class Convertor extends Plugin implements SplObserver {
         echo $str;
         die();
       }
-      header("Location: ?admin=$f.html");
-      exit();
+      redirTo("?admin=$f.html");
     } catch(Exception $e) {
       new Logger($e->getMessage(),"warning");
       die($e->getMessage());

@@ -289,8 +289,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $redir = getLocalLink();
     #FIXME: different admin variations (admin, superadmin, viewonly)
     if(!isset($_POST["saveandgo"])) $redir .= "?admin" . $f;
-    header("Location: $redir");
-    exit;
+    redirTo($redir,null,true);
   }
 
 }

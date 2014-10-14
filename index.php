@@ -11,6 +11,7 @@ include('cls/globals.php');
 try {
 
   $l = new Logger("CMS init " . dirname(__FILE__));
+  throw new Exception("test");
 
   // register core variables
   $cms = new Cms();
@@ -37,10 +38,17 @@ try {
 
 } catch(Exception $e) {
 
-  try {
-    new Logger($e->getMessage(),"error");
+  if(!$e instanceof LoggerException) try {
+    new Logger($e->getMessage(),"fatal");
   } catch (Exception $e) {};
-  echo "Exception: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
+
+  if(isAtLocalhost()) {
+    echo "Exception: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
+    exit;
+  }
+
+  http_response_code(500);
+  echo file_get_contents(CMS_FOLDER."/500.html");
 
 }
 
