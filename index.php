@@ -11,7 +11,6 @@ include('cls/globals.php');
 try {
 
   $l = new Logger("CMS init " . dirname(__FILE__));
-  throw new Exception("test");
 
   // register core variables
   $cms = new Cms();

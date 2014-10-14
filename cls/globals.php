@@ -74,13 +74,21 @@ function getRes($res,$dest,$resFolder) {
     throw new LoggerException("Forbidden file name");
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
-  if(!is_dir($newDir) && !@mkdir($newDir,0755,true))
+  if(!is_dir($newDir) && !@mkdir($newDir,0775,true))
     throw new LoggerException("Unable to create directory structure '$newDir'");
   if(file_exists($newRes)) {
     if(filectime($newRes) >= filectime($res)) return $newRes;
+    chmod($newRes, 664); // not important if passed or not
   }
-  if(!copy($res, $newRes))
-    throw new LoggerException("Unable to copy resource file to '$newRes'");
+  if(!copy($res, $newRes)) {
+    if(!file_exists($newRes)) {
+      throw new LoggerException("Unable to copy resource file to '$newRes'");
+    }
+    new Logger("Unable to rewrite resource file to '$newRes'");
+    return $newRes;
+  }
+  if(!chmod($newRes, 664))
+    new Logger("Unable to chmod resource file '$newRes'");
   return $newRes;
 }
 

@@ -119,7 +119,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(!@$doc->loadXML($html)) return false;
     try {
       $doc->validatePlus();
-    } catch(Exception $e) {
+    } catch(Exception $ex) {
       return false;
     }
     return true;
@@ -207,7 +207,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function appendLinkElement(DOMElement $parent,$file,$rel,$type=false,$media=false,$user=true) {
     try {
       $f = findFile($file,$user,true,true);
-    } catch (Exception $e) $f = false;
+    } catch (Exception $ex) {
+      $f = false;
+    }
     if($f === false) {
       $parent->appendChild(new DOMComment(" [$rel] file '$file' not found "));
       return;
@@ -274,7 +276,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       if(!is_null($this->jsFiles[$k]["file"])) {
         try {
           $f = findFile($this->jsFiles[$k]["file"],$this->jsFiles[$k]["user"],true,true);
-        } catch (Exception $e) {}
+        } catch (Exception $ex) {}
         if($f === false) {
           $parent->appendChild(new DOMComment(" JS file '$k' not found "));
           continue;
