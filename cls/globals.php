@@ -74,11 +74,11 @@ function getRes($res,$dest,$resFolder) {
     throw new LoggerException("Forbidden file name");
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
-  if(!is_dir($newDir) && !@mkdir($newDir,0775,true))
+  if(!is_dir($newDir) && !mkdirGroup($newDir,0775,true))
     throw new LoggerException("Unable to create directory structure '$newDir'");
   if(file_exists($newRes)) {
+    chmodGroup($newRes,0664); // not important if passed or not
     if(filectime($newRes) >= filectime($res)) return $newRes;
-    chmod($newRes, 664); // not important if passed or not
   }
   if(!copy($res, $newRes)) {
     if(!file_exists($newRes)) {
@@ -87,9 +87,30 @@ function getRes($res,$dest,$resFolder) {
     new Logger("Unable to rewrite resource file to '$newRes'");
     return $newRes;
   }
-  if(!chmod($newRes, 664))
+  if(!chmodGroup($newRes,0664))
     new Logger("Unable to chmod resource file '$newRes'");
   return $newRes;
+}
+
+function chmodGroup($file,$mode) {
+  $a["orig_umask"] = umask();
+  $a["orig_perms"] = fileperms($file);
+  $oldMask = umask(002);
+  $a["new_umask"] = umask();
+  $chmod = chmod($file,$mode);
+  $a["chmod()"] = $chmod;
+  $a["new_perms"] = fileperms($file);
+  umask($oldMask);
+  $a["back_umask"] = umask();
+  #print_r($a);
+  return $chmod;
+}
+
+function mkdirGroup($dir,$mode=0777,$rec=false) {
+  $oldMask = umask(002);
+  $dirMade = @mkdir($dir,$mode,$rec);
+  umask($oldMask);
+  return $dirMade;
 }
 
 function __autoload($className) {
@@ -172,7 +193,7 @@ function normalize($s) {
 function saveRewriteFile($dest,$src) {
   if(!file_exists($src))
     throw new LoggerException("Source file '$src' not found");
-  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0755,true))
+  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0775,true))
     throw new LoggerException("Unable to create directory structure");
   if(!touch($dest))
     throw new LoggerException("Unable to touch destination file");
@@ -184,7 +205,7 @@ function saveRewriteFile($dest,$src) {
 }
 
 function saveRewrite($dest,$content) {
-  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0755,true)) return false;
+  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0775,true)) return false;
   if(!file_exists($dest)) return file_put_contents($dest, $content);
   $b = file_put_contents("$dest.new", $content);
   if($b === false) return false;
