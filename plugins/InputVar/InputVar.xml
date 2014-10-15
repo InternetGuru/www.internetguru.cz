@@ -3,19 +3,19 @@
   <!-- http://php.net/manual/en/function.strftime.php -->
   <var id="month_num" fn="date" format="%m"/>
   <var id="month_tr" fn="translate" name="$month_num">
-    <cs name="01">ledna</cs>
-    <cs name="02">února</cs>
-    <cs name="03">března</cs>
-    <cs name="04">dubna</cs>
-    <cs name="05">května</cs>
-    <cs name="06">června</cs>
-    <cs name="07">července</cs>
-    <cs name="08">srpna</cs>
-    <cs name="09">září</cs>
-    <cs name="10">října</cs>
-    <cs name="11">listopadu</cs>
-    <cs name="12">prosince</cs>
-    <cs>n/a</cs>
+    <data lang="cs" name="01">ledna</data>
+    <data lang="cs" name="02">února</data>
+    <data lang="cs" name="03">března</data>
+    <data lang="cs" name="04">dubna</data>
+    <data lang="cs" name="05">května</data>
+    <data lang="cs" name="06">června</data>
+    <data lang="cs" name="07">července</data>
+    <data lang="cs" name="08">srpna</data>
+    <data lang="cs" name="09">září</data>
+    <data lang="cs" name="10">října</data>
+    <data lang="cs" name="11">listopadu</data>
+    <data lang="cs" name="12">prosince</data>
+    <data lang="cs">n/a</data>
   </var>
   <var id="today" fn="date" format="%e. $month_tr %Y"/>
 <!--

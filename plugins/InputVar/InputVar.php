@@ -60,7 +60,8 @@ class InputVar extends Plugin implements SplObserver {
     $name = $this->parse($var->getAttribute("name"));
     $lang = $this->subject->getCms()->getVariable("cms-lang");
     $translation = false;
-    foreach($var->getElementsByTagName($lang) as $e) {
+    foreach($var->getElementsByTagName("data") as $e) {
+      if(!$e->hasAttribute("lang") && $e->getAttribute("lang") != $lang) continue;
       if($e->hasAttribute("name") && $e->getAttribute("name") != $name) continue;
       if(!$e->hasAttribute("name") && $translation !== false) continue;
       $translation = $e->nodeValue;
