@@ -35,7 +35,12 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function fnHash(DOMElement $var) {
-    return hash("crc32b", $this->parse($var->nodeValue));
+    $algo = "crc32b";
+    if($var->hasAttribute("algo")) {
+      $userAlgo = $this->parse($var->getAttribute("algo"));
+      if(in_array($userAlgo, hash_algos())) $algo = $userAlgo;
+    }
+    return hash($algo, $this->parse($var->nodeValue));
   }
 
   private function fnLocal_link(DOMElement $var) {

@@ -14,7 +14,7 @@
   <xsl:param name="cms-mtime" select="''"/>
   <xsl:param name="cms-url" select="''"/>
   <xsl:param name="cms-link" select="''"/>
-  <xsl:param name="var-today" select="''"/>
+  <xsl:param name="inputvar-today" select="''"/>
 
   <xsl:template match="/body">
     <body>
@@ -27,7 +27,7 @@
         <ul>
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-ig"/></li>
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
-            <li><xsl:value-of select="$var-today"/></li>
+            <li><xsl:value-of select="$inputvar-today"/></li>
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-url"/><xsl:value-of disable-output-escaping="yes" select="$cms-link"/></li>
         </ul>
       </div>
