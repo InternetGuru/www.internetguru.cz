@@ -93,16 +93,9 @@ function getRes($res,$dest,$resFolder) {
 }
 
 function chmodGroup($file,$mode) {
-  $a["orig_umask"] = umask();
-  $a["orig_perms"] = fileperms($file);
   $oldMask = umask(002);
-  $a["new_umask"] = umask();
   $chmod = chmod($file,$mode);
-  $a["chmod()"] = $chmod;
-  $a["new_perms"] = fileperms($file);
   umask($oldMask);
-  $a["back_umask"] = umask();
-  #print_r($a);
   return $chmod;
 }
 

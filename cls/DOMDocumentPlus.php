@@ -1,6 +1,7 @@
 <?php
 
 class DOMDocumentPlus extends DOMDocument {
+  const DEBUG = true;
 
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);
@@ -141,6 +142,7 @@ class DOMDocumentPlus extends DOMDocument {
       $internal_errors = libxml_get_errors();
       if(count($internal_errors)) {
         $note = " [Caution: this message may be misleading]";
+        if(self::DEBUG) die($this->saveXML());
         $e = new Exception(current($internal_errors)->message . $note);
       }
     }

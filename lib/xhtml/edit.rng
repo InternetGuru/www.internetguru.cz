@@ -26,8 +26,10 @@
     <ref name="Inline.model"/>
   </define>
   <define name="Inline.class" combine="choice">
-    <ref name="ins"/>
-    <ref name="del"/>
+    <choice>
+      <ref name="ins"/>
+      <ref name="del"/>
+    </choice>
   </define>
 
 </grammar>
