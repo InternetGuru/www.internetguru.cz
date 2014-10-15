@@ -104,15 +104,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function getProcParams(Cms $cms) {
     $o = array();
     foreach($cms->getAllVariables() as $k => $v) {
-      if($v instanceof DOMDocument) {
-        $o[$k] = html_entity_decode($v->saveHTML());
-        continue;
-      }
-      if(is_object($v) && !method_exists($v, '__toString')) {
+      if($v instanceof DOMDocument) $v = $v->saveHTML();
+      elseif(is_array($v)) $v = html_entity_decode(implode(",",$v));
+      elseif(is_object($v) && !method_exists($v, '__toString')) {
         new Logger("Unable to convert variable '$k' to string","error");
         continue;
-      }
-      $v = html_entity_decode((string) $v);
+      } else $v = html_entity_decode((string) $v);
       if(!$this->isValidInlineHTML($v)) {
         new Logger("Input variable '$k' is not HTML valid","error");
         continue;

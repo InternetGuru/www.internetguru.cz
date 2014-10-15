@@ -37,6 +37,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function insertVar($varName,$varValue,$prefix="") {
+    echo "inserting $varName";
     $xpath = new DOMXPath($this);
     $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";
     #$noparse = "*";

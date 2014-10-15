@@ -106,6 +106,12 @@ function mkdirGroup($dir,$mode=0777,$rec=false) {
   return $dirMade;
 }
 
+function __toString($o) {
+  echo "|";
+  if(is_array($o)) return implode(",",$o);
+  return (string) $o;
+}
+
 function __autoload($className) {
   $fp = CMS_FOLDER ."/". PLUGIN_FOLDER . "/$className/$className.php";
   if(@include $fp) return;

@@ -91,14 +91,8 @@ class Cms {
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
     $this->loadDefaultVariables($this->content);
-    $this->loadInputVariables();
-  }
-
-  private function loadInputVariables() {
-    $isi = $this->plugins->getIsInterface("InputStrategyInterface");
-    foreach($isi as $k => $o) {
-      $this->variables = array_merge($this->variables,$o->getVariables());
-    }
+    $this->setVariable("variables", array_keys($this->variables));
+    foreach($this->variables as $k => $v) $this->content->insertVar($k,$v);
   }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
@@ -136,7 +130,6 @@ class Cms {
     if(!isset($d[1]["class"])) throw new LoggerException("Unknown caller class");
     $varId = strtolower($d[1]["class"])."-".normalize($name);
     $this->variables[$varId] = $value;
-    $this->variables["cms-variables"] = implode(" ",array_keys($this->variables));
     return $varId;
   }
 
