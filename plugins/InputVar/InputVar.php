@@ -64,7 +64,7 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function fnDate(DOMElement $var) {
-    $format = "n/j/Y";
+    $format = "%D";
     if($var->hasAttribute("format")) {
       $format = $this->parse($var->getAttribute("format"));
       $format = $this->crossPlatformCompatibleFormat($format);
@@ -103,6 +103,8 @@ class InputVar extends Plugin implements SplObserver {
       preg_match_all('/\$((?:cms-)?[a-z_]+)/',$s,$match);
       foreach($match[1] as $var) {
         $varVal = $this->subject->getCms()->getVariable($var);
+        if(is_null($varVal))
+          $varVal = $this->subject->getCms()->getVariable("inputvar-$var");
         if(is_null($varVal)) {
           new Logger("Variable '$var' does not exist","warning");
           $output[] = $s;

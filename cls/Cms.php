@@ -108,18 +108,18 @@ class Cms {
   private function loadDefaultVariables(HTMLPlus $doc) {
     $desc = $doc->getElementsByTagName("desc")->item(0);
     $h1 = $doc->getElementsByTagName("h")->item(0);
-    $this->variables["cms-ig"] = "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>";
-    $this->variables["cms-ez"] = "<a href='http://www.ezakladna.cz'>E-Základna</a>";
-    $this->variables["cms-url"] = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
-    $this->variables["cms-link"] = getLocalLink();
-    $this->variables["cms-lang"] = $doc->documentElement->getAttribute("xml:lang");
-    $this->variables["cms-desc"] = $desc->nodeValue;
-    if($h1->hasAttribute("short")) $this->variables["cms-title"] = $h1->getAttribute("short");
-    else $this->variables["cms-title"] = $h1->nodeValue;
-    if($h1->hasAttribute("author")) $this->variables["cms-author"] = $h1->getAttribute("author");
-    if($desc->hasAttribute("kw")) $this->variables["cms-kw"] = $desc->getAttribute("kw");
-    if($h1->hasAttribute("mtime")) $this->variables["cms-mtime"] = $h1->getAttribute("mtime");
-    if($h1->hasAttribute("ctime")) $this->variables["cms-ctime"] = $h1->getAttribute("ctime");
+    $this->setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
+    $this->setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
+    $this->setVariable("url", $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"]);
+    $this->setVariable("link", getLocalLink());
+    $this->setVariable("lang", $doc->documentElement->getAttribute("xml:lang"));
+    $this->setVariable("desc", $desc->nodeValue);
+    if($h1->hasAttribute("short")) $this->setVariable("title", $h1->getAttribute("short"));
+    else $this->setVariable("title", $h1->nodeValue);
+    if($h1->hasAttribute("author")) $this->setVariable("author", $h1->getAttribute("author"));
+    if($desc->hasAttribute("kw")) $this->setVariable("kw", $desc->getAttribute("kw"));
+    if($h1->hasAttribute("mtime")) $this->setVariable("mtime", $h1->getAttribute("mtime"));
+    if($h1->hasAttribute("ctime")) $this->setVariable("ctime", $h1->getAttribute("ctime"));
   }
 
   private function loadContent() {
@@ -132,7 +132,12 @@ class Cms {
   }
 
   public function setVariable($name, $value) {
-    $this->variables[$name] = $value;
+    $d = debug_backtrace();
+    if(!isset($d[1]["class"])) throw new LoggerException("Unknown caller class");
+    $varId = strtolower($d[1]["class"])."-".normalize($name);
+    $this->variables[$varId] = $value;
+    $this->variables["cms-variables"] = implode(" ",array_keys($this->variables));
+    return $varId;
   }
 
   public function getAllVariables() {

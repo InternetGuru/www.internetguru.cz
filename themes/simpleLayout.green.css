@@ -1,33 +1,28 @@
 h2 {
-  color: #249E47;
+  color: #008627;
 }
 
 div.cms-balancer a,
 #content > div:first-child {
-  background: #66C982;
-}
-
-#content > div:first-child + div,
-div.list, div.cms-balancer {
-  /*background-image: url('ticks.png');*/
+  background: #3CC563;
 }
 
 ol.cms-breadcrumb li a {
-  color: #249E47;
+  color: #008627;
 }
 
 a:link {
-  color: #1D7436;
+  color: #008627;
 }
 
 a:visited {
-  color: #555;
+  color: black;
 }
 
 #footer {
-  background: #66C982;
+  background: #3CC563;
 }
 
 #footer > ul.cms-menu > li a:not([href]) {
-  color: #249E47;
+  color: #008627;
 }

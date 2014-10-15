@@ -1,7 +1,7 @@
 <?php
 
 class DOMDocumentPlus extends DOMDocument {
-  const DEBUG = true;
+  const DEBUG = false;
 
   function __construct($version="1.0",$encoding="utf-8") {
     parent::__construct($version,$encoding);

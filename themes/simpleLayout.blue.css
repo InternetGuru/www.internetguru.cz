@@ -7,23 +7,22 @@ div.cms-balancer a,
   background: #3C9DD1;
 }
 
-#content > div:first-child + div,
-div.list, div.cms-balancer {
-  /*background-image: url('ticks.png');*/
-}
-
 ol.cms-breadcrumb li a {
   color: #086CA2;
 }
 
 a:link {
-  color: #3846CA;
+  color: #086CA2;
 }
 
 a:visited {
-  color: #555;
+  color: black;
 }
 
 #footer {
   background: #3C9DD1;
+}
+
+#footer > ul.cms-menu > li a:not([href]) {
+  color: #008627;
 }

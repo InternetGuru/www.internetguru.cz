@@ -50,7 +50,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // add head element
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title",$cms->getVariable("cms-title")));
+    $head->appendChild($doc->createElement("title",$this->getTitle($cms)));
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"viewport","initial-scale=1");
     $this->appendMeta($head,"Content-Language", $cms->getVariable("cms-lang"));
@@ -90,6 +90,15 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // and that's it
     return $doc->saveXML();
+  }
+
+  private function getTitle(Cms $cms) {
+    $title = $cms->getVariable("cms-title");
+    foreach($this->subject->getIsInterface("ContentStrategyInterface") as $clsName => $cls) {
+      $tmp = $cms->getVariable(strtolower($clsName)."-cms-title");
+      if(!is_null($tmp)) $title = $tmp;
+    }
+    return $title;
   }
 
   private function getProcParams(Cms $cms) {

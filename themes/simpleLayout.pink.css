@@ -7,11 +7,6 @@ div.cms-balancer a,
   background: #E42E91;
 }
 
-#content > div:first-child + div,
-div.list, div.cms-balancer {
-  /*background-image: url('ticks.png');*/
-}
-
 ol.cms-breadcrumb li a {
   color: #FF1493;
 }
@@ -21,7 +16,7 @@ a:link {
 }
 
 a:visited {
-  color: #555;
+  color: black;
 }
 
 #footer {
