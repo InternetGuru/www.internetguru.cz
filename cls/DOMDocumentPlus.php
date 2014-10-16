@@ -37,7 +37,6 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function insertVar($varName,$varValue,$prefix="") {
-    echo "inserting $varName";
     $xpath = new DOMXPath($this);
     $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";
     #$noparse = "*";
@@ -67,16 +66,22 @@ class DOMDocumentPlus extends DOMDocument {
     if(!count($where)) return;
     $type = gettype($varValue);
     foreach($where as $attr => $e) {
+      if(is_null($e->parentNode)) continue;
       switch($type) {
         case "NULL":
         $this->removeVarElement($e);
         break;
         case "string":
+        $e = $this->prepareIfDl($e,$varName);
         $this->insertVarString($varValue,$e,$attr);
         break;
         case "array":
-        if(empty($varValue)) $this->emptyVarArray($e);
-        else $this->insertVarArray($varValue,$e);
+        if(empty($varValue)) {
+          $this->emptyVarArray($e);
+          continue;
+        }
+        $e = $this->prepareIfDl($e,$varName);
+        $this->insertVarArray($varValue,$e);
         break;
         default:
         if($varValue instanceof DOMElement) {
@@ -86,6 +91,13 @@ class DOMDocumentPlus extends DOMDocument {
         new Logger("Unsupported variable type '$type' for '$varName'","error");
       }
     }
+  }
+
+  private function prepareIfDl(DOMElement $e,$varName) {
+    if($e->nodeName != "dl") return $e;
+    $e->removeChildNodes();
+    $e->appendChild($e->ownerDocument->createElement("dt",$varName));
+    return $e->appendChild($e->ownerDocument->createElement("dd"));
   }
 
   public function removeNodes($query) {
@@ -193,9 +205,28 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function insertVarArray(Array $varValue,DOMElement $e) {
+    switch($e->nodeName) {
+      case "body":
+      case "section":
+      case "dl":
+      case "form":
+      case "fieldset":
+      return;
+      case "li":
+      case "dd":
+      break;
+      case "ul":
+      case "ol":
+      $e->removeChildNodes();
+      $e = $e->appendChild($e->ownerDocument->createElement("li"));
+      break;
+      default:
+      $this->insertVarString(implode(", ",$varValue),$e);
+      return;
+    }
     $p = $e->parentNode;
     foreach($varValue as $v) {
-      $li = $p->appendChild($e->cloneNode());
+      $li = $p->insertBefore($e->cloneNode(),$e);
       $li->nodeValue = $v;
     }
     $p->removeChild($e);
