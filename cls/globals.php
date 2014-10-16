@@ -242,6 +242,33 @@ function matchFiles($pattern, $dir) {
   return $files;
 }
 
+function validateXMLMarkup($v,$n=null) {
+  $doc = new DOMDocument();
+  if(@$doc->loadXML($v)) return true;
+  $html = '<html>'.translateLiteral2NumericEntities($v).'</html>';
+  if(!@$doc->loadXML($html)) {
+    if(is_null($n)) $n="unknown variable";
+    new Logger("Input variable '$n' is not HTML valid","error");
+    return false;
+  }
+  return true;
+}
 
+function translateLiteral2NumericEntities($xmlSource, $reverse = FALSE) {
+  static $literal2NumericEntity;
+
+  if (empty($literal2NumericEntity)) {
+    $transTbl = get_html_translation_table(HTML_ENTITIES);
+    foreach ($transTbl as $char => $entity) {
+      if (strpos('&"<>', $char) !== FALSE) continue;
+      $literal2NumericEntity[$entity] = '&#'.ord($char).';';
+    }
+  }
+  if ($reverse) {
+    return strtr($xmlSource, array_flip($literal2NumericEntity));
+  } else {
+    return strtr($xmlSource, $literal2NumericEntity);
+  }
+}
 
 ?>

@@ -69,25 +69,24 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $type = (in_array($this->type,array("html","xsl")) ? "xml" : $this->type);
 
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("heading",$cms->getVariable("cms-title"),"ContentAdmin");
-    $newContent->insertVar("errors",$this->errors,"ContentAdmin");
-    $newContent->insertVar("link",getLocalLink(),"ContentAdmin");
-    $newContent->insertVar("linkAdmin",$la,"ContentAdmin");
-    $newContent->insertVar("linkAdminStatus","$la&$statusChange","ContentAdmin");
+    $newContent->insertVar("contentadmin-heading", $cms->getVariable("cms-title"));
+    $newContent->insertVar("contentadmin-errors", $this->errors);
+    $newContent->insertVar("contentadmin-link", getLocalLink());
+    $newContent->insertVar("contentadmin-linkadmin", $la);
+    $newContent->insertVar("contentadmin-linkadminstatus", "$la&amp;$statusChange");
 
     if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown")
-      $newContent->insertVar("statusChange",null,"ContentAdmin");
+      $newContent->insertVar("contentadmin-statuschange", null);
 
-    $newContent->insertVar("content",$this->contentValue,"ContentAdmin");
-    $newContent->insertVar("filename",$this->defaultFile,"ContentAdmin");
-    $newContent->insertVar("schema",$format,"ContentAdmin");
-    $newContent->insertVar("mode",$mode,"ContentAdmin");
-    $newContent->insertVar("classType",$type,"ContentAdmin");
-    $newContent->insertVar("defaultContent",$this->getDefContent(),"ContentAdmin");
-    $newContent->insertVar("resultContent",$this->getResContent(),"ContentAdmin");
-    $newContent->insertVar("status",$this->dataFileStatus,"ContentAdmin");
-    #$newContent->insertVar("noparse","noparse","ContentAdmin");
-    $newContent->insertVar("userfilehash",$usrDestHash,"ContentAdmin");
+    $newContent->insertVar("contentadmin-content", $this->contentValue);
+    $newContent->insertVar("contentadmin-filename", $this->defaultFile);
+    $newContent->insertVar("contentadmin-schema", $format);
+    $newContent->insertVar("contentadmin-mode", $mode);
+    $newContent->insertVar("contentadmin-classtype", $type);
+    $newContent->insertVar("contentadmin-defaultcontent", $this->getDefContent());
+    $newContent->insertVar("contentadmin-resultcontent", $this->getResContent());
+    $newContent->insertVar("contentadmin-status", $this->dataFileStatus);
+    $newContent->insertVar("contentadmin-userfilehash", $usrDestHash);
 
     return $newContent;
   }

@@ -40,7 +40,11 @@ class DOMDocumentPlus extends DOMDocument {
     $xpath = new DOMXPath($this);
     $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";
     #$noparse = "*";
-    if($prefix != "") $varName = $prefix.":".$varName;
+    if($prefix != "") {
+      new Logger("DEPRECATED: Using variable prefix","warning");
+      $varName = $prefix.":".$varName;
+    }
+    #if(!validateXMLMarkup($varValue,$varName)) return;
     // find elements with current var
     $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$varName));
     $where = array();

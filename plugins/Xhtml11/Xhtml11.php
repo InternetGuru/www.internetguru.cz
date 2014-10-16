@@ -104,31 +104,33 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function getProcParams(Cms $cms) {
     $o = array();
     foreach($cms->getAllVariables() as $k => $v) {
+      $valid = true;
       if($v instanceof DOMDocument) $v = $v->saveHTML();
-      elseif(is_array($v)) $v = html_entity_decode(implode(",",$v));
-      elseif(is_object($v) && !method_exists($v, '__toString')) {
+      elseif(is_array($v)) {
+        $v = implode(",",$v);
+        if(!validateXMLMarkup($v,$k)) continue;
+      } elseif(is_object($v) && !method_exists($v, '__toString')) {
         new Logger("Unable to convert variable '$k' to string","error");
         continue;
-      } else $v = html_entity_decode((string) $v);
-      if(!$this->isValidInlineHTML($v)) {
-        new Logger("Input variable '$k' is not HTML valid","error");
-        continue;
+      } else {
+        $v = (string) $v;
+        if(!validateXMLMarkup($v,$k)) continue;
       }
-      $o[$k] = $v;
+      if(false) {
+        #continue;
+        if($k != "cms-ig") continue;
+        $v = "&copy;2014 &amp; <a href='http://www.internetguru.cz'>InternetGuru</a>";
+        echo ($v)."\n";
+        echo html_entity_decode($v)."\n";
+        echo htmlentities($v)."\n";
+        echo html_entity_decode($v)."\n";
+        echo utf8_decode(html_entity_decode($v))."\n";
+        echo translateLiteral2NumericEntities($v)."\n";
+        die();
+      }
+      $o[$k] = str_replace("'",'"',html_entity_decode($v));
     }
     return $o;
-  }
-
-  private function isValidInlineHTML($v) {
-    $doc = new HTMLPlus();
-    $html = '<body xml:lang="en"><h id="x">x</h><desc>'.utf8_encode($v).'</desc></body>';
-    if(!@$doc->loadXML($html)) return false;
-    try {
-      $doc->validatePlus();
-    } catch(Exception $ex) {
-      return false;
-    }
-    return true;
   }
 
   private function registerThemes(DOMDocumentPlus $cfg) {

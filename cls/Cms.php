@@ -121,6 +121,7 @@ class Cms {
   }
 
   public function getVariable($name) {
+    $name = strtolower($name);
     if(!array_key_exists($name, $this->variables)) return null;
     return $this->variables[$name];
   }
