@@ -27,7 +27,6 @@
   <plugin>ContentLink</plugin>
   <plugin>ContentMatch</plugin>
   <plugin>GlobalMenu</plugin>
-  <plugin>ContentVar</plugin>
   <plugin>Convertor</plugin>
   <plugin>GA</plugin>
   <plugin>InputVar</plugin>

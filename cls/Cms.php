@@ -91,7 +91,7 @@ class Cms {
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
     $this->loadDefaultVariables($this->content);
-    $this->setVariable("variables", array_keys($this->variables));
+    $this->setVariable(array_keys($this->variables), "variables");
     foreach($this->variables as $k => $v) $this->content->insertVar($k,$v);
   }
 
@@ -102,18 +102,18 @@ class Cms {
   private function loadDefaultVariables(HTMLPlus $doc) {
     $desc = $doc->getElementsByTagName("desc")->item(0);
     $h1 = $doc->getElementsByTagName("h")->item(0);
-    $this->setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
-    $this->setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
-    $this->setVariable("url", $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"]);
-    $this->setVariable("link", getLocalLink());
-    $this->setVariable("lang", $doc->documentElement->getAttribute("xml:lang"));
-    $this->setVariable("desc", $desc->nodeValue);
-    if($h1->hasAttribute("short")) $this->setVariable("title", $h1->getAttribute("short"));
-    else $this->setVariable("title", $h1->nodeValue);
-    if($h1->hasAttribute("author")) $this->setVariable("author", $h1->getAttribute("author"));
-    if($desc->hasAttribute("kw")) $this->setVariable("kw", $desc->getAttribute("kw"));
-    if($h1->hasAttribute("mtime")) $this->setVariable("mtime", $h1->getAttribute("mtime"));
-    if($h1->hasAttribute("ctime")) $this->setVariable("ctime", $h1->getAttribute("ctime"));
+    $this->setVariable("&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>", "ig");
+    $this->setVariable("<a href='http://www.ezakladna.cz'>E-Základna</a>", "ez");
+    $this->setVariable($_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"], "url");
+    $this->setVariable(getLocalLink(), "link");
+    $this->setVariable($doc->documentElement->getAttribute("xml:lang"), "lang");
+    $this->setVariable($desc->nodeValue, "desc");
+    if($h1->hasAttribute("short")) $this->setVariable($h1->getAttribute("short"), "title");
+    else $this->setVariable($h1->nodeValue, "title");
+    if($h1->hasAttribute("author")) $this->setVariable($h1->getAttribute("author"), "author");
+    if($desc->hasAttribute("kw")) $this->setVariable($desc->getAttribute("kw"), "kw");
+    if($h1->hasAttribute("mtime")) $this->setVariable($h1->getAttribute("mtime"), "mtime");
+    if($h1->hasAttribute("ctime")) $this->setVariable($h1->getAttribute("ctime"), "ctime");
   }
 
   private function loadContent() {
@@ -125,10 +125,11 @@ class Cms {
     return $this->variables[$name];
   }
 
-  public function setVariable($name, $value) {
+  public function setVariable($value,$name=null) {
     $d = debug_backtrace();
     if(!isset($d[1]["class"])) throw new LoggerException("Unknown caller class");
-    $varId = strtolower($d[1]["class"])."-".normalize($name);
+    $varId = strtolower($d[1]["class"]);
+    if($varId != $name) $varId .= (strlen($name) ? "-".normalize($name) : "");
     $this->variables[$varId] = $value;
     return $varId;
   }

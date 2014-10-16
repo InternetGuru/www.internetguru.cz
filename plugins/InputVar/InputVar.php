@@ -31,7 +31,7 @@ class InputVar extends Plugin implements SplObserver {
     } else {
       $value = $this->parse($var->nodeValue);
     }
-    $this->subject->getCms()->setVariable($var->getAttribute("id"),$value);
+    $this->subject->getCms()->setVariable($value,$var->getAttribute("id"));
   }
 
   private function fnHash(DOMElement $var) {
