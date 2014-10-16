@@ -122,7 +122,9 @@ class DOMDocumentPlus extends DOMDocument {
       $id = $e->getAttribute($attr);
       if(array_key_exists($id, $ids)) {
         if(!$repair) throw new Exception("Duplicit $attr attribute '$id' found");
-        $id = $id."1";
+        $i = 1;
+        while(array_key_exists($id.$i, $ids)) $i++;
+        $id = $id.$i;
         $e->setAttribute("id",$id);
       }
       $ids[$id] = null;
