@@ -102,22 +102,30 @@ class DOMBuilder {
     if(self::DEBUG) $this->doc->formatOutput = true;
 
     if($replace) {
-      $this->loadDOM($this->findFile($filePath,$user),$this->doc);
+      $this->safeLoadDOM($filePath,$user,$this->doc);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
       return;
     }
 
-    $this->loadDOM($this->findFile($filePath,false,false),$this->doc);
+    $this->safeLoadDOM($filePath,false,$this->doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$filePath";
-    if(is_file($f)) $this->updateDOM($f,true);
+    try {
+      if(is_file($f)) $this->updateDOM($f,true);
+    } catch(Exception $e) {
+      new Logger($e->getMessage,"error");
+    }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     if(!$user) return;
 
     $f = USER_FOLDER . "/$filePath";
-    if(is_file($f)) $this->updateDOM($f);
+    try {
+      if(is_file($f)) $this->updateDOM($f);
+    } catch(Exception $e) {
+      new Logger($e->getMessage,"error");
+    }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
   }
 
@@ -127,18 +135,46 @@ class DOMBuilder {
     return $f;
   }
 
+  private function safeLoadDOM($filePath,$user,DOMDocumentPlus $doc) {
+    $files = array();
+    try {
+      $files[$this->findFile($filePath,$user,true)] = null;
+      $files[$this->findFile($filePath,false,true)] = null;
+      $files[$this->findFile($filePath,false,false)] = null;
+    } catch(Exception $e) {
+      if(empty($files)) throw $e;
+    }
+    $success = false;
+    $e = null;
+    foreach($files as $f => $void) {
+      try {
+        $this->loadDOM($f,$doc);
+      } catch(Exception $e) {
+        continue;
+      }
+      $success = true;
+      break;
+    }
+    if($success) return;
+    $doc = null;
+    if(!is_null($e)) throw $e;
+  }
+
   private function loadDOM($filePath, DOMDocumentPlus $doc) {
     // load
     if(!@$doc->load($filePath))
-      throw new Exception("Unable to load DOM from file '$filePath'");
+      throw new LoggerException("Unable to load DOM from file '$filePath'");
     // validate if htmlplus
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
-      if(!($doc instanceof HTMLPlus)) throw $e;
-      $doc->validatePlus(true);
-      $doc->formatOutput = true;
-      saveRewrite($filePath, $doc->saveXML());
+      if(!($doc instanceof HTMLPlus)) throw new LoggerException($e->getMessage());
+      try {
+        $doc->validatePlus(true);
+        saveRewrite($filePath, $doc->saveXML());
+      } catch(Exception $e) {
+        throw new LoggerException($e->getMessage());
+      }
     }
     // HTMLPlus import
     if(!($doc instanceof HTMLPlus)) return;
@@ -168,13 +204,15 @@ class DOMBuilder {
   }
 
   private function insertHtmlPlus(DOMElement $h, $file) {
-    if(in_array($file, $this->imported))
-      throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$h->getAttribute("import")));
-    $doc = new HTMLPlus();
     try {
+      if(in_array($file, $this->imported))
+        throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$h->getAttribute("import")));
+      $doc = new HTMLPlus();
       $this->loadDOM($file, $doc);
     } catch(Exception $e) {
-      $c = new DOMComment(" invalid import file '$file' ");
+      $msg = "Unable to import '$file': ". $e->getMessage();
+      $c = new DOMComment(" $msg ");
+      new Logger($msg,"error");
       $h->parentNode->insertBefore($c,$h);
       return;
     }

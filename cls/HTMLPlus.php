@@ -67,7 +67,6 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->relaxNGValidatePlus();
-    return true;
   }
 
   public function relaxNGValidatePlus() {
