@@ -80,7 +80,7 @@
   function indicateChange(){
     var areas = document.getElementsByTagName("textarea");
     for(var i=0; i < areas.length; i++) {
-      areas[i].addEventListener('input', function() {
+      areas[i].addEventListener('keyup', function() {
         if(modified) return;
         modified = true;
         document.title = CHANGE + document.title;
