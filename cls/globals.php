@@ -126,31 +126,6 @@ function stableSort(Array &$a) {
   array_multisort($a,SORT_ASC,$order,SORT_ASC);
 }
 
-function getLocalLink($link=null,$force=false) {
-  if(strpos($link, "#") === 0) return $link;
-  if(is_null($link)) $link = getCurLink();
-  $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException("Unable to parse href '$link'");
-  if(!$force && isset($pLink["scheme"])) return true; // link is absolute
-  if(isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  $localLink = array();
-  if(isAtLocalhost() && !isset($pLink["scheme"])) {
-    $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
-    $localLink[] = $dir[1];
-  }
-  $root = "/".implode("/",$localLink);
-  if(strpos($link,"$root/") === 0 || $link == $root) return true; // link is correct
-  $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
-  $fragment = isset($pLink["fragment"]) ? "#" . $pLink["fragment"] : "";
-  if(isset($pLink["path"])) {
-    foreach(explode("/",$pLink["path"]) as $pp) {
-      if(!strlen($pp) || $pp == ".") continue; // "/mylink"
-      $localLink[] = $pp;
-    }
-  }
-  return "/".implode("/",$localLink) . $query . $fragment;
-}
-
 function getCurLink() {
   if(isset($_GET["page"])) return $_GET["page"];
   return "";

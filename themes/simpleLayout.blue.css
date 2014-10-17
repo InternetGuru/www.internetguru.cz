@@ -2,12 +2,12 @@ h2 {
   color: #086CA2;
 }
 
-div.cms-balancer a,
+div.contentbalancer a,
 #content > div:first-child {
   background: #3C9DD1;
 }
 
-ol.cms-breadcrumb li a {
+ol.contentlink-bc li a {
   color: #086CA2;
 }
 
@@ -23,6 +23,6 @@ a:visited {
   background: #3C9DD1;
 }
 
-#footer > ul.cms-menu > li a:not([href]) {
+#footer > ul.globalmenu > li a:not([href]) {
   color: #008627;
 }

@@ -3,4 +3,4 @@ h1, h2, h3 { font-weight: normal; page-break-after: avoid; page-break-inside: av
 p, ul, ol, dl, div:not(.section) {page-break-inside: avoid;}
 body {font-size:10pt; font-family: Charter, Georgia, sans;}
 @page {size: auto; margin: 21mm 20mm;}
-#footer, #header, ol.cms-breadcrumb {display: none;}
+#footer, #header, ol.contentlink-bc {display: none;}

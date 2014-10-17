@@ -96,6 +96,99 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
+  public function validateLinks($elName,$attName,$repair) {
+    $toStrip = array();
+    foreach($this->getElementsByTagName($elName) as $e) {
+      if(!$e->hasAttribute($attName)) continue;
+      try {
+        $link = $this->repairLink($e->getAttribute($attName));
+        if($link === $e->getAttribute($attName)) continue;
+        if(!$repair)
+          throw new Exception("Invalid repairable link '".$e->getAttribute($attName)."'");
+        $e->setAttribute($attName,$link);
+      } catch(Exception $ex) {
+        if(!$repair) throw $ex;
+        $toStrip[] = array($e,$ex->getMessage());
+      }
+    }
+    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
+  }
+
+  private function repairLink($link=null) {
+    if(strpos($link, "#") === 0) return $link; // #f is ok, no change
+    if(strpos($link, "?") === 0) return $link; // ?q is ok, no change
+    if(is_null($link)) $link = getCurLink(); // null -> currentLink
+    $pLink = parse_url($link);
+    if($pLink === false) throw new LoggerException("Unable to parse href '$link'"); // fail2parse
+    if(isset($pLink["scheme"])) { // link is in absolute form
+      $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
+      if(strpos($link,$curDomain) !== 0) return $link; // link is external
+    }
+    $path = isset($pLink["path"]) && !in_array($pLink["path"],array(".","..","/")) ? $pLink["path"] : "";
+    $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
+    $fragment = isset($pLink["fragment"]) ? "#" . $pLink["fragment"] : "";
+    if(strlen($path . $query . $fragment)) return $path . $query . $fragment;
+    return "#".$this->getElementsByTagName("body")->item(0)->firstElement->getAttribute("id");
+  }
+
+  public function fragToLinks(HTMLPlus $src,$root="/") {
+    $toStrip = array();
+    foreach($this->getElementsByTagName("a") as $a) {
+      if(!$a->hasAttribute("href")) continue; // no link found
+      $pLink = parse_url($a->getAttribute("href"));
+      // expecting only 3 variables:
+      // 1) is absolute link
+      // 2) is internal fragment
+      // 3) is internal link
+      if(isset($pLink["scheme"])) continue;
+      if(isset($pLink["path"])) {
+        $linkedElement = $src->getElementById($pLink["path"],"link");
+        if(is_null($linkedElement)) {
+          $toStrip[] = array($a,"link '".$pLink["path"]."' not found");
+          continue; // link not exists
+        }
+        if(getCurLink() == $pLink["path"]) {
+          $toStrip[] = array($a,"cyclic link found");
+          continue;
+        }
+        $a->setAttribute("href",$root.$pLink["path"]);
+        continue;
+      }
+      $frag = $pLink["fragment"];
+      $linkedElement = $this->getElementById($frag);
+      if(!is_null($linkedElement)) {
+        if($this->getElementsByTagName("h1")->item(0)->isSameNode($linkedElement)) {
+          $toStrip[] = array($a,"cyclic fragment found");
+        }
+        continue; // ignore visible headings
+      }
+      $linkedElement = $src->getElementById($frag);
+      if(is_null($linkedElement)) {
+        $toStrip[] = array($a,"id '$frag' not found");
+        continue; // id not exists
+      }
+      if($linkedElement->nodeName == "h" && $linkedElement->hasAttribute("link")) {
+        $a->setAttribute("href",$root.$linkedElement->getAttribute("link"));
+        continue; // is outter h1
+      }
+      $h = $linkedElement->parentNode->getPreviousElement("h");
+      while(!is_null($h) && !$h->hasAttribute("link")) {
+        $h = $h->parentNode->getPreviousElement("h");
+      }
+      if(is_null($h)) {
+        $h1 = $src->documentElement->firstElement;
+        if($h1->getAttribute("id") == $frag) {
+          $a->setAttribute("href",$root);
+          continue; // link to root heading
+        }
+        $a->setAttribute("href",$root."#".$frag);
+        continue; // no link attribute until root heading
+      }
+      $a->setAttribute("href",$root.$h->getAttribute("link")."#".$frag);
+    }
+    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
+  }
+
   private function prepareIfDl(DOMElement $e,$varName) {
     if($e->nodeName != "dl") return $e;
     $e->removeChildNodes();

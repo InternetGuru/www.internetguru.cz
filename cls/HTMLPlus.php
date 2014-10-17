@@ -23,38 +23,6 @@ class HTMLPlus extends DOMDocumentPlus {
     return $this->autocorrected;
   }
 
-  public function fragToLinks(HTMLPlus $src) {
-    $toStrip = array();
-    foreach($this->getElementsByTagName("a") as $a) {
-      if(!$a->hasAttribute("href")) continue;
-      if(strpos($a->getAttribute("href"),"#") !== 0) continue;
-      $frag = substr($a->getAttribute("href"),1);
-      $linkedElement = $this->getElementById($frag);
-      if(!is_null($linkedElement)) {
-        if($this->getElementsByTagName("h")->item(0)->isSameNode($linkedElement)) {
-          $toStrip[] = array($a,"cyclic fragment found");
-        }
-        continue; // ignore visible headings
-      }
-      $linkedElement = $src->getElementById($frag);
-      if(is_null($linkedElement)) {
-        $toStrip[] = array($a,"id '$frag' not found");
-        continue; // id not exists
-      }
-      if($linkedElement->nodeName == "h" && $linkedElement->hasAttribute("link")) {
-        $a->setAttribute("href",getLocalLink($linkedElement->getAttribute("link")));
-        continue; // is outter h1
-      }
-      $h = $linkedElement->getPreviousElement("h");
-      while(!is_null($h) && !$h->hasAttribute("link")) {
-        $h = $h->parentNode->getPreviousElement("h");
-      }
-      if(is_null($h)) continue; // no link till root
-      $a->setAttribute("href",getLocalLink($h->getAttribute("link"))."#".$frag);
-    }
-    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
-  }
-
   public function validatePlus($repair=false) {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot();
@@ -64,6 +32,8 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHId($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
+    $this->validateLinks("a","href",$repair);
+    $this->validateLinks("form","action",$repair);
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->relaxNGValidatePlus();

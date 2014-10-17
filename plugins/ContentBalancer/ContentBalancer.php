@@ -15,7 +15,6 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
 
   public function getContent(HTMLPlus $content) {
     $this->filter($content);
-    $content->fragToLinks($this->subject->getCms()->getContentFull());
     return $content;
   }
 
@@ -27,23 +26,13 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       $hs = array();
       foreach($xpath->query($e->getNodePath() . "/h") as $h) $hs[] = $h;
       $ul = $content->createElement("ul");
-      $ul->setAttribute("class","cms-balancer");
+      $ul->setAttribute("class","contentbalancer");
       foreach($hs as $h) {
-        if($h->hasAttribute("link")) $href = getLocalLink($h->getAttribute("link"));
-        else {
-          $parentHeading = $this->getParentHeading($e);
-          if($parentHeading->hasAttribute("link") && $h->hasAttribute("id")) {
-            $href = getLocalLink($parentHeading->getAttribute("link")) . "#" . $h->getAttribute("id");
-          } else {
-            #throw new Exception("Unable to build link for {$h->nodeValue}");
-            continue 2;
-          }
-        }
         $li = $content->createElement("li");
         $textContent = $h->nodeValue;
         if($h->hasAttribute("short")) $textContent = $h->getAttribute("short");
         $a = $content->createElement("a",$textContent);
-        $a->setAttribute("href",$href);
+        $a->setAttribute("href","#".$h->getAttribute("id"));
         $li->appendChild($a);
         $ul->appendChild($li);
       }

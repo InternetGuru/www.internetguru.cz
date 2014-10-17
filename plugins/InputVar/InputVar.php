@@ -6,7 +6,7 @@ class InputVar extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "process") return;
     $this->subject = $subject;
-    $cf = $subject->getCms()->getContentFull();
+    #$cf = $subject->getCms()->getContentFull();
     $dom = $this->getDOMPlus();
     $vars = $dom->getElementsByTagName("var");
     foreach($vars as $var) $this->parseVar($var);
@@ -48,7 +48,7 @@ class InputVar extends Plugin implements SplObserver {
     $title = null;
     if($var->hasAttribute("href")) $href = $this->parse($var->getAttribute("href"));
     if($var->hasAttribute("title")) $title = $var->getAttribute("title");
-    return "<a href='" . getLocalLink($href) . "'" . (is_null($title) ? "" : " title='$title'")
+    return "<a href='$href'" . (is_null($title) ? "" : " title='$title'")
     . ">" . $this->parse($var->nodeValue) . "</a>";
   }
 

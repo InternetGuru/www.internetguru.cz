@@ -14,6 +14,7 @@ class DOMElementPlus extends DOMElement {
   public function getPreviousElement($eName=null) {
     if(is_null($eName)) $eName = $this->nodeName;
     $e = $this->previousElement;
+    if(is_null($e)) $e = $this->parentNode;
     while($e instanceof DOMElement) {
       if($e->nodeName == $eName) return $e;
       if(!is_null($e->previousElement)) $e = $e->previousElement;
@@ -39,6 +40,9 @@ class DOMElementPlus extends DOMElement {
       case "childElements":
       return $this->getChildElements();
       break;
+      case "firstElement":
+      return $this->getFirstElement();
+      break;
       #default:
       #return parent::__get($name);
     }
@@ -56,9 +60,14 @@ class DOMElementPlus extends DOMElement {
     return $e;
   }
 
+  private function getFirstElement() {
+    if(!$this->childElements->length) return null;
+    return $this->childElements->item(0);
+  }
+
   private function getChildElements() {
     $xpath = new DOMXPath($this->ownerDocument);
-    return $xpath->query($this->getNodePath() . "/node()[not(self::text())]");
+    return $xpath->query($this->getNodePath() . "/node()[not(self::text() or self::comment() or self::processing-instruction())]");
   }
 
 }

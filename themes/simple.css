@@ -54,7 +54,7 @@ dl ul, dl ol, dl dl {
 div.list ul,
 div.list ol,
 div.list dl,
-div.cms-balancer ul {
+div.contentbalancer ul {
   margin-top: 0;
   margin-bottom: 0;
 }
@@ -94,7 +94,7 @@ h3, h4, h5, h6 {
 
 /* breadcrumb navigation */
 
-ol.cms-breadcrumb {
+ol.contentlink-bc {
   list-style: none;
   padding: 0;
   margin-top: -2rem;
@@ -104,17 +104,17 @@ ol.cms-breadcrumb {
   max-width: 61rem;
 }
 
-ol.cms-breadcrumb li:not(:first-child) {
+ol.contentlink-bc li:not(:first-child) {
   margin-left: 1.5rem;
 }
 
-ol.cms-breadcrumb li {
+ol.contentlink-bc li {
   position: relative;
   display: inline-block;
   margin: 0;
 }
 
-ol.cms-breadcrumb li a {
+ol.contentlink-bc li a {
   display: inline-block;
   padding: 0.5rem 0.3rem 0.5rem 0.4rem;
   background: #EAF2F5;
@@ -122,16 +122,16 @@ ol.cms-breadcrumb li a {
   text-decoration: none;
 }
 
-ol.cms-breadcrumb li:first-child a {
+ol.contentlink-bc li:first-child a {
   padding-left: 0.8rem;
 }
 
-ol.cms-breadcrumb li:last-child {
+ol.contentlink-bc li:last-child {
   padding-left: 0.2rem;
 }
 
-ol.cms-breadcrumb li:not(:first-child) a:before,
-ol.cms-breadcrumb li a:after {
+ol.contentlink-bc li:not(:first-child) a:before,
+ol.contentlink-bc li a:after {
   border-width: 1.2rem 0 1.2rem 1.25rem;
   content: '';
   position: absolute;
@@ -141,19 +141,19 @@ ol.cms-breadcrumb li a:after {
   top: 0;
 }
 
-ol.cms-breadcrumb li a:after {
+ol.contentlink-bc li a:after {
   border-color: transparent #EAF2F5;
   z-index: 1;
   right: -1.25rem;
 }
 
-ol.cms-breadcrumb li:not(:first-child) a:before {
+ol.contentlink-bc li:not(:first-child) a:before {
   border-color: #EAF2F5 transparent;
   left: -1.25rem;
 }
 
 #content > div:first-child + div,
-div.list, div.cms-balancer {
+div.list, div.contentbalancer {
   background: #EAF2F5;
   padding-top: 1.5em;
   padding-bottom: 1.5em;
@@ -188,17 +188,17 @@ dt {
   font-weight: normal;
 }
 
-div.cms-balancer ul {
+div.contentbalancer ul {
   list-style: none;
   text-align: center;
 }
 
-div.cms-balancer li {
+div.contentbalancer li {
   display: inline-block;
   margin: 0;
 }
 
-div.cms-balancer a {
+div.contentbalancer a {
   text-transform: uppercase;
   padding: 1em;
   font-weight: 100;
@@ -243,7 +243,7 @@ div.cms-balancer a {
   margin-right: 0.7em;
 }
 
-#footer > ul.cms-menu li {
+#footer > ul.globalmenu li {
   margin-left: 0;
   margin-right: 0;
 }
@@ -252,7 +252,7 @@ div.cms-balancer a {
   margin: 0;
 }
 
-#footer > ul.cms-menu > li a {
+#footer > ul.globalmenu > li a {
   text-decoration: none;
   font-weight: 100;
   text-transform: none;
@@ -260,23 +260,24 @@ div.cms-balancer a {
   display: inline-block;
 }
 
-#footer > ul.cms-menu > li li {
+#footer > ul.globalmenu > li li {
   text-transform: none;
   margin: 0.2em 0;
 }
 
-#footer > ul.cms-menu > li {
+#footer > ul.globalmenu > li {
   text-transform: uppercase;
   font-weight: 600;
 }
 
-#footer > ul.cms-menu > li > a {
+#footer > ul.globalmenu > li > a {
   text-transform: uppercase;
 }
 
-#footer > ul.cms-menu > li a:not([href]) {
+#footer > ul.globalmenu > li a:not([href]) {
   background: #EAF2F5;
   font-weight: 500;
   padding: 0.25em 0.5em;
   margin-left: 0.7em;
+  color: #222;
 }

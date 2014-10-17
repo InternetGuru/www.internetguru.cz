@@ -32,7 +32,7 @@
 
   <xsl:template match="//desc[string-length(text()) = 0]"/>
 
-  <xsl:template match="//ul[contains(@class,'cms-balancer')]">
+  <xsl:template match="//ul[contains(@class,'contentbalancer')]">
     <xsl:element name="div">
       <xsl:copy-of select="@*"/>
       <ul>

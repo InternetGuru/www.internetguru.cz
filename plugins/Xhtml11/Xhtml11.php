@@ -18,7 +18,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "preinit") {
       $this->subject = $subject;
-      $subject->getCms()->setOutputStrategy($this);
+      $cms = $subject->getCms();
+      $cms->setOutputStrategy($this);
+      $cms->setVariable($_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"], "url");
+      $cms->setVariable($this->getRoot().getCurLink(), "link");
     }
   }
 
@@ -83,12 +86,19 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       }
       $content = $newContent;
     }
-    $content = $doc->importNode($content->documentElement,true);
+
+    // correct links
+    $contentPlus = new DOMDocumentPlus();
+    $contentPlus->loadXML($content->saveXML());
+    $contentPlus->validateLinks("a","href",true);
+    $contentPlus->validateLinks("form","action",true);
+    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),$this->getRoot());
+
+    // import into html and save
+    $content = $doc->importNode($contentPlus->documentElement,true);
     $html->appendChild($content);
     $this->appendJsFiles($content,self::APPEND_BODY);
     #var_dump($doc->schemaValidate(CMS_FOLDER . "/" . self::DTD_FILE));
-
-    // and that's it
     return $doc->saveXML();
   }
 
@@ -226,7 +236,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($type) $e->setAttribute("type",$type);
     if($rel) $e->setAttribute("rel",$rel);
     if($media) $e->setAttribute("media",$media);
-    $e->setAttribute("href", getLocalLink($f));
+    $e->setAttribute("href", $this->getRoot().$f);
     $parent->appendChild($e);
   }
 
@@ -242,6 +252,14 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       "content" => "",
       "user" => $user);
     $this->jsFilesPriority[$filePath] = $priority;
+  }
+
+  public function getRoot() {
+    if(isAtLocalhost()) {
+      $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
+      return "/".$dir[1]."/";
+    }
+    $root = "/";
   }
 
   /**
@@ -294,7 +312,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $e = $parent->ownerDocument->createElement("script");
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
-      if($f !== false) $e->setAttribute("src", getLocalLink($f));
+      if($f !== false) $e->setAttribute("src", $this->getRoot().$f);
       $parent->appendChild($e);
     }
   }

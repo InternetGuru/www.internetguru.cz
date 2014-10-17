@@ -24,7 +24,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
     $this->setPath($curH);
     $this->setTitle();
-    $this->setBc($link);
+    $this->setBc($c);
 
     $this->setAncestorValue($curH, "author");
     $this->setAncestorValue($curH->parentNode, "xml:lang");
@@ -45,7 +45,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     $this->appendUntilSame($curH,$body);
 
-    $content->fragToLinks($cf);
+    #$content->fragToLinks($cf);
     return $content;
   }
 
@@ -68,37 +68,22 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->subject->getCms()->setVariable(implode(" - ", $subtitles), "cms-title");
   }
 
-  private function setBc($curLink) {
+  private function setBc(HTMLPlus $src) {
     $first = true;
     $bc = new DOMDocumentPlus();
     $ol = $bc->appendChild($bc->createElement("ol"));
-    $ol->setAttribute("class","cms-breadcrumb");
-    $parentLink = getLocalLink("");
+    $ol->setAttribute("class","contentlink-bc");
     foreach(array_reverse($this->headings) as $h) {
-      $content = $h->nodeValue;
-      if($h->hasAttribute("short")) {
-        $content = $h->getAttribute("short");
-      }
+      $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
       $li = $ol->appendChild($bc->createElement("li"));
-      if($h->hasAttribute("link") && $h->getAttribute("link") == $curLink) {
-        $li->nodeValue = $content;
-        continue;
-      }
-      if($first) {
-        $first = false;
-        $href = getLocalLink("");
-      } elseif($h->hasAttribute("link")) {
-        $href = getLocalLink($h->getAttribute("link"));
-        $parentLink = $href;
-      } else {
-        $href = $parentLink ."#". $h->getAttribute("id");
-      }
+      $href = "#". $h->getAttribute("id");
       $a = $li->appendChild($bc->createElement("a",$content));
       $a->setAttribute("href",$href);
       if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
       else $a->setAttribute("title",$h->nodeValue);
     }
-    $this->subject->getCms()->setVariable($bc, "bc");
+    $cms = $this->subject->getCms();
+    $cms->setVariable($bc, "bc");
   }
 
   private function setAncestorValue(DOMElement $e, $attName=null) {

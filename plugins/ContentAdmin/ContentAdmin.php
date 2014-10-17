@@ -34,7 +34,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    $this->adminLink = getLocalLink()."?admin";
+    $this->adminLink = "?admin";
     try {
       $this->setDefaultFile();
       $this->dataFile = $this->getDataFile();
@@ -71,7 +71,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("contentadmin-heading", $cms->getVariable("cms-title"));
     $newContent->insertVar("contentadmin-errors", $this->errors);
-    $newContent->insertVar("contentadmin-link", getLocalLink());
+    $newContent->insertVar("contentadmin-link", "");
     $newContent->insertVar("contentadmin-linkadmin", $la);
     $newContent->insertVar("contentadmin-linkadminstatus", "$la&amp;$statusChange");
 
@@ -285,7 +285,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   private function redir($f="") {
     if(strlen($f)) $f = "=$f";
-    $redir = getLocalLink();
+    $os = $this->subject->getCms()->getOutputStrategy();
+    $redir = $os->getRoot().getCurLink();
     #FIXME: different admin variations (admin, superadmin, viewonly)
     if(!isset($_POST["saveandgo"])) $redir .= "?admin" . $f;
     redirTo($redir,null,true);

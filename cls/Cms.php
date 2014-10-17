@@ -104,8 +104,6 @@ class Cms {
     $h1 = $doc->getElementsByTagName("h")->item(0);
     $this->setVariable("&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>", "ig");
     $this->setVariable("<a href='http://www.ezakladna.cz'>E-Základna</a>", "ez");
-    $this->setVariable($_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"], "url");
-    $this->setVariable(getLocalLink(), "link");
     $this->setVariable($doc->documentElement->getAttribute("xml:lang"), "lang");
     $this->setVariable($desc->nodeValue, "desc");
     if($h1->hasAttribute("short")) $this->setVariable($h1->getAttribute("short"), "title");
