@@ -1,6 +1,7 @@
 <?php
 
 include_once('cls/globals.php');
+include_once('cls/Logger.php');
 include_once('cls/DOMElementPlus.php');
 include_once('cls/DOMBuilder.php');
 include_once('cls/DOMDocumentPlus.php');

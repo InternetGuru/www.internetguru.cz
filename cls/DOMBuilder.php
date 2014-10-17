@@ -102,12 +102,12 @@ class DOMBuilder {
     if(self::DEBUG) $this->doc->formatOutput = true;
 
     if($replace) {
-      $this->safeLoadDOM($filePath,$user,$this->doc);
+      $this->safeLoadDOM($filePath,$this->doc,$user,true);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
       return;
     }
 
-    $this->safeLoadDOM($filePath,false,$this->doc);
+    $this->loadDOM($filePath,$this->doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$filePath";
@@ -135,10 +135,10 @@ class DOMBuilder {
     return $f;
   }
 
-  private function safeLoadDOM($filePath,$user,DOMDocumentPlus $doc) {
+  private function safeLoadDOM($filePath,DOMDocumentPlus $doc,$user,$admin) {
     $files = array();
     try {
-      $files[$this->findFile($filePath,$user,true)] = null;
+      $files[$this->findFile($filePath,$user,$admin)] = null;
       $files[$this->findFile($filePath,false,true)] = null;
       $files[$this->findFile($filePath,false,false)] = null;
     } catch(Exception $e) {

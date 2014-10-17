@@ -10,10 +10,17 @@ class Logger {
     if(!is_dir(LOG_FOLDER) && !mkdir(LOG_FOLDER,0755,true))
       throw new Exception(sprintf("Unable to create log dir '%s'",LOG_FOLDER));
     $this->f = LOG_FOLDER ."/". date("Ymd") .".log";
-    $this->m[] = $_SERVER["REMOTE_ADDR"] .":". $_SERVER["REMOTE_PORT"];
+    if(isset($_SERVER["REMOTE_ADDR"],$_SERVER["REMOTE_PORT"]))
+      $this->m[] = $_SERVER["REMOTE_ADDR"] .":". $_SERVER["REMOTE_PORT"];
+    else
+      $this->m[] = "0.0.0.0:0000";
     $this->m[] = "unknown"; // logged user
     $this->m[] = date(DATE_ATOM); // http://php.net/manual/en/class.datetime.php
-    $this->m[] = '"'. $_SERVER["REQUEST_METHOD"] ." ". $_SERVER["REQUEST_URI"] ." ". $_SERVER["SERVER_PROTOCOL"] .'"';
+    if(isset($_SERVER["REQUEST_METHOD"],$_SERVER["REQUEST_URI"],$_SERVER["SERVER_PROTOCOL"]))
+      $this->m[] = '"'. $_SERVER["REQUEST_METHOD"] ." ". $_SERVER["REQUEST_URI"] ." ". $_SERVER["SERVER_PROTOCOL"] .'"';
+    else {
+      $this->m[] = '"UNKNOWN UNKNOWN UNKNOWN"';
+    }
     $this->m[] = http_response_code();
     $this->m[] = normalize($type);
     $this->m[] = '"'. $message .'"';

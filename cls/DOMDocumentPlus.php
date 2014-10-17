@@ -44,7 +44,6 @@ class DOMDocumentPlus extends DOMDocument {
       new Logger("DEPRECATED: Using variable prefix","warning");
       $varName = $prefix.":".$varName;
     }
-    #if(!validateXMLMarkup($varValue,$varName)) return;
     // find elements with current var
     $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$varName));
     $where = array();
@@ -77,7 +76,7 @@ class DOMDocumentPlus extends DOMDocument {
         break;
         case "string":
         $e = $this->prepareIfDl($e,$varName);
-        $this->insertVarString($varValue,$e,$attr);
+        $this->insertVarString($varValue,$e,$attr,$varName);
         break;
         case "array":
         if(empty($varValue)) {
@@ -85,7 +84,7 @@ class DOMDocumentPlus extends DOMDocument {
           continue;
         }
         $e = $this->prepareIfDl($e,$varName);
-        $this->insertVarArray($varValue,$e);
+        $this->insertVarArray($varValue,$e,$varName);
         break;
         default:
         if($varValue instanceof DOMElement) {
@@ -187,7 +186,8 @@ class DOMDocumentPlus extends DOMDocument {
     $e->parentNode->removeChild($e);
   }
 
-  private function insertVarString($varValue,DOMElement $e,$attr=null) {
+  private function insertVarString($varValue,DOMElement $e,$attr,$varName) {
+    if(!validateXMLMarkup($varValue,$varName)) return;
     if(!is_null($attr) && !is_numeric($attr)) {
       if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
         $e->setAttribute($attr,$varValue);
@@ -210,7 +210,7 @@ class DOMDocumentPlus extends DOMDocument {
     if(!$replaced) $e->nodeValue = $varValue;
   }
 
-  private function insertVarArray(Array $varValue,DOMElement $e) {
+  private function insertVarArray(Array $varValue,DOMElement $e,$varName) {
     switch($e->nodeName) {
       case "body":
       case "section":
@@ -227,11 +227,12 @@ class DOMDocumentPlus extends DOMDocument {
       $e = $e->appendChild($e->ownerDocument->createElement("li"));
       break;
       default:
-      $this->insertVarString(implode(", ",$varValue),$e);
+      $this->insertVarString(implode(", ",$varValue),$e,null,$varName);
       return;
     }
     $p = $e->parentNode;
     foreach($varValue as $v) {
+      if(!validateXMLMarkup($v,$varName)) continue;
       $li = $p->insertBefore($e->cloneNode(),$e);
       $li->nodeValue = $v;
     }
