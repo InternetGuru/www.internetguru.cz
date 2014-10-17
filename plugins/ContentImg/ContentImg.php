@@ -1,8 +1,11 @@
 <?php
 
+#todo: limit as {x,y}
+
 class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
   private $mime = array("image/jpeg","image/png","image/gif","image/svg+xml");
+  const PREFIX = "contentimg-";
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
@@ -14,15 +17,15 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
   public function getContent(HTMLPlus $content) {
     $cfg = $this->getDomPlus();
     $xpath = new DOMXPath($content);
-    foreach($xpath->query("//ul[@var and contains(@var,'ContentImg:')]") as $ul) {
+    foreach($xpath->query("//*[self::ul or self::ol][@var and contains(@var,'".self::PREFIX."')]") as $ul) {
       $dom = new DOMDocumentPlus();
-      $list = $dom->createElement("ul");
+      $list = $dom->appendChild($dom->createElement("list"));
       foreach(explode(" ", $ul->getAttribute("var")) as $val) {
-        if(strpos($val,"ContentImg:") !== 0) continue;
+        if(strpos($val,self::PREFIX) !== 0) continue;
         $pattern = substr($val,11);
         $this->getImages($list, $pattern, $cfg);
         if($list->childElements->length == 0) continue;
-        $content->insertVar($pattern,$list,"ContentImg");
+        $content->insertVar(self::PREFIX.$pattern,$list);
       }
     }
     return $content;

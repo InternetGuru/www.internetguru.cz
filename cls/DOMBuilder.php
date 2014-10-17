@@ -107,7 +107,7 @@ class DOMBuilder {
       return;
     }
 
-    $this->loadDOM($filePath,$this->doc);
+    $this->loadDOM($this->findFile($filePath,false,false),$this->doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$filePath";
