@@ -126,9 +126,10 @@ function stableSort(Array &$a) {
   array_multisort($a,SORT_ASC,$order,SORT_ASC);
 }
 
-function getCurLink() {
-  if(isset($_GET["page"])) return $_GET["page"];
-  return "";
+function getCurLink($query=false) {
+  $query = $query && isset($_SERVER['QUERY_STRING']) ? "?".$_SERVER['QUERY_STRING'] : "";
+  $page = isset($_GET["page"]) ? $_GET["page"] : "";
+  return $page.$query;
 }
 
 function getSubdom() {

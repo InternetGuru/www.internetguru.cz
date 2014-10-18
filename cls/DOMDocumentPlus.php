@@ -111,7 +111,7 @@ class DOMDocumentPlus extends DOMDocument {
         $toStrip[] = array($e,$ex->getMessage());
       }
     }
-    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
+    foreach($toStrip as $a) $a[0]->stripAttr($attName,$a[1]);
   }
 
   private function repairLink($link=null) {
@@ -140,18 +140,21 @@ class DOMDocumentPlus extends DOMDocument {
       // 1) is absolute link
       // 2) is internal fragment
       // 3) is internal link
+      // 4) is internal query
       if(isset($pLink["scheme"])) continue;
-      if(isset($pLink["path"])) {
-        $linkedElement = $src->getElementById($pLink["path"],"link");
+      if(isset($pLink["path"]) || isset($pLink["query"])) {
+        $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
+        $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
+        $linkedElement = $src->getElementById($path,"link");
         if(is_null($linkedElement)) {
           $toStrip[] = array($a,"link '".$pLink["path"]."' not found");
           continue; // link not exists
         }
-        if(getCurLink() == $pLink["path"]) {
+        if(getCurLink(true) == $path.$query) {
           $toStrip[] = array($a,"cyclic link found");
           continue;
         }
-        $a->setAttribute("href",$root.$pLink["path"]);
+        $a->setAttribute("href",$root.$path.$query);
         continue;
       }
       $frag = $pLink["fragment"];
@@ -186,7 +189,7 @@ class DOMDocumentPlus extends DOMDocument {
       }
       $a->setAttribute("href",$root.$h->getAttribute("link")."#".$frag);
     }
-    foreach($toStrip as $a) $a[0]->stripTag($a[1]);
+    foreach($toStrip as $a) $a[0]->stripAttr("href",$a[1]);
   }
 
   private function prepareIfDl(DOMElement $e,$varName) {

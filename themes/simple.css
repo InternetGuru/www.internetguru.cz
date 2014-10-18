@@ -114,7 +114,7 @@ ol.contentlink-bc li {
   margin: 0;
 }
 
-ol.contentlink-bc li a {
+ol.contentlink-bc li a[href] {
   display: inline-block;
   padding: 0.5rem 0.3rem 0.5rem 0.4rem;
   background: #EAF2F5;
@@ -122,16 +122,16 @@ ol.contentlink-bc li a {
   text-decoration: none;
 }
 
-ol.contentlink-bc li:first-child a {
+ol.contentlink-bc li:first-child a[href] {
   padding-left: 0.8rem;
 }
 
-ol.contentlink-bc li:last-child {
+ol.contentlink-bc li:last-child a:not([href]) {
   padding-left: 0.2rem;
 }
 
-ol.contentlink-bc li:not(:first-child) a:before,
-ol.contentlink-bc li a:after {
+ol.contentlink-bc li:not(:first-child) a[href]:before,
+ol.contentlink-bc li a[href]:after {
   border-width: 1.2rem 0 1.2rem 1.25rem;
   content: '';
   position: absolute;
@@ -141,13 +141,13 @@ ol.contentlink-bc li a:after {
   top: 0;
 }
 
-ol.contentlink-bc li a:after {
+ol.contentlink-bc li a[href]:after {
   border-color: transparent #EAF2F5;
   z-index: 1;
   right: -1.25rem;
 }
 
-ol.contentlink-bc li:not(:first-child) a:before {
+ol.contentlink-bc li:not(:first-child) a[href]:before {
   border-color: #EAF2F5 transparent;
   left: -1.25rem;
 }

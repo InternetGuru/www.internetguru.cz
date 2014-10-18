@@ -7,7 +7,7 @@ div.contentbalancer a,
   background: #FD563B;
 }
 
-ol.contentlink-bc li a {
+ol.contentlink-bc li a[href] {
   color: #E02000;
 }
 

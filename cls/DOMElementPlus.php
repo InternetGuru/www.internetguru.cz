@@ -2,6 +2,7 @@
 
 class DOMElementPlus extends DOMElement {
 
+  #UNUSED
   public function stripTag($comment = null) {
     $text = $this->ownerDocument->createTextNode($this->nodeValue);
     $this->parentNode->insertBefore($text,$this);
@@ -9,6 +10,14 @@ class DOMElementPlus extends DOMElement {
     if(is_null($comment)) return;
     $cmt = $this->ownerDocument->createComment(" $comment ");
     $text->parentNode->insertBefore($cmt,$text);
+  }
+
+  public function stripAttr($attr, $comment = null) {
+    if(!$this->hasAttribute($attr)) return;
+    $this->removeAttribute($attr);
+    if(is_null($comment)) $comment = "attribute '$attr' stripped";
+    $cmt = $this->ownerDocument->createComment(" $comment ");
+    $this->parentNode->insertBefore($cmt,$this);
   }
 
   public function getPreviousElement($eName=null) {

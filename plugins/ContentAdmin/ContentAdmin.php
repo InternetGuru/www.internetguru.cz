@@ -71,7 +71,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("contentadmin-heading", $cms->getVariable("cms-title"));
     $newContent->insertVar("contentadmin-errors", $this->errors);
-    $newContent->insertVar("contentadmin-link", "");
+    $newContent->insertVar("contentadmin-link", getCurLink());
     $newContent->insertVar("contentadmin-linkadmin", $la);
     $newContent->insertVar("contentadmin-linkadminstatus", "$la&amp;$statusChange");
 

@@ -14,7 +14,7 @@ class Cms {
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
   private $variables = array();
-  const DEBUG = false;
+  const DEBUG = true;
 
   function __construct() {
     $this->domBuilder = new DOMBuilder();
