@@ -15,6 +15,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
   const DEBUG = false;
 
+  public function __construct() {
+    if(self::DEBUG) new Logger("DEBUG");
+  }
+
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "preinit") {
       $this->subject = $subject;
@@ -22,6 +26,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $cms->setOutputStrategy($this);
       $cms->setVariable($_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"], "url");
       $cms->setVariable($this->getRoot().getCurLink(), "link");
+      $cfg = $this->getDOMPlus();
+      $this->registerThemes($cfg);
+      $this->favIcon = $this->getFavicon($cfg);
+      #todo: xhtml11-files variable
     }
   }
 
@@ -31,8 +39,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    */
   public function getOutput(HTMLPlus $content) {
     $cms = $this->subject->getCms();
-    $cfg = $this->getDOMPlus();
-    $this->registerThemes($cfg);
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
 
@@ -63,8 +69,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(strlen($desc)) $this->appendMeta($head, "description", $desc);
     $kw = $cms->getVariable("cms-kw");
     if(strlen($kw)) $this->appendMeta($head, "keywords", $kw);
-    $fav = $this->getFavicon($cfg);
-    if($fav) $this->appendLinkElement($head,$fav,"shortcut icon");
+    if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon");
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
@@ -154,15 +159,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($theme->length) {
       $themeId = $theme->item(0)->nodeValue;
       $t = $cfg->getElementById($themeId);
-      if(is_null($t)) throw new Exception("Theme '$themeId' not found");
-      $this->addThemeFiles($t);
+      if(is_null($t)) new Logger("Theme '$themeId' not found","error");
+      else $this->addThemeFiles($t);
     }
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
 
-    // add final xsl
-    #$this->transformations[$this->getDir() ."/Xhtml11final.xsl"] = false;
   }
 
   private function addThemeFiles(DOMElement $e) {
@@ -190,7 +193,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function getFavicon(DOMDocumentPlus $cfg) {
     $xpath = new DOMXPath($cfg);
     $theme = $xpath->query("favicon[last()]");
-    if(!$theme->length) return false;
+    if(!$theme->length) return null;
     return $theme->item(0)->nodeValue;
   }
 
@@ -229,7 +232,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $f = false;
     }
     if($f === false) {
-      $parent->appendChild(new DOMComment(" [$rel] file '$file' not found "));
+      $comment = "[$rel] file '$file' not found";
+      $parent->appendChild(new DOMComment(" $comment "));
+      new Logger($comment,"error");
       return;
     }
     $e = $parent->ownerDocument->createElement("link");
@@ -304,7 +309,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $f = findFile($this->jsFiles[$k]["file"],$this->jsFiles[$k]["user"],true,true);
         } catch (Exception $ex) {}
         if($f === false) {
-          $parent->appendChild(new DOMComment(" JS file '$k' not found "));
+          $comment = "JS file '$k' not found";
+          $parent->appendChild(new DOMComment(" $comment "));
+          new Logger($comment,"error");
           continue;
         }
       }

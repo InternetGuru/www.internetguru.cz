@@ -4,10 +4,9 @@ class DOMDocumentPlus extends DOMDocument {
   const DEBUG = false;
 
   function __construct($version="1.0",$encoding="utf-8") {
+    if(self::DEBUG) new Logger("DEBUG");
     parent::__construct($version,$encoding);
     $r = $this->registerNodeClass("DOMElement","DOMElementPlus");
-    #$this->preserveWhiteSpace = false;
-    #$this->formatOutput = true;
   }
 
   public function getElementById($id,$attribute="id") {

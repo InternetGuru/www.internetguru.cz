@@ -22,7 +22,9 @@ class DOMBuilder {
   private $replace; // bool
   private $imported = array();
 
-  public function __construct() {}
+  public function __construct() {
+    if(self::DEBUG) new Logger("DEBUG");
+  }
 
   public function buildDOMPlus($filePath,$replace=false,$user=true) {
     $this->doc = new DOMDocumentPlus();

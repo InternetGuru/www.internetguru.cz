@@ -7,6 +7,10 @@
 class Convertor extends Plugin implements SplObserver {
   const DEBUG = false;
 
+  public function __construct() {
+    if(self::DEBUG) new Logger("DEBUG");
+  }
+
   public function update(SplSubject $subject) {
     $this->subject = $subject;
     if($subject->getStatus() != "preinit") return;
