@@ -285,8 +285,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   private function redir($f="") {
     if(strlen($f)) $f = "=$f";
-    $os = $this->subject->getCms()->getOutputStrategy();
-    $redir = $os->getRoot().getCurLink();
+    $redir = getRoot().getCurLink();
     #FIXME: different admin variations (admin, superadmin, viewonly)
     if(!isset($_POST["saveandgo"])) $redir .= "?admin" . $f;
     redirTo($redir,null,true);

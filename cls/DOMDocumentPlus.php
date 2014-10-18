@@ -114,20 +114,20 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function repairLink($link=null) {
-    if(strpos($link, "#") === 0) return $link; // #f is ok, no change
-    if(strpos($link, "?") === 0) return $link; // ?q is ok, no change
     if(is_null($link)) $link = getCurLink(); // null -> currentLink
     $pLink = parse_url($link);
     if($pLink === false) throw new LoggerException("Unable to parse href '$link'"); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
-      $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
+      $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"] . getRoot();
       if(strpos($link,$curDomain) !== 0) return $link; // link is external
     }
-    $path = isset($pLink["path"]) && !in_array($pLink["path"],array(".","..","/")) ? $pLink["path"] : "";
+    if(isset($pLink["fragment"])) return "#" . $pLink["fragment"];
+    $path = isset($pLink["path"]) ? $pLink["path"] : "";
+    while(strpos($path,".") === 0) $path = substr($path,1);
+    if(strpos($path,getRoot()) === 0) $path = substr($path,strlen(getRoot()));
     $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
-    $fragment = isset($pLink["fragment"]) ? "#" . $pLink["fragment"] : "";
-    if(strlen($path . $query . $fragment)) return $path . $query . $fragment;
-    return "#".$this->getElementsByTagName("body")->item(0)->firstElement->getAttribute("id");
+    if(strlen($path . $query)) return $path . $query;
+    return "#".$this->documentElement->firstElement->getAttribute("id");
   }
 
   public function fragToLinks(HTMLPlus $src,$root="/") {

@@ -132,6 +132,14 @@ function getCurLink($query=false) {
   return $page.$query;
 }
 
+function getRoot() {
+  if(isAtLocalhost()) {
+    $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
+    return "/".$dir[1]."/";
+  }
+  $root = "/";
+}
+
 function getSubdom() {
   $d = explode(".",$_SERVER["HTTP_HOST"]);
   return $d[0];

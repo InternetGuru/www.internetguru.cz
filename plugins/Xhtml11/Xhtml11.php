@@ -26,7 +26,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $this->subject = $subject;
       $cms->setOutputStrategy($this);
       $cms->setVariable($_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"], "url");
-      $cms->setVariable($this->getRoot().getCurLink(), "link");
+      $cms->setVariable(getRoot().getCurLink(), "link");
     }
     if($subject->getStatus() == "process") {
       $cfg = $this->getDOMPlus();
@@ -102,7 +102,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->loadXML($content->saveXML());
     $contentPlus->validateLinks("a","href",true);
     $contentPlus->validateLinks("form","action",true);
-    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),$this->getRoot());
+    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),getRoot());
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement,true);
@@ -246,7 +246,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($type) $e->setAttribute("type",$type);
     if($rel) $e->setAttribute("rel",$rel);
     if($media) $e->setAttribute("media",$media);
-    $e->setAttribute("href", $this->getRoot().$f);
+    $e->setAttribute("href", getRoot().$f);
     $parent->appendChild($e);
   }
 
@@ -262,14 +262,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       "content" => "",
       "user" => $user);
     $this->jsFilesPriority[$filePath] = $priority;
-  }
-
-  public function getRoot() {
-    if(isAtLocalhost()) {
-      $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
-      return "/".$dir[1]."/";
-    }
-    $root = "/";
   }
 
   /**
@@ -324,7 +316,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $e = $parent->ownerDocument->createElement("script");
       $e->appendChild($parent->ownerDocument->createTextNode($content));
       $e->setAttribute("type","text/javascript");
-      if($f !== false) $e->setAttribute("src", $this->getRoot().$f);
+      if($f !== false) $e->setAttribute("src", getRoot().$f);
       $parent->appendChild($e);
     }
   }

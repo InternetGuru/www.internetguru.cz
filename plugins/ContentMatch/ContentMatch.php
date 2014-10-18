@@ -26,7 +26,6 @@ class ContentMatch extends Plugin implements SplObserver {
   }
 
   private function proceed($link,$code=404) {
-    $os = $this->subject->getCms()->getOutputStrategy();
     $xpath = new DOMXPath($this->subject->getCms()->getContentFull());
     $q = "//h[@link='" . $link . "']";
     $exactMatch = $xpath->query($q);
@@ -38,7 +37,7 @@ class ContentMatch extends Plugin implements SplObserver {
         if(getCurLink() == "") return;
         $link = ""; // redir to hp if page not found (and not at hp)
       }
-      redirTo($os->getRoot().$link,$code);
+      redirTo(getRoot().$link,$code);
     }
     if($exactMatch->length == 1) return;
     $newLink = normalize($link);
@@ -48,7 +47,7 @@ class ContentMatch extends Plugin implements SplObserver {
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];
     new Logger("Link '$link' not found, redir to '$newLink'","info");
-    redirTo($os->getRoot().$newLink,$code);
+    redirTo(getRoot().$newLink,$code);
   }
 
   /**
