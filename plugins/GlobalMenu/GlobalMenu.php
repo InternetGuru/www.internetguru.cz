@@ -44,13 +44,12 @@ class GlobalMenu extends Plugin implements SplObserver {
     return true;
   }
 
-  private function getMenu(DOMDocumentPlus $doc, DOMElement $section, $parentLink = null) {
-    if(is_null($parentLink)) $parentLink = "";
+  private function getMenu(DOMDocumentPlus $doc, DOMElement $section) {
     $ul = $doc->createElement("ul");
     $li = null;
     foreach($section->childElements as $n) {
       if($n->nodeName == "section") {
-        $menu = $this->getMenu($doc,$n,$parentLink);
+        $menu = $this->getMenu($doc,$n);
         if(!is_null($menu)) {
           $li->appendChild($menu);
         }
@@ -58,12 +57,8 @@ class GlobalMenu extends Plugin implements SplObserver {
       }
       if($n->nodeName != "h") continue;
       $li = $doc->createElement("li");
-      $parentLink = "";
       $link = null;
-      if($n->hasAttribute("link")) {
-        $link = $n->getAttribute("link");
-        $parentLink = $link;
-      }
+      if($n->hasAttribute("link")) $link = $n->getAttribute("link");
       $a = $doc->createElement("a",$n->nodeValue);
       if($n->hasAttribute("short")) {
         $a->nodeValue = $n->getAttribute("short");
