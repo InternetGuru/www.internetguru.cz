@@ -28,6 +28,7 @@ try {
   $plugins->setStatus("process");
   $plugins->notify();
 
+  $cms->processVariables();
   $plugins->setStatus("postprocess");
   $plugins->notify();
 

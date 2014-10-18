@@ -12,6 +12,10 @@ class Plugins implements SplSubject {
     $this->attachPlugins();
   }
 
+  public function getObservers() {
+    return $this->observers;
+  }
+
   public function isAttachedPlugin($pluginName) {
     return array_key_exists($pluginName,$this->observers);
   }

@@ -91,7 +91,11 @@ class Cms {
       if(self::DEBUG) echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
+  }
+
+  public function processVariables() {
     $this->loadDefaultVariables($this->content);
+    $this->setVariable(array_keys($this->plugins->getObservers()), "plugins");
     $this->setVariable(array_keys($this->variables), "variables");
     foreach($this->variables as $k => $v) $this->content->insertVar($k,$v);
   }

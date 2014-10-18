@@ -7,9 +7,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $jsFilesPriority = array(); // String filename => Int priority
   private $jsContent = array();
   private $jsContentBody = array();
-  private $cssFiles = array(); // String filename => Int priority
+  private $cssFiles = array();
   private $cssFilesPriority = array();
   private $transformations = array();
+  private $favIcon;
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
@@ -20,16 +21,20 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
+    $cms = $subject->getCms();
     if($subject->getStatus() == "preinit") {
       $this->subject = $subject;
-      $cms = $subject->getCms();
       $cms->setOutputStrategy($this);
       $cms->setVariable($_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"], "url");
       $cms->setVariable($this->getRoot().getCurLink(), "link");
+    }
+    if($subject->getStatus() == "process") {
       $cfg = $this->getDOMPlus();
       $this->registerThemes($cfg);
       $this->favIcon = $this->getFavicon($cfg);
-      #todo: xhtml11-files variable
+      $cms->setVariable(array_keys($this->transformations),"transformations");
+      $cms->setVariable(array_keys($this->cssFiles),"styles");
+      $cms->setVariable(array_keys($this->jsFiles),"javascripts");
     }
   }
 

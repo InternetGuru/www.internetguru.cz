@@ -306,6 +306,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function insertVarArray(Array $varValue,DOMElement $e,$varName) {
+    $sep = null;
     switch($e->nodeName) {
       case "body":
       case "section":
@@ -316,21 +317,32 @@ class DOMDocumentPlus extends DOMDocument {
       case "li":
       case "dd":
       break;
+      case "em":
+      case "strong":
+      case "samp":
+      case "del":
+      case "ins":
+      $sep = $e->ownerDocument->createTextNode(", ");
+      break;
       case "ul":
       case "ol":
       $e->removeChildNodes();
       $e = $e->appendChild($e->ownerDocument->createElement("li"));
       break;
       default:
-      $this->insertVarString(implode(", ",$varValue),$e,null,$varName);
+      $dom = new DOMDocument();
+      $dom->loadXML("<var><em>".implode("</em>, <em>",$varValue)."</em></var>");
+      $this->insertVarDOMElement($dom->documentElement,$e,null,$varName);
       return;
     }
     $p = $e->parentNode;
     foreach($varValue as $v) {
       if(!validateXMLMarkup($v,$varName)) continue;
-      $li = $p->insertBefore($e->cloneNode(),$e);
-      $li->nodeValue = $v;
+      $i = $p->insertBefore($e->cloneNode(),$e);
+      $i->nodeValue = $v;
+      if(!is_null($sep)) $i = $p->insertBefore($sep->cloneNode(),$e);
     }
+    if(!is_null($sep)) $p->removeChild($i);
     $p->removeChild($e);
   }
 
