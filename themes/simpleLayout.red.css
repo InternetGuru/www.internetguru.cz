@@ -23,6 +23,6 @@ a:visited {
   background: #FD563B;
 }
 
-#footer > ul.globalmenu > li a:not([href]) {
+#footer > ul.globalmenu > li a.current {
   color: #E02000;
 }

@@ -69,15 +69,9 @@ class GlobalMenu extends Plugin implements SplObserver {
         $a->nodeValue = $n->getAttribute("short");
         $a->setAttribute("title",$n->nodeValue);
       }
-      if(getCurLink() === $link) {
-        $a->setAttribute("class","current");
-      } else {
-        if(!is_null($link)) $a->setAttribute("href",$link);
-        else {
-          $a->setAttribute("href","$parentLink#".$n->getAttribute("id"));
-          $a->setAttribute("class","fragment");
-        }
-      }
+      if(getCurLink() === $link) $a->setAttribute("class","current");
+      $a->setAttribute("href","#".$n->getAttribute("id"));
+      if(is_null($link)) $a->setAttribute("class","fragment");
       $li->appendChild($a);
       $ul->appendChild($li);
     }

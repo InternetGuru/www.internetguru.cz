@@ -274,7 +274,7 @@ div.contentbalancer a {
   text-transform: uppercase;
 }
 
-#footer > ul.globalmenu > li a:not([href]) {
+#footer > ul.globalmenu > li a.current {
   background: #EAF2F5;
   font-weight: 500;
   padding: 0.25em 0.5em;
