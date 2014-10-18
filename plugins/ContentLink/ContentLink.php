@@ -34,6 +34,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     $this->setAncestorValue($curH, "ctime");
     $this->setAncestorValue($curH, "mtime");
+    #echo $cf->saveXML(); exit();
+    #echo $curH->nextElement->nodeName; exit;
     $this->setAncestorValue($curH->nextElement);
     $this->setAncestorValue($curH->nextElement, "kw");
 
@@ -98,7 +100,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       }
       $ancestor = $ancestor->parentNode;
       if(is_null($ancestor)) return;
-      $ancestor = $ancestor->getPreviousElement();
+      $ancestor = $ancestor->getPreviousElement($e->nodeName);
     }
   }
 
