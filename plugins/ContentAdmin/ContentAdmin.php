@@ -3,7 +3,7 @@
 #TODO: ?superadmin
 #TODO: success message
 #TODO: select file
-#TODO: validateLinks (add into validateplus(true)?) invalid/absolute/root (.,"" to "/")
+#todo: reset - not a cyclic link
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";

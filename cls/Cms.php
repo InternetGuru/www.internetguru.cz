@@ -14,7 +14,7 @@ class Cms {
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
   private $variables = array();
-  const DEBUG = false;
+  const DEBUG = true;
 
   function __construct() {
     if(self::DEBUG) new Logger("DEBUG");
@@ -82,7 +82,7 @@ class Cms {
         #echo $c->saveXML(); die();
         if(!($c instanceof HTMLPlus))
           throw new Exception("Content must be an instance of HTMLPlus");
-        $c->validatePlus();
+        $c->validatePlus(true);
         $this->content = $c;
       }
     } catch (Exception $e) {

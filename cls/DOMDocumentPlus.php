@@ -114,20 +114,22 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function repairLink($link=null) {
+    #$rootHeading = "#".$this->documentElement->firstElement->getAttribute("id");
     if(is_null($link)) $link = getCurLink(); // null -> currentLink
+    if($link == "") return $link;
     $pLink = parse_url($link);
     if($pLink === false) throw new LoggerException("Unable to parse href '$link'"); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
       $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"] . getRoot();
       if(strpos($link,$curDomain) !== 0) return $link; // link is external
     }
-    if(isset($pLink["fragment"])) return "#" . $pLink["fragment"];
+    $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
+    if(isset($pLink["fragment"])) return $query . "#" . $pLink["fragment"];
     $path = isset($pLink["path"]) ? $pLink["path"] : "";
     while(strpos($path,".") === 0) $path = substr($path,1);
     if(strpos($path,getRoot()) === 0) $path = substr($path,strlen(getRoot()));
-    $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
-    if(strlen($path . $query)) return $path . $query;
-    return "#".$this->documentElement->firstElement->getAttribute("id");
+    while(strpos($path,"/") === 0) $path = substr($path,1);
+    return $path . $query;
   }
 
   public function fragToLinks(HTMLPlus $src,$root="/") {
@@ -141,25 +143,26 @@ class DOMDocumentPlus extends DOMDocument {
       // 3) is internal link
       // 4) is internal query
       if(isset($pLink["scheme"])) continue;
+      $query = isset($pLink["query"]) ? $pLink["query"] : "";
+      $queryUrl = strlen($query) ? "?$query" : "";
       if(isset($pLink["path"]) || isset($pLink["query"])) {
         $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
-        $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
-        $linkedElement = $src->getElementById($path,"link");
-        if(is_null($linkedElement)) {
-          $toStrip[] = array($a,"link '".$pLink["path"]."' not found");
+        if(strlen($path) && is_null($src->getElementById($path,"link"))) {
+          $toStrip[] = array($a,"link '$path' not found");
           continue; // link not exists
         }
-        if(getCurLink(true) == $path.$query) {
+        if(getCurLink(true) == $path.$queryUrl) {
           $toStrip[] = array($a,"cyclic link found");
           continue;
         }
-        $a->setAttribute("href",$root.$path.$query);
+        $a->setAttribute("href",$root.$path.$queryUrl);
         continue;
       }
       $frag = $pLink["fragment"];
       $linkedElement = $this->getElementById($frag);
       if(!is_null($linkedElement)) {
-        if($this->getElementsByTagName("h1")->item(0)->isSameNode($linkedElement)) {
+        $h1id = $this->getElementsByTagName("h1")->item(0)->getAttribute("id");
+        if(getCurLink(true) == getCurLink() . $queryUrl && $h1id == $frag) {
           $toStrip[] = array($a,"cyclic fragment found");
         }
         continue; // ignore visible headings
@@ -179,6 +182,7 @@ class DOMDocumentPlus extends DOMDocument {
       }
       if(is_null($h)) {
         $h1 = $src->documentElement->firstElement;
+        #die($h1->getAttribute("id") . " -- $frag");
         if($h1->getAttribute("id") == $frag) {
           $a->setAttribute("href",$root);
           continue; // link to root heading
