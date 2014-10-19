@@ -89,7 +89,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $newContent = $this->transform($content,$xslt,$user,$proc);
       $newContent->encoding="utf-8";
       $xml = $newContent->saveXML();
-      if(!@$newContent->loadXML($xml)) {
+      if(!$newContent->loadXML($xml)) {
+        echo $xml;
+        die();
         new Logger("Invalid transformation (or parameter) in '$xslt'","error");
         if(self::DEBUG) {
           echo $xml;
@@ -129,7 +131,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $o = array();
     foreach($cms->getAllVariables() as $k => $v) {
       $valid = true;
-      if($v instanceof DOMDocument) $v = $v->saveHTML();
+      if($v instanceof DOMDocument) $v = html_entity_decode($v->saveHTML());
       elseif(is_array($v)) {
         $v = implode(",",$v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
@@ -150,7 +152,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         echo translateLiteral2NumericEntities($v)."\n";
         die();
       }
-      $o[$k] = str_replace("'",'"',html_entity_decode($v));
+      $o[$k] = str_replace("'",'"',$v);
     }
     return $o;
   }
