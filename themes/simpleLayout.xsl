@@ -8,6 +8,7 @@
   <xsl:param name="globalmenu" select="''"/>
   <xsl:param name="cms-lang" select="''"/>
   <xsl:param name="cms-author" select="''"/>
+  <xsl:param name="cms-version" select="''"/>
   <xsl:param name="cms-desc" select="''"/>
   <xsl:param name="cms-kw" select="''"/>
   <xsl:param name="cms-ctime" select="''"/>
@@ -35,6 +36,7 @@
               <li><xsl:value-of select="$inputvar-mtime"/></li>
             </xsl:if>
             <li><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/><xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
+            <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
       </div>
     </body>

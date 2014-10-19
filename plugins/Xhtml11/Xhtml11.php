@@ -68,6 +68,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"viewport","initial-scale=1");
     $this->appendMeta($head,"Content-Language", $cms->getVariable("cms-lang"));
+    $this->appendMeta($head,"generator", $cms->getVariable("cms-version"));
     $author = $cms->getVariable("cms-author");
     if(strlen($author)) $this->appendMeta($head, "author", $author);
     $desc = $cms->getVariable("cms-desc");

@@ -101,8 +101,11 @@ class Cms {
   private function loadDefaultVariables(HTMLPlus $doc) {
     $desc = $doc->getElementsByTagName("desc")->item(0);
     $h1 = $doc->getElementsByTagName("h")->item(0);
+
+    $this->setVariable("IGCMS ver. " . CMS_VERSION, "version");
     $this->setVariable("&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>", "ig");
     $this->setVariable("<a href='http://www.ezakladna.cz'>E-Základna</a>", "ez");
+
     $this->setVariable($doc->documentElement->getAttribute("xml:lang"), "lang");
     $this->setVariable($desc->nodeValue, "desc");
     if($h1->hasAttribute("short")) $this->setVariable($h1->getAttribute("short"), "title");
