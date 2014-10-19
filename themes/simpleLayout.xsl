@@ -35,7 +35,7 @@
             <xsl:if test="not($cms-mtime = '')">
               <li><xsl:value-of select="$inputvar-mtime"/></li>
             </xsl:if>
-            <li><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/><xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
+            <li><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/>/<xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
             <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
       </div>

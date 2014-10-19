@@ -25,8 +25,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($subject->getStatus() == "preinit") {
       $this->subject = $subject;
       $cms->setOutputStrategy($this);
-      $cms->setVariable($_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"], "url");
-      $cms->setVariable(getRoot().getCurLink(), "link");
+      $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
+      if(isAtLocalhost()) $domain .= substr(getRoot(),0,-1);
+      $cms->setVariable($domain, "url");
+      $cms->setVariable(getCurLink(), "link");
     }
     if($subject->getStatus() == "process") {
       $cfg = $this->getDOMPlus();
