@@ -1,24 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
-  <!-- http://php.net/manual/en/function.strftime.php -->
-  <var id="today_mm" fn="date" format="%m"/>
-  <var id="today_mon" fn="translate" name="$today_mm">
-    <data lang="cs" name="01">ledna</data>
-    <data lang="cs" name="02">února</data>
-    <data lang="cs" name="03">března</data>
-    <data lang="cs" name="04">dubna</data>
-    <data lang="cs" name="05">května</data>
-    <data lang="cs" name="06">června</data>
-    <data lang="cs" name="07">července</data>
-    <data lang="cs" name="08">srpna</data>
-    <data lang="cs" name="09">září</data>
-    <data lang="cs" name="10">října</data>
-    <data lang="cs" name="11">listopadu</data>
-    <data lang="cs" name="12">prosince</data>
-    <data lang="cs">n/a</data>
-  </var>
-  <var id="today" fn="date" format="%e. $today_mon %Y"/>
-
+  <!-- format creation time -->
   <var id="ctime_mm" fn="date" format="%m" date="$cms-ctime"/>
   <var id="ctime_mon" fn="translate" name="$ctime_mm">
     <data lang="cs" name="01">ledna</data>
@@ -36,6 +18,24 @@
     <data lang="cs">n/a</data>
   </var>
   <var id="ctime" fn="date" format="Vytvořeno %e. $ctime_mon %Y" date="$cms-ctime"/>
+  <!-- format modification time -->
+  <var id="mtime_mm" fn="date" format="%m"/>
+  <var id="mtime_mon" fn="translate" name="$mtime_mm">
+    <data lang="cs" name="01">ledna</data>
+    <data lang="cs" name="02">února</data>
+    <data lang="cs" name="03">března</data>
+    <data lang="cs" name="04">dubna</data>
+    <data lang="cs" name="05">května</data>
+    <data lang="cs" name="06">června</data>
+    <data lang="cs" name="07">července</data>
+    <data lang="cs" name="08">srpna</data>
+    <data lang="cs" name="09">září</data>
+    <data lang="cs" name="10">října</data>
+    <data lang="cs" name="11">listopadu</data>
+    <data lang="cs" name="12">prosince</data>
+    <data lang="cs">n/a</data>
+  </var>
+  <var id="mtime" fn="date" format="Poslední úpravy %e. $mtime_mon %Y"/>
 <!--
   <var id="hash" fn="hash">$cms-author</var>
   <var id="link" fn="local_link" href="$hash">$cms-author</var>

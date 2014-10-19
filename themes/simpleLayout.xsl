@@ -14,8 +14,8 @@
   <xsl:param name="cms-mtime" select="''"/>
   <xsl:param name="xhtml11-url" select="''"/>
   <xsl:param name="xhtml11-link" select="''"/>
-  <xsl:param name="inputvar-today" select="''"/>
   <xsl:param name="inputvar-ctime" select="''"/>
+  <xsl:param name="inputvar-mtime" select="''"/>
 
   <xsl:template match="/body">
     <body>
@@ -30,6 +30,9 @@
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
             <xsl:if test="not($cms-ctime = '')">
               <li><xsl:value-of select="$inputvar-ctime"/></li>
+            </xsl:if>
+            <xsl:if test="not($cms-mtime = '')">
+              <li><xsl:value-of select="$inputvar-mtime"/></li>
             </xsl:if>
             <li><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/><xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
         </ul>
