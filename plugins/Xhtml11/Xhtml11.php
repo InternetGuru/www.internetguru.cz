@@ -89,9 +89,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $newContent = $this->transform($content,$xslt,$user,$proc);
       $newContent->encoding="utf-8";
       $xml = $newContent->saveXML();
-      if(!$newContent->loadXML($xml)) {
-        echo $xml;
-        die();
+      if(!@$newContent->loadXML($xml)) {
         new Logger("Invalid transformation (or parameter) in '$xslt'","error");
         if(self::DEBUG) {
           echo $xml;
@@ -149,10 +147,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         echo htmlentities($v)."\n";
         echo html_entity_decode($v)."\n";
         echo utf8_decode(html_entity_decode($v))."\n";
-        echo translateLiteral2NumericEntities($v)."\n";
+        echo htmlentities(utf8_decode(html_entity_decode($v)),ENT_XHTML)."\n";
+        echo translateUtf8Entities($v)."\n";
         die();
       }
-      $o[$k] = str_replace("'",'"',$v);
+      $o[$k] = str_replace("'",'"',translateUtf8Entities($v));
     }
     return $o;
   }

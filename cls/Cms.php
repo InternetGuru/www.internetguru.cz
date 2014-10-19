@@ -151,7 +151,7 @@ class Cms {
   private function validateXMLMarkup($v) {
     $doc = new DOMDocument();
     if(@$doc->loadXML($v)) return true;
-    $html = '<html>'.translateLiteral2NumericEntities($v).'</html>';
+    $html = '<html>'.translateUtf8Entities($v).'</html>';
     if(!@$doc->loadXML($html)) {
       return false;
     }

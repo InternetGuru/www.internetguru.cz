@@ -27,4 +27,9 @@
       }
   });
 
+  cm.on("change",function(cm,change) {
+    if(typeof setModified != "function") return;
+    setModified();
+  });
+
 })(window);

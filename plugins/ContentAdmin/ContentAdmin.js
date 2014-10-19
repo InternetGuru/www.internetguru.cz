@@ -80,15 +80,9 @@
   function indicateChange(){
     var areas = document.getElementsByTagName("textarea");
     for(var i=0; i < areas.length; i++) {
-      areas[i].addEventListener('input', function() {
-        alert("x");
-        if(modified) return;
-        modified = true;
-        document.title = CHANGE + document.title;
-      }, false);
+      areas[i].addEventListener('input', setModified, false);
     }
   }
-
 
   window.onbeforeunload = function(e) {
     if(!modified) return;
@@ -101,7 +95,12 @@
     return UNLOAD_MSG;
   }
 
-
+  window.setModified = function() {
+    alert("change");
+    if(modified) return;
+    modified = true;
+    document.title = CHANGE + document.title;
+  }
 
   setSaveEvents();
   dynamicFieldset();

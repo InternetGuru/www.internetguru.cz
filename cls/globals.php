@@ -222,14 +222,15 @@ function matchFiles($pattern, $dir) {
   return $files;
 }
 
-function translateLiteral2NumericEntities($xmlSource, $reverse = FALSE) {
+function translateUtf8Entities($xmlSource, $reverse = FALSE) {
   static $literal2NumericEntity;
 
   if (empty($literal2NumericEntity)) {
     $transTbl = get_html_translation_table(HTML_ENTITIES);
     foreach ($transTbl as $char => $entity) {
       if (strpos('&"<>', $char) !== FALSE) continue;
-      $literal2NumericEntity[$entity] = '&#'.ord($char).';';
+      #$literal2NumericEntity[$entity] = '&#'.ord($char).';';
+      $literal2NumericEntity[$entity] = $char;
     }
   }
   if ($reverse) {
