@@ -132,31 +132,26 @@ class DOMDocumentPlus extends DOMDocument {
     return $path . $query;
   }
 
-  public function fragToLinks(HTMLPlus $src,$root="/") {
+  public function fragToLinks(HTMLPlus $src,$root="/",$eName="a",$aName="href") {
     $toStrip = array();
-    foreach($this->getElementsByTagName("a") as $a) {
-      if(!$a->hasAttribute("href")) continue; // no link found
-      $pLink = parse_url($a->getAttribute("href"));
-      // expecting only 3 variables:
-      // 1) is absolute link
-      // 2) is internal fragment
-      // 3) is internal link
-      // 4) is internal query
-      if(isset($pLink["scheme"])) continue;
+    foreach($this->getElementsByTagName($eName) as $a) {
+      if(!$a->hasAttribute($aName)) continue; // no link found
+      $pLink = parse_url($a->getAttribute($aName));
+      if(isset($pLink["scheme"])) continue; // link is absolute (suppose internal)
       $query = isset($pLink["query"]) ? $pLink["query"] : "";
       $queryUrl = strlen($query) ? "?$query" : "";
-      if(isset($pLink["path"]) || isset($pLink["query"])) {
+      if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
         $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
         if(strlen($path) && is_null($src->getElementById($path,"link"))) {
           $toStrip[] = array($a,"link '$path' not found");
           continue; // link not exists
         }
-        if(getCurLink(true) == $path.$queryUrl) {
+        if($eName != "form" && getCurLink(true) == $path.$queryUrl) {
           $toStrip[] = array($a,"cyclic link found");
-          continue;
+          continue; // link is cyclic (except form@action)
         }
-        $a->setAttribute("href",$root.$path.$queryUrl);
-        continue;
+        $a->setAttribute($aName,$root.$path.$queryUrl);
+        continue; // localize link
       }
       $frag = $pLink["fragment"];
       $linkedElement = $this->getElementById($frag);
@@ -173,7 +168,7 @@ class DOMDocumentPlus extends DOMDocument {
         continue; // id not exists
       }
       if($linkedElement->nodeName == "h" && $linkedElement->hasAttribute("link")) {
-        $a->setAttribute("href",$root.$linkedElement->getAttribute("link"));
+        $a->setAttribute($aName,$root.$linkedElement->getAttribute("link"));
         continue; // is outter h1
       }
       $h = $linkedElement->parentNode->getPreviousElement("h");
@@ -184,15 +179,15 @@ class DOMDocumentPlus extends DOMDocument {
         $h1 = $src->documentElement->firstElement;
         #die($h1->getAttribute("id") . " -- $frag");
         if($h1->getAttribute("id") == $frag) {
-          $a->setAttribute("href",$root);
+          $a->setAttribute($aName,$root);
           continue; // link to root heading
         }
-        $a->setAttribute("href",$root."#".$frag);
+        $a->setAttribute($aName,$root."#".$frag);
         continue; // no link attribute until root heading
       }
-      $a->setAttribute("href",$root.$h->getAttribute("link")."#".$frag);
+      $a->setAttribute($aName,$root.$h->getAttribute("link")."#".$frag);
     }
-    foreach($toStrip as $a) $a[0]->stripAttr("href",$a[1]);
+    foreach($toStrip as $a) $a[0]->stripAttr($aName,$a[1]);
   }
 
   private function prepareIfDl(DOMElement $e,$varName) {

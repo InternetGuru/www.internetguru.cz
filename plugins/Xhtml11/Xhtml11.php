@@ -102,7 +102,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->loadXML($content->saveXML());
     $contentPlus->validateLinks("a","href",true);
     $contentPlus->validateLinks("form","action",true);
-    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),getRoot());
+    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),getRoot(),"a","href");
+    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),getRoot(),"form","action");
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement,true);
