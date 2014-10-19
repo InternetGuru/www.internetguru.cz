@@ -134,9 +134,9 @@ class Cms {
       return null;
     }
     if(!$value instanceof DOMDocument) {
-      $items = array();
+      $items = $value;
       if(is_string($value)) $items = array($value);
-      foreach($items as $k => $i) if(!$this->validateXMLMarkup($value)) {
+      foreach($items as $k => $i) if(!$this->validateXMLMarkup($i)) {
         new Logger("Input variable '$varId' is not HTML valid","warning");
         if(!is_string($i)) return null; // in case of an array with non-string item
         $items[$k] = htmlentities($i);
