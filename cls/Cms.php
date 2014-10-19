@@ -14,7 +14,7 @@ class Cms {
   private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
   private $variables = array();
-  const DEBUG = true;
+  const DEBUG = false;
 
   function __construct() {
     if(self::DEBUG) new Logger("DEBUG");
@@ -71,24 +71,18 @@ class Cms {
     if(is_null($this->contentFull)) throw new Exception("Content not set");
     if(!is_null($this->content)) throw new Exception("Should not run twice");
     $this->content = clone $this->contentFull;
-    #$contentStrategies = $this->plugins->getContentStrategies();
-    #foreach($contentStrategies as $cs) {
-    #  $this->titleQueries = $cs->getTitle($this->titleQueries);
-    #}
     try {
       $cs = null;
       foreach($this->plugins->getIsInterface("ContentStrategyInterface") as $cs) {
         $c = $cs->getContent($this->content);
-        #echo $c->saveXML(); die();
         if(!($c instanceof HTMLPlus))
           throw new Exception("Content must be an instance of HTMLPlus");
         $c->validatePlus(true);
         $this->content = $c;
+        $this->loadDefaultVariables($this->content);
       }
     } catch (Exception $e) {
-      #var_dump($cs);
-      #echo $this->content->saveXML();
-      if(self::DEBUG) echo $c->saveXML();
+      if(self::DEBUG) echo $this->content->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }

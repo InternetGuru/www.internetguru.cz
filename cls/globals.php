@@ -127,9 +127,9 @@ function stableSort(Array &$a) {
 }
 
 function getCurLink($query=false) {
-  $query = $query && isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
-  $page = isset($_GET["page"]) ? $_GET["page"] : "";
-  return substr($page.$query,strlen(getRoot()));
+  if(!$query) return isset($_GET["page"]) ? $_GET["page"] : "";
+  $query = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
+  return substr($query,strlen(getRoot()));
 }
 
 function getRoot() {

@@ -171,7 +171,8 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function createDate($d) {
-    $date = DateTime::createFromFormat(DateTime::W3C, $d);
+    $date = new DateTime();
+    $date->setTimestamp(strtotime($d));
     $date_errors = DateTime::getLastErrors();
     if($date_errors['warning_count'] + $date_errors['error_count'] > 0) {
       return null;

@@ -70,15 +70,18 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function fnDate(DOMElement $var) {
-    $format = "%D";
+    $format = "%m/%d/%Y";
     if($var->hasAttribute("format")) {
       $format = $this->parse($var->getAttribute("format"));
       $format = $this->crossPlatformCompatibleFormat($format);
     }
     $time = false;
-    if($var->hasAttribute("date"))
-      $time = strtotime($this->parse($var->getAttribute("date")));
-    if(!$time) $date = strftime($format);
+    if($var->hasAttribute("date")) {
+      $time = $this->parse($var->getAttribute("date"));
+      if(strlen($time) == 4) $time .= "-01"; // strtotime unable to parse year only
+      $time = strtotime($time);
+    }
+    if($time === false) $date = strftime($format);
     else $date = strftime($format,$time);
     if($date === false)
       new Logger("Unrecognized date value or format","error");
@@ -106,14 +109,13 @@ class InputVar extends Plugin implements SplObserver {
     $output = array();
     foreach($subStr as $s) {
       $r = array();
-      preg_match_all('/\$((?:cms-)?[a-z_]+)/',$s,$match);
+      preg_match_all('/\$((?:[a-z]+-)?[a-z_]+)/',$s,$match);
       foreach($match[1] as $var) {
         $varVal = $this->subject->getCms()->getVariable($var);
         if(is_null($varVal))
           $varVal = $this->subject->getCms()->getVariable("inputvar-$var");
         if(is_null($varVal)) {
           new Logger("Variable '$var' does not exist","warning");
-          $output[] = $s;
           continue;
         }
         $r[$var] = $varVal;
