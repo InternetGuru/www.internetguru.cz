@@ -129,8 +129,33 @@ class Cms {
     if(!isset($d[1]["class"])) throw new LoggerException("Unknown caller class");
     $varId = strtolower($d[1]["class"]);
     if($varId != $name) $varId .= (strlen($name) ? "-".normalize($name) : "");
+    if(!is_string($value) && !is_array($value) && !$value instanceof DOMDocument) {
+      new Logger("Unsupported variable '$varId' type","error");
+      return null;
+    }
+    if(!$value instanceof DOMDocument) {
+      $items = array();
+      if(is_string($value)) $items = array($value);
+      foreach($items as $k => $i) if(!$this->validateXMLMarkup($value)) {
+        new Logger("Input variable '$varId' is not HTML valid","error");
+        if(!is_string($i)) return null; // in case of an array with non-string item
+        $items[$k] = htmlentities($i);
+      }
+      if(is_string($value)) $value = $items[0];
+      else $value = $items;
+    }
     $this->variables[$varId] = $value;
     return $varId;
+  }
+
+  private function validateXMLMarkup($v) {
+    $doc = new DOMDocument();
+    if(@$doc->loadXML($v)) return true;
+    $html = '<html>'.translateLiteral2NumericEntities($v).'</html>';
+    if(!@$doc->loadXML($html)) {
+      return false;
+    }
+    return true;
   }
 
   public function getAllVariables() {

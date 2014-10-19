@@ -222,18 +222,6 @@ function matchFiles($pattern, $dir) {
   return $files;
 }
 
-function validateXMLMarkup($v,$n=null) {
-  $doc = new DOMDocument();
-  if(@$doc->loadXML($v)) return true;
-  $html = '<html>'.translateLiteral2NumericEntities($v).'</html>';
-  if(!@$doc->loadXML($html)) {
-    if(is_null($n)) $n="unknown variable";
-    new Logger("Input variable '$n' is not HTML valid","error");
-    return false;
-  }
-  return true;
-}
-
 function translateLiteral2NumericEntities($xmlSource, $reverse = FALSE) {
   static $literal2NumericEntity;
 

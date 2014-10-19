@@ -80,14 +80,14 @@
   function indicateChange(){
     var areas = document.getElementsByTagName("textarea");
     for(var i=0; i < areas.length; i++) {
-      areas[i].addEventListener('keyup', function() {
+      areas[i].addEventListener('input', function() {
+        alert("x");
         if(modified) return;
         modified = true;
         document.title = CHANGE + document.title;
       }, false);
     }
   }
-
 
 
   window.onbeforeunload = function(e) {

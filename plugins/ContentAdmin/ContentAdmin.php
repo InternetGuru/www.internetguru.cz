@@ -3,7 +3,7 @@
 #TODO: ?superadmin
 #TODO: success message
 #TODO: select file
-#todo: reset - not a cyclic link
+#fixme: js showing multi stars...
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
@@ -66,7 +66,17 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $statusChange = $this->dataFileStatus == self::FILE_DISABLED ? self::FILE_ENABLE : self::FILE_DISABLE;
     $usrDestHash = getFileHash($this->dataFile);
     $mode = $this->replace ? "replace" : "modify";
-    $type = (in_array($this->type,array("html","xsl")) ? "xml" : $this->type);
+    switch($this->type) {
+      case "html":
+      case "xsl":
+      $type = "xml";
+      break;
+      case "js":
+      $type = "javascript";
+      break;
+      default:
+      $type = $this->type;
+    }
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("contentadmin-heading", $cms->getVariable("cms-title"));
@@ -158,7 +168,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->redir($pluginFile);
     }
 
-    if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{3,4}$~", $f))
+    if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{2,4}$~", $f))
       throw new Exception("Unsupported file name format '$f'");
 
     $this->defaultFile = $f;

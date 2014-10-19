@@ -33,8 +33,8 @@ class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyIn
     // supported syntax only
     $modes = array(
       "xml" => "lib/codemirror/mode/xml/xml.js",
-      "xsl" => "lib/codemirror/mode/xml/xml.js",
       "css" => "lib/codemirror/mode/css/css.js",
+      "javascript" => "lib/codemirror/mode/javascript/javascript.js",
       );
     $libs = array();
     foreach($ta as $t) {

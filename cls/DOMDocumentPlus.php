@@ -281,7 +281,6 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function insertVarString($varValue,DOMElement $e,$attr,$varName) {
-    if(!validateXMLMarkup($varValue,$varName)) return;
     if(!is_null($attr) && !is_numeric($attr)) {
       if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
         $e->setAttribute($attr,$varValue);
@@ -336,7 +335,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
     $p = $e->parentNode;
     foreach($varValue as $v) {
-      if(!validateXMLMarkup($v,$varName)) continue;
       $i = $p->insertBefore($e->cloneNode(),$e);
       $i->nodeValue = $v;
       if(!is_null($sep)) $i = $p->insertBefore($sep->cloneNode(),$e);
