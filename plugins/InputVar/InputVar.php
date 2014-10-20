@@ -1,5 +1,7 @@
 <?php
 
+#TODO: silent error support (@ sign)
+
 class InputVar extends Plugin implements SplObserver {
   private $contentXPath;
 

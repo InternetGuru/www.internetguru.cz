@@ -19,7 +19,7 @@
   </var>
   <var id="ctime" fn="date" format="Vytvořeno %e. $ctime_mon %Y" date="$cms-ctime"/>
   <!-- format modification time -->
-  <var id="mtime_mm" fn="date" format="%m"/>
+  <var id="mtime_mm" fn="date" format="%m" date="$cms-mtime"/>
   <var id="mtime_mon" fn="translate" name="$mtime_mm">
     <data lang="cs" name="01">ledna</data>
     <data lang="cs" name="02">února</data>
@@ -35,7 +35,7 @@
     <data lang="cs" name="12">prosince</data>
     <data lang="cs">n/a</data>
   </var>
-  <var id="mtime" fn="date" format="Poslední úpravy %e. $mtime_mon %Y"/>
+  <var id="mtime" fn="date" format="Poslední úpravy %e. $mtime_mon %Y" date="$cms-mtime"/>
 <!--
   <var id="hash" fn="hash">$cms-author</var>
   <var id="link" fn="local_link" href="$hash">$cms-author</var>
