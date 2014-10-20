@@ -32,8 +32,8 @@ class Convertor extends Plugin implements SplObserver {
       }
       redirTo("?admin=$f.html");
     } catch(Exception $e) {
-      new Logger($e->getMessage(),"warning");
-      die($e->getMessage());
+      new Logger($e->getMessage(),"error");
+      throw $e;
     }
   }
 
@@ -60,12 +60,20 @@ class Convertor extends Plugin implements SplObserver {
   private function saveFromUrl() {
     $url = $_GET["import"];
     $purl = parse_url($url);
+    if($purl === false) throw new Exception("Unable to parse link (invalid format)");
     if(!isset($purl["scheme"])) return null;
     if($purl["host"] == "docs.google.com") {
-      $url = $this->createGdocsUrl($purl);
-    }
-    if(!$this->urlExists($url))
-      throw new Exception("Invalid link");
+      $url = $purl["scheme"] ."://". $purl["host"] . $purl["path"] . "/export?format=doc";
+      $headers = @get_headers($url);
+      if(strpos($headers[0],'404') !== false) {
+        $url = $purl["scheme"] ."://". $purl["host"] . dirname($purl["path"]) . "/export?format=doc";
+        $headers = @get_headers($url);
+      }
+    } else $headers = @get_headers($url);
+    if(strpos($headers[0],'302') !== false)
+      throw new Exception("Destination URL '$url' is unaccessible (must be shared publically)");
+    elseif(strpos($headers[0],'200') === false)
+      throw new Exception("Destination URL '$url' not found");
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header,$url);
     if(!is_dir(IMPORT_FOLDER)) mkdir(IMPORT_FOLDER, 0755, true);
@@ -87,17 +95,7 @@ class Convertor extends Plugin implements SplObserver {
 
 
   private function createGdocsUrl($url) {
-    $urlstr = $url["scheme"] ."://". $url["host"] . $url["path"] . "/export?format=doc";
-    if($this->urlExists($urlstr)) return $urlstr;
-    return $url["scheme"] ."://". $url["host"] . dirname($url["path"]) . "/export?format=doc";
   }
-
-  private function urlExists($url) {
-    $headers = @get_headers($url);
-    if(strpos($headers[0],'200') === false) return false;
-    return true;
-  }
-
 
   private function transformFile($f) {
     $dom = new DOMDocument();
