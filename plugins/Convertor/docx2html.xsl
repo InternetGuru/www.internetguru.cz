@@ -97,41 +97,45 @@
               <xsl:text disable-output-escaping="yes">&lt;!-- mismatch heading structure ignored --></xsl:text>
               <xsl:apply-templates select="$h[$pos]"/>
             </xsl:if>
-            <!-- content between this and next heading -->
+
+            <!-- description after heading -->
             <xsl:variable name="curHPos" select="count($h[$pos]/preceding-sibling::*)+1" />
             <xsl:variable name="nextHPos" select="count($h[$pos+1]/preceding-sibling::*)+1" />
-            <xsl:if test="$correct">
-               <xsl:choose>
-                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">&#160;
+            <xsl:if test="$correct and not($nextHPos = $curHPos+1)">
+              <xsl:choose>
+                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)]">&#160;
   <desc>
                     <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
                   </desc>
                 </xsl:when>
                 <xsl:otherwise>&#160;
   <desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
-                  <xsl:if test="$nextHPos - $curHPos &gt; 1">
-                    <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
-                  </xsl:if>
+                  <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>
+
             <!-- content between headings -->
-            <xsl:apply-templates select="//p[position() &gt; $curHPos+$correct and (position() &lt; $nextHPos or $nextHPos = $curHPos)]"/>
+            <xsl:apply-templates select="//p[position() &gt; $curHPos+$correct
+              and (position() &lt; $nextHPos or $nextHPos = $curHPos)]"/>
+
             <!-- next heading (pos+1) -->
-            <xsl:if test="$correct">
-              <xsl:call-template name="headingStructure">
-                <xsl:with-param name="lvl" select="$curLvl"/>
-                <xsl:with-param name="pos" select="$pos+1"/>
-                <xsl:with-param name="sec" select="$sec"/>
-              </xsl:call-template>
-            </xsl:if>
-            <xsl:if test="not($correct)">
-              <xsl:call-template name="headingStructure">
-                <xsl:with-param name="lvl" select="$lvl"/>
-                <xsl:with-param name="pos" select="$pos+1"/>
-                <xsl:with-param name="sec" select="$sec"/>
-              </xsl:call-template>
-            </xsl:if>
+            <xsl:choose>
+              <xsl:when test="$correct">
+                <xsl:call-template name="headingStructure">
+                  <xsl:with-param name="lvl" select="$curLvl"/>
+                  <xsl:with-param name="pos" select="$pos+1"/>
+                  <xsl:with-param name="sec" select="$sec"/>
+                </xsl:call-template>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="headingStructure">
+                  <xsl:with-param name="lvl" select="$lvl"/>
+                  <xsl:with-param name="pos" select="$pos+1"/>
+                  <xsl:with-param name="sec" select="$sec"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
           </xsl:when>
 
           <!-- mismatched heading structure detected -->
@@ -195,11 +199,11 @@
   </xsl:template>
 
   <xsl:template match="t" priority="1">
-    <xsl:variable name="bold" select="preceding-sibling::rPr[1]/b"/>
-  	<xsl:variable name="italic" select="preceding-sibling::rPr[1]/i"/>
-    <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike"/>
-  	<xsl:variable name="sup" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'superscript')"/>
-  	<xsl:variable name="sub" select="contains(preceding-sibling::rPr[1]/vertAlign/@val, 'subscript')"/>
+    <xsl:variable name="bold" select="preceding-sibling::rPr[1]/b/@val = 1"/>
+  	<xsl:variable name="italic" select="preceding-sibling::rPr[1]/i/@val = 1"/>
+    <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike/@val = 1"/>
+  	<xsl:variable name="sup" select="preceding-sibling::rPr[1]/vertAlign/@val = 'superscript'"/>
+  	<xsl:variable name="sub" select="preceding-sibling::rPr[1]/vertAlign/@val = 'subscript'"/>
 
   	<xsl:choose>
   		<xsl:when test="$sup and $bold and $italic and $del"><sup><del><strong><em><xsl:apply-templates/></em></strong></del></sup></xsl:when>
