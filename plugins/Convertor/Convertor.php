@@ -14,9 +14,11 @@ class Convertor extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     $this->subject = $subject;
     if($subject->getStatus() != "preinit") return;
-    if(!isset($_GET["import"])) return;
+    if(isset($_GET["import"])) redirTo(getRoot() . getCurLink() . "?" . get_class($this)
+      . (strlen($_GET["import"]) ? "=".$_GET["import"] : "")); // backward compatibility
+    if(!isset($_GET[get_class($this)])) return;
     try {
-      $f = $this->getFile();
+      $f = $this->getFile($_GET[get_class($this)]);
       $xml = $this->transformFile($f);
       $doc = new DOMDocumentPlus();
       $doc->loadXML($xml->saveXML());
@@ -31,7 +33,8 @@ class Convertor extends Plugin implements SplObserver {
         echo $str;
         die();
       }
-      redirTo("?admin=$f.html");
+      if($subject->isAttachedPlugin("ContentAdmin")) redirTo("?ContentAdmin=$f.html");
+      echo $str;
     } catch(Exception $e) {
       new Logger($e->getMessage(),"error");
       throw $e;
@@ -48,18 +51,17 @@ class Convertor extends Plugin implements SplObserver {
       return $ids;
   }
 
-  private function getFile() {
-    if(!strlen($_GET["import"]))
+  private function getFile($dest) {
+    if(!strlen($dest))
       throw new Exception("Missing import parameter");
-    $f = $this->saveFromUrl();
+    $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
-    $f = findFile($_GET["import"]);
+    $f = findFile($dest);
     if(!$f) throw new Exception("Invalid import parameter");
     return $f;
   }
 
-  private function saveFromUrl() {
-    $url = $_GET["import"];
+  private function saveFromUrl($url) {
     $purl = parse_url($url);
     if($purl === false) throw new Exception("Unable to parse link (invalid format)");
     if(!isset($purl["scheme"])) return null;

@@ -26,14 +26,14 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   public function update(SplSubject $subject) {
     if(isset($_GET["admin"])) redirTo(getRoot() . getCurLink() . "?" . get_class($this)
       . (strlen($_GET["admin"]) ? "=".$_GET["admin"] : "")); // back compatibility
-    if(!isset($_GET[get_class($this)])) {
-      $subject->detach($this);
-      return;
-    }
     if($subject->getStatus() == "preinit") {
       $subject->setPriority($this,3);
     }
     if($subject->getStatus() != "init") return;
+    if(!isset($_GET[get_class($this)])) {
+      $subject->detach($this);
+      return;
+    }
     $this->subject = $subject;
     try {
       $this->setDefaultFile();
