@@ -47,32 +47,30 @@
     }
   }
 
-  function setSaveEvents() {
-    document.onkeydown=function(e){
+  function setEvents() {
+    var forms = document.getElementsByTagName("form");
+    if(forms.length != 1) return; // multiple forms not supported
+    forms[0].onsubmit = function(){
+      modified = false;
+    }
+    setSaveEvents(forms[0]);
+  }
+
+  function setSaveEvents(form) {
+    form.onkeydown=function(){
+
       // letter s and ctrl or meta
-      if(e.keyCode != 83) return true;
-      if(!e.ctrlKey && !e.metaKey) return true;
-
-      // parent is form
-      var p = e.target.parentNode;
-      while(true) {
-        if(p == null) return true;
-        if(p.nodeName.toLowerCase() == "form") break;
-        p = p.parentNode;
-      }
-
-      p.onsubmit = function(){
-        modified = false;
-      }
+      if(event.keyCode != 83) return true;
+      if(!event.ctrlKey && !event.metaKey) return true;
 
       // save and exit if shift
-      if(e.shiftKey) {
-        p['saveandgo'].click();
+      if(event.shiftKey) {
+        form['saveandgo'].click();
         return false;
       }
 
       // save and stay
-      p['saveandstay'].click();
+      form['saveandstay'].click();
       return false;
     }
   }
@@ -101,7 +99,7 @@
     document.title = CHANGE + document.title;
   }
 
-  setSaveEvents();
+  setEvents();
   dynamicFieldset();
   indicateChange();
 
