@@ -5,11 +5,6 @@
 #todo: check document type/mime
 
 class Convertor extends Plugin implements SplObserver {
-  const DEBUG = false;
-
-  public function __construct() {
-    if(self::DEBUG) new Logger("DEBUG");
-  }
 
   public function update(SplSubject $subject) {
     $this->subject = $subject;
@@ -29,12 +24,9 @@ class Convertor extends Plugin implements SplObserver {
       }
       $str = str_replace("> \n",">\n",$str); // remove "nbsp hack" from transformation
       file_put_contents("$f.html",$str);
-      if(self::DEBUG) {
-        echo $str;
-        die();
-      }
       if($subject->isAttachedPlugin("ContentAdmin")) redirTo("?ContentAdmin=$f.html");
       echo $str;
+      die();
     } catch(Exception $e) {
       new Logger($e->getMessage(),"error");
       throw $e;

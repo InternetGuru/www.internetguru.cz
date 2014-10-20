@@ -101,16 +101,23 @@
             <!-- description after heading -->
             <xsl:variable name="curHPos" select="count($h[$pos]/preceding-sibling::*)+1" />
             <xsl:variable name="nextHPos" select="count($h[$pos+1]/preceding-sibling::*)+1" />
-            <xsl:if test="$correct and not($nextHPos = $curHPos+1)">
+            <!--
+              DEBUG:
+              curHPos = <xsl:value-of select="$curHPos"/>
+              nextHPos = <xsl:value-of select="$nextHPos"/>
+            -->
+            <xsl:if test="$correct">
               <xsl:choose>
-                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)]">&#160;
+                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">&#160;
   <desc>
                     <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
                   </desc>
                 </xsl:when>
                 <xsl:otherwise>&#160;
   <desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
-                  <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
+                  <xsl:if test="not($nextHPos = $curHPos+1)">
+                    <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
+                  </xsl:if>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>
