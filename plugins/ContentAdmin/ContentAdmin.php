@@ -25,7 +25,9 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $defaultFile = "n/a";
 
   public function update(SplSubject $subject) {
-    if(!isset($_GET["admin"])) {
+    $this->adminLink = "?" . get_class($this);
+    if(isset($_GET["admin"])) $this->redir($_GET["admin"]); // back compatibility
+    if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;
     }
@@ -34,7 +36,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
-    $this->adminLink = "?admin";
     try {
       $this->setDefaultFile();
       $this->dataFile = $this->getDataFile();
@@ -150,7 +151,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
    */
   private function setDefaultFile() {
 
-    $f = $_GET["admin"];
+    $f = $_GET[get_class($this)];
     if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
     if(!strlen($f)) {
       $l = getCurLink() . ".html";
@@ -304,7 +305,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if(strlen($f)) $f = "=$f";
     $redir = getRoot().getCurLink();
     #FIXME: different admin variations (admin, superadmin, viewonly)
-    if(!isset($_POST["saveandgo"])) $redir .= "?admin" . $f;
+    if(!isset($_POST["saveandgo"])) $redir .= $this->adminLink . $f;
     redirTo($redir,null,true);
   }
 
