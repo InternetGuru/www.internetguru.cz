@@ -79,17 +79,17 @@ function getRes($res,$dest,$resFolder) {
     throw new LoggerException("Unable to create directory structure '$newDir'");
   if(file_exists($newRes)) {
     chmodGroup($newRes,0664); // not important if passed or not
-    if(filectime($newRes) >= filectime($res)) return $newRes;
+    if(filemtime($newRes) >= filemtime($res)) return $newRes;
   }
   if(!copy($res, $newRes)) {
     if(!file_exists($newRes)) {
       throw new LoggerException("Unable to copy resource file to '$newRes'");
     }
-    new Logger("Unable to rewrite resource file to '$newRes'");
+    new Logger("Unable to rewrite resource file to '$newRes'","error");
     return $newRes;
   }
   if(!chmodGroup($newRes,0664))
-    new Logger("Unable to chmod resource file '$newRes'");
+    new Logger("Unable to chmod resource file '$newRes'","error");
   return $newRes;
 }
 

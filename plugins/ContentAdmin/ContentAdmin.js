@@ -96,7 +96,6 @@
   }
 
   window.setModified = function() {
-    alert("change");
     if(modified) return;
     modified = true;
     document.title = CHANGE + document.title;
