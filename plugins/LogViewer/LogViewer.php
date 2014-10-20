@@ -25,9 +25,11 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $cms = $this->subject->getCms();
     #$cms->getOutputStrategy()->addCssFile($this->getDir() . '/LogViewer.css');
     #$cms->getOutputStrategy()->addJsFile($this->getDir() . '/LogViewer.js', 100, "body");
-
+    $f = LOG_FOLDER ."/". $_GET[get_class($this)] . ".log";
+    if(!is_file($f)) $f = LOG_FOLDER ."/". date('Ymd') . ".log";
+    if(!is_file($f)) new LoggerException("Unable to find '$f'");
     $newContent = $this->getHTMLPlus();
-
+    $newContent->insertVar("logviewer-content", file_get_contents($f));
     return $newContent;
   }
 

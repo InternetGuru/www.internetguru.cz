@@ -60,6 +60,7 @@ function redirTo($link,$code=null,$force=false) {
     if($curLink == $absLink)
       throw new LoggerException("Cyclic redirection to '$link'");
   }
+  new Logger("Redirecting to '$link' with status code '".(is_null($code) ? 302 : $code)."'");
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
