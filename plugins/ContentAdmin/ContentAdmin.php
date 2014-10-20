@@ -62,8 +62,14 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if($this->type == "html") $format = "html+";
     if(!is_null($this->schema)) $format .= " (" . pathinfo($this->schema,PATHINFO_BASENAME) . ")";
 
+    $newContent = $this->getHTMLPlus();
+
     $la = $this->adminLink ."=". $this->defaultFile;
-    $statusChange = $this->dataFileStatus == self::FILE_DISABLED ? self::FILE_ENABLE : self::FILE_DISABLE;
+    $statusChange =  self::FILE_DISABLE;
+    if($this->dataFileStatus == self::FILE_DISABLED) {
+      $newContent->insertVar("contentadmin-warning", "warning");
+      $statusChange = self::FILE_ENABLE;
+    }
     $usrDestHash = getFileHash($this->dataFile);
     $mode = $this->replace ? "replace" : "modify";
     switch($this->type) {
@@ -78,12 +84,11 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $type = $this->type;
     }
 
-    $newContent = $this->getHTMLPlus();
     $newContent->insertVar("contentadmin-heading", $cms->getVariable("cms-title"));
     $newContent->insertVar("contentadmin-errors", $this->errors);
     $newContent->insertVar("contentadmin-link", getCurLink());
     $newContent->insertVar("contentadmin-linkadmin", $la);
-    $newContent->insertVar("contentadmin-linkadminstatus", "$la&amp;$statusChange");
+    $newContent->insertVar("contentadmin-linkadminstatus", "$la&$statusChange");
 
     if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown")
       $newContent->insertVar("contentadmin-statuschange", null);
@@ -188,8 +193,10 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $fd = pathinfo($f,PATHINFO_DIRNAME) ."/.". pathinfo($f,PATHINFO_BASENAME);
     if(isset($_GET[self::FILE_ENABLE]) && file_exists($fd)) rename($fd,$f);
     if(isset($_GET[self::FILE_DISABLE]) && file_exists($f)) rename($f,$fd);
-    $this->dataFileStatus = self::FILE_ENABLED;
-    if(file_exists($f)) return $f;
+    if(file_exists($f)) {
+      $this->dataFileStatus = self::FILE_ENABLED;
+      return $f;
+    }
     if(file_exists($fd)) {
       $this->dataFileStatus = self::FILE_DISABLED;
       return $fd;
