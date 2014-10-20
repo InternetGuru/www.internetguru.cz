@@ -17,7 +17,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $errors = array();
   private $contentValue = "n/a";
   private $schema = null;
-  private $adminLink;
   private $type = "unknown";
   private $replace = true;
   private $dataFile = null;
@@ -25,7 +24,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $defaultFile = "n/a";
 
   public function update(SplSubject $subject) {
-    $this->adminLink = "?" . get_class($this);
     if(isset($_GET["admin"])) $this->redir($_GET["admin"]); // back compatibility
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
@@ -58,14 +56,13 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $cms->getOutputStrategy()->addCssFile($this->getDir() . '/ContentAdmin.css');
     $cms->getOutputStrategy()->addJsFile($this->getDir() . '/ContentAdmin.js', 100, "body");
 
-    #$this->errors = array("a","b","c");
     $format = $this->type;
     if($this->type == "html") $format = "html+";
     if(!is_null($this->schema)) $format .= " (" . pathinfo($this->schema,PATHINFO_BASENAME) . ")";
 
     $newContent = $this->getHTMLPlus();
 
-    $la = $this->adminLink ."=". $this->defaultFile;
+    $la = "?" . get_class($this) . "=" . $this->defaultFile;
     $statusChange =  self::FILE_DISABLE;
     if($this->dataFileStatus == self::FILE_DISABLED) {
       $newContent->insertVar("contentadmin-warning", "warning");
@@ -302,10 +299,9 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   }
 
   private function redir($f="") {
-    if(strlen($f)) $f = "=$f";
     $redir = getRoot().getCurLink();
-    #FIXME: different admin variations (admin, superadmin, viewonly)
-    if(!isset($_POST["saveandgo"])) $redir .= $this->adminLink . $f;
+    if(isset($_POST["saveandgo"]))
+      $redir .= "?" . get_class($this) . (strlen($f) ? "=$f" : "");
     redirTo($redir,null,true);
   }
 
