@@ -124,7 +124,7 @@
 
             <!-- content between headings -->
             <xsl:apply-templates select="//p[position() &gt; $curHPos+$correct
-              and (position() &lt; $nextHPos or $nextHPos = $curHPos)]"/>
+              and (position() &lt; $nextHPos or $nextHPos = 1)]"/>
 
             <!-- next heading (pos+1) -->
             <xsl:choose>
