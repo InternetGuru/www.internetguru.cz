@@ -214,18 +214,28 @@ class DOMDocumentPlus extends DOMDocument {
   public function validateId($attr="id",$repair=false) {
     $xpath = new DOMXPath($this);
     $ids = array();
+    $repairs = array();
     foreach($xpath->query("//*[@$attr]") as $e) {
       $id = $e->getAttribute($attr);
-      if(array_key_exists($id, $ids)) {
-        if(!$repair) throw new Exception("Duplicit $attr attribute '$id' found");
-        $i = 1;
-        while(array_key_exists($id.$i, $ids)) $i++;
-        $id = $id.$i;
-        $e->setAttribute("id",$id);
+      if(!array_key_exists($id, $ids)) {
+        $ids[$id] = null;
+        continue;
       }
-      $ids[$id] = null;
+      if(!$repair) throw new Exception("Duplicit $attr attribute '$id' found");
+      $i = 1;
+      while(true) try {
+        $newId = $id.$i;
+        $el = $this->getElementById($newId);
+        if(is_null($el)) break;
+        $i++;
+      } catch (Exception $ex) {
+        $i++;
+      }
+      $e->setAttribute($attr,$newId);
+      $repairs[$newId] = $id;
+      $ids[$newId] = null;
     }
-    return true;
+    return $repairs;
   }
 
   public function removeUntilSame(DOMElement $e) {
