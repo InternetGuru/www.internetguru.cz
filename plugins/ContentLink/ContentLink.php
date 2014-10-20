@@ -6,25 +6,26 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private $headings;
 
   public function update(SplSubject $subject) {
+    $this->subject = $subject;
     $this->isRoot = getCurLink() == "";
     $subject->setPriority($this,2);
     if($this->isRoot) return;
     if($subject->getStatus() != "init") return;
-    $this->subject = $subject;
     if($this->detachIfNotAttached("Xhtml11")) return;
   }
 
   public function getContent(HTMLPlus $c) {
-    if($this->isRoot) return $c;
     $cf = $this->subject->getCms()->getContentFull();
     $link = getCurLink();
     $curH = $cf->getElementById($link,"link");
+    if(is_null($curH)) $curH = $cf->documentElement->firstElement;
+    $this->setPath($curH);
+    $this->setBc($c);
+    if($this->isRoot) return $c;
     if(is_null($curH))
       throw new Exception("No unique exact match found for link '$link'");
 
-    $this->setPath($curH);
     $this->setTitle();
-    $this->setBc($c);
 
     $this->setAncestorValue($curH, "author");
     $this->setAncestorValue($curH->parentNode, "xml:lang");
