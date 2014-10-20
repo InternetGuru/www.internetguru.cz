@@ -114,14 +114,13 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function repairLink($link=null) {
-    #$rootHeading = "#".$this->documentElement->firstElement->getAttribute("id");
     if(is_null($link)) $link = getCurLink(); // null -> currentLink
     if($link == "") return $link;
     $pLink = parse_url($link);
     if($pLink === false) throw new LoggerException("Unable to parse href '$link'"); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
       $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"] . getRoot();
-      if(strpos($link,$curDomain) !== 0) return $link; // link is external
+      if(strpos($curDomain,$link) !== 0) return $link; // link is external
     }
     $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
     if(isset($pLink["fragment"])) return $query . "#" . $pLink["fragment"];
