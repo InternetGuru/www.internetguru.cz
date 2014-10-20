@@ -1,6 +1,8 @@
 div.CodeMirror {
   font-family: "Emilbus Mono","Lucida Console",monospace;
   line-height: 120%;
+  margin-top: 1em;
+  margin-bottom: 1em;
 }
 
 .cm-s-tomorrow-night-eighties .CodeMirror-cursor {
