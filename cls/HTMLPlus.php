@@ -106,6 +106,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$h->hasAttribute("link")) continue;
       #$this->getElementById($h->getAttribute("link"),"link");
       $link = normalize($h->getAttribute("link"));
+      while(preg_match("/^[^a-z]/",$link)) $link = substr($link,1); // must start with a-z
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))
           throw new Exception ("Normalize link leads to empty value '{$h->getAttribute("link")}'");
