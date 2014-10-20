@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Xhtml11>
 
-  <themes readonly="readonly"/>
+  <!-- <themes readonly="readonly"/> -->
   <themes>
     <theme id="default">
       <xslt>themes/defaultLayout.xsl</xslt>
@@ -17,7 +17,7 @@
   <!-- available themes: default or simple -->
   <theme>default</theme>
 
-  <xslt readonly="readonly"/>
+  <!-- <xslt readonly="readonly"/> -->
   <stylesheet>themes/cms-default.css</stylesheet>
   <stylesheet media="print">themes/cms-print.css</stylesheet>
   <!-- <stylesheet>themes/document.css</stylesheet> -->

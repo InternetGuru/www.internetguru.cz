@@ -14,7 +14,6 @@
   <xsl:param name="cms-mtime" select="''"/>
   <xsl:param name="xhtml11-url" select="''"/>
   <xsl:param name="xhtml11-link" select="''"/>
-  <xsl:param name="inputvar-today" select="''"/>
 
   <xsl:template match="/body">
     <body>
@@ -27,7 +26,10 @@
       </div>
       <div id="footer">
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
-        <ul><li>©2014 internetguru.cz</li></ul>
+        <ul>
+          <li><xsl:value-of disable-output-escaping="yes" select="$cms-ig"/></li>
+          <li><xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
+        </ul>
       </div>
     </body>
   </xsl:template>

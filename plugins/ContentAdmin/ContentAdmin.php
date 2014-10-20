@@ -301,7 +301,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   private function redir($f="") {
     $redir = getRoot().getCurLink();
-    if(isset($_POST["saveandgo"]))
+    if(!isset($_POST["saveandgo"]))
       $redir .= "?" . get_class($this) . (strlen($f) ? "=$f" : "");
     redirTo($redir,null,true);
   }
