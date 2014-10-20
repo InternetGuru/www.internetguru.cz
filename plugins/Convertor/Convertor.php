@@ -25,6 +25,7 @@ class Convertor extends Plugin implements SplObserver {
       foreach($ids as $old => $new) {
         $str = str_replace($old,$new,$str);
       }
+      $str = str_replace("> \n",">\n",$str); // remove "nbsp hack" from transformation
       file_put_contents("$f.html",$str);
       if(self::DEBUG) {
         echo $str;
