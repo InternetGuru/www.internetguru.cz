@@ -33,7 +33,8 @@ try {
   $plugins->notify();
 
   echo $cms->getOutput();
-
+  backupDir(USER_FOLDER);
+  backupDir(ADMIN_FOLDER);
   $l->finished();
 
 } catch(Exception $e) {

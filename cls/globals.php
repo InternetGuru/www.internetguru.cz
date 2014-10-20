@@ -71,8 +71,8 @@ function redirTo($link,$code=null,$force=false) {
 
 function getRes($res,$dest,$resFolder) {
   if(!$resFolder) return $res;
-  if(strpos(pathinfo($res,PATHINFO_FILENAME), ".") === 0)
-    throw new LoggerException("Forbidden file name");
+  #if(strpos(pathinfo($res,PATHINFO_FILENAME), ".") === 0)
+  #  throw new LoggerException("Forbidden file name");
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
   if(!is_dir($newDir) && !mkdirGroup($newDir,0775,true))
@@ -220,6 +220,41 @@ function matchFiles($pattern, $dir) {
   }
 
   return $files;
+}
+
+function backupDir($dir) {
+  if(!is_dir($dir)) return;
+  $info = pathinfo($dir);
+  $bakDir = $info["dirname"]."/~".$info["basename"];
+  copyFiles($dir,$bakDir);
+  deleteRedundantFiles($bakDir,$dir);
+  #new Logger("Active data backup updated");
+}
+
+function deleteRedundantFiles($in,$according) {
+  if(!is_dir($in)) return;
+  foreach(scandir($in) as $f) {
+    if(in_array($f,array(".",".."))) continue;
+    if(is_dir("$in/$f")) {
+      deleteRedundantFiles("$in/$f","$according/$f");
+      if(!is_dir("$according/$f")) rmdir("$in/$f");
+      continue;
+    }
+    if(!is_file("$according/$f")) unlink("$in/$f");
+  }
+}
+
+function copyFiles($src,$dest) {
+  if(!is_dir($dest) && !@mkdir($dest))
+    throw new LoggerException("Unable to create '$dest'");
+  foreach(scandir($src) as $f) {
+    if(in_array($f,array(".",".."))) continue;
+    if(is_dir("$src/$f")) {
+      copyFiles("$src/$f","$dest/$f");
+      continue;
+    }
+    getRes("$src/$f",$f,$dest);
+  }
 }
 
 function translateUtf8Entities($xmlSource, $reverse = FALSE) {
