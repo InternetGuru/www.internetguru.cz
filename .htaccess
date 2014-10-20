@@ -9,8 +9,8 @@ RewriteRule   .                      - [E=RB:/%1/]
 
 ##
 # remove trailing slash, eg. /mivepo/ -> /mivepo
-RewriteCond   %{REQUEST_FILENAME}    !-f
-RewriteRule   ^(.+)\/$               %{ENV:RB}$1  [R=301,L]
+#RewriteCond   %{REQUEST_FILENAME}    !-f
+#RewriteRule   ^(.+)\/$               %{ENV:RB}$1  [R=301,L]
 
 ##
 # create _GET parameters

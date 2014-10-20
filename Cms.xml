@@ -30,6 +30,7 @@
   <plugin>Convertor</plugin>
   <plugin>GA</plugin>
   <plugin>InputVar</plugin>
+  <plugin>LogViewer</plugin>
   <plugin>TOC</plugin>
   <!-- <plugin>Slider</plugin> -->
   <plugin>Xhtml11</plugin>
