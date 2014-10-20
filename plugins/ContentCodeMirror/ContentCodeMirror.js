@@ -12,7 +12,7 @@
       width:"100%",
       lineWrapping: true,
       //tabSize: 2,
-      styleActiveLine: true,
+      //styleActiveLine: true,
       styleSelectedText: true,
       autoCloseTags: {
         whenClosing: true,
