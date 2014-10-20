@@ -22,13 +22,14 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $xpath = new DOMXPath($content);
     $nodes = array();
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
-    foreach($nodes as $e) {
+    foreach($nodes as $section) {
       $hs = array();
-      foreach($xpath->query($e->getNodePath() . "/h") as $h) $hs[] = $h;
+      foreach($section->childElements as $e) if($e->nodeName == "h") $hs[] = $e;
+      $force = $section->getPreviousElement("h")->hasAttribute("link");
       $ul = $content->createElement("ul");
       $ul->setAttribute("class","contentbalancer");
       foreach($hs as $h) {
-        if(!$h->hasAttribute("link")) continue 2;
+        if(!$force && !$h->hasAttribute("link")) continue 2;
         $li = $content->createElement("li");
         $textContent = $h->nodeValue;
         if($h->hasAttribute("short")) $textContent = $h->getAttribute("short");
@@ -37,7 +38,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
         $li->appendChild($a);
         $ul->appendChild($li);
       }
-      $e->parentNode->replaceChild($ul,$e);
+      $section->parentNode->replaceChild($ul,$section);
     }
   }
 
