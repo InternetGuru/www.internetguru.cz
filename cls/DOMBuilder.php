@@ -184,8 +184,6 @@ class DOMBuilder {
     foreach($doc->documentElement->childElements as $n) {
       $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
     }
-    $h->ownerDocument->validateId("id",true);
-    $h->ownerDocument->validateId("link",true);
     $h->ownerDocument->validatePlus(true);
     $this->imported[] = $file;
   }

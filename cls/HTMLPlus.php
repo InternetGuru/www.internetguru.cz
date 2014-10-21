@@ -27,8 +27,8 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot();
     $this->validateLang($repair);
-    if(count($this->validateId("id",$repair))) $this->autocorrected = true;
-    if(count($this->validateId("link",$repair))) $this->autocorrected = true;
+    if($this->validateId("id",$repair)) $this->autocorrected = true;
+    if($this->validateId("link",$repair)) $this->autocorrected = true;
     $this->validateHId($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
