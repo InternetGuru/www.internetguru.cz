@@ -83,7 +83,7 @@
           <!-- same level -->
           <xsl:when test="$curLvl = $lvl or not($correct)">
             <!-- generate heading -->
-            <xsl:if test="$correct">&#160;
+            <xsl:if test="$correct">·
   <xsl:element name="h">
                 <xsl:if test="$bookmarkId">
                   <xsl:attribute name="id">
@@ -108,12 +108,12 @@
             -->
             <xsl:if test="$correct">
               <xsl:choose>
-                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">&#160;
+                <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">·
   <desc>
                     <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
                   </desc>
                 </xsl:when>
-                <xsl:otherwise>&#160;
+                <xsl:otherwise>·
   <desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
                   <xsl:if test="not($nextHPos = $curHPos+1)">
                     <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
@@ -156,7 +156,7 @@
           </xsl:when>
 
           <!-- lower level -->
-          <xsl:when test="$curLvl &gt; $lvl">&#160;
+          <xsl:when test="$curLvl &gt; $lvl">·
   <xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
             <!-- call current-level heading -->
             <xsl:call-template name="headingStructure">
@@ -167,9 +167,8 @@
           </xsl:when>
 
           <!-- 2+ higher level -->
-          <xsl:when test="$lvl - $curLvl &gt; 1">
-            <!-- close section -->
-            <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+          <xsl:when test="$lvl - $curLvl &gt; 1">·
+  <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
             <!-- call current-level heading keeping level -->
             <xsl:call-template name="headingStructure">
               <xsl:with-param name="lvl" select="$lvl -1"/>
@@ -179,9 +178,8 @@
           </xsl:when>
 
           <!-- higher level -->
-          <xsl:when test="$curLvl &lt; $lvl">
-            <!-- close section -->
-            <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+          <xsl:when test="$curLvl &lt; $lvl">·
+  <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
             <!-- call current-level heading -->
             <xsl:call-template name="headingStructure">
               <xsl:with-param name="lvl" select="$curLvl"/>
@@ -248,8 +246,8 @@
         <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)] or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0)">
           <xsl:choose>
             <!-- definition list if first is bold -->
-            <xsl:when test="count(r) = 1 and r/rPr/b">&#160;
-  <dl>&#160;
+            <xsl:when test="count(r) = 1 and r/rPr/b">·
+  <dl>·
     <dt>
                   <xsl:copy-of select="r/t/text()"/>
                 </dt>
@@ -269,9 +267,9 @@
           </xsl:choose>
         </xsl:if>
       </xsl:when>
-      <xsl:otherwise>&#160;
+      <xsl:when test="r/t">·
   <p><xsl:apply-templates select="node()"/></p>
-      </xsl:otherwise>
+      </xsl:when>
     </xsl:choose>
   </xsl:template>
 
@@ -279,13 +277,13 @@
     <xsl:param name="i"/>
     <xsl:variable name="item" select="following-sibling::p[$i]"/>
     <xsl:choose>
-      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ((count($item/r) = 1 and $item/r/rPr/b) or (following-sibling::p[$i+1]/pPr/numPr/ilvl/@val > $item/pPr/numPr/ilvl/@val))">&#160;
+      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ((count($item/r) = 1 and $item/r/rPr/b) or (following-sibling::p[$i+1]/pPr/numPr/ilvl/@val > $item/pPr/numPr/ilvl/@val))">·
     <dt>
           <xsl:copy-of select="$item//t/text()"/>
           <!-- <xsl:apply-templates select="$item/node()"/> -->
         </dt>
       </xsl:when>
-      <xsl:otherwise>&#160;
+      <xsl:otherwise>·
     <dd>
           <xsl:apply-templates select="$item/node()"/>
         </dd>
@@ -313,7 +311,7 @@
         <xsl:when test="contains($indentType,'bullet')">ul</xsl:when>
         <xsl:otherwise>ol</xsl:otherwise>
       </xsl:choose>
-    </xsl:variable>&#160;
+    </xsl:variable>·
 <xsl:copy-of select="$indent"/><xsl:element name="{$listType}">
     <!-- create list and insert items -->
       <xsl:call-template name="insertListItem">
@@ -321,7 +319,7 @@
         <xsl:with-param name="ilvl" select="$ilvl"/>
         <xsl:with-param name="ilvlActual" select="$ilvlActual"/>
         <xsl:with-param name="indent" select="concat($indent,'  ')"/>
-      </xsl:call-template>&#160;
+      </xsl:call-template>·
 <xsl:copy-of select="$indent"/></xsl:element>
   </xsl:template>
 
@@ -360,7 +358,7 @@
         </xsl:if>
       </xsl:when>
       <!-- else print item -->
-      <xsl:otherwise>&#160;
+      <xsl:otherwise>·
 <xsl:copy-of select="$indent"/><xsl:element name="li">
           <xsl:choose>
             <xsl:when test="$i=0">

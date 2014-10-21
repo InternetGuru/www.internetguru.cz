@@ -22,7 +22,7 @@ class Convertor extends Plugin implements SplObserver {
       foreach($ids as $old => $new) {
         $str = str_replace($old,$new,$str);
       }
-      $str = str_replace("> \n",">\n",$str); // remove "nbsp hack" from transformation
+      $str = str_replace(">·\n",">\n",$str); // remove "nbsp hack" from transformation
       file_put_contents("$f.html",$str);
       if($subject->isAttachedPlugin("ContentAdmin")) redirTo("?ContentAdmin=$f.html");
       echo $str;
@@ -68,7 +68,7 @@ class Convertor extends Plugin implements SplObserver {
     if(strpos($headers[0],'302') !== false)
       throw new Exception("Destination URL '$url' is unaccessible (must be shared publically)");
     elseif(strpos($headers[0],'200') === false)
-      throw new Exception("Destination URL '$url' not found");
+      throw new Exception("Destination URL '$url' error: ".$headers[0]);
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header,$url);
     if(!is_dir(IMPORT_FOLDER)) mkdir(IMPORT_FOLDER, 0755, true);
@@ -86,10 +86,6 @@ class Convertor extends Plugin implements SplObserver {
     }
     $stripped_url = preg_replace('/\\?.*/', '', $url);
     return basename($stripped_url);
-  }
-
-
-  private function createGdocsUrl($url) {
   }
 
   private function transformFile($f) {
@@ -118,9 +114,9 @@ class Convertor extends Plugin implements SplObserver {
       throw new Exception("Unable to locate word/document.xml in docx");
     $dom->loadXML($xml);
     $dom = $this->transform("removePrefix.xsl",$dom);
+    // add an empty paragraph to prevent li:following-sibling fail
+    $dom->getElementsByTagName("body")->item(0)->appendChild($dom->createElement("p"));
     $dom->save($f."_document.xml"); // for debug purpose
-    #file_put_contents($f."_document.xml",$xml); // just for debug
-    #$dom->loadXML($xml);
     return $this->transform("docx2html.xsl",$dom, $variables);
   }
 
@@ -129,7 +125,9 @@ class Convertor extends Plugin implements SplObserver {
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);
-    return $proc->transformToDoc($content);
+    $doc = $proc->transformToDoc($content);
+    if($doc === false) throw new Exception("Failed to apply transformation '$xslFile'");
+    return $doc;
   }
 
   private function readZippedXML($archiveFile, $dataFile) {
