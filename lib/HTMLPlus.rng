@@ -87,10 +87,10 @@
   <define name="desc">
     <element name="desc">
       <ref name="p.attlist"/>
-      <ref name="Inline.model"/>
       <optional>
         <attribute name="kw"/>
       </optional>
+      <ref name="Inline.model"/>
     </element>
   </define>
 
@@ -248,5 +248,6 @@
   <include href="xhtml/hypertext.rng"/>
   <include href="xhtml/xhtml-form-1.rng"/>
   <include href="xhtml/edit.rng"/>
+  <include href="xhtml/indexes.rng"/>
 
 </grammar>

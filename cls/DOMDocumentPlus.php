@@ -329,6 +329,8 @@ class DOMDocumentPlus extends DOMDocument {
       case "samp":
       case "del":
       case "ins":
+      case "sub":
+      case "sup":
       $sep = $e->ownerDocument->createTextNode(", ");
       break;
       case "ul":
