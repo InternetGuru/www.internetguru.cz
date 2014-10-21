@@ -1,20 +1,35 @@
-<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8"?>
 <body xml:lang="en">
-  <h id="h.abc" short="Short title">Long heading</h>
-  <desc>Some description...</desc>
+  <h short="IGCMS" id="h.db7" ctime="2014-10-20" mtime="2014-10-21">Creating Web with IGCMS</h>
+  <desc>This is the default content written in HTML+. It is designed to give administrators basic web creating process overview.</desc>
   <section>
-    <h id="h.def" link="sub1">Subtitle accessible with link sub1</h>
-    <desc>Description of the first chapter.</desc>
-    <p>Some paragraph containing<ul>
-      <li>an</li>
-      <li>unordered</li>
-      <li>list</li>
-    </ul>.</p>
-    <h id="h.ghi" link="sub2">Subtitle accessible with link sub2</h>
-    <desc>Description of the second chapter containing definition list.</desc>
+    <h id="h.7c3">How to start with IGCMS</h>
+    <desc/>
+    <ol>
+      <li>Prepare well-structured concept (document) of what you want to achieve. Focus on the structure and content (not only content).<ul>
+        <li>Every concept has one and only one main heading (title).</li>
+        <li>Every heading should be followed by a summary (description) of the following sub/chapter.</li>
+        <li>The content should be “balanced”, meaning there should not be too little or too many elements (headings, paragraphs, list items) after each other.</li>
+        <li>Find more about creating structural contents online.</li>
+      </ul></li>
+      <li>Have a look at <a href="http://partner.internetguru.cz/igcms">IGCMS Specification</a> page.<ul>
+        <li>Login: <samp>partner</samp> / <samp>igpartner</samp></li>
+        <li>Make sure you <em>understand the basic terminology</em> first!</li>
+        <li>If you are lost, always RTFM :-)</li>
+      </ul></li>
+      <li>Import your document into IGCMS using <samp>?import</samp> parameter.<ul>
+        <li>Remember the imported file is stored separatedly to prevent unexpected results.</li>
+        <li>To use the content (or a part of it) copy the imported code into content document.</li>
+        <li>Or you can “join” the generated document with the content document using <samp>import</samp> attribute inside the content document.</li>
+      </ul></li>
+      <li>Enter administration using <samp>?admin</samp> parameter for further modifications or use FTP access to modify files directly.</li>
+    </ol>
+    <h id="h.a31">Quick Demonstration</h>
+    <desc/>
     <dl>
-      <dt>Definition term</dt>
-      <dd>Definition description</dd>
+      <dt>Using Variables</dt>
+      <dd>Showing value of global variable <samp>cms-version</samp>: <em var="cms-version"/></dd>
+      <dd>Preceding variable is shown using code <code class="xml">&lt;em var="cms-version"/&gt;</code></dd>
     </dl>
   </section>
 </body>
