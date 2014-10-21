@@ -1,0 +1,44 @@
+RewriteEngine On
+
+#redir to www
+RewriteCond %{HTTP_HOST} ^([^\.]*)\.([^\.]*)$
+RewriteRule .* http://www.%0/$0 [R=301,L,QSA]
+
+#redir www.a.b.cz to a.b.cz
+RewriteCond %{HTTP_HOST} ^www\.([^.]+\.[^.]+\.[^.]+)$
+RewriteRule .* http://%1/$0 [R=301,L,QSA]
+
+# subdomeny
+RewriteCond %{REQUEST_URI} !^/error/
+RewriteCond %{REQUEST_URI} !^subdom/
+RewriteCond %{REQUEST_URI} !^/subdom/
+RewriteCond %{HTTP_HOST} ^(.+)\.[^.]+\.[^.]+$
+RewriteCond %{DOCUMENT_ROOT}/subdom/%1 -d
+RewriteRule .* subdom/%1/$0 [DPI]
+
+AuthType Basic
+AuthName "restricted"
+AuthUserFile /var/www/.htpasswd
+
+# CMS ?admin
+<If "%{QUERY_STRING} =~ /(ContentAdmin|LogViewer|Convertor)/">
+  Require user admin
+</If>
+
+# CRM & SML
+<If "%{REQUEST_FILENAME} =~ m#/subdom/(crm|doc)/#">
+  Require user admin
+</If>
+
+# PARTNER
+<If "%{REQUEST_FILENAME} =~ m#/subdom/partner/#">
+  Require user partner admin
+</If>
+
+
+#RewriteRule . - [E=R_USER:admin]
+#Require expr ( %{REMOTE_USER} == "%{ENV:R_USER}e" )
+
+<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+  Header set Cache-Control "max-age=290304000, public"
+</FilesMatch>
