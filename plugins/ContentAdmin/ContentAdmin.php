@@ -4,6 +4,7 @@
 #TODO: success message
 #TODO: select file
 #fixme: js showing multi stars...
+#TODO: always redir to file inc. Content.html
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
