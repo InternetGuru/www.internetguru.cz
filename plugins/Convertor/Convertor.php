@@ -3,15 +3,21 @@
 #bug: infinite loop if gd ends with a list item
 #todo: export
 #todo: check document type/mime
+#todo: support file upload
 
-class Convertor extends Plugin implements SplObserver {
+class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
+  private $errors = array();
 
   public function update(SplSubject $subject) {
     $this->subject = $subject;
     if($subject->getStatus() != "preinit") return;
+    $subject->setPriority($this,1);
     if(isset($_GET["import"])) redirTo(getRoot() . getCurLink() . "?" . get_class($this)
       . (strlen($_GET["import"]) ? "=".$_GET["import"] : "")); // backward compatibility
-    if(!isset($_GET[get_class($this)])) return;
+    if(!isset($_GET[get_class($this)])) {
+      $subject->detach($this);
+      return;
+    }
     try {
       $f = $this->getFile($_GET[get_class($this)]);
       $xml = $this->transformFile($f);
@@ -24,28 +30,38 @@ class Convertor extends Plugin implements SplObserver {
       }
       $str = str_replace(">·\n",">\n",$str); // remove "nbsp hack" from transformation
       file_put_contents("$f.html",$str);
-      if($subject->isAttachedPlugin("ContentAdmin")) redirTo("?ContentAdmin=$f.html");
+      $cfg = $this->getDOMPlus();
+      $res = $cfg->getElementById("display_result");
+      if(!is_null($res) && $res->hasAttribute("query"))
+        redirTo($res->nodeValue."?".$res->getAttribute("query")."=$f.html");
       echo $str;
       die();
     } catch(Exception $e) {
-      new Logger($e->getMessage(),"error");
-      throw $e;
+      $this->errors[] = $e->getMessage();
     }
   }
 
+  public function getContent(HTMLPlus $c) {
+    $this->subject->getCms()->getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
+    $newContent = $this->getHTMLPlus();
+    $newContent->insertVar("convertor-errors", $this->errors);
+    $newContent->insertVar("convertor-link", $_GET[get_class($this)]);
+    return $newContent;
+  }
+
   private function regenerateIds(DOMDocumentPlus $doc) {
-      $ids = array();
-      foreach($doc->getElementsByTagName("h") as $h) {
-        $oldId = $h->getAttribute("id");
-        $doc->setUniqueId($h);
-        $ids[$oldId] = $h->getAttribute("id");
-      }
-      return $ids;
+    $ids = array();
+    foreach($doc->getElementsByTagName("h") as $h) {
+      $oldId = $h->getAttribute("id");
+      $doc->setUniqueId($h);
+      $ids[$oldId] = $h->getAttribute("id");
+    }
+    return $ids;
   }
 
   private function getFile($dest) {
     if(!strlen($dest))
-      throw new Exception("Missing import parameter");
+      throw new Exception("Please, set file to import");
     $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
     $f = findFile($dest);
