@@ -66,8 +66,7 @@ class HTMLPlus extends DOMDocumentPlus {
       break;
     }
     if($hRoot == 1) return;
-    if($hRoot == 0)
-      throw new Exception("No root heading found");
+    if($hRoot == 0) throw new Exception("No root heading found");
     $children = array();
     foreach($this->documentElement->childNodes as $e) $children[] = $e;
     $s = $this->createElement("section");

@@ -49,6 +49,7 @@ try {
   $h = array(
     "Něco je špatně",
     "Tak s tímhle jsme nepočítali",
+    "Tohle se nemělo stát",
     );
   $m = array(
     "Gratulujeme, objevili jste skrytou <del>chybu</del> komnatu.",
