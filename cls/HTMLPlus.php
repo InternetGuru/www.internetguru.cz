@@ -46,10 +46,16 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$repair) throw new Exception("Root element must be 'body'",1);
       $this->documentElement->rename("body");
     }
-    if(!$this->documentElement->hasAttribute("lang") &&
-       !$this->documentElement->hasAttribute("xml:lang")) {
+    if(!$this->documentElement->hasAttribute("lang")
+      && !$this->documentElement->hasAttribute("xml:lang")) {
       if(!$repair) throw new Exception("Root element missing attribute 'xml:lang'");
       $this->documentElement->setAttribute("xml:lang", "en");
+    }
+    if($this->documentElement->childElements->length == 1
+      && $this->documentElement->childElements->item(0)->nodeName == "section") {
+      if(!$repair) throw new Exception("Root element missing attribute 'xml:lang'");
+      $this->addTitleElements();
+      return;
     }
     $hRoot = 0;
     foreach($this->documentElement->childNodes as $e) {
@@ -67,13 +73,18 @@ class HTMLPlus extends DOMDocumentPlus {
     $s = $this->createElement("section");
     foreach($children as $e) $s->appendChild($e);
     $s->appendChild($this->createTextNode("  "));
-    $this->documentElement->appendChild($this->createTextNode("\n  "));
-    $this->documentElement->appendChild($this->createElement("h","Web title"));
-    $this->documentElement->appendChild($this->createTextNode("\n  "));
-    $this->documentElement->appendChild($this->createElement("desc","Web description"));
-    $this->documentElement->appendChild($this->createTextNode("\n  "));
     $this->documentElement->appendChild($s);
     $this->documentElement->appendChild($this->createTextNode("\n"));
+    $this->addTitleElements($s);
+  }
+
+  private function addTitleElements() {
+    $b = $this->documentElement->firstElement;
+    $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
+    $b->parentNode->insertBefore($this->createElement("h","Web title"), $b);
+    $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
+    $b->parentNode->insertBefore($this->createElement("desc","Web description"), $b);
+    $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
   }
 
   private function validateSections($repair) {
