@@ -5,7 +5,6 @@
 
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
-  private $autocorrected = false;
   const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
@@ -19,17 +18,13 @@ class HTMLPlus extends DOMDocumentPlus {
     return $doc;
   }
 
-  public function isAutocorrected() {
-    return $this->autocorrected;
-  }
-
-  public function validatePlus($repair=false) {
+  protected function validateHTMLPlus($repair) {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot($repair);
     $this->validateSections($repair);
     $this->validateLang($repair);
-    if($this->validateId("id",$repair)) $this->autocorrected = true;
-    if($this->validateId("link",$repair)) $this->autocorrected = true;
+    $this->validateId("id",$repair);
+    $this->validateId("link",$repair);
     $this->validateHId($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
@@ -53,6 +48,7 @@ class HTMLPlus extends DOMDocumentPlus {
     }
     if(!$this->documentElement->hasAttribute("lang") &&
        !$this->documentElement->hasAttribute("xml:lang")) {
+      if(!$repair) throw new Exception("Root element missing attribute 'xml:lang'");
       $this->documentElement->setAttribute("xml:lang", "en");
     }
     $hRoot = 0;
@@ -78,7 +74,6 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->documentElement->appendChild($this->createTextNode("\n  "));
     $this->documentElement->appendChild($s);
     $this->documentElement->appendChild($this->createTextNode("\n"));
-    $this->autocorrected = true;
   }
 
   private function validateSections($repair) {
@@ -89,8 +84,6 @@ class HTMLPlus extends DOMDocumentPlus {
     if(!$repair && count($emptySect)) throw new Exception("Empty section(s) found");
     if(!count($emptySect)) return;
     foreach($emptySect as $s) $s->stripTag("Empty section deleted");
-    #$s->parentNode->removeChild($s);
-    $this->autocorrected = true;
   }
 
   private function validateLang($repair) {
@@ -102,16 +95,14 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$n->hasAttribute("xml:lang"))
         $n->setAttribute("xml:lang", $n->getAttribute("lang"));
       $n->removeAttribute("lang");
-      $this->autocorrected = true;
     }
-   }
+  }
 
   private function validateHId($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("id")) {
         if(!$repair) throw new Exception ("Missing id attribute in element h");
         $this->setUniqueId($h);
-        $this->autocorrected = true;
         continue;
       }
       $id = $h->getAttribute("id");
@@ -119,7 +110,6 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair || trim($id) != "")
           throw new Exception ("Invalid ID value '$id'");
         $this->setUniqueId($h);
-        $this->autocorrected = true;
         continue;
       }
     }
@@ -132,7 +122,6 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair) throw new Exception ("Missing element 'desc'");
         $desc = $h->ownerDocument->createElement("desc");
         $h->parentNode->insertBefore($desc,$h->nextElement);
-        $this->autocorrected = true;
       }
     }
   }
@@ -142,7 +131,6 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->getElementsByTagName("description") as $d) $desc[] = $d;
     foreach($desc as $d) {
       $d->rename("desc");
-      $this->autocorrected = true;
     }
   }
 
@@ -163,7 +151,6 @@ class HTMLPlus extends DOMDocumentPlus {
           throw new Exception ("Normalize link leads to duplicit value '{$h->getAttribute("link")}'");
         }
         $h->setAttribute("link",$link);
-        $this->autocorrected = true;
       }
     }
   }
@@ -175,7 +162,6 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$repair) throw new Exception("Attr 'author' cannot be empty");
       $h->parentNode->insertBefore(new DOMComment(" empty attr 'author' removed "),$h);
       $h->removeAttribute("author");
-      $this->autocorrected = true;
     }
   }
 
@@ -190,14 +176,12 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair) throw new Exception("Attribute 'mtime' requires 'ctime'");
         $ctime = $mtime;
         $h->setAttribute("ctime",$ctime);
-        $this->autocorrected = true;
       }
       $ctime_date = $this->createDate($ctime);
       if(is_null($ctime_date)) {
         if(!$repair) throw new Exception("Invalid 'ctime' attribute format");
         $h->parentNode->insertBefore(new DOMComment(" invalid ctime='$ctime' "),$h);
         $h->removeAttribute("ctime");
-        $this->autocorrected = true;
       }
       if(is_null($mtime)) return;
       $mtime_date = $this->createDate($mtime);
@@ -205,13 +189,11 @@ class HTMLPlus extends DOMDocumentPlus {
         if(!$repair) throw new Exception("Invalid 'mtime' attribute format");
         $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
         $h->removeAttribute("mtime");
-        $this->autocorrected = true;
       }
       if($mtime_date < $ctime_date) {
         if(!$repair) throw new Exception("'mtime' cannot be lower than 'ctime'");
         $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
         $h->removeAttribute("mtime");
-        $this->autocorrected = true;
       }
     }
   }

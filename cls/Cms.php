@@ -80,7 +80,8 @@ class Cms {
         $c = $cs->getContent($this->content);
         if(!($c instanceof HTMLPlus))
           throw new Exception("Content must be an instance of HTMLPlus");
-        $c->validatePlus(true);
+        if(!$c->validatePlus(true))
+          new Logger("Plugin '".get_class($cs)."' HTML+ autocorrected","warning");
         $this->content = $c;
         $this->loadDefaultVariables($this->content);
       }

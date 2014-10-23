@@ -217,10 +217,11 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->schema = $this->getSchema($this->dataFile);
     }
 
-    if($this->isHtmlPlus()) {
+
+
+    if($this->type == "html") {
       $doc = new HTMLPlus();
       $doc->load(findFile("Content.html",false,false));
-      #$doc->formatOutput = true;
     } else $doc = new DOMDocumentPlus();
     if($this->contentValue == "n/a") {
       $this->contentValue = $doc->saveXML();
@@ -228,17 +229,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if(!@$doc->loadXml($this->contentValue))
       throw new Exception("Invalid XML syntax");
-
-    if($this->isHtmlPlus()) {
-      #$doc->formatOutput = true;
-      $doc->validatePlus(true);
-      if($doc->isAutocorrected()) $this->contentValue = $doc->saveXML();
-      return;
-    }
-
-    $doc->validatePlus();
+    if(!$doc->validatePlus(true)) $this->contentValue = $doc->saveXML();
     if($this->type != "xml" || $this->isPost()) return;
-
     $this->replace = false;
     if($this->dataFileStatus == self::FILE_NEW) {
       $doc->documentElement->removeChildNodes();
@@ -270,11 +262,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if(saveRewrite($this->dataFile, $this->contentValue) === false)
       throw new Exception("Unable to save changes, administration may be locked (update in progress)");
     if(empty($this->errors)) $this->redir($this->defaultFile);
-  }
-
-  private function isHtmlPlus() {
-    return $this->type == "html";
-    #return in_array($this->schema,array(self::HTMLPLUS_SCHEMA, CMS_FOLDER ."/". self::HTMLPLUS_SCHEMA));
   }
 
   private function validateXml(DOMDocumentPlus $doc) {

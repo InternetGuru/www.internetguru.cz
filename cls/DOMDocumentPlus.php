@@ -94,6 +94,7 @@ class DOMDocumentPlus extends DOMDocument {
       }
     }
     foreach($toStrip as $a) $a[0]->stripAttr($attName,$a[1]);
+    return count($toStrip);
   }
 
   private function repairLink($link=null) {
@@ -189,12 +190,25 @@ class DOMDocumentPlus extends DOMDocument {
     return count($toRemove);
   }
 
-  public function validatePlus() {
-    $this->validateId();
-    return true;
+  public function validatePlus($repair=false) {
+    try {
+      if($this instanceof HTMLPlus) $this->validateHTMLPlus(false);
+      else $this->validateDOMPlus(false);
+      return true;
+    } catch(Exception $e) {
+      if(!$repair) throw $e;
+    }
+    if($this instanceof HTMLPlus) $this->validateHTMLPlus(true);
+    else $this->validateDOMPlus(true);
+    return false;
   }
 
-  public function validateId($attr="id",$repair=false) {
+  private function validateDOMPlus($repair) {
+    $this->validateId(null,$repair);
+  }
+
+  public function validateId($attr=null,$repair=false) {
+    if(is_null($attr)) $attr = "id";
     $xpath = new DOMXPath($this);
     $identifiers = array();
     $duplicit = array();
