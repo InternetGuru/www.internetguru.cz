@@ -18,23 +18,6 @@ class DOMDocumentPlus extends DOMDocument {
     return $q->item(0);
   }
 
-  public function renameElement($node, $name) {
-    $newnode = $this->createElement($name);
-    $children = array();
-    foreach ($node->childElements as $child) {
-      $children[] = $child;
-    }
-    foreach ($children as $child) {
-      $child = $this->importNode($child, true);
-      $newnode->appendChild($child);
-    }
-    foreach ($node->attributes as $attrName => $attrNode) {
-      $newnode->setAttribute($attrName, $attrNode->nodeValue);
-    }
-    $node->parentNode->replaceChild($newnode, $node);
-    return $newnode;
-  }
-
   public function insertVar($varName,$varValue,$prefix="") {
     $xpath = new DOMXPath($this);
     $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";

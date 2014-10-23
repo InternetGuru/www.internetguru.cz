@@ -2,6 +2,23 @@
 
 class DOMElementPlus extends DOMElement {
 
+  public function rename($name) {
+    $newnode = $this->ownerDocument->createElement($name);
+    $children = array();
+    foreach ($this->childElements as $child) {
+      $children[] = $child;
+    }
+    foreach ($children as $child) {
+      $child = $this->ownerDocument->importNode($child, true);
+      $newnode->appendChild($child);
+    }
+    foreach ($this->attributes as $attrName => $attrNode) {
+      $newnode->setAttribute($attrName, $attrNode->nodeValue);
+    }
+    $this->parentNode->replaceChild($newnode, $this);
+    return $newnode;
+  }
+
   #UNUSED
   public function stripTag($comment = null) {
     $text = $this->ownerDocument->createTextNode($this->nodeValue);

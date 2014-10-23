@@ -42,7 +42,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $e = null;
       $this->doc->loadXML('<a><b/><c id="c"><d/><d class="f"/></c></a>');
       try {
-        $n = $this->doc->renameElement($this->doc->getElementById("c"),"e");
+        $n = $this->doc->getElementById("c")->rename("e");
       } catch (Exception $e) {
         $e = $e->getMessage();
       }

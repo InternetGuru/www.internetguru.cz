@@ -25,7 +25,8 @@ class HTMLPlus extends DOMDocumentPlus {
 
   public function validatePlus($repair=false) {
     $this->headings = $this->getElementsByTagName("h");
-    $this->validateRoot();
+    $this->validateRoot($repair);
+    $this->validateSections($repair);
     $this->validateLang($repair);
     if($this->validateId("id",$repair)) $this->autocorrected = true;
     if($this->validateId("link",$repair)) $this->autocorrected = true;
@@ -43,9 +44,53 @@ class HTMLPlus extends DOMDocumentPlus {
     return parent::relaxNGValidatePlus(CMS_FOLDER . "/" . self::RNG_FILE);
   }
 
-  private function validateRoot() {
-    if(is_null($this->documentElement) || $this->documentElement->nodeName != "body")
-      throw new Exception("Root element must be 'body'",1);
+  private function validateRoot($repair) {
+    if(is_null($this->documentElement))
+      throw new Exception("Root element not found");
+    if($this->documentElement->nodeName != "body") {
+      if(!$repair) throw new Exception("Root element must be 'body'",1);
+      $this->documentElement->rename("body");
+    }
+    if(!$this->documentElement->hasAttribute("lang") &&
+       !$this->documentElement->hasAttribute("xml:lang")) {
+      $this->documentElement->setAttribute("xml:lang", "en");
+    }
+    $hRoot = 0;
+    foreach($this->documentElement->childNodes as $e) {
+      if($e->nodeType != XML_ELEMENT_NODE) continue;
+      if($e->nodeName != "h") continue;
+      if($hRoot++ == 0) continue;
+      if(!$repair) throw new Exception("Multiple root headings found");
+      break;
+    }
+    if($hRoot == 1) return;
+    if($hRoot == 0)
+      throw new Exception("No root heading found");
+    $children = array();
+    foreach($this->documentElement->childNodes as $e) $children[] = $e;
+    $s = $this->createElement("section");
+    foreach($children as $e) $s->appendChild($e);
+    $s->appendChild($this->createTextNode("  "));
+    $this->documentElement->appendChild($this->createTextNode("\n  "));
+    $this->documentElement->appendChild($this->createElement("h","Web title"));
+    $this->documentElement->appendChild($this->createTextNode("\n  "));
+    $this->documentElement->appendChild($this->createElement("desc","Web description"));
+    $this->documentElement->appendChild($this->createTextNode("\n  "));
+    $this->documentElement->appendChild($s);
+    $this->documentElement->appendChild($this->createTextNode("\n"));
+    $this->autocorrected = true;
+  }
+
+  private function validateSections($repair) {
+    $emptySect = array();
+    foreach($this->getElementsByTagName("section") as $s) {
+      if($s->childElements->length === 0) $emptySect[] = $s;
+    }
+    if(!$repair && count($emptySect)) throw new Exception("Empty section(s) found");
+    if(!count($emptySect)) return;
+    foreach($emptySect as $s) $s->stripTag("Empty section deleted");
+    #$s->parentNode->removeChild($s);
+    $this->autocorrected = true;
   }
 
   private function validateLang($repair) {
@@ -59,7 +104,7 @@ class HTMLPlus extends DOMDocumentPlus {
       $n->removeAttribute("lang");
       $this->autocorrected = true;
     }
-  }
+   }
 
   private function validateHId($repair) {
     foreach($this->headings as $h) {
@@ -96,7 +141,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $desc = array();
     foreach($this->getElementsByTagName("description") as $d) $desc[] = $d;
     foreach($desc as $d) {
-      $this->renameElement($d,"desc");
+      $d->rename("desc");
       $this->autocorrected = true;
     }
   }
