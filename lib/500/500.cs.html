@@ -10,13 +10,34 @@
     <meta content="cs" name="Content-Language"/>
     <style rel="stylesheet" type="text/css">
     <!--
-@STYLE@
+    @import url(http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600,700&subset=latin,latin-ext);
+    body {
+      font-family: 'Open Sans', Tahoma, sans-serif;
+      max-width: 60em;
+      margin: 0 auto;
+      padding: 0 1.5em;
+      line-height: 1.3em;
+    }
+    h1 {
+      font-weight: 300;
+      text-transform: uppercase;
+      margin: 1em 0;
+    }
+    dd {
+      white-space: initial;
+      word-wrap: break-word;
+      font-family: "Emilbus Mono","Lucida Console",monospace;
+    }
     -->
     </style>
   </head>
   <body>
     <h1>@HEADING@</h1>
     <p>@MESSAGE@</p>
-    <p class="warning">@ERROR@</p>
+    <dl>
+      <dt>Error</dt>
+      <dd>@ERROR@</dd>
+    </dl>
+    <p><img src="@IMAGE@" alt="" /></p>
   </body>
 </html>
