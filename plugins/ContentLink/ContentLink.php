@@ -19,15 +19,15 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $cf = $cms->getContentFull();
     $link = getCurLink();
     $curH = $cf->getElementById($link,"link");
-    if(is_null($curH)) $curH = $cf->documentElement->firstElement;
+    if(is_null($curH)) {
+      if(strlen($link)) errorPage("Page '$link' not found",404);
+      $curH = $cf->documentElement->firstElement;
+    }
     $this->setPath($curH);
     $this->setBc($c);
     if($this->isRoot) return $c;
-    if(is_null($curH))
-      throw new Exception("No unique exact match found for link '$link'");
 
     $this->setTitle();
-
     $this->setAncestorValue($curH, "author");
     $this->setAncestorValue($curH->parentNode, "xml:lang");
     if(!$curH->parentNode->hasAttribute("xml:lang")) {
