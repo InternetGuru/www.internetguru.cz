@@ -1,7 +1,5 @@
 <?php
 
-#TODO: optimize foreaches?
-
 class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
 

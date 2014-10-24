@@ -2,6 +2,8 @@
 
 #TODO: ?superadmin
 #TODO: success message
+#TODO: new htmlplus as EMPTY (?)
+#TODO: js button 'copy default to user'
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";

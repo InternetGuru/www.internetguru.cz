@@ -1,7 +1,5 @@
 <?php
 
-#TODO: title
-
 class GlobalMenu extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {

@@ -1,6 +1,5 @@
 <?php
 
-#bug: infinite loop if gd ends with a list item
 #todo: export
 #todo: check document type/mime
 #todo: support file upload
