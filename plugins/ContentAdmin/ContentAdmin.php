@@ -29,6 +29,9 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     if($subject->getStatus() == "preinit") {
       $subject->setPriority($this,3);
     }
+    if($subject->getStatus() == "postprocess") {
+      $os = $subject->getCms()->getOutputStrategy()->addTransformation($this->getDir()."/ContentAdmin.xsl");
+    }
     if($subject->getStatus() != "init") return;
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
