@@ -1,6 +1,6 @@
 <?php
 
-$dir = CMS_FOLDER."/lib/500";
+$dir = CMS_FOLDER."/lib/error";
 $h = array(
   "Něco je špatně",
   "Tak s tímhle jsme nepočítali",
@@ -15,11 +15,9 @@ $i = array();
 foreach(scandir($dir) as $img) {
   if(pathinfo("$dir/$img",PATHINFO_EXTENSION) == "png") $i[] = "$dir/$img";
 }
-$html = file_get_contents(CMS_FOLDER."/$dir/500.cs.html");
-$search = array('@HEADING@','@MESSAGE@','@ERROR@','@IMAGE@');
-$ex = $e->getMessage();
-if(isAtLocalhost()) $ex = "Exception: ".$e->getMessage()." in ".$e->getFile()." on line ".$e->getLine();
-$replace = array($h[array_rand($h)],$m[array_rand($m)],$ex,$i[array_rand($i)]);
+$html = file_get_contents(CMS_FOLDER."/$dir/error.cs.html");
+$search = array('@HEADING@','@MESSAGE@','@ERROR@','@IMAGE@','@ERRNR@','@ROOT@');
+$replace = array($h[array_rand($h)], $m[array_rand($m)], $message, $i[array_rand($i)], http_response_code(), getRoot());
 echo str_replace($search,$replace,$html);
 
 ?>

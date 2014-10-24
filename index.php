@@ -43,10 +43,11 @@ try {
     new Logger($e->getMessage(),"fatal");
   } catch (Exception $e) {};
 
-  http_response_code(500);
-  if(!@include("500.php")) {
-    echo $e->getMessage();
-  }
+  #http_response_code(500);
+  #if(!@include(CMS_FOLDER . "/error.php")) echo $e->getMessage();
+  $m = $e->getMessage();
+  if(isAtLocalhost()) $m = "Exception: ".$m." in ".$e->getFile()." on line ".$e->getLine();
+  errorPage($m,500);
 
 }
 
