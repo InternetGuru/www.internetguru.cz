@@ -14,7 +14,7 @@ class GlobalMenu extends Plugin implements SplObserver {
 
   public function setVariables() {
     $doc = new DOMDocumentPlus();
-    $cms = $this->subject->getCms();
+    global $cms;
     $xpath = new DOMXPath($cms->getContentFull());
     $sect = $xpath->query("/body/section")->item(0);
     if(is_null($sect)) return;

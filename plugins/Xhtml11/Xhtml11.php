@@ -20,7 +20,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    $cms = $subject->getCms();
+    global $cms;
     if($subject->getStatus() == "preinit") {
       $this->subject = $subject;
       $cms->setOutputStrategy($this);
@@ -44,7 +44,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   public function getOutput(HTMLPlus $content) {
-    $cms = $this->subject->getCms();
+    global $cms;
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
 
@@ -105,8 +105,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->loadXML($content->saveXML());
     $contentPlus->validateLinks("a","href",true);
     $contentPlus->validateLinks("form","action",true);
-    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),getRoot(),"a","href");
-    $contentPlus->fragToLinks($this->subject->getCms()->getContentFull(),getRoot(),"form","action");
+    $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"a","href");
+    $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"form","action");
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement,true);
@@ -207,7 +207,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function transform(DOMDocument $content,$fileName,$user, XSLTProcessor $proc) {
     #var_dump($fileName);
-    $db = $this->subject->getCms()->getDomBuilder();
+    global $cms;
+    $db = $cms->getDomBuilder();
     $xsl = $db->buildDOMPlus($fileName,true,$user);
     if(!@$proc->importStylesheet($xsl)) {
       new Logger("XSLT '$fileName' compilation error","error");

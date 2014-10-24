@@ -51,7 +51,7 @@ class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyIn
       return $content;
     }
 
-    $cms = $this->subject->getCms();
+    global $cms;
     $os = $cms->getOutputStrategy();
 
     $os->addCssFile("lib/codemirror/lib/codemirror.css");

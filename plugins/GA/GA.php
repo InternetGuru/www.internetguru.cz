@@ -8,7 +8,7 @@ class GA extends Plugin implements SplObserver {
     if($subject->getStatus() != "process") return;
     $this->subject = $subject;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    if(isAtLocalhost() || is_null($subject->getCms()->getOutputStrategy())) {
+    if(isAtLocalhost()) {
       $subject->detach($this);
       return;
     }
@@ -24,16 +24,17 @@ class GA extends Plugin implements SplObserver {
       $ga_id = $this->getDOMPlus()->getElementById("other");
     }
     $ga_id = $ga_id->nodeValue;
+    global $cms;
     if(!$this->isValidId($ga_id)) {
-      $this->subject->getCms()->getOutputStrategy()->addJs("// invalid ga_id format '$ga_id'",1,"body");
+      $cms->getOutputStrategy()->addJs("// invalid ga_id format '$ga_id'",1,"body");
       $this->subject->detach($this);
       return;
     }
-    $this->subject->getCms()->getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
+    $cms->getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
     foreach($this->getDOMPlus()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
       $f = $this->getDir() ."/". $jsFile->nodeValue;
-      $this->subject->getCms()->getOutputStrategy()->addJsFile($f,1,"body",$user);
+      $cms->getOutputStrategy()->addJsFile($f,1,"body",$user);
     }
   }
 

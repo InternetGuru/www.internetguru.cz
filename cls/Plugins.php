@@ -2,13 +2,11 @@
 
 class Plugins implements SplSubject {
   private $status = null;
-  private $cms;
   private $observers = array(); // list of observers
   private $observerPriority = array();
   private $disabledObservers = array(); // dirs starting with a dot
 
-  public function __construct(Cms $cms) {
-    $this->cms = $cms;
+  public function __construct() {
     $this->attachPlugins();
   }
 
@@ -29,7 +27,8 @@ class Plugins implements SplSubject {
     $dir = CMS_FOLDER . "/". PLUGIN_FOLDER;
     if(!is_dir($dir))
       throw new Exception("Missing plugin folder '$dir'");
-    $cfg = $this->cms->getDomBuilder()->buildDOMPlus("Cms.xml");
+    global $cms;
+    $cfg = $cms->getDomBuilder()->buildDOMPlus("Cms.xml");
     $plugins = $cfg->getElementsByTagName("plugin");
     foreach($plugins as $plugin) {
       $p = $plugin->nodeValue;
@@ -41,15 +40,6 @@ class Plugins implements SplSubject {
       if($this->isAttachedPlugin($p)) continue;
       $this->attach(new $p);
     }
-  }
-
-  #delete
-  #public function setCms(Cms $cms) {
-  #  if($this->cms === null) $this->cms = $cms;
-  #}
-
-  public function getCms() {
-    return $this->cms;
   }
 
   public function setStatus($status) {

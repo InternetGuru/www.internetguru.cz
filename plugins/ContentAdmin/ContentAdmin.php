@@ -28,7 +28,8 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $subject->setPriority($this,3);
     }
     if($subject->getStatus() == "postprocess") {
-      $os = $subject->getCms()->getOutputStrategy()->addTransformation($this->getDir()."/ContentAdmin.xsl");
+      global $cms;
+      $os = $cms->getOutputStrategy()->addTransformation($this->getDir()."/ContentAdmin.xsl");
     }
     if($subject->getStatus() != "init") return;
     if(!isset($_GET[get_class($this)])) {
@@ -54,7 +55,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   }
 
   public function getContent(HTMLPlus $content) {
-    $cms = $this->subject->getCms();
+    global $cms;
     $cms->getOutputStrategy()->addCssFile($this->getDir() . '/ContentAdmin.css');
     $cms->getOutputStrategy()->addJsFile($this->getDir() . '/ContentAdmin.js', 100, "body");
 

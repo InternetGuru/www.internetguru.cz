@@ -42,7 +42,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function getContent(HTMLPlus $c) {
-    $this->subject->getCms()->getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
+    global $cms;
+    $cms->getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("convertor-errors", $this->errors);
     $newContent->insertVar("convertor-link", $_GET[get_class($this)]);

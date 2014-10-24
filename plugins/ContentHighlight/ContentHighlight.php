@@ -26,7 +26,7 @@ class ContentHighlight extends Plugin implements SplObserver, ContentStrategyInt
       return $content;
     }
 
-    $cms = $this->subject->getCms();
+    global $cms;
     $os = $cms->getOutputStrategy();
 
     $os->addCssFile("lib/highlight/styles/tomorrow.css");

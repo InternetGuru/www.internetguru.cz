@@ -14,7 +14,7 @@ try {
 
   // register core variables
   $cms = new Cms();
-  $plugins = new Plugins($cms);
+  $plugins = new Plugins();
 
   $cms->setPlugins($plugins);
   $plugins->setStatus("preinit");

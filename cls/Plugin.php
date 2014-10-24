@@ -8,7 +8,8 @@ class Plugin {
   protected function detachIfNotAttached($pluginName) {
     if(!is_array($pluginName)) $pluginName = array($pluginName);
     foreach($pluginName as $p) {
-      if($this->subject->getCms()->isAttachedPlugin($p)) continue;
+      global $cms;
+      if($cms->isAttachedPlugin($p)) continue;
       $this->subject->detach($this);
       new Logger("Detaching '".get_class($this)."' due to '$p' dependancy","warning");
       return true;
@@ -43,7 +44,8 @@ class Plugin {
 
   private function buildDOMPlus($filePath, $htmlPlus, $user) {
     if(is_null($this->subject)) throw new Exception("SplSubject not set");
-    $db = $this->subject->getCms()->getDombuilder();
+    global $cms;
+    $db = $cms->getDombuilder();
     $key = $this->getKey($filePath,$htmlPlus,$user);
     if($htmlPlus)
       $this->doms[$key] = $db->buildHTMLPlus($filePath,$user);

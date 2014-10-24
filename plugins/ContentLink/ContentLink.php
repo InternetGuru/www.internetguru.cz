@@ -15,7 +15,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $c) {
-    $cf = $this->subject->getCms()->getContentFull();
+    global $cms;
+    $cf = $cms->getContentFull();
     $link = getCurLink();
     $curH = $cf->getElementById($link,"link");
     if(is_null($curH)) $curH = $cf->documentElement->firstElement;
@@ -68,7 +69,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       }
       $subtitles[] = $h->nodeValue;
     }
-    $this->subject->getCms()->setVariable("cms-title", implode(" - ", $subtitles));
+    global $cms;
+    $cms->setVariable("cms-title", implode(" - ", $subtitles));
   }
 
   private function setBc(HTMLPlus $src) {
@@ -85,7 +87,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
       else $a->setAttribute("title",$h->nodeValue);
     }
-    $cms = $this->subject->getCms();
+    global $cms;
     $cms->setVariable("bc", $bc);
   }
 

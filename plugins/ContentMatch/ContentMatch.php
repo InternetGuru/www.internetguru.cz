@@ -26,7 +26,8 @@ class ContentMatch extends Plugin implements SplObserver {
   }
 
   private function proceed($link,$code=404) {
-    $xpath = new DOMXPath($this->subject->getCms()->getContentFull());
+    global $cms;
+    $xpath = new DOMXPath($cms->getContentFull());
     $q = "//h[@link='" . $link . "']";
     $exactMatch = $xpath->query($q);
     if($exactMatch->length > 1)

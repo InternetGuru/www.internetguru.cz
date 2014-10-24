@@ -8,7 +8,6 @@ class InputVar extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "process") return;
     $this->subject = $subject;
-    #$cf = $subject->getCms()->getContentFull();
     $dom = $this->getDOMPlus();
     $vars = $dom->getElementsByTagName("var");
     foreach($vars as $var) $this->parseVar($var);
@@ -33,7 +32,8 @@ class InputVar extends Plugin implements SplObserver {
     } else {
       $value = $this->parse($var->nodeValue);
     }
-    $this->subject->getCms()->setVariable($var->getAttribute("id"), $value);
+    global $cms;
+    $cms->setVariable($var->getAttribute("id"), $value);
   }
 
   private function fnHash(DOMElement $var) {
@@ -60,7 +60,8 @@ class InputVar extends Plugin implements SplObserver {
       return false;
     }
     $name = $this->parse($var->getAttribute("name"));
-    $lang = $this->subject->getCms()->getVariable("cms-lang");
+    global $cms;
+    $lang = $cms->getVariable("cms-lang");
     $translation = false;
     foreach($var->getElementsByTagName("data") as $e) {
       if(!$e->hasAttribute("lang") && $e->getAttribute("lang") != $lang) continue;
@@ -107,15 +108,16 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function parse($string) {
+    global $cms;
     $subStr = explode('\$', $string);
     $output = array();
     foreach($subStr as $s) {
       $r = array();
       preg_match_all('/\$((?:[a-z]+-)?[a-z_]+)/',$s,$match);
       foreach($match[1] as $var) {
-        $varVal = $this->subject->getCms()->getVariable($var);
+        $varVal = $cms->getVariable($var);
         if(is_null($varVal))
-          $varVal = $this->subject->getCms()->getVariable("inputvar-$var");
+          $varVal = $cms->getVariable("inputvar-$var");
         if(is_null($varVal)) {
           new Logger("Variable '$var' does not exist","warning");
           continue;
