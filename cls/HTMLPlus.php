@@ -1,8 +1,5 @@
 <?php
 
-#TODO: kw attribute do rng
-#TODO: attribute style rng?
-
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
   const RNG_FILE = "lib/HTMLPlus.rng";

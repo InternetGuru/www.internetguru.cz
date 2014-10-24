@@ -3,20 +3,14 @@
 /**
  * Create DOM from XML file and update elements from adm/usr directories.
  * Add by default; empty element to delete all elements with same nodeName.
- * Respect readonly attribute when applying user file.
- * Default XML file is required (plugins do not have to use Config at all).
- * Elements with attribute subdom will be applied only when matched.
- *
- * @param: String plugin (optional)
- * @return: DOMDocument
- * @throws: Exception when files don't exist or are corrupted/empty
+ * Preserve values with readonly attribute.
+ * Elements with attribute domain will be applied only when matched.
  */
 class DOMBuilder {
 
   const DEBUG = false;
   const USE_CACHE = true;
   private $doc; // DOMDocument (HTMLPlus)
-  private $plugin;
   private $replace; // bool
   private $imported = array();
 
@@ -122,6 +116,11 @@ class DOMBuilder {
   }
 
   private function loadDOM($filePath, DOMDocumentPlus $doc) {
+    if($doc instanceof HTMLPlus) {
+      global $cms;
+      $remove = array("?".USER_FOLDER."/","?".ADMIN_FOLDER."/","?".CMS_FOLDER."/");
+      $cms->addVariableItem(str_replace($remove,array(),"?$filePath"),"html");
+    }
     // load
     if(!@$doc->load($filePath))
       throw new LoggerException("Unable to load DOM from file '$filePath'");
