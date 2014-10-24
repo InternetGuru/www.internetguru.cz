@@ -22,7 +22,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     $doc->appendChild($menu);
     $menu->setAttribute("class","globalmenu");
     $this->trimList($menu);
-    $cms->setVariable($doc);
+    $cms->setVariable("globalmenu",$doc);
   }
 
   private function trimList(DOMElement $ul) {

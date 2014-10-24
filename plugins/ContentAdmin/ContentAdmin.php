@@ -2,8 +2,6 @@
 
 #TODO: ?superadmin
 #TODO: success message
-#TODO: select file
-#TODO: quick edit links parsed from edited content
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";

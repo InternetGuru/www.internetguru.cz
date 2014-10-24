@@ -31,9 +31,9 @@ class Cms {
   }
 
   public function init() {
-    $this->setVariable("IGCMS ver. " . CMS_VERSION, "version");
-    $this->setVariable("&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>", "ig");
-    $this->setVariable("<a href='http://www.ezakladna.cz'>E-Základna</a>", "ez");
+    $this->setVariable("version", "IGCMS ver. " . CMS_VERSION);
+    $this->setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
+    $this->setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     $cfg = $this->domBuilder->buildDOMPlus("Cms.xml")->getElementsByTagName("environmental");
     $env = null;
     foreach($cfg as $e) {
@@ -90,8 +90,8 @@ class Cms {
 
   public function processVariables() {
     $this->loadDefaultVariables($this->content);
-    $this->setVariable(array_keys($this->plugins->getObservers()), "plugins");
-    $this->setVariable(array_keys($this->variables), "variables");
+    $this->setVariable("plugins", array_keys($this->plugins->getObservers()));
+    $this->setVariable("variables", array_keys($this->variables));
     foreach($this->variables as $k => $v) $this->content->insertVar($k,$v);
   }
 
@@ -102,14 +102,14 @@ class Cms {
   private function loadDefaultVariables(HTMLPlus $doc) {
     $desc = $doc->getElementsByTagName("desc")->item(0);
     $h1 = $doc->getElementsByTagName("h")->item(0);
-    $this->setVariable($doc->documentElement->getAttribute("xml:lang"), "lang");
-    $this->setVariable($desc->nodeValue, "desc");
-    if($h1->hasAttribute("short")) $this->setVariable($h1->getAttribute("short"), "title");
-    else $this->setVariable($h1->nodeValue, "title");
-    if($h1->hasAttribute("author")) $this->setVariable($h1->getAttribute("author"), "author");
-    if($desc->hasAttribute("kw")) $this->setVariable($desc->getAttribute("kw"), "kw");
-    if($h1->hasAttribute("mtime")) $this->setVariable($h1->getAttribute("mtime"), "mtime");
-    if($h1->hasAttribute("ctime")) $this->setVariable($h1->getAttribute("ctime"), "ctime");
+    $this->setVariable("lang", $doc->documentElement->getAttribute("xml:lang"));
+    $this->setVariable("desc", $desc->nodeValue);
+    if($h1->hasAttribute("short")) $this->setVariable("title", $h1->getAttribute("short"));
+    else $this->setVariable("title", $h1->nodeValue);
+    if($h1->hasAttribute("author")) $this->setVariable("author", $h1->getAttribute("author"));
+    if($desc->hasAttribute("kw")) $this->setVariable("kw", $desc->getAttribute("kw"));
+    if($h1->hasAttribute("mtime")) $this->setVariable("mtime", $h1->getAttribute("mtime"));
+    if($h1->hasAttribute("ctime")) $this->setVariable("ctime", $h1->getAttribute("ctime"));
   }
 
   private function loadContent() {
@@ -142,7 +142,7 @@ class Cms {
     return $varId;
   }
 
-  public function setVariable($value,$name=null) {
+  public function setVariable($name,$value) {
     $varId = $this->getVarId($name);
     if(!is_string($value) && !is_array($value) && !$value instanceof DOMDocument) {
       new Logger("Unsupported variable '$varId' type","error");

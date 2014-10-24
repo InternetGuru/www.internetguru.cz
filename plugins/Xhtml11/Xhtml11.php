@@ -1,7 +1,5 @@
 <?php
 
-#TODO: meta keywords
-
 class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $jsFiles = array(); // String filename => Int priority
   private $jsFilesPriority = array(); // String filename => Int priority
@@ -28,16 +26,16 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $cms->setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
       if(isAtLocalhost()) $domain .= substr(getRoot(),0,-1);
-      $cms->setVariable($domain, "url");
-      $cms->setVariable(getCurLink(), "link");
+      $cms->setVariable("url", $domain);
+      $cms->setVariable("link", getCurLink());
     }
     if($subject->getStatus() == "process") {
       $cfg = $this->getDOMPlus();
       $this->registerThemes($cfg);
       $this->favIcon = $this->getFavicon($cfg);
-      $cms->setVariable(array_keys($this->transformations),"transformations");
-      $cms->setVariable(array_keys($this->cssFiles),"styles");
-      $cms->setVariable(array_keys($this->jsFiles),"javascripts");
+      $cms->setVariable("transformations", array_keys($this->transformations));
+      $cms->setVariable("styles", array_keys($this->cssFiles));
+      $cms->setVariable("javascripts", array_keys($this->jsFiles));
     }
   }
 

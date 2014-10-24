@@ -68,7 +68,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       }
       $subtitles[] = $h->nodeValue;
     }
-    $this->subject->getCms()->setVariable(implode(" - ", $subtitles), "cms-title");
+    $this->subject->getCms()->setVariable("cms-title", implode(" - ", $subtitles));
   }
 
   private function setBc(HTMLPlus $src) {
@@ -86,7 +86,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       else $a->setAttribute("title",$h->nodeValue);
     }
     $cms = $this->subject->getCms();
-    $cms->setVariable($bc, "bc");
+    $cms->setVariable("bc", $bc);
   }
 
   private function setAncestorValue(DOMElement $e, $attName=null) {
