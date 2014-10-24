@@ -117,16 +117,33 @@ class Cms {
   }
 
   public function getVariable($name) {
-    $name = strtolower($name);
-    if(!array_key_exists($name, $this->variables)) return null;
-    return $this->variables[$name];
+    $id = strtolower($name);
+    if(!array_key_exists($id, $this->variables)) return null;
+    return $this->variables[$id];
+  }
+
+  public function addVariableItem($value,$name=null) {
+    $varId = $this->getVarId($name);
+    $var = $this->getVariable($varId);
+    if(is_null($var)) {
+      $this->variables[$varId] = array($value);
+      return;
+    }
+    if(!is_array($var)) $var = array($var);
+    $var[] = $value;
+    $this->variables[$varId] = $var;
+  }
+
+  private function getVarId($name) {
+    $d = debug_backtrace();
+    if(!isset($d[2]["class"])) throw new LoggerException("Unknown caller class");
+    $varId = strtolower($d[2]["class"]);
+    if($varId != $name) $varId .= (strlen($name) ? "-".normalize($name) : "");
+    return $varId;
   }
 
   public function setVariable($value,$name=null) {
-    $d = debug_backtrace();
-    if(!isset($d[1]["class"])) throw new LoggerException("Unknown caller class");
-    $varId = strtolower($d[1]["class"]);
-    if($varId != $name) $varId .= (strlen($name) ? "-".normalize($name) : "");
+    $varId = $this->getVarId($name);
     if(!is_string($value) && !is_array($value) && !$value instanceof DOMDocument) {
       new Logger("Unsupported variable '$varId' type","error");
       return null;
