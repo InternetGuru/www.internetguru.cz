@@ -1,7 +1,5 @@
 <?php
 
-#TODO: cache
-
 /**
  * Create DOM from XML file and update elements from adm/usr directories.
  * Add by default; empty element to delete all elements with same nodeName.
@@ -169,13 +167,24 @@ class DOMBuilder {
       $h->parentNode->insertBefore($c,$h);
       return;
     }
-    #todo: validate imported file language
+    $sectLang = $this->getSectionLang($h->parentNode);
+    $impLang = $doc->documentElement->getAttribute("xml:lang");
+    if($impLang != $sectLang)
+      new Logger("Imported file language '$impLang' does not match section language '$sectLang' in '$file'","warning");
     foreach($doc->documentElement->childElements as $n) {
       $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
     }
     if(!$h->ownerDocument->validatePlus(true))
       new Logger("Import '$file' HTML+ autocorrected","warning");
     $this->imported[] = $file;
+  }
+
+  private function getSectionLang($s) {
+    while(!is_null($s)) {
+      if($s->hasAttribute("xml:lang")) return $s->getAttribute("xml:lang");
+      $s = $s->parentNode;
+    }
+    return null;
   }
 
   /**

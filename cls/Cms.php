@@ -1,9 +1,6 @@
 <?php
 
-#TODO: link2var
-#TODO: singleton contentXpath, contentFullXpath
-#TODO: outputStrategy interface
-#TODO: default outputStrategy (ignore methods)
+#TODO: singleton contentXpath, contentFullXpath (?)
 
 class Cms {
 
