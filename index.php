@@ -39,10 +39,6 @@ try {
 
 } catch(Exception $e) {
 
-  if(!$e instanceof LoggerException) try {
-    new Logger($e->getMessage(),"fatal");
-  } catch (Exception $e) {};
-
   #http_response_code(500);
   #if(!@include(CMS_FOLDER . "/error.php")) echo $e->getMessage();
   $m = $e->getMessage();

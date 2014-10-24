@@ -277,6 +277,9 @@ function translateUtf8Entities($xmlSource, $reverse = FALSE) {
 }
 
 function errorPage($message, $code=404) {
+  try {
+    new Logger("$message ($code)","fatal");
+  } catch (Exception $e) {};
   http_response_code($code);
   $page = CMS_FOLDER . "/error.php";
   if(!@include(CMS_FOLDER . "/error.php")) echo $e->getMessage();
