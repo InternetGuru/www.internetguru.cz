@@ -3,8 +3,7 @@
 #TODO: ?superadmin
 #TODO: success message
 #TODO: select file
-#fixme: js showing multi stars...
-#TODO: always redir to file inc. Content.html
+#TODO: quick edit links parsed from edited content
 
 class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
@@ -156,6 +155,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $l = getCurLink() . ".html";
       if(findFile($l)) $f = $l;
       else $f = self::DEFAULT_FILE;
+      $this->redir($f);
     }
 
     // direct user/admin file input is disallowed
