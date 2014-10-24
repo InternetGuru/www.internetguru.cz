@@ -9,6 +9,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $jsContentBody = array();
   private $cssFiles = array();
   private $cssFilesPriority = array();
+  private $transformationsPriority = array();
   private $transformations = array();
   private $favIcon;
   const APPEND_HEAD = "head";
@@ -85,8 +86,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // apply transformations
     $proc = new XSLTProcessor();
     $proc->setParameter('',$this->getProcParams($cms));
-    foreach($this->transformations as $xslt => $user) {
-      $newContent = $this->transform($content,$xslt,$user,$proc);
+    stableSort($this->transformationsPriority);
+    foreach($this->transformationsPriority as $xslt => $priority) {
+      $newContent = $this->transform($content,$xslt,$this->transformations[$xslt]['user'],$proc);
       $newContent->encoding="utf-8";
       $xml = $newContent->saveXML();
       if(!@$newContent->loadXML($xml)) {
@@ -159,7 +161,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->transformations[$this->getDir() ."/Xhtml11.xsl"] = false;
+    $this->addTransformation($this->getDir() ."/Xhtml11.xsl", 0, false);
 
     // add template files
     $xpath = new DOMXPath($cfg);
@@ -182,7 +184,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       switch ($n->nodeName) {
         case "xslt":
         $user = !$n->hasAttribute("readonly");
-        $this->transformations[$n->nodeValue] = $user;
+        $this->addTransformation($n->nodeValue, 5, $user);
         break;
         case "jsFile":
         $user = !$n->hasAttribute("readonly");
@@ -206,10 +208,19 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function transform(DOMDocument $content,$fileName,$user, XSLTProcessor $proc) {
+    #var_dump($fileName);
     $db = $this->subject->getCms()->getDomBuilder();
     $xsl = $db->buildDOMPlus($fileName,true,$user);
-    $proc->importStylesheet($xsl);
-    return $proc->transformToDoc($content);
+    if(!@$proc->importStylesheet($xsl)) {
+      new Logger("XSLT '$fileName' compilation error","error");
+      return $content;
+    }
+    if(($x = @$proc->transformToDoc($content) ) === false) {
+      new Logger("XSLT '$fileName' transformation fail","error");
+      return $content;
+    }
+    #echo $x->saveXML();
+    return $x;
   }
 
   /**
@@ -293,6 +304,15 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       "media" => $media,
       "user" => $user);
     $this->cssFilesPriority[$filePath] = $priority;
+  }
+
+
+  public function addTransformation($filePath, $priority = 10, $user = true) {
+    $this->transformations[$filePath] = array(
+      "priority" => $priority,
+      "file" => $filePath,
+      "user" => $user);
+    $this->transformationsPriority[$filePath] = $priority;
   }
 
   /**
