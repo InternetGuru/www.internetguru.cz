@@ -47,8 +47,13 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("logviewer-errors", $this->err);
-    if(!is_null($f)) $newContent->insertVar("logviewer-content", file_get_contents($f));
+    if(!is_null($f)) $newContent->insertVar("logviewer-content", $this->file_get_contents($f));
     return $newContent;
+  }
+
+  private function file_get_contents($file) {
+    if(substr($file,-4) != ".zip") return file_get_contents($file);
+    return readZippedFile($file,substr(pathinfo($file,PATHINFO_BASENAME),0,-4));
   }
 
   private function getLogFile($fileName=null) {
@@ -63,13 +68,16 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   private function getFile($fileName,$dir,$defaultName,$ext) {
     $f = "$fileName.$ext";
     if(is_file("$dir/$f")) return "$dir/$f";
+    if(is_file("$dir/$f.zip")) return "$dir/$f.zip";
     if(strlen($fileName)) $this->err[] = "File '$f' not found";
     $f = "$defaultName.$ext";
-    if(is_file("$dir/$f")) {
-      $this->err[] = "Showing current file '$f'";
-      return "$dir/$f";
+    $zip = "";
+    if(!is_file("$dir/$f")) $zip = ".zip";
+    if(is_file("$dir/$f$zip")) {
+      $this->err[] = "Showing default file '$f'";
+      return "$dir/$f$zip";
     }
-    $this->err[] = "Current file '$f' not found";
+    $this->err[] = "Default file '$f' not found";
     return null;
   }
 
