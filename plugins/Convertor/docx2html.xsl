@@ -215,6 +215,7 @@
   <xsl:template match="t" priority="1">
     <xsl:variable name="b" select="preceding-sibling::rPr[1]/b/@val = 1"/>
     <xsl:variable name="i" select="preceding-sibling::rPr[1]/i/@val = 1"/>
+  	<xsl:variable name="u" select="preceding-sibling::rPr[1]/u/@val = 'single'"/>
     <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike/@val = 1"/>
   	<xsl:variable name="sup" select="preceding-sibling::rPr[1]/vertAlign/@val = 'superscript'"/>
   	<xsl:variable name="sub" select="preceding-sibling::rPr[1]/vertAlign/@val = 'subscript'"/>
@@ -225,6 +226,10 @@
 
     <xsl:if test="$i">
       <xsl:text disable-output-escaping="yes">&lt;em></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$u">
+      <xsl:text disable-output-escaping="yes">&lt;samp></xsl:text>
     </xsl:if>
 
     <xsl:if test="$del">
@@ -251,6 +256,10 @@
 
     <xsl:if test="$del">
       <xsl:text disable-output-escaping="yes">&lt;/del></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$u">
+      <xsl:text disable-output-escaping="yes">&lt;/samp></xsl:text>
     </xsl:if>
 
     <xsl:if test="$i">
