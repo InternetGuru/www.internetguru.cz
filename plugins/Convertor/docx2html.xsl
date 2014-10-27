@@ -215,37 +215,52 @@
   <xsl:template match="t" priority="1">
     <xsl:variable name="b" select="preceding-sibling::rPr[1]/b/@val = 1"/>
     <xsl:variable name="i" select="preceding-sibling::rPr[1]/i/@val = 1"/>
-  	<xsl:variable name="u" select="preceding-sibling::rPr[1]/u/@val = 'single'"/>
-    <xsl:variable name="d" select="preceding-sibling::rPr[1]/strike/@val = 1"/>
+    <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike/@val = 1"/>
   	<xsl:variable name="sup" select="preceding-sibling::rPr[1]/vertAlign/@val = 'superscript'"/>
   	<xsl:variable name="sub" select="preceding-sibling::rPr[1]/vertAlign/@val = 'subscript'"/>
 
-  	<xsl:choose>
-  		<xsl:when test="$sup and $b and $i and $d"><sup><del><strong><em><xsl:apply-templates/></em></strong></del></sup></xsl:when>
-  		<xsl:when test="$sub and $b and $i and $d"><sub><del><strong><em><xsl:apply-templates /></em></strong></del></sub></xsl:when>
-  		<xsl:when test="$sup and $b and $i"><sup><strong><em><xsl:apply-templates/></em></strong></sup></xsl:when>
-  		<xsl:when test="$sub and $b and $i"><sub><strong><em><xsl:apply-templates /></em></strong></sub></xsl:when>
-      <xsl:when test="$sup and $b and $d"><sup><strong><del><xsl:apply-templates/></del></strong></sup></xsl:when>
-  		<xsl:when test="$sub and $b and $d"><sub><strong><del><xsl:apply-templates /></del></strong></sub></xsl:when>
-      <xsl:when test="$sup and $d and $i"><sup><em><del><xsl:apply-templates/></del></em></sup></xsl:when>
-  		<xsl:when test="$sub and $d and $i"><sub><em><del><xsl:apply-templates /></del></em></sub></xsl:when>
-  		<xsl:when test="$b and $i"><strong><em><xsl:apply-templates /></em></strong></xsl:when>
-  		<xsl:when test="$sup and $b"><sup><strong><xsl:apply-templates /></strong></sup></xsl:when>
-  		<xsl:when test="$sub and $b"><sub><strong><xsl:apply-templates /></strong></sub></xsl:when>
-      <xsl:when test="$b and $d"><strong><del><xsl:apply-templates /></del></strong></xsl:when>
-  		<xsl:when test="$d and $i"><em><del><xsl:apply-templates /></del></em></xsl:when>
-  		<xsl:when test="$sup and $i"><sup><em><xsl:apply-templates /></em></sup></xsl:when>
-  		<xsl:when test="$sub and $i"><sub><em><xsl:apply-templates /></em></sub></xsl:when>
-      <xsl:when test="$d and $sup"><sup><del><xsl:apply-templates /></del></sup></xsl:when>
-  		<xsl:when test="$d and $sub"><sub><del><xsl:apply-templates /></del></sub></xsl:when>
-  		<xsl:when test="$b"><strong><xsl:apply-templates /></strong></xsl:when>
-      <xsl:when test="$i"><em><xsl:apply-templates /></em></xsl:when>
-  		<xsl:when test="$sup"><sup><xsl:apply-templates /></sup></xsl:when>
-  		<xsl:when test="$sub"><sub><xsl:apply-templates /></sub></xsl:when>
-      <xsl:when test="$d"><del><xsl:apply-templates /></del></xsl:when>
-  		<xsl:otherwise><xsl:apply-templates /></xsl:otherwise>
-  		<!--<xsl:otherwise><xsl:value-of select="." disable-output-escaping="yes"/></xsl:otherwise>-->
-  	</xsl:choose>
+    <xsl:if test="$b">
+      <xsl:text disable-output-escaping="yes">&lt;strong></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$i">
+      <xsl:text disable-output-escaping="yes">&lt;em></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$del">
+      <xsl:text disable-output-escaping="yes">&lt;del></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$sub">
+      <xsl:text disable-output-escaping="yes">&lt;sub></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$sup">
+      <xsl:text disable-output-escaping="yes">&lt;sup></xsl:text>
+    </xsl:if>
+
+    <xsl:apply-templates/>
+
+    <xsl:if test="$sup">
+      <xsl:text disable-output-escaping="yes">&lt;/sup></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$sub">
+      <xsl:text disable-output-escaping="yes">&lt;/sub></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$del">
+      <xsl:text disable-output-escaping="yes">&lt;/del></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$i">
+      <xsl:text disable-output-escaping="yes">&lt;/em></xsl:text>
+    </xsl:if>
+
+    <xsl:if test="$b">
+      <xsl:text disable-output-escaping="yes">&lt;/strong></xsl:text>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template match="p">
