@@ -31,6 +31,7 @@
     <xsl:param name="pos" select="1"/>
     <xsl:param name="lvl" select="0"/>
     <xsl:param name="sec" select="0"/>
+    <xsl:param name="secIndent" select="'  '"/>
     <xsl:param name="correct" select="1"/>
     <xsl:variable name="h" select="//p[pPr/pStyle[
       @val='Title' or @val='Název' or
@@ -77,6 +78,7 @@
               <xsl:with-param name="lvl" select="$curLvl"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec"/>
+              <xsl:with-param name="secIndent" select="$secIndent"/>
             </xsl:call-template>
           </xsl:when>
 
@@ -90,7 +92,7 @@
                     <xsl:value-of select="$bookmarkId" />
                   </xsl:attribute>
                 </xsl:if>
-                <xsl:apply-templates select="$h[$pos]/r"/>
+                <xsl:copy-of select="$h[$pos]//t/text()"/>
               </xsl:element>
             </xsl:if>
             <xsl:if test="not($correct)">
@@ -133,6 +135,7 @@
                   <xsl:with-param name="lvl" select="$curLvl"/>
                   <xsl:with-param name="pos" select="$pos+1"/>
                   <xsl:with-param name="sec" select="$sec"/>
+                  <xsl:with-param name="secIndent" select="$secIndent"/>
                 </xsl:call-template>
               </xsl:when>
               <xsl:otherwise>
@@ -140,6 +143,7 @@
                   <xsl:with-param name="lvl" select="$lvl"/>
                   <xsl:with-param name="pos" select="$pos+1"/>
                   <xsl:with-param name="sec" select="$sec"/>
+                  <xsl:with-param name="secIndent" select="$secIndent"/>
                 </xsl:call-template>
               </xsl:otherwise>
             </xsl:choose>
@@ -151,52 +155,57 @@
               <xsl:with-param name="lvl" select="$lvl"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec"/>
+              <xsl:with-param name="secIndent" select="$secIndent"/>
               <xsl:with-param name="correct" select="0"/>
             </xsl:call-template>
           </xsl:when>
 
           <!-- lower level -->
           <xsl:when test="$curLvl &gt; $lvl">·
-  <xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
+<xsl:copy-of select="$secIndent"/><xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
             <!-- call current-level heading -->
             <xsl:call-template name="headingStructure">
               <xsl:with-param name="lvl" select="$curLvl"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec+1"/>
+              <xsl:with-param name="secIndent" select="concat($secIndent,'  ')"/>
             </xsl:call-template>
           </xsl:when>
 
           <!-- 2+ higher level -->
           <xsl:when test="$lvl - $curLvl &gt; 1">·
-  <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+<xsl:copy-of select="$secIndent"/><xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
             <!-- call current-level heading keeping level -->
             <xsl:call-template name="headingStructure">
               <xsl:with-param name="lvl" select="$lvl -1"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec -1"/>
+              <xsl:with-param name="secIndent" select="substring($secIndent,2)"/>
             </xsl:call-template>
           </xsl:when>
 
           <!-- higher level -->
           <xsl:when test="$curLvl &lt; $lvl">·
-  <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+<xsl:copy-of select="$secIndent"/><xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
             <!-- call current-level heading -->
             <xsl:call-template name="headingStructure">
               <xsl:with-param name="lvl" select="$curLvl"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec -1"/>
+              <xsl:with-param name="secIndent" select="substring($secIndent,2)"/>
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
 
       </xsl:when>
       <!-- close all opened section if no further heading -->
-      <xsl:when test="$sec > 0">
-        <xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
+      <xsl:when test="$sec > 0">·
+<xsl:copy-of select="$secIndent"/><xsl:text disable-output-escaping="yes">&lt;/section></xsl:text>
         <xsl:call-template name="headingStructure">
           <xsl:with-param name="lvl" select="$lvl"/>
           <xsl:with-param name="pos" select="$pos"/>
           <xsl:with-param name="sec" select="$sec -1"/>
+          <xsl:with-param name="secIndent" select="substring($secIndent,2)"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -204,35 +213,36 @@
   </xsl:template>
 
   <xsl:template match="t" priority="1">
-    <xsl:variable name="bold" select="preceding-sibling::rPr[1]/b/@val = 1"/>
-  	<xsl:variable name="italic" select="preceding-sibling::rPr[1]/i/@val = 1"/>
-    <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike/@val = 1"/>
+    <xsl:variable name="b" select="preceding-sibling::rPr[1]/b/@val = 1"/>
+    <xsl:variable name="i" select="preceding-sibling::rPr[1]/i/@val = 1"/>
+  	<xsl:variable name="u" select="preceding-sibling::rPr[1]/u/@val = 'single'"/>
+    <xsl:variable name="d" select="preceding-sibling::rPr[1]/strike/@val = 1"/>
   	<xsl:variable name="sup" select="preceding-sibling::rPr[1]/vertAlign/@val = 'superscript'"/>
   	<xsl:variable name="sub" select="preceding-sibling::rPr[1]/vertAlign/@val = 'subscript'"/>
 
   	<xsl:choose>
-  		<xsl:when test="$sup and $bold and $italic and $del"><sup><del><strong><em><xsl:apply-templates/></em></strong></del></sup></xsl:when>
-  		<xsl:when test="$sub and $bold and $italic and $del"><sub><del><strong><em><xsl:apply-templates /></em></strong></del></sub></xsl:when>
-  		<xsl:when test="$sup and $bold and $italic"><sup><strong><em><xsl:apply-templates/></em></strong></sup></xsl:when>
-  		<xsl:when test="$sub and $bold and $italic"><sub><strong><em><xsl:apply-templates /></em></strong></sub></xsl:when>
-      <xsl:when test="$sup and $bold and $del"><sup><strong><del><xsl:apply-templates/></del></strong></sup></xsl:when>
-  		<xsl:when test="$sub and $bold and $del"><sub><strong><del><xsl:apply-templates /></del></strong></sub></xsl:when>
-      <xsl:when test="$sup and $del and $italic"><sup><em><del><xsl:apply-templates/></del></em></sup></xsl:when>
-  		<xsl:when test="$sub and $del and $italic"><sub><em><del><xsl:apply-templates /></del></em></sub></xsl:when>
-  		<xsl:when test="$bold and $italic"><strong><em><xsl:apply-templates /></em></strong></xsl:when>
-  		<xsl:when test="$sup and $bold"><sup><strong><xsl:apply-templates /></strong></sup></xsl:when>
-  		<xsl:when test="$sub and $bold"><sub><strong><xsl:apply-templates /></strong></sub></xsl:when>
-      <xsl:when test="$bold and $del"><strong><del><xsl:apply-templates /></del></strong></xsl:when>
-  		<xsl:when test="$del and $italic"><em><del><xsl:apply-templates /></del></em></xsl:when>
-  		<xsl:when test="$sup and $italic"><sup><em><xsl:apply-templates /></em></sup></xsl:when>
-  		<xsl:when test="$sub and $italic"><sub><em><xsl:apply-templates /></em></sub></xsl:when>
-      <xsl:when test="$del and $sup"><sup><del><xsl:apply-templates /></del></sup></xsl:when>
-  		<xsl:when test="$del and $sub"><sub><del><xsl:apply-templates /></del></sub></xsl:when>
-  		<xsl:when test="$bold"><strong><xsl:apply-templates /></strong></xsl:when>
-      <xsl:when test="$italic"><em><xsl:apply-templates /></em></xsl:when>
+  		<xsl:when test="$sup and $b and $i and $d"><sup><del><strong><em><xsl:apply-templates/></em></strong></del></sup></xsl:when>
+  		<xsl:when test="$sub and $b and $i and $d"><sub><del><strong><em><xsl:apply-templates /></em></strong></del></sub></xsl:when>
+  		<xsl:when test="$sup and $b and $i"><sup><strong><em><xsl:apply-templates/></em></strong></sup></xsl:when>
+  		<xsl:when test="$sub and $b and $i"><sub><strong><em><xsl:apply-templates /></em></strong></sub></xsl:when>
+      <xsl:when test="$sup and $b and $d"><sup><strong><del><xsl:apply-templates/></del></strong></sup></xsl:when>
+  		<xsl:when test="$sub and $b and $d"><sub><strong><del><xsl:apply-templates /></del></strong></sub></xsl:when>
+      <xsl:when test="$sup and $d and $i"><sup><em><del><xsl:apply-templates/></del></em></sup></xsl:when>
+  		<xsl:when test="$sub and $d and $i"><sub><em><del><xsl:apply-templates /></del></em></sub></xsl:when>
+  		<xsl:when test="$b and $i"><strong><em><xsl:apply-templates /></em></strong></xsl:when>
+  		<xsl:when test="$sup and $b"><sup><strong><xsl:apply-templates /></strong></sup></xsl:when>
+  		<xsl:when test="$sub and $b"><sub><strong><xsl:apply-templates /></strong></sub></xsl:when>
+      <xsl:when test="$b and $d"><strong><del><xsl:apply-templates /></del></strong></xsl:when>
+  		<xsl:when test="$d and $i"><em><del><xsl:apply-templates /></del></em></xsl:when>
+  		<xsl:when test="$sup and $i"><sup><em><xsl:apply-templates /></em></sup></xsl:when>
+  		<xsl:when test="$sub and $i"><sub><em><xsl:apply-templates /></em></sub></xsl:when>
+      <xsl:when test="$d and $sup"><sup><del><xsl:apply-templates /></del></sup></xsl:when>
+  		<xsl:when test="$d and $sub"><sub><del><xsl:apply-templates /></del></sub></xsl:when>
+  		<xsl:when test="$b"><strong><xsl:apply-templates /></strong></xsl:when>
+      <xsl:when test="$i"><em><xsl:apply-templates /></em></xsl:when>
   		<xsl:when test="$sup"><sup><xsl:apply-templates /></sup></xsl:when>
   		<xsl:when test="$sub"><sub><xsl:apply-templates /></sub></xsl:when>
-      <xsl:when test="$del"><del><xsl:apply-templates /></del></xsl:when>
+      <xsl:when test="$d"><del><xsl:apply-templates /></del></xsl:when>
   		<xsl:otherwise><xsl:apply-templates /></xsl:otherwise>
   		<!--<xsl:otherwise><xsl:value-of select="." disable-output-escaping="yes"/></xsl:otherwise>-->
   	</xsl:choose>
@@ -253,8 +263,8 @@
                 </dt>
                 <xsl:call-template name="insertDefListItem">
                   <xsl:with-param name="i" select="1"/>
-                </xsl:call-template>
-              </dl>
+                </xsl:call-template>·
+  </dl>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="buildList">
