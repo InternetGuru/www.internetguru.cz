@@ -31,7 +31,7 @@
     <xsl:param name="pos" select="1"/>
     <xsl:param name="lvl" select="0"/>
     <xsl:param name="sec" select="0"/>
-    <xsl:param name="secIndent" select="'  '"/>
+    <xsl:param name="secIndent" select="''"/>
     <xsl:param name="correct" select="1"/>
     <xsl:variable name="h" select="//p[pPr/pStyle[
       @val='Title' or @val='Název' or
@@ -86,7 +86,7 @@
           <xsl:when test="$curLvl = $lvl or not($correct)">
             <!-- generate heading -->
             <xsl:if test="$correct">·
-  <xsl:element name="h">
+  <xsl:copy-of select="$secIndent"/><xsl:element name="h">
                 <xsl:if test="$bookmarkId">
                   <xsl:attribute name="id">
                     <xsl:value-of select="$bookmarkId" />
@@ -97,7 +97,9 @@
             </xsl:if>
             <xsl:if test="not($correct)">
               <xsl:text disable-output-escaping="yes">&lt;!-- mismatch heading structure ignored --></xsl:text>
-              <xsl:apply-templates select="$h[$pos]"/>
+              <xsl:apply-templates select="$h[$pos]">
+                <xsl:with-param name="pIndent" select="$secIndent"/>
+              </xsl:apply-templates>
             </xsl:if>
 
             <!-- description after heading -->
@@ -111,14 +113,16 @@
             <xsl:if test="$correct">
               <xsl:choose>
                 <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">·
-  <desc>
+  <xsl:copy-of select="$secIndent"/><desc>
                     <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
                   </desc>
                 </xsl:when>
                 <xsl:otherwise>·
-  <desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
+  <xsl:copy-of select="$secIndent"/><desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
                   <xsl:if test="not($nextHPos = $curHPos+1)">
-                    <xsl:apply-templates select="//p[position() = $curHPos+1]"/>
+                    <xsl:apply-templates select="//p[position() = $curHPos+1]">
+                      <xsl:with-param name="pIndent" select="$secIndent"/>
+                    </xsl:apply-templates>
                   </xsl:if>
                 </xsl:otherwise>
               </xsl:choose>
@@ -126,7 +130,9 @@
 
             <!-- content between headings -->
             <xsl:apply-templates select="//p[position() &gt; $curHPos+$correct
-              and (position() &lt; $nextHPos or $nextHPos = 1)]"/>
+              and (position() &lt; $nextHPos or $nextHPos = 1)]">
+              <xsl:with-param name="pIndent" select="$secIndent"/>
+            </xsl:apply-templates>
 
             <!-- next heading (pos+1) -->
             <xsl:choose>
@@ -162,12 +168,13 @@
 
           <!-- lower level -->
           <xsl:when test="$curLvl &gt; $lvl">·
-<xsl:copy-of select="$secIndent"/><xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
+  <xsl:copy-of select="$secIndent"/><xsl:text disable-output-escaping="yes">&lt;section></xsl:text>
             <!-- call current-level heading -->
             <xsl:call-template name="headingStructure">
               <xsl:with-param name="lvl" select="$curLvl"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec+1"/>
+              <!-- <xsl:with-param name="secIndent" select="$secIndent"/> -->
               <xsl:with-param name="secIndent" select="concat($secIndent,'  ')"/>
             </xsl:call-template>
           </xsl:when>
@@ -180,7 +187,7 @@
               <xsl:with-param name="lvl" select="$lvl -1"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec -1"/>
-              <xsl:with-param name="secIndent" select="substring($secIndent,2)"/>
+              <xsl:with-param name="secIndent" select="substring($secIndent,3)"/>
             </xsl:call-template>
           </xsl:when>
 
@@ -192,7 +199,8 @@
               <xsl:with-param name="lvl" select="$curLvl"/>
               <xsl:with-param name="pos" select="$pos"/>
               <xsl:with-param name="sec" select="$sec -1"/>
-              <xsl:with-param name="secIndent" select="substring($secIndent,2)"/>
+              <!-- <xsl:with-param name="secIndent" select="$secIndent"/> -->
+              <xsl:with-param name="secIndent" select="substring($secIndent,3)"/>
             </xsl:call-template>
           </xsl:when>
         </xsl:choose>
@@ -205,7 +213,8 @@
           <xsl:with-param name="lvl" select="$lvl"/>
           <xsl:with-param name="pos" select="$pos"/>
           <xsl:with-param name="sec" select="$sec -1"/>
-          <xsl:with-param name="secIndent" select="substring($secIndent,2)"/>
+          <!-- <xsl:with-param name="secIndent" select="$secIndent"/> -->
+          <xsl:with-param name="secIndent" select="substring($secIndent,3)"/>
         </xsl:call-template>
       </xsl:when>
     </xsl:choose>
@@ -220,59 +229,27 @@
   	<xsl:variable name="sup" select="preceding-sibling::rPr[1]/vertAlign/@val = 'superscript'"/>
   	<xsl:variable name="sub" select="preceding-sibling::rPr[1]/vertAlign/@val = 'subscript'"/>
 
-    <xsl:if test="$b">
-      <xsl:text disable-output-escaping="yes">&lt;strong></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$i">
-      <xsl:text disable-output-escaping="yes">&lt;em></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$u">
-      <xsl:text disable-output-escaping="yes">&lt;samp></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$del">
-      <xsl:text disable-output-escaping="yes">&lt;del></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$sub">
-      <xsl:text disable-output-escaping="yes">&lt;sub></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$sup">
-      <xsl:text disable-output-escaping="yes">&lt;sup></xsl:text>
-    </xsl:if>
+    <xsl:if test="$b"><xsl:text disable-output-escaping="yes">&lt;strong></xsl:text></xsl:if>
+    <xsl:if test="$i"><xsl:text disable-output-escaping="yes">&lt;em></xsl:text></xsl:if>
+    <xsl:if test="$u"><xsl:text disable-output-escaping="yes">&lt;samp></xsl:text></xsl:if>
+    <xsl:if test="$del"><xsl:text disable-output-escaping="yes">&lt;del></xsl:text></xsl:if>
+    <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;sub></xsl:text></xsl:if>
+    <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;sup></xsl:text></xsl:if>
 
     <xsl:apply-templates/>
 
-    <xsl:if test="$sup">
-      <xsl:text disable-output-escaping="yes">&lt;/sup></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$sub">
-      <xsl:text disable-output-escaping="yes">&lt;/sub></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$del">
-      <xsl:text disable-output-escaping="yes">&lt;/del></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$u">
-      <xsl:text disable-output-escaping="yes">&lt;/samp></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$i">
-      <xsl:text disable-output-escaping="yes">&lt;/em></xsl:text>
-    </xsl:if>
-
-    <xsl:if test="$b">
-      <xsl:text disable-output-escaping="yes">&lt;/strong></xsl:text>
-    </xsl:if>
+    <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;/sup></xsl:text></xsl:if>
+    <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;/sub></xsl:text></xsl:if>
+    <xsl:if test="$del"><xsl:text disable-output-escaping="yes">&lt;/del></xsl:text></xsl:if>
+    <xsl:if test="$u"><xsl:text disable-output-escaping="yes">&lt;/samp></xsl:text></xsl:if>
+    <xsl:if test="$i"><xsl:text disable-output-escaping="yes">&lt;/em></xsl:text></xsl:if>
+    <xsl:if test="$b"><xsl:text disable-output-escaping="yes">&lt;/strong></xsl:text></xsl:if>
 
   </xsl:template>
 
   <xsl:template match="p">
+    <xsl:param name="pIndent" select="'  '"/>
+
     <xsl:choose>
       <!-- list items -->
       <xsl:when test="pPr/numPr">
@@ -281,14 +258,15 @@
           <xsl:choose>
             <!-- definition list if first is bold -->
             <xsl:when test="count(r) = 1 and r/rPr/b">·
-  <dl>·
-    <dt>
+  <xsl:copy-of select="$pIndent"/><dl>·
+    <xsl:copy-of select="$pIndent"/><dt>
                   <xsl:copy-of select="r/t/text()"/>
                 </dt>
                 <xsl:call-template name="insertDefListItem">
                   <xsl:with-param name="i" select="1"/>
+                  <xsl:with-param name="pIndent" select="$pIndent"/>
                 </xsl:call-template>·
-  </dl>
+  <xsl:copy-of select="$pIndent"/></dl>
             </xsl:when>
             <xsl:otherwise>
               <xsl:call-template name="buildList">
@@ -296,29 +274,32 @@
                 <xsl:with-param name="i" select="0"/>
                 <xsl:with-param name="ilvl" select="pPr/numPr/ilvl/@val"/>
                 <xsl:with-param name="numId" select="pPr/numPr/numId/@val"/>
+                <xsl:with-param name="indent" select="concat($pIndent,'  ')"/>
               </xsl:call-template>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:if>
       </xsl:when>
       <xsl:when test="r/t">·
-  <p><xsl:apply-templates select="node()"/></p>
+  <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
       </xsl:when>
     </xsl:choose>
   </xsl:template>
 
   <xsl:template name="insertDefListItem">
     <xsl:param name="i"/>
+    <xsl:param name="pIndent" select="'  '"/>
     <xsl:variable name="item" select="following-sibling::p[$i]"/>
+
     <xsl:choose>
       <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ((count($item/r) = 1 and $item/r/rPr/b) or (following-sibling::p[$i+1]/pPr/numPr/ilvl/@val > $item/pPr/numPr/ilvl/@val))">·
-    <dt>
+    <xsl:copy-of select="$pIndent"/><dt>
           <xsl:copy-of select="$item//t/text()"/>
           <!-- <xsl:apply-templates select="$item/node()"/> -->
         </dt>
       </xsl:when>
       <xsl:otherwise>·
-    <dd>
+    <xsl:copy-of select="$pIndent"/><dd>
           <xsl:apply-templates select="$item/node()"/>
         </dd>
       </xsl:otherwise>
