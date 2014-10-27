@@ -117,7 +117,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     foreach($varFiles as $varName => $p) {
       $fileSuffix = pathinfo($p, PATHINFO_BASENAME);
       $file = $f."_$fileSuffix";
-      $xml = $this->readZippedXML($f, $p);
+      $xml = readZippedFile($f, $p);
       if(is_null($xml)) continue;
       $dom->loadXML($xml);
       $dom = $this->transform("removePrefix.xsl",$dom);
@@ -125,7 +125,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $dom->save($file);
       $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
     }
-    $xml = $this->readZippedXML($f, "word/document.xml");
+    $xml = readZippedFile($f, "word/document.xml");
     if(is_null($xml))
       throw new Exception("Unable to locate word/document.xml in docx");
     $dom->loadXML($xml);
@@ -144,22 +144,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $doc = $proc->transformToDoc($content);
     if($doc === false) throw new Exception("Failed to apply transformation '$xslFile'");
     return $doc;
-  }
-
-  private function readZippedXML($archiveFile, $dataFile) {
-    // Create new ZIP archive
-    $zip = new ZipArchive;
-    // Open received archive file
-    if (!$zip->open($archiveFile))
-      throw new Exception("Unable to open file");
-    // If done, search for the data file in the archive
-    if (!($index = $zip->locateName($dataFile))) return null;
-    // If found, read it to the string
-    $data = $zip->getFromIndex($index);
-    // Close archive file
-    $zip->close();
-    // Load XML from a string
-    return $data;
   }
 
 }

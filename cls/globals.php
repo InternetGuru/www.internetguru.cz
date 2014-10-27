@@ -287,4 +287,22 @@ function errorPage($message, $code=404) {
   die();
 }
 
+function readZippedFile($archiveFile, $dataFile) {
+  // Create new ZIP archive
+  $zip = new ZipArchive;
+  // Open received archive file
+  if(!$zip->open($archiveFile))
+    throw new Exception("Unable to open file");
+  // If done, search for the data file in the archive
+  $index = $zip->locateName($dataFile);
+  // If file not found, return null
+  if($index === false) return null;
+  // If found, read it to the string
+  $data = $zip->getFromIndex($index);
+  // Close archive file
+  $zip->close();
+  // Load data from a string
+  return $data;
+}
+
 ?>
