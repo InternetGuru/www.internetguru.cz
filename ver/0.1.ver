@@ -1,0 +1,16 @@
+0.1.1-dev
+---------
+
+* ContentAdmin: showing links to edit files
+
+* new system variable dombuilder-html
+
+* ContentAdmin: redir to default file
+
+* HTML+ import: added language check
+
+
+0.1.0-dev
+---------
+
+* initial version

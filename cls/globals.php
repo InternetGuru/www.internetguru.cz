@@ -11,8 +11,9 @@ if(!defined('USER_FOLDER')) define('USER_FOLDER', 'usr'); // where user cfg xml 
 if(!defined('USER_BACKUP')) define('USER_BACKUP', 'usr.bak'); // where backup files are stored
 if(!defined('THEMES_FOLDER')) define('THEMES_FOLDER', 'themes'); // where templates are stored
 if(!defined('CMSRES_FOLDER')) define('CMSRES_FOLDER', false); // where cmsres files are stored
-if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where res files are stored
+if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where resource files are stored
 if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are stored
+if(!defined('VER_FOLDER')) define('VER_FOLDER', 'ver'); // where version files are stored
 if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files are stored
 
 define('FILES_FOLDER', 'files'); // where web files are stored
