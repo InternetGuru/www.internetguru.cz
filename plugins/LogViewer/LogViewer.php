@@ -8,8 +8,8 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function update(SplSubject $subject) {
-    if(isset($_GET["log"])) redirTo(getRoot() . getCurLink() . "?" . get_class($this)
-      . (strlen($_GET["log"]) ? "=".$_GET["log"] : "")); // shortcut log to LogViewer
+    #if(isset($_GET["log"])) redirTo(getRoot() . getCurLink() . "?" . get_class($this)
+    #  . (strlen($_GET["log"]) ? "=".$_GET["log"] : "")); // shortcut log to LogViewer
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;

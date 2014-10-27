@@ -2,6 +2,6 @@
 <ContentMatch>
 
   <!-- attr code="permanent" (default is temporary) -->
-  <!-- <var link="">myhomepagelink</var> -->
+  <!-- <var link="">myhomepage</var> -->
 
 </ContentMatch>

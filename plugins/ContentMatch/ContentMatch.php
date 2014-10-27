@@ -1,54 +1,80 @@
 <?php
 
+#TODO: keep missing url_parts from var->nodeValue
+
 class ContentMatch extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
+    if($subject->getStatus() == "preinit") {
+      $subject->setPriority($this,2);
+    }
     if($subject->getStatus() != "init") return;
     $this->subject = $subject;
     if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
-    $link = getCurLink();
-    $this->cfgRedir($link);
-    if($link == "") {
+    $this->cfgRedir();
+    if(getCurLink() == "") {
       $subject->detach($this);
       return;
     }
-    $this->proceed($link);
+    $this->proceed();
   }
 
-  private function cfgRedir($link) {
-    $cfg = $this->getDOMPlus();
-    $dest = $cfg->getElementById($link,"link");
-    if(is_null($dest)) return;
-    $code = 302;
-    if($dest->hasAttribute("code") && $dest->getAttribute("code") == "permanent")
-      $code = 301;
-    $this->proceed($dest->nodeValue,$code);
-  }
-
-  private function proceed($link,$code=404) {
+  private function cfgRedir() {
     global $cms;
-    $xpath = new DOMXPath($cms->getContentFull());
-    $q = "//h[@link='" . $link . "']";
-    $exactMatch = $xpath->query($q);
-    if($exactMatch->length > 1)
-      throw new Exception("Link not unique");
-    if($code != 404) {
-      if($exactMatch->length != 1) {
-        new Logger("Destination redir link '$link' not found","warning");
-        if(getCurLink() == "") return;
-        $link = ""; // redir to hp if page not found (and not at hp)
+    $cfg = $this->getDOMPlus();
+    foreach($cfg->documentElement->childNodes as $var) {
+      if($var->nodeName != "var") continue;
+      if($var->hasAttribute("link") && $var->getAttribute("link") != getCurLink()) continue;
+      $pNam = $var->hasAttribute("parName") ? $var->getAttribute("parName") : null;
+      $pVal = $var->hasAttribute("parValue") ? $var->getAttribute("parValue") : null;
+      if(!$this->queryMatch($pNam, $pVal)) continue;
+      $code = $var->hasAttribute("code") && $var->getAttribute("code") == "permanent" ? 301 : 302;
+      $link = parse_url($var->nodeValue, PHP_URL_PATH);
+      if(!strlen($link)) $link = getCurLink();
+      if($link != getCurLink() && is_null($cms->getContentFull()->getElementById($link,"link"))) {
+        new Logger("Redirection link '$link' not found","warning");
+        continue;
       }
-      redirTo(getRoot().$link,$code);
+      $query = parse_url($var->nodeValue, PHP_URL_QUERY);
+      if(strlen($query)) $query = $this->alterQuery($query, $pNam);
+      redirTo(getRoot() . $link . (strlen($query) ? "?$query" : ""), $code);
     }
-    if($exactMatch->length == 1) return;
-    $newLink = normalize($link);
+  }
+
+  private function alterQuery($query, $pNam) {
+    $param = array();
+    foreach(explode("&",$query) as $p) {
+      list($parName, $parValue) = explode("=","$p="); // ensure there is always parValue
+      if(!strlen($parValue)) $parValue = $_GET[$pNam];
+      $param[$parName] = $parValue;
+    }
+    $query = array();
+    foreach($param as $k => $v) $query[] = $k . (strlen($v) ? "=$v" : "");
+    return implode("&",$query);
+  }
+
+  private function queryMatch($pNam, $pVal) {
+    foreach(explode("&",parse_url(getCurLink(true),PHP_URL_QUERY)) as $q) {
+      if(is_null($pVal) && strpos("$q=","$pNam=$pVal") === 0) return true;
+      if(!is_null($pVal) && "$q=" == "$pNam=$pVal") return true;
+    }
+    return false;
+  }
+
+  private function proceed() {
+    global $cms;
+    $h = $cms->getContentFull()->getElementById(getCurLink(),"link");
+    if(!is_null($h)) return;
+    $newLink = normalize(getCurLink());
     $links = array();
-    foreach($xpath->query("//h[@link]") as $h) $links[] = $h->getAttribute("link");
+    foreach($cms->getContentFull()->getElementsByTagName("h") as $h) {
+      if($h->hasAttribute("link")) $links[] = $h->getAttribute("link");
+    }
     $linkId = $this->findSimilar($links,$newLink);
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];
-    new Logger("Link '$link' not found, redir to '$newLink'","info");
-    redirTo(getRoot().$newLink,$code);
+    new Logger("Link '".getCurLink()."' not found, redir to '$newLink'","info");
+    redirTo(getRoot().$newLink,404);
   }
 
   /**
