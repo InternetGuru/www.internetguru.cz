@@ -3,5 +3,9 @@
 
   <!-- attr code="permanent" (default is temporary) -->
   <!-- <var link="">myhomepage</var> -->
+  <var parName="log">?LogViewer</var>
+  <var parName="ver" parValue="">?LogViewer=ver</var>
+  <var parName="ver">?LogViewer</var>
+  <var parName="admin">?ContentAdmin</var>
 
 </ContentMatch>
