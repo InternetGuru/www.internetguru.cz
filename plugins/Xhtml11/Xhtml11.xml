@@ -20,10 +20,12 @@
   <!-- <xslt readonly="readonly"/> -->
   <stylesheet>themes/cms-default.css</stylesheet>
   <stylesheet media="print">themes/cms-print.css</stylesheet>
+  <stylesheet>themes/toggleHidable.css</stylesheet>
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
   <jsFile readonly="readonly" />
-  <jsFile append="body">plugins/Xhtml11/headingFragment.js</jsFile>
+  <jsFile append="body">themes/headingFragment.js</jsFile>
+  <jsFile append="body">themes/toggleHidable.js</jsFile>
   <favicon>themes/igcms.ico</favicon>
 
 </Xhtml11>
