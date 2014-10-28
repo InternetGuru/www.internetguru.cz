@@ -5,7 +5,9 @@
 #todo: support file upload
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $errors = array();
+  private $warn = array();
+  private $info = array();
+  private $html = null;
 
   public function update(SplSubject $subject) {
     $this->subject = $subject;
@@ -25,19 +27,16 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $ids = $this->regenerateIds($doc);
       $doc->documentElement->firstElement->setAttribute("ctime",date("Y-m-d\TH:i:sP"));
       $this->addLinks($doc);
-      $str = $doc->saveXML();
-      #foreach($ids as $old => $new) $str = str_replace($old,$new,$str);
-      $str = str_replace(array_keys($ids),$ids,$str);
-      $str = str_replace(">·\n",">\n",$str); // remove "format hack" from transformation
-      file_put_contents("$f.html",$str);
-      $cfg = $this->getDOMPlus();
-      $res = $cfg->getElementById("display_result");
-      if(!is_null($res) && $res->hasAttribute("query"))
-        redirTo($res->nodeValue."?".$res->getAttribute("query")."=$f.html");
-      echo $str;
-      die();
+      $this->html = $doc->saveXML();
+      $this->html = str_replace(array_keys($ids),$ids,$this->html);
+      $this->html = str_replace(">·\n",">\n",$this->html); // remove "format hack" from transformation
+      if(@file_put_contents("$f.html",$this->html) !== false) return;
+      $m = "Unable to save imported file into '$f.html'";
+      $this->warn[] = $m;
+      new Logger($m,"error");
     } catch(Exception $e) {
-      $this->errors[] = $e->getMessage();
+      $this->warn[] = $e->getMessage();
+      if(strlen($_GET[get_class($this)])) new Logger($e->getMessage(), "warning");
     }
   }
 
@@ -56,8 +55,11 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     global $cms;
     $cms->getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("convertor-errors", $this->errors);
-    $newContent->insertVar("convertor-link", $_GET[get_class($this)]);
+    $newContent->insertVar("warning", $this->warn);
+    $newContent->insertVar("info", $this->info);
+    $newContent->insertVar("link", $_GET[get_class($this)]);
+    if(!is_null($this->html))
+      $newContent->insertVar("content", file_get_contents($this->html));
     return $newContent;
   }
 
