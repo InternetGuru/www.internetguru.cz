@@ -305,4 +305,12 @@ function readZippedFile($archiveFile, $dataFile) {
   return $data;
 }
 
+function getFileMime($file) {
+  if(!function_exists("finfo_file")) throw new Exception("Function finfo_file() not supported");
+  $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+  $mime = finfo_file($finfo, $file);
+  finfo_close($finfo);
+  return $mime;
+}
+
 ?>
