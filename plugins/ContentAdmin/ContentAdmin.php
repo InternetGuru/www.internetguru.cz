@@ -15,6 +15,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   const FILE_ENABLE = "enable";
   private $content = null;
   private $errors = array();
+  private $info = array();
   private $contentValue = "n/a";
   private $schema = null;
   private $type = "unknown";
@@ -24,8 +25,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $defaultFile = "n/a";
 
   public function update(SplSubject $subject) {
-    #if(isset($_GET["admin"])) redirTo(getRoot() . getCurLink() . "?" . get_class($this)
-    #  . (strlen($_GET["admin"]) ? "=".$_GET["admin"] : "")); // back compatibility
     if($subject->getStatus() == "preinit") {
       $subject->setPriority($this,3);
     }
@@ -58,7 +57,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   public function getContent(HTMLPlus $content) {
     global $cms;
-    $cms->getOutputStrategy()->addCssFile($this->getDir() . '/ContentAdmin.css');
     $cms->getOutputStrategy()->addJsFile($this->getDir() . '/ContentAdmin.js', 100, "body");
 
     $format = $this->type;
@@ -70,7 +68,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $la = "?" . get_class($this) . "=" . $this->defaultFile;
     $statusChange =  self::FILE_DISABLE;
     if($this->dataFileStatus == self::FILE_DISABLED) {
-      $newContent->insertVar("contentadmin-warning", "warning");
+      $newContent->insertVar("warning", "warning");
       $statusChange = self::FILE_ENABLE;
     }
     $usrDestHash = getFileHash($this->dataFile);
@@ -87,24 +85,25 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $type = $this->type;
     }
 
-    $newContent->insertVar("contentadmin-heading", $cms->getVariable("cms-title"));
-    $newContent->insertVar("contentadmin-errors", $this->errors);
-    $newContent->insertVar("contentadmin-link", getCurLink());
-    $newContent->insertVar("contentadmin-linkadmin", $la);
-    $newContent->insertVar("contentadmin-linkadminstatus", "$la&$statusChange");
+    $newContent->insertVar("heading", $cms->getVariable("cms-title"));
+    $newContent->insertVar("errors", $this->errors);
+    $newContent->insertVar("info", $this->info);
+    $newContent->insertVar("link", getCurLink());
+    $newContent->insertVar("linkadmin", $la);
+    $newContent->insertVar("linkadminstatus", "$la&$statusChange");
 
     if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown")
-      $newContent->insertVar("contentadmin-statuschange", null);
+      $newContent->insertVar("statuschange", null);
 
-    $newContent->insertVar("contentadmin-content", $this->contentValue);
-    $newContent->insertVar("contentadmin-filename", $this->defaultFile);
-    $newContent->insertVar("contentadmin-schema", $format);
-    $newContent->insertVar("contentadmin-mode", $mode);
-    $newContent->insertVar("contentadmin-classtype", $type);
-    $newContent->insertVar("contentadmin-defaultcontent", $this->getDefContent());
-    $newContent->insertVar("contentadmin-resultcontent", $this->getResContent());
-    $newContent->insertVar("contentadmin-status", $this->dataFileStatus);
-    $newContent->insertVar("contentadmin-userfilehash", $usrDestHash);
+    $newContent->insertVar("content", $this->contentValue);
+    $newContent->insertVar("filename", $this->defaultFile);
+    $newContent->insertVar("schema", $format);
+    $newContent->insertVar("mode", $mode);
+    $newContent->insertVar("classtype", $type);
+    $newContent->insertVar("defaultcontent", $this->getDefContent());
+    $newContent->insertVar("resultcontent", $this->getResContent());
+    $newContent->insertVar("status", $this->dataFileStatus);
+    $newContent->insertVar("userfilehash", $usrDestHash);
 
     return $newContent;
   }

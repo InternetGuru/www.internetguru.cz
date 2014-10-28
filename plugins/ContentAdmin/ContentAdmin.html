@@ -1,30 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <body xml:lang="cs">
-  <h id="h.adf" var="contentadmin-heading">Administrace</h>
-  <desc>Administrace souboru <samp var="contentadmin-filename"/> ve formátu <samp var="contentadmin-schema"/></desc>
+  <h id="h.adf" var="heading">Administrace</h>
+  <desc>Administrace souboru <samp var="filename"/> ve formátu <samp var="schema"/></desc>
   <ol class="warning">
-    <li var="contentadmin-errors"/>
+    <li var="errors"/>
   </ol>
-  <form action="" method="post" var="contentadmin-linkadmin@action">
-    <fieldset><legend>Výchozí soubor</legend>
-      <blockcode var="contentadmin-defaultcontent">n/a</blockcode>
+  <ol class="info">
+    <li var="info"/>
+  </ol>
+  <form action="" method="post" var="linkadmin@action">
+    <fieldset class="hidable"><legend>Výchozí soubor</legend>
+      <blockcode var="defaultcontent">n/a</blockcode>
     </fieldset>
-    <fieldset class="contentadmin-nohide"><legend>Uživatelský soubor, mód <samp var="contentadmin-mode"/>, stav <samp var="contentadmin-status contentadmin-warning@class"/><span var="contentadmin-statuschange"> (<a href="" var="contentadmin-linkadminstatus@href">změnit stav</a>)</span></legend>
-      <textarea cols="40" name="content" rows="20" var="contentadmin-classtype@class contentadmin-content">n/a</textarea>
+    <fieldset class="hidable nohide"><legend>Uživatelský soubor, mód <samp var="mode"/>, stav <samp var="status warning@class"/><span var="statuschange"> (<a href="" var="linkadminstatus@href">změnit stav</a>)</span></legend>
+      <textarea cols="40" name="content" rows="20" var="classtype@class content">n/a</textarea>
     </fieldset>
-    <fieldset><legend>Výsledek, mód <samp var="contentadmin-mode"/></legend>
-      <blockcode var="contentadmin-resultcontent">n/a</blockcode>
+    <fieldset class="hidable"><legend>Výsledek, mód <samp var="mode"/></legend>
+      <blockcode var="resultcontent">n/a</blockcode>
     </fieldset>
-    <fieldset class="contentadmin-nohide"><legend>Ovládací panel</legend>
-      <input name="userfilehash" type="hidden" value="" var="contentadmin-userfilehash@value"/>
+    <fieldset class="hidable nohide"><legend>Ovládací panel</legend>
+      <input name="userfilehash" type="hidden" value="" var="userfilehash@value"/>
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít" title="Ctrl+Shift+S"/></li>
         <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
-        <!-- <li><a href="" var="contentadmin-linkadmin@href">Zahodit změny</a></li> -->
-        <!-- <li><a href="" var="contentadmin-link@href">Zahodit změny a odejít</a></li> -->
+        <!-- <li><a href="" var="linkadmin@href">Zahodit změny</a></li> -->
+        <!-- <li><a href="" var="link@href">Zahodit změny a odejít</a></li> -->
       </ul>
     </fieldset>
-    <fieldset class="contentadmin-nohide"><legend>Seznamy proměnných</legend>
+    <fieldset class="hidable nohide"><legend>Seznamy proměnných</legend>
       <dl>
         <dt>Globální proměnné (proměnná <samp>cms-variables</samp>)</dt>
         <dd><samp var="cms-variables">žádné</samp></dd>
