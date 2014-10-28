@@ -23,11 +23,11 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $doc = new DOMDocumentPlus();
       $doc->loadXML($xml->saveXML());
       $ids = $this->regenerateIds($doc);
+      $doc->documentElement->firstElement->setAttribute("ctime",date("Y-m-d\TH:i:sP"));
       $str = $doc->saveXML();
-      foreach($ids as $old => $new) {
-        $str = str_replace($old,$new,$str);
-      }
-      $str = str_replace(">·\n",">\n",$str); // remove "nbsp hack" from transformation
+      #foreach($ids as $old => $new) $str = str_replace($old,$new,$str);
+      $str = str_replace(array_keys($ids),$ids,$str);
+      $str = str_replace(">·\n",">\n",$str); // remove "format hack" from transformation
       file_put_contents("$f.html",$str);
       $cfg = $this->getDOMPlus();
       $res = $cfg->getElementById("display_result");
