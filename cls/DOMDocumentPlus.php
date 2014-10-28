@@ -322,27 +322,24 @@ class DOMDocumentPlus extends DOMDocument {
       case "ins":
       case "sub":
       case "sup":
-      $sep = $e->ownerDocument->createTextNode(", ");
+      $sep = ", ";
       break;
       case "ul":
       case "ol":
       $e->removeChildNodes();
       $e = $e->appendChild($e->ownerDocument->createElement("li"));
       break;
-      default:
-      $dom = new DOMDocument();
-      $dom->loadXML("<var><em>".implode("</em>, <em>",$varValue)."</em></var>");
-      $this->insertVarDOMElement($dom->documentElement,$e,null,$varName);
-      return;
     }
-    $p = $e->parentNode;
-    foreach($varValue as $v) {
-      $i = $p->insertBefore($e->cloneNode(),$e);
-      $i->nodeValue = $v;
-      if(!is_null($sep)) $i = $p->insertBefore($sep->cloneNode(),$e);
+    $dom = new DOMDocument();
+    $eNam = $e->nodeName;
+    $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$varValue)."</$eNam></var>";
+    if(!@$dom->loadXML($xml)) {
+      new Logger("Invalid XML inserted as '$varName' (converting specialchars)","warning");
+      foreach($varValue as $k => $v) $varValue[$k] = htmlspecialchars($v);
+      $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$varValue)."</$eNam></var>";
+      if(!@$dom->loadXML($xml)) throw new Exception("Unable to parse '$varName' variable");
     }
-    if(!is_null($sep)) $p->removeChild($i);
-    $p->removeChild($e);
+    $this->insertVarDOMElement($dom->documentElement,$e->parentNode);
   }
 
   private function emptyVarArray(DOMElement $e) {
