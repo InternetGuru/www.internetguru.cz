@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <body xml:lang="cs">
   <h id="h.adf">Convertor</h>
-  <desc>Import souboru ze souboru nebo z URL</desc>
+  <desc>Import do HTML+ ze souboru nebo z URL</desc>
   <ol class="warning">
     <li var="warning"/>
   </ol>
@@ -9,12 +9,18 @@
     <li var="info"/>
   </ol>
   <form action="" method="get">
-    <dl>
-      <dt><label for="i1">Adresa importovaného souboru</label></dt>
-      <dd><input id="i1" name="Convertor" type="text" var="link@value"/></dd>
-      <dt>Akce</dt>
-      <dd><input type="submit" value="Odeslat"/></dd>
-    </dl>
+    <fieldset class="hidable nohide"><legend>Import souboru</legend>
+      <dl>
+        <dt><label for="i1">Adresa souboru</label></dt>
+        <dd><input id="i1" name="Convertor" type="text" var="link@value"/></dd>
+        <dt>Akce</dt>
+        <dd><input type="submit" value="Zobrazit nebo importovat"/></dd>
+        <dt>Všechny importované soubory HTML+</dt>
+        <dd class="links"><samp var="importedhtml">žádné</samp></dd>
+      </dl>
+    </fieldset>
+    <fieldset class="hidable" var="nohide@class"><legend>Importovaný soubor <samp var="filename"/></legend>
+      <blockcode var="content">n/a</blockcode>
+    </fieldset>
   </form>
-  <blockcode var="content">n/a</blockcode>
 </body>
