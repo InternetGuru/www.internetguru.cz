@@ -1,13 +1,19 @@
 0.1.1-dev
 ---------
 
-* ContentAdmin: showing links to edit files
-
-* new system variable dombuilder-html
-
-* ContentAdmin: redir to default file
-
-* HTML+ import: added language check
+Convertor: independent UI with features
+Convertor: adds short/link attr for headings with section
+Convertor: adds ctime into first heading
+Convertor: added samp support (from underlined text)
+InputVar: silent error support (@)
+LogViewer: zipped files support
+LogViewer: log/ver file support
+ContentMatch: default redirections (log, ver, admin)
+ContentMatch: query redirection support
+ContentAdmin: showing links to edit files
+new system variable dombuilder-html
+ContentAdmin: redir to default file
+HTML+ import: added language check
 
 
 0.1.0-dev
