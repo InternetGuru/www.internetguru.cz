@@ -66,7 +66,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent = $this->getHTMLPlus();
 
     $la = "?" . get_class($this) . "=" . $this->defaultFile;
-    $statusChange =  self::FILE_DISABLE;
+    $statusChange = self::FILE_DISABLE;
     if($this->dataFileStatus == self::FILE_DISABLED) {
       $newContent->insertVar("warning", "warning");
       $statusChange = self::FILE_ENABLE;
@@ -91,10 +91,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("link", getCurLink());
     $newContent->insertVar("linkadmin", $la);
     $newContent->insertVar("linkadminstatus", "$la&$statusChange");
-
-    if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown")
-      $newContent->insertVar("statuschange", null);
-
     $newContent->insertVar("content", $this->contentValue);
     $newContent->insertVar("filename", $this->defaultFile);
     $newContent->insertVar("schema", $format);
@@ -104,6 +100,11 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
     $newContent->insertVar("resultcontent", $this->getResContent());
     $newContent->insertVar("status", $this->dataFileStatus);
     $newContent->insertVar("userfilehash", $usrDestHash);
+
+    if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown") {
+      $newContent->insertVar("statuschange", null);
+      $newContent->insertVar("warning", "warning");
+    }
 
     return $newContent;
   }
@@ -220,11 +221,9 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->schema = $this->getSchema($this->dataFile);
     }
 
-
-
     if($this->type == "html") {
       $doc = new HTMLPlus();
-      $doc->load(findFile("Content.html",false,false));
+      #todo: load minimalistic valid html+ file?
     } else $doc = new DOMDocumentPlus();
     if($this->contentValue == "n/a") {
       $this->contentValue = $doc->saveXML();
@@ -256,8 +255,9 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   private function setContent() {
     $f = $this->dataFile;
-    if(!file_exists($f)) $f = findFile($this->defaultFile);
-    if($f && !($this->contentValue = file_get_contents($f)))
+    if(!file_exists($f)) return;
+    #if(!file_exists($f)) $f = findFile($this->defaultFile);
+    if(!($this->contentValue = file_get_contents($f)))
       throw new Exception ("Unable to get contents from '{$this->dataFile}'");
   }
 

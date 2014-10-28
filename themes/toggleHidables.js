@@ -17,7 +17,7 @@
     return hidables;
   }
 
-  function toggleHidable() {
+  function toggleHidables() {
     var hidables = getHidables();
     for(var i = 0; i < hidables.length; i++) {
       var firstElement = hidables[i].children[0];
@@ -55,6 +55,6 @@
     }
   }
 
-  toggleHidable();
+  toggleHidables();
 
 })(window);
