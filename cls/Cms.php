@@ -122,7 +122,7 @@ class Cms {
     return $this->variables[$id];
   }
 
-  public function addVariableItem($value,$name=null) {
+  public function addVariableItem($name,$value) {
     $varId = $this->getVarId($name);
     $var = $this->getVariable($varId);
     if(is_null($var)) {

@@ -33,7 +33,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $cfg = $this->getDOMPlus();
       $this->registerThemes($cfg);
       $this->favIcon = $this->getFavicon($cfg);
-      $cms->setVariable("transformations", array_keys($this->transformations));
+      #$cms->setVariable("transformations", array_keys($this->transformations));
       $cms->setVariable("styles", array_keys($this->cssFiles));
       $cms->setVariable("javascripts", array_keys($this->jsFiles));
     }
@@ -307,6 +307,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
 
   public function addTransformation($filePath, $priority = 10, $user = true) {
+    global $cms;
+    $cms->addVariableItem("transformations",$filePath);
     $this->transformations[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
