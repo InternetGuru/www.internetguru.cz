@@ -43,7 +43,7 @@
     for(var i = 0; i < e.childNodes.length; i++) {
       var ch = e.childNodes[i];
       if(ch.nodeType != 1) continue;
-      if(ch.nodeName.toLowerCase() == "legend") continue;
+      if(ch.isSameNode(link.parentNode)) continue;
       if(ch.classList.contains(HIDE_CLASS)) {
         ch.classList.remove(HIDE_CLASS);
         link.innerHTML = COLLAPSE;
