@@ -28,7 +28,7 @@ class TOC extends Plugin implements SplObserver, ContentStrategyInterface {
     global $cms;
     $cms->getOutputStrategy()->addCssFile($this->getDir() ."/TOC.css");
     $cms->getOutputStrategy()->addJsFile($this->getDir() ."/TOC.js",5,"body");
-    $cms->getOutputStrategy()->addJs("TOC.init({".$tocVars."});",20);
+    $cms->getOutputStrategy()->addJs("TOC.init({".$tocVars."});",6);
   }
 
   public function getContent(HTMLPlus $c) {

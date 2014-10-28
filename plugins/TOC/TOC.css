@@ -1,11 +1,11 @@
-.contenttoc-wrapper dd {
+.hidable dd {
   margin-left: 0em;
   font-style: normal;
 }
-.contenttoc-hide {
+.xcontenttoc-hide {
   display: none;
 }
-.contenttoc-switch {
+.xcontenttoc-switch {
   text-decoration: none;
   /*font-family: "Lucida Console",monospace;*/
   font-family: inherit;

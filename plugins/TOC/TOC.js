@@ -2,8 +2,6 @@
 
   var Config = {}
 
-  Config.show = "[+]";
-  Config.hide = "[-]";
   Config.tocTitle = "Table of contents";
   Config.tocNS = "contenttoc";
 
@@ -35,7 +33,7 @@
         var div = document.createElement("div");
         div.className = "list";
         tocWrapper = document.createElement("dl");
-        tocWrapper.className = Config.tocNS + "-wrapper";
+        tocWrapper.className = "hidable nohide";
         div.appendChild(tocWrapper);
         tocRoot.parentNode.insertBefore(div,tocRoot);
       },
@@ -70,16 +68,6 @@
           createTOC(i+1, subOl);
           li.appendChild(subOl);
         }
-      },
-      toggleToc = function(e) {
-        var dd = e.parentNode.nextSibling;
-        if(dd.classList.contains(Config.tocNS + "-hide")) {
-          dd.classList.remove(Config.tocNS + "-hide");
-          e.innerHTML = Config.hide;
-        } else {
-          dd.classList.add(Config.tocNS + "-hide");
-          e.innerHTML = Config.show;
-        }
       }
 
       // public
@@ -96,21 +84,10 @@
           // insert title and toc
           var dt = document.createElement("dt");
           dt.innerHTML = " " + Config.tocTitle;
-          var sw = document.createElement("a");
-          sw.href = "";
-          sw.className = Config.tocNS + "-switch";
-          sw.innerHTML = Config.hide;
-          dt.insertBefore(sw,dt.firstChild);
           tocWrapper.appendChild(dt);
           var dd = document.createElement("dd");
           dd.appendChild(ol);
           tocWrapper.appendChild(dd);
-
-          // register and run toggle
-          sw.addEventListener("click", function(e){
-            toggleToc(e.target);
-            e.preventDefault();
-          });
         }
       }
    };

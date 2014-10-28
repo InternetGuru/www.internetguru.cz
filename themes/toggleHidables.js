@@ -2,7 +2,7 @@
 (function(window){
 
   var EXPAND = "[+]";
-  var COLLAPSE = "[-]";
+  var COLLAPSE = "[–]";
   var HIDABLE_CLASS = "hidable";
   var HIDE_CLASS = "hide";
   var NO_HIDE_CLASS = "nohide";
