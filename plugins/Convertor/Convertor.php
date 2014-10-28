@@ -24,6 +24,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $doc->loadXML($xml->saveXML());
       $ids = $this->regenerateIds($doc);
       $doc->documentElement->firstElement->setAttribute("ctime",date("Y-m-d\TH:i:sP"));
+      $this->addLinks($doc);
       $str = $doc->saveXML();
       #foreach($ids as $old => $new) $str = str_replace($old,$new,$str);
       $str = str_replace(array_keys($ids),$ids,$str);
@@ -37,6 +38,17 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       die();
     } catch(Exception $e) {
       $this->errors[] = $e->getMessage();
+    }
+  }
+
+  private function addLinks(DOMDocumentPlus $doc) {
+    foreach($doc->getElementsByTagName("h") as $h) {
+      if($h->isSameNode($doc->documentElement->firstElement)) continue; // skip first h
+      foreach($h->parentNode->childNodes as $e) {
+        if($e->nodeName != "section") continue;
+        $h->setAttribute("short", $h->nodeValue);
+        $h->setAttribute("link", normalize($h->nodeValue));
+      }
     }
   }
 
