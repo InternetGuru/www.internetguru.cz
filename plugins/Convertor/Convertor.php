@@ -65,7 +65,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->addLinks($doc);
     $this->html = $doc->saveXML();
     $this->html = str_replace(array_keys($ids),$ids,$this->html);
-    $this->html = str_replace(">·\n",">\n",$this->html); // remove "format hack" from transformation
+    $this->html = str_replace("·\n","\n",$this->html); // remove "format hack" from transformation
     $this->info[] = "File successfully imported";
     $this->file = "$f.html";
     if(@file_put_contents("$f.html",$this->html) !== false) return;

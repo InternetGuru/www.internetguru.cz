@@ -257,7 +257,7 @@
         <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)] or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0)">
           <xsl:choose>
             <!-- definition list if first is bold -->
-            <xsl:when test="count(r) = 1 and r/rPr/b">·
+            <xsl:when test="count(r) = 1 and r/rPr/b/@val = 1">·
   <xsl:copy-of select="$pIndent"/><dl>·
     <xsl:copy-of select="$pIndent"/><dt>
                   <xsl:copy-of select="r/t/text()"/>
@@ -292,7 +292,7 @@
     <xsl:variable name="item" select="following-sibling::p[$i]"/>
 
     <xsl:choose>
-      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ((count($item/r) = 1 and $item/r/rPr/b) or (following-sibling::p[$i+1]/pPr/numPr/ilvl/@val > $item/pPr/numPr/ilvl/@val))">·
+      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ($item/r/rPr/b/@val = 1 or following-sibling::p[$i+1]/pPr/numPr/ilvl/@val &gt; 0)">·
     <xsl:copy-of select="$pIndent"/><dt>
           <xsl:copy-of select="$item//t/text()"/>
           <!-- <xsl:apply-templates select="$item/node()"/> -->
@@ -307,6 +307,7 @@
     <xsl:if test="following-sibling::p[$i+1]/pPr/numPr/numId/@val = $item/pPr/numPr/numId/@val">
       <xsl:call-template name="insertDefListItem">
         <xsl:with-param name="i" select="$i+1"/>
+        <xsl:with-param name="pIndent" select="$pIndent"/>
       </xsl:call-template>
     </xsl:if>
   </xsl:template>
@@ -457,7 +458,8 @@
                   <xsl:otherwise><xsl:apply-templates select="node()"/></xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
-            <xsl:apply-templates select="node()"/>
+            <!-- <xsl:apply-templates select="node()"/> -->
+            <xsl:copy-of select="node()//t/text()"/>
       </xsl:element>
     </xsl:template>
 
