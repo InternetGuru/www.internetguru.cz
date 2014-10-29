@@ -39,6 +39,7 @@ class Plugins implements SplSubject {
       }
       if($this->isAttachedPlugin($p)) continue;
       $this->attach(new $p);
+      $cms->addVariableItem("loaded",$p);
     }
   }
 
