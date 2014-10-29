@@ -15,6 +15,89 @@ class HTMLPlus extends DOMDocumentPlus {
     return $doc;
   }
 
+  public function applySyntax() {
+    $extend = array("strong","em","ins","del","sub","sup","a","h","desc");
+    foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCodeTag($n);
+    foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCode($n);
+    foreach($this->getInlineTextNodes($extend) as $n) $this->parseSyntaxVariable($n);
+  }
+
+  private function getInlineTextNodes($extend = array()) {
+    $textNodes = array();
+    foreach(array_merge(array("p","dd","li"),$extend) as $eNam) {
+      foreach($this->getElementsByTagName($eNam) as $e) {
+        foreach($e->childNodes as $n) {
+          if($n->nodeType == XML_TEXT_NODE) $textNodes[] = $n;
+        }
+      }
+    }
+    return $textNodes;
+  }
+
+  private function parseSyntaxCodeTag(DOMText $n) {
+    $pat = "/<code(?: [a-z]+)?>(.+?)<\/code>/";
+    $p = preg_split($pat,$n->nodeValue,-1,PREG_SPLIT_DELIM_CAPTURE);
+    if(count($p) < 2) return;
+    foreach($p as $i => $v) {
+      if($i % 2 == 0) $newNode = $this->createTextNode($v);
+      else {
+        $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
+        $r = array('"','"','"',"'","'");
+        $v = str_replace($s,$r,translateUtf8Entities($v,true));
+        $newNode = $this->createElement("code",translateUtf8Entities($v));
+        if(preg_match("/<code ([a-z]+)>/",$n->nodeValue,$match)) {
+          $newNode->setAttribute("class",$match[1]);
+        }
+      }
+      $n->parentNode->insertBefore($newNode,$n);
+    }
+    $n->parentNode->removeChild($n);
+  }
+
+  private function parseSyntaxCode(DOMText $n) {
+    $pat = "/(?:&lsquo;|&rsquo;|'){2}(.+?)(?:&lsquo;|&rsquo;|'){2}/";
+    $src = translateUtf8Entities($n->nodeValue,true);
+    $p = preg_split($pat,$src,-1,PREG_SPLIT_DELIM_CAPTURE);
+    if(count($p) < 2) return;
+    foreach($p as $i => $v) {
+      if($i % 2 == 0) $newNode = $this->createTextNode(translateUtf8Entities($v));
+      else {
+        $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
+        $r = array('"','"','"',"'","'");
+        $v = str_replace($s,$r,$v);
+        $newNode = $this->createElement("code",translateUtf8Entities($v));
+      }
+      $n->parentNode->insertBefore($newNode,$n);
+    }
+    $n->parentNode->removeChild($n);
+  }
+
+  private function parseSyntaxVariable(DOMText $n) {
+    if(strpos($n->nodeValue, 'cms-') === false) return;
+    foreach(explode('\$', $n->nodeValue) as $src) {
+      $p = preg_split('/\$('.VARIABLE_PATTERN.")/",$src,-1,PREG_SPLIT_DELIM_CAPTURE);
+      if(count($p) < 2) return;
+      foreach($p as $i => $v) {
+        if($i % 2 == 0) $newNode = $this->createTextNode($v);
+        else {
+          // <p>$varname</p> -> <p var="varname"/>
+          // <p><strong>$varname</strong></p> -> <p><strong var="varname"/></p>
+          // else
+          // <p>aaa $varname</p> -> <p>aaa <em var="varname"/></p>
+          if($n->parentNode->nodeValue == "\$$v") {
+            $n->parentNode->setAttribute("var",$v);
+            continue;
+          } else {
+            $newNode = $this->createElement("em");
+            $newNode->setAttribute("var",$v);
+          }
+        }
+        $n->parentNode->insertBefore($newNode,$n);
+      }
+    }
+    $n->parentNode->removeChild($n);
+  }
+
   protected function validateHTMLPlus($repair) {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot($repair);
