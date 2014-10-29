@@ -196,6 +196,13 @@ alias ll='ls -lah'
 # }
 #
 # alias cd=cd_func
-alias cdcms='cd /cygdrive/c/wamp/www/cms'
+CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
+CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
+alias cdcms='if [ -d "$CMS_FOLDER_1" ]; then cd "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then cd "$CMS_FOLDER_2"; else echo "dir not found"; fi'
+
+alias gitlog='git log --decorate --all --oneline --graph'
 alias gitver='_(){ git log --oneline $1 | cut -f2- -d" " | grep -v "^\."; }; _'
-alias gitpsh='git push --all; git push --tags'
+alias gitcurver='gitver $( git show-ref --tags | head -1 | cut -f1 -d" " )..'
+alias gitpush='git push --all; git push --tags'
+alias gitdeltag='_(){ git tag -d $1; git push origin :refs/tags/$1; }; _'
+alias gitdellasttag='gitdeltag $( git show-ref --tags | head -1 | cut -f2 -d" " )'
