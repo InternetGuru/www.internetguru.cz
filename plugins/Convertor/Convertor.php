@@ -5,7 +5,7 @@
 #todo: js copy content to clipboard
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $warn = array();
+  private $err = array();
   private $info = array();
   private $html = null;
   private $file = null;
@@ -38,7 +38,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     try {
       $f = $this->getFile($_GET[get_class($this)]);
     } catch(Exception $e) {
-      $this->warn[] = $e->getMessage();
+      $this->err[] = $e->getMessage();
       if(strlen($_GET[get_class($this)])) new Logger($e->getMessage(), "warning");
       return;
     }
@@ -52,29 +52,71 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->file = $f;
       break;
       default:
-      $this->warn[] = "Unsupported file type '$mime'";
+      $this->err[] = "Unsupported file type '$mime'";
     }
   }
 
   private function parseZippedDoc($f) {
-    $xml = $this->transformFile($f);
-    $doc = new DOMDocumentPlus();
-    $doc->loadXML($xml->saveXML());
-    $ids = $this->regenerateIds($doc);
+    $doc = $this->transformFile($f);
+    $xml = $doc->saveXML();
+    $xml = str_replace("·\n","\n",$xml); // remove "format hack" from transformation
+
+    $doc = new HTMLPlus();
+    $doc->loadXML($xml);
     $doc->documentElement->firstElement->setAttribute("ctime",date("Y-m-d\TH:i:sP"));
     $this->addLinks($doc);
+    $this->safeValidate($doc);
+    $this->addInlineElements($doc);
+
+    $ids = $this->regenerateIds($doc);
     $this->html = $doc->saveXML();
     $this->html = str_replace(array_keys($ids),$ids,$this->html);
-    $this->html = str_replace("·\n","\n",$this->html); // remove "format hack" from transformation
-    $this->info[] = "File successfully imported";
+
+    if(empty($this->err)) $this->info[] = "File successfully imported";
     $this->file = "$f.html";
     if(@file_put_contents("$f.html",$this->html) !== false) return;
     $m = "Unable to save imported file into '$f.html'";
-    $this->warn[] = $m;
+    $this->err[] = $m;
     new Logger($m,"error");
   }
 
-  private function addLinks(DOMDocumentPlus $doc) {
+  private function safeValidate(HTMLPlus $doc) {
+    try {
+      $doc->validatePlus(true);
+    } catch(Exception $e) {
+      $this->err[] = $e->getMessage();
+    }
+  }
+
+  private function addInlineElements(HTMLPlus $doc) {
+    foreach(array("desc","p","dd","li") as $eNam) {
+      foreach($doc->getElementsByTagName($eNam) as $e) {
+        foreach($e->childNodes as $n) {
+          if($n->nodeType != XML_TEXT_NODE) continue;
+          // '' to code
+          $pat = "/(?:&lsquo;|&rsquo;|'){2}(.+?)(?:&lsquo;|&rsquo;|'){2}/";
+          $src = translateUtf8Entities($n->nodeValue,true);
+          $p = preg_split($pat,$src,-1,PREG_SPLIT_DELIM_CAPTURE);
+          if(count($p) < 2) continue;
+          foreach($p as $i => $v) {
+            if($i % 2 == 0) $newNode = $doc->createTextNode(translateUtf8Entities($v));
+            else {
+              $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
+              $r = array('"','"','"',"'","'");
+              $v = str_replace($s,$r,$v);
+              $newNode = $doc->createElement("code",translateUtf8Entities($v));
+            }
+            $n->parentNode->insertBefore($newNode,$n);
+          }
+          $n->parentNode->removeChild($n);
+          // variables
+          #TODO
+        }
+      }
+    }
+  }
+
+  private function addLinks(HTMLPlus $doc) {
     foreach($doc->getElementsByTagName("h") as $h) {
       if($h->isSameNode($doc->documentElement->firstElement)) continue; // skip first h
       foreach($h->parentNode->childNodes as $e) {
@@ -89,7 +131,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     global $cms;
     $cms->getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("warning", $this->warn);
+    $newContent->insertVar("warning", $this->err);
     $newContent->insertVar("info", $this->info);
     $newContent->insertVar("link", $_GET[get_class($this)]);
     $newContent->insertVar("importedhtml",$this->importedFiles);
