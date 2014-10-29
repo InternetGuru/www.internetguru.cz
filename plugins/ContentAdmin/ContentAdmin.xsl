@@ -5,12 +5,15 @@
     <xsl:apply-templates/>
   </xsl:template>
 
-  <xsl:template match="samp[parent::*[@class='links']]">
+  <xsl:template match="samp[parent::*[contains(@class,'links')]]">
     <xsl:element name="{name()}">
     <xsl:element name="a">
       <xsl:attribute name="href">
         <xsl:text>?ContentAdmin=</xsl:text>
-        <xsl:value-of select="text()"/>
+        <xsl:choose>
+          <xsl:when test="parent::*[contains(@class,'plugin')]">plugins/<xsl:value-of select="text()"/>/<xsl:value-of select="text()"/>.xml</xsl:when>
+          <xsl:otherwise><xsl:value-of select="text()"/></xsl:otherwise>
+        </xsl:choose>
       </xsl:attribute>
       <xsl:apply-templates/>
     </xsl:element>
