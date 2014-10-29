@@ -14,7 +14,7 @@
   <!-- <xsl:param name="header" select="document($headerFile)//p"/> -->
   <!-- <xsl:param name="footer" select="document($footerFile)//p"/> -->
 
-  <xsl:template xml:space="preserve" match="/"><body xml:lang="cs"><xsl:call-template name="headingStructure"/>
+  <xsl:template xml:space="preserve" match="/"><body xml:lang="cs"><xsl:call-template name="headingStructure"/>·
 </body></xsl:template>
 
   <!-- Template pro zachovani formatovani z dokumentu header.xml
