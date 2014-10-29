@@ -292,7 +292,7 @@
     <xsl:variable name="item" select="following-sibling::p[$i]"/>
 
     <xsl:choose>
-      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ($item/r/rPr/b/@val = 1 or following-sibling::p[$i+1]/pPr/numPr/ilvl/@val &gt; 0)">·
+      <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ($item/r[1]/rPr/b/@val = 1 or following-sibling::p[$i+1]/pPr/numPr/ilvl/@val &gt; 0)">·
     <xsl:copy-of select="$pIndent"/><dt>
           <xsl:copy-of select="$item//t/text()"/>
           <!-- <xsl:apply-templates select="$item/node()"/> -->
