@@ -24,7 +24,7 @@ define('PICTURES_FOLDER', FILES_FOLDER .'/pictures'); // where pictures files ar
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 define('FILE_HASH_ALGO', 'crc32b');
-define('CMS_VERSION', '0.1.0-dev');
+define('CMS_VERSION', '0.1.1-dev');
 
 #print_r($_SERVER);
 
