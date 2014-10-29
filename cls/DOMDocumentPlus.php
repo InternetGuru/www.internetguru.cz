@@ -104,13 +104,14 @@ class DOMDocumentPlus extends DOMDocument {
     if($pLink === false) throw new LoggerException("Unable to parse href '$link'"); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
       $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"] . getRoot();
-      if(strpos($curDomain,$link) !== 0) return $link; // link is external
+      if(strpos(str_replace(array("?","#"),array("/","/"),$link), $curDomain) !== 0) return $link; // link is external
     }
     $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
     if(isset($pLink["fragment"])) return $query . "#" . $pLink["fragment"];
     $path = isset($pLink["path"]) ? $pLink["path"] : "";
     while(strpos($path,".") === 0) $path = substr($path,1);
-    if(strpos($path,getRoot()) === 0) $path = substr($path,strlen(getRoot()));
+    if(isAtLocalhost() && strpos($path,substr(getRoot(),0,-1)) === 0)
+      $path = substr($path,strlen(getRoot())-1);
     while(strpos($path,"/") === 0) $path = substr($path,1);
     return $path . $query;
   }
