@@ -66,7 +66,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $doc->documentElement->firstElement->setAttribute("ctime",date("Y-m-d\TH:i:sP"));
     $this->addLinks($doc);
     $this->safeValidate($doc);
-    $this->addInlineElements($doc);
+    $doc->applySyntax();
 
     $ids = $this->regenerateIds($doc);
     $this->html = $doc->saveXML();
@@ -85,34 +85,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $doc->validatePlus(true);
     } catch(Exception $e) {
       $this->err[] = $e->getMessage();
-    }
-  }
-
-  private function addInlineElements(HTMLPlus $doc) {
-    foreach(array("desc","p","dd","li") as $eNam) {
-      foreach($doc->getElementsByTagName($eNam) as $e) {
-        foreach($e->childNodes as $n) {
-          if($n->nodeType != XML_TEXT_NODE) continue;
-          // '' to code
-          $pat = "/(?:&lsquo;|&rsquo;|'){2}(.+?)(?:&lsquo;|&rsquo;|'){2}/";
-          $src = translateUtf8Entities($n->nodeValue,true);
-          $p = preg_split($pat,$src,-1,PREG_SPLIT_DELIM_CAPTURE);
-          if(count($p) < 2) continue;
-          foreach($p as $i => $v) {
-            if($i % 2 == 0) $newNode = $doc->createTextNode(translateUtf8Entities($v));
-            else {
-              $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
-              $r = array('"','"','"',"'","'");
-              $v = str_replace($s,$r,$v);
-              $newNode = $doc->createElement("code",translateUtf8Entities($v));
-            }
-            $n->parentNode->insertBefore($newNode,$n);
-          }
-          $n->parentNode->removeChild($n);
-          // variables
-          #TODO
-        }
-      }
     }
   }
 
