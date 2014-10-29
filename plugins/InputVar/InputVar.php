@@ -113,7 +113,7 @@ class InputVar extends Plugin implements SplObserver {
     $output = array();
     foreach($subStr as $s) {
       $r = array();
-      preg_match_all('/@?\$((?:[a-z]+-)?[a-z_]+)/',$s,$match);
+      preg_match_all('/@?\$('.VARIABLE_PATTERN.')/',$s,$match);
       foreach($match[1] as $k => $var) {
         $varVal = $cms->getVariable($var);
         if(is_null($varVal))

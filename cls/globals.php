@@ -16,6 +16,7 @@ if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are s
 if(!defined('VER_FOLDER')) define('VER_FOLDER', 'ver'); // where version files are stored
 if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files are stored
 
+define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+'); // global variable pattern
 define('FILES_FOLDER', 'files'); // where web files are stored
 define('IMPORT_FOLDER', FILES_FOLDER .'/import'); // where imported files are stored
 define('THUMBS_FOLDER', FILES_FOLDER .'/thumbs'); // where thumbs files are stored
