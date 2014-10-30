@@ -3,6 +3,7 @@
 #todo: export
 #todo: support file upload
 #todo: js copy content to clipboard
+#todo: files/import to usr/temp (const)
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
   private $err = array();
