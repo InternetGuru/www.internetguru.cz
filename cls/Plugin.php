@@ -8,8 +8,8 @@ class Plugin {
   protected function detachIfNotAttached($pluginName) {
     if(!is_array($pluginName)) $pluginName = array($pluginName);
     foreach($pluginName as $p) {
-      global $cms;
-      if($cms->isAttachedPlugin($p)) continue;
+      global $plugins;
+      if($plugins->isAttachedPlugin($p)) continue;
       $this->subject->detach($this);
       new Logger("Detaching '".get_class($this)."' due to '$p' dependancy","warning");
       return true;

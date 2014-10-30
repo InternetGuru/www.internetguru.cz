@@ -27,19 +27,11 @@ class Plugins implements SplSubject {
     $dir = CMS_FOLDER . "/". PLUGIN_FOLDER;
     if(!is_dir($dir))
       throw new Exception("Missing plugin folder '$dir'");
-    global $cms;
-    $cfg = $cms->getDomBuilder()->buildDOMPlus("Cms.xml");
-    $plugins = $cfg->getElementsByTagName("plugin");
-    foreach($plugins as $plugin) {
-      $p = $plugin->nodeValue;
-      // disable plugins starting with a dot
-      if(is_dir("$dir/.$p")) {
-        $this->disabledObservers[$p] = null;
-        continue;
-      }
-      if($this->isAttachedPlugin($p)) continue;
+    foreach(scandir($dir) as $p) {
+      if(strpos($p,".") === 0 || file_exists("$dir/.$p")) continue; // skip .plugin
+      if(isAtLocalhost() && file_exists(PLUGIN_FOLDER."/.$p")) continue;
+      if(!isAtLocalhost() && !file_exists("PLUGIN.$p")) continue;
       $this->attach(new $p);
-      $cms->addVariableItem("loaded",$p);
     }
   }
 
@@ -94,8 +86,8 @@ interface ContentStrategyInterface {
   public function getContent(HTMLPlus $content);
 }
 
-interface InputStrategyInterface {
-  public function getVariables();
+interface OutputStrategyInterface {
+  public function getOutput(HTMLPlus $content);
 }
 
 ?>

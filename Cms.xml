@@ -17,22 +17,4 @@
     <locale cat="LC_ALL">cs_CZ.utf8</locale>
   </environmental>
 
-  <!-- <plugin readonly="readonly"/> -->
-  <plugin>Backup</plugin>
-  <plugin>ContentAdmin</plugin>
-  <plugin>ContentBalancer</plugin>
-  <plugin>ContentCodeMirror</plugin>
-  <plugin>ContentHighlight</plugin>
-  <plugin>ContentImg</plugin>
-  <plugin>ContentLink</plugin>
-  <plugin>ContentMatch</plugin>
-  <plugin>GlobalMenu</plugin>
-  <plugin>Convertor</plugin>
-  <plugin>GA</plugin>
-  <plugin>InputVar</plugin>
-  <plugin>LogViewer</plugin>
-  <plugin>TOC</plugin>
-  <!-- <plugin>Slider</plugin> -->
-  <plugin>Xhtml11</plugin>
-
 </Cms>

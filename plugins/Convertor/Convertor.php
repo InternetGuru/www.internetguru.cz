@@ -16,8 +16,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->subject = $subject;
     if($subject->getStatus() != "preinit") return;
     $subject->setPriority($this,1);
-    if(isset($_GET["import"])) redirTo(getRoot() . getCurLink() . "?" . get_class($this)
-      . (strlen($_GET["import"]) ? "=".$_GET["import"] : "")); // backward compatibility
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;

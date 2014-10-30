@@ -1,6 +1,7 @@
 <?php
 
 #TODO: keep missing url_parts from var->nodeValue
+#TODO: user redir in preinit
 
 class ContentMatch extends Plugin implements SplObserver {
 

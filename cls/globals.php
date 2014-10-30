@@ -16,13 +16,13 @@ if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where resource files 
 if(!defined('LOG_FOLDER')) define('LOG_FOLDER', 'log'); // where log files are stored
 if(!defined('VER_FOLDER')) define('VER_FOLDER', 'ver'); // where version files are stored
 if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files are stored
+if(!defined('PLUGIN_FOLDER')) define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+'); // global variable pattern
 define('IMPORT_FOLDER', FILES_FOLDER .'/import'); // where imported files are stored
 define('THUMBS_FOLDER', FILES_FOLDER .'/thumbs'); // where thumbs files are stored
 define('PICTURES_FOLDER', FILES_FOLDER .'/pictures'); // where pictures files are stored
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
-define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 define('FILE_HASH_ALGO', 'crc32b');
 define('CMS_VERSION', '0.1.2-dev');
 

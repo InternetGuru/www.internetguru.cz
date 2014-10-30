@@ -7,5 +7,6 @@
   <var parName="ver" parValue="">?LogViewer=ver</var>
   <var parName="ver">?LogViewer</var>
   <var parName="admin">?ContentAdmin</var>
+  <var parName="import">?Convertor</var>
 
 </ContentMatch>

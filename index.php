@@ -10,19 +10,14 @@ include('cls/globals.php');
 
 try {
 
-  handleFile();
-
   $l = new Logger("CMS finished " . dirname(__FILE__),null,false);
 
-  // register core variables
-  $cms = new Cms();
   $plugins = new Plugins();
-
-  $cms->setPlugins($plugins);
   $plugins->setStatus("preinit");
   $plugins->notify();
 
-  $cms->init();
+  $cms = new Cms();
+  $cms->init(); // because of dombulder to set variable into cms
   $plugins->setStatus("init");
   $plugins->notify();
 

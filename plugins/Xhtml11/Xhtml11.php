@@ -20,8 +20,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    global $cms;
-    if($subject->getStatus() == "preinit") {
+    if($subject->getStatus() == "init") {
+      global $cms;
       $this->subject = $subject;
       $cms->setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];

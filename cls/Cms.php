@@ -8,7 +8,6 @@ class Cms {
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
-  private $plugins = null; // SplSubject
   private $titleQueries = array("/body/h");
   private $variables = array();
   const DEBUG = false;
@@ -18,22 +17,16 @@ class Cms {
     $this->domBuilder = new DOMBuilder();
   }
 
-  public function setPlugins(SplSubject $p) {
-    $this->plugins = $p;
-  }
-
-  public function isAttachedPlugin($pluginName) {
-    return $this->plugins->isAttachedPlugin($pluginName);
-  }
-
   public function getDomBuilder() {
     return $this->domBuilder;
   }
 
   public function init() {
+    global $plugins;
     $this->setVariable("version", "IGCMS ver. " . CMS_VERSION);
     $this->setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
     $this->setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
+    $this->setVariable("plugins", array_keys($plugins->getObservers()));
     $cfg = $this->domBuilder->buildDOMPlus("Cms.xml")->getElementsByTagName("environmental");
     $env = null;
     foreach($cfg as $e) {
@@ -73,7 +66,8 @@ class Cms {
     $this->content = clone $this->contentFull;
     try {
       $cs = null;
-      foreach($this->plugins->getIsInterface("ContentStrategyInterface") as $cs) {
+      global $plugins;
+      foreach($plugins->getIsInterface("ContentStrategyInterface") as $cs) {
         $c = $cs->getContent($this->content);
         if(!($c instanceof HTMLPlus))
           throw new Exception("Content must be an instance of HTMLPlus");
@@ -90,7 +84,6 @@ class Cms {
 
   public function processVariables() {
     $this->loadDefaultVariables($this->content);
-    $this->setVariable("plugins", array_keys($this->plugins->getObservers()));
     $this->setVariable("variables", array_keys($this->variables));
     foreach($this->variables as $k => $v) $this->content->insertVar($k,$v);
   }
@@ -187,10 +180,6 @@ class Cms {
     return $this->outputStrategy;
   }
 
-}
-
-interface OutputStrategyInterface {
-  public function getOutput(HTMLPlus $content);
 }
 
 ?>
