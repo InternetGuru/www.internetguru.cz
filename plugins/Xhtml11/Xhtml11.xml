@@ -3,19 +3,22 @@
 
   <!-- <themes readonly="readonly"/> -->
   <themes>
-    <theme id="default">
-      <xslt>themes/defaultLayout.xsl</xslt>
+    <theme id="basic">
+      <xslt>themes/lists.xsl</xslt>
+      <xslt>themes/basicLayout.xsl</xslt>
+      <favicon>themes/igcms.ico</favicon>
     </theme>
     <theme id="simple">
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/simpleLayout.xsl</xslt>
       <stylesheet media="screen">themes/simple.css</stylesheet>
+      <favicon>themes/igcms.ico</favicon>
     </theme>
     <theme id="custom"/>
   </themes>
 
-  <!-- available themes: default or simple -->
-  <theme>default</theme>
+  <!-- available themes: basic or simple -->
+  <var id="theme">simple</var>
 
   <!-- <xslt readonly="readonly"/> -->
   <stylesheet>themes/cms-default.css</stylesheet>
@@ -26,6 +29,7 @@
   <jsFile readonly="readonly" />
   <jsFile append="body">themes/headingFragment.js</jsFile>
   <jsFile append="body">themes/toggleHidables.js</jsFile>
-  <favicon>themes/igcms.ico</favicon>
+
+  <!-- <favicon>myFavicon.ico</favicon> -->
 
 </Xhtml11>

@@ -9,7 +9,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $cssFilesPriority = array();
   private $transformationsPriority = array();
   private $transformations = array();
-  private $favIcon;
+  private $favIcon = null;
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
@@ -32,10 +32,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($subject->getStatus() == "process") {
       $cfg = $this->getDOMPlus();
       $this->registerThemes($cfg);
-      $this->favIcon = $this->getFavicon($cfg);
-      #$cms->setVariable("transformations", array_keys($this->transformations));
-      $cms->setVariable("styles", array_keys($this->cssFiles));
-      $cms->setVariable("javascripts", array_keys($this->jsFiles));
     }
   }
 
@@ -76,7 +72,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(strlen($desc)) $this->appendMeta($head, "description", $desc);
     $kw = $cms->getVariable("cms-kw");
     if(strlen($kw)) $this->appendMeta($head, "keywords", $kw);
-    if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon");
+    if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon",false,false,false);
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
@@ -162,10 +158,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->addTransformation($this->getDir() ."/Xhtml11.xsl", 0, false);
 
     // add template files
-    $xpath = new DOMXPath($cfg);
-    $theme = $xpath->query("theme[last()]");
-    if($theme->length) {
-      $themeId = $theme->item(0)->nodeValue;
+    $theme = $cfg->getElementById("theme");
+    if(!is_null($theme)) {
+      $themeId = $theme->nodeValue;
       $t = $cfg->getElementById($themeId);
       if(is_null($t)) new Logger("Theme '$themeId' not found","error");
       else $this->addThemeFiles($t);
@@ -194,15 +189,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
         $this->addCssFile($n->nodeValue,$media);
         break;
+        case "favicon":
+        $this->favIcon = $n->nodeValue;
+        break;
       }
     }
-  }
-
-  private function getFavicon(DOMDocumentPlus $cfg) {
-    $xpath = new DOMXPath($cfg);
-    $theme = $xpath->query("favicon[last()]");
-    if(!$theme->length) return null;
-    return $theme->item(0)->nodeValue;
   }
 
   private function transform(DOMDocument $content,$fileName,$user, XSLTProcessor $proc) {
@@ -249,6 +240,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     } catch (Exception $ex) {
       $f = false;
     }
+    if($f === false && $rel == "shortcut icon") $f = $file;
     if($f === false) {
       $comment = "[$rel] file '$file' not found";
       $parent->appendChild(new DOMComment(" $comment "));
@@ -269,6 +261,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($filePath,$priority = 10,$append = self::APPEND_HEAD,$user=false) {
+    global $cms;
+    $cms->addVariableItem("javascripts",$filePath);
     $this->jsFiles[$filePath] = array(
       "file" => $filePath,
       "append" => $append,
@@ -297,6 +291,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
+    global $cms;
+    $cms->addVariableItem("styles",$filePath);
     $this->cssFiles[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,

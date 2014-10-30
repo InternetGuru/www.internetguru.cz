@@ -73,7 +73,7 @@ h1 {
 }
 
 h2 {
-  color: #222;
+  color: #551A8B;
   font-weight: 100;
   text-transform: uppercase;
   margin-top: 2em;
@@ -86,7 +86,7 @@ h3, h4, h5, h6 {
 }
 
 #content > div:first-child {
-  background: #555;
+  background: #6D6EAE;
   color: #fff;
 }
 
@@ -116,7 +116,7 @@ ol.contentlink-bc li a[href] {
   display: inline-block;
   padding: 0.5rem 0.3rem 0.5rem 0.4rem;
   background: #EAF2F5;
-  color: #222;
+  color: #551A8B;
   text-decoration: none;
 }
 
@@ -200,14 +200,14 @@ div.contentbalancer a {
   padding: 1em;
   font-weight: 100;
   margin: 0.3em;
-  background: #555;
+  background: #6D6EAE;
   display: inline-block;
   color: white;
   text-decoration: none;
 }
 
 #footer {
-  background: #555;
+  background: #6D6EAE;
   padding-top: 0.5em;
   padding-bottom: 0.5em;
   color: white;
@@ -276,5 +276,5 @@ div.contentbalancer a {
   font-weight: 500;
   padding: 0.25em 0.5em;
   margin-left: 0.7em;
-  color: #222;
+  color: #551A8B;
 }
