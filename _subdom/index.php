@@ -8,7 +8,7 @@ $currentSubdom = basename(dirname($_SERVER["PHP_SELF"]));
 // default local values
 $var = array(
   "USER_ID" => "ig1",
-  "CMS_VER" => "prod",
+  "CMS_VER" => "0.1",
   "USER_DIR" => $currentSubdom,
   "ADMIN_DIR" => $currentSubdom,
   "FILES_DIR" => $currentSubdom
@@ -33,20 +33,15 @@ define("USER_FOLDER", "../../" . $var["USER_ID"] . "/usr/" . $var["USER_DIR"]);
 define("USER_BACKUP", "../../usr.bak/$currentSubdom");
 define("ADMIN_FOLDER", "../../adm/" . $var["ADMIN_DIR"]);
 define("ADMIN_BACKUP", "../../adm.bak/$currentSubdom");
+define("FILES_FOLDER", "../../" . $var["USER_ID"] . "/files/" . $var["FILES_DIR"]);
 define("CMSRES_FOLDER","cmsres/". $var["CMS_VER"]);
 define("RES_FOLDER","res");
 define("LOG_FOLDER","../../log/$currentSubdom");
 define("CACHE_FOLDER","../../cache/$currentSubdom");
 
-// create directories {cmsres,res,files}
+// create directories {cmsres,res}
 $name = "cmsres";
 $path = "/var/www/cmsres/";
-if(!file_exists($name) || readlink($name) != $path) {
-  symlink($path, $name . "~");
-  rename($name . "~", $name);
-}
-$name = "files";
-$path = "../../" . $var["USER_ID"] . "/files/" . $var["FILES_DIR"];
 if(!file_exists($name) || readlink($name) != $path) {
   symlink($path, $name . "~");
   rename($name . "~", $name);

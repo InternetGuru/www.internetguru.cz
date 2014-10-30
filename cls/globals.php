@@ -9,6 +9,7 @@ if(!defined('ADMIN_BACKUP')) define('ADMIN_BACKUP', 'adm.bak'); // where backup 
 if(!defined('ADMIN_FOLDER')) define('ADMIN_FOLDER', 'adm'); // where admin cfg xml files are stored
 if(!defined('USER_FOLDER')) define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 if(!defined('USER_BACKUP')) define('USER_BACKUP', 'usr.bak'); // where backup files are stored
+if(!defined('FILES_FOLDER')) define('FILES_FOLDER', 'files'); // where web files are stored
 if(!defined('THEMES_FOLDER')) define('THEMES_FOLDER', 'themes'); // where templates are stored
 if(!defined('CMSRES_FOLDER')) define('CMSRES_FOLDER', false); // where cmsres files are stored
 if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where resource files are stored
@@ -17,7 +18,6 @@ if(!defined('VER_FOLDER')) define('VER_FOLDER', 'ver'); // where version files a
 if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files are stored
 
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+'); // global variable pattern
-define('FILES_FOLDER', 'files'); // where web files are stored
 define('IMPORT_FOLDER', FILES_FOLDER .'/import'); // where imported files are stored
 define('THUMBS_FOLDER', FILES_FOLDER .'/thumbs'); // where thumbs files are stored
 define('PICTURES_FOLDER', FILES_FOLDER .'/pictures'); // where pictures files are stored
@@ -74,6 +74,7 @@ function redirTo($link,$code=null,$force=false) {
 
 function getRes($res,$dest,$resFolder) {
   if(!$resFolder) return $res;
+  #TODO: check mime==ext, allowed types, max size
   #if(strpos(pathinfo($res,PATHINFO_FILENAME), ".") === 0)
   #  throw new LoggerException("Forbidden file name");
   $newRes = $resFolder . "/$dest";
@@ -278,13 +279,14 @@ function translateUtf8Entities($xmlSource, $reverse = FALSE) {
   }
 }
 
+#todo: safe errorHandle
 function errorPage($message, $code=404) {
   try {
     new Logger("$message ($code)","fatal");
   } catch (Exception $e) {};
   http_response_code($code);
   $page = CMS_FOLDER . "/error.php";
-  if(!@include(CMS_FOLDER . "/error.php")) echo $e->getMessage();
+  if(!include(CMS_FOLDER . "/error.php")) echo $e->getMessage();
   die();
 }
 
@@ -312,6 +314,62 @@ function getFileMime($file) {
   $mime = finfo_file($finfo, $file);
   finfo_close($finfo);
   return $mime;
+}
+
+function handleFile() {
+  $requestUri = $_SERVER["REQUEST_URI"];
+  if(strpos($requestUri,"/") === 0) $requestUri = substr($requestUri,1); // remove trailing slash
+  $filePathPattern = "/^".preg_quote(getRoot(),"/")."(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}$/";
+  if(!preg_match($filePathPattern,$requestUri,$m)) return;
+  $filePath = FILES_FOLDER . $m[0];
+  if(isAtLocalhost() || !is_file($filePath)) errorPage("File not found", 404);
+  $size = filesize($filePath);
+  $l = new Logger("File download '$filePath' ".fileSizeConvert($size),null,false);
+  $disallowedMime = array(
+    "application/x-msdownload" => null,
+    "application/x-msdos-program" => null,
+    "application/x-msdos-windows" => null,
+    "application/x-download" => null,
+    "application/bat" => null,
+    "application/x-bat" => null,
+    "application/com" => null,
+    "application/x-com" => null,
+    "application/exe" => null,
+    "application/x-exe" => null,
+    "application/x-winexe" => null,
+    "application/x-winhlp" => null,
+    "application/x-winhelp" => null,
+    "application/x-javascript" => null,
+    "application/hta" => null,
+    "application/x-ms-shortcut" => null,
+    "application/octet-stream" => null,
+    "vms/exe" => null,
+  );
+  $mime = getFileMime($filePath);
+  if(array_key_exists($mime,$disallowedMime)) errorPage("Unsupported Media Type", 415);
+  header("Content-Type: $mime");
+  header("Content-Length: $size");
+  set_time_limit(0);
+  $file = @fopen($filePath,"rb");
+  if($file === false) throw new Exception("Unable to read from file '$filePath'");
+  while(!feof($file)) {
+    print(fread($file, 1024*8));
+    ob_flush();
+    flush();
+  }
+  $l->finished();
+  die();
+}
+
+function fileSizeConvert($b) {
+    if(!is_numeric($b)) return $b;
+    $i = 0;
+    $iec = array("B","KB","MB","GB","TB","PB","EB","ZB","YB");
+    while(($b/1024) > 1) {
+        $b = $b/1024;
+        $i++;
+    }
+    return round($b,1)." ".$iec[$i];
 }
 
 ?>

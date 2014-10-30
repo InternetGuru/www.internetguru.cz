@@ -10,6 +10,8 @@ include('cls/globals.php');
 
 try {
 
+  handleFile();
+
   $l = new Logger("CMS finished " . dirname(__FILE__),null,false);
 
   // register core variables
@@ -39,11 +41,10 @@ try {
 
 } catch(Exception $e) {
 
-  #http_response_code(500);
-  #if(!@include(CMS_FOLDER . "/error.php")) echo $e->getMessage();
   $m = $e->getMessage();
   if(isAtLocalhost()) $m = "Exception: ".$m." in ".$e->getFile()." on line ".$e->getLine();
   errorPage($m,500);
+  if(isset($l)) $l->finished();
 
 }
 
