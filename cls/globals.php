@@ -19,6 +19,7 @@ if(!defined('CACHE_FOLDER')) define('CACHE_FOLDER', 'cache'); // where log files
 if(!defined('PLUGIN_FOLDER')) define('PLUGIN_FOLDER', 'plugins'); // where plugins are stored
 
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+'); // global variable pattern
+define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}");
 define('IMPORT_FOLDER', FILES_FOLDER .'/import'); // where imported files are stored
 define('THUMBS_FOLDER', FILES_FOLDER .'/thumbs'); // where thumbs files are stored
 define('PICTURES_FOLDER', FILES_FOLDER .'/pictures'); // where pictures files are stored
@@ -75,22 +76,26 @@ function redirTo($link,$code=null,$force=false) {
 function getRes($res,$dest,$resFolder) {
   if(!$resFolder) return $res;
   #TODO: check mime==ext, allowed types, max size
-  #if(strpos(pathinfo($res,PATHINFO_FILENAME), ".") === 0)
-  #  throw new LoggerException("Forbidden file name");
+  $folders = preg_quote(CMS_FOLDER,"/") ."|". preg_quote(ADMIN_FOLDER,"/") ."|". preg_quote(USER_FOLDER,"/");
+  if(!preg_match("/^(?:$folders)\/".FILEPATH_PATTERN."$/", $res)) {
+    new Logger("Forbidden file name '$res' to copy to '$resFolder' folder","error");
+    return false;
+  }
+  $mime = getFileMime($res);
+  if($mime != "text/plain") {
+    new Logger("Forbidden mime type '$mime' to copy '$res' to '$resFolder' folder","error");
+    return false;
+  }
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
-  if(!is_dir($newDir) && !mkdirGroup($newDir,0775,true))
-    throw new LoggerException("Unable to create directory structure '$newDir'");
-  if(file_exists($newRes)) {
-    chmodGroup($newRes,0664); // not important if passed or not
-    if(filemtime($newRes) >= filemtime($res)) return $newRes;
+  if(!is_dir($newDir) && !mkdirGroup($newDir,0775,true)) {
+    new Logger("Unable to create directory structure '$newDir'","error");
+    return false;
   }
-  if(!copy($res, $newRes)) {
-    if(!file_exists($newRes)) {
-      throw new LoggerException("Unable to copy resource file to '$newRes'");
-    }
-    new Logger("Unable to rewrite resource file to '$newRes'","error");
-    return $newRes;
+  if(file_exists($newRes)) return $newRes;
+  if(!symlink($res, $newRes . "~") || !rename($newRes . "~", $newRes)) {
+    new Logger("Unable to create symlink '$newRes' for '$res'","error");
+    return false;
   }
   if(!chmodGroup($newRes,0664))
     new Logger("Unable to chmod resource file '$newRes'","error");
@@ -226,13 +231,27 @@ function matchFiles($pattern, $dir) {
   return $files;
 }
 
-function backupDir($dir) {
+function duplicateDir($dir) {
   if(!is_dir($dir)) return;
   $info = pathinfo($dir);
   $bakDir = $info["dirname"]."/~".$info["basename"];
   copyFiles($dir,$bakDir);
   deleteRedundantFiles($bakDir,$dir);
   #new Logger("Active data backup updated");
+}
+
+function smartCopy($src, $dest, $delay=0) {
+  if(file_exists($dest)) return;
+  $destDir = pathinfo($dest,PATHINFO_DIRNAME);
+  if(is_dir($destDir)) foreach(scandir($destDir) as $f) {
+    if(pathinfo($f,PATHINFO_FILENAME) != pathinfo($src,PATHINFO_BASENAME)) continue;
+    if($delay && filectime("$destDir/$f") > time() - $delay) return;
+  }
+  if(!is_dir($destDir) && !mkdir($destDir,0755,true))
+    throw new Exception("Unable to create directory '$destDir'");
+  if(!copy($src,$dest)) {
+    throw new Exception("Unable to copy '$src' to '$dest'");
+  }
 }
 
 function deleteRedundantFiles($in,$according) {
@@ -248,16 +267,16 @@ function deleteRedundantFiles($in,$according) {
   }
 }
 
-function copyFiles($src,$dest) {
+function copyFiles($src, $dest) {
   if(!is_dir($dest) && !@mkdir($dest))
-    throw new LoggerException("Unable to create '$dest'");
+    throw new LoggerException("Unable to create '$dest' folder");
   foreach(scandir($src) as $f) {
     if(in_array($f,array(".",".."))) continue;
     if(is_dir("$src/$f")) {
-      copyFiles("$src/$f","$dest/$f");
+      copyFiles("$src/$f", "$dest/$f");
       continue;
     }
-    getRes("$src/$f",$f,$dest);
+    smartCopy("$src/$f", "$dest/$f");
   }
 }
 

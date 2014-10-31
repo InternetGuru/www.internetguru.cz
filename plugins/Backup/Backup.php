@@ -27,59 +27,13 @@ class Backup extends Plugin implements SplObserver {
         continue;
       }
       if(in_array(pathinfo($file,PATHINFO_EXTENSION), $deny)) continue;
-      $this->doBackup("$dir/$file",$backupDir ."/". $this->getBackupFileName("$dir/$file"));
+      smartCopy("$dir/$file", $backupDir ."/". $this->getBackupFileName("$dir/$file"), 60*60);
     }
   }
 
   private function getBackupFileName($filePath) {
     $pi = pathinfo($filePath);
     return sprintf("%s.%s",$pi["basename"],getFileHash($filePath));
-  }
-
-  private function doBackup($src,$dest) {
-    if(file_exists($dest)) return;
-    $destDir = pathinfo($dest,PATHINFO_DIRNAME);
-    if(is_dir($destDir)) foreach(scandir($destDir) as $f) {
-      if(pathinfo($f,PATHINFO_FILENAME) != pathinfo($src,PATHINFO_BASENAME)) continue;
-      if(filectime("$destDir/$f") > time() - 60*60) return;
-    }
-    if(!is_dir($destDir) && !mkdir($destDir,0755,true))
-      throw new Exception("Unable to create backup directory '$destDir'");
-    if(!copy($src,$dest)) {
-      throw new Exception("Unable to create backup '$dest'");
-    }
-  }
-
-  #UNUSED (restore)
-  public function restoreNewestBackup($filePath) {
-    $fileInfo = $this->getFileInfo($filePath);
-    $backupFileName = $this->getNewestBackupFileName($fileInfo["backupdirname"],$fileInfo["filename"]);
-    if(is_file($filePath) && !rename($filePath,$filePath . self::CORRUPTED_FILE_EXTENSION))
-      throw new Exception("Unable to rename corrupted file $filePath");
-    if(!rename($fileInfo["backupdirname"] ."/". $backupFileName,$filePath))
-      throw new Exception("Unable to restore newest backup $filePath");
-    $this->doBackup($filePath);
-  }
-
-  #UNUSED (restore)
-  private function getNewestBackupFilePath($filePath) {
-    $fileInfo = $this->getFileInfo($filePath);
-    return $fileInfo["backupdirname"] . "/" . $this->getNewestBackupFileName($filePath);
-  }
-
-  #UNUSED (restore)
-  private function getNewestBackupFileName($filePath) {
-    $fileInfo = $this->getFileInfo($filePath);
-    if(is_dir($fileInfo["backupdirname"])) {
-      foreach(scandir($fileInfo["backupdirname"],SCANDIR_SORT_DESCENDING) as $backupFileName) {
-        if(!is_file($fileInfo["backupdirname"] ."/". $backupFileName)) continue;
-        if(strpos($backupFileName,$fileInfo["filename"].self::BACKUP_FILENAME_SEPARATOR) === 0) {
-          if($fileInfo["extension"] != pathinfo($backupFileName,PATHINFO_EXTENSION)) continue;
-          return $backupFileName;
-        }
-      }
-    }
-    throw new Exception("Unable to find backup of '$filePath'");
   }
 
 }

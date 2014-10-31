@@ -30,8 +30,8 @@ try {
   $plugins->notify();
 
   echo $cms->getOutput();
-  backupDir(USER_FOLDER);
-  backupDir(ADMIN_FOLDER);
+  duplicateDir(USER_FOLDER);
+  duplicateDir(ADMIN_FOLDER);
   $l->finished();
 
 } catch(Exception $e) {

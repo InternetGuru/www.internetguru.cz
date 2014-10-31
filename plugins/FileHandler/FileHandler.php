@@ -10,8 +10,7 @@ class FileHandler extends Plugin implements SplObserver {
   private function handleRequest() {
     $rUri = $_SERVER["REQUEST_URI"];
     if(parse_url($rUri) === false || strpos($rUri, "//") !== false) errorPage("Bad Request", 400);
-    $filePathPattern = "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}";
-    if(!preg_match("/^".preg_quote(getRoot(), "/")."($filePathPattern)$/",$rUri,$m)) return;
+    if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")$/",$rUri,$m)) return;
     $filePath = FILES_FOLDER ."/". $m[1];
     if(!is_file($filePath)) errorPage("File not found", 404);
     $size = filesize($filePath);
