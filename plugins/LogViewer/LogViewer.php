@@ -62,7 +62,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function getVersionFile($fileName=null) {
     $v = explode(".",CMS_VERSION);
-    return $this->getFile($fileName,CMS_FOLDER ."/". VER_FOLDER,$v[0].".".$v[1],"ver");
+    return $this->getFile($fileName,CMS_FOLDER ."/". VER_FOLDER,$v[0],"ver");
   }
 
   private function getFile($fileName,$dir,$defaultName,$ext) {

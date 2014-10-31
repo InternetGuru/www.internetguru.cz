@@ -1,3 +1,12 @@
+0.2.0
+-----
+
+ContentMatch user redirection root support
+Changed root link in HTML+ is now '/'
+FileHandler plugin created
+Xhtml11 changed default layout and config
+
+
 0.1.2-dev
 ---------
 
