@@ -152,7 +152,7 @@ function getDomain() {
 }
 
 function findFile($file,$user=true,$admin=true,$res=false) {
-  if(strpos($file,"/") === 0) $file = substr($file,1); // remove trailing slash
+  while(strpos($file,"/") === 0) $file = substr($file,1);
   $f = USER_FOLDER . "/$file";
   if($user && is_file($f)) return ($res ? getRes($f,$file,RES_FOLDER) : $f);
   $f = ADMIN_FOLDER . "/$file";

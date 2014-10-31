@@ -240,8 +240,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     } catch (Exception $ex) {
       $f = false;
     }
-    if($f === false && $rel == "shortcut icon") $f = $file;
-    if($f === false) {
+    if($f === false && $rel == "shortcut icon") {
+      $f = $file;
+      while(strpos($f,"/") === 0) $f = substr($f,1);
+    }
+    if(!strlen($f)) {
       $comment = "[$rel] file '$file' not found";
       $parent->appendChild(new DOMComment(" $comment "));
       new Logger($comment,"error");

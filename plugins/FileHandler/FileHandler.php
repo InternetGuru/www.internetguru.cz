@@ -3,18 +3,17 @@
 class FileHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
-    if(isAtLocalhost()) return;
     if($subject->getStatus() != "preinit") return;
     $this->handleRequest();
   }
 
   private function handleRequest() {
-    $requestUri = $_SERVER["REQUEST_URI"];
-    if(strpos($requestUri,"/") !== 0) $requestUri = "/".$requestUri; // add trailing slash
-    $filePathPattern = "/^\/(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}$/";
-    if(!preg_match($filePathPattern,$requestUri,$m)) return;
-    $filePath = FILES_FOLDER . $m[0];
-    if(isAtLocalhost() || !is_file($filePath)) errorPage("File not found", 404);
+    $rUri = $_SERVER["REQUEST_URI"];
+    if(parse_url($rUri) === false || strpos($rUri, "//") !== false) errorPage("Bad Request", 400);
+    $filePathPattern = "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}";
+    if(!preg_match("/^".preg_quote(getRoot(), "/")."($filePathPattern)$/",$rUri,$m)) return;
+    $filePath = FILES_FOLDER ."/". $m[1];
+    if(!is_file($filePath)) errorPage("File not found", 404);
     $size = filesize($filePath);
     $l = new Logger("File download '$filePath' ".fileSizeConvert($size),null,false);
     $disallowedMime = array(

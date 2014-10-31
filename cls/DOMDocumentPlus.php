@@ -99,7 +99,7 @@ class DOMDocumentPlus extends DOMDocument {
 
   private function repairLink($link=null) {
     if(is_null($link)) $link = getCurLink(); // null -> currentLink
-    if($link == "") return $link;
+    if($link == "" || $link == "/") return "/";
     $pLink = parse_url($link);
     if($pLink === false) throw new LoggerException("Unable to parse href '$link'"); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
@@ -126,6 +126,7 @@ class DOMDocumentPlus extends DOMDocument {
       $queryUrl = strlen($query) ? "?$query" : "";
       if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
         $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
+        if($path == "/") $path = "";
         if(strlen($path) && is_null($src->getElementById($path,"link"))) {
           $toStrip[] = array($a,"link '$path' not found");
           continue; // link not exists
