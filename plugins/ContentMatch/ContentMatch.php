@@ -30,15 +30,16 @@ class ContentMatch extends Plugin implements SplObserver {
       $pVal = $var->hasAttribute("parValue") ? $var->getAttribute("parValue") : null;
       if(!$this->queryMatch($pNam, $pVal)) continue;
       $code = $var->hasAttribute("code") && $var->getAttribute("code") == "permanent" ? 301 : 302;
-      $link = parse_url($var->nodeValue, PHP_URL_PATH);
-      if(!strlen($link)) $link = getCurLink();
-      if($link != getCurLink() && is_null($cms->getContentFull()->getElementById($link,"link"))) {
-        new Logger("Redirection link '$link' not found","warning");
+      $path = parse_url($var->nodeValue, PHP_URL_PATH);
+      if(!strlen($path)) $path = getCurLink(); // current link if empty string
+      while(strpos($path,"/") === 0) $path = substr($path,1); // empty string if root
+      if($path != getCurLink() && strlen($path) && is_null($cms->getContentFull()->getElementById($path,"link"))) {
+        new Logger("Redirection link '$path' not found","warning");
         continue;
       }
       $query = parse_url($var->nodeValue, PHP_URL_QUERY);
       if(strlen($query)) $query = $this->alterQuery($query, $pNam);
-      redirTo(getRoot() . $link . (strlen($query) ? "?$query" : ""), $code);
+      redirTo(getRoot() . $path . (strlen($query) ? "?$query" : ""), $code);
     }
   }
 
