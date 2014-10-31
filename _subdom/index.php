@@ -1,9 +1,7 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set("display_errors",1);
-
 $currentSubdom = basename(dirname($_SERVER["PHP_SELF"]));
+$cmsRootFolder = "/var/www/cms/";
 
 // default local values
 $var = array(
@@ -22,8 +20,16 @@ foreach(scandir(dirname(__FILE__)) as $f) {
   $var[$vName] = substr($f,strlen($vName)+1);
 }
 
+// find newest stable version
+if(!file_exists("CMS_VER.".$var["CMS_VER"])) {
+  foreach(scandir($cmsRootFolder) as $v) {
+    if(!preg_match("/^\d+\.\d+$/",$v)) continue;
+    if(version_compare($var["CMS_VER"],$v) < 0) $var["CMS_VER"] = $v;
+  }
+}
+
 // define global constants
-define("CMS_FOLDER", "/var/www/cms/" . $var["CMS_VER"]);
+define("CMS_FOLDER", $cmsRootFolder . $var["CMS_VER"]);
 define("USER_FOLDER", "../../" . $var["USER_ID"] . "/usr/" . $var["USER_DIR"]);
 define("USER_BACKUP", "../../usr.bak/$currentSubdom");
 define("ADMIN_FOLDER", "../../adm/" . $var["ADMIN_DIR"]);
@@ -54,7 +60,7 @@ if(!file_exists("PLUGINS.".$var["PLUGINS"])) {
   }
 }
 
-// create data files
+// create missing data files
 foreach($var as $name => $val) {
   $f = "$name.$val";
   if(!file_exists($f)) touch($f);
