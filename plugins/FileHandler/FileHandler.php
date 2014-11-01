@@ -15,10 +15,12 @@ class FileHandler extends Plugin implements SplObserver {
   private function handleRequest() {
     $rUri = $_SERVER["REQUEST_URI"];
     $pUrl = parse_url($rUri);
-    if($pUrl === false || strpos($pUrl["path"], "//") !== false) errorPage("Bad Request", 400);
+    if($pUrl === false || strpos($pUrl["path"], "//") !== false)
+      errorPage("Bad Request", 400, false);
     if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")$/",$rUri,$m)) return;
     $filePath = FILES_FOLDER ."/". $m[1];
-    if(!is_file($filePath)) errorPage("File not found", 404);
+    if(!is_file($filePath))
+      errorPage("File not found", 404, false);
     $size = filesize($filePath);
     $l = new Logger("File download '$filePath' ".fileSizeConvert($size),null,false);
     $disallowedMime = array(
