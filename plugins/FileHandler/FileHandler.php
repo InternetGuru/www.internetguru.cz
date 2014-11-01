@@ -2,6 +2,11 @@
 
 class FileHandler extends Plugin implements SplObserver {
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,1);
+  }
+
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "preinit") return;
     $this->handleRequest();

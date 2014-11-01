@@ -7,12 +7,12 @@ class ContentImg extends Plugin implements SplObserver, ContentStrategyInterface
   private $mime = array("image/jpeg","image/png","image/gif","image/svg+xml");
   const PREFIX = "contentimg-";
 
-  public function update(SplSubject $subject) {
-    if($subject->getStatus() == "init") {
-      $this->subject = $subject;
-      $subject->setPriority($this,110);
-    }
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,110);
   }
+
+  public function update(SplSubject $subject) {}
 
   public function getContent(HTMLPlus $content) {
     $cfg = $this->getDomPlus();

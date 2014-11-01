@@ -15,14 +15,14 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
   const DEBUG = false;
 
-  public function __construct() {
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
     if(self::DEBUG) new Logger("DEBUG");
   }
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "init") {
       global $cms;
-      $this->subject = $subject;
       $cms->setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
       if(isAtLocalhost()) $domain .= substr(getRoot(),0,-1);

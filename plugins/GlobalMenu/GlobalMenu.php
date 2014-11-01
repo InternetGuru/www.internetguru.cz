@@ -2,11 +2,14 @@
 
 class GlobalMenu extends Plugin implements SplObserver {
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,60);
+  }
+
   public function update(SplSubject $subject) {
     if($subject->getStatus() != "init") return;
-    $this->subject = $subject;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    $subject->setPriority($this,60);
     $this->setVariables();
   }
 

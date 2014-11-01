@@ -11,11 +11,12 @@
 
 class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,100);
+  }
+
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "preinit") {
-      $this->subject = $subject;
-      $subject->setPriority($this,100);
-    }
     if($subject->getStatus() == "init") {
       $this->detachIfNotAttached("Xhtml11");
       return;

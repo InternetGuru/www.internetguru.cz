@@ -31,7 +31,7 @@ class Plugins implements SplSubject {
       if(strpos($p,".") === 0 || file_exists("$dir/.$p")) continue; // skip .plugin
       if(isAtLocalhost() && file_exists(PLUGIN_FOLDER."/.$p")) continue;
       if(!isAtLocalhost() && !file_exists("PLUGIN.$p")) continue;
-      $this->attach(new $p);
+      $this->attach(new $p($this));
     }
   }
 
@@ -46,14 +46,12 @@ class Plugins implements SplSubject {
   public function attach(SplObserver $observer,$priority=10) {
     $o = get_class($observer);
     $this->observers[$o] = $observer;
+    if(array_key_exists($o, $this->observerPriority)) return;
     $this->observerPriority[$o] = $priority;
   }
 
   public function setPriority(SplObserver $observer,$priority) {
-    $o = get_class($observer);
-    if(!array_key_exists($o,$this->observers))
-      throw new Exception("Observer '$o' not attached");
-    $this->observerPriority[$o] = $priority;
+    $this->observerPriority[get_class($observer)] = $priority;
   }
 
   public function detach(SplObserver $observer) {

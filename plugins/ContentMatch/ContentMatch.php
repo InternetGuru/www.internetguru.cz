@@ -5,12 +5,13 @@
 
 class ContentMatch extends Plugin implements SplObserver {
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,3);
+  }
+
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "preinit") {
-      $subject->setPriority($this,2);
-    }
     if($subject->getStatus() != "init") return;
-    $this->subject = $subject;
     if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
     $this->cfgRedir();
     if(getCurLink() == "") {

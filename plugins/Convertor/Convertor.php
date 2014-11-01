@@ -13,10 +13,13 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private $file = null;
   private $importedFiles = array();
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,5);
+  }
+
   public function update(SplSubject $subject) {
-    $this->subject = $subject;
     if($subject->getStatus() != "preinit") return;
-    $subject->setPriority($this,1);
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;

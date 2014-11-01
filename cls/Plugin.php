@@ -5,6 +5,10 @@ class Plugin {
   private $doms = array();
   protected $subject = null;
 
+  public function __construct(SplSubject $s) {
+    $this->subject = $s;
+  }
+
   protected function detachIfNotAttached($pluginName) {
     if(!is_array($pluginName)) $pluginName = array($pluginName);
     foreach($pluginName as $p) {

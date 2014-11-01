@@ -5,10 +5,13 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private $isRoot;
   private $headings;
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,4);
+  }
+
   public function update(SplSubject $subject) {
-    $this->subject = $subject;
     $this->isRoot = getCurLink() == "";
-    $subject->setPriority($this,2);
     if($this->isRoot) return;
     if($subject->getStatus() != "init") return;
     if($this->detachIfNotAttached("Xhtml11")) return;

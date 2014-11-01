@@ -24,10 +24,12 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   private $dataFileStatus = "unknown";
   private $defaultFile = "n/a";
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this,5);
+  }
+
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "preinit") {
-      $subject->setPriority($this,3);
-    }
     if($subject->getStatus() == "process") {
       global $cms;
       $os = $cms->getOutputStrategy()->addTransformation($this->getDir()."/ContentAdmin.xsl");
@@ -37,7 +39,6 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
       $subject->detach($this);
       return;
     }
-    $this->subject = $subject;
     try {
       $this->setDefaultFile();
       $this->dataFile = $this->getDataFile();
