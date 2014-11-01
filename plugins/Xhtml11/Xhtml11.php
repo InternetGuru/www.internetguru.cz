@@ -82,18 +82,16 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $proc->setParameter('',$this->getProcParams($cms));
     stableSort($this->transformationsPriority);
     foreach($this->transformationsPriority as $xslt => $priority) {
-      $newContent = $this->transform($content,$xslt,$this->transformations[$xslt]['user'],$proc);
-      $newContent->encoding="utf-8";
-      $xml = $newContent->saveXML();
-      if(!@$newContent->loadXML($xml)) {
-        new Logger("Invalid transformation (or parameter) in '$xslt'","error");
-        if(self::DEBUG) {
-          echo $xml;
-          die();
-        }
-        continue;
+      try {
+        $newContent = $this->transform($content,$xslt,$this->transformations[$xslt]['user'],$proc);
+        $newContent->encoding="utf-8";
+        $xml = $newContent->saveXML();
+        if(!@$newContent->loadXML($xml))
+          throw new Exception("Invalid transformation (or parameter) in '$xslt'");
+        $content = $newContent;
+      } catch(Exception $e) {
+        new Logger($e->getMessage(),"error");
       }
-      $content = $newContent;
     }
 
     // correct links
@@ -200,14 +198,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump($fileName);
     $db = new DOMBuilder();
     $xsl = $db->buildDOMPlus($fileName,true,$user);
-    if(!@$proc->importStylesheet($xsl)) {
-      new Logger("XSLT '$fileName' compilation error","error");
-      return $content;
-    }
-    if(($x = @$proc->transformToDoc($content) ) === false) {
-      new Logger("XSLT '$fileName' transformation fail","error");
-      return $content;
-    }
+    if(!@$proc->importStylesheet($xsl))
+      throw new Exception("XSLT '$fileName' compilation error");
+    if(($x = @$proc->transformToDoc($content) ) === false)
+      throw new Exception("XSLT '$fileName' transformation fail");
     #echo $x->saveXML();
     return $x;
   }
