@@ -325,15 +325,6 @@ function translateUtf8Entities($xmlSource, $reverse = FALSE) {
   }
 }
 
-function errorPage($message, $code=404, $decorate=true) {
-  try {
-    new Logger("$message ($code)","fatal");
-  } catch (Exception $e) {};
-  http_response_code($code);
-  if(!$decorate || !include(CMS_FOLDER . "/error.php")) echo $message;
-  die();
-}
-
 function readZippedFile($archiveFile, $dataFile) {
   // Create new ZIP archive
   $zip = new ZipArchive;
@@ -371,13 +362,41 @@ function fileSizeConvert($b) {
     return round($b,1)." ".$iec[$i];
 }
 
-function checkUrl() {
+function checkUrl($folder = null, $extended = false) {
   $rUri = $_SERVER["REQUEST_URI"];
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
-    errorPage("Bad request", 400, false);
-  if(preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")$/",$rUri))
-    errorPage("File not found. Use FileHandler plugin to access files folder", 404, false);
+    new ErrorPage("The requested URL $rUri was not understood by this server.", 400, $extended);
+  if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/",$rUri,$m)) return null;
+  $fInfo["filepath"] = "$folder/". $m[1];
+
+  if(!is_file($fInfo["filepath"]))
+    new ErrorPage("The requested URL $rUri was not found on this server.", 404, $extended);
+
+  $disallowedMime = array(
+    "application/x-msdownload" => null,
+    "application/x-msdos-program" => null,
+    "application/x-msdos-windows" => null,
+    "application/x-download" => null,
+    "application/bat" => null,
+    "application/x-bat" => null,
+    "application/com" => null,
+    "application/x-com" => null,
+    "application/exe" => null,
+    "application/x-exe" => null,
+    "application/x-winexe" => null,
+    "application/x-winhlp" => null,
+    "application/x-winhelp" => null,
+    "application/x-javascript" => null,
+    "application/hta" => null,
+    "application/x-ms-shortcut" => null,
+    "application/octet-stream" => null,
+    "vms/exe" => null,
+  );
+  $fInfo["filemime"] = getFileMime($fInfo["filepath"]);
+  if(array_key_exists($fInfo["filemime"], $disallowedMime))
+    new ErrorPage("Unsupported mime type '".$fInfo["filemime"]."'", 415);
+  return $fInfo;
 }
 
 ?>

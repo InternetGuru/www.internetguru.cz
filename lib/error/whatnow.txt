@@ -1,0 +1,5 @@
+Co teď?
+Opakujte akci později.
+Zkuste se vrátit (tlačítko Zpět).
+Přejděte na <a href="@ROOT@">domovskou stránku webu</a>.
+Kontaktujte správce webu.

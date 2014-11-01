@@ -40,8 +40,8 @@ try {
 
   $m = $e->getMessage();
   if(isAtLocalhost()) $m = "Exception: ".$m." in ".$e->getFile()." on line ".$e->getLine();
-  errorPage($m,500);
   if(isset($l)) $l->finished();
+  new ErrorPage($m, 500, true);
 
 }
 
