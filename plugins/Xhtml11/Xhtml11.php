@@ -99,8 +99,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->loadXML($content->saveXML());
     $contentPlus->validateLinks("a","href",true);
     $contentPlus->validateLinks("form","action",true);
+    $contentPlus->validateLinks("object","data",true);
     $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"a","href");
     $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"form","action");
+
+    // check object.data mime/size
+    $this->validateImages($contentPlus);
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement,true);
@@ -109,6 +113,73 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump($doc->schemaValidate(CMS_FOLDER . "/" . self::DTD_FILE));
     return $doc->saveXML();
   }
+
+  private function validateImages(DOMDocumentPlus $dom) {
+    $toStrip = array();
+    foreach($dom->getElementsByTagName("object") as $o) {
+      if(!$o->hasAttribute("data")) continue;
+      $filePath = $o->getAttribute("data");
+      $pUrl = parse_url($filePath);
+      if(!is_array($pUrl)) {
+        $toStrip[] = array($o, "invalid object data '$filePath' format");
+        continue;
+      }
+      if(array_key_exists("scheme",$pUrl)) {
+        #todo: $this->asynchronousExternalImageCheck($filePath);
+        continue;
+      }
+      if(!is_file($filePath)) {
+        $filePath = FILES_FOLDER ."/$filePath";
+        if(!is_file($filePath)) {
+          $toStrip[] = array($o, "object data '$filePath' not found");
+          continue;
+        }
+      }
+      try {
+        $this->validateImage($o, $filePath);
+      } catch(Exception $e) {
+        $toStrip[] = array($o, $e->getMessage());
+      }
+    }
+    foreach($toStrip as $o) $o[0]->stripTag($o[1]);
+  }
+
+  private function validateImage(DOMElement $o, $filePath) {
+    $mime = getFileMime($filePath);
+    if(strpos($mime, "image/") !== 0)
+      throw new Exception("invalid object '$filePath' mime type '$mime'");
+    if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
+      $o->setAttribute("type", $mime);
+      new Logger("Object '$filePath' attr type set to '".$mime."'","warning");
+    }
+    $size = filesize($filePath);
+    if($size > 350*1024) {
+      new Logger("Object '$filePath' too big ".fileSizeConvert($size),"warning");
+    }
+  }
+
+  /*
+  private function asynchronousExternalImageCheck($file) {
+    $headers = @get_headers(absoluteLink(getRoot().$filePath), 1);
+    $invalid = !is_array($headers) || !array_key_exists("Content-Type", $headers)
+      || !array_key_exists("Content-Length", $headers);
+    if($invalid || strpos($headers[0], '200') === false) {
+      $error = $invalid ? "bad response" : $headers[0];
+      throw new Exception("object data '$filePath' not found ($error)");
+    }
+    $mime = $headers["Content-Type"];
+    if(strpos($mime, "image/") !== 0)
+      throw new Exception("invalid object '$filePath' mime type '$mime'");
+    if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
+      $o->setAttribute("type", $mime);
+      new Logger("Object '$filePath' attr type set to '".$mime."'","warning");
+    }
+    $size = (int) $headers["Content-Length"];
+    if(!$size || $size > 350*1024) {
+      new Logger("Object '$filePath' too big or invalid size ".fileSizeConvert($size),"warning");
+    }
+  }
+  */
 
   private function getTitle(Cms $cms) {
     $title = $cms->getVariable("cms-title");

@@ -19,14 +19,14 @@ class DOMElementPlus extends DOMElement {
     return $newnode;
   }
 
-  #UNUSED
   public function stripTag($comment = null) {
-    $text = $this->ownerDocument->createTextNode($this->nodeValue);
-    $this->parentNode->insertBefore($text,$this);
+    if(!is_null($comment)) {
+      $cmt = $this->ownerDocument->createComment(" $comment ");
+      $this->parentNode->insertBefore($cmt,$this);
+    }
+    foreach($this->childNodes as $n) $children[] = $n;
+    foreach($children as $n) $this->parentNode->insertBefore($n,$this);
     $this->parentNode->removeChild($this);
-    if(is_null($comment)) return;
-    $cmt = $this->ownerDocument->createComment(" $comment ");
-    $text->parentNode->insertBefore($cmt,$text);
   }
 
   public function stripAttr($attr, $comment = null) {
