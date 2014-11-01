@@ -42,7 +42,7 @@
       @val='Heading4' or @val='Nadpis4' or
       @val='Heading5' or @val='Nadpis5' or
       @val='Heading6' or @val='Nadpis6'
-      ]]"/>
+      ]][r/t]"/> <!-- ignore empty headings -->
     <xsl:variable name="bookmarkId" select="$h[$pos]/descendant::bookmarkStart/@name"/>
 
     <xsl:choose>
