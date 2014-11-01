@@ -325,14 +325,12 @@ function translateUtf8Entities($xmlSource, $reverse = FALSE) {
   }
 }
 
-#todo: safe errorHandle
-function errorPage($message, $code=404) {
+function errorPage($message, $code=404, $decorate=true) {
   try {
     new Logger("$message ($code)","fatal");
   } catch (Exception $e) {};
   http_response_code($code);
-  $page = CMS_FOLDER . "/error.php";
-  if(!include(CMS_FOLDER . "/error.php")) echo $e->getMessage();
+  if(!$decorate || !include(CMS_FOLDER . "/error.php")) echo $message;
   die();
 }
 
@@ -371,6 +369,15 @@ function fileSizeConvert($b) {
         $i++;
     }
     return round($b,1)." ".$iec[$i];
+}
+
+function checkUrl() {
+  $rUri = $_SERVER["REQUEST_URI"];
+  $pUrl = parse_url($rUri);
+  if($pUrl === false || strpos($pUrl["path"], "//") !== false)
+    errorPage("Bad request", 400, false);
+  if(preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")$/",$rUri))
+    errorPage("File not found. Use FileHandler plugin to access files folder", 404, false);
 }
 
 ?>

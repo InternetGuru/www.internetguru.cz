@@ -17,6 +17,7 @@ try {
   $plugins->setStatus("preinit");
   $plugins->notify();
 
+  checkUrl();
   $cms = new Cms();
   $cms->init(); // because of dombulder to set variable into cms
   $plugins->setStatus("init");
