@@ -44,8 +44,7 @@ class Plugin {
 
   private function buildDOMPlus($filePath, $htmlPlus, $user) {
     if(is_null($this->subject)) throw new Exception("SplSubject not set");
-    global $cms;
-    $db = $cms->getDombuilder();
+    $db = new DOMBuilder();
     $key = $this->getKey($filePath,$htmlPlus,$user);
     if($htmlPlus)
       $this->doms[$key] = $db->buildHTMLPlus($filePath,$user);

@@ -4,7 +4,6 @@
 
 class Cms {
 
-  private $domBuilder; // DOMBuilder
   private $contentFull = null; // HTMLPlus
   private $content = null; // HTMLPlus
   private $outputStrategy = null; // OutputStrategyInterface
@@ -14,11 +13,6 @@ class Cms {
 
   function __construct() {
     if(self::DEBUG) new Logger("DEBUG");
-    $this->domBuilder = new DOMBuilder();
-  }
-
-  public function getDomBuilder() {
-    return $this->domBuilder;
   }
 
   public function init() {
@@ -27,7 +21,8 @@ class Cms {
     $this->setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
     $this->setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     $this->setVariable("plugins", array_keys($plugins->getObservers()));
-    $cfg = $this->domBuilder->buildDOMPlus("Cms.xml")->getElementsByTagName("environmental");
+    $db = new DOMBuilder();
+    $cfg = $db->buildDOMPlus("Cms.xml")->getElementsByTagName("environmental");
     $env = null;
     foreach($cfg as $e) {
       if($e->hasAttribute("domain")) {
@@ -106,7 +101,8 @@ class Cms {
   }
 
   private function loadContent() {
-    $this->contentFull = $this->domBuilder->buildHTMLPlus("Content.html");
+    $db = new DOMBuilder();
+    $this->contentFull = $db->buildHTMLPlus("Content.html");
   }
 
   public function getVariable($name) {
