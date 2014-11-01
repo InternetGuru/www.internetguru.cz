@@ -25,7 +25,7 @@ define('THUMBS_FOLDER', FILES_FOLDER .'/thumbs'); // where thumbs files are stor
 define('PICTURES_FOLDER', FILES_FOLDER .'/pictures'); // where pictures files are stored
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('FILE_HASH_ALGO', 'crc32b');
-define('CMS_VERSION', '0.1.2-dev');
+define('CMS_VERSION', '0.2.0');
 
 #print_r($_SERVER);
 
@@ -82,7 +82,7 @@ function getRes($res,$dest,$resFolder) {
     return false;
   }
   $mime = getFileMime($res);
-  if($mime != "text/plain") {
+  if($resFolder != CMSRES_FOLDER && $mime != "text/plain") {
     new Logger("Forbidden mime type '$mime' to copy '$res' to '$resFolder' folder","error");
     return false;
   }
@@ -93,7 +93,7 @@ function getRes($res,$dest,$resFolder) {
     return false;
   }
   if(file_exists($newRes)) return $newRes;
-  if(!symlink($res, $newRes . "~") || !rename($newRes . "~", $newRes)) {
+  if(!symlink(realpath($res), $newRes . "~") || !rename($newRes . "~", $newRes)) {
     new Logger("Unable to create symlink '$newRes' for '$res'","error");
     return false;
   }
