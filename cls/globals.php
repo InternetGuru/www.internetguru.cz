@@ -10,6 +10,7 @@ if(!defined('ADMIN_FOLDER')) define('ADMIN_FOLDER', 'adm'); // where admin cfg x
 if(!defined('USER_FOLDER')) define('USER_FOLDER', 'usr'); // where user cfg xml files are stored
 if(!defined('USER_BACKUP')) define('USER_BACKUP', 'usr.bak'); // where backup files are stored
 if(!defined('FILES_FOLDER')) define('FILES_FOLDER', 'files'); // where web files are stored
+if(!defined('TEMP_FOLDER')) define('TEMP_FOLDER', 'temp'); // where web files are stored
 if(!defined('THEMES_FOLDER')) define('THEMES_FOLDER', 'themes'); // where templates are stored
 if(!defined('CMSRES_FOLDER')) define('CMSRES_FOLDER', false); // where cmsres files are stored
 if(!defined('RES_FOLDER')) define('RES_FOLDER', false); // where resource files are stored
@@ -20,8 +21,9 @@ if(!defined('PLUGIN_FOLDER')) define('PLUGIN_FOLDER', 'plugins'); // where plugi
 
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+'); // global variable pattern
 define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}");
-define('IMPORT_FOLDER', FILES_FOLDER .'/import'); // where imported files are stored
+#OBSOLETE
 define('THUMBS_FOLDER', FILES_FOLDER .'/thumbs'); // where thumbs files are stored
+#OBSOLETE
 define('PICTURES_FOLDER', FILES_FOLDER .'/pictures'); // where pictures files are stored
 define('CLASS_FOLDER', 'cls'); // where objects and other src are stored
 define('FILE_HASH_ALGO', 'crc32b');
@@ -32,6 +34,26 @@ define('CMS_VERSION', '0.2.0');
 // --------------------------------------------------------------------
 // GLOBAL FUNCTIONS
 // --------------------------------------------------------------------
+
+function mkStructure() {
+  $dirs = array(
+    'ADMIN_BACKUP' => ADMIN_BACKUP,
+    'ADMIN_FOLDER' => ADMIN_FOLDER,
+    'USER_FOLDER' => USER_FOLDER,
+    'USER_BACKUP' => USER_BACKUP,
+    'FILES_FOLDER' => FILES_FOLDER,
+    'TEMP_FOLDER' => TEMP_FOLDER,
+    'CMSRES_FOLDER' => CMSRES_FOLDER,
+    'RES_FOLDER' => RES_FOLDER,
+    'LOG_FOLDER' => LOG_FOLDER,
+    'CACHE_FOLDER' => CACHE_FOLDER,
+    );
+  foreach($dirs as $k => $d) {
+    if(!$d) continue; // res/cmsres == false
+    if(!is_dir($d) && !@mkdir($d,0755,true))
+      throw new Exception("Unable to create folder '$d' (const $k)");
+  }
+}
 
 function isAtLocalhost() {
   if($_SERVER["REMOTE_ADDR"] == "127.0.0.1"
@@ -169,13 +191,18 @@ function findFile($file,$user=true,$admin=true,$res=false) {
   return false;
 }
 
-function normalize($s) {
-  $s = mb_strtolower($s,"utf-8");
+function normalize($s,$extKeep="",$tolower=true,$convertToUtf8=false) {
+  if($convertToUtf8) $s = utf8_encode($s);
+  if($tolower) $s = mb_strtolower($s,"utf-8");
   $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
-  $s = strtolower($s);
+  if($tolower) $s = strtolower($s);
   $s = str_replace(" ","_",$s);
-  $s = preg_replace("~[^a-z0-9/_-]~","",$s);
-  return $s;
+  $keep = "~[^a-zA-Z0-9/_%s-]~";
+  if(is_null($ext = @preg_replace(sprintf($keep,$extKeep),"",$s))) {
+    new Logger("Normalize extended keep expression '".sprintf($keep,$extKeep)."' is invalid","error");
+    return preg_replace(sprintf($keep,""),"",$s);
+  }
+  return $ext;
 }
 
 function saveRewriteFile($dest,$src) {

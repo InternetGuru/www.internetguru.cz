@@ -4,6 +4,7 @@
 #todo: support file upload
 #todo: js copy content to clipboard
 #todo: files/import to usr/temp (const)
+#todo: fix empty link
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
   private $err = array();
@@ -20,16 +21,14 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $subject->detach($this);
       return;
     }
-    $this->getImportedFiles();
     $this->proceedImport();
+    $this->getImportedFiles();
   }
 
   private function getImportedFiles() {
-    if(!is_dir(IMPORT_FOLDER) && !@mkdir(IMPORT_FOLDER, 0755, true))
-      throw new Exception("Unable to create import directory");
-    foreach(scandir(IMPORT_FOLDER, SCANDIR_SORT_ASCENDING) as $f) {
-      if(pathinfo(IMPORT_FOLDER."/$f", PATHINFO_EXTENSION) != "html") continue;
-      $this->importedFiles[] = "<a href='?Convertor=".IMPORT_FOLDER."/$f'>$f</a>";
+    foreach(scandir(TEMP_FOLDER, SCANDIR_SORT_ASCENDING) as $f) {
+      if(pathinfo(TEMP_FOLDER."/$f", PATHINFO_EXTENSION) != "html") continue;
+      $this->importedFiles[] = "<a href='?Convertor=$f'>$f</a>";
     }
   }
 
@@ -41,13 +40,14 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       if(strlen($_GET[get_class($this)])) new Logger($e->getMessage(), "warning");
       return;
     }
-    $mime = getFileMime($f);
+    $mime = getFileMime(TEMP_FOLDER."/$f");
     switch($mime) {
       case "application/zip":
+      case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       $this->parseZippedDoc($f);
       break;
       case "application/xml": // just display (may be xml or broken html+)
-      $this->html = file_get_contents($f);
+      $this->html = file_get_contents(TEMP_FOLDER."/$f");
       $this->file = $f;
       break;
       default:
@@ -56,7 +56,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function parseZippedDoc($f) {
-    $doc = $this->transformFile($f);
+    $doc = $this->transformFile(TEMP_FOLDER ."/$f");
     $xml = $doc->saveXML();
     $xml = str_replace("·\n","\n",$xml); // remove "format hack" from transformation
 
@@ -73,8 +73,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
     if(empty($this->err)) $this->info[] = "File successfully imported";
     $this->file = "$f.html";
-    if(@file_put_contents("$f.html",$this->html) !== false) return;
-    $m = "Unable to save imported file into '$f.html'";
+    if(@file_put_contents(TEMP_FOLDER ."/$f.html", $this->html) !== false) return;
+    $m = "Unable to save imported file '$f.html' into temp folder";
     $this->err[] = $m;
     new Logger($m,"error");
   }
@@ -128,7 +128,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!strlen($dest)) throw new Exception("Please, enter file to view or import");
     $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
-    if(!is_file($dest)) throw new Exception("File '$dest' not found");
+    if(!is_file(TEMP_FOLDER ."/$dest")) throw new Exception("File '$dest' not found in temp folder");
     return $dest;
   }
 
@@ -150,16 +150,15 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       throw new Exception("Destination URL '$url' error: ".$headers[0]);
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header,$url);
-    $f = IMPORT_FOLDER ."/$filename";
-    file_put_contents($f, $data);
-    return $f;
+    file_put_contents(TEMP_FOLDER ."/$filename", $data);
+    return $filename;
   }
 
   private function get_real_filename($headers,$url) {
     foreach($headers as $header) {
       if (strpos(strtolower($header),'content-disposition') !== false) {
         $tmp_name = explode('=', $header);
-        if ($tmp_name[1]) return trim($tmp_name[1],'";\'');
+        if($tmp_name[1]) return normalize(trim($tmp_name[1],'";\''),".",false,true);
       }
     }
     $stripped_url = preg_replace('/\\?.*/', '', $url);

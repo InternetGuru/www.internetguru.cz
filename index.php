@@ -11,6 +11,7 @@ include('cls/globals.php');
 try {
 
   $l = new Logger("CMS finished " . dirname(__FILE__),null,false);
+  mkStructure();
 
   $plugins = new Plugins();
   $plugins->setStatus("preinit");

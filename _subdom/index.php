@@ -35,6 +35,7 @@ define("USER_BACKUP", "../../usr.bak/$currentSubdom");
 define("ADMIN_FOLDER", "../../adm/" . $var["ADMIN_DIR"]);
 define("ADMIN_BACKUP", "../../adm.bak/$currentSubdom");
 define("FILES_FOLDER", "../../" . $var["USER_ID"] . "/files/" . $var["FILES_DIR"]);
+define("TEMP_FOLDER", "../../" . $var["USER_ID"] . "/temp");
 define("CMSRES_FOLDER", "cmsres/". $var["CMS_VER"]);
 define("RES_FOLDER", "res");
 define("LOG_FOLDER", "../../log/$currentSubdom");
@@ -48,7 +49,6 @@ if(!file_exists($name) || readlink($name) != $path) {
   symlink($path, $name . "~");
   rename($name . "~", $name);
 }
-if(!file_exists(RES_FOLDER)) mkdir(RES_FOLDER,0755);
 
 // create default plugin files
 if(!file_exists("PLUGINS.".$var["PLUGINS"])) {
