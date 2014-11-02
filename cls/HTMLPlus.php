@@ -2,6 +2,7 @@
 
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
+
   const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
@@ -17,9 +18,23 @@ class HTMLPlus extends DOMDocumentPlus {
 
   public function applySyntax() {
     $extend = array("strong","em","ins","del","sub","sup","a","h","desc");
+
+    // hide noparse
+    $noparse = array();
+    foreach($this->getInlineTextNodes($extend) as $n)
+      $noparse = array_merge($noparse, $this->parseSyntaxNoparse($n));
+
+    // proceed syntax translation
     foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCodeTag($n);
     foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCode($n);
     foreach($this->getInlineTextNodes($extend) as $n) $this->parseSyntaxVariable($n);
+
+    // restore noparse
+    foreach($noparse as $n) {
+      $newNode = $this->createTextNode($n[1]);
+      $n[0]->parentNode->insertBefore($newNode,$n[0]);
+      $n[0]->parentNode->removeChild($n[0]);
+    }
   }
 
   private function getInlineTextNodes($extend = array()) {
@@ -32,6 +47,23 @@ class HTMLPlus extends DOMDocumentPlus {
       }
     }
     return $textNodes;
+  }
+
+  private function parseSyntaxNoparse(DOMText $n) {
+    $noparse = array();
+    $pat = "/<noparse>(.+?)<\/noparse>/";
+    $p = preg_split($pat,$n->nodeValue,-1,PREG_SPLIT_DELIM_CAPTURE);
+    if(count($p) < 2) return $noparse;
+    foreach($p as $i => $v) {
+      if($i % 2 == 0) $newNode = $this->createTextNode($v);
+      else {
+        $newNode = $this->createElement("noparse");
+        $noparse[] = array($newNode, $v);
+      }
+      $n->parentNode->insertBefore($newNode,$n);
+    }
+    $n->parentNode->removeChild($n);
+    return $noparse;
   }
 
   private function parseSyntaxCodeTag(DOMText $n) {
