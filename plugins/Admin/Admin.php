@@ -5,7 +5,7 @@
 #TODO: new htmlplus as EMPTY (?)
 #TODO: js button 'copy default to user'
 
-class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterface {
+class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
   const DEFAULT_FILE = "Content.html";
   const FILE_NEW = "new file";
@@ -32,7 +32,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
   public function update(SplSubject $subject) {
     if($subject->getStatus() == "process") {
       global $cms;
-      $os = $cms->getOutputStrategy()->addTransformation($this->getDir()."/ContentAdmin.xsl");
+      $os = $cms->getOutputStrategy()->addTransformation($this->getDir()."/Admin.xsl");
     }
     if($subject->getStatus() != "init") return;
     if(!isset($_GET[get_class($this)])) {
@@ -58,7 +58,7 @@ class ContentAdmin extends Plugin implements SplObserver, ContentStrategyInterfa
 
   public function getContent(HTMLPlus $content) {
     global $cms;
-    $cms->getOutputStrategy()->addJsFile($this->getDir() . '/ContentAdmin.js', 100, "body");
+    $cms->getOutputStrategy()->addJsFile($this->getDir() . '/Admin.js', 100, "body");
 
     $format = $this->type;
     if($this->type == "html") $format = "html+";

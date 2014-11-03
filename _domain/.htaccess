@@ -21,7 +21,7 @@ AuthName "restricted"
 AuthUserFile /var/www/.htpasswd
 
 # CMS ?admin
-<If "%{QUERY_STRING} =~ /(ContentAdmin|LogViewer|Convertor)/">
+<If "%{QUERY_STRING} =~ /(Admin|LogViewer|Convertor)/">
   Require user admin
 </If>
 
