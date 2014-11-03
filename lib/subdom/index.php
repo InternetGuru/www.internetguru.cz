@@ -46,17 +46,19 @@ define("PLUGIN_FOLDER", "plugins");
 $name = "cmsres";
 $path = "/var/www/cmsres/";
 if(!file_exists($name) || readlink($name) != $path) {
-  symlink($path, $name . "~");
-  rename($name . "~", $name);
+  symlink($path, "$name~");
+  rename("$name~", $name);
 }
 
 // create default plugin files
 if(!file_exists("PLUGINS.".$var["PLUGINS"])) {
-  $skipPlugins = array("Slider" => null);
+  $disabledPlugins = array("Slider" => null);
+  foreach($disabledPlugins as $p => $null) touch(".PLUGIN.$p");
+  $skipedPlugins = array("Slider" => null);
   foreach(scandir(CMS_FOLDER ."/". PLUGIN_FOLDER) as $f) {
     if(strpos($f,".") === 0) continue; // skip folders starting with a dot
-    if(array_key_exists($f, $skipPlugins)) continue;
-    touch("PLUGIN.".$f);
+    if(array_key_exists($f, $skipedPlugins)) continue;
+    touch("PLUGIN.$f");
   }
 }
 

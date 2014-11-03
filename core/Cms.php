@@ -21,6 +21,7 @@ class Cms {
     $this->setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
     $this->setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     $this->setVariable("plugins", array_keys($plugins->getObservers()));
+    $this->setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
     $db = new DOMBuilder();
     $cfg = $db->buildDOMPlus("Cms.xml")->getElementsByTagName("environmental");
     $env = null;

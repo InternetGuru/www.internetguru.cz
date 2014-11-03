@@ -25,6 +25,11 @@ AuthUserFile /var/www/.htpasswd
   Require user admin
 </If>
 
+# CMS ?SubdomManager
+#<If "%{QUERY_STRING} =~ /SubdomManager/">
+#  Require group partner
+#</If>
+
 # CRM & SML
 <If "%{REQUEST_FILENAME} =~ m#/subdom/(crm|doc)/#">
   Require user admin

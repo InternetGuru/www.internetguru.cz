@@ -320,6 +320,7 @@ class DOMDocumentPlus extends DOMDocument {
       case "em":
       case "strong":
       case "samp":
+      case "span":
       case "del":
       case "ins":
       case "sub":
