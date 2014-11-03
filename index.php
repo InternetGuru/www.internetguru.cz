@@ -6,7 +6,7 @@
 // IGCMS CORE
 // --------------------------------------------------------------------
 
-include('cls/globals.php');
+include('core/globals.php');
 
 try {
 
