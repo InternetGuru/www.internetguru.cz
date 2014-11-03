@@ -1,5 +1,6 @@
 <?php
 
+
 class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface {
   private $lang = null;
   private $isRoot;
