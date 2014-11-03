@@ -9,7 +9,7 @@
 #fixme: moving up/down changes word wrapping (issue 13)
 #https://bitbucket.org/igwr/cms/issue/13/codemirror-changing-word-wrap
 
-class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
+class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -58,7 +58,7 @@ class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyIn
 
     $os->addCssFile("lib/codemirror/lib/codemirror.css");
     $os->addCssFile("lib/codemirror/theme/tomorrow-night-eighties.css");
-    $os->addCssFile($this->getDir() .'/ContentCodeMirror.css');
+    $os->addCssFile($this->getDir() .'/SyntaxCodeMirror.css');
 
     $os->addJsFile("lib/codemirror/lib/codemirror.js");
     foreach($libs as $l) $os->addJsFile($l);
@@ -76,7 +76,7 @@ class ContentCodeMirror extends Plugin implements SplObserver, ContentStrategyIn
     $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
     $os->addJsFile("lib/codemirror/addon/fold/foldcode.js");
 
-    $os->addJsFile($this->getDir() .'/ContentCodeMirror.js', 10, "body");
+    $os->addJsFile($this->getDir() .'/SyntaxCodeMirror.js', 10, "body");
 
     return $content;
   }
