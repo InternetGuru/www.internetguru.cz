@@ -21,12 +21,23 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     global $cms;
     global $plugins;
 
+    #TODO: run script
+
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("curlink", getCurLink(true));
     $newContent->insertVar("domain", getDomain());
 
-    $newContent->insertVar("CMS_VER", $var["CMS_VER"]);
+    $doc = new DOMDocumentPlus();
+    $select = $doc->appendChild($doc->createElement("var"));
+    foreach(scandir(CMS_FOLDER ."/..") as $cmsVer) {
+      if(!is_dir(CMS_FOLDER ."/../$cmsVer") || strpos($cmsVer, ".") === 0) continue;
+      $o = $select->appendChild($doc->createElement("option", $cmsVer));
+      if($var["CMS_VER"] == $cmsVer) $o->setAttribute("selected", "selected");
+      $o->setAttribute("value", $cmsVer);
+    }
+    $newContent->insertVar("versions", $select);
+
     $newContent->insertVar("USER_DIR", $var["USER_DIR"]);
     $newContent->insertVar("FILES_DIR", $var["FILES_DIR"]);
 

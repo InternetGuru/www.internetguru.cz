@@ -1,25 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <body xml:lang="cs">
-  <h id="h.adf">Manažer poddomén</h>
+  <h id="h.adf" var="domain">Manažer domény %s</h>
   <desc/>
   <ol class="warning">
     <li var="errors"/>
   </ol>
   <form action="/" method="post" var="curlink@action">
-    <fieldset><legend>Na doméně <em var="domain"/></legend>
+    <fieldset class="hidable"><legend>Správa poddomén na doméně <em var="domain"/></legend>
       <dl>
         <dt><label for="CMS_VER">Verze IGCMS (konstanta <samp>CMS_VER</samp>)</label></dt>
-        <dd><input id="CMS_VER" name="CMS_VER" type="text" var="CMS_VER@value"/></dd>
+        <dd><select id="CMS_VER" name="CMS_VER" var="versions"><option>n/a</option></select></dd>
         <dt><label for="USER_DIR">Uživatelské soubory (konstanta <samp>USER_DIR</samp>)</label></dt>
         <dd><input id="USER_DIR" name="USER_DIR" type="text" var="USER_DIR@value"/></dd>
         <dt><label for="FILES_DIR">Soubory ke stažení (konstanta <samp>FILES_DIR</samp>)</label></dt>
         <dd><input id="FILES_DIR" name="FILES_DIR" type="text" var="FILES_DIR@value"/></dd>
         <dt>Dostupná rozšíření (konstanta <samp>PLUGIN</samp>)</dt>
         <dd><samp var="plugins">n/a</samp></dd>
+      </dl>
+    </fieldset>
+    <fieldset><legend>Ovládací panel</legend>
+      <dl>
         <dt>Akce</dt>
-        <dd><input type="submit" value="Nastavit vše"/></dd>
-        <!-- <dt>Seznam domén</dt> -->
-        <!-- <dd class="links"><samp var="domains">žádné</samp></dd> -->
+        <dd><input type="submit" value="Aplikovat změny"/></dd>
       </dl>
     </fieldset>
   </form>

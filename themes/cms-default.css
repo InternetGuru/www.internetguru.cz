@@ -10,7 +10,8 @@ code, samp, textarea {
   font-family: "Emilbus Mono","Lucida Console",monospace;
 }
 
-input:not([type="checkbox"]),
+select,
+/*input:not([type="checkbox"]),*/
 input:not([type="radio"]) {
   font-size: inherit;
   padding: 0.15em 0.3em;
