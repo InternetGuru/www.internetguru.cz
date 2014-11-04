@@ -17,9 +17,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   public function getContent(HTMLPlus $content) {
-    global $var;
-    global $cms;
-    global $plugins;
 
     #TODO: run script
 
@@ -28,29 +25,46 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $newContent->insertVar("curlink", getCurLink(true));
     $newContent->insertVar("domain", getDomain());
 
+    #todo: cycle thru subdomains
+    $fset = $newContent->getElementsByTagName("fieldset")->item(0);
     $doc = new DOMDocumentPlus();
-    $select = $doc->appendChild($doc->createElement("var"));
+    $doc->appendChild($doc->importNode($fset, true));
+    $this->modifyDOM($doc);
+    $fset->parentNode->insertBefore($newContent->importNode($doc->documentElement, true), $fset);
+
+    $fset->parentNode->removeChild($fset);
+    return $newContent;
+  }
+
+  private function modifyDOM(DOMDocumentPlus $doc) {
+    global $var;
+    global $cms;
+    global $plugins;
+    // version
+    $d = new DOMDocumentPlus();
+    $select = $d->appendChild($d->createElement("var"));
     foreach(scandir(CMS_FOLDER ."/..") as $cmsVer) {
       if(!is_dir(CMS_FOLDER ."/../$cmsVer") || strpos($cmsVer, ".") === 0) continue;
-      $o = $select->appendChild($doc->createElement("option", $cmsVer));
+      $o = $select->appendChild($d->createElement("option", $cmsVer));
       if($var["CMS_VER"] == $cmsVer) $o->setAttribute("selected", "selected");
       $o->setAttribute("value", $cmsVer);
     }
-    $newContent->insertVar("versions", $select);
+    $doc->insertVar("versions", $select);
 
-    $newContent->insertVar("USER_DIR", $var["USER_DIR"]);
-    $newContent->insertVar("FILES_DIR", $var["FILES_DIR"]);
+    #TODO: select user_dir
+    $doc->insertVar("USER_DIR", $var["USER_DIR"]);
 
+    #TODO: select files_dir
+    $doc->insertVar("FILES_DIR", $var["FILES_DIR"]);
+
+    // plugins
     $pInput = array();
     foreach($cms->getVariable("cms-plugins_available") as $p) {
       $c = in_array($p, $cms->getVariable("cms-plugins")) ? " checked='checked'" : "";
       $pInput[] = "<input type='checkbox' id='i.$p' name='plugins'$c/><label for='i.$p'> $p</label>";
     }
-    $newContent->insertVar("plugins",$pInput);
-
-    return $newContent;
+    $doc->insertVar("plugins",$pInput);
   }
-
 
 }
 
