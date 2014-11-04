@@ -24,7 +24,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $link = getCurLink();
     $curH = $cf->getElementById($link,"link");
     if(is_null($curH)) {
-      if(strlen($link)) errorPage("Page '$link' not found",404);
+      if(strlen($link)) new ErrorPage("Page '$link' not found",404);
       $curH = $cf->documentElement->firstElement;
     }
     $this->setPath($curH);
