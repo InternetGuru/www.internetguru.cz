@@ -10,6 +10,7 @@ class ErrorPage {
   private $whatnowFile = "whatnow.txt";
 
   public function __construct($message, $code, $extended=false) {
+    new Logger("$message ($code)","fatal");
     $dir = CMS_FOLDER ."/". $this->relDir;
     $tt = array(
       "@CODE@" => $code,
