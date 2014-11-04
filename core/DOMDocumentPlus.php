@@ -308,12 +308,6 @@ class DOMDocumentPlus extends DOMDocument {
   private function insertVarArray(Array $varValue,DOMElement $e,$varName) {
     $sep = null;
     switch($e->nodeName) {
-      case "body":
-      case "section":
-      case "dl":
-      case "form":
-      case "fieldset":
-      return;
       case "li":
       case "dd":
       break;
@@ -332,10 +326,19 @@ class DOMDocumentPlus extends DOMDocument {
       $e->removeChildNodes();
       $e = $e->appendChild($e->ownerDocument->createElement("li"));
       break;
+      #case "body":
+      #case "section":
+      #case "dl":
+      #case "form":
+      #case "fieldset":
+      default:
+      new Logger("Unable to insert variable array into '{$n->nodeName}'","error");
+      return;
     }
     $dom = new DOMDocument();
     $eNam = $e->nodeName;
     $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$varValue)."</$eNam></var>";
+
     if(!@$dom->loadXML($xml)) {
       new Logger("Invalid XML inserted as '$varName' (converting specialchars)","warning");
       foreach($varValue as $k => $v) $varValue[$k] = htmlspecialchars($v);
@@ -354,7 +357,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   // full replace only
-  private function insertVarDOMElement(DOMElement $varValue,DOMElement $e,$attr=null) {
+  private function insertVarDOMElement(DOMElement $varValue, DOMElement $e, $attr=null) {
     if(!is_null($attr) && !is_numeric($attr)) {
       $this->insertVarstring($varValue->nodeValue,$e,$attr);
       return;
