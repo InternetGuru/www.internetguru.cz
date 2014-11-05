@@ -151,7 +151,8 @@ ol.contentlink-bc li:not(:first-child) a[href]:before {
 }
 
 #content > div:first-child + div,
-div.list, div.contentbalancer {
+div.list, div.contentbalancer,
+fieldset > dl {
   background: #EAF2F5;
   padding-top: 1.5em;
   padding-bottom: 1.5em;
