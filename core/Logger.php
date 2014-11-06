@@ -5,14 +5,15 @@ class Logger {
   private $type;
   private $start_time;
 
-  function __construct($message, $type=null, $doLog=true) {
+  function __construct($message, $type=null, $delay=-1) {
     if(!is_dir(LOG_FOLDER) && !mkdir(LOG_FOLDER,0755,true))
       throw new Exception(sprintf("Unable to create log dir '%s'",LOG_FOLDER));
     if(!is_string($type)) $type = "info";
     $this->message = $message;
     $this->type = $type;
     $this->start_time = microtime(true);
-    if($doLog) $this->log();
+    if($delay < 0) $this->log();
+    else $this->start_time -= $delay;
   }
 
   private function getCaller() {

@@ -139,7 +139,7 @@ class DOMBuilder {
       if($h->hasAttribute("import")) $headings[] = $h;
     }
     if(!count($headings)) return;
-    $l = new Logger("Importing HTML+",null,false);
+    $l = new Logger("Importing HTML+",null,0);
     foreach($headings as $h) {
       $files = matchFiles($h->getAttribute("import"),$dir);
       $h->removeAttribute("import");

@@ -17,7 +17,7 @@ class FileHandler extends Plugin implements SplObserver {
     $filepath = $fInfo["filepath"];
     if(is_null($filepath)) return;
     $filesize = filesize($filepath);
-    $l = new Logger("File download '$filepath' ".fileSizeConvert($filesize),null,false);
+    $l = new Logger("File download '$filepath' ".fileSizeConvert($filesize),null,0);
     header("Content-Type: " . $fInfo["filemime"]);
     header("Content-Length: $filesize");
     set_time_limit(0);
