@@ -30,6 +30,7 @@ if(!file_exists("CMS_VER.".$var["CMS_VER"])) {
 
 // define global constants
 define("CMS_FOLDER", $cmsRootFolder . $var["CMS_VER"]);
+define("SUBDOM_FOLDER", "../../" . $var["USER_ID"] . "/subdom");
 define("USER_FOLDER", "../../" . $var["USER_ID"] . "/usr/" . $var["USER_DIR"]);
 define("USER_BACKUP", "../../usr.bak/$currentSubdom");
 define("ADMIN_FOLDER", "../../adm/" . $var["ADMIN_DIR"]);

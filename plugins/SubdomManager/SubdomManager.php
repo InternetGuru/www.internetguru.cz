@@ -15,20 +15,42 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   public function update(SplSubject $subject) {
-    if(isAtLocalhost() || !isset($_GET[get_class($this)])) {
+    if(!SUBDOM_FOLDER || !isset($_GET[get_class($this)])) {
       $subject->detach($this);
     }
-  }
-
-  public function getContent(HTMLPlus $content) {
-
+    if($subject->getStatus() != "preinit") return;
     $this->cmsVersions = $this->getSubdirs(CMS_FOLDER ."/..");
     $this->cmsPlugins = $this->getSubdirs(CMS_FOLDER ."/". PLUGIN_FOLDER);
     $this->userDirs = $this->getSubdirs(USER_FOLDER ."/..");
     $this->filesDirs = $this->getSubdirs(FILES_FOLDER ."/..");
-
     #TODO: run script
+    if(!empty($_POST)) $this->processPost();
+  }
 
+  // process post (changes) into USER_ID/subdom
+  private function processPost() {
+    global $var;
+    foreach($_POST as $k => $v) {
+      $k = explode("-", $k);
+      if(!is_file("../{$k[0]}/USER_ID.{$var["USER_ID"]}")) continue;
+      if(is_file("../{$k[0]}/{$k[1]}.$v")) continue;
+      $userFilePath = SUBDOM_FOLDER ."/{$k[0]}/{$k[1]}.$v";
+      switch($k[1]) {
+        case "CMS_VER":
+        case "USER_DIR":
+        case "FILES_DIR":
+        if(!is_dir(dirname($userFilePath))) mkdir(dirname($userFilePath), 0755, true);
+        if(touch($userFilePath, 0644)) continue;
+        $this->err[] = "Unable to create configuration file '$userFilePath'";
+        new Logger(end($this->err), "error");
+        break;
+        case "PLUGINS":
+        #todo
+      }
+    }
+  }
+
+  public function getContent(HTMLPlus $content) {
     global $var;
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
@@ -39,7 +61,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $fset = $newContent->getElementsByTagName("fieldset")->item(0);
     foreach(scandir("..") as $subdom) {
       if(!is_dir("../$subdom") || strpos($subdom, ".") === 0) continue;
-      if(!is_file("../$subdom/USER_ID.".$var["USER_ID"])) continue;
+      if(!is_file("../$subdom/USER_ID.". $var["USER_ID"])) continue;
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($fset, true));
       $this->modifyDOM($doc, $subdom);
@@ -52,17 +74,17 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   private function modifyDOM(DOMDocumentPlus $doc, $subdom) {
     $doc->insertVar("subdom", $subdom);
-    $doc->insertVar("cmsVerId", "$subdom.CMS_VER");
-    $doc->insertVar("userDirId", "$subdom.USER_DIR");
-    $doc->insertVar("filesDirId", "$subdom.FILES_DIR");
+    $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
+    $doc->insertVar("userDirId", "$subdom-USER_DIR");
+    $doc->insertVar("filesDirId", "$subdom-FILES_DIR");
     if($subdom == basename(dirname($_SERVER["PHP_SELF"]))) $doc->insertVar("nohide", "nohide");
 
     // versions
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
     foreach($this->cmsVersions as $cmsVer => $active) {
-      $verName = $cmsVer . ($active ? "" : " (deprecated)");
-      $o = $set->appendChild($d->createElement("option", $verName));
+      if(!$active) continue; // silently skip disabled versions
+      $o = $set->appendChild($d->createElement("option", $cmsVer));
       if(is_file("../$subdom/CMS_VER.$cmsVer")) $o->setAttribute("selected", "selected");
       $o->setAttribute("value", $cmsVer);
     }
@@ -97,11 +119,11 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       if(is_file("../$subdom/.PLUGIN.$pName")) continue; // silently skip forbidden plugins
       $i = $set->appendChild($d->createElement("input"));
       $i->setAttribute("type", "checkbox");
-      $i->setAttribute("id", "$subdom.$pName");
-      $i->setAttribute("name", "$pName");
+      $i->setAttribute("id", "$subdom-$pName");
+      $i->setAttribute("name", "$subdom-PLUGIN-$pName");
       if(file_exists("../$subdom/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
       $l = $set->appendChild($d->createElement("label", " $pName"));
-      $l->setAttribute("for","$subdom.$pName");
+      $l->setAttribute("for","$subdom-$pName");
       $set->appendChild($d->createTextNode(", "));
     }
     $doc->insertVar("plugins", $set);
