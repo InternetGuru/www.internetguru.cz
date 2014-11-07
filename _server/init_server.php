@@ -43,9 +43,9 @@ function init_server($subdom, $cms_root_dir, $update = false) {
   // create directories {cmsres,res}
   $name = "cmsres";
   $path = "/var/www/cmsres/";
-  if(!file_exists($name) || readlink($name) != $path) {
-    symlink($path, "$name~");
-    rename("$name~", $name);
+  if(!file_exists("$serverSubdomDir/$name") || readlink("$serverSubdomDir/$name") != $path) {
+    symlink($path, "$serverSubdomDir/$name~");
+    rename("$serverSubdomDir/$name~", "$serverSubdomDir/$name");
   }
 
   // create default plugin files
