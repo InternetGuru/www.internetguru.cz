@@ -17,6 +17,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   public function update(SplSubject $subject) {
     if(!SUBDOM_FOLDER || !isset($_GET[get_class($this)])) {
       $subject->detach($this);
+      return;
     }
     if($subject->getStatus() != "preinit") return;
     $this->cmsVersions = $this->getSubdirs(CMS_FOLDER ."/..");
@@ -29,12 +30,11 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   // process post (changes) into USER_ID/subdom
   private function processPost() {
-    global $var;
     foreach($_POST as $k => $v) {
       $k = explode("-", $k);
-      if(!is_file("../{$k[0]}/USER_ID.{$var["USER_ID"]}")) continue;
+      if(!is_file("../{$k[0]}/USER_ID.". USER_ID)) continue;
       if(is_file("../{$k[0]}/{$k[1]}.$v")) continue;
-      $userFilePath = SUBDOM_FOLDER ."/{$k[0]}/{$k[1]}.$v";
+      $userFilePath = SUBDOM_FOLDER ."/../{$k[0]}/{$k[1]}.$v";
       switch($k[1]) {
         case "CMS_VER":
         case "USER_DIR":
@@ -51,17 +51,16 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   public function getContent(HTMLPlus $content) {
-    global $var;
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("curlink", getCurLink(true));
     $newContent->insertVar("domain", getDomain());
-    $newContent->insertVar("user", $var["USER_ID"]);
+    $newContent->insertVar("user", USER_ID);
 
     $fset = $newContent->getElementsByTagName("fieldset")->item(0);
     foreach(scandir("..") as $subdom) {
       if(!is_dir("../$subdom") || strpos($subdom, ".") === 0) continue;
-      if(!is_file("../$subdom/USER_ID.". $var["USER_ID"])) continue;
+      if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($fset, true));
       $this->modifyDOM($doc, $subdom);
