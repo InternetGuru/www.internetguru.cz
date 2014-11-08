@@ -22,14 +22,15 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     if($subject->getStatus() != "preinit") return;
     $this->cmsVersions = $this->getSubdirs(CMS_FOLDER ."/..");
     $this->cmsPlugins = $this->getSubdirs(CMS_FOLDER ."/". PLUGIN_FOLDER);
-    $this->userDirs = $this->getSubdirs(USER_FOLDER ."/..");
+    $this->userDirs = $this->getSubdirs(USER_FOLDER ."/..", "/^[^~]/");
     $this->filesDirs = $this->getSubdirs(FILES_FOLDER ."/..");
-    #TODO: run script
+    $this->syncUserSubdoms();
     if(!empty($_POST)) $this->processPost();
   }
 
   // process post (changes) into USER_ID/subdom
   private function processPost() {
+    /*
     foreach($_POST as $k => $v) {
       $k = explode("-", $k);
       if(!is_file("../{$k[0]}/USER_ID.". USER_ID)) continue;
@@ -48,6 +49,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         #todo
       }
     }
+    */
   }
 
   public function getContent(HTMLPlus $content) {
@@ -58,9 +60,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $newContent->insertVar("user", USER_ID);
 
     $fset = $newContent->getElementsByTagName("fieldset")->item(0);
-    foreach(scandir("..") as $subdom) {
-      if(!is_dir("../$subdom") || strpos($subdom, ".") === 0) continue;
-      if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
+    foreach($this->getSubdirs(SUBDOM_FOLDER ."/..", "/^[a-z][a-z0-9]*$/") as $subdom => $null) {
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($fset, true));
       $this->modifyDOM($doc, $subdom);
@@ -69,6 +69,17 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
     $fset->parentNode->removeChild($fset);
     return $newContent;
+  }
+
+  private function syncUserSubdoms() {
+    foreach($this->getSubdirs("..", "/^[a-z][a-z0-9]*$/") as $subdom => $null) {
+      if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
+      try {
+        init_server($subdom, CMS_FOLDER ."/.."); // clone existing subdoms (no update)
+      } catch(Exception $e) {
+        $this->err[] = $e->getMessage();
+      }
+    }
   }
 
   private function modifyDOM(DOMDocumentPlus $doc, $subdom) {
@@ -80,20 +91,31 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
     // versions
     $d = new DOMDocumentPlus();
+    $curVer = null;
+    $deprecated = false;
     $set = $d->appendChild($d->createElement("var"));
     foreach($this->cmsVersions as $cmsVer => $active) {
-      if(!$active) continue; // silently skip disabled versions
-      $o = $set->appendChild($d->createElement("option", $cmsVer));
-      if(is_file("../$subdom/CMS_VER.$cmsVer")) $o->setAttribute("selected", "selected");
+      $o = $d->createElement("option", $cmsVer);
+      if(is_file("../$subdom/CMS_VER.$cmsVer")) {
+        $o->setAttribute("selected", "selected");
+        $curVer = $cmsVer;
+      }
+      if(!$active) {
+        if($curVer == $cmsVer) $deprecated = true;
+        continue; // silently skip disabled versions
+      }
       $o->setAttribute("value", $cmsVer);
+      $set->appendChild($o);
     }
-    $doc->insertVar("cmsVers", $set);
+    if(!is_null($curVer)) $doc->insertVar("version", $curVer);
+    if(!$deprecated) $doc->insertVar("deprecated", null);
+    if($set->childNodes->length) $doc->insertVar("cmsVers", $set);
 
     // user directories
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
     foreach($this->userDirs as $dir => $active) {
-      if(!$active || strpos($dir, "~") === 0) continue; // silently skip dirs to del and mirrors
+      if(!$active) continue; // silently skip dirs to del and mirrors
       $o = $set->appendChild($d->createElement("option", $dir));
       if(is_file("../$subdom/USER_DIR.$dir")) $o->setAttribute("selected", "selected");
       $o->setAttribute("value", $dir);
@@ -119,7 +141,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $i = $set->appendChild($d->createElement("input"));
       $i->setAttribute("type", "checkbox");
       $i->setAttribute("id", "$subdom-$pName");
-      $i->setAttribute("name", "$subdom-PLUGIN-$pName");
+      $i->setAttribute("name", "PLUGIN-$pName");
       if(file_exists("../$subdom/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
       $l = $set->appendChild($d->createElement("label", " $pName"));
       $l->setAttribute("for","$subdom-$pName");
@@ -128,10 +150,11 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $doc->insertVar("plugins", $set);
   }
 
-  private function getSubdirs($dir) {
+  private function getSubdirs($dir, $filter = null) {
     $subdirs = array();
     foreach(scandir($dir) as $f) {
-      if(!is_dir("$dir/$f") || strpos($f, ".") === 0) continue;
+      if(strpos($f, ".") === 0 || !is_dir("$dir/$f")) continue;
+      if(!is_null($filter) && !preg_match($filter, $f)) continue;
       $subdirs[$f] = !file_exists("$dir/.$f");
     }
     return $subdirs;

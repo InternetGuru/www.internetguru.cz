@@ -6,22 +6,22 @@
     <li var="errors"/>
   </ol>
   <form action="/" method="post" var="curlink@action">
-    <fieldset class="hidable" var="nohide@class"><legend>Poddoména <samp var="subdom"/>.<em var="domain"/></legend>
+    <fieldset class="hidable" var="nohide@class"><legend>Poddoména <em><strong var="subdom"/>.</em><em var="domain"/>, verze <em var="version">neznámá</em> <strong var="deprecated">(zastaralá)</strong></legend>
       <dl>
         <dt><label var="cmsVerId@for">Verze IGCMS (konstanta <samp>CMS_VER</samp>)</label></dt>
-        <dd><select var="cmsVerId@id cmsVerId@name cmsVers"><option>n/a</option></select></dd>
+        <dd><select name="CMS_VER" var="cmsVerId@id cmsVers"><option>n/a</option></select></dd>
         <dt><label var="userDirId@for">Datové a konfigurační soubory (konstanta <samp>USER_DIR</samp>)</label></dt>
-        <dd><select var="userDirId@id userDirId@name userDirs"><option>n/a</option></select></dd>
+        <dd><select name="USER_DIR" var="userDirId@id userDirs"><option>n/a</option></select></dd>
         <dt><label var="filesDirId@for">Veřejně dostupný adresář (konstanta <samp>FILES_DIR</samp>)</label></dt>
-        <dd><select var="filesDirId@id filesDirId@name filesDirs"><option>n/a</option></select></dd>
+        <dd><select name="FILES_DIR" var="filesDirId@id filesDirs"><option>n/a</option></select></dd>
         <dt>Dostupná rozšíření (konstanta <samp>PLUGIN</samp>)</dt>
         <dd var="plugins"><samp>n/a</samp></dd>
-      </dl>
-    </fieldset>
-    <fieldset><legend>Ovládací panel</legend>
-      <dl>
         <dt>Akce</dt>
-        <dd><input type="submit" value="Aplikovat změny"/></dd>
+        <dd>
+          <input type="submit" value="Uložit změny"/>
+          <input type="hidden" name="subdom" var="subdom@value"/>
+        </dd>
+        <dd><input type="submit" name="apply" value="Uložit a aplikovat změny"/></dd>
       </dl>
     </fieldset>
   </form>
