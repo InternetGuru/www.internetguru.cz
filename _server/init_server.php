@@ -133,10 +133,12 @@ function init_server($subdom, $cms_root_dir, $update = false) {
     }
 
     // define global constants
-    define("USER_ID", $vars["USER_ID"]);
-    define("PLUGIN_FOLDER", $vars["PLUGIN_DIR"]);
-    define('CMS_FOLDER', "$cms_root_dir/{$vars["CMS_VER"]}");
-    foreach($dirs as $k => $v) define($k, $v);
+    if(!defined("USER_ID")) {
+      define("USER_ID", $vars["USER_ID"]);
+      define("PLUGIN_FOLDER", $vars["PLUGIN_DIR"]);
+      define('CMS_FOLDER', "$cms_root_dir/{$vars["CMS_VER"]}");
+      foreach($dirs as $k => $v) define($k, $v);
+    }
     return;
 
   }
