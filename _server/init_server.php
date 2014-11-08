@@ -88,9 +88,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
 
   // reset server and sync user if user subdom empty
   $userVar = array("CMS_VER" => $vars["CMS_VER"], "USER_DIR" => $subdom, "FILES_DIR" => $subdom);
-  if(count(scandir($dirs["SUBDOM_FOLDER"])) == 2) {
-    if(!is_file("$serverSubdomDir/PLUGINS.user"))
-      createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
+  if($update && count(scandir($dirs["SUBDOM_FOLDER"])) == 2) {
     foreach(scandir($serverSubdomDir) as $f) {
       if(!is_file("$serverSubdomDir/$f") || strpos($f, ".") === 0) continue;
       $var = explode(".", $f, 2);
@@ -104,11 +102,12 @@ function init_server($subdom, $cms_root_dir, $update = false) {
           throw new Exception("Unable to sync subdom setup");
         break;
         case "PLUGIN":
-        if(!is_file("$serverSubdomDir/PLUGINS.user")) continue;
-        if(!touch($dirs["SUBDOM_FOLDER"] ."/$f"))
-          throw new Exception("Unable to sync subdom setup");
+        if(!is_file("$serverSubdomDir/PLUGINS.user")) continue; // user cannot modify plugins
+        unlink("$serverSubdomDir/$f"); // delete all plugins (create default below)
       }
     }
+    if(is_file("$serverSubdomDir/PLUGINS.user"))
+      createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
   }
 
   // define global constants
