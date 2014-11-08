@@ -8,18 +8,18 @@
   <form action="/" method="post" var="curlink@action">
     <fieldset class="hidable" var="nohide@class"><legend>Poddoména <em><strong var="subdom"/>.</em><em var="domain"/>, verze <em var="version">neznámá</em> <strong var="deprecated">(zastaralá)</strong></legend>
       <dl>
-        <dt><label var="cmsVerId@for">Verze IGCMS (konstanta <samp>CMS_VER</samp>)</label></dt>
+        <dt><label var="cmsVerId@for">Verze IGCMS, aktuálně <samp var="CMS_VER">neznámá</samp>  <strong var="deprecated">(zastaralá verze)</strong></label></dt>
         <dd><select name="CMS_VER" var="cmsVerId@id cmsVers"><option>n/a</option></select></dd>
-        <dt><label var="userDirId@for">Datové a konfigurační soubory (konstanta <samp>USER_DIR</samp>)</label></dt>
+        <dt><label var="userDirId@for">Datové a konfigurační soubory, aktuálně <samp var="USER_DIR">neznámé</samp></label></dt>
         <dd><select name="USER_DIR" var="userDirId@id userDirs"><option>n/a</option></select></dd>
-        <dt><label var="filesDirId@for">Veřejně dostupný adresář (konstanta <samp>FILES_DIR</samp>)</label></dt>
+        <dt><label var="filesDirId@for">Veřejně dostupný adresář, aktuálně <samp var="FILES_DIR">neznámý</samp></label></dt>
         <dd><select name="FILES_DIR" var="filesDirId@id filesDirs"><option>n/a</option></select></dd>
         <dt>Dostupná rozšíření (konstanta <samp>PLUGIN</samp>)</dt>
         <dd var="plugins"><samp>n/a</samp></dd>
         <dt>Akce</dt>
         <dd>
-          <input type="submit" value="Uložit změny"/>
           <input type="hidden" name="subdom" var="subdom@value"/>
+          <input type="submit" value="Uložit změny"/>
         </dd>
         <dd><input type="submit" name="apply" value="Uložit a aplikovat změny"/></dd>
       </dl>
