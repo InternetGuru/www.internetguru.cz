@@ -16,7 +16,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
     "FILES_DIR" => $subdom,
     "PLUGIN_DIR" => "plugins",
     "RES_DIR" => "res",
-    "PLUGINS" => "user",
+    "CONFIG" => "user",
   );
 
   // update default values from server subdom
@@ -28,8 +28,10 @@ function init_server($subdom, $cms_root_dir, $update = false) {
 
   if($update) {
 
-    // check ID
-    if(is_dir($serverSubdomDir) && !is_file("$serverSubdomDir/USER_ID.". $vars["USER_ID"]))
+    // pass if dir is new, owned or empty
+    if(is_dir($serverSubdomDir)
+      && !is_file("$serverSubdomDir/USER_ID.". $vars["USER_ID"])
+      && count(scandir($serverSubdomDir)) != 2)
       throw new Exception("Cannot modify subdom '$subdom', USER_ID mismatch");
 
     // safely remove (rename) subdom if .subdom && user_id match
@@ -49,10 +51,11 @@ function init_server($subdom, $cms_root_dir, $update = false) {
         throw new Exception("New subdom must start with USER_ID '".$vars["USER_ID"]."'");
       if(!@mkdir($serverSubdomDir, 0755, true))
         throw new Exception("Unable to create folder '$serverSubdomDir'");
-      if(!touch("$serverSubdomDir/USER_ID.". $vars["USER_ID"]))
-        throw new Exception("Unable to create user id file");
     }
 
+    // acquire subdom if new or empty
+    if(!touch("$serverSubdomDir/USER_ID.". $vars["USER_ID"]))
+      throw new Exception("Unable to create user id file");
   }
 
   // create folder constants
@@ -89,7 +92,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
   // create default plugin files
   $disabledPlugins = array("Slider" => null);
   foreach($disabledPlugins as $p => $null) touch("$serverSubdomDir/.PLUGIN.$p");
-  if(!is_file("$serverSubdomDir/PLUGINS.". $vars["PLUGINS"])) {
+  if(!is_file("$serverSubdomDir/CONFIG.". $vars["CONFIG"])) {
     createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
     $update = true;
   }
@@ -116,6 +119,10 @@ function init_server($subdom, $cms_root_dir, $update = false) {
     return;
   }
 
+  // check rights to modify files
+  if(!is_file("$serverSubdomDir/CONFIG.user"))
+    throw new Exception("User cannot force update subdom.");
+
   // reset server and sync user if user subdom empty
   $userVar = array("CMS_VER" => $vars["CMS_VER"], "USER_DIR" => $subdom, "FILES_DIR" => $subdom);
   if($update && count(scandir($dirs["SUBDOM_FOLDER"])) == 2) {
@@ -132,19 +139,22 @@ function init_server($subdom, $cms_root_dir, $update = false) {
           throw new Exception("Unable to sync subdom setup");
         break;
         case "PLUGIN":
-        if(!is_file("$serverSubdomDir/PLUGINS.user")) continue; // user cannot modify plugins
         unlink("$serverSubdomDir/$f"); // delete all plugins (create default below)
       }
     }
-    if(is_file("$serverSubdomDir/PLUGINS.user"))
-      createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
-      createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $dirs["SUBDOM_FOLDER"]);
+    createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
+    createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $dirs["SUBDOM_FOLDER"]);
   }
 
   // copy index and .htaccess
-  foreach(array("index.php", ".htaccess") as $f) {
-    if(!is_file("$serverSubdomDir/$f") && !@symlink("$cms_root_dir/{$vars["CMS_VER"]}/$f", "$serverSubdomDir/$f"))
-      throw new Exception("Unable to link file '$f' into '$serverSubdomDir'");
+  $files = array("index.php" => "index.php", ".htaccess" => ".htaccess");
+  if(preg_match("/^ig\d/", $subdom)) $files["robots.txt"] = "robots_off.txt";
+  else $files["robots.txt"] = "robots_default.txt";
+  foreach($files as $link => $target) {
+    if(!is_link("$serverSubdomDir/$link")
+      && (!symlink("$cms_root_dir/{$vars["CMS_VER"]}/$target", "$serverSubdomDir/$link~")
+      || !rename("$serverSubdomDir/$link~", "$serverSubdomDir/$link")))
+      throw new Exception("Unable to link file '$l' into '$subdom'");
   }
 
   // apply user subdom
@@ -160,14 +170,19 @@ function init_server($subdom, $cms_root_dir, $update = false) {
       $userVar[$var[0]] = $var[1];
       break;
       case "PLUGIN":
-      if(!is_file("$serverSubdomDir/PLUGINS.user"))
-        throw new Exception("Plugin modification is disabled");
       if(!is_dir("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}/{$var[1]}"))
         throw new Exception("Plugin '{$var[1]}' is not available");
       if(is_file("$serverSubdomDir/.$f"))
         throw new Exception("Plugin '{$var[1]}' is forbidden");
       if(!is_file("$serverSubdomDir/$f") && !touch("$serverSubdomDir/$f"))
         throw new Exception("Unable to enable plugin '{$var[1]}'");
+      break;
+      case "robots":
+      if($f != "robots.txt") continue;
+      if(preg_match("/^ig\d/", $subdom))
+        throw new Exception("Cannot modify '$f' in subdom '$subdom'");
+      if(!copy("{$dirs["SUBDOM_FOLDER"]}/$f", "$serverSubdomDir/$f"))
+        throw new Exception("Unable to copy '$f' into subdom '$subdom'");
       break;
     }
   }
@@ -188,8 +203,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
         throw new Exception("Unable to setup '$newFile'");
       break;
       case "PLUGIN":
-      if(is_file("$serverSubdomDir/PLUGINS.user")
-        && !is_file($dirs["SUBDOM_FOLDER"] ."/$f") && !unlink("$serverSubdomDir/$f"))
+      if(!is_file($dirs["SUBDOM_FOLDER"] ."/$f") && !unlink("$serverSubdomDir/$f"))
         throw new Exception("Unable to disable plugin '{$var[1]}'");
       break;
     }
