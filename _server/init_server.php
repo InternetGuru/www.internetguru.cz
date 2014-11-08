@@ -2,6 +2,11 @@
 
 function init_server($subdom, $cms_root_dir, $update = false) {
 
+  // subdom check
+  if(!preg_match("/^[a-z][a-z0-9]*$/", $subdom))
+    throw new Exception("Invalid subdom format '$subdom'");
+  $serverSubdomDir = "../$subdom";
+
   // default local values
   $vars = array(
     "USER_ID" => isset($_SERVER["REMOTE_USER"]) ? $user_id = $_SERVER["REMOTE_USER"] : "ig1",
@@ -14,23 +19,56 @@ function init_server($subdom, $cms_root_dir, $update = false) {
     "PLUGINS" => "user",
   );
 
-  // create subdom
-  if(!preg_match("/^[a-z][a-z0-9]+$/", $subdom))
-    throw new Exception("Invalid subdom format '$subdom'");
-  $serverSubdomDir = "../$subdom";
-  if(!is_dir($serverSubdomDir)) {
-    if(strpos($subdom, $vars["USER_ID"]) !== 0)
-      throw new Exception("New subdom must start with USER_ID '".$vars["USER_ID"]."'");
-    if(!@mkdir($serverSubdomDir, 0755, true))
-      throw new Exception("Unable to create folder '$serverSubdomDir'");
-  }
-
   // update default values from server subdom
-  foreach(scandir($serverSubdomDir) as $f) {
+  if(is_dir($serverSubdomDir)) foreach(scandir($serverSubdomDir) as $f) {
     $vName = substr($f,0,strpos($f,"."));
     if(!array_key_exists($vName, $vars)) continue;
     $vars[$vName] = substr($f,strlen($vName)+1);
   }
+
+  if($update) {
+
+    // check ID
+    if(is_dir($serverSubdomDir) && !is_file("$serverSubdomDir/USER_ID.". $vars["USER_ID"]))
+      throw new Exception("Cannot modify subdom '$subdom', USER_ID mismatch");
+
+    // safely remove (rename) subdom if .subdom && user_id match
+    if(is_dir("../../" . $vars["USER_ID"] . "/subdom/.$subdom")) {
+      if(is_dir($serverSubdomDir)) {
+        $newSubdom = "~$subdom";
+        while(file_exists("../$newSubdom")) $newSubdom = "~$newSubdom";
+        if(!rename($serverSubdomDir,"../$newSubdom"))
+          throw new Exception("Unable to remove subdom '$subdom'");
+      }
+      throw new Exception("Subdom '$subdom' has been removed");
+    }
+
+    // create subdom
+    if(!is_dir($serverSubdomDir)) {
+      if(!preg_match("/^".$vars["USER_ID"]."[a-z][a-z0-9]*$/", $subdom))
+        throw new Exception("New subdom must start with USER_ID '".$vars["USER_ID"]."'");
+      if(!@mkdir($serverSubdomDir, 0755, true))
+        throw new Exception("Unable to create folder '$serverSubdomDir'");
+      if(!touch("$serverSubdomDir/USER_ID.". $vars["USER_ID"]))
+        throw new Exception("Unable to create user id file");
+    }
+
+  }
+
+  // create folder constants
+  $dirs = array(
+    'SUBDOM_FOLDER' => "../../" . $vars["USER_ID"] . "/subdom/$subdom",
+    'ADMIN_BACKUP' => "../../adm.bak/$subdom",
+    'ADMIN_FOLDER' => "../../adm/". $vars["ADMIN_DIR"],
+    'USER_FOLDER' => "../../" . $vars["USER_ID"] . "/usr/" . $vars["USER_DIR"],
+    'USER_BACKUP' => "../../usr.bak/$subdom",
+    'FILES_FOLDER' => "../../" . $vars["USER_ID"] . "/files/" . $vars["FILES_DIR"],
+    'TEMP_FOLDER' => "../../" . $vars["USER_ID"] . "/temp",
+    'CMSRES_FOLDER' => "cmsres/". $vars["CMS_VER"],
+    'RES_FOLDER' => $vars["RES_DIR"],
+    'LOG_FOLDER' => "../../log/$subdom",
+    'CACHE_FOLDER' => "../../cache/$subdom",
+  );
 
   // find newest stable version
   if(!file_exists("CMS_VER.".$vars["CMS_VER"])) {
@@ -63,28 +101,20 @@ function init_server($subdom, $cms_root_dir, $update = false) {
   }
 
   // create required directories
-  $dirs = array(
-    'SUBDOM_FOLDER' => "../../" . $vars["USER_ID"] . "/subdom/$subdom",
-    'ADMIN_BACKUP' => "../../adm.bak/$subdom",
-    'ADMIN_FOLDER' => "../../adm/". $vars["ADMIN_DIR"],
-    'USER_FOLDER' => "../../" . $vars["USER_ID"] . "/usr/" . $vars["USER_DIR"],
-    'USER_BACKUP' => "../../usr.bak/$subdom",
-    'FILES_FOLDER' => "../../" . $vars["USER_ID"] . "/files/" . $vars["FILES_DIR"],
-    'TEMP_FOLDER' => "../../" . $vars["USER_ID"] . "/temp",
-    'CMSRES_FOLDER' => "cmsres/". $vars["CMS_VER"],
-    'RES_FOLDER' => $vars["RES_DIR"],
-    'LOG_FOLDER' => "../../log/$subdom",
-    'CACHE_FOLDER' => "../../cache/$subdom",
-    );
   foreach($dirs as $k => $d) {
     if(!$d) continue; // res/cmsres == false
     if(!is_dir("$serverSubdomDir/$d") && !@mkdir("$serverSubdomDir/$d",0755,true))
       throw new Exception("Unable to create folder '$d'");
   }
 
-  // check ID
-  if(!is_file("$serverSubdomDir/USER_ID.". $vars["USER_ID"]))
-    throw new Exception("Cannot modify subdom '$subdom', USER_ID mismatch");
+  // define global constants
+  if(!$update) {
+    define("USER_ID", $vars["USER_ID"]);
+    define("PLUGIN_FOLDER", $vars["PLUGIN_DIR"]);
+    define('CMS_FOLDER', "$cms_root_dir/{$vars["CMS_VER"]}");
+    foreach($dirs as $k => $v) define($k, $v);
+    return;
+  }
 
   // reset server and sync user if user subdom empty
   $userVar = array("CMS_VER" => $vars["CMS_VER"], "USER_DIR" => $subdom, "FILES_DIR" => $subdom);
@@ -108,15 +138,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
     }
     if(is_file("$serverSubdomDir/PLUGINS.user"))
       createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
-  }
-
-  // define global constants
-  if(!$update) {
-    define("USER_ID", $vars["USER_ID"]);
-    define("PLUGIN_FOLDER", $vars["PLUGIN_DIR"]);
-    define('CMS_FOLDER', "$cms_root_dir/{$vars["CMS_VER"]}");
-    foreach($dirs as $k => $v) define($k, $v);
-    return;
+      createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $dirs["SUBDOM_FOLDER"]);
   }
 
   // copy index and .htaccess
