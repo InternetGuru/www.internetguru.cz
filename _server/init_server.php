@@ -160,44 +160,8 @@ function init_server($subdom, $update = false) {
   if(!is_file("$serverSubdomDir/CONFIG.user"))
     throw new Exception("User subdom setup disabled.");
 
-  // reset server and sync user if user subdom empty
-  $userVar = array("CMS_VER" => $vars["CMS_VER"], "USER_DIR" => $subdom, "FILES_DIR" => $subdom);
-  if(count(scandir($dirs["SUBDOM_FOLDER"])) == 2) {
-    foreach(scandir($serverSubdomDir) as $f) {
-      if(!is_file("$serverSubdomDir/$f") || strpos($f, ".") === 0) continue;
-      $var = explode(".", $f, 2);
-      switch($var[0]) {
-        case "CMS_VER":
-        case "USER_DIR":
-        case "FILES_DIR":
-        if(!rename("$serverSubdomDir/$f", "$serverSubdomDir/{$var[0]}.". $userVar[$var[0]]))
-          throw new Exception("Unable to reset server subdom setup");
-        if(!touch($dirs["SUBDOM_FOLDER"] ."/{$var[0]}.". $userVar[$var[0]]))
-          throw new Exception("Unable to sync subdom setup");
-        break;
-        case "PLUGIN":
-        unlink("$serverSubdomDir/$f"); // delete all plugins (create default below)
-      }
-    }
-    createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
-    createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $dirs["SUBDOM_FOLDER"]);
-  }
-
-  // link root files
-  $files = array("index.php" => "index.php", ".htaccess" => ".htaccess", "robots.txt" => "robots_default.txt");
-  if(preg_match("/^ig\d/", $subdom)) $files["robots.txt"] = "robots_off.txt";
-  foreach($files as $link => $target) {
-    if(!is_link("$serverSubdomDir/$link")
-      || readlink("$serverSubdomDir/$link") != "$cms_root_dir/{$vars["CMS_VER"]}/$target") {
-      if(!symlink("$cms_root_dir/{$vars["CMS_VER"]}/$target", "$serverSubdomDir/$link~")
-      || !rename("$serverSubdomDir/$link~", "$serverSubdomDir/$link"))
-        throw new Exception("Unable to link file '$l' into '$subdom'");
-      clearstatcache(true, "$serverSubdomDir/$link");
-    }
-  }
-
-  // apply user subdom
-  foreach(scandir($dirs["SUBDOM_FOLDER"]) as $f) {
+  // apply user subdom (first update CMS_VER then plugins .. ascending)
+  foreach(scandir($dirs["SUBDOM_FOLDER"], SCANDIR_SORT_ASCENDING) as $f) {
     if(!is_file("{$dirs["SUBDOM_FOLDER"]}/$f") || strpos($f, ".") === 0) continue;
     $var = explode(".", $f, 2);
     switch($var[0]) {
@@ -206,7 +170,7 @@ function init_server($subdom, $update = false) {
         throw new Exception("CMS variant '{$var[1]}' not available");
       case "USER_DIR":
       case "FILES_DIR":
-      $userVar[$var[0]] = $var[1];
+      $vars[$var[0]] = $var[1];
       break;
       case "PLUGIN":
       if(!is_dir("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}/{$var[1]}"))
@@ -226,6 +190,30 @@ function init_server($subdom, $update = false) {
     }
   }
 
+  // reset server and sync user if user subdom empty
+  if(count(scandir($dirs["SUBDOM_FOLDER"])) == 2) {
+    $vars["USER_DIR"] = $subdom;
+    $vars["FILES_DIR"] = $subdom;
+    foreach(scandir($serverSubdomDir) as $f) {
+      if(!is_file("$serverSubdomDir/$f") || strpos($f, ".") === 0) continue;
+      $var = explode(".", $f, 2);
+      switch($var[0]) {
+        case "CMS_VER":
+        case "USER_DIR":
+        case "FILES_DIR":
+        if(!rename("$serverSubdomDir/$f", "$serverSubdomDir/{$var[0]}.". $vars[$var[0]]))
+          throw new Exception("Unable to reset server subdom setup");
+        if(!touch($dirs["SUBDOM_FOLDER"] ."/{$var[0]}.". $vars[$var[0]]))
+          throw new Exception("Unable to sync subdom setup");
+        break;
+        case "PLUGIN":
+        unlink("$serverSubdomDir/$f"); // delete all plugins (create default below)
+      }
+    }
+    createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $serverSubdomDir);
+    createDefaultPlugins("$cms_root_dir/{$vars["CMS_VER"]}/{$vars["PLUGIN_DIR"]}", $dirs["SUBDOM_FOLDER"]);
+  }
+
   // apply server subdom
   foreach(scandir($serverSubdomDir) as $f) {
     if(strpos($f, ".") === 0) continue;
@@ -234,10 +222,10 @@ function init_server($subdom, $update = false) {
       case "CMS_VER":
       case "USER_DIR":
       case "FILES_DIR":
-      $newFile = "{$var[0]}.". $userVar[$var[0]];
+      $newFile = "{$var[0]}.". $vars[$var[0]];
       if(!is_file($dirs["SUBDOM_FOLDER"] ."/$newFile") && !touch($dirs["SUBDOM_FOLDER"] ."/$newFile"))
         throw new Exception("Unable to update user subdom setup");
-      if($userVar[$var[0]] == $var[1]) continue;
+      if($vars[$var[0]] == $var[1]) continue;
       if(!rename("$serverSubdomDir/$f", "$serverSubdomDir/$newFile"))
         throw new Exception("Unable to setup '$newFile'");
       break;
@@ -246,6 +234,29 @@ function init_server($subdom, $update = false) {
         throw new Exception("Unable to disable plugin '{$var[1]}'");
       break;
     }
+  }
+
+  // link root files
+  $files = array("index.php" => "index.php", ".htaccess" => ".htaccess", "robots.txt" => "robots_default.txt");
+  if(preg_match("/^ig\d/", $subdom)) $files["robots.txt"] = "robots_off.txt";
+  foreach($files as $link => $target) {
+    #$info["toVersion"] = $vars["CMS_VER"];
+    #$info["isLink"] = is_link("$serverSubdomDir/$link");
+    #$info["readlink"] = readlink("$serverSubdomDir/$link");
+    if(!is_link("$serverSubdomDir/$link")
+      || readlink("$serverSubdomDir/$link") != "$cms_root_dir/{$vars["CMS_VER"]}/$target") {
+      #$info["settingTo"] = "$cms_root_dir/{$vars["CMS_VER"]}/$target";
+      if(!symlink("$cms_root_dir/{$vars["CMS_VER"]}/$target", "$serverSubdomDir/$link~")
+      || !rename("$serverSubdomDir/$link~", "$serverSubdomDir/$link"))
+        throw new Exception("Unable to link file '$l' into '$subdom'");
+      #$info["beforeClear"] = readlink("$serverSubdomDir/$link");
+      clearstatcache(true, "$serverSubdomDir/$link");
+      #$info["afterClear"] = readlink("$serverSubdomDir/$link");
+      if(readlink("$serverSubdomDir/$link") != "$cms_root_dir/{$vars["CMS_VER"]}/$target")
+        throw new Exception("Unable to verify symlink (cache).");
+    }
+    #print_r($info);
+    #throw new Exception("ALL OK");
   }
 
 }
