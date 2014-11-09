@@ -25,8 +25,14 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $this->userDirs = $this->getSubdirs(USER_FOLDER ."/..", "/^[^~]/");
     $this->filesDirs = $this->getSubdirs(FILES_FOLDER ."/..");
     $this->syncUserSubdoms();
-    if(!empty($_POST)) try {
+    if(empty($_POST)) return;
+    try {
       $this->processPost();
+      if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
+      init_server($_POST["subdom"], CMS_FOLDER ."/..", true);
+      $link = getCurLink(true);
+      if(isset($_POST["redir"])) $link = "http://{$_POST["subdom"]}.". getDomain();
+      redirTo($link, null, true);
     } catch(Exception $e) { // this should never happen
       new Logger($e->getMessage(), "error");
       $this->err[] = $e->getMessage();
@@ -62,9 +68,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       if(touch("$subdomFolder/PLUGIN.$p", 0644)) continue;
       throw new Exception("Unable to enable plugin from subdom '{$_POST["subdom"]}'");
     }
-    if(!isset($_POST["apply"])) return;
-    init_server($_POST["subdom"], CMS_FOLDER ."/..", true);
-    #todo: redir
   }
 
   public function getContent(HTMLPlus $content) {
@@ -102,7 +105,10 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
     $doc->insertVar("userDirId", "$subdom-USER_DIR");
     $doc->insertVar("filesDirId", "$subdom-FILES_DIR");
-    if($subdom == basename(dirname($_SERVER["PHP_SELF"]))) $doc->insertVar("nohide", "nohide");
+
+    $showSubdom = basename(dirname($_SERVER["PHP_SELF"]));
+    if(isset($_POST["subdom"])) $showSubdom = $_POST["subdom"];
+    if($subdom == $showSubdom) $doc->insertVar("nohide", "nohide");
 
     // versions
     $d = new DOMDocumentPlus();
@@ -168,8 +174,11 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $i->setAttribute("id", "$subdom-$pName");
       $i->setAttribute("name", "PLUGINS[]");
       $i->setAttribute("value", $pName);
-      if(file_exists("$userSubdomFolder/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
-      $l = $set->appendChild($d->createElement("label", " $pName"));
+      $changed = "";
+      if(is_file("../$subdom/PLUGIN.$pName") != is_file("$userSubdomFolder/PLUGIN.$pName"))
+        $changed = "*";
+      if(is_file("$userSubdomFolder/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
+      $l = $set->appendChild($d->createElement("label", " $pName$changed"));
       $l->setAttribute("for","$subdom-$pName");
       $set->appendChild($d->createTextNode(", "));
     }
