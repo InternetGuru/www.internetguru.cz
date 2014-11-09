@@ -37,14 +37,26 @@ function init_server($subdom, $cms_root_dir, $update = false) {
       throw new Exception("Cannot modify subdom '$subdom', USER_ID mismatch");
 
     // safely remove (rename) subdom if .subdom && user_id match
-    if(is_dir("../../" . $vars["USER_ID"] . "/subdom/.$subdom")) {
+    $userDotSubdom = "../../" . $vars["USER_ID"] . "/subdom/.$subdom";
+    if(is_dir($userDotSubdom)) {
+      // safely remove/rename user .subdom folder
+      if(count(scandir($userDotSubdom)) == 2) {
+        if(!rmdir($userDotSubdom))
+          throw new Exception("Unable to remove '.$subdom' folder");
+      } else {
+        $newSubdom = "~$subdom";
+        while(file_exists("$userDotSubdom/../$newSubdom")) $newSubdom = "~$newSubdom";
+        if(!rename($userDotSubdom, "$userDotSubdom/../$newSubdom"))
+          throw new Exception("Unable to rename '.$subdom' folder");
+      }
       if(is_dir($serverSubdomDir)) {
         $newSubdom = "~$subdom";
         while(file_exists("../$newSubdom")) $newSubdom = "~$newSubdom";
         if(!rename($serverSubdomDir,"../$newSubdom"))
           throw new Exception("Unable to remove subdom '$subdom'");
       }
-      throw new Exception("Subdom '$subdom' has been removed");
+
+      return; // throw new Exception("Subdom '$subdom' has been removed");
     }
 
     // create subdom
@@ -141,8 +153,8 @@ function init_server($subdom, $cms_root_dir, $update = false) {
       define('CMS_FOLDER', "$cms_root_dir/{$vars["CMS_VER"]}");
       foreach($dirs as $k => $v) define($k, $v);
     }
-    return;
 
+    return;
   }
 
   // check rights to modify files
@@ -173,9 +185,8 @@ function init_server($subdom, $cms_root_dir, $update = false) {
   }
 
   // link root files
-  $files = array("index.php" => "index.php", ".htaccess" => ".htaccess");
+  $files = array("index.php" => "index.php", ".htaccess" => ".htaccess", "robots.txt" => "robots_default.txt");
   if(preg_match("/^ig\d/", $subdom)) $files["robots.txt"] = "robots_off.txt";
-  else $files["robots.txt"] = "robots_default.txt";
   foreach($files as $link => $target) {
     if(!is_link("$serverSubdomDir/$link")
       && (!symlink("$cms_root_dir/{$vars["CMS_VER"]}/$target", "$serverSubdomDir/$link~")

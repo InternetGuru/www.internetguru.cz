@@ -30,8 +30,14 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $subdom = null;
       if(isset($_POST["new_subdom"])) $subdom = $this->processCreateSubdom($_POST["new_subdom"]);
       if(isset($_POST["subdom"])) {
-        $subdom = $this->processUpdateSubdom($_POST["subdom"]);
-        if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
+        #if(!is_file("../{$_POST["subdom"]}/USER_ID.". USER_ID))
+        #  throw new Exception(sprintf("Unauthorized subdom '%s' modification by '%s'", $_POST["subdom"], USER_ID));
+        if(isset($_POST["delete"])) {
+          $subdom = $this->processDeleteSubdom($_POST["subdom"]);
+        } else {
+          $subdom = $this->processUpdateSubdom($_POST["subdom"]);
+          if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
+        }
       }
       if(is_null($subdom)) throw new Exception("Unrecognized POST");
       init_server($subdom, CMS_FOLDER ."/..", true);
@@ -42,6 +48,22 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       new Logger($e->getMessage(), "error");
       $this->err[] = $e->getMessage();
     }
+  }
+
+  private function processDeleteSubdom($subdom) {
+    if(self::DEBUG) throw new Exception("Deleting DISABLED");
+    $activeDir = SUBDOM_FOLDER ."/../$subdom";
+    $inactiveDir = SUBDOM_FOLDER ."/../.$subdom";
+    if(is_dir($activeDir)) {
+      $newSubdom = "~$subdom";
+      while(file_exists(SUBDOM_FOLDER ."/../$newSubdom")) $newSubdom = "~$newSubdom";
+      if(!rename($activeDir, SUBDOM_FOLDER ."/../$newSubdom"))
+        throw new Exception("Unable to keep subdom '$subdom' setup");
+    }
+    if(!is_dir($inactiveDir) && !mkdir($inactiveDir)) {
+      throw new Exception("Unable to process delete subdom '$subdom'");
+    }
+    return $subdom;
   }
 
   private function processCreateSubdom($subdom) {
@@ -55,8 +77,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   // process post (changes) into USER_ID/subdom
   private function processUpdateSubdom($subdom) {
-    if(!is_file("../$subdom/USER_ID.". USER_ID))
-      throw new Exception(sprintf("Unauthorized subdom '%s' modification by '%s'", $_POST["subdom"], USER_ID));
     $subdomFolder = SUBDOM_FOLDER ."/../$subdom";
     if(!is_dir($subdomFolder) && !mkdir($subdomFolder, 0755, true))
       throw new Exception("Unable to create user subdom directory '$subdom'");
@@ -88,6 +108,16 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   public function getContent(HTMLPlus $content) {
     global $cms;
     $cms->getOutputStrategy()->addCssFile($this->getDir() ."/SubdomManager.css");
+    $cms->getOutputStrategy()->addJs("
+    var forms = document.getElementsByTagName('form');
+    for(var i=0; i<forms.length; i++) {
+      if(typeof forms[i]['delete'] !== 'object') continue;
+      forms[i]['delete'].addEventListener('click', function(e){
+        if(confirm('Delete subdom \"' + e.target.form['subdom'].value + '\"?')) return;
+        e.preventDefault();
+      }, false);
+    }");
+
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("curlink", getCurLink(true));
