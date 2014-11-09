@@ -40,7 +40,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         }
       }
       if(is_null($subdom)) throw new Exception("Unrecognized POST");
-      init_server($subdom, CMS_FOLDER ."/..", true);
+      init_server($subdom, true);
       $link = getCurLink(true);
       if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
       redirTo($link, null, true);
@@ -145,7 +145,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     foreach($this->getSubdirs("..", "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
       if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
       try {
-        init_server($subdom, CMS_FOLDER ."/.."); // clone existing subdoms (no update)
+        init_server($subdom); // clone existing subdoms (no update)
       } catch(Exception $e) {
         $this->err[] = $e->getMessage();
       }

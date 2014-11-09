@@ -1,49 +1,29 @@
 <?php
 
-$errorMessage = "CMS core init file not found.";
-error_reporting(E_ALL);
-ini_set("display_errors", 1);
+if(is_link(basename(__FILE__))) define('CMS_FOLDER', dirname(readlink(basename(__FILE__))));
+else define('CMS_FOLDER', "../cms");
+define('CMS_VERSION', file_get_contents(CMS_FOLDER ."/cms_version.txt"));
+define('CORE_FOLDER', 'core');
+define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
+define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
+define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}");
+define('FILE_HASH_ALGO', 'crc32b');
 
-// run cms directly
-$init_cms_path = "core/init_cms.php";
+if(substr(CMS_VERSION,-4) == "-dev") {
+  error_reporting(E_ALL);
+  ini_set("display_errors", 1);
+}
+
+#todo: date_default_timezone_set()
+#todo: setlocale(LC_ALL, czech); // cs_CZ.utf8 (localhost)
+
+$init_cms_path = CMS_FOLDER ."/". CORE_FOLDER ."/init_cms.php";
 if(is_file($init_cms_path)) {
   include($init_cms_path);
   return;
-}
-
-// run cms on localhost
-$init_cms_path = "../cms/core/init_cms.php";
-if(is_file($init_cms_path)) {
-  include($init_cms_path);
-  return;
-}
-
-// run/update cms on server
-$cms_root_dir = "/var/www/cms";
-$init_server_path = "$cms_root_dir/init_server.php";
-if(is_file($init_server_path)) try {
-  $subdom = basename(dirname($_SERVER["PHP_SELF"]));
-  require_once($init_server_path);
-  init_server($subdom, $cms_root_dir);
-  // update subdom
-  if(isset($_GET["updateSubdom"])) {
-    if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
-    update_subdom($subdom, $cms_root_dir);
-    $d = explode(".",$_SERVER["HTTP_HOST"]);
-    while(count($d) > 2) array_shift($d);
-    header("Location: http://$subdom.". implode(".",$d));
-    exit();
-  }
-  $init_cms_path = CMS_FOLDER ."/core/init_cms.php";
-  if(is_file($init_cms_path)) {
-    include($init_cms_path);
-    return;
-  }
-} catch(Exception $e) {
-  $errorMessage = $e->getMessage();
 }
 
 http_response_code(500);
-echo $errorMessage;
+echo "CMS core init file not found.";
 
 ?>

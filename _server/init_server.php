@@ -1,8 +1,8 @@
 <?php
 
-define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
+function init_server($subdom, $update = false) {
 
-function init_server($subdom, $cms_root_dir, $update = false) {
+  $cms_root_dir = realpath(CMS_FOLDER ."/..");
 
   // subdom check
   if(!preg_match("/^".SUBDOM_PATTERN."$/", $subdom))
@@ -88,7 +88,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
   );
 
   // find newest stable version
-  if(!file_exists("CMS_VER.".$vars["CMS_VER"])) {
+  if(!file_exists("$serverSubdomDir/CMS_VER.".$vars["CMS_VER"])) {
     foreach(scandir($cms_root_dir) as $v) {
       if(!preg_match("/^\d+\.\d+$/",$v)) continue;
       if(version_compare($vars["CMS_VER"],$v) < 0) $vars["CMS_VER"] = $v;
@@ -150,7 +150,6 @@ function init_server($subdom, $cms_root_dir, $update = false) {
     if(!defined("USER_ID")) {
       define("USER_ID", $vars["USER_ID"]);
       define("PLUGIN_FOLDER", $vars["PLUGIN_DIR"]);
-      define('CMS_FOLDER', "$cms_root_dir/{$vars["CMS_VER"]}");
       foreach($dirs as $k => $v) define($k, $v);
     }
 
@@ -159,7 +158,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
 
   // check rights to modify files
   if(!is_file("$serverSubdomDir/CONFIG.user"))
-    throw new Exception("User cannot force update subdom.");
+    throw new Exception("User subdom setup disabled.");
 
   // reset server and sync user if user subdom empty
   $userVar = array("CMS_VER" => $vars["CMS_VER"], "USER_DIR" => $subdom, "FILES_DIR" => $subdom);
@@ -189,9 +188,12 @@ function init_server($subdom, $cms_root_dir, $update = false) {
   if(preg_match("/^ig\d/", $subdom)) $files["robots.txt"] = "robots_off.txt";
   foreach($files as $link => $target) {
     if(!is_link("$serverSubdomDir/$link")
-      && (!symlink("$cms_root_dir/{$vars["CMS_VER"]}/$target", "$serverSubdomDir/$link~")
-      || !rename("$serverSubdomDir/$link~", "$serverSubdomDir/$link")))
-      throw new Exception("Unable to link file '$l' into '$subdom'");
+      || readlink("$serverSubdomDir/$link") != "$cms_root_dir/{$vars["CMS_VER"]}/$target") {
+      if(!symlink("$cms_root_dir/{$vars["CMS_VER"]}/$target", "$serverSubdomDir/$link~")
+      || !rename("$serverSubdomDir/$link~", "$serverSubdomDir/$link"))
+        throw new Exception("Unable to link file '$l' into '$subdom'");
+      clearstatcache(true, "$serverSubdomDir/$link");
+    }
   }
 
   // apply user subdom
@@ -258,8 +260,8 @@ function createDefaultPlugins($srcDir, $destDir) {
   }
 }
 
-function update_subdom($subdom, $cms_root_dir) {
-  init_server($subdom, $cms_root_dir, true);
+function update_subdom($subdom) {
+  init_server($subdom, true);
 }
 
 ?>

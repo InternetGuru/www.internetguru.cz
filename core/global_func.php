@@ -30,7 +30,8 @@ function redirTo($link,$code=null,$force=false) {
     if($curLink == $absLink)
       throw new LoggerException("Cyclic redirection to '$link'");
   }
-  new Logger("Redirecting to '$link' with status code '".(is_null($code) ? 302 : $code)."'");
+  if(class_exists("Logger"))
+    new Logger("Redirecting to '$link' with status code '".(is_null($code) ? 302 : $code)."'");
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
@@ -38,35 +39,6 @@ function redirTo($link,$code=null,$force=false) {
   header("Location: $link",true,$code);
   header("Refresh: 0; url=$link");
   exit();
-}
-
-function getRes($res,$dest,$resFolder) {
-  if(!$resFolder) return $res;
-  #TODO: check mime==ext, allowed types, max size
-  $folders = preg_quote(CMS_FOLDER,"/") ."|". preg_quote(ADMIN_FOLDER,"/") ."|". preg_quote(USER_FOLDER,"/");
-  if(!preg_match("/^(?:$folders)\/".FILEPATH_PATTERN."$/", $res)) {
-    new Logger("Forbidden file name '$res' to copy to '$resFolder' folder","error");
-    return false;
-  }
-  $mime = getFileMime($res);
-  if($resFolder != CMSRES_FOLDER && $mime != "text/plain") {
-    new Logger("Forbidden mime type '$mime' to copy '$res' to '$resFolder' folder","error");
-    return false;
-  }
-  $newRes = $resFolder . "/$dest";
-  $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
-  if(!is_dir($newDir) && !mkdirGroup($newDir,0775,true)) {
-    new Logger("Unable to create directory structure '$newDir'","error");
-    return false;
-  }
-  if(file_exists($newRes)) return $newRes;
-  if(!symlink(realpath($res), $newRes . "~") || !rename($newRes . "~", $newRes)) {
-    new Logger("Unable to create symlink '$newRes' for '$res'","error");
-    return false;
-  }
-  if(!chmodGroup($newRes,0664))
-    new Logger("Unable to chmod resource file '$newRes'","error");
-  return $newRes;
 }
 
 function chmodGroup($file,$mode) {
@@ -87,14 +59,6 @@ function __toString($o) {
   echo "|";
   if(is_array($o)) return implode(",",$o);
   return (string) $o;
-}
-
-function __autoload($className) {
-  $fp = CMS_FOLDER ."/". PLUGIN_FOLDER . "/$className/$className.php";
-  if(@include $fp) return;
-  $fc = CMS_FOLDER ."/". CORE_FOLDER . "/$className.php";
-  if(@include $fc) return;
-  throw new LoggerException("Unable to find class '$className' in '$fp' nor '$fc'");
 }
 
 function stableSort(Array &$a) {
@@ -121,19 +85,6 @@ function getDomain() {
   $d = explode(".",$_SERVER["HTTP_HOST"]);
   while(count($d) > 2) array_shift($d);
   return implode(".",$d);
-}
-
-function findFile($file,$user=true,$admin=true,$res=false) {
-  while(strpos($file,"/") === 0) $file = substr($file,1);
-  $f = USER_FOLDER . "/$file";
-  if($user && is_file($f)) return ($res ? getRes($f,$file,RES_FOLDER) : $f);
-  $f = ADMIN_FOLDER . "/$file";
-  if($admin && is_file($f)) return ($res ? getRes($f,$file,RES_FOLDER) : $f);
-  $f = $file;
-  if(is_file($f)) return ($res ? getRes($f,$file,RES_FOLDER) : $f);
-  $f = CMS_FOLDER . "/$file";
-  if(is_file($f)) return ($res ? getRes($f,$file,CMSRES_FOLDER) : $f);
-  return false;
 }
 
 function normalize($s,$extKeep="",$tolower=true,$convertToUtf8=false) {
@@ -172,11 +123,6 @@ function saveRewrite($dest,$content) {
   if(!copy($dest,"$dest.old")) return false;
   if(!rename("$dest.new",$dest)) return false;
   return $b;
-}
-
-function getFileHash($filePath) {
-  if(!file_exists($filePath)) return "";
-  return hash_file(FILE_HASH_ALGO,$filePath);
 }
 
 function matchFiles($pattern, $dir) {
@@ -342,6 +288,11 @@ function checkUrl($folder = null, $extended = false) {
   if(array_key_exists($fInfo["filemime"], $disallowedMime))
     new ErrorPage("Unsupported mime type '".$fInfo["filemime"]."'", 415);
   return $fInfo;
+}
+
+function getFileHash($filePath) {
+  if(!file_exists($filePath)) return "";
+  return hash_file(FILE_HASH_ALGO,$filePath);
 }
 
 ?>

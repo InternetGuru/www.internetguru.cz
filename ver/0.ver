@@ -1,18 +1,23 @@
 0.2.0
 -----
 
+SubdomManager plugin created
+ContentMatch renamed to UrlHandler
+ContentAdmin renamed to Admin
+Convertor added noparse support
+Xhtml11 check object: exist/mime/size
+ContentMatch default redirection updated
+LogViewer support major version number only (eg. 0.ver)
 ContentMatch user redirection root support
 Changed root link in HTML+ is now '/'
 FileHandler plugin created
 Xhtml11 changed default layout and config
-
 
 0.1.2-dev
 ---------
 
 ContentAdmin showing plugins-loaded (instead of cms-plugins)
 Added new variable plugins-loaded
-
 
 0.1.1-dev
 ---------
@@ -33,7 +38,6 @@ ContentAdmin: showing links to edit files
 new system variable dombuilder-html
 ContentAdmin: redir to default file
 HTML+ import: added language check
-
 
 0.1.0-dev
 ---------
