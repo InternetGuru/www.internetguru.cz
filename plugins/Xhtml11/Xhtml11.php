@@ -399,12 +399,23 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           continue;
         }
       }
-      $content = $this->jsFiles[$k]["content"];
       $e = $parent->ownerDocument->createElement("script");
-      $e->appendChild($parent->ownerDocument->createTextNode($content));
+      $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type","text/javascript");
       if($f !== false) $e->setAttribute("src", getRoot().$f);
       $parent->appendChild($e);
+    }
+  }
+
+  private function appendCdata(DOMElement $appendTo, $text) {
+    if(strlen($text)) {
+      $cm = $appendTo->ownerDocument->createTextNode("\n//");
+      if(strpos($text, "\n") !== 0) $text = "\n$text";
+      $ct = $appendTo->ownerDocument->createCDATASection("$text\n//");
+      $appendTo->appendChild($cm);
+      $appendTo->appendChild($ct);
+    } else {
+      $appendTo->appendChild($appendTo->ownerDocument->createTextNode("")); // force close tag </script>
     }
   }
 
