@@ -39,8 +39,7 @@ class DOMDocumentPlus extends DOMDocument {
           $keep[] = $v;
           continue;
         }
-        if(isset($p[1])) $where[$p[1]] = $e;
-        else $where[] = $e;
+        $where[] = array($e, isset($p[1]) ? $p[1] : null);
       }
       if(empty($keep)) {
         $e->removeAttribute("var");
@@ -50,7 +49,9 @@ class DOMDocumentPlus extends DOMDocument {
     }
     if(!count($where)) return;
     $type = gettype($varValue);
-    foreach($where as $attr => $e) {
+    foreach($where as $item) {
+      $e = $item[0];
+      $attr = $item[1];
       if(is_null($e->parentNode)) continue;
       switch($type) {
         case "NULL":
@@ -283,7 +284,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function insertVarString($varValue,DOMElement $e,$attr,$varName) {
-    if(!is_null($attr) && !is_numeric($attr)) {
+    if(!is_null($attr)) {
       if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
         $e->setAttribute($attr,$varValue);
         return;
@@ -358,8 +359,8 @@ class DOMDocumentPlus extends DOMDocument {
 
   // full replace only
   private function insertVarDOMElement(DOMElement $varValue, DOMElement $e, $attr=null) {
-    if(!is_null($attr) && !is_numeric($attr)) {
-      $this->insertVarstring($varValue->nodeValue,$e,$attr);
+    if(!is_null($attr)) {
+      $this->insertVarstring($varValue->nodeValue, $e, $attr);
       return;
     }
     // clear destination element
