@@ -1,9 +1,11 @@
 <?php
 
+define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
+
 function init_server($subdom, $cms_root_dir, $update = false) {
 
   // subdom check
-  if(!preg_match("/^[a-z][a-z0-9]*$/", $subdom))
+  if(!preg_match("/^".SUBDOM_PATTERN."$/", $subdom))
     throw new Exception("Invalid subdom format '$subdom'");
   $serverSubdomDir = "../$subdom";
 
@@ -47,7 +49,7 @@ function init_server($subdom, $cms_root_dir, $update = false) {
 
     // create subdom
     if(!is_dir($serverSubdomDir)) {
-      if(!preg_match("/^".$vars["USER_ID"]."[a-z][a-z0-9]*$/", $subdom))
+      if(!preg_match("/^".$vars["USER_ID"].SUBDOM_PATTERN."$/", $subdom))
         throw new Exception("New subdom must start with USER_ID '".$vars["USER_ID"]."'");
       if(!@mkdir($serverSubdomDir, 0755, true))
         throw new Exception("Unable to create folder '$serverSubdomDir'");

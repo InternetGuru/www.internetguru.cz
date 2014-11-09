@@ -27,11 +27,16 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $this->syncUserSubdoms();
     if(empty($_POST)) return;
     try {
-      $this->processPost();
-      if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
-      init_server($_POST["subdom"], CMS_FOLDER ."/..", true);
+      $subdom = null;
+      if(isset($_POST["new_subdom"])) $subdom = $this->processCreateSubdom($_POST["new_subdom"]);
+      if(isset($_POST["subdom"])) {
+        $subdom = $this->processUpdateSubdom($_POST["subdom"]);
+        if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
+      }
+      if(is_null($subdom)) throw new Exception("Unrecognized POST");
+      init_server($subdom, CMS_FOLDER ."/..", true);
       $link = getCurLink(true);
-      if(isset($_POST["redir"])) $link = "http://{$_POST["subdom"]}.". getDomain();
+      if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
       redirTo($link, null, true);
     } catch(Exception $e) { // this should never happen
       new Logger($e->getMessage(), "error");
@@ -39,13 +44,22 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
   }
 
+  private function processCreateSubdom($subdom) {
+    if(strpos($subdom, USER_ID) !== 0) $subdom = USER_ID . $subdom;
+    if(!preg_match("/^".USER_ID.SUBDOM_PATTERN."$/", $subdom))
+      throw new Exception("Invalid subdom format");
+    if(is_dir("../$subdom"))
+      throw new Exception("Subdom '$subdom' already exists");
+    return $subdom;
+  }
+
   // process post (changes) into USER_ID/subdom
-  private function processPost() {
-    if(!is_file("../{$_POST["subdom"]}/USER_ID.". USER_ID))
+  private function processUpdateSubdom($subdom) {
+    if(!is_file("../$subdom/USER_ID.". USER_ID))
       throw new Exception(sprintf("Unauthorized subdom '%s' modification by '%s'", $_POST["subdom"], USER_ID));
-    $subdomFolder = SUBDOM_FOLDER ."/../{$_POST["subdom"]}";
+    $subdomFolder = SUBDOM_FOLDER ."/../$subdom";
     if(!is_dir($subdomFolder) && !mkdir($subdomFolder, 0755, true))
-      throw new Exception("Unable to create user subdom directory '{$_POST["subdom"]}'");
+      throw new Exception("Unable to create user subdom directory '$subdom'");
     if(!isset($_POST["PLUGINS"]) || !is_array($_POST["PLUGINS"]))
       throw new Exception("Missing POST data 'PLUGINS'");
     foreach(scandir($subdomFolder) as $f) {
@@ -61,24 +75,32 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         break;
         case "PLUGIN":
         if(!in_array($var[1], $_POST["PLUGINS"]) && !unlink("$subdomFolder/$f"))
-          throw new Exception("Unable to disable plugin from subdom '{$_POST["subdom"]}'");
+          throw new Exception("Unable to disable plugin from subdom '$subdom'");
       }
     }
     foreach($_POST["PLUGINS"] as $p) {
       if(touch("$subdomFolder/PLUGIN.$p", 0644)) continue;
-      throw new Exception("Unable to enable plugin from subdom '{$_POST["subdom"]}'");
+      throw new Exception("Unable to enable plugin from subdom '$subdom'");
     }
+    return $subdom;
   }
 
   public function getContent(HTMLPlus $content) {
+    global $cms;
+    $cms->getOutputStrategy()->addCssFile($this->getDir() ."/SubdomManager.css");
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("curlink", getCurLink(true));
     $newContent->insertVar("domain", getDomain());
-    $newContent->insertVar("user", USER_ID);
+    $newContent->insertVar("USER_ID", USER_ID);
 
-    $form = $newContent->getElementsByTagName("form")->item(0);
-    foreach($this->getSubdirs(SUBDOM_FOLDER ."/..", "/^[a-z][a-z0-9]*$/") as $subdom => $null) {
+    if(isset($_POST["new_subdom"])) {
+      $newContent->insertVar("new_nohide", "nohide");
+      $newContent->insertVar("new_subdom", $_POST["new_subdom"]);
+    }
+
+    $form = $newContent->getElementsByTagName("form")->item(1);
+    foreach($this->getSubdirs(SUBDOM_FOLDER ."/..", "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($form, true));
       $this->modifyDOM($doc, $subdom);
@@ -90,7 +112,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   private function syncUserSubdoms() {
-    foreach($this->getSubdirs("..", "/^[a-z][a-z0-9]*$/") as $subdom => $null) {
+    foreach($this->getSubdirs("..", "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
       if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
       try {
         init_server($subdom, CMS_FOLDER ."/.."); // clone existing subdoms (no update)
@@ -169,18 +191,18 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $set = $d->appendChild($d->createElement("var"));
     foreach($this->cmsPlugins as $pName => $default) {
       if(is_file("../$subdom/.PLUGIN.$pName")) continue; // silently skip forbidden plugins
-      $i = $set->appendChild($d->createElement("input"));
+      $i = $d->createElement("input");
       $i->setAttribute("type", "checkbox");
-      $i->setAttribute("id", "$subdom-$pName");
       $i->setAttribute("name", "PLUGINS[]");
       $i->setAttribute("value", $pName);
       $changed = "";
       if(is_file("../$subdom/PLUGIN.$pName") != is_file("$userSubdomFolder/PLUGIN.$pName"))
         $changed = "*";
       if(is_file("$userSubdomFolder/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
-      $l = $set->appendChild($d->createElement("label", " $pName$changed"));
-      $l->setAttribute("for","$subdom-$pName");
-      $set->appendChild($d->createTextNode(", "));
+      $l = $set->appendChild($d->createElement("label"));
+      $l->appendChild($i);
+      $l->appendChild(new DOMText(" $pName$changed"));
+      #$set->appendChild($d->createTextNode(", "));
     }
     $doc->insertVar("plugins", $set);
   }

@@ -1,10 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <body xml:lang="cs">
   <h id="h.adf">Manažer poddomén</h>
-  <desc>Správa poddomén uživatele <em var="user"/> na doméně <em var="domain"/>.</desc>
+  <desc>Správa poddomén uživatele <em var="USER_ID"/> na doméně <em var="domain"/>.</desc>
   <ol class="warning">
     <li var="errors"/>
   </ol>
+  <form action="/" method="post" var="curlink@action">
+    <fieldset class="hidable" var="new_nohide@class"><legend><strong>Nová</strong> poddoména</legend>
+      <dl>
+        <dt><label for="new_subdom">Název nové poddomény</label></dt>
+        <dd><samp var="USER_ID"/><input type="text" name="new_subdom" id="new_subdom" var="new_subdom@value"/><samp var="domain">.%s</samp></dd>
+        <dd>Subdoména musí být ve formátu <code>[USER_ID][písmeno][písmena nebo čísla]</code></dd>
+        <dt>Akce</dt>
+        <dd><input type="submit" value="Vytvořit poddoménu"/></dd>
+        <dd><input type="submit" name="redir" value="Vytvořit poddoménu a přesměrovat"/></dd>
+      </dl>
+    </fieldset>
+  </form>
   <form action="/" method="post" var="curlink@action">
     <fieldset class="hidable" var="nohide@class"><legend>Poddoména <em><strong var="subdom"/>.</em><em var="domain"/>, verze <em var="version">neznámá</em> <strong var="deprecated">(zastaralá)</strong></legend>
       <dl>
@@ -15,7 +27,7 @@
         <dt><label var="filesDirId@for">Veřejně dostupný adresář, aktuálně <samp var="FILES_DIR">neznámý</samp></label></dt>
         <dd><select name="FILES_DIR" var="filesDirId@id filesDirs"><option>n/a</option></select></dd>
         <dt>Dostupná rozšíření (konstanta <samp>PLUGIN</samp>)</dt>
-        <dd var="plugins"><samp>n/a</samp></dd>
+        <dd class="plugins" var="plugins"><samp>n/a</samp></dd>
         <dd>*) Uložené neaplikované změny</dd>
         <dt>Akce</dt>
         <dd>
