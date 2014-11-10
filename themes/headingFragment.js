@@ -1,6 +1,6 @@
 document.addEventListener("click", changeUrl);
 
 function changeUrl(event) {
-  if(!/h[1-6]/.test(event.target.nodeName.toLowerCase())) return true;
-  window.history.replaceState("", "", "#"+event.target.id);
+  if(/h[2-6]/.test(event.target.nodeName.toLowerCase()))
+    window.history.replaceState("", "", "#"+event.target.id);
 }
