@@ -254,7 +254,9 @@
       <!-- list items -->
       <xsl:when test="pPr/numPr">
         <!-- mind first list item only -->
-        <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)] or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0)">
+        <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)]">
+          <!-- unreliable -->
+          <!-- or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0) -->
           <xsl:choose>
             <!-- definition list if first is bold -->
             <xsl:when test="count(r) = 1 and r/rPr/b/@val = 1">·
