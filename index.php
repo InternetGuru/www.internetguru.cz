@@ -10,11 +10,8 @@ define("ADMIN_ROOT_DIR", "adm");
 define("USER_ROOT_DIR", "usr");
 define("FILES_ROOT_DIR", "files");
 define("TEMP_DIR", "temp");
-define("LOG_DIR", "log");
 define("CACHE_DIR", "cache");
 define('CORE_DIR', 'core');
-define("ADMIN_BACKUP_DIR", "adm.bak");
-define("USER_BACKUP_DIR", "usr.bak");
 define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
 define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}");
@@ -24,6 +21,9 @@ define('STATUS_INIT', 'init');
 define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
 if(is_link(basename(__FILE__))) { // runs on server
+  define("LOG_DIR", "log");
+  define("ADMIN_BACKUP_DIR", "adm.bak");
+  define("USER_BACKUP_DIR", "usr.bak");
   define('SUBDOM_ROOT_FOLDER', realpath(SUBDOM_FOLDER."/.."));
   define('DOMAIN_FOLDER', realpath(SUBDOM_ROOT_FOLDER."/.."));
   define('CMS_FOLDER', dirname(readlink(basename(__FILE__))));
@@ -37,6 +37,9 @@ if(is_link(basename(__FILE__))) { // runs on server
   define('RES_FOLDER', SUBDOM_FOLDER."/".RES_DIR);
   define('ADMIN_ROOT_FOLDER', DOMAIN_FOLDER.'/'.ADMIN_DIR);
 } else { // runs on localhost
+  define("LOG_DIR", "_log");
+  define("ADMIN_BACKUP_DIR", "_adm.bak");
+  define("USER_BACKUP_DIR", "_usr.bak");
   define('DOMAIN_FOLDER', realpath(SUBDOM_FOLDER."/.."));
   define('USER_ID', "n/a");
   define('CMS_DIR', CMS_ROOT_DIR);
