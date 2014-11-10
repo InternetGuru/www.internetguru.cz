@@ -153,8 +153,8 @@ function duplicateDir($dir) {
   if(!is_dir($dir)) return;
   $info = pathinfo($dir);
   $bakDir = $info["dirname"]."/~".$info["basename"];
-  copyFiles($dir,$bakDir);
-  deleteRedundantFiles($bakDir,$dir);
+  copyFiles($dir, $bakDir);
+  deleteRedundantFiles($bakDir, $dir);
   #new Logger("Active data backup updated");
 }
 
@@ -172,7 +172,7 @@ function smartCopy($src, $dest, $delay=0) {
   }
 }
 
-function deleteRedundantFiles($in,$according) {
+function deleteRedundantFiles($in, $according) {
   if(!is_dir($in)) return;
   foreach(scandir($in) as $f) {
     if(in_array($f,array(".",".."))) continue;

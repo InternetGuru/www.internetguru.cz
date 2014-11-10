@@ -5,7 +5,7 @@
 class TOC extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != "init") return;
+    if($subject->getStatus() != STATUS_INIT) return;
     $this->detachIfNotAttached("Xhtml11");
   }
 

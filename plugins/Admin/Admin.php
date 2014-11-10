@@ -30,11 +30,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "process") {
+    if($subject->getStatus() == STATUS_PROCESS) {
       global $cms;
       $os = $cms->getOutputStrategy()->addTransformation($this->getDir()."/Admin.xsl");
     }
-    if($subject->getStatus() != "init") return;
+    if($subject->getStatus() != STATUS_INIT) return;
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;
@@ -164,16 +164,16 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
 
     // direct user/admin file input is disallowed
-    if(strpos($f,USER_FOLDER."/") === 0) {
-      $this->redir(substr($f,strlen(USER_FOLDER)+1));
+    if(strpos($f,USER_ROOT_DIR."/") === 0) {
+      $this->redir(substr($f,strlen(USER_ROOT_DIR)+1));
     }
-    if(strpos($f,ADMIN_FOLDER."/") === 0) {
-      $this->redir(substr($f,strlen(ADMIN_FOLDER)+1));
+    if(strpos($f,ADMIN_ROOT_DIR."/") === 0) {
+      $this->redir(substr($f,strlen(ADMIN_ROOT_DIR)+1));
     }
 
     // redir to plugin if no path or extension
     if(preg_match("~^[\w-]+$~", $f)) {
-      $pluginFile = PLUGIN_FOLDER."/$f/$f.xml";
+      $pluginFile = PLUGINS_DIR."/$f/$f.xml";
       if(!findFile($pluginFile)) $this->redir("$f.xml");
       $this->redir($pluginFile);
     }
@@ -187,9 +187,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     // no direct match with extension [and path]
     if(findFile($f,false)) return;
     // check/redir to plugin dir
-    if(!findFile(PLUGIN_FOLDER . "/$f",false)) return;
+    if(!findFile(PLUGINS_DIR . "/$f",false)) return;
     // found plugin file
-    $this->redir(PLUGIN_FOLDER . "/$f");
+    $this->redir(PLUGINS_DIR . "/$f");
 
   }
 

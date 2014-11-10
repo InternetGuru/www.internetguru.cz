@@ -8,9 +8,9 @@ class Backup extends Plugin implements SplObserver {
    * @return void
    */
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != "process") return;
-    $this->backupFilesDeep(ADMIN_FOLDER,ADMIN_BACKUP);
-    $this->backupFilesDeep(USER_FOLDER,USER_BACKUP);
+    if($subject->getStatus() != STATUS_PROCESS) return;
+    $this->backupFilesDeep(ADMIN_FOLDER, ADMIN_BACKUP_FOLDER);
+    $this->backupFilesDeep(USER_FOLDER, USER_BACKUP_FOLDER);
   }
 
   private function backupFilesDeep($dir,$backupDir) {

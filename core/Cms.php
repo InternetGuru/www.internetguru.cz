@@ -17,7 +17,8 @@ class Cms {
 
   public function init() {
     global $plugins;
-    $this->setVariable("version", "IGCMS ver. " . CMS_VERSION);
+    $this->setVariable("version", CMS_VERSION);
+    $this->setVariable("user_id", USER_ID);
     $this->setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
     $this->setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     $this->setVariable("plugins", array_keys($plugins->getObservers()));

@@ -11,7 +11,7 @@ class SyntaxHighlightJs extends Plugin implements SplObserver, ContentStrategyIn
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "init") {
+    if($subject->getStatus() == STATUS_INIT) {
       $this->detachIfNotAttached("Xhtml11");
       return;
     }

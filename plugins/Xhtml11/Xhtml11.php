@@ -21,7 +21,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "init") {
+    if($subject->getStatus() == STATUS_INIT) {
       global $cms;
       $cms->setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
@@ -29,7 +29,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $cms->setVariable("url", $domain);
       $cms->setVariable("link", getCurLink());
     }
-    if($subject->getStatus() == "process") {
+    if($subject->getStatus() == STATUS_PROCESS) {
       $cfg = $this->getDOMPlus();
       $this->registerThemes($cfg);
     }
@@ -429,6 +429,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $this->appendLinkElement($parent, $this->cssFiles[$k]["file"], "stylesheet",
         "text/css", $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"]);
     }
+  }
+
+  #UNUSED
+  private function relPath($path) {
+    if(strpos($path, SUBDOM_FOLDER) !== 0) return $path;
+    return str_replace("?".SUBDOM_FOLDER,"","?$path");
   }
 
 }

@@ -8,7 +8,7 @@ class GlobalMenu extends Plugin implements SplObserver {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != "init") return;
+    if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
     $this->setVariables();
   }

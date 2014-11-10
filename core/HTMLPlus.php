@@ -2,7 +2,6 @@
 
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
-
   const RNG_FILE = "lib/HTMLPlus.rng";
 
   function __construct($version="1.0",$encoding="utf-8") {
@@ -148,7 +147,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function relaxNGValidatePlus() {
-    return parent::relaxNGValidatePlus(CMS_FOLDER . "/" . self::RNG_FILE);
+    return parent::relaxNGValidatePlus(CMS_FOLDER."/".self::RNG_FILE);
   }
 
   private function validateRoot($repair) {
