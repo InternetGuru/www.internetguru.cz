@@ -1,9 +1,8 @@
 <?php
 
-#TODO: ?superadmin
 #TODO: success message
-#TODO: new htmlplus as EMPTY (?)
 #TODO: js button 'copy default to user'
+#TODO: nohide default if no user file
 
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";

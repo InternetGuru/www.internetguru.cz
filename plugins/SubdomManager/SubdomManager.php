@@ -1,5 +1,7 @@
 <?php
 
+#todo: cmsPlugins according to cmsVersion
+
 class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $err = array();
