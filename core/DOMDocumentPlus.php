@@ -293,17 +293,7 @@ class DOMDocumentPlus extends DOMDocument {
       $e->setAttribute($attr,$varValue);
       return;
     }
-    $varValue = htmlspecialchars($varValue);
-    $replaced = false;
-    foreach($e->childNodes as $n) {
-      if($n->nodeType != 3) continue;
-      $new = sprintf($n->nodeValue,$varValue);
-      if($new == $n->nodeValue) continue;
-      $n->nodeValue = $new;
-      $replaced = true;
-      break;
-    }
-    if(!$replaced) $e->nodeValue = $varValue;
+    $e->nodeValue = $varValue;
   }
 
   private function insertVarArray(Array $varValue,DOMElement $e,$varName) {
