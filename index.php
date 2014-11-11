@@ -25,6 +25,7 @@ if(is_link(basename(__FILE__))) { // runs on server
   define("ADMIN_BACKUP_DIR", "adm.bak");
   define("USER_BACKUP_DIR", "usr.bak");
   define('SUBDOM_ROOT_FOLDER', realpath(SUBDOM_FOLDER."/.."));
+  define('SUBDOM_ROOT_DIR', basename(SUBDOM_ROOT_FOLDER));
   define('DOMAIN_FOLDER', realpath(SUBDOM_ROOT_FOLDER."/.."));
   define('CMS_FOLDER', dirname(readlink(basename(__FILE__))));
   define('CMS_ROOT_FOLDER', realpath(CMS_FOLDER."/.."));
@@ -58,7 +59,7 @@ define('ADMIN_BACKUP_FOLDER', DOMAIN_FOLDER.'/'.ADMIN_BACKUP_DIR.'/'.SUBDOM_DIR)
 define('USER_BACKUP_FOLDER', DOMAIN_FOLDER.'/'.USER_BACKUP_DIR.'/'.SUBDOM_DIR);
 define('LOG_FOLDER', DOMAIN_FOLDER.'/'.LOG_DIR.'/'.SUBDOM_DIR);
 define('CACHE_FOLDER', DOMAIN_FOLDER.'/'.CACHE_DIR.'/'.SUBDOM_DIR);
-#print_r(get_defined_constants(true)); die();
+print_r(get_defined_constants(true)); die();
 
 if(substr(CMS_VERSION,-4) == "-dev") {
   error_reporting(E_ALL);

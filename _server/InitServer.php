@@ -34,16 +34,16 @@ class InitServer {
     }
     $this->folderVars = array(
       'ADMIN_FOLDER' => DOMAIN_FOLDER."/".ADMIN_ROOT_DIR."/".$this->subdomVars["ADMIN_DIR"],
-      'USER_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"],
-      'FILES_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"],
+      'USER_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"]."/".USER_ROOT_DIR,
+      'FILES_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"]."/".FILES_ROOT_DIR,
       'TEMP_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"]."/".TEMP_DIR,
     );
-    $this->folderVars['USER_FOLDER'] = $this->folderVars["USER_ROOT_FOLDER"]."/".USER_ROOT_DIR."/".$this->subdomVars["USER_DIR"];
-    $this->folderVars['FILES_FOLDER'] = $this->folderVars["FILES_ROOT_FOLDER"]."/".FILES_ROOT_DIR."/".$this->subdomVars["FILES_DIR"];
+    $this->folderVars['USER_FOLDER'] = $this->folderVars["USER_ROOT_FOLDER"]."/".$this->subdomVars["USER_DIR"];
+    $this->folderVars['FILES_FOLDER'] = $this->folderVars["FILES_ROOT_FOLDER"]."/".$this->subdomVars["FILES_DIR"];
     $this->completeStructure($serverSubdomDir);
     if($setConst) $this->setConst();
     if(!$update) {
-      if(count(scandir($userSubdomDir)) == 2)
+      if(is_dir($userSubdomDir) && count(scandir($userSubdomDir)) == 2)
         $this->syncServerToUser($userSubdomDir, $serverSubdomDir);
       return;
     }
@@ -203,14 +203,14 @@ class InitServer {
         case "USER_DIR":
         case "FILES_DIR":
         $newFile = "{$var[0]}.". $this->subdomVars[$var[0]];
-        if(!is_file($this->folderVars["SUBDOM_FOLDER"] ."/$newFile") && !touch($this->folderVars["SUBDOM_FOLDER"] ."/$newFile"))
+        if(!is_file("$destDir/$newFile") && !touch("$destDir/$newFile"))
           throw new Exception("Unable to update user subdom setup");
         if($this->subdomVars[$var[0]] == $var[1]) continue;
         if(!rename("$destDir/$f", "$destDir/$newFile"))
           throw new Exception("Unable to setup '$newFile'");
         break;
         case "PLUGIN":
-        if(!is_file($this->folderVars["SUBDOM_FOLDER"] ."/$f") && !unlink("$destDir/$f"))
+        if(is_file("$destDir/$f") && !unlink("$destDir/$f"))
           throw new Exception("Unable to disable plugin '{$var[1]}'");
         break;
       }

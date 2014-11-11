@@ -9,6 +9,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private $cmsPlugins;
   private $userDirs;
   private $filesDirs;
+  private $subdoms = array();
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -54,8 +55,9 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   private function processDeleteSubdom($subdom) {
     if(self::DEBUG) throw new Exception("Deleting DISABLED");
-    $activeDir = SUBDOM_ROOT_FOLDER."/$subdom";
-    $inactiveDir = SUBDOM_ROOT_FOLDER."/.$subdom";
+    #FIXME: add DOMAIN_ROOT_FOLDER / USER_ID /
+    $activeDir = SUBDOM_ROOT_DIR."/$subdom";
+    $inactiveDir = SUBDOM_ROOT_DIR."/.$subdom";
     if(is_dir($activeDir)) {
       $newSubdom = "~$subdom";
       while(file_exists(SUBDOM_ROOT_FOLDER."/$newSubdom")) $newSubdom = "~$newSubdom";
@@ -131,7 +133,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
 
     $form = $newContent->getElementsByTagName("form")->item(1);
-    foreach($this->getSubdirs(SUBDOM_ROOT_FOLDER, "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
+    foreach($this->subdoms as $subdom) {
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($form, true));
       $this->modifyDOM($doc, $subdom);
@@ -146,6 +148,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     foreach($this->getSubdirs("..", "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
       if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
       try {
+        $this->subdoms[] = $subdom;
         new InitServer($subdom); // clone existing subdoms (no update)
       } catch(Exception $e) {
         $this->err[] = $e->getMessage();

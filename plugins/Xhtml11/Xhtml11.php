@@ -440,12 +440,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     }
   }
 
-  #UNUSED
-  private function relPath($path) {
-    if(strpos($path, SUBDOM_FOLDER) !== 0) return $path;
-    return str_replace("?".SUBDOM_FOLDER,"","?$path");
-  }
-
 }
 
 ?>
