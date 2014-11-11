@@ -63,7 +63,8 @@ define('CACHE_FOLDER', DOMAIN_FOLDER.'/'.CACHE_DIR.'/'.SUBDOM_DIR);
 if(substr(CMS_VERSION,-4) == "-dev") {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
-}
+  define('CMS_DEBUG', true);
+} else define('CMS_DEBUG', false);
 
 #todo: date_default_timezone_set()
 #todo: setlocale(LC_ALL, czech); // cs_CZ.utf8 (localhost)
