@@ -35,11 +35,11 @@ class InitServer {
     $this->folderVars = array(
       'ADMIN_FOLDER' => DOMAIN_FOLDER."/".ADMIN_ROOT_DIR."/".$this->subdomVars["ADMIN_DIR"],
       'USER_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"],
-      'USER_FOLDER' => USER_ROOT_FOLDER."/".USER_ROOT_DIR."/".$this->subdomVars["USER_DIR"],
       'FILES_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"],
-      'FILES_FOLDER' => FILES_ROOT_FOLDER."/".FILES_ROOT_DIR."/".$this->subdomVars["FILES_DIR"],
       'TEMP_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"]."/".TEMP_DIR,
     );
+    $this->folderVars['USER_FOLDER'] = $this->folderVars["USER_ROOT_FOLDER"]."/".USER_ROOT_DIR."/".$this->subdomVars["USER_DIR"];
+    $this->folderVars['FILES_FOLDER'] = $this->folderVars["FILES_ROOT_FOLDER"]."/".FILES_ROOT_DIR."/".$this->subdomVars["FILES_DIR"];
     $this->completeStructure($serverSubdomDir);
     if($setConst) $this->setConst();
     if(!$update) {

@@ -37,7 +37,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
-    if(!is_null($f)) $newContent->insertVar("content", $this->file_get_contents($f));
+    if(!is_null($f)) $newContent->insertVar("content", htmlspecialchars($this->file_get_contents($f)));
     return $newContent;
   }
 

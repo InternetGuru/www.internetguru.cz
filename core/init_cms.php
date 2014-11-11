@@ -16,7 +16,7 @@ try {
   require_once(CORE_FOLDER.'/global_const.php');
 
   $l = new Logger("CMS init ".CMS_DIR.", v. ".CMS_VERSION
-    .(CMS_DEBUG ? " (DEBUG MODE)" : ""), null, microtime(true) - $start_time);
+    .(CMS_DEBUG ? " (DEBUG)" : ""), null, microtime(true) - $start_time);
   $l->finished();
   $l = new Logger("CMS finished ".CMS_DIR, null, 0);
 
