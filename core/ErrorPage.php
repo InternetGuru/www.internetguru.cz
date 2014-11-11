@@ -10,7 +10,8 @@ class ErrorPage {
   private $whatnowFile = "whatnow.txt";
 
   public function __construct($message, $code, $extended=false) {
-    new Logger("$message ($code)","fatal");
+    http_response_code($code);
+    new Logger($message,"fatal");
     $dir = CMS_FOLDER ."/". $this->relDir;
     $tt = array(
       "@CODE@" => $code,
@@ -32,7 +33,6 @@ class ErrorPage {
       $tt["@IMAGE@"] = $images[array_rand($images)];
       $tt["@ROOT@"] = getRoot();
     }
-    http_response_code($code);
     echo str_replace(array_keys($tt),$tt,$html);
     die();
   }

@@ -253,16 +253,16 @@ function fileSizeConvert($b) {
     return round($b,1)." ".$iec[$i];
 }
 
-function checkUrl($folder = null, $extended = false) {
+function checkUrl($folder = null) {
   $rUri = $_SERVER["REQUEST_URI"];
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
-    new ErrorPage("The requested URL $rUri was not understood by this server.", 400, $extended);
+    new ErrorPage("The requested URL '$rUri' was not understood by this server.", 400);
   if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/",$rUri,$m)) return null;
-  $fInfo["filepath"] = "$folder/". $m[1];
 
+  $fInfo["filepath"] = "$folder/". $m[1];
   if(!is_file($fInfo["filepath"]))
-    new ErrorPage("The requested URL $rUri was not found on this server.", 404, $extended);
+    new ErrorPage("The requested URL '$rUri' was not found on this server.", 404);
 
   $disallowedMime = array(
     "application/x-msdownload" => null,

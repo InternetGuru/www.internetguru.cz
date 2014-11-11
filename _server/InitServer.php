@@ -18,8 +18,8 @@ class InitServer {
       "FILES_DIR" => $subdom,
     );
     $serverSubdomDir = "../$subdom";
-    $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/{$this->subdom}";
     $this->updateSubdomVars($serverSubdomDir);
+    $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/{$this->subdom}";
     if($update) {
       $this->authorizeUpdate($serverSubdomDir);
       if(is_dir($userSubdomDir."/../.".$this->subdom)) {
@@ -216,7 +216,11 @@ class InitServer {
       }
     }
     // apply "symlinks" to server subdom
-    $files = array("index.php" => "index.php", ".htaccess" => ".htaccess", "robots.txt" => "robots_default.txt");
+    $files = array(
+      "index.php" => "index.php",
+      ".htaccess" => ".htaccess",
+      "robots.txt" => "robots_default.txt"
+    );
     if(preg_match("/^ig\d/", $this->subdom)) $files["robots.txt"] = "robots_off.txt";
     foreach($files as $link => $target) {
       #$info["toVersion"] = $this->subdomVars["CMS_VER"];
