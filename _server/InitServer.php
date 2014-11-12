@@ -4,12 +4,15 @@ class InitServer {
   private $subdom;
   private $subdomVars;
   private $folderVars;
+  const FORBIDDEN_PLUGINS = array("Slider" => null);
+  const DISABLED_PLUGINS = array("Slider" => null);
 
   public function __construct($subdom, $setConst = false, $update = false) {
     if(!preg_match("/^" . SUBDOM_PATTERN . "$/", $subdom))
       throw new Exception("Invalid subdom format '$subdom'");
     $this->subdom = $subdom;
     $this->subdomVars = array(
+      #fixme: due to "admin" username
       #"USER_ID" => isset($_SERVER["REMOTE_USER"]) ? $_SERVER["REMOTE_USER"] : "ig1",
       "USER_ID" => "ig1",
       "CMS_VER" => CMS_RELEASE,
@@ -23,8 +26,9 @@ class InitServer {
     $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/$subdom";
     if($update) {
       $this->authorizeUpdate($serverSubdomDir);
-      if(is_dir($userSubdomDir."/../.$subdom")) {
-        $this->safeDeleteSubdom($userSubdomDir."/../.$subdom", $serverSubdomDir);
+      $userDelDir = dirname($userSubdomDir)."/.$subdom";
+      if(is_dir($userDelDir)) {
+        $this->safeDeleteSubdom($userDelDir, $serverSubdomDir);
         return;
       }
       if(!is_dir($serverSubdomDir)) $this->createSubdom($serverSubdomDir);
@@ -146,17 +150,6 @@ class InitServer {
       if(!file_exists($f)) touch($f);
     }
     // create required directories
-    /*
-    [ADMIN_FOLDER] => ../../adm/www
-    [USER_ROOT_FOLDER] => ../../admin/usr
-    [FILES_ROOT_FOLDER] => ../../admin/files
-    [SUBDOM_ROOT_FOLDER] => ../../admin/subdom
-    [TEMP_FOLDER] => ../../admin/temp
-    [USER_FOLDER] => ../../admin/usr/www
-    [FILES_FOLDER] => ../../admin/files/www
-    [SUBDOM_FOLDER] => ../../admin/subdom/www
-    [RES_FOLDER] => ../www/res
-    */
     foreach($this->folderVars as $dirPath) {
       if(is_dir($dirPath) || @mkdir($dirPath,0755,true)) continue;
       throw new Exception("Unable to create folder '$dirPath'");
@@ -268,15 +261,13 @@ class InitServer {
   }
 
   private function createDefaultPlugins($srcDir, $destDir) {
-    $disabledPlugins = array("Slider" => null);
-    foreach($disabledPlugins as $p => $null) {
+    foreach(self::FORBIDDEN_PLUGINS as $p => $null) {
       if(!is_file("$destDir/.PLUGIN.$p") && !touch("$destDir/.PLUGIN.$p"))
         throw new Exception("Unable to create forbidden plugin files");
     }
-    $skipedPlugins = array("Slider" => null);
     foreach(scandir($srcDir) as $f) {
       if(strpos($f,".") === 0) continue; // skip folders starting with a dot
-      if(array_key_exists($f, $skipedPlugins)) continue;
+      if(array_key_exists($f, self::DISABLED_PLUGINS)) continue;
       if(!touch("$destDir/PLUGIN.$f"))
         throw new Exception("Unable to create plugin files");
     }

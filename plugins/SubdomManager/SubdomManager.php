@@ -23,28 +23,31 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       return;
     }
     if($subject->getStatus() != STATUS_PREINIT) return;
+    if(!empty($_POST)) $this->processPost();
     $this->cmsVersions = $this->getSubdirs(CMS_ROOT_FOLDER);
     $this->cmsPlugins = $this->getSubdirs(PLUGINS_FOLDER);
     $this->userDirs = $this->getSubdirs(USER_ROOT_FOLDER, "/^[^~]/");
     $this->filesDirs = $this->getSubdirs(FILES_ROOT_FOLDER);
     $this->syncUserSubdoms();
-    if(empty($_POST)) return;
+  }
+
+  private function processPost() {
     try {
       $subdom = null;
       if(isset($_POST["new_subdom"])) $subdom = $this->processCreateSubdom($_POST["new_subdom"]);
-      if(isset($_POST["subdom"])) {
-        #if(!is_file("../{$_POST["subdom"]}/USER_ID.". USER_ID))
-        #  throw new Exception(sprintf("Unauthorized subdom '%s' modification by '%s'", $_POST["subdom"], USER_ID));
+      if(strlen($_GET[get_class($this)])) {
+        if(!is_file("../".$_GET[get_class($this)]."/USER_ID.".USER_ID))
+          throw new Exception(sprintf("Unauthorized subdom '%s' modification by '%s'", $_GET[get_class($this)], USER_ID));
         if(isset($_POST["delete"])) {
-          $subdom = $this->processDeleteSubdom($_POST["subdom"]);
+          $subdom = $this->processDeleteSubdom($_GET[get_class($this)]);
         } else {
-          $subdom = $this->processUpdateSubdom($_POST["subdom"]);
+          $subdom = $this->processUpdateSubdom($_GET[get_class($this)]);
           if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
         }
       }
-      if(is_null($subdom)) throw new Exception("Unrecognized POST");
+      if(is_null($subdom)) throw new Exception("Unrecognized request");
       new InitServer($subdom, false, true);
-      $link = getCurLink(true);
+      $link = getCurLink()."?".get_class($this)."=$subdom";
       if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
       redirTo($link, null, true);
     } catch(Exception $e) { // this should never happen
@@ -116,14 +119,14 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     for(var i=0; i<forms.length; i++) {
       if(typeof forms[i]['delete'] !== 'object') continue;
       forms[i]['delete'].addEventListener('click', function(e){
-        if(confirm('Delete subdom \"' + e.target.form['subdom'].value + '\"?')) return;
+        var subdom = e.target.form['action'].split('=')[1];
+        if(confirm('Delete subdom \"' + subdom + '\"?')) return;
         e.preventDefault();
       }, false);
     }");
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
-    $newContent->insertVar("curlink", getCurLink(true));
     $newContent->insertVar("domain", getDomain());
 
     if(isset($_POST["new_subdom"])) {
@@ -160,9 +163,10 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
     $doc->insertVar("userDirId", "$subdom-USER_DIR");
     $doc->insertVar("filesDirId", "$subdom-FILES_DIR");
+    $doc->insertVar("curlink", getCurLink()."?".get_class($this)."=$subdom");
 
     $showSubdom = basename(dirname($_SERVER["PHP_SELF"]));
-    if(isset($_POST["subdom"])) $showSubdom = $_POST["subdom"];
+    if(strlen($_GET[get_class($this)])) $showSubdom = $_GET[get_class($this)];
     if($subdom == $showSubdom) $doc->insertVar("nohide", "nohide");
 
     // versions
