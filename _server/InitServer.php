@@ -11,7 +11,7 @@ class InitServer {
     $this->subdom = $subdom;
     $this->subdomVars = array(
       "USER_ID" => isset($_SERVER["REMOTE_USER"]) ? $_SERVER["REMOTE_USER"] : "ig1",
-      "CMS_VER" => CMS_DIR,
+      "CMS_VER" => CMS_RELEASE,
       "CONFIG" => "user",
       "USER_DIR" => $subdom,
       "ADMIN_DIR" => $subdom,
@@ -32,14 +32,17 @@ class InitServer {
     if(!file_exists("{$serverSubdomDir}/CMS_VER.".$this->subdomVars["CMS_VER"])) {
       $this->subdomVars["CMS_VER"] = $this->getNewestStableVersion();
     }
+    $root = "../..";
     $this->folderVars = array(
-      'ADMIN_FOLDER' => DOMAIN_FOLDER."/".ADMIN_ROOT_DIR."/".$this->subdomVars["ADMIN_DIR"],
-      'USER_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"]."/".USER_ROOT_DIR,
-      'FILES_ROOT_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"]."/".FILES_ROOT_DIR,
-      'TEMP_FOLDER' => DOMAIN_FOLDER."/".$this->subdomVars["USER_ID"]."/".TEMP_DIR,
+      'ADMIN_FOLDER' => "$root/".ADMIN_ROOT_DIR."/".$this->subdomVars["ADMIN_DIR"],
+      'USER_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".USER_ROOT_DIR,
+      'FILES_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".FILES_ROOT_DIR,
+      'SUBDOM_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".SUBDOM_ROOT_DIR,
+      'TEMP_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".TEMP_DIR,
     );
     $this->folderVars['USER_FOLDER'] = $this->folderVars["USER_ROOT_FOLDER"]."/".$this->subdomVars["USER_DIR"];
     $this->folderVars['FILES_FOLDER'] = $this->folderVars["FILES_ROOT_FOLDER"]."/".$this->subdomVars["FILES_DIR"];
+    $this->folderVars['SUBDOM_FOLDER'] = $this->folderVars["SUBDOM_ROOT_FOLDER"]."/".basename(".");
     $this->completeStructure($serverSubdomDir);
     if($setConst) $this->setConst();
     if(!$update) {

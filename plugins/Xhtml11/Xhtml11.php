@@ -237,7 +237,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
-    $this->createRootFavicon();
+    if(!isAtLocalhost()) $this->createRootFavicon();
   }
 
   private function createRootFavicon() {

@@ -55,17 +55,16 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   private function processDeleteSubdom($subdom) {
     if(self::DEBUG) throw new Exception("Deleting DISABLED");
-    #FIXME: add DOMAIN_ROOT_FOLDER / USER_ID /
-    $activeDir = SUBDOM_ROOT_DIR."/$subdom";
-    $inactiveDir = SUBDOM_ROOT_DIR."/.$subdom";
+    $activeDir = SUBDOM_ROOT_FOLDER."/$subdom";
+    $inactiveDir = SUBDOM_ROOT_FOLDER."/.$subdom";
     if(is_dir($activeDir)) {
       $newSubdom = "~$subdom";
       while(file_exists(SUBDOM_ROOT_FOLDER."/$newSubdom")) $newSubdom = "~$newSubdom";
       if(!rename($activeDir, SUBDOM_ROOT_FOLDER."/$newSubdom"))
-        throw new Exception("Unable to keep subdom '$subdom' setup");
+        throw new Exception("Unable to backup subdom '$subdom' setup");
     }
     if(!is_dir($inactiveDir) && !mkdir($inactiveDir)) {
-      throw new Exception("Unable to process delete subdom '$subdom'");
+      throw new Exception("Unable to create '.$subdom' dir");
     }
     return $subdom;
   }

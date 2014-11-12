@@ -18,7 +18,7 @@ function findFile($file, $user=true, $admin=true, $res=false) {
     if($admin && is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
     $f = $file;
     if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
-    if($res && !isAtLocalhost()) $resFolder = CMSRES_ROOT_DIR."/".CMSRES_DIR;
+    if($res && !isAtLocalhost()) $resFolder = CMSRES_ROOT_DIR."/".CMS_RELEASE;
     $f = CMS_FOLDER . "/$file";
     if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
   } catch(Exception $e) {

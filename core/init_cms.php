@@ -6,7 +6,7 @@ try {
   if(!isAtLocalhost()) {
     if(!is_file(CMS_ROOT_FOLDER."/InitServer.php")) throw new Exception("Missing server init file");
     require_once(CMS_ROOT_FOLDER."/InitServer.php");
-    new InitServer(SUBDOM_DIR, true);
+    new InitServer(basename("."), true);
     if(isset($_GET["updateSubdom"])) {
       if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
       new InitServer($subdom, false, true);
@@ -15,10 +15,10 @@ try {
   }
   require_once(CORE_FOLDER.'/global_const.php');
 
-  $l = new Logger("CMS init ".CMS_DIR.", v. ".CMS_VERSION
+  $l = new Logger("CMS init ".CMS_RELEASE.", v. ".CMS_VERSION
     .(CMS_DEBUG ? " (DEBUG)" : ""), null, microtime(true) - $start_time);
   $l->finished();
-  $l = new Logger("CMS finished ".CMS_DIR, null, 0);
+  $l = new Logger("CMS finished ".CMS_RELEASE, null, 0);
 
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
