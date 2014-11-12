@@ -91,21 +91,22 @@ class InitServer {
 
   private function safeDeleteSubdom($userDotSubdom, $destDir) {
     // safely remove/rename user .subdom folder
-    if(count(scandir($userDotSubdom)) == 2) {
-      if(!rmdir($userDotSubdom))
-        throw new Exception("Unable to remove '.{$this->subdom}' folder");
-    } else {
-      $newSubdom = "~{$this->subdom}";
-      while(file_exists("$userDotSubdom/../$newSubdom")) $newSubdom = "~$newSubdom";
-      if(!rename($userDotSubdom, "$userDotSubdom/../$newSubdom"))
-        throw new Exception("Unable to rename '.{$this->subdom}' folder");
-    }
+    $this->safelyRemoveDir($userDotSubdom);
     // disable server subdom
     if(!is_dir($destDir)) return;
-    $newSubdom = "~{$this->subdom}";
-    while(file_exists("../$newSubdom")) $newSubdom = "~$newSubdom";
-    if(!rename($destDir,"../$newSubdom"))
-      throw new Exception("Unable to remove subdom '{$this->subdom}'");
+    $this->safelyRemoveDir($destDir);
+  }
+
+  private function safelyRemoveDir($dir) {
+    if(count(scandir($dir)) == 2) {
+      if(rmdir($dir)) return;
+      throw new Exception("Unable to remove '.{$this->subdom}' folder");
+    }
+    $i = 0;
+    $newDir = basename($dir)."~";
+    while(file_exists(dirname($dir)."/$newDir")) $newDir = basename($dir)."~".++$i;
+    if(rename($dir, dirname($dir)."/$newDir")) return;
+    throw new Exception("Unable to rename '".basename($dir)."' folder");
   }
 
   private function createSubdom($dir) {

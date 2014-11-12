@@ -26,7 +26,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     if(!empty($_POST)) $this->processPost();
     $this->cmsVersions = $this->getSubdirs(CMS_ROOT_FOLDER);
     $this->cmsPlugins = $this->getSubdirs(PLUGINS_FOLDER);
-    $this->userDirs = $this->getSubdirs(USER_ROOT_FOLDER, "/^[^~]/");
+    $this->userDirs = $this->getSubdirs(USER_ROOT_FOLDER, "/^".SUBDOM_PATTERN."$/");
     $this->filesDirs = $this->getSubdirs(FILES_ROOT_FOLDER);
     $this->syncUserSubdoms();
   }
@@ -61,8 +61,9 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $activeDir = SUBDOM_ROOT_FOLDER."/$subdom";
     $inactiveDir = SUBDOM_ROOT_FOLDER."/.$subdom";
     if(is_dir($activeDir)) {
-      $newSubdom = "~$subdom";
-      while(file_exists(SUBDOM_ROOT_FOLDER."/$newSubdom")) $newSubdom = "~$newSubdom";
+      $i = 0;
+      $newSubdom = "$subdom~";
+      while(file_exists(SUBDOM_ROOT_FOLDER."/$newSubdom")) $newSubdom = "$subdom~".++$i;
       if(!rename($activeDir, SUBDOM_ROOT_FOLDER."/$newSubdom"))
         throw new Exception("Unable to backup subdom '$subdom' setup");
     }
@@ -128,6 +129,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("domain", getDomain());
+    $newContent->insertVar("curlink", getCurLink()."?".get_class($this));
 
     if(isset($_POST["new_subdom"])) {
       $newContent->insertVar("new_nohide", "nohide");
@@ -163,7 +165,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
     $doc->insertVar("userDirId", "$subdom-USER_DIR");
     $doc->insertVar("filesDirId", "$subdom-FILES_DIR");
-    $doc->insertVar("curlink", getCurLink()."?".get_class($this)."=$subdom");
+    $doc->insertVar("curlinkSubdom", getCurLink()."?".get_class($this)."=$subdom");
 
     $showSubdom = basename(dirname($_SERVER["PHP_SELF"]));
     if(strlen($_GET[get_class($this)])) $showSubdom = $_GET[get_class($this)];
