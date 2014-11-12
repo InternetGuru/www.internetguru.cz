@@ -1,50 +1,43 @@
-0.3.0
------
+0.3
+---
 
-Major structural changes
+0.3.0 - Major structural changes
+0.3.1 - SubdomManager using GET param
 
-0.2.0
------
+0.2
+---
 
-SubdomManager plugin created
-ContentMatch renamed to UrlHandler
-ContentAdmin renamed to Admin
-Convertor added noparse support
-Xhtml11 check object: exist/mime/size
-ContentMatch default redirection updated
-LogViewer support major version number only (eg. 0.ver)
-ContentMatch user redirection root support
-Changed root link in HTML+ is now '/'
-FileHandler plugin created
-Xhtml11 changed default layout and config
+0.2.0 - SubdomManager plugin created
+0.2.0 - ContentMatch renamed to UrlHandler
+0.2.0 - ContentAdmin renamed to Admin
+0.2.0 - Convertor added noparse support
+0.2.0 - Xhtml11 check object: exist/mime/size
+0.2.0 - ContentMatch default redirection updated
+0.2.0 - LogViewer support major version number only (eg. 0.ver)
+0.2.0 - ContentMatch user redirection root support
+0.2.0 - Changed root link in HTML+ is now '/'
+0.2.0 - FileHandler plugin created
+0.2.0 - Xhtml11 changed default layout and config
 
-0.1.2-dev
----------
+0.1
+---
 
-ContentAdmin showing plugins-loaded (instead of cms-plugins)
-Added new variable plugins-loaded
-
-0.1.1-dev
----------
-
-Convertor: added code and variable syntax support
-Convertor: added code element (''myCode'' syntax)
-Content.html default content file changed
-Convertor: independent UI with features
-Convertor: adds short/link attr for headings with section
-Convertor: adds ctime into first heading
-Convertor: added samp support (from underlined text)
-InputVar: silent error support (@)
-LogViewer: zipped files support
-LogViewer: log/ver file support
-ContentMatch: default redirections (log, ver, admin)
-ContentMatch: query redirection support
-ContentAdmin: showing links to edit files
-new system variable dombuilder-html
-ContentAdmin: redir to default file
-HTML+ import: added language check
-
-0.1.0-dev
----------
-
-* initial version
+0.1.0 - initial version
+0.1.1 - Convertor: added code and variable syntax support
+0.1.1 - Convertor: added code element (''myCode'' syntax)
+0.1.1 - Content.html default content file changed
+0.1.1 - Convertor: independent UI with features
+0.1.1 - Convertor: adds short/link attr for headings with section
+0.1.1 - Convertor: adds ctime into first heading
+0.1.1 - Convertor: added samp support (from underlined text)
+0.1.1 - InputVar: silent error support (@)
+0.1.1 - LogViewer: zipped files support
+0.1.1 - LogViewer: log/ver file support
+0.1.1 - ContentMatch: default redirections (log, ver, admin)
+0.1.1 - ContentMatch: query redirection support
+0.1.1 - ContentAdmin: showing links to edit files
+0.1.1 - new system variable dombuilder-html
+0.1.1 - ContentAdmin: redir to default file
+0.1.1 - HTML+ import: added language check
+0.1.2 - ContentAdmin showing plugins-loaded (instead of cms-plugins)
+0.1.2 - Added new variable plugins-loaded
