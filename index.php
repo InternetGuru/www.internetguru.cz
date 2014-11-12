@@ -1,6 +1,7 @@
 <?php
 
 define('CMS_ROOT_DIR', "cms");
+define('CURRENT_SUBDOM_DIR',basename(dirname($_SERVER["PHP_SELF"])));
 define("PLUGINS_DIR", "plugins");
 define("THEMES_DIR", "themes");
 define("VER_DIR", "ver");
@@ -46,10 +47,10 @@ define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
 define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
 define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
 define('CMS_VERSION', file_get_contents(CMS_FOLDER ."/cms_version.txt"));
-define('ADMIN_BACKUP_FOLDER', '../../'.ADMIN_BACKUP_DIR.'/'.basename("."));
-define('USER_BACKUP_FOLDER', '../../'.USER_BACKUP_DIR.'/'.basename("."));
-define('LOG_FOLDER', '../../'.LOG_DIR.'/'.basename("."));
-define('CACHE_FOLDER', '../../'.CACHE_DIR.'/'.basename("."));
+define('ADMIN_BACKUP_FOLDER', '../../'.ADMIN_BACKUP_DIR.'/'.CURRENT_SUBDOM_DIR);
+define('USER_BACKUP_FOLDER', '../../'.USER_BACKUP_DIR.'/'.CURRENT_SUBDOM_DIR);
+define('LOG_FOLDER', '../../'.LOG_DIR.'/'.CURRENT_SUBDOM_DIR);
+define('CACHE_FOLDER', '../../'.CACHE_DIR.'/'.CURRENT_SUBDOM_DIR);
 #print_r(get_defined_constants(true)); die();
 
 if(substr(CMS_VERSION,-4) == "-dev") {

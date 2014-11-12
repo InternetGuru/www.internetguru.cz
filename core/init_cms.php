@@ -6,8 +6,9 @@ try {
   if(!isAtLocalhost()) {
     if(!is_file(CMS_ROOT_FOLDER."/InitServer.php")) throw new Exception("Missing server init file");
     require_once(CMS_ROOT_FOLDER."/InitServer.php");
-    new InitServer(basename("."), true);
+    new InitServer(CURRENT_SUBDOM_DIR, true);
     if(isset($_GET["updateSubdom"])) {
+      $subdom = CURRENT_SUBDOM_DIR;
       if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
       new InitServer($subdom, false, true);
       redirTo("http://$subdom.". getDomain());

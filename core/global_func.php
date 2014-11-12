@@ -43,7 +43,7 @@ function redirTo($link,$code=null,$force=false) {
 
 function chmodGroup($file,$mode) {
   $oldMask = umask(002);
-  $chmod = chmod($file,$mode);
+  $chmod = @chmod($file,$mode);
   umask($oldMask);
   return $chmod;
 }

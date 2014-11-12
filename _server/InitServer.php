@@ -10,7 +10,8 @@ class InitServer {
       throw new Exception("Invalid subdom format '$subdom'");
     $this->subdom = $subdom;
     $this->subdomVars = array(
-      "USER_ID" => isset($_SERVER["REMOTE_USER"]) ? $_SERVER["REMOTE_USER"] : "ig1",
+      #"USER_ID" => isset($_SERVER["REMOTE_USER"]) ? $_SERVER["REMOTE_USER"] : "ig1",
+      "USER_ID" => "ig1",
       "CMS_VER" => CMS_RELEASE,
       "CONFIG" => "user",
       "USER_DIR" => $subdom,
@@ -19,18 +20,21 @@ class InitServer {
     );
     $serverSubdomDir = "../$subdom";
     $this->updateSubdomVars($serverSubdomDir);
-    $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/{$this->subdom}";
+    $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/$subdom";
     if($update) {
       $this->authorizeUpdate($serverSubdomDir);
-      if(is_dir($userSubdomDir."/../.".$this->subdom)) {
-        $this->safeDeleteSubdom($userSubdomDir."/../.".$this->subdom, $serverSubdomDir);
+      if(is_dir($userSubdomDir."/../.$subdom")) {
+        $this->safeDeleteSubdom($userSubdomDir."/../.$subdom", $serverSubdomDir);
         return;
       }
       if(!is_dir($serverSubdomDir)) $this->createSubdom($serverSubdomDir);
       if(count(scandir($serverSubdomDir)) == 2) $this->acquireSubdom($serverSubdomDir);
     }
-    if(!file_exists("{$serverSubdomDir}/CMS_VER.".$this->subdomVars["CMS_VER"])) {
-      $this->subdomVars["CMS_VER"] = $this->getNewestStableVersion();
+    // create CMS_VER file from index or newest stable available version
+    if(!file_exists("$serverSubdomDir/CMS_VER.".$this->subdomVars["CMS_VER"])) {
+      if(is_link("$serverSubdomDir/index.php"))
+        $this->subdomVars["CMS_VER"] = basename(dirname(readlink("$serverSubdomDir/index.php")));
+      else $this->subdomVars["CMS_VER"] = $this->getNewestStableVersion();
     }
     $root = "../..";
     $this->folderVars = array(
@@ -42,20 +46,19 @@ class InitServer {
     );
     $this->folderVars['USER_FOLDER'] = $this->folderVars["USER_ROOT_FOLDER"]."/".$this->subdomVars["USER_DIR"];
     $this->folderVars['FILES_FOLDER'] = $this->folderVars["FILES_ROOT_FOLDER"]."/".$this->subdomVars["FILES_DIR"];
-    $this->folderVars['SUBDOM_FOLDER'] = $this->folderVars["SUBDOM_ROOT_FOLDER"]."/".basename(".");
+    $this->folderVars['SUBDOM_FOLDER'] = $this->folderVars["SUBDOM_ROOT_FOLDER"]."/".$this->subdom;
+    $this->folderVars['RES_FOLDER'] = "$serverSubdomDir/".RES_DIR;
     $this->completeStructure($serverSubdomDir);
     if($setConst) $this->setConst();
-    if(!$update) {
-      if(is_dir($userSubdomDir) && count(scandir($userSubdomDir)) == 2)
-        $this->syncServerToUser($userSubdomDir, $serverSubdomDir);
-      return;
-    }
+    if(!$update && count(scandir($userSubdomDir)) == 2)
+      $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
+    if(!$update) return;
     // check rights to modify files
-    if(!is_file("{$serverSubdomDir}/CONFIG.user"))
+    if(!is_file("$serverSubdomDir/CONFIG.user"))
       throw new Exception("User subdom setup disabled.");
     if(count(scandir($userSubdomDir)) == 2) {
       $this->resetServerSubdom($serverSubdomDir);
-      $this->syncServerToUser($userSubdomDir, $serverSubdomDir);
+      $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
     } else {
       $this->updateServerFromUser($userSubdomDir, $serverSubdomDir);
     }
@@ -117,36 +120,62 @@ class InitServer {
     $nsv = null;
     foreach(scandir(CMS_ROOT_FOLDER) as $v) {
       if(!preg_match("/^\d+\.\d+$/",$v)) continue;
-      if(version_compare($this->subdomVars["CMS_VER"],$v) < 0) $nsv = $v;
+      if(version_compare($nsv, $v) < 0) $nsv = $v;
     }
+    if(is_null($nsv)) throw new Exception("No stable IGCMS variant found");
     return $nsv;
   }
 
-  private function completeStructure($dir) {
-    // create symlink
-    $name = CMSRES_ROOT_DIR;
-    $path = CMSRES_ROOT_FOLDER;
-    if(!file_exists("$dir/$name") || readlink("$dir/$name") != $path) {
-      symlink($path, "$dir/$name~");
-      rename("$dir/$name~", "$dir/$name");
+  private function completeStructure($subdomDir) {
+    // create symlinks
+    $rob = preg_match("/^ig\d/", $this->subdom) ? "robots_off.txt" : "robots_default.txt";
+    $files = array(
+      "$subdomDir/".CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER,
+      "$subdomDir/index.php" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php",
+      "$subdomDir/.htaccess" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/.htaccess",
+      "$subdomDir/robots.txt" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/$rob",
+    );
+    foreach($files as $link => $target) $this->createSymlink($link, $target);
+    // init default plugin files
+    if(!is_file("$subdomDir/CONFIG.". $this->subdomVars["CONFIG"])) {
+      $this->createDefaultPlugins(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_DIR, $subdomDir);
     }
     // create missing data files
     foreach($this->subdomVars as $name => $val) {
-      $f = "$dir/$name.$val";
+      $f = "$subdomDir/$name.$val";
       if(!file_exists($f)) touch($f);
     }
-    // init default plugin files
-    if(!is_file("$dir/CONFIG.". $this->subdomVars["CONFIG"])) {
-      $this->createDefaultPlugins(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_DIR, $dir);
-    }
     // create required directories
-    foreach($this->folderVars as $k => $d) {
-      if(!$d) continue; // res/cmsres == false
-      if(!is_dir("$dir/$d") && !@mkdir("$dir/$d",0755,true))
-        throw new Exception("Unable to create folder '$d'");
+    /*
+    [ADMIN_FOLDER] => ../../adm/www
+    [USER_ROOT_FOLDER] => ../../admin/usr
+    [FILES_ROOT_FOLDER] => ../../admin/files
+    [SUBDOM_ROOT_FOLDER] => ../../admin/subdom
+    [TEMP_FOLDER] => ../../admin/temp
+    [USER_FOLDER] => ../../admin/usr/www
+    [FILES_FOLDER] => ../../admin/files/www
+    [SUBDOM_FOLDER] => ../../admin/subdom/www
+    [RES_FOLDER] => ../www/res
+    */
+    foreach($this->folderVars as $dirPath) {
+      if(is_dir($dirPath) || @mkdir($dirPath,0755,true)) continue;
+      throw new Exception("Unable to create folder '$dirPath'");
     }
   }
 
+  private function createSymlink($link, $target) {
+    #$info["toVersion"] = $this->subdomVars["CMS_VER"];
+    #$info["isLink"] = is_link($link);
+    #$info["readlink"] = readlink($link);
+    if(file_exists($link) && readlink($link) == $target) return;
+    if(!symlink($target, "$link~") || !rename("$link~", $link))
+      throw new Exception("Unable to create symlink '$link'");
+    clearstatcache(true, $link);
+    #$info["afterClear"] = readlink($link);
+    #print_r($info);
+    if(readlink($link) == $target) return;
+    throw new Exception("Unable to verify symlink (cache).");
+  }
 
   private function resetServerSubdom($dir) {
     $this->subdomVars["USER_DIR"] = $this->subdom;
@@ -181,7 +210,7 @@ class InitServer {
         $this->subdomVars[$var[0]] = $var[1];
         break;
         case "PLUGIN":
-        if(!is_dir(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_FOLDER."/{$var[1]}"))
+        if(!is_dir(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_DIR."/{$var[1]}"))
           throw new Exception("Plugin '{$var[1]}' is not available");
         if(is_file("$destDir/.$f"))
           throw new Exception("Plugin '{$var[1]}' is forbidden");
@@ -213,36 +242,10 @@ class InitServer {
           throw new Exception("Unable to setup '$newFile'");
         break;
         case "PLUGIN":
-        if(is_file("$destDir/$f") && !unlink("$destDir/$f"))
+        if(!is_file("$srcDir/$f") && !unlink("$destDir/$f"))
           throw new Exception("Unable to disable plugin '{$var[1]}'");
         break;
       }
-    }
-    // apply "symlinks" to server subdom
-    $files = array(
-      "index.php" => "index.php",
-      ".htaccess" => ".htaccess",
-      "robots.txt" => "robots_default.txt"
-    );
-    if(preg_match("/^ig\d/", $this->subdom)) $files["robots.txt"] = "robots_off.txt";
-    foreach($files as $link => $target) {
-      #$info["toVersion"] = $this->subdomVars["CMS_VER"];
-      #$info["isLink"] = is_link("$destDir/$link");
-      #$info["readlink"] = readlink("$destDir/$link");
-      if(!is_link("$destDir/$link")
-        || readlink("$destDir/$link") != CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/$target") {
-        #$info["settingTo"] = CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/$target";
-        if(!symlink(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/$target", "$destDir/$link~")
-        || !rename("$destDir/$link~", "$destDir/$link"))
-          throw new Exception("Unable to link file '$l' into '{$this->subdom}'");
-        #$info["beforeClear"] = readlink("$destDir/$link");
-        clearstatcache(true, "$destDir/$link");
-        #$info["afterClear"] = readlink("$destDir/$link");
-        if(readlink("$destDir/$link") != CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/$target")
-          throw new Exception("Unable to verify symlink (cache).");
-      }
-      #print_r($info);
-      #throw new Exception("ALL OK");
     }
   }
 
