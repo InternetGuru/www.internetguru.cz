@@ -8,7 +8,7 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != "preinit") return;
+    if($subject->getStatus() != STATUS_PREINIT) return;
     $this->handleRequest();
   }
 

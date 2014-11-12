@@ -5,7 +5,7 @@
 class Slider extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != "process") return;
+    if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
     if(is_null($this->cms->getOutputStrategy())) {
       $subject->detach($this);
@@ -25,7 +25,7 @@ class Slider extends Plugin implements SplObserver {
     }
     // set css
     #todo:fixme
-    #$fileName = findFile(PLUGIN_FOLDER ."/". get_class($this) . "/Slider.css");
+    #$fileName = findFile(PLUGINS_FOLDER ."/". get_class($this) . "/Slider.css");
     #if($fileName === false) throw new Exception("CSS file not found");
     #$fileName = getLocalLink("").$fileName;
     #$setters["setCss"] = "Slider.setCss('$fileName');";
@@ -33,7 +33,7 @@ class Slider extends Plugin implements SplObserver {
     foreach($cfg->getElementsByTagName("parameters")->item(0)->childElements as $r) {
       $setters[$r->nodeName] = "Slider." . $r->nodeName . "('" . $r->nodeValue . "');";
     }
-    $f = PLUGIN_FOLDER ."/". get_class($this) ."/Slider.js";
+    $f = PLUGINS_FOLDER ."/". get_class($this) ."/Slider.js";
     $this->cms->getOutputStrategy()->addJsFile($f,10,"head",false);
     $this->cms->getOutputStrategy()->addJs(implode($setters),20);
   }

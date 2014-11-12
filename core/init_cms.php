@@ -2,41 +2,41 @@
 try {
 
   $start_time = microtime(true);
-  require_once(dirname(__FILE__) .'/global_func.php');
+  require_once(CORE_FOLDER.'/global_func.php');
   if(!isAtLocalhost()) {
-    $init_server_path = CMS_FOLDER ."/../init_server.php";
-    if(!is_file($init_server_path)) throw new Exception("Missing init_server file");
-    require_once($init_server_path);
-    $subdom = basename(dirname($_SERVER["PHP_SELF"]));
-    init_server($subdom);
+    if(!is_file(CMS_ROOT_FOLDER."/InitServer.php")) throw new Exception("Missing server init file");
+    require_once(CMS_ROOT_FOLDER."/InitServer.php");
+    new InitServer(CURRENT_SUBDOM_DIR, true);
     if(isset($_GET["updateSubdom"])) {
+      $subdom = CURRENT_SUBDOM_DIR;
       if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
-      update_subdom($subdom);
+      new InitServer($subdom, false, true);
       redirTo("http://$subdom.". getDomain());
     }
   }
-  require_once(dirname(__FILE__) .'/global_const.php');
+  require_once(CORE_FOLDER.'/global_const.php');
 
-  $l = new Logger("CMS init " . dirname(__FILE__), null, microtime(true) - $start_time);
+  $l = new Logger("CMS init ".CMS_RELEASE.", v. ".CMS_VERSION
+    .(CMS_DEBUG ? " (DEBUG)" : ""), null, microtime(true) - $start_time);
   $l->finished();
-  $l = new Logger("CMS finished " . dirname(__FILE__), null, 0);
+  $l = new Logger("CMS finished ".CMS_RELEASE, null, 0);
 
   $plugins = new Plugins();
-  $plugins->setStatus("preinit");
+  $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 
   checkUrl();
   $cms = new Cms();
   $cms->init(); // because of dombulder to set variable into cms
-  $plugins->setStatus("init");
+  $plugins->setStatus(STATUS_INIT);
   $plugins->notify();
 
   $cms->buildContent();
-  $plugins->setStatus("process");
+  $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
 
   $cms->processVariables();
-  $plugins->setStatus("postprocess");
+  $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
   echo $cms->getOutput();

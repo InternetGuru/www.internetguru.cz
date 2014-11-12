@@ -1,5 +1,7 @@
 <?php
 
+#todo: files list, next/prev
+
 class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $err = array();
@@ -37,7 +39,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
-    if(!is_null($f)) $newContent->insertVar("content", $this->file_get_contents($f));
+    if(!is_null($f)) $newContent->insertVar("content", htmlspecialchars($this->file_get_contents($f)));
     return $newContent;
   }
 
@@ -47,12 +49,12 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function getLogFile($fileName=null) {
-    return $this->getFile($fileName,LOG_FOLDER,date('Ymd'),"log");
+    return $this->getFile($fileName, LOG_FOLDER, date('Ymd'), "log");
   }
 
   private function getVersionFile($fileName=null) {
-    $v = explode(".",CMS_VERSION);
-    return $this->getFile($fileName,CMS_FOLDER ."/". VER_FOLDER,$v[0],"ver");
+    $v = explode(".", CMS_VERSION);
+    return $this->getFile($fileName, VER_FOLDER, $v[0], "ver");
   }
 
   private function getFile($fileName,$dir,$defaultName,$ext) {

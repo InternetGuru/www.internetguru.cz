@@ -1,7 +1,6 @@
 <?php
 
 class Plugin {
-  const HASH_ALGO = 'crc32b';
   private $doms = array();
   protected $subject = null;
 
@@ -22,7 +21,7 @@ class Plugin {
   }
 
   protected function getDir() {
-    return PLUGIN_FOLDER ."/". get_class($this);
+    return PLUGINS_DIR ."/". get_class($this);
   }
 
   protected function getHTMLPlus($filePath=null, $user=true) {
@@ -43,7 +42,7 @@ class Plugin {
   }
 
   private function getKey($a,$b=null,$c=null) {
-    return hash(self::HASH_ALGO, $a.$b.$c);
+    return hash(FILE_HASH_ALGO, $a.$b.$c);
   }
 
   private function buildDOMPlus($filePath, $htmlPlus, $user) {

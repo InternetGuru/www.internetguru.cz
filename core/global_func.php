@@ -43,7 +43,7 @@ function redirTo($link,$code=null,$force=false) {
 
 function chmodGroup($file,$mode) {
   $oldMask = umask(002);
-  $chmod = chmod($file,$mode);
+  $chmod = @chmod($file,$mode);
   umask($oldMask);
   return $chmod;
 }
@@ -153,8 +153,8 @@ function duplicateDir($dir) {
   if(!is_dir($dir)) return;
   $info = pathinfo($dir);
   $bakDir = $info["dirname"]."/~".$info["basename"];
-  copyFiles($dir,$bakDir);
-  deleteRedundantFiles($bakDir,$dir);
+  copyFiles($dir, $bakDir);
+  deleteRedundantFiles($bakDir, $dir);
   #new Logger("Active data backup updated");
 }
 
@@ -172,7 +172,7 @@ function smartCopy($src, $dest, $delay=0) {
   }
 }
 
-function deleteRedundantFiles($in,$according) {
+function deleteRedundantFiles($in, $according) {
   if(!is_dir($in)) return;
   foreach(scandir($in) as $f) {
     if(in_array($f,array(".",".."))) continue;
@@ -253,16 +253,16 @@ function fileSizeConvert($b) {
     return round($b,1)." ".$iec[$i];
 }
 
-function checkUrl($folder = null, $extended = false) {
+function checkUrl($folder = null) {
   $rUri = $_SERVER["REQUEST_URI"];
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
-    new ErrorPage("The requested URL $rUri was not understood by this server.", 400, $extended);
+    new ErrorPage("The requested URL '$rUri' was not understood by this server.", 400);
   if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/",$rUri,$m)) return null;
-  $fInfo["filepath"] = "$folder/". $m[1];
 
+  $fInfo["filepath"] = "$folder/". $m[1];
   if(!is_file($fInfo["filepath"]))
-    new ErrorPage("The requested URL $rUri was not found on this server.", 404, $extended);
+    new ErrorPage("The requested URL '$rUri' was not found on this server.", 404);
 
   $disallowedMime = array(
     "application/x-msdownload" => null,

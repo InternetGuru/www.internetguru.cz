@@ -10,7 +10,8 @@ class ErrorPage {
   private $whatnowFile = "whatnow.txt";
 
   public function __construct($message, $code, $extended=false) {
-    new Logger("$message ($code)","fatal");
+    http_response_code($code);
+    new Logger($message,"fatal");
     $dir = CMS_FOLDER ."/". $this->relDir;
     $tt = array(
       "@CODE@" => $code,
@@ -32,7 +33,6 @@ class ErrorPage {
       $tt["@IMAGE@"] = $images[array_rand($images)];
       $tt["@ROOT@"] = getRoot();
     }
-    http_response_code($code);
     echo str_replace(array_keys($tt),$tt,$html);
     die();
   }
@@ -42,7 +42,8 @@ class ErrorPage {
     // http://xkcd.com/1350/#p:10e7f9b6-b9b8-11e3-8003-002590d77bdd
     foreach(scandir($dir) as $img) {
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
-      $i[] = getRes("$dir/$img", $this->relDir ."/$img", CMSRES_FOLDER);
+      $resFolder = isAtLocalhost() ? false : CMSRES_ROOT_DIR."/".CMS_RELEASE;
+      $i[] = getRes("$dir/$img", $this->relDir ."/$img", $resFolder);
     }
     return $i;
   }

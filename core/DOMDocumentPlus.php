@@ -1,5 +1,7 @@
 <?php
 
+#todo: insertVarDOMElement insertBefore()
+
 class DOMDocumentPlus extends DOMDocument {
   const DEBUG = false;
 
@@ -293,17 +295,8 @@ class DOMDocumentPlus extends DOMDocument {
       $e->setAttribute($attr,$varValue);
       return;
     }
-    $varValue = htmlspecialchars($varValue);
-    $replaced = false;
-    foreach($e->childNodes as $n) {
-      if($n->nodeType != 3) continue;
-      $new = sprintf($n->nodeValue,$varValue);
-      if($new == $n->nodeValue) continue;
-      $n->nodeValue = $new;
-      $replaced = true;
-      break;
-    }
-    if(!$replaced) $e->nodeValue = $varValue;
+    #$this->insertInnerHTML($varValue, $e);
+    $e->nodeValue = $varValue;
   }
 
   private function insertVarArray(Array $varValue,DOMElement $e,$varName) {
@@ -336,17 +329,19 @@ class DOMDocumentPlus extends DOMDocument {
       new Logger("Unable to insert variable array into '{$n->nodeName}'","error");
       return;
     }
-    $dom = new DOMDocument();
-    $eNam = $e->nodeName;
-    $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$varValue)."</$eNam></var>";
+    $this->insertInnerHTML($varValue, $e, $sep);
+  }
 
+  private function insertInnerHTML($html, DOMElement $dest, $sep = "") {
+    if(!is_array($html)) $html = array($html);
+    $dom = new DOMDocument();
+    $eNam = $dest->nodeName;
+    $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$html)."</$eNam></var>";
     if(!@$dom->loadXML($xml)) {
-      new Logger("Invalid XML inserted as '$varName' (converting specialchars)","warning");
-      foreach($varValue as $k => $v) $varValue[$k] = htmlspecialchars($v);
-      $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$varValue)."</$eNam></var>";
-      if(!@$dom->loadXML($xml)) throw new Exception("Unable to parse '$varName' variable");
+      foreach($html as $k => $v) $html[$k] = htmlspecialchars($v);
+      $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$html)."</$eNam></var>";
     }
-    $this->insertVarDOMElement($dom->documentElement,$e->parentNode);
+    $this->insertVarDOMElement($dom->documentElement,$dest->parentNode);
   }
 
   private function emptyVarArray(DOMElement $e) {
@@ -373,4 +368,3 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
 }
-?>

@@ -28,12 +28,12 @@ class Plugins implements SplSubject {
   }
 
   private function attachPlugins() {
-    $dir = CMS_FOLDER . "/". PLUGIN_FOLDER;
+    $dir = PLUGINS_FOLDER;
     if(!is_dir($dir))
       throw new Exception("Missing plugin folder '$dir'");
     foreach(scandir($dir) as $p) {
       if(strpos($p,".") === 0 || file_exists("$dir/.$p")) continue; // skip .plugin
-      if(isAtLocalhost() && file_exists(PLUGIN_FOLDER."/.$p")) {
+      if(isAtLocalhost() && file_exists(PLUGINS_FOLDER."/.$p")) {
         $this->availableObservers[$p] = null;
         continue;
       }

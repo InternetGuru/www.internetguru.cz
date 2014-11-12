@@ -4,7 +4,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   private $content = null;
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "init") {
+    if($subject->getStatus() == STATUS_INIT) {
       if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
     }
   }

@@ -19,7 +19,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != "preinit") return;
+    if($subject->getStatus() != STATUS_PREINIT) return;
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;

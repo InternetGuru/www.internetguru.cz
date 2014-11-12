@@ -6,7 +6,7 @@ class InputVar extends Plugin implements SplObserver {
   private $contentXPath;
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != "process") return;
+    if($subject->getStatus() != STATUS_PROCESS) return;
     $dom = $this->getDOMPlus();
     $vars = $dom->getElementsByTagName("var");
     foreach($vars as $var) $this->parseVar($var);

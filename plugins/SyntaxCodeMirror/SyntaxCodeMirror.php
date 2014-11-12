@@ -17,7 +17,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "init") {
+    if($subject->getStatus() == STATUS_INIT) {
       $this->detachIfNotAttached("Xhtml11");
       return;
     }

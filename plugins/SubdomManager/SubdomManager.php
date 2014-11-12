@@ -1,5 +1,7 @@
 <?php
 
+#todo: cmsPlugins according to cmsVersion
+
 class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $err = array();
@@ -7,6 +9,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private $cmsPlugins;
   private $userDirs;
   private $filesDirs;
+  private $subdoms = array();
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -15,15 +18,15 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   public function update(SplSubject $subject) {
-    if(!SUBDOM_FOLDER || !isset($_GET[get_class($this)])) {
+    if(isAtLocalhost() || !isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;
     }
-    if($subject->getStatus() != "preinit") return;
-    $this->cmsVersions = $this->getSubdirs(CMS_FOLDER ."/..");
-    $this->cmsPlugins = $this->getSubdirs(CMS_FOLDER ."/". PLUGIN_FOLDER);
-    $this->userDirs = $this->getSubdirs(USER_FOLDER ."/..", "/^[^~]/");
-    $this->filesDirs = $this->getSubdirs(FILES_FOLDER ."/..");
+    if($subject->getStatus() != STATUS_PREINIT) return;
+    $this->cmsVersions = $this->getSubdirs(CMS_ROOT_FOLDER);
+    $this->cmsPlugins = $this->getSubdirs(PLUGINS_FOLDER);
+    $this->userDirs = $this->getSubdirs(USER_ROOT_FOLDER, "/^[^~]/");
+    $this->filesDirs = $this->getSubdirs(FILES_ROOT_FOLDER);
     $this->syncUserSubdoms();
     if(empty($_POST)) return;
     try {
@@ -40,7 +43,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         }
       }
       if(is_null($subdom)) throw new Exception("Unrecognized POST");
-      init_server($subdom, true);
+      new InitServer($subdom, false, true);
       $link = getCurLink(true);
       if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
       redirTo($link, null, true);
@@ -52,16 +55,16 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   private function processDeleteSubdom($subdom) {
     if(self::DEBUG) throw new Exception("Deleting DISABLED");
-    $activeDir = SUBDOM_FOLDER ."/../$subdom";
-    $inactiveDir = SUBDOM_FOLDER ."/../.$subdom";
+    $activeDir = SUBDOM_ROOT_FOLDER."/$subdom";
+    $inactiveDir = SUBDOM_ROOT_FOLDER."/.$subdom";
     if(is_dir($activeDir)) {
       $newSubdom = "~$subdom";
-      while(file_exists(SUBDOM_FOLDER ."/../$newSubdom")) $newSubdom = "~$newSubdom";
-      if(!rename($activeDir, SUBDOM_FOLDER ."/../$newSubdom"))
-        throw new Exception("Unable to keep subdom '$subdom' setup");
+      while(file_exists(SUBDOM_ROOT_FOLDER."/$newSubdom")) $newSubdom = "~$newSubdom";
+      if(!rename($activeDir, SUBDOM_ROOT_FOLDER."/$newSubdom"))
+        throw new Exception("Unable to backup subdom '$subdom' setup");
     }
     if(!is_dir($inactiveDir) && !mkdir($inactiveDir)) {
-      throw new Exception("Unable to process delete subdom '$subdom'");
+      throw new Exception("Unable to create '.$subdom' dir");
     }
     return $subdom;
   }
@@ -77,7 +80,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   // process post (changes) into USER_ID/subdom
   private function processUpdateSubdom($subdom) {
-    $subdomFolder = SUBDOM_FOLDER ."/../$subdom";
+    $subdomFolder = SUBDOM_ROOT_FOLDER."/$subdom";
     if(!is_dir($subdomFolder) && !mkdir($subdomFolder, 0755, true))
       throw new Exception("Unable to create user subdom directory '$subdom'");
     if(!isset($_POST["PLUGINS"]) || !is_array($_POST["PLUGINS"]))
@@ -122,7 +125,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("curlink", getCurLink(true));
     $newContent->insertVar("domain", getDomain());
-    $newContent->insertVar("USER_ID", USER_ID);
 
     if(isset($_POST["new_subdom"])) {
       $newContent->insertVar("new_nohide", "nohide");
@@ -130,7 +132,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
 
     $form = $newContent->getElementsByTagName("form")->item(1);
-    foreach($this->getSubdirs(SUBDOM_FOLDER ."/..", "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
+    foreach($this->subdoms as $subdom) {
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($form, true));
       $this->modifyDOM($doc, $subdom);
@@ -145,7 +147,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     foreach($this->getSubdirs("..", "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
       if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
       try {
-        init_server($subdom); // clone existing subdoms (no update)
+        $this->subdoms[] = $subdom;
+        new InitServer($subdom); // clone existing subdoms (no update)
       } catch(Exception $e) {
         $this->err[] = $e->getMessage();
       }
@@ -167,7 +170,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $current = null;
     $deprecated = false;
     $set = $d->appendChild($d->createElement("var"));
-    $userSubdomFolder = SUBDOM_FOLDER ."/../$subdom";
+    $userSubdomFolder = SUBDOM_ROOT_FOLDER ."/$subdom";
     foreach($this->cmsVersions as $cmsVer => $active) {
       if(is_file("../$subdom/CMS_VER.$cmsVer")) $current = $cmsVer;
       if(!$active) {

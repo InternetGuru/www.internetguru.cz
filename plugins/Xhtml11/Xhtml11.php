@@ -21,7 +21,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == "init") {
+    if($subject->getStatus() == STATUS_INIT) {
       global $cms;
       $cms->setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
@@ -29,7 +29,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $cms->setVariable("url", $domain);
       $cms->setVariable("link", getCurLink());
     }
-    if($subject->getStatus() == "process") {
+    if($subject->getStatus() == STATUS_PROCESS) {
       $cfg = $this->getDOMPlus();
       $this->registerThemes($cfg);
     }
@@ -237,7 +237,16 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
+    if(!isAtLocalhost()) $this->createRootFavicon();
+  }
 
+  private function createRootFavicon() {
+    $link = "favicon.ico";
+    $target = CMS_FOLDER."/".$this->favIcon;
+    if(is_null($this->favIcon)) return;
+    if(is_link($link) && readlink($link) == $target) return;
+    if(symlink($target, "$link~") && rename("$link~", $link)) return;
+    new Logger("Unable to create root 'favicon.ico' link", "error");
   }
 
   private function addThemeFiles(DOMElement $e) {
