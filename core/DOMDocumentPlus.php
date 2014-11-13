@@ -40,8 +40,8 @@ class DOMDocumentPlus extends DOMDocument {
           $keep[] = $v;
           continue;
         }
-        if(isset($p[1])) $replaceAttr[$p[1]] = $e;
-        else $replaceCont[] = $e;
+        if(isset($p[1])) $replaceAttr[] = array($e, $p[1]);
+        else $replaceCont[] = array($e, null);
       }
       if(empty($keep)) {
         $e->removeAttribute("var");
@@ -52,8 +52,9 @@ class DOMDocumentPlus extends DOMDocument {
     $replaces = array_merge($replaceAttr, $replaceCont); // attributes first!
     if(!count($replaces)) return;
     $type = gettype($varValue);
-    foreach($replaces as $attr => $e) {
-      if(is_numeric($attr)) $attr = null;
+    foreach($replaces as $item) {
+      $e = $item[0];
+      $attr = $item[1];
       if(is_null($e->parentNode)) continue;
       switch($type) {
         case "NULL":
