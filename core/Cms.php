@@ -54,7 +54,15 @@ class Cms {
   public function processVariables() {
     $this->loadDefaultVariables($this->content);
     $this->setVariable("variables", array_keys($this->variables));
-    foreach($this->variables as $k => $v) $this->content->insertVar($k,$v);
+    $newContent = clone $this->content;
+    foreach($this->variables as $k => $v) $newContent->insertVar($k,$v);
+    try {
+      $newContent->validatePlus();
+      $this->content = $newContent;
+    } catch(Exception $e) {
+      new Logger("Variables generate invalid HTML+: ".$e->getMessage(), "error");
+    }
+    return $this->content;
   }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
