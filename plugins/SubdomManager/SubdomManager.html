@@ -3,7 +3,7 @@
   <h id="h.adf">Manažer poddomén</h>
   <desc>Správa poddomén uživatele <em var="cms-user_id"/> na doméně <em var="domain"/>.</desc>
   <ol class="warning">
-    <li var="errors"/>
+    <li var="errors">Žádné chyby</li>
   </ol>
   <form action="/" method="post" var="curlink@action">
     <fieldset class="hidable" var="new_nohide@class"><legend><strong>Nová</strong> poddoména</legend>
@@ -21,13 +21,13 @@
     <fieldset class="hidable" var="nohide@class"><legend>Poddoména <em><strong var="subdom"/>.</em><em var="domain"/>, verze <em var="version">neznámá</em> <strong var="deprecated">(zastaralá)</strong></legend>
       <dl>
         <dt><label var="cmsVerId@for">Verze IGCMS, aktuálně <samp var="CMS_VER">neznámá</samp>  <strong var="deprecated">(zastaralá verze)</strong></label></dt>
-        <dd><select name="CMS_VER" var="cmsVerId@id cmsVers"><option>n/a</option></select></dd>
+        <dd><select name="CMS_VER" var="cmsVerId@id"><option var="cmsVers">n/a</option></select></dd>
         <dt><label var="userDirId@for">Datové a konfigurační soubory, aktuálně <samp var="USER_DIR">neznámé</samp></label></dt>
-        <dd><select name="USER_DIR" var="userDirId@id userDirs"><option>n/a</option></select></dd>
+        <dd><select name="USER_DIR" var="userDirId@id"><option var="userDirs">n/a</option></select></dd>
         <dt><label var="filesDirId@for">Veřejně dostupný adresář, aktuálně <samp var="FILES_DIR">neznámý</samp></label></dt>
-        <dd><select name="FILES_DIR" var="filesDirId@id filesDirs"><option>n/a</option></select></dd>
+        <dd><select name="FILES_DIR" var="filesDirId@id"><option var="filesDirs">n/a</option></select></dd>
         <dt>Dostupná rozšíření (konstanta <samp>PLUGIN</samp>)</dt>
-        <dd class="plugins" var="plugins"><samp>n/a</samp></dd>
+        <dd class="plugins"><samp var="plugins">n/a</samp></dd>
         <dd>*) Uložené neaplikované změny</dd>
         <dt>Akce</dt>
         <dd><input type="submit" value="Uložit změny"/></dd>
