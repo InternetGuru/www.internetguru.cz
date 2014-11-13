@@ -75,11 +75,10 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue($s1 == $s2);
     }
 
-    #fixme: insertint string into root must throw exception
     public function testInsertVarStringRoot()
     {
       $e = null;
-      $this->doc->loadXML('<root><a var="somevar">x<b/>%s</a></root>'); // %s not supported any more
+      $this->doc->loadXML('<a var="somevar">x<b/></a>');
       try {
         $n = $this->doc->insertVar("somevar","myValue");
       } catch (Exception $e) {
@@ -88,7 +87,7 @@ class DOMDocumentPlusTest extends \Codeception\TestCase\Test
       $this->assertTrue(is_null($e),$e);
       $s1 = $this->doc->C14N(true,false);
       $doc = new DOMDocumentPlus();
-      $doc->loadXML('<root><a>myValue</a></root>');
+      $doc->loadXML('<a>myValue</a>');
       $s2 = $doc->C14N(true,false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);
