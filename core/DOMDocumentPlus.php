@@ -1,7 +1,5 @@
 <?php
 
-#todo: insertVarDOMElement insertBefore()
-
 class DOMDocumentPlus extends DOMDocument {
   const DEBUG = false;
 
@@ -30,9 +28,10 @@ class DOMDocumentPlus extends DOMDocument {
     }
     // find elements with current var
     $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$varName));
-    $where = array();
+    $replaceCont = array();
+    $replaceAttr = array();
     // check for attributes and real match (xpath accepts substrings)
-    foreach($matches as $e) {
+    foreach($matches as $k => $e) {
       $vars = explode(" ",$e->getAttribute("var"));
       $keep = array();
       foreach($vars as $v) {
@@ -41,7 +40,8 @@ class DOMDocumentPlus extends DOMDocument {
           $keep[] = $v;
           continue;
         }
-        $where[] = array($e, isset($p[1]) ? $p[1] : null);
+        if(isset($p[1])) $replaceAttr[$p[1]] = $e;
+        else $replaceCont[] = $e;
       }
       if(empty($keep)) {
         $e->removeAttribute("var");
@@ -49,11 +49,11 @@ class DOMDocumentPlus extends DOMDocument {
       }
       $e->setAttribute("var",implode(" ",$keep));
     }
-    if(!count($where)) return;
+    $replaces = array_merge($replaceAttr, $replaceCont); // attributes first!
+    if(!count($replaces)) return;
     $type = gettype($varValue);
-    foreach($where as $item) {
-      $e = $item[0];
-      $attr = $item[1];
+    foreach($replaces as $attr => $e) {
+      if(is_numeric($attr)) $attr = null;
       if(is_null($e->parentNode)) continue;
       switch($type) {
         case "NULL":
@@ -295,8 +295,8 @@ class DOMDocumentPlus extends DOMDocument {
       $e->setAttribute($attr,$varValue);
       return;
     }
-    #$this->insertInnerHTML($varValue, $e);
-    $e->nodeValue = $varValue;
+    $this->insertInnerHTML($varValue, $e);
+    #$e->nodeValue = $varValue;
   }
 
   private function insertVarArray(Array $varValue,DOMElement $e,$varName) {
@@ -340,31 +340,34 @@ class DOMDocumentPlus extends DOMDocument {
     if(!@$dom->loadXML($xml)) {
       foreach($html as $k => $v) $html[$k] = htmlspecialchars($v);
       $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$html)."</$eNam></var>";
+      if(!@$dom->loadXML($xml)) throw new Exception("Unable to parse variable");
     }
-    $this->insertVarDOMElement($dom->documentElement,$dest->parentNode);
+    $this->insertVarDOMElement($dom->documentElement, $dest);
   }
 
   private function emptyVarArray(DOMElement $e) {
-    if($e->nodeValue != "") return;
     $p = $e->parentNode;
     $p->removeChild($e);
     if($p->childElements->length == 0)
       $p->parentNode->removeChild($p);
   }
 
-  // full replace only
   private function insertVarDOMElement(DOMElement $varValue, DOMElement $e, $attr=null) {
     if(!is_null($attr)) {
       $this->insertVarstring($varValue->nodeValue, $e, $attr);
       return;
     }
-    // clear destination element
+    $var = $e->ownerDocument->importNode($varValue, true);
+    $attributes = array();
+    foreach($e->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
+    $nodes = array();
+    foreach($var->childNodes as $n) $nodes[] = $n;
+    foreach($nodes as $n) {
+      foreach($attributes as $aName => $aValue) $n->setAttribute($aName, $aValue);
+      $e->parentNode->insertBefore($n, $e);
+    }
+    $e->parentNode->removeChild($e);
     $e->removeChildNodes();
-    // fill destination element
-    $var = $e->ownerDocument->importNode($varValue,true);
-    $children = array();
-    foreach($var->childNodes as $n) $children[] = $n;
-    foreach($children as $n) $e->appendChild($n);
   }
 
 }

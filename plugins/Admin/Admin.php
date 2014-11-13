@@ -104,6 +104,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown") {
       $newContent->insertVar("statuschange", null);
       $newContent->insertVar("warning", "warning");
+      $newContent->insertVar("nohide", "nohide");
     }
 
     return $newContent;

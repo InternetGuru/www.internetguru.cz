@@ -1,11 +1,12 @@
 <?php
 
-include_once('cls/globals.php');
-include_once('cls/Logger.php');
-include_once('cls/DOMElementPlus.php');
-include_once('cls/DOMBuilder.php');
-include_once('cls/DOMDocumentPlus.php');
-include_once('cls/HTMLPlus.php');
+include_once('core/global_func.php');
+include_once('core/global_const.php');
+include_once('core/Logger.php');
+include_once('core/DOMElementPlus.php');
+include_once('core/DOMBuilder.php');
+include_once('core/DOMDocumentPlus.php');
+include_once('core/HTMLPlus.php');
 
 class DOMBuilderTest extends \Codeception\TestCase\Test
 {

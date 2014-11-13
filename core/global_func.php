@@ -1,12 +1,11 @@
 <?php
 
 function isAtLocalhost() {
-  if($_SERVER["REMOTE_ADDR"] == "127.0.0.1"
-  || substr($_SERVER["REMOTE_ADDR"],0,8) == "192.168."
-  || substr($_SERVER["REMOTE_ADDR"],0,3) == "10."
-  || $_SERVER["REMOTE_ADDR"] == "::1") {
-    return true;
-  }
+  if(!isset($_SERVER["REMOTE_ADDR"])) return true;
+  if($_SERVER["REMOTE_ADDR"] == "127.0.0.1") return true;
+  if(substr($_SERVER["REMOTE_ADDR"],0,8) == "192.168.") return true;
+  if(substr($_SERVER["REMOTE_ADDR"],0,3) == "10.") return true;
+  if($_SERVER["REMOTE_ADDR"] == "::1") return true;
   return false;
 }
 

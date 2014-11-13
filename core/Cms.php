@@ -1,7 +1,5 @@
 <?php
 
-#TODO: singleton contentXpath, contentFullXpath (?)
-
 class Cms {
 
   private $contentFull = null; // HTMLPlus
@@ -48,7 +46,7 @@ class Cms {
         $this->loadDefaultVariables($this->content);
       }
     } catch (Exception $e) {
-      if(self::DEBUG) echo $this->content->saveXML();
+      if(self::DEBUG) echo $c->saveXML();
       throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
     }
   }

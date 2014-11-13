@@ -3,6 +3,7 @@
 
 0.3.0 - Major structural changes
 0.3.1 - SubdomManager using GET param
+0.3.3 - Admin opens default file if user file missing
 
 0.2
 ---

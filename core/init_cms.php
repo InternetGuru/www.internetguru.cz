@@ -2,7 +2,8 @@
 try {
 
   $start_time = microtime(true);
-  require_once(CORE_FOLDER.'/global_func.php');
+  require_once('global_func.php');
+  require_once('global_const.php');
   if(!isAtLocalhost()) {
     if(!is_file(CMS_ROOT_FOLDER."/InitServer.php")) throw new Exception("Missing server init file");
     require_once(CMS_ROOT_FOLDER."/InitServer.php");
@@ -14,7 +15,7 @@ try {
       redirTo("http://$subdom.". getDomain());
     }
   }
-  require_once(CORE_FOLDER.'/global_const.php');
+  #require_once(CORE_FOLDER.'/global_func2.php');
 
   $l = new Logger("CMS init ".CMS_RELEASE.", v. ".CMS_VERSION
     .(CMS_DEBUG ? " (DEBUG)" : ""), null, microtime(true) - $start_time);
