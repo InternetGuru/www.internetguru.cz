@@ -61,6 +61,7 @@ if(substr(CMS_VERSION,-4) == "-dev") {
   ini_set("display_errors", 1);
   define('CMS_DEBUG', true);
 } else define('CMS_DEBUG', false);
+define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
 
 #todo: date_default_timezone_set()
 #todo: setlocale(LC_ALL, czech); // cs_CZ.utf8 (localhost)

@@ -17,8 +17,7 @@ try {
   }
   #require_once(CORE_FOLDER.'/global_func2.php');
 
-  $l = new Logger("CMS init ".CMS_RELEASE.", v. ".CMS_VERSION
-    .(CMS_DEBUG ? " (DEBUG)" : ""), null, microtime(true) - $start_time);
+  $l = new Logger(CMS_NAME, null, microtime(true) - $start_time);
   $l->finished();
   $l = new Logger("CMS finished ".CMS_RELEASE, null, 0);
 
