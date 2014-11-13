@@ -1,5 +1,7 @@
 <?php
 
+#TODO: symlink cache!??
+
 class InitServer {
   private $subdom;
   private $subdomVars;
@@ -52,20 +54,22 @@ class InitServer {
     $this->folderVars['FILES_FOLDER'] = $this->folderVars["FILES_ROOT_FOLDER"]."/".$this->subdomVars["FILES_DIR"];
     $this->folderVars['SUBDOM_FOLDER'] = $this->folderVars["SUBDOM_ROOT_FOLDER"]."/".$this->subdom;
     $this->folderVars['RES_FOLDER'] = "$serverSubdomDir/".RES_DIR;
-    $this->completeStructure($serverSubdomDir);
     if($setConst) $this->setConst();
-    if(!$update && count(scandir($userSubdomDir)) == 2)
-      $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
-    if(!$update) return;
-    // check rights to modify files
+    if(!$update) {
+      $this->completeStructure($serverSubdomDir);
+      if(count(scandir($userSubdomDir)) == 2)
+        $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
+      return;
+    }
     if(!is_file("$serverSubdomDir/CONFIG.user"))
       throw new Exception("User subdom setup disabled.");
     if(count(scandir($userSubdomDir)) == 2) {
       $this->resetServerSubdom($serverSubdomDir);
       $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
-    } else {
-      $this->updateServerFromUser($userSubdomDir, $serverSubdomDir);
+      return;
     }
+    $this->updateServerFromUser($userSubdomDir, $serverSubdomDir);
+    $this->completeStructure($serverSubdomDir);
   }
 
   private function setConst() {
