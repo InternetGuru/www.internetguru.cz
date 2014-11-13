@@ -4,20 +4,8 @@ try {
   $start_time = microtime(true);
   require_once('global_func.php');
   require_once('global_const.php');
-  if(!isAtLocalhost()) {
-    if(!is_file(CMS_ROOT_FOLDER."/InitServer.php")) throw new Exception("Missing server init file");
-    require_once(CMS_ROOT_FOLDER."/InitServer.php");
-    new InitServer(CURRENT_SUBDOM_DIR, true);
-    if(isset($_GET["updateSubdom"])) {
-      $subdom = CURRENT_SUBDOM_DIR;
-      if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
-      new InitServer($subdom, false, true);
-      redirTo("http://$subdom.". getDomain());
-    }
-  }
-  #require_once(CORE_FOLDER.'/global_func2.php');
-
   $l = new Logger(CMS_NAME, null, microtime(true) - $start_time);
+  proceedServerInit("InitServer.php");
   $l->finished();
   $l = new Logger("CMS finished ".CMS_RELEASE, null, 0);
 

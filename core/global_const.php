@@ -74,6 +74,24 @@ function __autoload($className) {
   throw new LoggerException("Unable to find class '$className' in '$fp' nor '$fc'");
 }
 
+function proceedServerInit($initServerFileName) {
+  if(isAtLocalhost()) return;
+  if(!is_file(CMS_ROOT_FOLDER."/$initServerFileName"))
+    throw new Exception("Missing server init file");
+  require_once(CMS_ROOT_FOLDER."/$initServerFileName");
+  new InitServer(CURRENT_SUBDOM_DIR, true);
+  if(isset($_GET["updateSubdom"])) {
+    if(is_file(CMS_ROOT_FOLDER."/.$initServerFileName")) {
+      new Logger("Subdom update is disabled.", "warning");
+      return;
+    }
+    $subdom = CURRENT_SUBDOM_DIR;
+    if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
+    new InitServer($subdom, false, true);
+    redirTo("http://$subdom.". getDomain());
+  }
+}
+
 function findFile($file, $user=true, $admin=true, $res=false) {
   while(strpos($file,"/") === 0) $file = substr($file,1);
   try {
