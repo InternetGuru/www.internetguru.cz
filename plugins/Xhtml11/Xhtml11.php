@@ -72,7 +72,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(strlen($desc)) $this->appendMeta($head, "description", $desc);
     $kw = $cms->getVariable("cms-kw");
     if(strlen($kw)) $this->appendMeta($head, "keywords", $kw);
-    if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon",false,false,false);
+    if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon");
+    #if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon",false,false,false);
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
@@ -237,13 +238,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
-    if(!isAtLocalhost()) $this->createRootFavicon();
   }
 
-  private function createRootFavicon() {
+  private function createRootFavicon($target) {
     $link = "favicon.ico";
-    $target = CMS_FOLDER."/".$this->favIcon;
-    if(is_null($this->favIcon)) return;
     if(is_link($link) && readlink($link) == $target) return;
     if(symlink($target, "$link~") && rename("$link~", $link)) return;
     new Logger("Unable to create root 'favicon.ico' link", "error");
@@ -313,16 +311,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     } catch (Exception $ex) {
       $f = false;
     }
-    if($f === false && $rel == "shortcut icon") {
-      $f = $file;
-      while(strpos($f,"/") === 0) $f = substr($f,1);
-    }
     if(!strlen($f)) {
       $comment = "[$rel] file '$file' not found";
       $parent->appendChild(new DOMComment(" $comment "));
       new Logger($comment,"error");
       return;
     }
+    if($rel == "shortcut icon") $this->createRootFavicon($f);
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type",$type);
     if($rel) $e->setAttribute("rel",$rel);
