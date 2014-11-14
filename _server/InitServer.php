@@ -6,8 +6,10 @@ class InitServer {
   private $subdom;
   private $subdomVars;
   private $folderVars;
+  private $apacheGraceful = false;
   const FORBIDDEN_PLUGINS = array("Slider" => null);
   const DISABLED_PLUGINS = array("Slider" => null);
+  const APACHE_RESTART_FILE = "APACHE_RESTART";
 
   public function __construct($subdom, $setConst = false, $update = false) {
     if(!preg_match("/^" . SUBDOM_PATTERN . "$/", $subdom))
@@ -42,7 +44,7 @@ class InitServer {
         $this->subdomVars["CMS_VER"] = basename(dirname(readlink("$serverSubdomDir/index.php")));
       else $this->subdomVars["CMS_VER"] = $this->getNewestStableVersion();
     }
-    $root = "../..";
+    $root = realpath("../..");
     $this->folderVars = array(
       'ADMIN_FOLDER' => "$root/".ADMIN_ROOT_DIR."/".$this->subdomVars["ADMIN_DIR"],
       'USER_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".USER_ROOT_DIR,
@@ -145,6 +147,11 @@ class InitServer {
       "$subdomDir/robots.txt" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/$rob",
     );
     foreach($files as $link => $target) $this->createSymlink($link, $target);
+    // restart apache if symlink changed
+    if($this->apacheGraceful) {
+      if(!touch(CMS_ROOT_FOLDER."/".self::APACHE_RESTART_FILE))
+        new Logger("Unable to force Apache cache symlink target update", "error");
+    }
     // init default plugin files
     if(!is_file("$subdomDir/CONFIG.". $this->subdomVars["CONFIG"])) {
       $this->createDefaultPlugins(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_DIR, $subdomDir);
@@ -161,11 +168,20 @@ class InitServer {
     }
   }
 
+  #todo: https support
   private function createSymlink($link, $target) {
     #$info["toVersion"] = $this->subdomVars["CMS_VER"];
     #$info["isLink"] = is_link($link);
     #$info["readlink"] = readlink($link);
-    if(file_exists($link) && readlink($link) == $target) return;
+    if(file_exists($link)) {
+      if(!is_link($link) || readlink($link) == $target) return;
+      #if(!symlink("$target~".microtime(true), "$link~") || !rename("$link~", $link))
+      #  throw new Exception("Unable to create symlink '$link'");
+      #$url = "http://".$this->subdom.".".getDomain()."/".basename($link);
+      #@get_headers($url);
+      #new Logger("get_headers($url) = ".implode(" | ", $h), "info");
+      $this->apacheGraceful = true;
+    }
     if(!symlink($target, "$link~") || !rename("$link~", $link))
       throw new Exception("Unable to create symlink '$link'");
     clearstatcache(true, $link);
