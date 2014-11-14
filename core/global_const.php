@@ -21,6 +21,7 @@ define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
 define('CORE_FOLDER', dirname(__FILE__));
 if(isAtLocalhost()) {
+  define('CMS_DEBUG', true);
   define("LOG_DIR", "_log");
   define("ADMIN_BACKUP_DIR", "_adm.bak");
   define("USER_BACKUP_DIR", "_usr.bak");
@@ -36,6 +37,7 @@ if(isAtLocalhost()) {
   define('LOG_FOLDER', '../'.LOG_DIR.'/'.CURRENT_SUBDOM_DIR);
   define('CACHE_FOLDER', '../'.CACHE_DIR.'/'.CURRENT_SUBDOM_DIR);
 } else {
+  define('CMS_DEBUG', is_file("CMS_DEBUG"));
   define("LOG_DIR", "log");
   define("ADMIN_BACKUP_DIR", "adm.bak");
   define("USER_BACKUP_DIR", "usr.bak");
@@ -56,11 +58,10 @@ define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
 define('CMS_VERSION', file_get_contents(CMS_FOLDER ."/cms_version.txt"));
 #print_r(get_defined_constants(true)); die();
 
-if(substr(CMS_VERSION,-4) == "-dev") {
+if(CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
-  define('CMS_DEBUG', true);
-} else define('CMS_DEBUG', false);
+}
 define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
 
 #todo: date_default_timezone_set()
