@@ -241,6 +241,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function createRootFavicon($target) {
+    if(isAtLocalhost()) return;
     $link = "favicon.ico";
     if(is_link($link) && readlink($link) == $target) return;
     if(symlink($target, "$link~") && rename("$link~", $link)) return;
