@@ -119,7 +119,7 @@ function getRes($res, $dest, $resFolder) {
     throw new Exception("Forbidden file name '$res' to copy to '$resFolder' folder");
   }
   $mime = getFileMime($res);
-  if(strpos($res, CMS_FOLDER) !== 0 && $mime != "text/plain") {
+  if(strpos($res, CMS_FOLDER) !== 0 && $mime != "text/plain" && strpos($mime, "image/") !== 0) {
     throw new Exception("Forbidden mime type '$mime' to copy '$res' to '$resFolder' folder");
   }
   $newRes = $resFolder . "/$dest";
