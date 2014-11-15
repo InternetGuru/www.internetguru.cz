@@ -80,7 +80,6 @@ function proceedServerInit($initServerFileName) {
   if(!is_file(CMS_ROOT_FOLDER."/$initServerFileName"))
     throw new Exception("Missing server init file");
   require_once(CMS_ROOT_FOLDER."/$initServerFileName");
-  new InitServer(CURRENT_SUBDOM_DIR, true);
   if(isset($_GET["updateSubdom"])) {
     if(is_file(CMS_ROOT_FOLDER."/.$initServerFileName")) {
       new Logger("Subdom update is disabled.", "warning");
@@ -91,6 +90,7 @@ function proceedServerInit($initServerFileName) {
     new InitServer($subdom, false, true);
     redirTo("http://$subdom.". getDomain());
   }
+  new InitServer(CURRENT_SUBDOM_DIR, true);
 }
 
 function findFile($file, $user=true, $admin=true, $res=false) {

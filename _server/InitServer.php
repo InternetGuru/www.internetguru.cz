@@ -5,7 +5,6 @@
 class InitServer {
   private $subdom;
   private $subdomVars;
-  private $folderVars;
   private $apacheGraceful = false;
   const FORBIDDEN_PLUGINS = array("Slider" => null);
   const DISABLED_PLUGINS = array("Slider" => null);
@@ -28,55 +27,65 @@ class InitServer {
     $serverSubdomDir = "../$subdom";
     $this->updateSubdomVars($serverSubdomDir);
     $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/$subdom";
-    if($update) {
-      $this->authorizeUpdate($serverSubdomDir);
-      $userDelDir = dirname($userSubdomDir)."/.$subdom";
-      if(is_dir($userDelDir)) {
-        $this->safeDeleteSubdom($userDelDir, $serverSubdomDir);
-        return;
-      }
-      if(!is_dir($serverSubdomDir)) $this->createSubdom($serverSubdomDir);
-      if(count(scandir($serverSubdomDir)) == 2) $this->acquireSubdom($serverSubdomDir);
+    if(!is_dir($serverSubdomDir)) {
+      if(!$updte) throw new Exception("Subdom '$subdom' does not exist (update?)");
+      $this->createSubdom($serverSubdomDir);
+    }
+    if(count(scandir($serverSubdomDir)) == 2) {
+      if(!$updte) throw new Exception("Subdom '$subdom' is not available (update?)");
+      $this->acquireSubdom($serverSubdomDir);
+    }
+    if($update && !is_file("$serverSubdomDir/USER_ID.". $this->subdomVars["USER_ID"]))
+      throw new Exception("Unauthorized subdom modification '{$this->subdom}' - USER_ID mismatch");
+    $userDelDir = dirname($userSubdomDir)."/.$subdom";
+    if($update && is_dir($userDelDir)) {
+      $this->safeDeleteSubdom($userDelDir, $serverSubdomDir);
+      return;
     }
     // create CMS_VER file from index or newest stable available version
     if(!file_exists("$serverSubdomDir/CMS_VER.".$this->subdomVars["CMS_VER"])) {
-      if(is_link("$serverSubdomDir/index.php"))
+      if(!$update && is_link("$serverSubdomDir/index.php"))
         $this->subdomVars["CMS_VER"] = basename(dirname(readlink("$serverSubdomDir/index.php")));
       else $this->subdomVars["CMS_VER"] = $this->getNewestStableVersion();
     }
+    $folders = $this->setFolderVars($serverSubdomDir);
+    if($update && !is_file("$serverSubdomDir/CONFIG.user"))
+      throw new Exception("User subdom setup disabled (missing $serverSubdomDir/CONFIG.user)");
+    if(count(scandir($userSubdomDir)) == 2) {
+      if($update) $this->userResetServerSubdom($serverSubdomDir);
+      $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
+    } elseif($update) {
+      $this->updateServerFromUser($userSubdomDir, $serverSubdomDir);
+      $folders = $this->setFolderVars($serverSubdomDir);
+    }
+    $this->completeStructure($serverSubdomDir);
+    if($setConst) $this->setConst($folders);
+  }
+
+  private function setFolderVars($serverSubdomDir) {
     $root = realpath("../..");
-    $this->folderVars = array(
+    $folders = array(
       'ADMIN_FOLDER' => "$root/".ADMIN_ROOT_DIR."/".$this->subdomVars["ADMIN_DIR"],
       'USER_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".USER_ROOT_DIR,
       'FILES_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".FILES_ROOT_DIR,
       'SUBDOM_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".SUBDOM_ROOT_DIR,
       'TEMP_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".TEMP_DIR,
     );
-    $this->folderVars['USER_FOLDER'] = $this->folderVars["USER_ROOT_FOLDER"]."/".$this->subdomVars["USER_DIR"];
-    $this->folderVars['FILES_FOLDER'] = $this->folderVars["FILES_ROOT_FOLDER"]."/".$this->subdomVars["FILES_DIR"];
-    $this->folderVars['SUBDOM_FOLDER'] = $this->folderVars["SUBDOM_ROOT_FOLDER"]."/".$this->subdom;
-    $this->folderVars['RES_FOLDER'] = "$serverSubdomDir/".RES_DIR;
-    if($setConst) $this->setConst();
-    if(!$update) {
-      $this->completeStructure($serverSubdomDir);
-      if(count(scandir($userSubdomDir)) == 2)
-        $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
-      return;
+    $folders['USER_FOLDER'] = $folders["USER_ROOT_FOLDER"]."/".$this->subdomVars["USER_DIR"];
+    $folders['FILES_FOLDER'] = $folders["FILES_ROOT_FOLDER"]."/".$this->subdomVars["FILES_DIR"];
+    $folders['SUBDOM_FOLDER'] = $folders["SUBDOM_ROOT_FOLDER"]."/".$this->subdom;
+    $folders['RES_FOLDER'] = "$serverSubdomDir/".RES_DIR;
+    // create required directories
+    foreach($folders as $dirPath) {
+      if(is_dir($dirPath) || @mkdir($dirPath,0755,true)) continue;
+      throw new Exception("Unable to create folder '$dirPath'");
     }
-    if(!is_file("$serverSubdomDir/CONFIG.user"))
-      throw new Exception("User subdom setup disabled.");
-    if(count(scandir($userSubdomDir)) == 2) {
-      $this->resetServerSubdom($serverSubdomDir);
-      $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
-      return;
-    }
-    $this->updateServerFromUser($userSubdomDir, $serverSubdomDir);
-    $this->completeStructure($serverSubdomDir);
+    return $folders;
   }
 
-  private function setConst() {
+  private function setConst(Array $folders) {
     define("USER_ID", $this->subdomVars["USER_ID"]);
-    foreach($this->folderVars as $fName => $fPath) define($fName, $fPath);
+    foreach($folders as $fName => $fPath) define($fName, $fPath);
   }
 
   private function updateSubdomVars($dir) {
@@ -86,13 +95,6 @@ class InitServer {
       if(!array_key_exists($var[0], $this->subdomVars)) continue;
       $this->subdomVars[$var[0]] = $var[1];
     }
-  }
-
-  private function authorizeUpdate($dir) {
-    if(!is_dir($dir)) return;
-    if(count(scandir($dir)) == 2) return;
-    if(is_file("$dir/USER_ID.". $this->subdomVars["USER_ID"])) return;
-    throw new Exception("Unauthorized subdom modification '{$this->subdom}' - USER_ID mismatch");
   }
 
   private function safeDeleteSubdom($userDotSubdom, $destDir) {
@@ -125,6 +127,8 @@ class InitServer {
   private function acquireSubdom($dir) {
     if(!touch("$dir/USER_ID.". $this->subdomVars["USER_ID"]))
       throw new Exception("Unable to create user id file");
+    if(!touch("$dir/CONFIG.user"))
+      throw new Exception("Unable to create CONFIG file");
   }
 
   private function getNewestStableVersion() {
@@ -161,11 +165,6 @@ class InitServer {
       $f = "$subdomDir/$name.$val";
       if(!file_exists($f)) touch($f);
     }
-    // create required directories
-    foreach($this->folderVars as $dirPath) {
-      if(is_dir($dirPath) || @mkdir($dirPath,0755,true)) continue;
-      throw new Exception("Unable to create folder '$dirPath'");
-    }
   }
 
   #todo: https support
@@ -191,7 +190,7 @@ class InitServer {
     throw new Exception("Unable to verify symlink (cache).");
   }
 
-  private function resetServerSubdom($dir) {
+  private function userResetServerSubdom($dir) {
     $this->subdomVars["USER_DIR"] = $this->subdom;
     $this->subdomVars["FILES_DIR"] = $this->subdom;
     foreach(scandir($dir) as $f) {
@@ -207,6 +206,10 @@ class InitServer {
         unlink("$dir/$f"); // delete all plugins (create default below)
       }
     }
+    if(!touch("$dir/CMS_VER.".$this->subdomVars["CMS_VER"])
+      || !touch("$dir/USER_DIR.".$this->subdomVars["USER_DIR"])
+      || !touch("$dir/FILES_DIR.".$this->subdomVars["FILES_DIR"]))
+      throw new Exception("Unable to create configuration file(s)");
     $this->createDefaultPlugins(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_DIR, $dir);
   }
 
