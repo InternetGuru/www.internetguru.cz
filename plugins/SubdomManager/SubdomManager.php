@@ -34,8 +34,9 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private function processPost() {
     try {
       $subdom = null;
-      if(isset($_POST["new_subdom"])) $subdom = $this->processCreateSubdom($_POST["new_subdom"]);
-      if(strlen($_GET[get_class($this)])) {
+      if(isset($_POST["new_subdom"])) {
+        $subdom = $this->processCreateSubdom($_POST["new_subdom"]);
+      } elseif(strlen($_GET[get_class($this)])) {
         if(!is_file("../".$_GET[get_class($this)]."/USER_ID.".USER_ID))
           throw new Exception(sprintf("Unauthorized subdom '%s' modification by '%s'", $_GET[get_class($this)], USER_ID));
         if(isset($_POST["delete"])) {

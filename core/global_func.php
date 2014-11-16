@@ -42,14 +42,14 @@ function redirTo($link,$code=null,$force=false) {
 
 function chmodGroup($file,$mode) {
   $oldMask = umask(002);
-  $chmod = @chmod($file,$mode);
+  $chmod = chmod($file,$mode);
   umask($oldMask);
   return $chmod;
 }
 
 function mkdirGroup($dir,$mode=0777,$rec=false) {
   $oldMask = umask(002);
-  $dirMade = @mkdir($dir,$mode,$rec);
+  $dirMade = mkdir($dir,$mode,$rec);
   umask($oldMask);
   return $dirMade;
 }

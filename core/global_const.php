@@ -115,8 +115,10 @@ function findFile($file, $user=true, $admin=true, $res=false) {
 function getRes($res, $dest, $resFolder) {
   if($resFolder === false) return $res;
   #TODO: check mime==ext, allowed types, max size
-  $folders = preg_quote(CMS_FOLDER,"/") ."|". preg_quote(ADMIN_FOLDER,"/") ."|". preg_quote(USER_FOLDER,"/");
-  if(!preg_match("/^(?:$folders)\/".FILEPATH_PATTERN."$/", $res)) {
+  $folders = array(preg_quote(CMS_FOLDER,"/"));
+  if(defined("ADMIN_FOLDER")) $folders[] = preg_quote(ADMIN_FOLDER,"/");
+  if(defined("USER_FOLDER")) $folders[] = preg_quote(USER_FOLDER,"/");
+  if(!preg_match("/^(?:".implode("|",$folders).")\/".FILEPATH_PATTERN."$/", $res)) {
     throw new Exception("Forbidden file name '$res' to copy to '$resFolder' folder");
   }
   $mime = getFileMime($res);
@@ -132,8 +134,8 @@ function getRes($res, $dest, $resFolder) {
   if(!symlink($res, "$newRes~") || !rename("$newRes~", $newRes)) {
     throw new Exception("Unable to create symlink '$newRes' for '$res'");
   }
-  if(!chmodGroup($newRes,0664))
-    throw new Exception("Unable to chmod resource file '$newRes'");
+  #if(!chmodGroup($newRes,0664))
+  #  throw new Exception("Unable to chmod resource file '$newRes'");
   return $newRes;
 }
 

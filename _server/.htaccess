@@ -16,20 +16,16 @@ RewriteCond %{HTTP_HOST} ^(.+)\.[^.]+\.[^.]+$
 RewriteCond %{DOCUMENT_ROOT}/subdom/%1 -d
 RewriteRule .* subdom/%1/$0 [DPI]
 
+AuthUserFile /var/www/.htpasswd
+AuthGroupFile /var/www/.htgroup
 AuthType Basic
 AuthName "restricted"
-AuthUserFile /var/www/.htpasswd
 
 # CMS ?admin
-<If "%{QUERY_STRING} =~ /(Admin|LogViewer|Convertor)/">
+<If "%{QUERY_STRING} =~ /(SubdomManager|updateSubdom|Admin|LogViewer|Convertor)/">
   Require user admin
+  Require group partner
 </If>
-
-#TODO
-# CMS ?SubdomManager
-#<If "%{QUERY_STRING} =~ /(SubdomManager|updateSubdom)/">
-#  Require group partner
-#</If>
 
 # CRM & SML
 <If "%{REQUEST_FILENAME} =~ m#/subdom/(crm|doc)/#">
@@ -39,6 +35,7 @@ AuthUserFile /var/www/.htpasswd
 # PARTNER
 <If "%{REQUEST_FILENAME} =~ m#/subdom/partner/#">
   Require user partner admin
+  Require group partner
 </If>
 
 

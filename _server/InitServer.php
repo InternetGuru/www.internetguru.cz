@@ -15,9 +15,7 @@ class InitServer {
       throw new Exception("Invalid subdom format '$subdom'");
     $this->subdom = $subdom;
     $this->subdomVars = array(
-      #fixme: due to "admin" username
-      #"USER_ID" => isset($_SERVER["REMOTE_USER"]) ? $_SERVER["REMOTE_USER"] : "ig1",
-      "USER_ID" => "ig1",
+      "USER_ID" => defined("USER_ID") ? USER_ID : "ig1",
       "CMS_VER" => CMS_RELEASE,
       "CONFIG" => "user",
       "USER_DIR" => $subdom,
@@ -28,11 +26,11 @@ class InitServer {
     $this->updateSubdomVars($serverSubdomDir);
     $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/$subdom";
     if(!is_dir($serverSubdomDir)) {
-      if(!$updte) throw new Exception("Subdom '$subdom' does not exist (update?)");
+      if(!$update) throw new Exception("Subdom '$subdom' does not exist (update?)");
       $this->createSubdom($serverSubdomDir);
     }
     if(count(scandir($serverSubdomDir)) == 2) {
-      if(!$updte) throw new Exception("Subdom '$subdom' is not available (update?)");
+      if(!$update) throw new Exception("Subdom '$subdom' is not available (update?)");
       $this->acquireSubdom($serverSubdomDir);
     }
     if($update && !is_file("$serverSubdomDir/USER_ID.". $this->subdomVars["USER_ID"]))
@@ -76,9 +74,11 @@ class InitServer {
     $folders['SUBDOM_FOLDER'] = $folders["SUBDOM_ROOT_FOLDER"]."/".$this->subdom;
     $folders['RES_FOLDER'] = "$serverSubdomDir/".RES_DIR;
     // create required directories
-    foreach($folders as $dirPath) {
-      if(is_dir($dirPath) || @mkdir($dirPath,0755,true)) continue;
-      throw new Exception("Unable to create folder '$dirPath'");
+    foreach($folders as $f => $dirPath) {
+      if(!is_dir($dirPath) && !@mkdirGroup($dirPath, 0775, true))
+        throw new Exception("Unable to create '$f' folder");
+      if(chgrp($dirPath, filegroup("$dirPath/.."))) continue;
+        throw new Exception("Unable to set '$f' permissions");
     }
     return $folders;
   }
@@ -153,7 +153,7 @@ class InitServer {
     foreach($files as $link => $target) $this->createSymlink($link, $target);
     // restart apache if symlink changed
     if($this->apacheGraceful) {
-      if(!touch(CMS_ROOT_FOLDER."/".self::APACHE_RESTART_FILE))
+      if(!touch(CMSRES_ROOT_FOLDER."/".self::APACHE_RESTART_FILE))
         new Logger("Unable to force Apache cache symlink target update", "error");
     }
     // init default plugin files
@@ -270,17 +270,22 @@ class InitServer {
     foreach(scandir($srcDir) as $f) {
       if(!is_file("$srcDir/$f") || strpos($f, ".") === 0) continue;
       $var = explode(".", $f, 2);
+      $fGroup = filegroup("$destDir/../..");
+      $ch = false;
       switch($var[0]) {
         case "CMS_VER":
         case "USER_DIR":
         case "FILES_DIR":
         case "PLUGIN":
-        touch("$destDir/$f"); // no exception if fail
+        if(touch("$destDir/$f")) $ch = true;
         break;
         case "robots":
         if($f != "robots.txt" || is_link("$srcDir/$f")) continue;
-        copy("$srcDir/$f", "$destDir/$f"); // no exception if fail
+        if(copy("$srcDir/$f", "$destDir/$f")) $ch = true;
       }
+      if(!$ch) continue;
+      if(chgrp("$destDir/$f", $fGroup) && chmodGroup("$destDir/$f", 0664)) continue;
+      throw new Exception("Unable to set permissions to '$f'");
     }
   }
 

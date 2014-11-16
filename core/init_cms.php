@@ -35,7 +35,7 @@ try {
 } catch(Exception $e) {
 
   $m = $e->getMessage();
-  if(isAtLocalhost()) $m = "Exception: ".$m." in ".$e->getFile()." on line ".$e->getLine();
+  if(CMS_DEBUG) $m = "Exception: ".$m." in ".$e->getFile()." on line ".$e->getLine();
   if(isset($l)) $l->finished();
   if(class_exists("ErrorPage")) new ErrorPage($m, 500, true);
 
