@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Auth>
+  <!--
+    <url [access="allow"]>controlled url</url>
+    default acces="deny"
+    controlled url: [path][?parname[=parvalue]]
+  -->
+  <url>?SubdomManager</url>
+  <url>?Admin</url>
+  <url>?LogViewer</url>
+  <url>?Convertor</url>
+  <url access="allow">?LogViewer=ver</url>
+</Auth>
