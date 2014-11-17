@@ -22,6 +22,7 @@
   <var link="log">/?LogViewer=log</var>
   <var link="ver">/?LogViewer=ver</var>
   <var link="import">/?Convertor</var>
+  <var link="subdom">/?SubdomManager</var>
 
   <var parName="ver" parValue="">?LogViewer=ver</var>
   <var parName="log" parValue="">?LogViewer=log</var>
@@ -30,5 +31,6 @@
   <var parName="log">?LogViewer</var>
   <var parName="ver">?LogViewer</var>
   <var parName="import">?Convertor</var>
+  <var parName="subdom">/?SubdomManager</var>
 
 </UrlHandler>
