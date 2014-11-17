@@ -77,14 +77,7 @@ function __autoload($className) {
 
 function proceedServerInit($initServerFileName) {
   if(isAtLocalhost()) return;
-  if(!is_file(CMS_ROOT_FOLDER."/$initServerFileName"))
-    throw new Exception("Missing server init file");
-  require_once(CMS_ROOT_FOLDER."/$initServerFileName");
   if(isset($_GET["updateSubdom"])) {
-    if(is_file(CMS_ROOT_FOLDER."/.$initServerFileName")) {
-      new Logger("Subdom update is disabled.", "warning");
-      return;
-    }
     $subdom = CURRENT_SUBDOM_DIR;
     if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
     new InitServer($subdom, false, true);
