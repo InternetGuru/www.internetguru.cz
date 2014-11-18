@@ -1,47 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <body xml:lang="cs">
-  <h id="h.c5d" ctime="2014-10-28T19:50:32+01:00">Tvorba webu v IGCMS</h>
-  <desc>Toto je výchozí dokument IGCMS ukazující základní proces tvorby webu s ukázkami typických prvků, které se při vytváření webu mohou hodit. Před začátkem práce se systémem je potřeba získat přehled o jeho fungování. Především je potřeba připravit kvalitní strukturovaný obsah vytvářeného webu. Technologie a vzhled výsledného webu jsou z hlediska tvorby až na druhém místě.</desc>
+  <h id="h.c5d">Webový prostor uživatele <span var="cms-user_id"/></h>
+  <desc>Toto je popis celého webu</desc>
   <section>
-    <h id="h.f4d">Jak začít s IGCMS</h>
-    <desc>Proces vytvoření webu na systému IGCMS rozdělený do několika kroků. Především jde o vytvoření obsahu se strukturou následované seznámením se systémem. V další fázi je možné dokument do systému naimportovat a v posledních fázích obsah doupravit a nastavit vzhled.</desc>
-    <ol>
-      <li>Připravte si dobře strukturovaný koncept (dokument) o tom, čeho chcete dosáhnout. Zaměřte se na strukturu a obsah (ne jen obsah).
-        <ul>
-          <li>Každý koncept má pouze jeden hlavní nadpis.</li>
-          <li>Po každém nadpisu by mělo následovat shrnutí následující pod/kapitoly (pro účely importu je shrnutí jako vycentrovaný odstavec za nadpisem).</li>
-          <li>Následuje samotný obsah, který by měl být členitý – kromě odstavců také seznamy apod. Delší kapitoly je dobré členit na podkapitoly – nadpisy nižší úrovně.</li>
-          <li>Obsah jako celek by měl být vyvážený tak, aby neobsahoval příliš mnoho ale ani příliš málo prvků stejného typu za sebou.</li>
-        </ul></li>
-      <li>Před používáním systému si projděte <a href="http://partner.internetguru.cz/igcms">Specifikaci IGCMS</a> (login: <samp>partner</samp> / <samp>igpartner</samp>).
-        <ul>
-          <li>Nejdříve se ujistěte, že chápete <em>základní pojmy</em>.</li>
-          <li>Kdykoli si nevíte rady, <a href="?log">koukejte do logů</a> a pravidelně sledujte <a href="?ver">změny v nových verzích</a>.</li>
-        </ul></li>
-      <li><a href="?import">Importujte dokumenty</a> do IGMS.
-        <ul>
-          <li>Nezapomeňte, že importovaný soubor je uložený odděleně, aby se zabránilo nežádoucímu přepsání.</li>
-          <li>Pokud chcete použít importovaný obsah (nebo jeho část), zkopírujte jej do souboru s obsahem. V této fázi stačí soubor zkopírovat do schránky.</li>
-          <li>Importovaný dokument je možné k obsahu připojit přímo pomocí atributu <samp>import</samp>. Případné další změny importovaného souboru se projeví okamžitě v obsahu webu.</li>
-        </ul></li>
-      <li>Pro vytvoření obsahu <a href="?admin">vstupte do administrace</a> nebo soubory modifikujte přímo přes FTP.
-        <ul>
-          <li>Do výchozího dokumentu <samp>Content.html</samp> vložte obsah ve formátu HTML+. Např. ten ze schránky – zkopírovaný v předchozím kroku z importovaného dokumentu.</li>
-        </ul></li>
-      <li>Vzhled a další nastavení
-        <ul>
-          <li>V rámci odkazů ve spodní části administrace můžete procházet a měnit datové a konfigurační soubory jednotlivých rozšíření dle libosti.</li>
-          <li>Každý vytvořený soubor je možné deaktivovat a tím obnovit výchozí hodnoty.</li>
-        </ul></li>
-    </ol>
-    <h id="h.f2b">Ukázky použití</h>
-    <desc>Několik příkladů typického použití systému při tvorbě webu. Použití definičního seznamu s několika řádkovými prvky a ukázkou zobrazení systémové proměnné.</desc>
+    <h short="Jedna" id="h.b99">První podnadpis</h>
+    <desc>Popis první podkapitoly.</desc>
+    <p>Odstavec s obsahem první podkapitoly.</p>
+    <h short="Dva" id="h.7cc">Druhý podnadpis</h>
+    <desc>Popis druhé podkapitoly.</desc>
+    <ul>
+      <li>První položka seznamu</li>
+      <li>Druhá položka seznamu</li>
+    </ul>
+    <h short="Tři" id="h.527">Třetí podnadpis</h>
+    <desc>Popis třetí podkapitoly.</desc>
     <dl>
-      <dt>Formátování textu</dt>
-      <dd>Text odstavce (nebo jiného prvku) může být <strong>zdůrazněný</strong> (typicky tučně), <em>méně důrazný</em> (typicky kurzívou), může se jednat o <samp>příklad</samp> a další.</dd>
-      <dt>Používání proměnných</dt>
-      <dd>Zobrazit hodnotu globální proměnné <samp>cms-name</samp>: <em var="cms-name"/></dd>
-      <dd>Předchozí proměnná se zobrazí pomocí kódu <code class="xml">&lt;em var="cms-name"/&gt;</code></dd>
+      <dt>První termnín definičního seznamu</dt>
+      <dd>Popis prvního termínu definičního seznamu</dd>
+      <dt>Druhý termnín definičního seznamu</dt>
+      <dd>Popis druhého termínu definičního seznamu</dd>
     </dl>
   </section>
 </body>
