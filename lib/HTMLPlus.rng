@@ -67,9 +67,12 @@
           <ref name="datetime"/>
         </attribute>
       </optional>
-      <data type="string">
-        <param name="pattern">.*\S.*</param>
-      </data>
+      <zeroOrMore>
+        <choice>
+          <text/>
+          <ref name="span"/>
+        </choice>
+      </zeroOrMore>
     </element>
   </define>
 

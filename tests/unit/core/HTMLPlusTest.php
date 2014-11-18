@@ -1,12 +1,12 @@
 <?php
 
-include_once('core/global_func.php');
-include_once('core/global_const.php');
-include_once('core/Logger.php');
-include_once('core/DOMElementPlus.php');
-include_once('core/DOMBuilder.php');
-include_once('core/DOMDocumentPlus.php');
-include_once('core/HTMLPlus.php');
+require_once('core/global_func.php');
+require_once('core/global_const.php');
+require_once('core/Logger.php');
+require_once('core/DOMElementPlus.php');
+require_once('core/DOMBuilder.php');
+require_once('core/DOMDocumentPlus.php');
+require_once('core/HTMLPlus.php');
 
 class HTMLPlusTest extends \Codeception\TestCase\Test
 {
@@ -225,7 +225,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted empty h");
+      $this->assertNotNull($e,"RelaxNG schema accepted empty h (known issue #18)");
     }
 
     public function testHEmptyTrim()

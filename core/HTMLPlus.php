@@ -136,7 +136,8 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateLang($repair);
     $this->validateId("id",$repair);
     $this->validateId("link",$repair);
-    $this->validateHId($repair);
+    $this->validateHid($repair);
+    $this->validateHempty($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
     $this->validateLinks("a","href",$repair);
@@ -146,7 +147,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->relaxNGValidatePlus();
   }
 
-  public function relaxNGValidatePlus() {
+  public function relaxNGValidatePlus($f=null) {
     return parent::relaxNGValidatePlus(CMS_FOLDER."/".self::RNG_FILE);
   }
 
@@ -219,7 +220,7 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  private function validateHId($repair) {
+  private function validateHid($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("id")) {
         if(!$repair) throw new Exception ("Missing id attribute in element h");
@@ -233,6 +234,14 @@ class HTMLPlus extends DOMDocumentPlus {
         $this->setUniqueId($h);
         continue;
       }
+    }
+  }
+
+  private function validateHempty($repair) {
+    foreach($this->headings as $h) {
+      if(strlen(trim($h->nodeValue))) continue;
+      if(!$repair) throw new Exception("Heading content must not be empty");
+      $h->nodeValue = "Some Heading";
     }
   }
 

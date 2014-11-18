@@ -53,10 +53,9 @@ class Cms {
   }
 
   public function processVariables() {
-    $this->loadDefaultVariables($this->content);
-    $this->setVariable("variables", array_keys($this->variables));
     $newContent = clone $this->content;
-    foreach($this->variables as $k => $v) $newContent->insertVar($k,$v);
+    $this->loadDefaultVariables($this->content);
+    $this->insertVariables($newContent);
     try {
       $newContent->validatePlus();
       $this->content = $newContent;
@@ -64,6 +63,10 @@ class Cms {
       new Logger("Variables generate invalid HTML+: ".$e->getMessage(), "error");
     }
     return $this->content;
+  }
+
+  public function insertVariables(DOMDocumentPlus $doc) {
+    foreach($this->variables as $k => $v) $doc->insertVar($k, $v);
   }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
@@ -81,6 +84,7 @@ class Cms {
     if($desc->hasAttribute("kw")) $this->setVariable("kw", $desc->getAttribute("kw"));
     if($h1->hasAttribute("mtime")) $this->setVariable("mtime", $h1->getAttribute("mtime"));
     if($h1->hasAttribute("ctime")) $this->setVariable("ctime", $h1->getAttribute("ctime"));
+    $this->setVariable("variables", array_keys($this->variables));
   }
 
   private function loadContent() {

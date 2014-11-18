@@ -31,7 +31,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->setBc($c);
     if($this->isRoot) return $c;
 
-    $this->setTitle();
     $this->setAncestorValue($curH, "author");
     $this->setAncestorValue($curH->parentNode, "xml:lang");
     if(!$curH->parentNode->hasAttribute("xml:lang")) {
@@ -64,35 +63,33 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
   }
 
-  private function setTitle() {
-    $subtitles = array();
-    foreach($this->headings as $h) {
-      if($h->hasAttribute("short")) {
-        $subtitles[] = $h->getAttribute("short");
-        continue;
-      }
-      $subtitles[] = $h->nodeValue;
-    }
-    global $cms;
-    $cms->setVariable("cms-title", implode(" - ", $subtitles));
-  }
-
   private function setBc(HTMLPlus $src) {
     $first = true;
     $bc = new DOMDocumentPlus();
     $ol = $bc->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class","contentlink-bc");
     foreach(array_reverse($this->headings) as $h) {
-      $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
       $li = $ol->appendChild($bc->createElement("li"));
+      $hs[] = $bc->importNode($h, true);
+      $li->appendChild(end($hs));
+    }
+    global $cms;
+    $cms->insertVariables($bc);
+    $subtitles = array();
+    foreach($hs as $h) {
+      $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
+      $subtitles[] = $content;
       $href = "#". $h->getAttribute("id");
-      $a = $li->appendChild($bc->createElement("a",$content));
+      $a = $h->parentNode->appendChild($bc->createElement("a",$content));
       $a->setAttribute("href",$href);
       if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
       else $a->setAttribute("title",$h->nodeValue);
+      $h->parentNode->removeChild($h);
     }
-    global $cms;
+    end($subtitles);
+    $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
     $cms->setVariable("bc", $bc);
+    $cms->setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
   }
 
   private function setAncestorValue(DOMElement $e, $attName=null) {
