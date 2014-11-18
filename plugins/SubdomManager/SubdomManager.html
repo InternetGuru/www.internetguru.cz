@@ -10,7 +10,7 @@
       <dl>
         <dt><label for="new_subdom">Název nové poddomény</label></dt>
         <dd><samp var="cms-user_id"/><input type="text" name="new_subdom" id="new_subdom" var="new_subdom@value"/><samp var="domain">.%s</samp></dd>
-        <dd>Subdoména musí být ve formátu <code>[USER_ID][písmeno][písmena nebo čísla]</code></dd>
+        <dd>Nová poddoména musí začínat písmenem a dále může obsahovat písmena nebo čísla (<samp>[a-z][a-z0-9]*</samp>).</dd>
         <dt>Akce</dt>
         <dd><input type="submit" value="Vytvořit poddoménu"/></dd>
         <dd><input type="submit" name="redir" value="Vytvořit poddoménu a přesměrovat"/></dd>
@@ -30,7 +30,7 @@
         <dd class="plugins"><samp var="plugins">n/a</samp></dd>
         <dd>*) Uložené neaplikované změny</dd>
         <dt>Akce</dt>
-        <dd><input type="submit" value="Uložit změny"/></dd>
+        <!-- <dd><input type="submit" value="Uložit změny"/></dd> -->
         <dd><input type="submit" name="apply" value="Uložit a aplikovat změny"/></dd>
         <dd><input type="submit" name="redir" value="Uložit a aplikovat změny, přesměrovat"/></dd>
         <dd>Změna verze se může projevit se zpožděním (běžně do minuty)!</dd>

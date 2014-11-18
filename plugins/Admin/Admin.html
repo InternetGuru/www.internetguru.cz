@@ -9,12 +9,11 @@
     <li var="info">Žádná dobrá zpráva</li>
   </ol>
   <form action="/" method="post" var="linkadmin@action">
-    <fieldset class="hidable" var="nohide@class"><legend>Výchozí soubor</legend>
-      <blockcode var="defaultcontent">n/a</blockcode>
-    </fieldset>
     <fieldset class="hidable nohide"><legend>Uživatelský soubor, mód <samp var="mode"/>, stav <samp var="status warning@class"/><span var="statuschange"> (<a href="/" var="linkadminstatus@href">změnit stav</a>)</span></legend>
       <textarea cols="40" name="content" rows="20" var="content classtype@class">n/a</textarea>
-      <!-- <textarea cols="40" name="content" rows="20" var="xcontent classtype@class">n/a</textarea> -->
+    </fieldset>
+    <fieldset class="hidable" var="nohide@class"><legend>Výchozí soubor</legend>
+      <blockcode var="defaultcontent">n/a</blockcode>
     </fieldset>
     <fieldset class="hidable"><legend>Výsledek, mód <samp var="mode"/></legend>
       <blockcode var="resultcontent">n/a</blockcode>
@@ -24,8 +23,6 @@
       <ul>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít" title="Ctrl+Shift+S"/></li>
         <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
-        <!-- <li><a href="" var="linkadmin@href">Zahodit změny</a></li> -->
-        <!-- <li><a href="" var="link@href">Zahodit změny a odejít</a></li> -->
       </ul>
     </fieldset>
     <fieldset class="hidable nohide"><legend>Seznamy proměnných</legend>
@@ -34,13 +31,13 @@
         <dd><samp var="cms-variables">žádné</samp></dd>
         <dt>Soubory HTML+ včetně importů (proměnná <samp>dombuilder-html</samp>)</dt>
         <dd class="links"><samp var="dombuilder-html">žádné</samp></dd>
-        <dt>Načtené pluginy (proměnná <samp>cms-plugins</samp>)</dt>
+        <dt>Konfigurace rozšíření (proměnná <samp>cms-plugins</samp>)</dt>
         <dd class="links plugin"><samp var="cms-plugins">žádné</samp></dd>
-        <dt>Použité transformace (proměnná <samp>xhtml11-transformations</samp>)</dt>
+        <dt>Transformace (proměnná <samp>xhtml11-transformations</samp>)</dt>
         <dd class="links"><samp var="xhtml11-transformations">žádné</samp></dd>
-        <dt>Použité soubory CSS (proměnná <samp>xhtml11-styles</samp>)</dt>
+        <dt>Soubory CSS (proměnná <samp>xhtml11-styles</samp>)</dt>
         <dd class="links"><samp var="xhtml11-styles">žádné</samp></dd>
-        <dt>Použité soubory JS (proměnná <samp>xhtml11-javascripts</samp>)</dt>
+        <dt>Soubory JS (proměnná <samp>xhtml11-javascripts</samp>)</dt>
         <dd class="links"><samp var="xhtml11-javascripts">žádné</samp></dd>
       </dl>
     </fieldset>
