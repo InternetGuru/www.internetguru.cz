@@ -9,6 +9,7 @@ class Auth extends Plugin implements SplObserver {
   }
 
   public function update(SplSubject $subject) {
+    if(isAtLocalhost()) return;
     if($subject->getStatus() != STATUS_PREINIT) return;
     $this->handleRequest();
   }
