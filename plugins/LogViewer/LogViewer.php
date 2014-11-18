@@ -5,6 +5,8 @@
 class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $err = array();
+  private $logFiles;
+  private $verFiles;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -16,31 +18,47 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
     }
+    if($subject->getStatus() != STATUS_PREINIT) return;
+    $this->logFiles = $this->getFiles(LOG_FOLDER, 15);
+    $this->verFiles = $this->getFiles(VER_FOLDER);
   }
 
   public function getContent(HTMLPlus $content) {
-    $f = strlen($_GET[get_class($this)]) ? $_GET[get_class($this)] : "log";
-    $fArr = explode(".",$f);
-    $ext = array_pop($fArr);
-    switch($ext) {
+    $fPath = null;
+    $fName = strlen($_GET[get_class($this)]) ? $_GET[get_class($this)] : "log";
+    switch($fName) {
       case "ver":
-      $f = $this->getVersionFile(implode(".",$fArr));
+      $fPath = end($this->verFiles);
+      $fName = key($this->verFiles);
       break;
       case "log":
-      $f = $this->getLogFile(implode(".",$fArr));
+      $fPath = end($this->logFiles);
+      $fName = key($this->logFiles);
       break;
       default:
-      $this->getLogFile($f);
-      if(empty($this->err)) redirTo("?".get_class($this)."=$f.log");
-      $this->err = array();
-      $this->err[] = "Unsupported LogViewer extension '$ext'";
-      $f = $this->getLogFile();
+      $fPath = $this->getFilePath($fName);
+      if(!is_null($fPath)) break;
+      $this->err[] = "File or extension '$fName' not found";
+      $fPath = end($this->logFiles);
+      $fName = key($this->logFiles);
     }
 
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("errors", $this->err);
-    if(!is_null($f)) $newContent->insertVar("content", htmlspecialchars($this->file_get_contents($f)));
+    $newContent->insertVar("cur_file", $fName);
+    $newContent->insertVar("log_files", $this->makeLink($this->logFiles));
+    $newContent->insertVar("ver_files", $this->makeLink($this->verFiles));
+
+    if(!is_null($fPath)) $newContent->insertVar("content", htmlspecialchars($this->file_get_contents($fPath)));
     return $newContent;
+  }
+
+  private function makeLink(Array $array) {
+    $links = array();
+    foreach($array as $name => $path) {
+      $links[] = "<a href='".getCurLink()."?".get_class($this)."=$name'>$name</a>";
+    }
+    return $links;
   }
 
   private function file_get_contents($file) {
@@ -48,29 +66,23 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     return readZippedFile($file,substr(pathinfo($file,PATHINFO_BASENAME),0,-4));
   }
 
-  private function getLogFile($fileName=null) {
-    return $this->getFile($fileName, LOG_FOLDER, date('Ymd'), "log");
-  }
-
-  private function getVersionFile($fileName=null) {
-    $v = explode(".", CMS_VERSION);
-    return $this->getFile($fileName, VER_FOLDER, $v[0], "ver");
-  }
-
-  private function getFile($fileName,$dir,$defaultName,$ext) {
-    $f = "$fileName.$ext";
-    if(is_file("$dir/$f")) return "$dir/$f";
-    if(is_file("$dir/$f.zip")) return "$dir/$f.zip";
-    if(strlen($fileName)) $this->err[] = "File '$f' not found";
-    $f = "$defaultName.$ext";
-    $zip = "";
-    if(!is_file("$dir/$f")) $zip = ".zip";
-    if(is_file("$dir/$f$zip")) {
-      $this->err[] = "Showing default file '$f'";
-      return "$dir/$f$zip";
-    }
-    $this->err[] = "Default file '$f' not found";
+  private function getFilePath($fName) {
+    if(is_file(LOG_FOLDER."/$fName")) return LOG_FOLDER."/$fName";
+    if(is_file(VER_FOLDER."/$fName")) return VER_FOLDER."/$fName";
+    if(is_file(LOG_FOLDER."/$fName.zip")) return LOG_FOLDER."/$fName.zip";
+    if(is_file(VER_FOLDER."/$fName.zip")) return VER_FOLDER."/$fName.zip";
     return null;
+  }
+
+  private function getFiles($dir, $limit=0) {
+    $files = array();
+    foreach(scandir($dir) as $f) {
+      if(!is_file("$dir/$f")) continue;
+      $id = (substr($f,-4) == ".zip") ? substr($f,0,-4) : $f;
+      $files[$id] = "$dir/$f";
+      if(count($files) == $limit) break;
+    }
+    return $files;
   }
 
 }

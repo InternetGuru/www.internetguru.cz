@@ -327,7 +327,7 @@ class DOMDocumentPlus extends DOMDocument {
       #case "form":
       #case "fieldset":
       default:
-      new Logger("Unable to insert variable array into '{$n->nodeName}'","error");
+      new Logger("Unable to insert array variable '$varName' into '{$e->nodeName}'","error");
       return;
     }
     $this->insertInnerHTML($varValue, $e, $sep);

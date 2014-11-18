@@ -24,7 +24,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
     if($subject->getStatus() != STATUS_PREINIT) return;
     if(!empty($_POST)) $this->processPost();
-    $this->cmsVersions = $this->getSubdirs(CMS_ROOT_FOLDER);
+    $this->cmsVersions = $this->getSubdirs(CMS_ROOT_FOLDER, "/^[a-z0-9.]+$/");
     $this->cmsPlugins = $this->getSubdirs(PLUGINS_FOLDER);
     $this->userDirs = $this->getSubdirs(USER_ROOT_FOLDER, "/^".SUBDOM_PATTERN."$/");
     $this->filesDirs = $this->getSubdirs(FILES_ROOT_FOLDER);
@@ -162,7 +162,9 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   private function modifyDOM(DOMDocumentPlus $doc, $subdom) {
-    $doc->insertVar("subdom", $subdom);
+    #$doc->insertVar("subdom", $subdom);
+    $doc->insertVar("linkName", "<strong>$subdom</strong>.".getDomain());
+    $doc->insertVar("linkHref", "http://$subdom.".getDomain());
     $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
     $doc->insertVar("userDirId", "$subdom-USER_DIR");
     $doc->insertVar("filesDirId", "$subdom-FILES_DIR");
