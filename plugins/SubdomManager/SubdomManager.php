@@ -6,7 +6,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   const DEBUG = false;
   private $err = array();
   private $cmsVersions;
-  private $cmsPlugins;
+  private $cmsVariants;
+  private $cmsPlugins = array();
   private $userDirs;
   private $filesDirs;
   private $subdoms = array();
@@ -24,8 +25,12 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
     if($subject->getStatus() != STATUS_PREINIT) return;
     if(!empty($_POST)) $this->processPost();
-    $this->cmsVersions = $this->getSubdirs(CMS_ROOT_FOLDER, "/^[a-z0-9.]+$/");
-    $this->cmsPlugins = $this->getSubdirs(PLUGINS_FOLDER);
+    $this->cmsVariants = $this->getSubdirs(CMS_ROOT_FOLDER, "/^[a-z0-9.]+$/");
+    foreach($this->cmsVariants as $verDir => $active) { // including deprecated
+      $verFile = CMS_ROOT_FOLDER."/$verDir/".CMS_VERSION_FILENAME;
+      $this->cmsVersions[$verDir] = is_file($verFile) ? file_get_contents($verFile) : "unknown";
+      $this->cmsPlugins[$verDir] = $this->getSubdirs(CMS_ROOT_FOLDER."/$verDir/".PLUGINS_DIR);
+    }
     $this->userDirs = $this->getSubdirs(USER_ROOT_FOLDER, "/^".SUBDOM_PATTERN."$/");
     $this->filesDirs = $this->getSubdirs(FILES_ROOT_FOLDER);
     $this->syncUserSubdoms();
@@ -180,13 +185,13 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $deprecated = false;
     $set = $d->appendChild($d->createElement("var"));
     $userSubdomFolder = SUBDOM_ROOT_FOLDER ."/$subdom";
-    foreach($this->cmsVersions as $cmsVer => $active) {
+    foreach($this->cmsVariants as $cmsVer => $active) {
       if(is_file("../$subdom/CMS_VER.$cmsVer")) $current = $cmsVer;
       if(!$active) {
         if($current == $cmsVer) $deprecated = true;
         continue; // silently skip disabled versions
       }
-      $o = $d->createElement("option", $cmsVer);
+      $o = $d->createElement("option", "$cmsVer/".$this->cmsVersions[$cmsVer]);
       if(is_file("$userSubdomFolder/CMS_VER.$cmsVer")) {
         $o->setAttribute("selected", "selected");
       }
@@ -194,11 +199,31 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $set->appendChild($o);
     }
     if(!is_null($current)) {
-      $doc->insertVar("version", $current);
+      $doc->insertVar("version", "$current/".$this->cmsVersions[$current]);
       $doc->insertVar("CMS_VER", "CMS_VER.$current");
     }
     if(!$deprecated) $doc->insertVar("deprecated", null);
     if($set->childNodes->length) $doc->insertVar("cmsVers", $set);
+
+    // plugins
+    $d = new DOMDocumentPlus();
+    $set = $d->appendChild($d->createElement("var"));
+    foreach($this->cmsPlugins[$current] as $pName => $default) {
+      if(is_file("../$subdom/.PLUGIN.$pName")) continue; // silently skip forbidden plugins
+      $i = $d->createElement("input");
+      $i->setAttribute("type", "checkbox");
+      $i->setAttribute("name", "PLUGINS[]");
+      $i->setAttribute("value", $pName);
+      $changed = "";
+      if(is_file("../$subdom/PLUGIN.$pName") != is_file("$userSubdomFolder/PLUGIN.$pName"))
+        $changed = "*";
+      if(is_file("$userSubdomFolder/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
+      $l = $set->appendChild($d->createElement("label"));
+      $l->appendChild($i);
+      $l->appendChild(new DOMText(" $pName$changed"));
+      #$set->appendChild($d->createTextNode(", "));
+    }
+    $doc->insertVar("plugins", $set);
 
     // user directories
     $d = new DOMDocumentPlus();
@@ -227,26 +252,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
     if(!is_null($current)) $doc->insertVar("FILES_DIR", "FILES_DIR.$current");
     $doc->insertVar("filesDirs", $set);
-
-    // plugins
-    $d = new DOMDocumentPlus();
-    $set = $d->appendChild($d->createElement("var"));
-    foreach($this->cmsPlugins as $pName => $default) {
-      if(is_file("../$subdom/.PLUGIN.$pName")) continue; // silently skip forbidden plugins
-      $i = $d->createElement("input");
-      $i->setAttribute("type", "checkbox");
-      $i->setAttribute("name", "PLUGINS[]");
-      $i->setAttribute("value", $pName);
-      $changed = "";
-      if(is_file("../$subdom/PLUGIN.$pName") != is_file("$userSubdomFolder/PLUGIN.$pName"))
-        $changed = "*";
-      if(is_file("$userSubdomFolder/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
-      $l = $set->appendChild($d->createElement("label"));
-      $l->appendChild($i);
-      $l->appendChild(new DOMText(" $pName$changed"));
-      #$set->appendChild($d->createTextNode(", "));
-    }
-    $doc->insertVar("plugins", $set);
   }
 
   private function getSubdirs($dir, $filter = null) {

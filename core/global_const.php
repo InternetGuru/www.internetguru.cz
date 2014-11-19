@@ -52,7 +52,8 @@ if(isAtLocalhost()) {
 define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
 define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
 define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
-define('CMS_VERSION', file_get_contents(CMS_FOLDER ."/cms_version.txt"));
+define('CMS_VERSION_FILENAME', "cms_version.txt");
+define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
 #print_r(get_defined_constants(true)); die();
 
 if(CMS_DEBUG) {
