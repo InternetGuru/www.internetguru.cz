@@ -1,0 +1,67 @@
+[inpmc.fm.mkdir]
+0=.cms
+
+[input-def]
+0=*
+
+[input2]
+0=alfa
+1=CMS_VER.alfa
+2=.alfa
+3=beta~
+4=beta
+5=0.3~
+6=0.3
+
+[Dir Hist New Right Panel]
+0=/var/www/cms/cms/_server
+1=/var/www/cms/cms/_devel
+2=/var/www/cms/dev
+3=/
+4=/var/www/cms/cms
+5=/var/www/cms/alfa
+6=/var/www/cms
+7=/var/www
+
+[cmdline]
+0=cat id_rsa.pub
+1=git clone git@bitbucket.org:igwr/cms.git
+2=git checkout hotfix
+3=lkjklůj
+4=[21~
+5=export TERM=xterm-256color
+6=cat .bashrc
+7=gp
+8=git pull
+9=gl
+10=cd /
+11=cd ~
+12=cd cms
+13=git --work-tree=../devgit checkout HEAD -- .
+14=.. 
+15=in
+16=[20~
+17=
+
+[Dir Hist New Left Panel]
+0=/var/www/cms/.mc
+1=/var/www/cms/cms/_server
+2=/var/www/cms/cms/_devel
+3=/etc
+4=/
+5=/var
+6=/var/www/cms/cms
+7=/var/www/internetguru.cz/web/subdom/test
+8=/var/www/internetguru.cz/web/subdom
+9=/var/www/internetguru.cz/web/ig062/usr
+10=/var/www/internetguru.cz/web/ig062/subdom/ig062
+11=/var/www/internetguru.cz/web/ig062/subdom
+12=/var/www/internetguru.cz/web/ig062
+13=/var/www/internetguru.cz
+14=/var/www/internetguru.cz/web
+15=/var/www
+16=/var/www/cms/.ssh
+17=/var/www/cms/0.3
+18=/var/www/cms/alfa
+19=/var/www/cms/beta
+20=/var/www/cms
