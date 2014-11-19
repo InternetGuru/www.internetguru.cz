@@ -195,14 +195,17 @@
 #   return 0
 # }
 #
-# alias cd=cd_func
+
+# FOLDERS
 CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
 CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
-
 alias cms='if [ -d "$CMS_FOLDER_1" ]; then cd "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then cd "$CMS_FOLDER_2"; else echo "dir not found"; fi'
+
+# GIT
 alias gaa='git add -A'
 alias gaas='gaa; gs'
 alias gd='git diff'
+alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _'
 alias gc='git commit'
 alias gcv='TAG=$( git show-ref --tags | tail -1 ); echo "Version history until" $( echo "$TAG" | cut -f3 -d"/" ); echo "---"; gv $( echo "$TAG" | cut -f1 -d" " )..'
 alias gl='git log --decorate --all --oneline --graph'
@@ -210,5 +213,8 @@ alias gp='git push --all; git push --tags'
 alias guc='_(){ git reset --hard ${1:-HEAD~1}; }; _'
 alias gv='_(){ git log --oneline $1 | cut -f2- -d" " | grep -v "^\."; }; _'
 alias gs='git status'
+
+# BASH
+alias sshcmsadmin='ssh -i ~/.ssh/id_rsa cmsadmin@46.28.109.142'
 alias less='less -rSX'
-alias ll='ls -l'
+alias ll='ls -lah'
