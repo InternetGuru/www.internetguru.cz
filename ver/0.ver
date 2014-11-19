@@ -6,6 +6,8 @@
 0.3.3 - Admin opens default file if user file missing
 0.3.4 - Added new variable cms-name added
 0.3.4 - New plugin Auth
+0.3.5 - Headings now support span element
+0.3.5 - New CMS default content
 
 0.2
 ---
