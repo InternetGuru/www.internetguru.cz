@@ -61,23 +61,23 @@ class DOMDocumentPlus extends DOMDocument {
         $this->removeVarElement($e);
         break;
         case "string":
-        $e = $this->prepareIfDl($e,$varName);
-        $this->insertVarString($varValue,$e,$attr,$varName);
+        $e = $this->prepareIfDl($e, $varName);
+        $this->insertVarString($varValue, $e, $attr, $varName);
         break;
         case "array":
         if(empty($varValue)) {
           $this->emptyVarArray($e);
           continue;
         }
-        $e = $this->prepareIfDl($e,$varName);
-        $this->insertVarArray($varValue,$e,$varName);
+        $e = $this->prepareIfDl($e, $varName);
+        $this->insertVarArray($varValue, $e, $varName);
         break;
         default:
         if($varValue instanceof DOMElement) {
-          $this->insertVarDOMElement($varValue,$e,$attr);
+          $this->insertVarDOMElement($varValue, $e, $attr, $varName);
           break;
         }
-        new Logger("Unsupported variable type '$type' for '$varName'","error");
+        new Logger("Unsupported variable type '".get_class($varValue)."' for '$varName'","error");
       }
     }
   }
@@ -353,7 +353,7 @@ class DOMDocumentPlus extends DOMDocument {
       $p->parentNode->removeChild($p);
   }
 
-  private function insertVarDOMElement(DOMElement $varValue, DOMElement $e, $attr=null) {
+  private function insertVarDOMElement(DOMElement $varValue, DOMElement $e, $attr=null, $varName=null) {
     if(!is_null($attr)) {
       $this->insertVarstring($varValue->nodeValue, $e, $attr);
       return;

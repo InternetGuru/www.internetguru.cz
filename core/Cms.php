@@ -120,11 +120,11 @@ class Cms {
 
   public function setVariable($name,$value) {
     $varId = $this->getVarId($name);
-    if(!is_string($value) && !is_array($value) && !$value instanceof DOMDocument) {
+    if(!is_string($value) && !is_array($value) && !$value instanceof DOMElement) {
       new Logger("Unsupported variable '$varId' type","error");
       return null;
     }
-    if(!$value instanceof DOMDocument) {
+    if(!$value instanceof DOMElement) {
       $items = $value;
       if(is_string($value)) $items = array($value);
       foreach($items as $k => $i) if(!$this->validateXMLMarkup($i)) {

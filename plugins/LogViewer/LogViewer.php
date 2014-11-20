@@ -28,18 +28,18 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $fName = strlen($_GET[get_class($this)]) ? $_GET[get_class($this)] : "log";
     switch($fName) {
       case "ver":
-      $fPath = end($this->verFiles);
+      $fPath = current($this->verFiles);
       $fName = key($this->verFiles);
       break;
       case "log":
-      $fPath = end($this->logFiles);
+      $fPath = current($this->logFiles);
       $fName = key($this->logFiles);
       break;
       default:
       $fPath = $this->getFilePath($fName);
       if(!is_null($fPath)) break;
       $this->err[] = "File or extension '$fName' not found";
-      $fPath = end($this->logFiles);
+      $fPath = current($this->logFiles);
       $fName = key($this->logFiles);
     }
 
@@ -76,7 +76,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function getFiles($dir, $limit=0) {
     $files = array();
-    foreach(scandir($dir) as $f) {
+    foreach(scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {
       if(!is_file("$dir/$f")) continue;
       $id = (substr($f,-4) == ".zip") ? substr($f,0,-4) : $f;
       $files[$id] = "$dir/$f";

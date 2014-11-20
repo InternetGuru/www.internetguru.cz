@@ -195,8 +195,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $o = array();
     foreach($cms->getAllVariables() as $k => $v) {
       $valid = true;
-      if($v instanceof DOMDocument) $v = html_entity_decode($v->saveHTML());
-      elseif(is_array($v)) {
+      if($v instanceof DOMElement) {
+        $d = new DOMDocumentPlus();
+        foreach($v->childNodes as $n) $d->appendChild($d->importNode($n, true));
+        $v = html_entity_decode($d->saveHTML());
+      } elseif(is_array($v)) {
         $v = implode(",",$v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
         new Logger("Unable to convert variable '$k' to string","error");

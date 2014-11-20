@@ -20,10 +20,11 @@ class GlobalMenu extends Plugin implements SplObserver {
     $sect = $xpath->query("/body/section")->item(0);
     if(is_null($sect)) return;
     $menu = $this->getMenu($doc,$sect);
-    $doc->appendChild($menu);
+    $root = $doc->appendChild($doc->createElement("root"));
+    $root->appendChild($menu);
     $menu->setAttribute("class","globalmenu");
     $this->trimList($menu);
-    $cms->setVariable("globalmenu",$doc);
+    $cms->setVariable("globalmenu",$root);
   }
 
   private function trimList(DOMElement $ul) {
