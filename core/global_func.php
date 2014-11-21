@@ -165,7 +165,7 @@ function smartCopy($src, $dest, $delay=0) {
       && readlink($dest) == readlink($src)) return;
     // both are files within given age gap (delay)
     elseif(!is_link($dest) && !is_link($src)
-      && $delay && filectime("$destDir/$f") > time()-$delay) return;
+      && $delay && filectime($dest) > time()-$delay) return;
   }
   $destDir = pathinfo($dest, PATHINFO_DIRNAME);
   if(!is_dir($destDir) && !mkdir($destDir, 0755, true))

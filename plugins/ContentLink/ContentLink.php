@@ -66,7 +66,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private function setBc(HTMLPlus $src) {
     $first = true;
     $bc = new DOMDocumentPlus();
-    $ol = $bc->appendChild($bc->createElement("ol"));
+    $root = $bc->appendChild($bc->createElement("root"));
+    $ol = $root->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class","contentlink-bc");
     foreach(array_reverse($this->headings) as $h) {
       $li = $ol->appendChild($bc->createElement("li"));
@@ -88,7 +89,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     end($subtitles);
     $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
-    $cms->setVariable("bc", $bc);
+    $cms->setVariable("bc", $bc->documentElement);
     $cms->setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
   }
 

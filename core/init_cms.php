@@ -29,7 +29,7 @@ try {
 
   duplicateDir(USER_FOLDER);
   duplicateDir(ADMIN_FOLDER);
-  duplicateDir(SUBDOM_FOLDER, false);
+  if(defined("SUBDOM_FOLDER")) duplicateDir(SUBDOM_FOLDER, false);
   echo $cms->getOutput();
   $l->finished();
 
