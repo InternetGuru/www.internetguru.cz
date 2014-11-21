@@ -11,6 +11,9 @@
         <dt><label for="new_subdom">Název nové poddomény</label></dt>
         <dd><samp var="cms-user_id"/><input type="text" name="new_subdom" id="new_subdom" var="new_subdom@value"/><samp var="domain">.%s</samp></dd>
         <dd>Nová poddoména musí začínat písmenem a dále může obsahovat písmena nebo čísla (<samp>[a-z][a-z0-9]*</samp>).</dd>
+        <dt><label for="mirror">Vytvořit jako zrcadlo (kopii) z existující poddomény</label></dt>
+        <dd><select name="mirror" id="mirror"><option var="subdoms">n/a</option></select></dd>
+        <dd>Zduplikují se pouze uživatelská data a uživatelské nastavení poddomény.</dd>
         <dt>Akce</dt>
         <dd><input type="submit" value="Vytvořit poddoménu"/></dd>
         <dd><input type="submit" name="redir" value="Vytvořit poddoménu a přesměrovat"/></dd>

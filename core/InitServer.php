@@ -5,10 +5,8 @@
 class InitServer {
   private $subdom;
   private $subdomVars;
-  private $apacheGraceful = false;
   const FORBIDDEN_PLUGINS = array("Slider" => null);
   const DISABLED_PLUGINS = array("Slider" => null);
-  const APACHE_RESTART_FILE = "APACHE_RESTART";
 
   public function __construct($subdom, $setConst = false, $update = false) {
     if(!preg_match("/^" . SUBDOM_PATTERN . "$/", $subdom))
@@ -63,12 +61,13 @@ class InitServer {
   private function setFolderVars($serverSubdomDir) {
     $root = realpath("../..");
     $folders = array(
-      'ADMIN_FOLDER' => "$root/".ADMIN_ROOT_DIR."/".$this->subdomVars["ADMIN_DIR"],
+      'ADMIN_ROOT_FOLDER' => "$root/".ADMIN_ROOT_DIR,
       'USER_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".USER_ROOT_DIR,
       'FILES_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".FILES_ROOT_DIR,
       'SUBDOM_ROOT_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".SUBDOM_ROOT_DIR,
       'TEMP_FOLDER' => "$root/".$this->subdomVars["USER_ID"]."/".TEMP_DIR,
     );
+    $folders['ADMIN_FOLDER'] = $folders["ADMIN_ROOT_FOLDER"]."/".$this->subdomVars["ADMIN_DIR"];
     $folders['USER_FOLDER'] = $folders["USER_ROOT_FOLDER"]."/".$this->subdomVars["USER_DIR"];
     $folders['FILES_FOLDER'] = $folders["FILES_ROOT_FOLDER"]."/".$this->subdomVars["FILES_DIR"];
     $folders['SUBDOM_FOLDER'] = $folders["SUBDOM_ROOT_FOLDER"]."/".$this->subdom;
@@ -150,11 +149,9 @@ class InitServer {
       "$subdomDir/.htaccess" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/.htaccess",
       "$subdomDir/robots.txt" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/$rob",
     );
-    foreach($files as $link => $target) $this->createSymlink($link, $target);
-    // restart apache if symlink changed
-    if($this->apacheGraceful) {
-      if(!touch(CMSRES_ROOT_FOLDER."/".self::APACHE_RESTART_FILE))
-        new Logger("Unable to force Apache cache symlink target update", "error");
+    foreach($files as $link => $target) {
+      if(is_file($link) && !is_link($link)) continue; // skip individual files
+      createSymlink($link, $target);
     }
     // init default plugin files
     if(!is_file("$subdomDir/CONFIG.". $this->subdomVars["CONFIG"])) {
@@ -165,29 +162,6 @@ class InitServer {
       $f = "$subdomDir/$name.$val";
       if(!file_exists($f)) touch($f);
     }
-  }
-
-  #todo: https support
-  private function createSymlink($link, $target) {
-    #$info["toVersion"] = $this->subdomVars["CMS_VER"];
-    #$info["isLink"] = is_link($link);
-    #$info["readlink"] = readlink($link);
-    if(file_exists($link)) {
-      if(!is_link($link) || readlink($link) == $target) return;
-      #if(!symlink("$target~".microtime(true), "$link~") || !rename("$link~", $link))
-      #  throw new Exception("Unable to create symlink '$link'");
-      #$url = "http://".$this->subdom.".".getDomain()."/".basename($link);
-      #@get_headers($url);
-      #new Logger("get_headers($url) = ".implode(" | ", $h), "info");
-      $this->apacheGraceful = true;
-    }
-    if(!symlink($target, "$link~") || !rename("$link~", $link))
-      throw new Exception("Unable to create symlink '$link'");
-    clearstatcache(true, $link);
-    #$info["afterClear"] = readlink($link);
-    #print_r($info);
-    if(readlink($link) == $target) return;
-    throw new Exception("Unable to verify symlink (cache).");
   }
 
   private function userResetServerSubdom($dir) {

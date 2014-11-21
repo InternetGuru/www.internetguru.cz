@@ -148,25 +148,33 @@ function matchFiles($pattern, $dir) {
   return $files;
 }
 
-function duplicateDir($dir) {
-  if(!is_dir($dir)) return;
+function duplicateDir($dir, $deep=true) {
+  if(!is_dir($dir)) throw new Exception("Directory '".basename($dir)."' not found");
   $info = pathinfo($dir);
   $bakDir = $info["dirname"]."/~".$info["basename"];
-  copyFiles($dir, $bakDir);
+  copyFiles($dir, $bakDir, $deep);
   deleteRedundantFiles($bakDir, $dir);
   #new Logger("Active data backup updated");
 }
 
 function smartCopy($src, $dest, $delay=0) {
-  if(file_exists($dest)) return;
-  $destDir = pathinfo($dest,PATHINFO_DIRNAME);
-  if(is_dir($destDir)) foreach(scandir($destDir) as $f) {
-    if(pathinfo($f,PATHINFO_FILENAME) != pathinfo($src,PATHINFO_BASENAME)) continue;
-    if($delay && filectime("$destDir/$f") > time() - $delay) return;
+  if(!file_exists($src)) throw new Exception("File '".basename($src)."' not found");
+  if(file_exists($dest)) {
+    // both are links with same target
+    if(is_link($dest) && is_link($src)
+      && readlink($dest) == readlink($src)) return;
+    // both are files within given age gap (delay)
+    elseif(!is_link($dest) && !is_link($src)
+      && $delay && filectime("$destDir/$f") > time()-$delay) return;
   }
-  if(!is_dir($destDir) && !mkdir($destDir,0755,true))
+  $destDir = pathinfo($dest, PATHINFO_DIRNAME);
+  if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
     throw new Exception("Unable to create directory '$destDir'");
-  if(!copy($src,$dest)) {
+  if(is_link($src)) {
+    createSymlink($dest, readlink($src));
+    return;
+  }
+  if(!copy($src, $dest)) {
     throw new Exception("Unable to copy '$src' to '$dest'");
   }
 }
@@ -184,13 +192,13 @@ function deleteRedundantFiles($in, $according) {
   }
 }
 
-function copyFiles($src, $dest) {
+function copyFiles($src, $dest, $deep) {
   if(!is_dir($dest) && !@mkdir($dest))
     throw new LoggerException("Unable to create '$dest' folder");
   foreach(scandir($src) as $f) {
     if(in_array($f,array(".",".."))) continue;
-    if(is_dir("$src/$f")) {
-      copyFiles("$src/$f", "$dest/$f");
+    if(is_dir("$src/$f") && !is_link("$src/$f")) {
+      if($deep) copyFiles("$src/$f", "$dest/$f", $deep);
       continue;
     }
     smartCopy("$src/$f", "$dest/$f");

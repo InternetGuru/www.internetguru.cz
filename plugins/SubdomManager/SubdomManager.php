@@ -1,7 +1,5 @@
 <?php
 
-#todo: cmsPlugins according to cmsVersion
-
 class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $err = array();
@@ -52,6 +50,22 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         }
       }
       if(is_null($subdom)) throw new Exception("Unrecognized request");
+      if(isset($_POST["mirror"]) && strlen($_POST["mirror"])) {
+        if(!preg_match("/^".SUBDOM_PATTERN."$/", $_POST["mirror"]))
+          throw new Exception("Invalid mirror subdom format");
+        $userDir = $this->getSubdomVar("USER_DIR", $_POST["mirror"]);
+        if(is_null($userDir))
+          throw new Exception("Subdom '".$_POST["mirror"]."' configuration file not found");
+        if(is_dir(USER_ROOT_FOLDER."/$subdom"))
+          throw new Exception("Subdom '".$_POST["mirror"]."' user folder exists");
+        duplicateDir(SUBDOM_ROOT_FOLDER."/".$_POST["mirror"], false);
+        duplicateDir(USER_ROOT_FOLDER."/$userDir");
+        $sFolder = SUBDOM_ROOT_FOLDER."/$subdom";
+        if(!rename(SUBDOM_ROOT_FOLDER."/~".$_POST["mirror"], $sFolder)
+          || !rename(USER_ROOT_FOLDER."/~$userDir", USER_ROOT_FOLDER."/$subdom")
+          || !rename("$sFolder/USER_DIR.$userDir", "$sFolder/USER_DIR.$subdom")
+          ) throw new Exception("Unable to create subdom mirror");
+      }
       new InitServer($subdom, false, true);
       $link = getCurLink()."?".get_class($this)."=$subdom";
       if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
@@ -60,6 +74,14 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       new Logger($e->getMessage(), "error");
       $this->err[] = $e->getMessage();
     }
+  }
+
+  private function getSubdomVar($varName, $subdom) {
+    foreach(scandir("../$subdom") as $f) {
+      if(strpos($f, "$varName.") !== 0) continue;
+      return substr($f,strlen($varName)+1);
+    }
+    return null;
   }
 
   private function processDeleteSubdom($subdom) {
@@ -83,7 +105,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     if(strpos($subdom, USER_ID) !== 0) $subdom = USER_ID . $subdom;
     if(!preg_match("/^".USER_ID.SUBDOM_PATTERN."$/", $subdom))
       throw new Exception("Invalid subdom format");
-    if(is_dir("../$subdom"))
+    if(is_dir(SUBDOM_ROOT_FOLDER."/$subdom"))
       throw new Exception("Subdom '$subdom' already exists");
     return $subdom;
   }
@@ -136,6 +158,21 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("domain", getDomain());
     $newContent->insertVar("curlink", getCurLink()."?".get_class($this));
+
+    $d = new DOMDocumentPlus();
+    $set = $d->appendChild($d->createElement("var"));
+    $o = $d->createElement("option", "n/a");
+    $o->setAttribute("value", "");
+    $set->appendChild($o);
+    foreach($this->subdoms as $subdom) {
+      $o = $d->createElement("option", $subdom);
+      if(isset($_POST["mirror"]) && $_POST["mirror"] == $subdom) {
+        $o->setAttribute("selected", "selected");
+      }
+      #$o->setAttribute("value", $subdom);
+      $set->appendChild($o);
+    }
+    if($set->childNodes->length) $newContent->insertVar("subdoms", $set);
 
     if(isset($_POST["new_subdom"])) {
       $newContent->insertVar("new_nohide", "nohide");

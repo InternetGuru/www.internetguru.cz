@@ -36,6 +36,7 @@ if(isAtLocalhost()) {
   define('USER_BACKUP_FOLDER', '../'.CURRENT_SUBDOM_DIR.'/'.USER_BACKUP_DIR);
   define('LOG_FOLDER', '../'.CURRENT_SUBDOM_DIR.'/'.LOG_DIR);
   define('CACHE_FOLDER', '../'.CURRENT_SUBDOM_DIR.'/'.CACHE_DIR);
+  define("APACHE_RESTART_FILEPATH", null);
 } else {
   define('CMS_DEBUG', is_file("CMS_DEBUG"));
   define('CMS_FOLDER', dirname(CORE_FOLDER));
@@ -43,6 +44,7 @@ if(isAtLocalhost()) {
   define('CMS_RELEASE', basename(CMS_FOLDER));
   define('CMSRES_ROOT_DIR', "cmsres");
   define('CMSRES_ROOT_FOLDER', realpath(CMS_ROOT_FOLDER."/../".CMSRES_ROOT_DIR));
+  define("APACHE_RESTART_FILEPATH", CMSRES_ROOT_FOLDER."/APACHE_RESTART");
   define('RES_DIR', "res");
   define('ADMIN_BACKUP_FOLDER', '../../'.ADMIN_BACKUP_DIR.'/'.CURRENT_SUBDOM_DIR);
   define('USER_BACKUP_FOLDER', '../../'.USER_BACKUP_DIR.'/'.CURRENT_SUBDOM_DIR);
@@ -128,6 +130,16 @@ function getRes($res, $dest, $resFolder) {
   #if(!chmodGroup($newRes,0664))
   #  throw new Exception("Unable to chmod resource file '$newRes'");
   return $newRes;
+}
+
+function createSymlink($link, $target) {
+  $restart = false;
+  if(is_link($link) && readlink($link) == $target) return;
+  elseif(is_link($link)) $restart = true;
+  if(!symlink($target, "$link~") || !rename("$link~", $link))
+    throw new Exception("Unable to create symlink '$link'");
+  if($restart && !touch(APACHE_RESTART_FILEPATH))
+    new Logger("Unable to force Apache cache symlink target update", "error");
 }
 
 ?>

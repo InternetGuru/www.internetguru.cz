@@ -27,9 +27,10 @@ try {
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
-  echo $cms->getOutput();
   duplicateDir(USER_FOLDER);
   duplicateDir(ADMIN_FOLDER);
+  duplicateDir(SUBDOM_FOLDER, false);
+  echo $cms->getOutput();
   $l->finished();
 
 } catch(Exception $e) {
