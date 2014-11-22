@@ -124,6 +124,7 @@ class DOMDocumentPlus extends DOMDocument {
     $toStrip = array();
     foreach($this->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
+      if(is_file(FILES_FOLDER."/".$a->getAttribute($aName))) continue;
       $pLink = parse_url($a->getAttribute($aName));
       if(isset($pLink["scheme"])) continue; // link is absolute (suppose internal)
       $query = isset($pLink["query"]) ? $pLink["query"] : "";
