@@ -34,9 +34,9 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
     // supported syntax only
     $modes = array(
-      "xml" => "lib/codemirror/mode/xml/xml.js",
-      "css" => "lib/codemirror/mode/css/css.js",
-      "javascript" => "lib/codemirror/mode/javascript/javascript.js",
+      "xml" => LIB_DIR."/codemirror/mode/xml/xml.js",
+      "css" => LIB_DIR."/codemirror/mode/css/css.js",
+      "javascript" => LIB_DIR."/codemirror/mode/javascript/javascript.js",
       );
     $libs = array();
     foreach($ta as $t) {
@@ -56,25 +56,25 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     global $cms;
     $os = $cms->getOutputStrategy();
 
-    $os->addCssFile("lib/codemirror/lib/codemirror.css");
-    $os->addCssFile("lib/codemirror/theme/tomorrow-night-eighties.css");
+    $os->addCssFile(LIB_DIR."/codemirror/lib/codemirror.css");
+    $os->addCssFile(LIB_DIR."/codemirror/theme/tomorrow-night-eighties.css");
     $os->addCssFile($this->getDir() .'/SyntaxCodeMirror.css');
 
-    $os->addJsFile("lib/codemirror/lib/codemirror.js");
+    $os->addJsFile(LIB_DIR."/codemirror/lib/codemirror.js");
     foreach($libs as $l) $os->addJsFile($l);
-    $os->addJsFile("lib/codemirror/keymap/sublime.js");
+    $os->addJsFile(LIB_DIR."/codemirror/keymap/sublime.js");
 
-    $os->addJsFile("lib/codemirror/addon/search/searchcursor.js");
-    $os->addJsFile("lib/codemirror/addon/search/search.js");
-    $os->addJsFile("lib/codemirror/addon/dialog/dialog.js");
-    $os->addCssFile("lib/codemirror/addon/dialog/dialog.css");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/search/searchcursor.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/search/search.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/dialog/dialog.js");
+    $os->addCssFile(LIB_DIR."/codemirror/addon/dialog/dialog.css");
 
-    $os->addJsFile("lib/codemirror/addon/selection/active-line.js");
-    $os->addJsFile("lib/codemirror/addon/selection/mark-selection.js");
-    $os->addJsFile("lib/codemirror/addon/comment/comment.js");
-    $os->addJsFile("lib/codemirror/addon/edit/closetag.js");
-    $os->addJsFile("lib/codemirror/addon/wrap/hardwrap.js");
-    $os->addJsFile("lib/codemirror/addon/fold/foldcode.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/selection/active-line.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/selection/mark-selection.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/comment/comment.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/edit/closetag.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/wrap/hardwrap.js");
+    $os->addJsFile(LIB_DIR."/codemirror/addon/fold/foldcode.js");
 
     $os->addJsFile($this->getDir() .'/SyntaxCodeMirror.js', 10, "body");
 

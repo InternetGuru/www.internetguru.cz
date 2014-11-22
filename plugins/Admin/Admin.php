@@ -5,7 +5,6 @@
 #TODO: nohide default if no user file
 
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
-  const HTMLPLUS_SCHEMA = "lib/HTMLPlus.rng";
   const DEFAULT_FILE = "Content.html";
   const FILE_NEW = "new file";
   const FILE_DISABLED = "inactive";

@@ -1,8 +1,7 @@
 <?php
 
 class ErrorPage {
-
-  private $relDir = "lib/error";
+  private $relDir = "error";
   private $headingFile = "headings.txt";
   private $msgFile = "messages.txt";
   private $errFile = "error.html";
@@ -12,7 +11,7 @@ class ErrorPage {
   public function __construct($message, $code, $extended=false) {
     http_response_code($code);
     new Logger($message,"fatal");
-    $dir = CMS_FOLDER ."/". $this->relDir;
+    $dir = LIB_FOLDER."/".$this->relDir;
     $tt = array(
       "@CODE@" => $code,
       "@STATUS@" => $this->getStatusMessage($code),
@@ -43,7 +42,7 @@ class ErrorPage {
     foreach(scandir($dir) as $img) {
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
       $resFolder = isAtLocalhost() ? false : CMSRES_ROOT_DIR."/".CMS_RELEASE;
-      $i[] = getRes("$dir/$img", $this->relDir ."/$img", $resFolder);
+      $i[] = getRes("$dir/$img", LIB_DIR."/".$this->relDir ."/$img", $resFolder);
     }
     return $i;
   }

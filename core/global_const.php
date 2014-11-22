@@ -5,6 +5,7 @@ define("PLUGINS_DIR", "plugins");
 define("THEMES_DIR", "themes");
 define("VER_DIR", "ver");
 define("LOG_DIR", "log");
+define("LIB_DIR", "lib");
 define("ADMIN_BACKUP_DIR", "adm.bak");
 define("USER_BACKUP_DIR", "usr.bak");
 define('SUBDOM_ROOT_DIR', "subdom");
@@ -53,6 +54,7 @@ if(isAtLocalhost()) {
 }
 define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
 define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
+define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
 define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
 define('CMS_VERSION_FILENAME', "cms_version.txt");
 define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
@@ -65,7 +67,11 @@ if(CMS_DEBUG) {
 define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
 
 #todo: date_default_timezone_set()
-#todo: setlocale(LC_ALL, czech); // cs_CZ.utf8 (localhost)
+#todo: localize lang
+if(isAtLocalhost()) setlocale(LC_ALL, "cs_CZ.utf8");
+else setlocale(LC_ALL, "czech");
+putenv("LANG=czech"); // for gettext
+bindtextdomain("messages", "dir");
 
 function __autoload($className) {
   $fp = PLUGINS_FOLDER."/$className/$className.php";
