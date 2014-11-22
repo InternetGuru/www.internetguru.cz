@@ -88,10 +88,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $newContent->encoding="utf-8";
         $xml = $newContent->saveXML();
         if(!@$newContent->loadXML($xml))
-          throw new Exception("Invalid transformation (or parameter) in '$xslt'");
+          throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
         $content = $newContent;
       } catch(Exception $e) {
-        new Logger($e->getMessage(),"error");
+        new Logger($e->getMessage(), "error");
       }
     }
 
@@ -122,7 +122,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $filePath = $o->getAttribute("data");
       $pUrl = parse_url($filePath);
       if(!is_array($pUrl)) {
-        $toStrip[] = array($o, "invalid object data '$filePath' format");
+        $toStrip[] = array($o, sprintf(_("Invalid object data '%s' format"), $filePath));
         continue;
       }
       if(array_key_exists("scheme",$pUrl)) {
@@ -132,7 +132,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       if(!is_file($filePath)) {
         $filePath = FILES_FOLDER ."/$filePath";
         if(!is_file($filePath)) {
-          $toStrip[] = array($o, "object data '$filePath' not found");
+          $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $filePath));
           continue;
         }
       }
@@ -148,14 +148,14 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function validateImage(DOMElement $o, $filePath) {
     $mime = getFileMime($filePath);
     if(strpos($mime, "image/") !== 0)
-      throw new Exception("invalid object '$filePath' mime type '$mime'");
+      throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $filePath, $mime));
     if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
       $o->setAttribute("type", $mime);
-      new Logger("Object '$filePath' attr type set to '".$mime."'","warning");
+      new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $filePath, $mime), "warning");
     }
     $size = filesize($filePath);
     if($size > 350*1024) {
-      new Logger("Object '$filePath' too big ".fileSizeConvert($size),"warning");
+      new Logger(sprintf(_("Object '%s' suspiciously big: %s"), $filePath, fileSizeConvert($size)), "warning");
     }
   }
 
@@ -202,7 +202,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       } elseif(is_array($v)) {
         $v = implode(",",$v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
-        new Logger("Unable to convert variable '$k' to string","error");
+        new Logger(sprintf(_("Unable to convert variable '%s' to string"), $k), "error");
         continue;
       } else {
         $v = (string) $v;
@@ -235,7 +235,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(!is_null($theme)) {
       $themeId = $theme->nodeValue;
       $t = $cfg->getElementById($themeId);
-      if(is_null($t)) new Logger("Theme '$themeId' not found","error");
+      if(is_null($t)) new Logger(sprintf(_("Theme '%s' not found"), $themeId), "error");
       else $this->addThemeFiles($t);
     }
 
@@ -248,7 +248,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $link = "favicon.ico";
     if(is_link($link) && readlink($link) == $target) return;
     if(symlink($target, "$link~") && rename("$link~", $link)) return;
-    new Logger("Unable to create root 'favicon.ico' link", "error");
+    new Logger(sprintf(_("Unable to create root '%s' link"), $link), "error");
   }
 
   private function addThemeFiles(DOMElement $e) {
@@ -281,9 +281,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $db = new DOMBuilder();
     $xsl = $db->buildDOMPlus($fileName,true,$user);
     if(!@$proc->importStylesheet($xsl))
-      throw new Exception("XSLT '$fileName' compilation error");
+      throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
     if(($x = @$proc->transformToDoc($content) ) === false)
-      throw new Exception("XSLT '$fileName' transformation fail");
+      throw new Exception(sprintf(_("XSLT '%s' transformation fail"), $fileName));
     #echo $x->saveXML();
     return $x;
   }
@@ -316,9 +316,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $f = false;
     }
     if(!strlen($f)) {
-      $comment = "[$rel] file '$file' not found";
+      $comment = sprintf(_("Link [%s] file '%s' not found"), $rel, $file);
       $parent->appendChild(new DOMComment(" $comment "));
-      new Logger($comment,"error");
+      new Logger($comment, "error");
       return;
     }
     if($rel == "shortcut icon") $this->createRootFavicon($f);
@@ -401,9 +401,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $f = findFile($this->jsFiles[$k]["file"],$this->jsFiles[$k]["user"],true,true);
         } catch (Exception $ex) {}
         if($f === false) {
-          $comment = "JS file '$k' not found";
+          $comment = sprintf(_("Javascript file '%s' not found"), $k);
           $parent->appendChild(new DOMComment(" $comment "));
-          new Logger($comment,"error");
+          new Logger($comment, "error");
           continue;
         }
       }

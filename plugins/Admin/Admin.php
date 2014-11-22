@@ -182,7 +182,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
 
     if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{2,4}$~", $f))
-      throw new Exception("Unsupported file name format '$f'");
+      throw new Exception(sprintf(_("Unsupported file name format '%s'"), $f));
 
     $this->defaultFile = $f;
     $this->type = pathinfo($f,PATHINFO_EXTENSION);
@@ -234,7 +234,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     if(!@$doc->loadXml($this->contentValue))
-      throw new Exception("Invalid XML syntax");
+      throw new Exception(_("Invalid XML syntax"));
     if(!$doc->validatePlus(true)) $this->contentValue = $doc->saveXML();
     if($this->type != "xml" || $this->isPost()) return;
     $this->replace = false;
@@ -252,9 +252,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $post_rn = str_replace("\n", "\r\n", $post_n);
     $this->contentValue = $post_n;
     if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn))))
-      throw new Exception("No changes made");
+      throw new Exception(_("No changes made"));
     if($_POST["userfilehash"] != getFileHash($this->dataFile))
-      throw new Exception("User file '{$this->defaultFile}' has changed during administration");
+      throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
   }
 
   private function setContent() {
@@ -262,12 +262,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(!file_exists($f)) return;
     #if(!file_exists($f)) $f = findFile($this->defaultFile);
     if(!($this->contentValue = file_get_contents($f)))
-      throw new Exception ("Unable to get contents from '{$this->dataFile}'");
+      throw new Exception(sprintf(_("Unable to get contents from '%s'"), $this->dataFile));
   }
 
   private function savePost() {
     if(saveRewrite($this->dataFile, $this->contentValue) === false)
-      throw new Exception("Unable to save changes, administration may be locked (update in progress)");
+      throw new Exception(_("Unable to save changes, administration may be locked"));
     if(empty($this->errors)) $this->redir($this->defaultFile);
   }
 
@@ -278,7 +278,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $doc->relaxNGValidatePlus($this->schema);
       break;
       default:
-      throw new Exception("Unsupported schema '{$this->schema}'");
+      throw new Exception(sprintf(_("Unsupported schema '%s'"), $this->schema));
     }
   }
 
@@ -290,7 +290,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(!preg_match('<\?xml-model href="([^"]+)" ?\?>',$line,$m)) return;
     $schema = findFile($m[1],false,false);
     if(!file_exists($schema))
-      throw new Exception("Schema file '$schema' not found");
+      throw new Exception(sprintf(_("Schema file '%s' not found"), $schema));
     return $schema;
   }
 

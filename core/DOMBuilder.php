@@ -86,7 +86,7 @@ class DOMBuilder {
 
   private function findFile($filePath,$user=true,$admin=true) {
     $f = findFile($filePath,$user,$admin);
-    if($f === false) throw new Exception("File '$filePath' not found");
+    if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $filePath));
     return $f;
   }
 
@@ -123,7 +123,7 @@ class DOMBuilder {
     }
     // load
     if(!@$doc->load($filePath))
-      throw new LoggerException("Unable to load DOM from file '$filePath'");
+      throw new LoggerException(sprintf(_("Unable to load DOM from file '%s'"), $filePath));
     // validate
     if(!$doc->validatePlus(true)) saveRewrite($filePath, $doc->saveXML());
     // HTMLPlus import
@@ -139,7 +139,7 @@ class DOMBuilder {
       if($h->hasAttribute("import")) $headings[] = $h;
     }
     if(!count($headings)) return;
-    $l = new Logger("Importing HTML+",null,0);
+    $l = new Logger(_("Importing HTML+"), null, 0);
     foreach($headings as $h) {
       $files = matchFiles($h->getAttribute("import"),$dir);
       $h->removeAttribute("import");
@@ -156,11 +156,11 @@ class DOMBuilder {
   private function insertHtmlPlus(DOMElement $h, $file) {
     try {
       if(in_array($file, $this->imported))
-        throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$h->getAttribute("import")));
+        throw new Exception(sprintf(_("Cyclic import '%s' found in '%s'"), $file, $h->getAttribute("import")));
       $doc = new HTMLPlus();
       $this->loadDOM($file, $doc);
     } catch(Exception $e) {
-      $msg = "Unable to import '$file': ". $e->getMessage();
+      $msg = sprintf(_("Unable to import '%s': %s"), $file, $e->getMessage());
       $c = new DOMComment(" $msg ");
       new Logger($msg,"error");
       $h->parentNode->insertBefore($c,$h);
@@ -169,12 +169,12 @@ class DOMBuilder {
     $sectLang = $this->getSectionLang($h->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      new Logger("Imported file language '$impLang' does not match section language '$sectLang' in '$file'","warning");
+      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $file), "warning");
     foreach($doc->documentElement->childElements as $n) {
       $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
     }
     if(!$h->ownerDocument->validatePlus(true))
-      new Logger("Import '$file' HTML+ autocorrected","warning");
+      new Logger(sprintf(_("Import '%s' HTML+ autocorrected"), $file), "warning");
     $this->imported[] = $file;
   }
 
@@ -224,7 +224,7 @@ class DOMBuilder {
           continue;
         }
         if($sameIdElement->nodeName != $n->nodeName)
-          throw new Exception ("Id conflict with " . $n->nodeName);
+          throw new Exception(sprintf(_("ID conflicts with element '%s'"), $n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
         $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
       } else {

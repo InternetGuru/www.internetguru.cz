@@ -14,18 +14,14 @@ class DOMDocumentPlus extends DOMDocument {
     $q = $xpath->query("//*[@$attribute='$id']");
     if($q->length == 0) return null;
     if($q->length > 1)
-      throw new Exception("Duplicit $attribute found for value '$id'");
+      throw new Exception(sprintf(_("Duplicit %s found for value '%s'"), $attribute, $id));
     return $q->item(0);
   }
 
-  public function insertVar($varName,$varValue,$prefix="") {
+  public function insertVar($varName, $varValue) {
     $xpath = new DOMXPath($this);
     $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";
     #$noparse = "*";
-    if($prefix != "") {
-      new Logger("DEPRECATED: Using variable prefix","warning");
-      $varName = $prefix.":".$varName;
-    }
     // find elements with current var
     $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$varName));
     $replaceCont = array();
@@ -77,7 +73,7 @@ class DOMDocumentPlus extends DOMDocument {
           $this->insertVarDOMElement($varValue, $e, $attr, $varName);
           break;
         }
-        new Logger("Unsupported variable type '".get_class($varValue)."' for '$varName'","error");
+        new Logger(sprintf(_("Unsupported variable type '%s' for '%s'"), get_class($varValue), $varName), "error");
       }
     }
   }
@@ -90,7 +86,7 @@ class DOMDocumentPlus extends DOMDocument {
         $link = $this->repairLink($e->getAttribute($attName));
         if($link === $e->getAttribute($attName)) continue;
         if(!$repair)
-          throw new Exception("Invalid repairable link '".$e->getAttribute($attName)."'");
+          throw new Exception(sprintf(_("Invalid repairable link '%s'"), $e->getAttribute($attName)));
         $e->setAttribute($attName,$link);
       } catch(Exception $ex) {
         if(!$repair) throw $ex;
@@ -105,7 +101,7 @@ class DOMDocumentPlus extends DOMDocument {
     if(is_null($link)) $link = getCurLink(); // null -> currentLink
     if($link == "" || $link == "/") return "/";
     $pLink = parse_url($link);
-    if($pLink === false) throw new LoggerException("Unable to parse href '$link'"); // fail2parse
+    if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
       $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"] . getRoot();
       if(strpos(str_replace(array("?","#"),array("/","/"),$link), $curDomain) !== 0) return $link; // link is external
@@ -133,11 +129,11 @@ class DOMDocumentPlus extends DOMDocument {
         $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
         if($path == "/") $path = "";
         if(strlen($path) && is_null($src->getElementById($path,"link"))) {
-          $toStrip[] = array($a,"link '$path' not found");
+          $toStrip[] = array($a, sprintf(_("Link '%s' not found"), $path));
           continue; // link not exists
         }
         if($eName != "form" && getCurLink(true) == $path.$queryUrl) {
-          $toStrip[] = array($a,"cyclic link found");
+          $toStrip[] = array($a, _("Cyclic link found"));
           continue; // link is cyclic (except form@action)
         }
         $a->setAttribute($aName,$root.$path.$queryUrl);
@@ -148,13 +144,13 @@ class DOMDocumentPlus extends DOMDocument {
       if(!is_null($linkedElement)) {
         $h1id = $this->getElementsByTagName("h1")->item(0)->getAttribute("id");
         if(getCurLink(true) == getCurLink() . $queryUrl && $h1id == $frag) {
-          $toStrip[] = array($a,"cyclic fragment found");
+          $toStrip[] = array($a, _("Cyclic fragment found"));
         }
         continue; // ignore visible headings
       }
       $linkedElement = $src->getElementById($frag);
       if(is_null($linkedElement)) {
-        $toStrip[] = array($a,"id '$frag' not found");
+        $toStrip[] = array($a, sprintf(_("Identifier '%s' not found"), $frag));
         continue; // id not exists
       }
       if($linkedElement->nodeName == "h" && $linkedElement->hasAttribute("link")) {
@@ -220,11 +216,11 @@ class DOMDocumentPlus extends DOMDocument {
     $identifiers = array();
     $duplicit = array();
     foreach($xpath->query("//*[@$attr]") as $e) {
-      if(!array_key_exists($e->getAttribute($attr),$identifiers)) {
+      if(!array_key_exists($e->getAttribute($attr), $identifiers)) {
         $identifiers[$e->getAttribute($attr)] = null;
         continue;
       }
-      if(!$repair) throw new Exception("Duplicit $attr attribute '$attr' found");
+      if(!$repair) throw new Exception(sprintf(_("Duplicit %s attribute '%s' found"), $attr, $e->getAttribute($attr)));
       $duplicit[] = $e;
     }
     foreach($duplicit as $e) {
@@ -252,15 +248,15 @@ class DOMDocumentPlus extends DOMDocument {
 
   public function relaxNGValidatePlus($f) {
     if(!file_exists($f))
-      throw new Exception ("Unable to find HTMLPlus RNG schema '$f'");
+      throw new Exception(sprintf(_("Unable to find HTML+ RNG schema '%s'"), $f));
     try {
       libxml_use_internal_errors(true);
       if(!$this->relaxNGValidate($f))
-        throw new Exception("relaxNGValidate internal error occured");
+        throw new Exception(_("relaxNGValidate() internal error occured"));
     } catch (Exception $e) {
       $internal_errors = libxml_get_errors();
       if(count($internal_errors)) {
-        $note = " [Caution: this message may be misleading]";
+        $note = " ["._("Caution: this message may be misleading")."]";
         if(self::DEBUG) die($this->saveXML());
         $e = new Exception(current($internal_errors)->message . $note);
       }
@@ -328,7 +324,7 @@ class DOMDocumentPlus extends DOMDocument {
       #case "form":
       #case "fieldset":
       default:
-      new Logger("Unable to insert array variable '$varName' into '{$e->nodeName}'","error");
+      new Logger(sprintf(_("Unable to insert array variable '%s' into '%s'"), $varName, $e->nodeName), "error");
       return;
     }
     $this->insertInnerHTML($varValue, $e, $sep);
@@ -342,7 +338,7 @@ class DOMDocumentPlus extends DOMDocument {
     if(!@$dom->loadXML($xml)) {
       foreach($html as $k => $v) $html[$k] = htmlspecialchars($v);
       $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$html)."</$eNam></var>";
-      if(!@$dom->loadXML($xml)) throw new Exception("Unable to parse variable");
+      if(!@$dom->loadXML($xml)) throw new Exception(_("Unable to parse variable"));
     }
     $this->insertVarDOMElement($dom->documentElement, $dest);
   }

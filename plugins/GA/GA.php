@@ -25,7 +25,7 @@ class GA extends Plugin implements SplObserver {
     $ga_id = $ga_id->nodeValue;
     global $cms;
     if(!$this->isValidId($ga_id)) {
-      $cms->getOutputStrategy()->addJs("// invalid ga_id format '$ga_id'",1,"body");
+      $cms->getOutputStrategy()->addJs("// ".sprintf(_("Invalid ga_id format '%s'"), $ga_id), 1, "body");
       $this->subject->detach($this);
       return;
     }

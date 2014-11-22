@@ -55,7 +55,7 @@ class InputVar extends Plugin implements SplObserver {
 
   private function fnTranslate(DOMElement $var) {
     if(!$var->hasAttribute("name")) {
-      new Logger("Function translate missing attribute 'name'","error");
+      new Logger(_("Attribute 'name' required for translate function"), "error");
       return false;
     }
     $name = $this->parse($var->getAttribute("name"));
@@ -85,8 +85,7 @@ class InputVar extends Plugin implements SplObserver {
     }
     if($time === false) $date = strftime($format);
     else $date = strftime($format,$time);
-    if($date === false)
-      new Logger("Unrecognized date value or format","error");
+    if($date === false) new Logger(_("Unrecognized date value or format"),"error");
     return $date;
   }
 
@@ -119,7 +118,7 @@ class InputVar extends Plugin implements SplObserver {
           $varVal = $cms->getVariable("inputvar-$var");
         if(is_null($varVal)) {
           if(strpos($match[0][$k],"@") !== 0)
-            new Logger("Variable '$var' does not exist","warning");
+            new Logger(sprintf(_("Variable '%s' does not exist"), $var), "warning");
           continue;
         }
         $r[$var] = $varVal;

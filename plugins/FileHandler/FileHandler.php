@@ -23,7 +23,7 @@ class FileHandler extends Plugin implements SplObserver {
     header("Content-Length: $filesize");
     set_time_limit(0);
     $handle = @fopen($filepath,"rb");
-    if($handle === false) throw new Exception("Unable to read file '$shortPath'");
+    if($handle === false) throw new Exception(sprintf(_("Unable to read file '%s'"), $shortPath));
     while(!feof($handle)) {
       print(fread($handle, 1024*8));
       ob_flush();

@@ -24,7 +24,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $subject->detach($this);
       return;
     }
-    $this->proceedImport();
+    if(strlen($_GET[get_class($this)])) $this->processImport($_GET[get_class($this)]);
     $this->getImportedFiles();
   }
 
@@ -35,12 +35,12 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     }
   }
 
-  private function proceedImport() {
+  private function processImport($fileUrl) {
     try {
-      $f = $this->getFile($_GET[get_class($this)]);
+      $f = $this->getFile($fileUrl);
     } catch(Exception $e) {
       $this->err[] = $e->getMessage();
-      if(strlen($_GET[get_class($this)])) new Logger($e->getMessage(), "warning");
+      new Logger($e->getMessage(), "warning");
       return;
     }
     $mime = getFileMime(TEMP_FOLDER."/$f");
@@ -54,7 +54,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->file = $f;
       break;
       default:
-      $this->err[] = "Unsupported file type '$mime'";
+      $this->err[] = sprintf(_("Unsupported file MIME type '%s'"), $mime);
     }
   }
 
@@ -74,12 +74,12 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->html = $doc->saveXML();
     $this->html = str_replace(array_keys($ids),$ids,$this->html);
 
-    if(empty($this->err)) $this->info[] = "File successfully imported";
+    if(empty($this->err)) $this->info[] = _("File successfully imported");
     $this->file = "$f.html";
     if(@file_put_contents(TEMP_FOLDER ."/$f.html", $this->html) !== false) return;
-    $m = "Unable to save imported file '$f.html' into temp folder";
+    $m = sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f);
     $this->err[] = $m;
-    new Logger($m,"error");
+    new Logger($m, "error");
   }
 
   private function safeValidate(HTMLPlus $doc) {
@@ -113,7 +113,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $newContent->insertVar("warning", $this->err);
     $newContent->insertVar("info", $this->info);
     $newContent->insertVar("link", $_GET[get_class($this)]);
-    $newContent->insertVar("importedhtml",$this->importedFiles);
+    if(!empty($this->importedFiles)) $newContent->insertVar("importedhtml", $this->importedFiles);
     $newContent->insertVar("filename",$this->file);
     if(!is_null($this->html)) {
       $newContent->insertVar("nohide", "nohide");
@@ -133,16 +133,16 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function getFile($dest) {
-    if(!strlen($dest)) throw new Exception("Please, enter file to view or import");
     $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
-    if(!is_file(TEMP_FOLDER ."/$dest")) throw new Exception("File '$dest' not found in temp folder");
+    if(!is_file(TEMP_FOLDER ."/$dest"))
+      throw new Exception(sprintf(_("File '%s' not found in temp folder"), $dest));
     return $dest;
   }
 
   private function saveFromUrl($url) {
     $purl = parse_url($url);
-    if($purl === false) throw new Exception("Unable to parse link (invalid format)");
+    if($purl === false) throw new Exception(_("Unable to parse link"));
     if(!isset($purl["scheme"])) return null;
     if($purl["host"] == "docs.google.com") {
       $url = $purl["scheme"] ."://". $purl["host"] . $purl["path"] . "/export?format=doc";
@@ -153,9 +153,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       }
     } else $headers = @get_headers($url);
     if(strpos($headers[0],'302') !== false)
-      throw new Exception("Destination URL '$url' is unaccessible (must be shared publically)");
+      throw new Exception(sprintf(_("Destination URL '%s' is unaccessible; must be shared publically"), $url));
     elseif(strpos($headers[0],'200') === false)
-      throw new Exception("Destination URL '$url' error: ".$headers[0]);
+      throw new Exception(sprintf(_("Destination URL '%s' error: %s"), $url, $headers[0]));
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header,$url);
     file_put_contents(TEMP_FOLDER ."/$filename", $data);
@@ -194,9 +194,10 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $dom->save($file);
       $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
     }
-    $xml = readZippedFile($f, "word/document.xml");
+    $wordDoc = "word/document.xml";
+    $xml = readZippedFile($f, $wordDoc);
     if(is_null($xml))
-      throw new Exception("Unable to locate 'word/document.xml' in '$f'");
+      throw new Exception(sprintf(_("Unable to locate '%s' in '%s'"), "word/document.xml", $f));
     $dom->loadXML($xml);
     $dom = $this->transform("removePrefix.xsl",$dom);
     // add an empty paragraph to prevent li:following-sibling fail
@@ -211,7 +212,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);
     $doc = $proc->transformToDoc($content);
-    if($doc === false) throw new Exception("Failed to apply transformation '$xslFile'");
+    if($doc === false) throw new Exception(sprintf(_("Failed to apply transformation '%s'"), $xslFile));
     return $doc;
   }
 

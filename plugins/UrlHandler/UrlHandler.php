@@ -35,7 +35,7 @@ class UrlHandler extends Plugin implements SplObserver {
       if(!strlen($path)) $path = getCurLink(); // current link if empty string
       while(strpos($path,"/") === 0) $path = substr($path,1); // empty string if root
       if($path != getCurLink() && strlen($path) && is_null($cms->getContentFull()->getElementById($path,"link"))) {
-        new Logger("Redirection link '$path' not found","warning");
+        new Logger(sprintf(_("Redirection link '%s' not found"), $path), "warning");
         continue;
       }
       $query = parse_url($var->nodeValue, PHP_URL_QUERY);
@@ -76,7 +76,7 @@ class UrlHandler extends Plugin implements SplObserver {
     $linkId = $this->findSimilar($links,$newLink);
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];
-    new Logger("Link '".getCurLink()."' not found, redir to '$newLink'","info");
+    new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $newLink), "info");
     redirTo(getRoot().$newLink,404);
   }
 

@@ -25,7 +25,7 @@ class Auth extends Plugin implements SplObserver {
     }
     if($access) return;
     if(isset($_SERVER['REMOTE_USER']) && in_array($_SERVER['REMOTE_USER'], array(USER_ID,"admin"))) return;
-    new ErrorPage("Authentication required", 403);
+    new ErrorPage(_("Authentication required"), 403);
   }
 
 }

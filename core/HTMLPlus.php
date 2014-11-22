@@ -153,19 +153,20 @@ class HTMLPlus extends DOMDocumentPlus {
 
   private function validateRoot($repair) {
     if(is_null($this->documentElement))
-      throw new Exception("Root element not found");
+      throw new Exception(_("Root element not found"));
     if($this->documentElement->nodeName != "body") {
-      if(!$repair) throw new Exception("Root element must be 'body'",1);
+      #todo: why ,1 ??
+      if(!$repair) throw new Exception(_("Root element must be 'body'"), 1);
       $this->documentElement->rename("body");
     }
     if(!$this->documentElement->hasAttribute("lang")
       && !$this->documentElement->hasAttribute("xml:lang")) {
-      if(!$repair) throw new Exception("Root element missing attribute 'xml:lang'");
+      if(!$repair) throw new Exception(_("Attribute 'xml:lang' is missing in element body"));
       $this->documentElement->setAttribute("xml:lang", "en");
     }
     if($this->documentElement->childElements->length == 1
       && $this->documentElement->childElements->item(0)->nodeName == "section") {
-      if(!$repair) throw new Exception("Root element missing attribute 'xml:lang'");
+      if(!$repair) throw new Exception(_("Element section cannot be empty"));
       $this->addTitleElements();
       return;
     }
@@ -174,11 +175,11 @@ class HTMLPlus extends DOMDocumentPlus {
       if($e->nodeType != XML_ELEMENT_NODE) continue;
       if($e->nodeName != "h") continue;
       if($hRoot++ == 0) continue;
-      if(!$repair) throw new Exception("Multiple root headings found");
+      if(!$repair) throw new Exception(_("There must be exactly one heading in body element"));
       break;
     }
     if($hRoot == 1) return;
-    if($hRoot == 0) throw new Exception("No root heading found");
+    if($hRoot == 0) throw new Exception(_("Missing heading in body element"));
     $children = array();
     foreach($this->documentElement->childNodes as $e) $children[] = $e;
     $s = $this->createElement("section");
@@ -192,9 +193,9 @@ class HTMLPlus extends DOMDocumentPlus {
   private function addTitleElements() {
     $b = $this->documentElement->firstElement;
     $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
-    $b->parentNode->insertBefore($this->createElement("h","Web title"), $b);
+    $b->parentNode->insertBefore($this->createElement("h", _("Web title")), $b);
     $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
-    $b->parentNode->insertBefore($this->createElement("desc","Web description"), $b);
+    $b->parentNode->insertBefore($this->createElement("desc", _("Web description")), $b);
     $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
   }
 
@@ -203,16 +204,17 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->getElementsByTagName("section") as $s) {
       if($s->childElements->length === 0) $emptySect[] = $s;
     }
-    if(!$repair && count($emptySect)) throw new Exception("Empty section(s) found");
+    if(!$repair && count($emptySect)) throw new Exception(_("Empty section(s) found"));
     if(!count($emptySect)) return;
-    foreach($emptySect as $s) $s->stripTag("Empty section deleted");
+    foreach($emptySect as $s) $s->stripTag(_("Empty section deleted"));
   }
 
   private function validateLang($repair) {
     $xpath = new DOMXPath($this);
     $langs = $xpath->query("//*[@lang]");
     if($langs->length && !$repair)
-      throw new Exception ("Lang attribute without xml namespace",3);
+      #todo why ,3 ??
+      throw new Exception(_("Lang attribute without xml namespace"), 3);
     foreach($langs as $n) {
       if(!$n->hasAttribute("xml:lang"))
         $n->setAttribute("xml:lang", $n->getAttribute("lang"));
@@ -223,14 +225,14 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHid($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("id")) {
-        if(!$repair) throw new Exception ("Missing id attribute in element h");
+        if(!$repair) throw new Exception(_("Missing id attribute in element h"));
         $this->setUniqueId($h);
         continue;
       }
       $id = $h->getAttribute("id");
       if(!$this->isValidId($id)) {
         if(!$repair || trim($id) != "")
-          throw new Exception ("Invalid ID value '$id'");
+          throw new Exception(sprintf(_("Invalid id attribute value '%s'"), $id));
         $this->setUniqueId($h);
         continue;
       }
@@ -240,7 +242,7 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHempty($repair) {
     foreach($this->headings as $h) {
       if(strlen(trim($h->nodeValue))) continue;
-      if(!$repair) throw new Exception("Heading content must not be empty");
+      if(!$repair) throw new Exception(_("Heading content must not be empty"));
       $h->nodeValue = "Some Heading";
     }
   }
@@ -249,7 +251,7 @@ class HTMLPlus extends DOMDocumentPlus {
     if($repair) $this->repairDesc();
     foreach($this->headings as $h) {
       if(is_null($h->nextElement) || $h->nextElement->nodeName != "desc") {
-        if(!$repair) throw new Exception ("Missing element 'desc'");
+        if(!$repair) throw new Exception(_("Missing element 'desc'"));
         $desc = $h->ownerDocument->createElement("desc");
         $h->parentNode->insertBefore($desc,$h->nextElement);
       }
@@ -272,15 +274,15 @@ class HTMLPlus extends DOMDocumentPlus {
       while(preg_match("/^[^a-z]/",$link)) $link = substr($link,1); // must start with a-z
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))
-          throw new Exception ("Normalize link leads to empty value '{$h->getAttribute("link")}'");
-        throw new Exception ("Empty link found");
+          throw new Exception(sprintf(_("Normalize link leads to empty value '%s'"), $h->getAttribute("link")));
+        throw new Exception(_("Empty link found"));
       }
       if($link != $h->getAttribute("link")) {
-        if(!$repair) throw new Exception ("Invalid link value found '{$h->getAttribute("link")}'");
+        if(!$repair) throw new Exception(sprintf(_("Invalid link value found '%s'"), $h->getAttribute("link")));
         if(!is_null($this->getElementById($link,"link"))) {
-          throw new Exception ("Normalize link leads to duplicit value '{$h->getAttribute("link")}'");
+          throw new Exception(sprintf(_("Normalize link leads to duplicit value '%s'"), $h->getAttribute("link")));
         }
-        $h->setAttribute("link",$link);
+        $h->setAttribute("link", $link);
       }
     }
   }

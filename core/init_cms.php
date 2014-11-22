@@ -7,7 +7,7 @@ try {
   $l = new Logger(CMS_NAME, null, microtime(true) - $start_time);
   proceedServerInit("InitServer.php");
   $l->finished();
-  $l = new Logger("CMS finished ".CMS_RELEASE, null, 0);
+  $l = new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), null, 0);
 
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
@@ -36,7 +36,7 @@ try {
 } catch(Exception $e) {
 
   $m = $e->getMessage();
-  if(CMS_DEBUG) $m = "Exception: ".$m." in ".$e->getFile()." on line ".$e->getLine();
+  if(CMS_DEBUG) $m = sprintf(_("Exception: %s in %s on line %s"), $m, $e->getFile(), $e->getLine());
   if(isset($l)) $l->finished();
   if(class_exists("ErrorPage")) new ErrorPage($m, 500, true);
 

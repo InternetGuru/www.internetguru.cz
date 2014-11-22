@@ -69,7 +69,8 @@ export TERM=xterm-256color
 # FOLDERS
 CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
 CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
-alias cms='if [ -d "$CMS_FOLDER_1" ]; then cd "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then cd "$CMS_FOLDER_2"; else echo "dir not found"; fi'
+CMS_FOLDER="$( if [ -d "$CMS_FOLDER_1" ]; then echo "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then echo "$CMS_FOLDER_2"; else echo "dir not found"; fi )"
+alias cms='cd "$CMS_FOLDER"'
 
 # GIT
 alias gaa='git add -A'
@@ -89,3 +90,6 @@ alias gs='git status'
 alias sshcmsadmin='ssh -i ~/.ssh/id_rsa cmsadmin@46.28.109.142'
 alias less='less -rSX'
 alias ll='ls -lah'
+alias gtcs='cd "$CMS_FOLDER"/lib/locale/cs_CZ/LC_MESSAGES'
+alias gtx='if [ -f messages.po ]; then find "$CMS_FOLDER" -iname "*.php" | xargs xgettext --from-code=UTF-8 -j; else echo "messages.po not found"; fi'
+alias gtc='msgfmt messages.po'

@@ -31,8 +31,8 @@ class Cms {
   }
 
   public function buildContent() {
-    if(is_null($this->contentFull)) throw new Exception("Content not set");
-    if(!is_null($this->content)) throw new Exception("Should not run twice");
+    if(is_null($this->contentFull)) throw new Exception(_("Full content must be set to build content"));
+    if(!is_null($this->content)) throw new Exception(_("Method cannot run twice"));
     $this->content = clone $this->contentFull;
     try {
       $cs = null;
@@ -40,9 +40,9 @@ class Cms {
       foreach($plugins->getIsInterface("ContentStrategyInterface") as $cs) {
         $c = $cs->getContent($this->content);
         if(!($c instanceof HTMLPlus))
-          throw new Exception("Content must be an instance of HTMLPlus");
+          throw new Exception(_("Content must be an instance of HTML+"));
         if(!$c->validatePlus(true))
-          new Logger("Plugin '".get_class($cs)."' HTML+ autocorrected","warning");
+          new Logger(sprintf(_("Plugin '%s' HTML+ autocorrected"), get_class($cs)), "warning");
         $this->content = $c;
         $this->loadDefaultVariables($this->content);
       }
@@ -60,7 +60,7 @@ class Cms {
       $newContent->validatePlus();
       $this->content = $newContent;
     } catch(Exception $e) {
-      new Logger("Variables generate invalid HTML+: ".$e->getMessage(), "error");
+      new Logger(sprintf(_("Some variable generates invalid HTML+: %s"), $e->getMessage()), "error");
     }
     return $this->content;
   }
@@ -112,7 +112,7 @@ class Cms {
 
   private function getVarId($name) {
     $d = debug_backtrace();
-    if(!isset($d[2]["class"])) throw new LoggerException("Unknown caller class");
+    if(!isset($d[2]["class"])) throw new LoggerException(_("Unknown caller class"));
     $varId = strtolower($d[2]["class"]);
     if($varId != $name) $varId .= (strlen($name) ? "-".normalize($name) : "");
     return $varId;
@@ -121,14 +121,14 @@ class Cms {
   public function setVariable($name,$value) {
     $varId = $this->getVarId($name);
     if(!is_string($value) && !is_array($value) && !$value instanceof DOMElement) {
-      new Logger("Unsupported variable '$varId' type","error");
+      new Logger(sprintf(_("Unsupported variable '%s' type"), $varId), "error");
       return null;
     }
     if(!$value instanceof DOMElement) {
       $items = $value;
       if(is_string($value)) $items = array($value);
       foreach($items as $k => $i) if(!$this->validateXMLMarkup($i)) {
-        new Logger("Input variable '$varId' is not HTML valid","warning");
+        new Logger(sprintf(_("Input variable '%s' is not XML valid"), $varId), "warning");
         if(!is_string($i)) return null; // in case of an array with non-string item
         $items[$k] = htmlentities($i);
       }
@@ -143,9 +143,7 @@ class Cms {
     $doc = new DOMDocument();
     if(@$doc->loadXML($v)) return true;
     $html = '<html>'.translateUtf8Entities($v).'</html>';
-    if(!@$doc->loadXML($html)) {
-      return false;
-    }
+    if(!@$doc->loadXML($html)) return false;
     return true;
   }
 
@@ -154,7 +152,7 @@ class Cms {
   }
 
   public function getOutput() {
-    if(is_null($this->content)) throw new Exception("Content not set");
+    if(is_null($this->content)) throw new Exception(_("Content is not set"));
     if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput($this->content);
     return $this->content->saveXML();
   }

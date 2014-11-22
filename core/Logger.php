@@ -7,7 +7,7 @@ class Logger {
 
   function __construct($message, $type=null, $delay=-1) {
     if(!is_dir(LOG_FOLDER) && !mkdir(LOG_FOLDER,0755,true))
-      throw new Exception(sprintf("Unable to create log dir '%s'",LOG_FOLDER));
+      throw new Exception(sprintf(_("Unable to create log dir '%s'"), LOG_FOLDER));
     if(!is_string($type)) $type = "info";
     $this->message = $message;
     $this->type = $type;

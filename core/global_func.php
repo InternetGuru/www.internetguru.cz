@@ -14,7 +14,7 @@ function absoluteLink($link=null) {
   if(substr($link,0,1) == "/") $link = substr($link,1);
   if(substr($link,-1) == "/") $link = substr($link,0,-1);
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException("Unable to parse href '$link'");
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse URL '%s'"), $link));
   $scheme = isset($pLink["scheme"]) ? $pLink["scheme"] : $_SERVER["REQUEST_SCHEME"];
   $host = isset($pLink["host"]) ? $pLink["host"] : $_SERVER["HTTP_HOST"];
   $path = isset($pLink["path"]) && $pLink["path"] != "" ? "/".$pLink["path"] : "";
@@ -27,10 +27,10 @@ function redirTo($link,$code=null,$force=false) {
     $curLink = absoluteLink();
     $absLink = absoluteLink($link);
     if($curLink == $absLink)
-      throw new LoggerException("Cyclic redirection to '$link'");
+      throw new LoggerException(sprintf(_("Cyclic redirection to '%s'"), $link));
   }
   if(class_exists("Logger"))
-    new Logger("Redirecting to '$link' with status code '".(is_null($code) ? 302 : $code)."'");
+    new Logger(sprintf(_("Redirecting to '%s' with status code %s"), $link, (is_null($code) ? 302 : $code)));
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
@@ -94,7 +94,7 @@ function normalize($s,$extKeep="",$tolower=true,$convertToUtf8=false) {
   $s = str_replace(" ","_",$s);
   $keep = "~[^a-zA-Z0-9/_%s-]~";
   if(is_null($ext = @preg_replace(sprintf($keep,$extKeep),"",$s))) {
-    new Logger("Normalize extended keep expression '".sprintf($keep,$extKeep)."' is invalid","error");
+    new Logger(sprintf(_("Invalid extended expression '%s'"), sprintf($keep,$extKeep)), "error");
     return preg_replace(sprintf($keep,""),"",$s);
   }
   return $ext;

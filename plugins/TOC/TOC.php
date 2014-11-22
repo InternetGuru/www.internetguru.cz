@@ -18,16 +18,11 @@ class TOC extends Plugin implements SplObserver, ContentStrategyInterface {
       break;
     }
     if(!$foundTocClass) return;
-    $vars = array();
-    foreach($this->getDOMPlus()->getElementsByTagName("var") as $v) {
-      if(!$v->hasAttribute("id")) continue;
-      $vars[] = $v->getAttribute("id") . ": \"{$v->nodeValue}\"";
-    }
-    $tocVars = implode(", ",$vars);
     global $cms;
     $cms->getOutputStrategy()->addCssFile($this->getDir() ."/TOC.css");
     $cms->getOutputStrategy()->addJsFile($this->getDir() ."/TOC.js",5,"body");
-    $cms->getOutputStrategy()->addJs("TOC.init({".$tocVars."});",6);
+    $tocTitle = _("Table of Contents");
+    $cms->getOutputStrategy()->addJs("TOC.init({tocTitle: \"$tocTitle\"});",6);
   }
 
   public function getContent(HTMLPlus $c) {

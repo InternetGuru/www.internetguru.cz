@@ -43,7 +43,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     while( ($h = $h->previousElement) != null) {
       if($h->nodeName == "h") return $h;
     }
-    throw new Exception("Unable to find parent heading for {$h->nodeValue}");
+    throw new Exception(sprintf(_("Unable to find parent heading for %s"), $h->nodeValue));
   }
 
 }
