@@ -51,6 +51,10 @@ class DOMDocumentPlus extends DOMDocument {
     foreach($replaces as $item) {
       $e = $item[0];
       $attr = $item[1];
+      if(is_null(@$e->getNodePath())) {
+        new Logger(sprintf(_("Unable to insert variable '%s' because destination element no longer exists"), $varName), "warning");
+        continue;
+      }
       if(is_null($e->parentNode)) continue;
       switch($type) {
         case "NULL":

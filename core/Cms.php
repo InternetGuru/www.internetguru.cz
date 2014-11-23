@@ -60,13 +60,26 @@ class Cms {
       $newContent->validatePlus();
       $this->content = $newContent;
     } catch(Exception $e) {
-      new Logger(sprintf(_("Some variable generates invalid HTML+: %s"), $e->getMessage()), "error");
+      // Some variable generates invalid HTML+
+      $eVars = array();
+      $newContent = clone $this->content;
+      foreach($this->variables as $varName => $varValue) {
+        $tmpContent = clone $newContent;
+        $tmpContent->insertVar($varName, $varValue);
+        try {
+          $tmpContent->validatePlus();
+          $newContent = $tmpContent;
+        } catch(Exception $e) {
+          $eVars[] = $varName;
+        }
+      }
+      new Logger(sprintf(_("Following variable(s) causing HTML+ error: %s"), implode(", ", $eVars)), "error");
     }
     return $this->content;
   }
 
   public function insertVariables(DOMDocumentPlus $doc) {
-    foreach($this->variables as $k => $v) $doc->insertVar($k, $v);
+    foreach($this->variables as $varName => $varValue) $doc->insertVar($varName, $varValue);
   }
 
   public function setOutputStrategy(OutputStrategyInterface $strategy) {
