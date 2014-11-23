@@ -69,7 +69,8 @@ export TERM=xterm-256color
 # FOLDERS
 CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
 CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
-alias cms='if [ -d "$CMS_FOLDER_1" ]; then cd "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then cd "$CMS_FOLDER_2"; else echo "dir not found"; fi'
+CMS_FOLDER_3='/cygdrive/e/Instal/wamp/www/cms/'
+alias cms='if [ -d "$CMS_FOLDER_1" ]; then cd "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then cd "$CMS_FOLDER_2"; elif [ -d "$CMS_FOLDER_3" ]; then cd "$CMS_FOLDER_3"; else echo "dir not found"; fi'
 
 # GIT
 alias gaa='git add -A'
