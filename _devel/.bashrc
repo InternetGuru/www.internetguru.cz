@@ -82,7 +82,7 @@ alias gcv='TAG=$( git show-ref --tags | tail -1 ); echo "Version history until" 
 alias gl='git log --decorate --all --oneline --graph'
 alias gp='git push --all; git push --tags'
 alias gpull='git pull --all && git fetch -p'
-alias guc='_(){ git reset --hard ${1:-HEAD~1}; }; _'
+alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _'
 alias gv='_(){ git log --oneline $1 | cut -f2- -d" " | grep -v "^\."; }; _'
 alias gs='git status'
 
