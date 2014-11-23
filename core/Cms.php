@@ -120,31 +120,8 @@ class Cms {
 
   public function setVariable($name,$value) {
     $varId = $this->getVarId($name);
-    if(!is_string($value) && !is_array($value) && !$value instanceof DOMElement) {
-      new Logger(sprintf(_("Unsupported variable '%s' type"), $varId), "error");
-      return null;
-    }
-    if(!$value instanceof DOMElement) {
-      $items = $value;
-      if(is_string($value)) $items = array($value);
-      foreach($items as $k => $i) if(!$this->validateXMLMarkup($i)) {
-        new Logger(sprintf(_("Input variable '%s' is not XML valid"), $varId), "warning");
-        if(!is_string($i)) return null; // in case of an array with non-string item
-        $items[$k] = htmlentities($i);
-      }
-      if(is_string($value)) $value = $items[0];
-      else $value = $items;
-    }
     $this->variables[$varId] = $value;
     return $varId;
-  }
-
-  private function validateXMLMarkup($v) {
-    $doc = new DOMDocument();
-    if(@$doc->loadXML($v)) return true;
-    $html = '<html>'.translateUtf8Entities($v).'</html>';
-    if(!@$doc->loadXML($html)) return false;
-    return true;
   }
 
   public function getAllVariables() {

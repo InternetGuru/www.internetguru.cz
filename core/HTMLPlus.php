@@ -155,8 +155,7 @@ class HTMLPlus extends DOMDocumentPlus {
     if(is_null($this->documentElement))
       throw new Exception(_("Root element not found"));
     if($this->documentElement->nodeName != "body") {
-      #todo: why ,1 ??
-      if(!$repair) throw new Exception(_("Root element must be 'body'"), 1);
+      if(!$repair) throw new Exception(_("Root element must be 'body'"));
       $this->documentElement->rename("body");
     }
     if(!$this->documentElement->hasAttribute("lang")
@@ -213,8 +212,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $xpath = new DOMXPath($this);
     $langs = $xpath->query("//*[@lang]");
     if($langs->length && !$repair)
-      #todo why ,3 ??
-      throw new Exception(_("Lang attribute without xml namespace"), 3);
+      throw new Exception(_("Lang attribute without xml namespace"));
     foreach($langs as $n) {
       if(!$n->hasAttribute("xml:lang"))
         $n->setAttribute("xml:lang", $n->getAttribute("lang"));

@@ -2,6 +2,7 @@
 try {
 
   $start_time = microtime(true);
+  session_start();
   require_once('global_func.php');
   require_once('global_const.php');
   $l = new Logger(CMS_NAME, null, microtime(true) - $start_time);

@@ -54,9 +54,13 @@ class DOMDocumentPlus extends DOMDocument {
       if(is_null($e->parentNode)) continue;
       switch($type) {
         case "NULL":
-        $this->removeVarElement($e);
+        $this->removeVar($e, $attr);
         break;
         case "string":
+        if(!strlen($varValue)) {
+          $this->removeVar($e, $attr);
+          continue;
+        }
         $e = $this->prepareIfDl($e, $varName);
         $this->insertVarString($varValue, $e, $attr, $varName);
         break;
@@ -279,7 +283,11 @@ class DOMDocumentPlus extends DOMDocument {
     return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/",$id);
   }
 
-  private function removeVarElement($e) {
+  private function removeVar($e, $attr) {
+    if(!is_null($attr)) {
+      if($e->hasAttribute($attr)) $e->removeAttribute($attr);
+      return;
+    }
     $e->parentNode->removeChild($e);
   }
 
