@@ -227,7 +227,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
     if($this->type == "html") {
       $doc = new HTMLPlus();
-      #todo: load minimalistic valid html+ file?
+      $doc->load(CMS_FOLDER."/".self::DEFAULT_FILE);
     } else $doc = new DOMDocumentPlus();
     if($this->contentValue == "n/a") {
       $this->contentValue = $doc->saveXML();
