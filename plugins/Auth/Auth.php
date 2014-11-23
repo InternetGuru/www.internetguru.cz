@@ -23,8 +23,14 @@ class Auth extends Plugin implements SplObserver {
       if($e->hasAttribute("access") && $e->getAttribute("access") == "allow") $access = true;
       else $access = false;
     }
-    if($access) return;
-    if(isset($_SERVER['REMOTE_USER']) && in_array($_SERVER['REMOTE_USER'], array(USER_ID,"admin"))) return;
+    $loggedUser = null;
+    if(isset($_SERVER['REMOTE_USER'])
+      && in_array($_SERVER['REMOTE_USER'], array(USER_ID,"admin"))) {
+      $loggedUser = $_SERVER['REMOTE_USER'];
+    }
+    global $cms;
+    $cms->insertVar("logged_user", $loggedUser);
+    if($access || !is_null($loggedUser)) return;
     new ErrorPage(_("Authentication required"), 403);
   }
 
