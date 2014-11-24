@@ -10,12 +10,12 @@ try {
   $l->finished();
   $l = new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), null, 0);
 
+  $cms = new Cms();
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 
   checkUrl();
-  $cms = new Cms();
   $cms->init(); // because of dombulder to set variable into cms
   $plugins->setStatus(STATUS_INIT);
   $plugins->notify();

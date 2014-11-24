@@ -141,17 +141,19 @@ class Cms {
   }
 
   public function addMessage($message, $type, $flash = false) {
+    $caller = $this->getCallerClass();
+    new Logger("$caller $type: $message", Logger::LOGGER_INFO);
     if(!in_array($type, array(self::FLASH_WARNING, self::FLASH_INFO))) $type = self::FLASH_INFO;
     if(!$flash && $this->forceFlash) {
       new Logger(_("Adding message after output - forcing flash"), Logger::LOGGER_WARNING);
       $flash = true;
     }
     if($flash) {
-      $_SESSION["cms"]["flash"][$this->getCallerClass()][] = array($message, $type);
+      $_SESSION["cms"]["flash"][$caller][] = array($message, $type);
       return;
     }
     if(is_null($this->flashList)) $this->createFlashList();
-    $this->addFlashItem($message, $type, $this->getCallerClass());
+    $this->addFlashItem($message, $type, $caller);
   }
 
   private function getCallerClass() {
