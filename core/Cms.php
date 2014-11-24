@@ -7,6 +7,7 @@ class Cms {
   private $outputStrategy = null; // OutputStrategyInterface
   private $titleQueries = array("/body/h");
   private $variables = array();
+  private $forceFlash = false;
   private $flashList = null;
   const DEBUG = false;
   const FLASH_WARNING = "warning";
@@ -16,9 +17,15 @@ class Cms {
     if(self::DEBUG) new Logger("DEBUG");
   }
 
+  public function __get($name) {
+    switch($name) {
+      case "forceFlash":
+      return $this->forceFlash;
+    }
+  }
+
   public function init() {
     global $plugins;
-    $this->setFlashList();
     $this->setVariable("messages", $this->flashList);
     $this->setVariable("version", CMS_VERSION);
     $this->setVariable("name", CMS_NAME);
@@ -35,18 +42,21 @@ class Cms {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
     $ul = $root->appendChild($doc->createElement("ul"));
-    return $root;
+    $this->flashList = $root;
+    $this->setVariable("messages", $this->flashList);
   }
 
-  private function setFlashList() {
+  private function addFlashItem($message, $type, $class) {
+    $li = $this->flashList->ownerDocument->createElement("li", "$class: $message");
+    $li->setAttribute("class", "$class $type");
+    $this->flashList->firstElement->appendChild($li);
+  }
+
+  public function getFlashMessages() {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
-    $this->flashList = $this->createFlashList();
+    if(is_null($this->flashList)) $this->createFlashList();
     foreach($_SESSION["cms"]["flash"] as $class => $item) {
-      foreach($item as $i) {
-        $li = $this->flashList->ownerDocument->createElement("li", $i[0]);
-        $li->setAttribute("class", "$class ".$i[1]);
-        $this->flashList->firstElement->appendChild($li);
-      }
+      foreach($item as $i) $this->addFlashItem($i[0], $i[1], $class);
     }
     $_SESSION["cms"]["flash"] = array();
   }
@@ -130,17 +140,18 @@ class Cms {
     $this->contentFull = $db->buildHTMLPlus("Content.html");
   }
 
-  public function setFlashMsg($message, $type, $store = true) {
+  public function addMessage($message, $type, $flash = false) {
     if(!in_array($type, array(self::FLASH_WARNING, self::FLASH_INFO))) $type = self::FLASH_INFO;
-    if($store) {
+    if(!$flash && $this->forceFlash) {
+      new Logger(_("Adding message after output - forcing flash"), Logger::LOGGER_WARNING);
+      $flash = true;
+    }
+    if($flash) {
       $_SESSION["cms"]["flash"][$this->getCallerClass()][] = array($message, $type);
       return;
     }
-    if(is_null($this->flashList)) $this->flashList = $this->createFlashList();
-    $li = $this->flashList->ownerDocument->createElement("li", $message);
-    $li->setAttribute("class", $this->getCallerClass()." $type");
-    $this->flashList->firstElement->appendChild($li);
-    $this->setVariable("messages", $this->flashList);
+    if(is_null($this->flashList)) $this->createFlashList();
+    $this->addFlashItem($message, $type, $this->getCallerClass());
   }
 
   private function getCallerClass() {
@@ -186,6 +197,7 @@ class Cms {
   }
 
   public function getOutput() {
+    $this->forceFlash = true;
     if(is_null($this->content)) throw new Exception(_("Content is not set"));
     if(!is_null($this->outputStrategy)) return $this->outputStrategy->getOutput($this->content);
     return $this->content->saveXML();

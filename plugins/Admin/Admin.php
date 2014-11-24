@@ -45,7 +45,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if(!$this->isPost()) return;
       $this->savePost();
     } catch (Exception $e) {
-      $cms->setFlashMsg($e->getMessage(), $cms::FLASH_WARNING, false);
+      $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
       $this->error = true;
     }
   }
@@ -268,7 +268,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       throw new Exception(_("Unable to save changes, administration may be locked"));
     if($this->error) return;
     global $cms;
-    $cms->setFlashMsg(_("Content successfully saved"), $cms::FLASH_INFO);
+    $cms->addMessage(_("Content successfully saved"), $cms::FLASH_INFO, true);
     $this->redir($this->defaultFile);
   }
 

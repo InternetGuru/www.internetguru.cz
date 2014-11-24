@@ -20,6 +20,7 @@ try {
   $plugins->setStatus(STATUS_INIT);
   $plugins->notify();
 
+  $cms->getFlashMessages();
   $cms->buildContent();
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
