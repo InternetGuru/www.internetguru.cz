@@ -6,12 +6,14 @@
     <theme id="basic">
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/basicLayout.xsl</xslt>
+      <xslt>themes/flashMessages.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
       <favicon>themes/igcms.ico</favicon>
     </theme>
     <theme id="simple">
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/simpleLayout.xsl</xslt>
+      <xslt>themes/flashMessages.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
       <stylesheet media="screen">themes/simple.css</stylesheet>
       <favicon>themes/igcms.ico</favicon>

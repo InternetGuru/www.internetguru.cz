@@ -7,7 +7,10 @@ class Cms {
   private $outputStrategy = null; // OutputStrategyInterface
   private $titleQueries = array("/body/h");
   private $variables = array();
+  private $flashList = null;
   const DEBUG = false;
+  const FLASH_WARNING = "warning";
+  const FLASH_INFO = "info";
 
   function __construct() {
     if(self::DEBUG) new Logger("DEBUG");
@@ -15,6 +18,8 @@ class Cms {
 
   public function init() {
     global $plugins;
+    $this->setFlashList();
+    $this->setVariable("messages", $this->flashList);
     $this->setVariable("version", CMS_VERSION);
     $this->setVariable("name", CMS_NAME);
     $this->setVariable("user_id", USER_ID);
@@ -24,6 +29,26 @@ class Cms {
     $this->setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
     $this->loadContent();
     $this->loadDefaultVariables($this->contentFull);
+  }
+
+  private function createFlashList() {
+    $doc = new DOMDocumentPlus();
+    $root = $doc->appendChild($doc->createElement("root"));
+    $ul = $root->appendChild($doc->createElement("ul"));
+    return $root;
+  }
+
+  private function setFlashList() {
+    if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
+    $this->flashList = $this->createFlashList();
+    foreach($_SESSION["cms"]["flash"] as $class => $item) {
+      foreach($item as $i) {
+        $li = $this->flashList->ownerDocument->createElement("li", $i[0]);
+        $li->setAttribute("class", "$class ".$i[1]);
+        $this->flashList->firstElement->appendChild($li);
+      }
+    }
+    $_SESSION["cms"]["flash"] = array();
   }
 
   public function getContentFull() {
@@ -103,6 +128,25 @@ class Cms {
   private function loadContent() {
     $db = new DOMBuilder();
     $this->contentFull = $db->buildHTMLPlus("Content.html");
+  }
+
+  public function setFlashMsg($message, $type, $store = true) {
+    if(!in_array($type, array(self::FLASH_WARNING, self::FLASH_INFO))) $type = self::FLASH_INFO;
+    if($store) {
+      $_SESSION["cms"]["flash"][$this->getCallerClass()][] = array($message, $type);
+      return;
+    }
+    if(is_null($this->flashList)) $this->flashList = $this->createFlashList();
+    $li = $this->flashList->ownerDocument->createElement("li", $message);
+    $li->setAttribute("class", $this->getCallerClass()." $type");
+    $this->flashList->firstElement->appendChild($li);
+    $this->setVariable("messages", $this->flashList);
+  }
+
+  private function getCallerClass() {
+    $callers = debug_backtrace();
+    if(isset($callers[2]['class'])) return $callers[2]['class'];
+    return "unknown";
   }
 
   public function getVariable($name) {
