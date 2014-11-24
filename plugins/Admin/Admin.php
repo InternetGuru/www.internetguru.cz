@@ -12,12 +12,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
   private $content = null;
-  private $errors = array();
-  private $info = array();
   private $contentValue = "n/a";
   private $schema = null;
   private $type = "unknown";
   private $replace = true;
+  private $error = false;
   private $dataFile = null;
   private $dataFileStatus = "unknown";
   private $defaultFile = "n/a";
@@ -28,8 +27,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
+    global $cms;
     if($subject->getStatus() == STATUS_PROCESS) {
-      global $cms;
       $os = $cms->getOutputStrategy()->addTransformation($this->getDir()."/Admin.xsl");
     }
     if($subject->getStatus() != STATUS_INIT) return;
@@ -46,7 +45,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if(!$this->isPost()) return;
       $this->savePost();
     } catch (Exception $e) {
-      $this->errors[] = $e->getMessage();
+      $cms->setFlashMsg($e->getMessage(), $cms::FLASH_WARNING, false);
+      $this->error = true;
     }
   }
 
@@ -89,8 +89,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
 
     $newContent->insertVar("heading", $d->documentElement);
-    $newContent->insertVar("errors", $this->errors);
-    $newContent->insertVar("info", $this->info);
     $newContent->insertVar("link", getCurLink());
     $newContent->insertVar("linkadmin", $la);
     $newContent->insertVar("linkadminstatus", "$la&$statusChange");
@@ -268,7 +266,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function savePost() {
     if(saveRewrite($this->dataFile, $this->contentValue) === false)
       throw new Exception(_("Unable to save changes, administration may be locked"));
-    if(empty($this->errors)) $this->redir($this->defaultFile);
+    if($this->error) return;
+    global $cms;
+    $cms->setFlashMsg(_("Content successfully saved"), $cms::FLASH_INFO);
+    $this->redir($this->defaultFile);
   }
 
   private function validateXml(DOMDocumentPlus $doc) {
