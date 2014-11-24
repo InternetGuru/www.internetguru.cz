@@ -79,8 +79,27 @@ p object {
   margin: 1em auto;
 }
 
+#flashMsg {
+  background: rgb(37,37,37);
+}
+#flashMsg ul {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 1rem;
+  list-style: none;
+}
+#flashMsg li {
+  margin: 0;
+}
+#flashMsg li.warning {
+  color: #ffcc66;
+}
+#flashMsg li.info {
+  color: rgb(232, 232, 232);
+}
+#flashMsg li.success {
+  color: rgb(88, 195, 106);
+}
 .warning {
-  border: 0.15em solid rgb(255, 137, 137);
-  background: rgb(255, 186, 186);
-  color: black;
+  /*todo*/
 }

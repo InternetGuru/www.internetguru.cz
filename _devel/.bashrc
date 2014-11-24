@@ -70,7 +70,8 @@ export TERM=xterm-256color
 CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
 CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
 CMS_FOLDER_3='/cygdrive/e/Instal/wamp/www/cms/'
-alias cms='if [ -d "$CMS_FOLDER_1" ]; then cd "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then cd "$CMS_FOLDER_2"; elif [ -d "$CMS_FOLDER_3" ]; then cd "$CMS_FOLDER_3"; else echo "dir not found"; fi'
+CMS_FOLDER="$( if [ -d "$CMS_FOLDER_1" ]; then echo "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then echo "$CMS_FOLDER_2"; elif [ -d "$CMS_FOLDER_3" ]; then echo "$CMS_FOLDER_3"; else echo "dir not found"; fi )"
+alias cms='cd "$CMS_FOLDER"'
 
 # GIT
 alias gaa='git add -A'
@@ -82,7 +83,7 @@ alias gcv='TAG=$( git show-ref --tags | tail -1 ); echo "Version history until" 
 alias gl='git log --decorate --all --oneline --graph'
 alias gp='git push --all; git push --tags'
 alias gpull='git pull --all && git fetch -p'
-alias guc='_(){ git reset --hard ${1:-HEAD~1}; }; _'
+alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _'
 alias gv='_(){ git log --oneline $1 | cut -f2- -d" " | grep -v "^\."; }; _'
 alias gs='git status'
 
@@ -90,3 +91,6 @@ alias gs='git status'
 alias sshcmsadmin='ssh -i ~/.ssh/id_rsa cmsadmin@46.28.109.142'
 alias less='less -rSX'
 alias ll='ls -lah'
+alias gtcs='cd "$CMS_FOLDER"/lib/locale/cs_CZ/LC_MESSAGES'
+alias gtx='if [ -f messages.po ]; then find "$CMS_FOLDER" -iname "*.php" | xargs xgettext --from-code=UTF-8 -j; else echo "messages.po not found"; fi'
+alias gtc='msgfmt messages.po'

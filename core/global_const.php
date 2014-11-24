@@ -5,6 +5,7 @@ define("PLUGINS_DIR", "plugins");
 define("THEMES_DIR", "themes");
 define("VER_DIR", "ver");
 define("LOG_DIR", "log");
+define("LIB_DIR", "lib");
 define("ADMIN_BACKUP_DIR", "adm.bak");
 define("USER_BACKUP_DIR", "usr.bak");
 define('SUBDOM_ROOT_DIR', "subdom");
@@ -53,6 +54,7 @@ if(isAtLocalhost()) {
 }
 define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
 define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
+define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
 define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
 define('CMS_VERSION_FILENAME', "cms_version.txt");
 define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
@@ -61,18 +63,25 @@ define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
 if(CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
+} else {
+  if(isAtLocalhost()) setlocale(LC_ALL, "cs_CZ.utf8");
+  else setlocale(LC_ALL, "czech");
+  putenv("LANG=cs_CZ"); // for gettext
+  bindtextdomain("messages", LIB_FOLDER."/locale");
+  textdomain("messages");
 }
 define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
 
 #todo: date_default_timezone_set()
-#todo: setlocale(LC_ALL, czech); // cs_CZ.utf8 (localhost)
+#todo: localize lang
 
 function __autoload($className) {
   $fp = PLUGINS_FOLDER."/$className/$className.php";
   if(@include $fp) return;
   $fc = CORE_FOLDER."/$className.php";
   if(@include $fc) return;
-  throw new LoggerException("Unable to find class '$className' in '$fp' nor '$fc'");
+  #todo: log shortPath
+  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
 function proceedServerInit($initServerFileName) {
@@ -112,23 +121,23 @@ function getRes($res, $dest, $resFolder) {
   if(defined("ADMIN_FOLDER")) $folders[] = preg_quote(ADMIN_FOLDER,"/");
   if(defined("USER_FOLDER")) $folders[] = preg_quote(USER_FOLDER,"/");
   if(!preg_match("/^(?:".implode("|",$folders).")\/".FILEPATH_PATTERN."$/", $res)) {
-    throw new Exception("Forbidden file name '$res' to copy to '$resFolder' folder");
+    throw new Exception(sprintf(_("Forbidden file name '%s' format to copy to '%s' folder"), $res, $resFolder));
   }
   $mime = getFileMime($res);
   if(strpos($res, CMS_FOLDER) !== 0 && $mime != "text/plain" && strpos($mime, "image/") !== 0) {
-    throw new Exception("Forbidden mime type '$mime' to copy '$res' to '$resFolder' folder");
+    throw new Exception(sprintf(_("Forbidden MIME type '%s' to copy '%s' to '%s' folder"), $mime, $res, $resFolder));
   }
   $newRes = $resFolder . "/$dest";
   $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
   if(!is_dir($newDir) && !mkdirGroup($newDir,0775,true)) {
-    throw new Exception("Unable to create directory structure '$newDir'");
+    throw new Exception(sprintf(_("Unable to create directory structure '%s'"), $newDir));
   }
   if(is_link($newRes) && readlink($newRes) == $res) return $newRes;
   if(!symlink($res, "$newRes~") || !rename("$newRes~", $newRes)) {
-    throw new Exception("Unable to create symlink '$newRes' for '$res'");
+    throw new Exception(sprintf(_("Unable to create symlink '%s' for '%s'"), $newRes, $res));
   }
   #if(!chmodGroup($newRes,0664))
-  #  throw new Exception("Unable to chmod resource file '$newRes'");
+  #  throw new Exception(sprintf(_("Unable to chmod resource file '%x'"), $newRes);
   return $newRes;
 }
 
@@ -137,9 +146,9 @@ function createSymlink($link, $target) {
   if(is_link($link) && readlink($link) == $target) return;
   elseif(is_link($link)) $restart = true;
   if(!symlink($target, "$link~") || !rename("$link~", $link))
-    throw new Exception("Unable to create symlink '$link'");
+    throw new Exception(sprintf(_("Unable to create symlink '%s'"), $link));
   if($restart && !touch(APACHE_RESTART_FILEPATH))
-    new Logger("Unable to force Apache cache symlink target update", "error");
+    new Logger(_("Unable to force symlink cache update"), "error");
 }
 
 ?>

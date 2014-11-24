@@ -14,7 +14,7 @@ class Plugin {
       global $plugins;
       if($plugins->isAttachedPlugin($p)) continue;
       $this->subject->detach($this);
-      new Logger("Detaching '".get_class($this)."' due to '$p' dependancy","warning");
+      new Logger(sprintf(_("Detaching '%s' due to '%s' dependancy"), get_class($this), $p), "warning");
       return true;
     }
     return false;
@@ -46,7 +46,7 @@ class Plugin {
   }
 
   private function buildDOMPlus($filePath, $htmlPlus, $user) {
-    if(is_null($this->subject)) throw new Exception("SplSubject not set");
+    if(is_null($this->subject)) throw new Exception(_("Unable to build DOM if SplSubject not set"));
     $db = new DOMBuilder();
     $key = $this->getKey($filePath,$htmlPlus,$user);
     if($htmlPlus)

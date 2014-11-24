@@ -22,7 +22,6 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function cfgRedir() {
-    global $cms;
     $cfg = $this->getDOMPlus();
     foreach($cfg->documentElement->childNodes as $var) {
       if($var->nodeName != "var") continue;
@@ -34,8 +33,8 @@ class UrlHandler extends Plugin implements SplObserver {
       $path = parse_url($var->nodeValue, PHP_URL_PATH);
       if(!strlen($path)) $path = getCurLink(); // current link if empty string
       while(strpos($path,"/") === 0) $path = substr($path,1); // empty string if root
-      if($path != getCurLink() && strlen($path) && is_null($cms->getContentFull()->getElementById($path,"link"))) {
-        new Logger("Redirection link '$path' not found","warning");
+      if($path != getCurLink() && strlen($path) && is_null(Cms::getContentFull()->getElementById($path,"link"))) {
+        new Logger(sprintf(_("Redirection link '%s' not found"), $path), "warning");
         continue;
       }
       $query = parse_url($var->nodeValue, PHP_URL_QUERY);
@@ -65,18 +64,17 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function proceed() {
-    global $cms;
-    $h = $cms->getContentFull()->getElementById(getCurLink(),"link");
+    $h = Cms::getContentFull()->getElementById(getCurLink(),"link");
     if(!is_null($h)) return;
     $newLink = normalize(getCurLink());
     $links = array();
-    foreach($cms->getContentFull()->getElementsByTagName("h") as $h) {
+    foreach(Cms::getContentFull()->getElementsByTagName("h") as $h) {
       if($h->hasAttribute("link")) $links[] = $h->getAttribute("link");
     }
     $linkId = $this->findSimilar($links,$newLink);
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];
-    new Logger("Link '".getCurLink()."' not found, redir to '$newLink'","info");
+    new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $newLink), "info");
     redirTo(getRoot().$newLink,404);
   }
 

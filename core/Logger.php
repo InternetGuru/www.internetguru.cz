@@ -4,11 +4,24 @@ class Logger {
   private $message;
   private $type;
   private $start_time;
+  const LOGGER_FATAL = "fatal";
+  const LOGGER_ERROR = "error";
+  const LOGGER_WARNING = "warning";
+  const LOGGER_INFO = "info";
 
   function __construct($message, $type=null, $delay=-1) {
     if(!is_dir(LOG_FOLDER) && !mkdir(LOG_FOLDER,0755,true))
-      throw new Exception(sprintf("Unable to create log dir '%s'",LOG_FOLDER));
-    if(!is_string($type)) $type = "info";
+      throw new Exception(sprintf(_("Unable to create log dir '%s'"), LOG_FOLDER));
+    if(!in_array($type, array(
+      self::LOGGER_FATAL,
+      self::LOGGER_ERROR,
+      self::LOGGER_WARNING,
+      self::LOGGER_INFO))) $type = self::LOGGER_INFO;
+    if(!is_null(Cms::getVariable("auth-logged_user"))
+      && ($type == self::LOGGER_ERROR || $type == self::LOGGER_WARNING)) {
+      Cms::addMessage($message.' ['. $this->getCaller()
+        .']', Cms::MSG_INFO, Cms::isForceFlash());
+    }
     $this->message = $message;
     $this->type = $type;
     $this->start_time = microtime(true);
@@ -20,7 +33,7 @@ class Logger {
     $callers = debug_backtrace();
     $c = array();
     if(isset($callers[3]['class'])) $c[] = $callers[3]['class'];
-    if(isset($callers[3]['function'])) $c[] = $callers[3]['function'];
+    if(CMS_DEBUG && isset($callers[3]['function'])) $c[] = $callers[3]['function'];
     return implode(".",$c);
   }
 

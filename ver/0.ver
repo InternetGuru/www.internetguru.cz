@@ -1,51 +1,81 @@
-0.3
----
+0.3.8 2014-11-24
+SubdomManager: detekce uložení beze změn (ed164af)
+DOMBuilder: zkrácení cest v logu (9d30707)
+SubdomManager: oprava CSS (981c011)
+SubdomManager: přidána podpora systémových hlášení (6e0a929)
+LogViewer: přidána podpora systémových hlášení (6312c43)
+Convertor: změna cesty dočasných souborů (28e9021)
+Convertor: přidána podpora systémových hlášení (6d34719)
+Logger: přidána podpora systémových hlášení (495fe75)
+Admin: přidána podpora systémových hlášení (686d93f)
+Cms: přidána podpora systémových hlášení (d3a7c36)
+Xhtml11: Přidané nové výchozí téma adminmenu.xsl (8f10d31)
+Auth: přidána nová proměnna auth-logged_user (926c424)
+Admin: zobrazuje Content.html pokud neexistuje uživatelský obsah (b4f874a)
+Změněn výchozí obsah Content.html (fc29b74)
+Podpora českých systémových hlášení (4c98a2c)
+Přidána podpora odkazování na soubory (ea80a5c)
 
-0.3.0 - Major structural changes
-0.3.1 - SubdomManager using GET param
-0.3.3 - Admin opens default file if user file missing
-0.3.4 - Added new variable cms-name added
-0.3.4 - New plugin Auth
-0.3.5 - Headings now support span element
-0.3.5 - New CMS default content
-0.3.6 - SubdomManager displays cms variant/version
-0.3.6 - Variable globalmenu is available for HTML+
-0.3.6 - SubdomManager mirror subdom support
+0.3.7 2014-11-21
+Proměnná contentlink-bc je dostupná pro HTML+ (b3a0877)
 
-0.2
----
+0.3.6 2014-11-21
+SubdomManager: podpora zrcadla poddomény (9ea6489)
+Proměnná globalmenu je dostupná pro HTML+ (2647f1f)
+SubdomManager: zobrazení verze cms vedle varianty (c72996f)
 
-0.2.0 - SubdomManager plugin created
-0.2.0 - ContentMatch renamed to UrlHandler
-0.2.0 - ContentAdmin renamed to Admin
-0.2.0 - Convertor added noparse support
-0.2.0 - Xhtml11 check object: exist/mime/size
-0.2.0 - ContentMatch default redirection updated
-0.2.0 - LogViewer support major version number only (eg. 0.ver)
-0.2.0 - ContentMatch user redirection root support
-0.2.0 - Changed root link in HTML+ is now '/'
-0.2.0 - FileHandler plugin created
-0.2.0 - Xhtml11 changed default layout and config
+0.3.5 2014-11-19
+Nový výchozí obsah CMS (9f79140)
+Přidána podpora elementu span a proměnných v nadpisech (c4fbf3c)
 
-0.1
----
+0.3.4 2014-11-17
+Auth: nové rozšíření pro autentifikaci (1956d94)
+Nová konstanta cms-name (4c75f4c)
 
-0.1.0 - initial version
-0.1.1 - Convertor: added code and variable syntax support
-0.1.1 - Convertor: added code element (''myCode'' syntax)
-0.1.1 - Content.html default content file changed
-0.1.1 - Convertor: independent UI with features
-0.1.1 - Convertor: adds short/link attr for headings with section
-0.1.1 - Convertor: adds ctime into first heading
-0.1.1 - Convertor: added samp support (from underlined text)
-0.1.1 - InputVar: silent error support (@)
-0.1.1 - LogViewer: zipped files support
-0.1.1 - LogViewer: log/ver file support
-0.1.1 - ContentMatch: default redirections (log, ver, admin)
-0.1.1 - ContentMatch: query redirection support
-0.1.1 - ContentAdmin: showing links to edit files
-0.1.1 - new system variable dombuilder-html
-0.1.1 - ContentAdmin: redir to default file
-0.1.1 - HTML+ import: added language check
-0.1.2 - ContentAdmin showing plugins-loaded (instead of cms-plugins)
-0.1.2 - Added new variable plugins-loaded
+0.3.3 2014-11-13
+Oprava chyb
+
+0.3.2 2014-11-12
+Oprava chyb
+
+0.3.1 2014-11-12
+SubdomManager: název poddomény v parametru URL (10c12af)
+
+0.3.0 2014-11-12
+Oprava chyb
+
+0.2.0 2014-11-09
+SubdomManager: nové rozšíření pro správu poddomén (4a3d04b)
+ContentMatch: rozšíření přejmenováno na UrlHandler (853a4b6)
+ContentAdmin: rozšíření přejmenováno na Admin (e65b158)
+Convertor: přidána podpora elementu noparse (c7b35be)
+Xhtml11: kontrola objektu na existenci, MIME typ a velikost (674b735)
+ContentMatch: nová výchozí přesměrování (d8769a3)
+LogViewer: sjednocení souborů v rámci nejvyšší verze, např. 0.ver (4cf714c)
+ContentMatch: podpora přesměrování uživatele na úvodní stránku (d7daa1e)
+Změna odkazu na úvodní stránku v HTML+, nově '/' (b954300)
+FileHandler: nové rozšíření pro stahování souborů (b8e146d)
+Xhtml11: změna výchozího vzhledu a nastavení (1393cea)
+
+0.1.2 2014-10-29
+ContentAdmin: zobrazuje plugins-loaded místo cms-plugins (89c399e)
+Přidána nová proměnná plugins-loaded (0720188)
+
+0.1.1 2014-10-29
+Convertor: přidaná podpora elementu code a proměnných (23739a3)
+Convertor: přidána podpora elementu code v syntaxi ‘’mujkod’’ (75d4bb5)
+Změna obsahu výchozího souboru (31a1689)
+Convertor: nezávislé UI s funkcemi (dd38fff)
+Convertor: generuje atributy short a link k nadpisům kapitol obsahujícím section (7977a84)
+Convertor: přidává atribut ctime do prvního nadpisu (97d9da3)
+Convertor: převádí podtržený text na prvek samp (26f4cde)
+InputVar: přidána podpora tichých chyb zápisem @$proměnná (e5a5cd0)
+ContentMatch: nová výchozí přesměrování z log, ver a admin (2d49b82)
+ContentMatch: podpora přesměrování URL parametru (caff2d6)
+ContentAdmin: zobrazuje odkazy na některé soubory (76a3b32)
+Nová systémová proměnná dombuilder-html (b831125)
+ContentAdmin: přesměrování na výchozí soubor (f9def23)
+HTML+ import: přidána kontrola řeči (c05fabc)
+
+0.1.0 2014-10-23
+Výchozí verze

@@ -4,7 +4,6 @@
 
 class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
-  private $err = array();
   private $logFiles;
   private $verFiles;
 
@@ -38,13 +37,12 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
       default:
       $fPath = $this->getFilePath($fName);
       if(!is_null($fPath)) break;
-      $this->err[] = "File or extension '$fName' not found";
+      Cms::addMessage(sprintf(_("File or extension '%s' not found"), $fName), Cms::MSG_WARNING);
       $fPath = current($this->logFiles);
       $fName = key($this->logFiles);
     }
 
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("cur_file", $fName);
     $newContent->insertVar("log_files", $this->makeLink($this->logFiles));
     $newContent->insertVar("ver_files", $this->makeLink($this->verFiles));

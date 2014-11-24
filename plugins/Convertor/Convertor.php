@@ -3,63 +3,68 @@
 #todo: export
 #todo: support file upload
 #todo: js copy content to clipboard
-#todo: files/import to usr/temp (const)
-#todo: fix empty link
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $err = array();
-  private $info = array();
+  private $error = false;
   private $html = null;
   private $file = null;
+  private $tmpFolder;
   private $importedFiles = array();
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this,5);
+    $this->tmpFolder = TEMP_FOLDER."/".PLUGINS_DIR."/".get_class($this);
+    if(is_dir($this->tmpFolder) || mkdir($this->tmpFolder, 0755, true)) return;
+    throw new Exception(_("Unable to create convertor tmp folder"));
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_PREINIT) return;
+    if($subject->getStatus() != STATUS_INIT) return;
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;
     }
-    $this->proceedImport();
+    if(strlen($_GET[get_class($this)])) $this->processImport($_GET[get_class($this)]);
+    elseif(substr(getCurLink(true), -1) == "=") {
+      Cms::addMessage(_("File URL cannot be empty"), Cms::MSG_WARNING);
+    }
     $this->getImportedFiles();
   }
 
   private function getImportedFiles() {
-    foreach(scandir(TEMP_FOLDER, SCANDIR_SORT_ASCENDING) as $f) {
-      if(pathinfo(TEMP_FOLDER."/$f", PATHINFO_EXTENSION) != "html") continue;
+    foreach(scandir($this->tmpFolder, SCANDIR_SORT_ASCENDING) as $f) {
+      if(pathinfo($this->tmpFolder."/$f", PATHINFO_EXTENSION) != "html") continue;
       $this->importedFiles[] = "<a href='?Convertor=$f'>$f</a>";
     }
   }
 
-  private function proceedImport() {
+  private function processImport($fileUrl) {
     try {
-      $f = $this->getFile($_GET[get_class($this)]);
+      $f = $this->getFile($fileUrl);
     } catch(Exception $e) {
-      $this->err[] = $e->getMessage();
-      if(strlen($_GET[get_class($this)])) new Logger($e->getMessage(), "warning");
+      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
+      $this->error = true;
       return;
     }
-    $mime = getFileMime(TEMP_FOLDER."/$f");
+    $mime = getFileMime($this->tmpFolder."/$f");
     switch($mime) {
       case "application/zip":
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       $this->parseZippedDoc($f);
       break;
       case "application/xml": // just display (may be xml or broken html+)
-      $this->html = file_get_contents(TEMP_FOLDER."/$f");
+      $this->html = file_get_contents($this->tmpFolder."/$f");
       $this->file = $f;
       break;
       default:
-      $this->err[] = "Unsupported file type '$mime'";
+      Cms::addMessage(sprintf(_("Unsupported file MIME type '%s'"), $mime), Cms::MSG_WARNING);
+      $this->error = true;
     }
   }
 
   private function parseZippedDoc($f) {
-    $doc = $this->transformFile(TEMP_FOLDER ."/$f");
+    $doc = $this->transformFile($this->tmpFolder ."/$f");
     $xml = $doc->saveXML();
     $xml = str_replace("·\n","\n",$xml); // remove "format hack" from transformation
 
@@ -73,20 +78,18 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $ids = $this->regenerateIds($doc);
     $this->html = $doc->saveXML();
     $this->html = str_replace(array_keys($ids),$ids,$this->html);
-
-    if(empty($this->err)) $this->info[] = "File successfully imported";
+    if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
     $this->file = "$f.html";
-    if(@file_put_contents(TEMP_FOLDER ."/$f.html", $this->html) !== false) return;
-    $m = "Unable to save imported file '$f.html' into temp folder";
-    $this->err[] = $m;
-    new Logger($m,"error");
+    if(@file_put_contents($this->tmpFolder ."/$f.html", $this->html) !== false) return;
+    $m = sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f);
+    new Logger($m, "error");
   }
 
   private function safeValidate(HTMLPlus $doc) {
     try {
       $doc->validatePlus(true);
     } catch(Exception $e) {
-      $this->err[] = $e->getMessage();
+      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
     }
   }
 
@@ -107,13 +110,11 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function getContent(HTMLPlus $c) {
-    global $cms;
-    $cms->getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
+    Cms::getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("warning", $this->err);
-    $newContent->insertVar("info", $this->info);
     $newContent->insertVar("link", $_GET[get_class($this)]);
-    $newContent->insertVar("importedhtml",$this->importedFiles);
+    $newContent->insertVar("path", TEMP_DIR."/".PLUGINS_DIR."/".get_class($this));
+    if(!empty($this->importedFiles)) $newContent->insertVar("importedhtml", $this->importedFiles);
     $newContent->insertVar("filename",$this->file);
     if(!is_null($this->html)) {
       $newContent->insertVar("nohide", "nohide");
@@ -133,16 +134,16 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function getFile($dest) {
-    if(!strlen($dest)) throw new Exception("Please, enter file to view or import");
     $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
-    if(!is_file(TEMP_FOLDER ."/$dest")) throw new Exception("File '$dest' not found in temp folder");
+    if(!is_file($this->tmpFolder ."/$dest"))
+      throw new Exception(sprintf(_("File '%s' not found in temp folder"), $dest));
     return $dest;
   }
 
   private function saveFromUrl($url) {
     $purl = parse_url($url);
-    if($purl === false) throw new Exception("Unable to parse link (invalid format)");
+    if($purl === false) throw new Exception(_("Unable to parse link"));
     if(!isset($purl["scheme"])) return null;
     if($purl["host"] == "docs.google.com") {
       $url = $purl["scheme"] ."://". $purl["host"] . $purl["path"] . "/export?format=doc";
@@ -153,12 +154,12 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       }
     } else $headers = @get_headers($url);
     if(strpos($headers[0],'302') !== false)
-      throw new Exception("Destination URL '$url' is unaccessible (must be shared publically)");
+      throw new Exception(sprintf(_("Destination URL '%s' is unaccessible; must be shared publically"), $url));
     elseif(strpos($headers[0],'200') === false)
-      throw new Exception("Destination URL '$url' error: ".$headers[0]);
+      throw new Exception(sprintf(_("Destination URL '%s' error: %s"), $url, $headers[0]));
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header,$url);
-    file_put_contents(TEMP_FOLDER ."/$filename", $data);
+    file_put_contents($this->tmpFolder ."/$filename", $data);
     return $filename;
   }
 
@@ -192,11 +193,12 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $dom = $this->transform("removePrefix.xsl",$dom);
       #file_put_contents($file,$xml);
       $dom->save($file);
-      $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
+      $variables[$varName] = "file:///$file";
     }
-    $xml = readZippedFile($f, "word/document.xml");
+    $wordDoc = "word/document.xml";
+    $xml = readZippedFile($f, $wordDoc);
     if(is_null($xml))
-      throw new Exception("Unable to locate 'word/document.xml' in '$f'");
+      throw new Exception(sprintf(_("Unable to locate '%s' in '%s'"), "word/document.xml", $f));
     $dom->loadXML($xml);
     $dom = $this->transform("removePrefix.xsl",$dom);
     // add an empty paragraph to prevent li:following-sibling fail
@@ -211,7 +213,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);
     $doc = $proc->transformToDoc($content);
-    if($doc === false) throw new Exception("Failed to apply transformation '$xslFile'");
+    if($doc === false) throw new Exception(sprintf(_("Failed to apply transformation '%s'"), $xslFile));
     return $doc;
   }
 

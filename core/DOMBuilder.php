@@ -86,7 +86,7 @@ class DOMBuilder {
 
   private function findFile($filePath,$user=true,$admin=true) {
     $f = findFile($filePath,$user,$admin);
-    if($f === false) throw new Exception("File '$filePath' not found");
+    if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $filePath));
     return $f;
   }
 
@@ -117,13 +117,12 @@ class DOMBuilder {
 
   private function loadDOM($filePath, DOMDocumentPlus $doc) {
     if($doc instanceof HTMLPlus) {
-      global $cms;
       $remove = array("?".USER_FOLDER."/","?".ADMIN_FOLDER."/","?".CMS_FOLDER."/");
-      if(isset($cms)) $cms->addVariableItem("html",str_replace($remove,array(),"?$filePath"));
+      Cms::addVariableItem("html",str_replace($remove,array(),"?$filePath"));
     }
     // load
     if(!@$doc->load($filePath))
-      throw new LoggerException("Unable to load DOM from file '$filePath'");
+      throw new LoggerException(sprintf(_("Unable to load DOM from file '%s'"), $filePath));
     // validate
     if(!$doc->validatePlus(true)) saveRewrite($filePath, $doc->saveXML());
     // HTMLPlus import
@@ -131,21 +130,20 @@ class DOMBuilder {
     $this->insertImports($doc,$filePath);
   }
 
-  private function insertImports(HTMLPlus $doc,$filePath) {
+  private function insertImports(HTMLPlus $doc, $filePath) {
     $this->imported[] = $filePath;
     $headings = array();
-    $dir = pathinfo($filePath, PATHINFO_DIRNAME);
     foreach($doc->getElementsByTagName("h") as $h) {
       if($h->hasAttribute("import")) $headings[] = $h;
     }
     if(!count($headings)) return;
-    $l = new Logger("Importing HTML+",null,0);
+    $l = new Logger(_("Importing HTML+"), null, 0);
     foreach($headings as $h) {
-      $files = matchFiles($h->getAttribute("import"),$dir);
+      $files = matchFiles($h->getAttribute("import"), dirname($filePath));
       $h->removeAttribute("import");
       if(!count($files)) continue;
       $before = count($this->imported);
-      foreach($files as $f) $this->insertHtmlPlus($h,$f);
+      foreach($files as $f) $this->insertHtmlPlus($h, $f, dirname($filePath));
       if($before < count($this->imported)) {
         $h->ownerDocument->removeUntilSame($h);
       }
@@ -153,29 +151,30 @@ class DOMBuilder {
     $l->finished();
   }
 
-  private function insertHtmlPlus(DOMElement $h, $file) {
+  private function insertHtmlPlus(DOMElement $h, $file, $dir) {
+    $filePath = "$dir/$file";
     try {
-      if(in_array($file, $this->imported))
-        throw new Exception(sprintf("Cyclic import '%s' found in '%s'",$file,$h->getAttribute("import")));
+      if(in_array($filePath, $this->imported))
+        throw new Exception(sprintf(_("Cyclic import '%s' found in '%s'"), $file, $h->getAttribute("import")));
       $doc = new HTMLPlus();
-      $this->loadDOM($file, $doc);
+      $this->loadDOM($filePath, $doc);
     } catch(Exception $e) {
-      $msg = "Unable to import '$file': ". $e->getMessage();
+      $msg = sprintf(_("Unable to import '%s': %s"), $file, $e->getMessage());
+      new Logger($msg, Logger::LOGGER_ERROR);
       $c = new DOMComment(" $msg ");
-      new Logger($msg,"error");
       $h->parentNode->insertBefore($c,$h);
       return;
     }
     $sectLang = $this->getSectionLang($h->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      new Logger("Imported file language '$impLang' does not match section language '$sectLang' in '$file'","warning");
+      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $file), "warning");
     foreach($doc->documentElement->childElements as $n) {
       $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
     }
     if(!$h->ownerDocument->validatePlus(true))
-      new Logger("Import '$file' HTML+ autocorrected","warning");
-    $this->imported[] = $file;
+      new Logger(sprintf(_("Import '%s' HTML+ autocorrected"), $file), "warning");
+    $this->imported[] = $filePath;
   }
 
   private function getSectionLang($s) {
@@ -224,7 +223,7 @@ class DOMBuilder {
           continue;
         }
         if($sameIdElement->nodeName != $n->nodeName)
-          throw new Exception ("Id conflict with " . $n->nodeName);
+          throw new Exception(sprintf(_("ID conflicts with element '%s'"), $n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
         $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
       } else {

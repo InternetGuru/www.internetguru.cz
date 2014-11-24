@@ -17,12 +17,13 @@ class FileHandler extends Plugin implements SplObserver {
     $filepath = $fInfo["filepath"];
     if(is_null($filepath)) return;
     $filesize = filesize($filepath);
-    $l = new Logger("File download '$filepath' ".fileSizeConvert($filesize),null,0);
+    $shortPath = substr($filepath,strlen(FILES_FOLDER)+1);
+    $l = new Logger("File download '$shortPath' ".fileSizeConvert($filesize), null, 0);
     header("Content-Type: " . $fInfo["filemime"]);
     header("Content-Length: $filesize");
     set_time_limit(0);
     $handle = @fopen($filepath,"rb");
-    if($handle === false) throw new Exception("Unable to read file '$filepath'");
+    if($handle === false) throw new Exception(sprintf(_("Unable to read file '%s'"), $shortPath));
     while(!feof($handle)) {
       print(fread($handle, 1024*8));
       ob_flush();

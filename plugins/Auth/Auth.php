@@ -2,19 +2,31 @@
 
 
 class Auth extends Plugin implements SplObserver {
+  private $loggedUser = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,1);
+    $s->setPriority($this,0);
   }
 
   public function update(SplSubject $subject) {
-    if(isAtLocalhost()) return;
     if($subject->getStatus() != STATUS_PREINIT) return;
     $this->handleRequest();
+    if(isAtLocalhost()) {
+      Cms::setVariable("logged_user", "admin");
+      return;
+    }
+    if(!is_null($this->loggedUser)) {
+      if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
+      $_SESSION[get_class($this)]["loggedUser"] = $this->loggedUser;
+    }
+    if(isset($_SESSION[get_class($this)]["loggedUser"]))
+      $this->loggedUser = $_SESSION[get_class($this)]["loggedUser"];
+    Cms::setVariable("logged_user", $this->loggedUser);
   }
 
   private function handleRequest() {
+    if(isAtLocalhost()) return;
     $cfg = $this->getDOMPlus();
     $url = getCurLink(true);
     $access = true;
@@ -23,9 +35,12 @@ class Auth extends Plugin implements SplObserver {
       if($e->hasAttribute("access") && $e->getAttribute("access") == "allow") $access = true;
       else $access = false;
     }
-    if($access) return;
-    if(isset($_SERVER['REMOTE_USER']) && in_array($_SERVER['REMOTE_USER'], array(USER_ID,"admin"))) return;
-    new ErrorPage("Authentication required", 403);
+    if(isset($_SERVER['REMOTE_USER'])
+      && in_array($_SERVER['REMOTE_USER'], array(USER_ID,"admin"))) {
+      $this->loggedUser = $_SERVER['REMOTE_USER'];
+    }
+    if($access || !is_null($this->loggedUser)) return;
+    new ErrorPage(_("Authorization Required"), 401);
   }
 
 }

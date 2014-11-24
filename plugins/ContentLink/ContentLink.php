@@ -1,6 +1,5 @@
 <?php
 
-
 class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface {
   private $lang = null;
   private $isRoot;
@@ -19,12 +18,11 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $c) {
-    global $cms;
-    $cf = $cms->getContentFull();
+    $cf = Cms::getContentFull();
     $link = getCurLink();
     $curH = $cf->getElementById($link,"link");
     if(is_null($curH)) {
-      if(strlen($link)) new ErrorPage("Page '$link' not found",404);
+      if(strlen($link)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
       $curH = $cf->documentElement->firstElement;
     }
     $this->setPath($curH);
@@ -74,8 +72,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $hs[] = $bc->importNode($h, true);
       $li->appendChild(end($hs));
     }
-    global $cms;
-    $cms->insertVariables($bc);
+    Cms::insertVariables($bc);
     $subtitles = array();
     foreach($hs as $h) {
       $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
@@ -89,8 +86,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     end($subtitles);
     $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
-    $cms->setVariable("bc", $bc->documentElement);
-    $cms->setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
+    Cms::setVariable("bc", $bc->documentElement);
+    Cms::setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
   }
 
   private function setAncestorValue(DOMElement $e, $attName=null) {

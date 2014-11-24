@@ -2,7 +2,6 @@
 
 class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
-  private $err = array();
   private $cmsVersions;
   private $cmsVariants;
   private $cmsPlugins = array();
@@ -37,42 +36,46 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private function processPost() {
     try {
       $subdom = null;
+      $succes = null;
       if(isset($_POST["new_subdom"])) {
         $subdom = $this->processCreateSubdom($_POST["new_subdom"]);
+        $succes = sprintf(_("Subdom %s successfully created"), $subdom);
       } elseif(strlen($_GET[get_class($this)])) {
         if(!is_file("../".$_GET[get_class($this)]."/USER_ID.".USER_ID))
-          throw new Exception(sprintf("Unauthorized subdom '%s' modification by '%s'", $_GET[get_class($this)], USER_ID));
+          throw new Exception(sprintf(_("Unauthorized subdom '%s' modification by '%s'"), $_GET[get_class($this)], USER_ID));
         if(isset($_POST["delete"])) {
           $subdom = $this->processDeleteSubdom($_GET[get_class($this)]);
+          $succes = sprintf(_("Subdom %s successfully deleted"), $subdom);
         } else {
           $subdom = $this->processUpdateSubdom($_GET[get_class($this)]);
           if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
+          $succes = sprintf(_("Subdom %s successfully updated"), $subdom);
         }
       }
-      if(is_null($subdom)) throw new Exception("Unrecognized request");
+      if(is_null($subdom)) throw new Exception(_("Unrecognized POST request"));
       if(isset($_POST["mirror"]) && strlen($_POST["mirror"])) {
         if(!preg_match("/^".SUBDOM_PATTERN."$/", $_POST["mirror"]))
-          throw new Exception("Invalid mirror subdom format");
+          throw new Exception(_("Invalid mirror subdom format"));
         $userDir = $this->getSubdomVar("USER_DIR", $_POST["mirror"]);
         if(is_null($userDir))
-          throw new Exception("Subdom '".$_POST["mirror"]."' configuration file not found");
+          throw new Exception(sprintf(_("Subdom '%s' configuration file not found"), $_POST["mirror"]));
         if(is_dir(USER_ROOT_FOLDER."/$subdom"))
-          throw new Exception("Subdom '".$_POST["mirror"]."' user folder exists");
+          throw new Exception(sprintf(_("Subdom '%s' user folder exists"), $subdom));
         duplicateDir(SUBDOM_ROOT_FOLDER."/".$_POST["mirror"], false);
         duplicateDir(USER_ROOT_FOLDER."/$userDir");
         $sFolder = SUBDOM_ROOT_FOLDER."/$subdom";
         if(!rename(SUBDOM_ROOT_FOLDER."/~".$_POST["mirror"], $sFolder)
           || !rename(USER_ROOT_FOLDER."/~$userDir", USER_ROOT_FOLDER."/$subdom")
           || !rename("$sFolder/USER_DIR.$userDir", "$sFolder/USER_DIR.$subdom")
-          ) throw new Exception("Unable to create subdom mirror");
+          ) throw new Exception(_("Unable to create subdom mirror"));
       }
       new InitServer($subdom, false, true);
       $link = getCurLink()."?".get_class($this)."=$subdom";
       if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
+      else Cms::addMessage($succes, Cms::MSG_SUCCESS, true);
       redirTo($link, null, true);
-    } catch(Exception $e) { // this should never happen
-      new Logger($e->getMessage(), "error");
-      $this->err[] = $e->getMessage();
+    } catch(Exception $e) {
+      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
     }
   }
 
@@ -85,7 +88,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   private function processDeleteSubdom($subdom) {
-    if(self::DEBUG) throw new Exception("Deleting DISABLED");
     $activeDir = SUBDOM_ROOT_FOLDER."/$subdom";
     $inactiveDir = SUBDOM_ROOT_FOLDER."/.$subdom";
     if(is_dir($activeDir)) {
@@ -93,10 +95,10 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $newSubdom = "$subdom~";
       while(file_exists(SUBDOM_ROOT_FOLDER."/$newSubdom")) $newSubdom = "$subdom~".++$i;
       if(!rename($activeDir, SUBDOM_ROOT_FOLDER."/$newSubdom"))
-        throw new Exception("Unable to backup subdom '$subdom' setup");
+        throw new Exception(sprintf(_("Unable to backup subdom '%s' setup"), $subdom));
     }
     if(!is_dir($inactiveDir) && !mkdir($inactiveDir)) {
-      throw new Exception("Unable to create '.$subdom' dir");
+      throw new Exception(sprintf(_("Unable to create '%s' dir"), ".$subdom"));
     }
     return $subdom;
   }
@@ -104,9 +106,9 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private function processCreateSubdom($subdom) {
     if(strpos($subdom, USER_ID) !== 0) $subdom = USER_ID . $subdom;
     if(!preg_match("/^".USER_ID.SUBDOM_PATTERN."$/", $subdom))
-      throw new Exception("Invalid subdom format");
+      throw new Exception(_("Invalid subdom format"));
     if(is_dir(SUBDOM_ROOT_FOLDER."/$subdom"))
-      throw new Exception("Subdom '$subdom' already exists");
+      throw new Exception(sprintf(_("Subdom '%s' already exists"), $subdom));
     return $subdom;
   }
 
@@ -114,9 +116,10 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private function processUpdateSubdom($subdom) {
     $subdomFolder = SUBDOM_ROOT_FOLDER."/$subdom";
     if(!is_dir($subdomFolder) && !mkdir($subdomFolder, 0755, true))
-      throw new Exception("Unable to create user subdom directory '$subdom'");
+      throw new Exception(sprintf(_("Unable to create user subdom directory '%s'"), $subdom));
     if(!isset($_POST["PLUGINS"]) || !is_array($_POST["PLUGINS"]))
-      throw new Exception("Missing POST data 'PLUGINS'");
+      throw new Exception(_("Missing POST data 'PLUGINS'"));
+    $origHash = getDirHash($subdomFolder);
     foreach(scandir($subdomFolder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $var = explode(".", $f, 2);
@@ -124,26 +127,27 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         case "CMS_VER":
         case "USER_DIR":
         case "FILES_DIR":
-        if(!isset($_POST[$var[0]])) throw new Exception("Missing POST data '{$var[0]}'");
+        if(!isset($_POST[$var[0]])) throw new Exception(sprintf(_("Missing POST data '%s'"), $var[0]));
         if(!rename("$subdomFolder/$f", "$subdomFolder/{$var[0]}.". $_POST[$var[0]]))
-          throw new Exception(sprintf("Unable to set '%s' to '%s'",$var[0],$_POST[$var[0]]));
+          throw new Exception(sprintf(_("Unable to set '%s' to '%s'"), $var[0], $_POST[$var[0]]));
         break;
         case "PLUGIN":
         if(!in_array($var[1], $_POST["PLUGINS"]) && !unlink("$subdomFolder/$f"))
-          throw new Exception("Unable to disable plugin from subdom '$subdom'");
+          throw new Exception(sprintf(_("Unable to disable plugin from subdom '%s'"), $subdom));
       }
     }
     foreach($_POST["PLUGINS"] as $p) {
       if(touch("$subdomFolder/PLUGIN.$p", 0644)) continue;
-      throw new Exception("Unable to enable plugin from subdom '$subdom'");
+      throw new Exception(sprintf(_("Unable to enable plugin from subdom '%s'"), $subdom));
     }
+    if($origHash == getDirHash($subdomFolder))
+      throw new Exception(sprintf(_("No changes made in '%s'"), $subdom));
     return $subdom;
   }
 
   public function getContent(HTMLPlus $content) {
-    global $cms;
-    $cms->getOutputStrategy()->addCssFile($this->getDir() ."/SubdomManager.css");
-    $cms->getOutputStrategy()->addJs("
+    Cms::getOutputStrategy()->addCssFile($this->getDir() ."/SubdomManager.css");
+    Cms::getOutputStrategy()->addJs("
     var forms = document.getElementsByTagName('form');
     for(var i=0; i<forms.length; i++) {
       if(typeof forms[i]['delete'] !== 'object') continue;
@@ -155,7 +159,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }");
 
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("domain", getDomain());
     $newContent->insertVar("curlink", getCurLink()."?".get_class($this));
 
@@ -198,7 +201,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         $this->subdoms[] = $subdom;
         new InitServer($subdom); // clone existing subdoms (no update)
       } catch(Exception $e) {
-        $this->err[] = $e->getMessage();
+        Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
       }
     }
   }

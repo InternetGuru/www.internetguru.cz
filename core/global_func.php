@@ -14,7 +14,7 @@ function absoluteLink($link=null) {
   if(substr($link,0,1) == "/") $link = substr($link,1);
   if(substr($link,-1) == "/") $link = substr($link,0,-1);
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException("Unable to parse href '$link'");
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse URL '%s'"), $link));
   $scheme = isset($pLink["scheme"]) ? $pLink["scheme"] : $_SERVER["REQUEST_SCHEME"];
   $host = isset($pLink["host"]) ? $pLink["host"] : $_SERVER["HTTP_HOST"];
   $path = isset($pLink["path"]) && $pLink["path"] != "" ? "/".$pLink["path"] : "";
@@ -27,10 +27,10 @@ function redirTo($link,$code=null,$force=false) {
     $curLink = absoluteLink();
     $absLink = absoluteLink($link);
     if($curLink == $absLink)
-      throw new LoggerException("Cyclic redirection to '$link'");
+      throw new LoggerException(sprintf(_("Cyclic redirection to '%s'"), $link));
   }
   if(class_exists("Logger"))
-    new Logger("Redirecting to '$link' with status code '".(is_null($code) ? 302 : $code)."'");
+    new Logger(sprintf(_("Redirecting to '%s' with status code %s"), $link, (is_null($code) ? 302 : $code)));
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
@@ -94,7 +94,7 @@ function normalize($s,$extKeep="",$tolower=true,$convertToUtf8=false) {
   $s = str_replace(" ","_",$s);
   $keep = "~[^a-zA-Z0-9/_%s-]~";
   if(is_null($ext = @preg_replace(sprintf($keep,$extKeep),"",$s))) {
-    new Logger("Normalize extended keep expression '".sprintf($keep,$extKeep)."' is invalid","error");
+    new Logger(sprintf(_("Invalid extended expression '%s'"), sprintf($keep,$extKeep)), "error");
     return preg_replace(sprintf($keep,""),"",$s);
   }
   return $ext;
@@ -124,27 +124,46 @@ function saveRewrite($dest,$content) {
   return $b;
 }
 
+/**
+ * Match files relative to given directory
+ * @param  String $pattern [description]
+ * @param  String $dir     [description]
+ * @return Array           [description]
+ */
 function matchFiles($pattern, $dir) {
   $files = array();
   $values = explode(" ",$pattern);
-
   foreach($values as $val) {
-    $f = findFile($val);
-    if($f) {
-      $files[] = $f;
+    $dirPath = realpath(dirname("$dir/$val"));
+    $filePath = "$dirPath/".basename($val);
+    if($dirPath === false) {
+      new Logger(sprintf(_("Path to '%s' not found"), $val), Logger::LOGGER_WARNING);
       continue;
     }
-    if(strpos($val,"*") === false) continue;
-    $f = "$dir/$val";
-    $d = pathinfo($f ,PATHINFO_DIRNAME);
-    if(!file_exists($d)) continue;
-    $fp = str_replace("\*",".*",preg_quote(pathinfo($f ,PATHINFO_BASENAME)));
-    foreach(scandir($d) as $f) {
-      if(!preg_match("/^$fp$/", $f)) continue;
-      $files[getFileHash("$d/$f")] = "$d/$f"; // disallowe import same content
+    if(strpos($dirPath, realpath("$dir/")) !== 0) {
+      new Logger(sprintf(_("Path '%s' is out of root directory"), $val), Logger::LOGGER_WARNING);
+      continue;
     }
+    if(!is_dir($dirPath)) {
+      new Logger(sprintf(_("Directory '%s' not found"), $val), Logger::LOGGER_WARNING);
+      continue;
+    }
+    if(strpos($val, "*") === false) {
+      if(is_file($filePath))
+        $files[getFileHash($filePath)] = substr($filePath, strlen(realpath($dir))+1);
+      else
+        new Logger(sprintf(_("File '%s' not found"), $val), Logger::LOGGER_WARNING);
+      continue;
+    }
+    $fp = str_replace("\*", ".*", preg_quote(basename($val), "/"));
+    $i = count($files);
+    foreach(scandir($dirPath) as $f) {
+      if(!preg_match("/^$fp$/", $f)) continue;
+      $files[getFileHash("$dirPath/$f")] = substr("$dirPath/$f", strlen(realpath($dir))+1);
+    }
+    if($i == count($files))
+      new Logger(sprintf(_("No files matching '%s' found"), $val), Logger::LOGGER_WARNING);
   }
-
   return $files;
 }
 
@@ -298,8 +317,13 @@ function checkUrl($folder = null) {
 }
 
 function getFileHash($filePath) {
-  if(!file_exists($filePath)) return "";
-  return hash_file(FILE_HASH_ALGO,$filePath);
+  if(!is_file($filePath)) return "";
+  return hash_file(FILE_HASH_ALGO, $filePath);
+}
+
+function getDirHash($dirPath) {
+  if(!is_dir($dirPath)) return "";
+  return hash(FILE_HASH_ALGO, implode("", scandir($dirPath)));
 }
 
 ?>

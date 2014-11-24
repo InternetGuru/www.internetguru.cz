@@ -22,12 +22,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
-      global $cms;
-      $cms->setOutputStrategy($this);
+      Cms::setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
       if(isAtLocalhost()) $domain .= substr(getRoot(),0,-1);
-      $cms->setVariable("url", $domain);
-      $cms->setVariable("link", getCurLink());
+      Cms::setVariable("url", $domain);
+      Cms::setVariable("link", getCurLink());
     }
     if($subject->getStatus() == STATUS_PROCESS) {
       $cfg = $this->getDOMPlus();
@@ -40,7 +39,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   public function getOutput(HTMLPlus $content) {
-    global $cms;
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
 
@@ -55,22 +53,22 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // add root element
     $html = $doc->createElement("html");
     $html->setAttribute("xmlns","http://www.w3.org/1999/xhtml");
-    $html->setAttribute("xml:lang",$cms->getVariable("cms-lang"));
-    $html->setAttribute("lang",$cms->getVariable("cms-lang"));
+    $html->setAttribute("xml:lang",Cms::getVariable("cms-lang"));
+    $html->setAttribute("lang",Cms::getVariable("cms-lang"));
     $doc->appendChild($html);
 
     // add head element
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title",$this->getTitle($cms)));
+    $head->appendChild($doc->createElement("title",$this->getTitle()));
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"viewport","initial-scale=1");
-    $this->appendMeta($head,"Content-Language", $cms->getVariable("cms-lang"));
-    $this->appendMeta($head,"generator", $cms->getVariable("cms-name"));
-    $author = $cms->getVariable("cms-author");
+    $this->appendMeta($head,"Content-Language", Cms::getVariable("cms-lang"));
+    $this->appendMeta($head,"generator", Cms::getVariable("cms-name"));
+    $author = Cms::getVariable("cms-author");
     if(strlen($author)) $this->appendMeta($head, "author", $author);
-    $desc = $cms->getVariable("cms-desc");
+    $desc = Cms::getVariable("cms-desc");
     if(strlen($desc)) $this->appendMeta($head, "description", $desc);
-    $kw = $cms->getVariable("cms-kw");
+    $kw = Cms::getVariable("cms-kw");
     if(strlen($kw)) $this->appendMeta($head, "keywords", $kw);
     if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon",false,false,false);
@@ -80,7 +78,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // apply transformations
     $proc = new XSLTProcessor();
-    $proc->setParameter('',$this->getProcParams($cms));
+    $proc->setParameter('',$this->getProcParams());
     stableSort($this->transformationsPriority);
     foreach($this->transformationsPriority as $xslt => $priority) {
       try {
@@ -88,10 +86,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $newContent->encoding="utf-8";
         $xml = $newContent->saveXML();
         if(!@$newContent->loadXML($xml))
-          throw new Exception("Invalid transformation (or parameter) in '$xslt'");
+          throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
         $content = $newContent;
       } catch(Exception $e) {
-        new Logger($e->getMessage(),"error");
+        new Logger($e->getMessage(), "error");
       }
     }
 
@@ -101,8 +99,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->validateLinks("a","href",true);
     $contentPlus->validateLinks("form","action",true);
     $contentPlus->validateLinks("object","data",true);
-    $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"a","href");
-    $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"form","action");
+    $contentPlus->fragToLinks(Cms::getContentFull(),getRoot(),"a","href");
+    $contentPlus->fragToLinks(Cms::getContentFull(),getRoot(),"form","action");
 
     // check object.data mime/size
     $this->validateImages($contentPlus);
@@ -122,7 +120,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $filePath = $o->getAttribute("data");
       $pUrl = parse_url($filePath);
       if(!is_array($pUrl)) {
-        $toStrip[] = array($o, "invalid object data '$filePath' format");
+        $toStrip[] = array($o, sprintf(_("Invalid object data '%s' format"), $filePath));
         continue;
       }
       if(array_key_exists("scheme",$pUrl)) {
@@ -132,7 +130,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       if(!is_file($filePath)) {
         $filePath = FILES_FOLDER ."/$filePath";
         if(!is_file($filePath)) {
-          $toStrip[] = array($o, "object data '$filePath' not found");
+          $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $filePath));
           continue;
         }
       }
@@ -148,14 +146,14 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function validateImage(DOMElement $o, $filePath) {
     $mime = getFileMime($filePath);
     if(strpos($mime, "image/") !== 0)
-      throw new Exception("invalid object '$filePath' mime type '$mime'");
+      throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $filePath, $mime));
     if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
       $o->setAttribute("type", $mime);
-      new Logger("Object '$filePath' attr type set to '".$mime."'","warning");
+      new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $filePath, $mime), "warning");
     }
     $size = filesize($filePath);
     if($size > 350*1024) {
-      new Logger("Object '$filePath' too big ".fileSizeConvert($size),"warning");
+      new Logger(sprintf(_("Object '%s' suspiciously big: %s"), $filePath, fileSizeConvert($size)), "warning");
     }
   }
 
@@ -182,18 +180,18 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
   */
 
-  private function getTitle(Cms $cms) {
-    $title = $cms->getVariable("cms-title");
+  private function getTitle() {
+    $title = Cms::getVariable("cms-title");
     foreach($this->subject->getIsInterface("ContentStrategyInterface") as $clsName => $cls) {
-      $tmp = $cms->getVariable(strtolower($clsName)."-cms-title");
+      $tmp = Cms::getVariable(strtolower($clsName)."-cms-title");
       if(!is_null($tmp)) $title = $tmp;
     }
     return $title;
   }
 
-  private function getProcParams(Cms $cms) {
+  private function getProcParams() {
     $o = array();
-    foreach($cms->getAllVariables() as $k => $v) {
+    foreach(Cms::getAllVariables() as $k => $v) {
       $valid = true;
       if($v instanceof DOMElement) {
         $d = new DOMDocumentPlus();
@@ -202,7 +200,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       } elseif(is_array($v)) {
         $v = implode(",",$v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
-        new Logger("Unable to convert variable '$k' to string","error");
+        new Logger(sprintf(_("Unable to convert variable '%s' to string"), $k), "error");
         continue;
       } else {
         $v = (string) $v;
@@ -235,7 +233,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(!is_null($theme)) {
       $themeId = $theme->nodeValue;
       $t = $cfg->getElementById($themeId);
-      if(is_null($t)) new Logger("Theme '$themeId' not found","error");
+      if(is_null($t)) new Logger(sprintf(_("Theme '%s' not found"), $themeId), "error");
       else $this->addThemeFiles($t);
     }
 
@@ -248,7 +246,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $link = "favicon.ico";
     if(is_link($link) && readlink($link) == $target) return;
     if(symlink($target, "$link~") && rename("$link~", $link)) return;
-    new Logger("Unable to create root 'favicon.ico' link", "error");
+    new Logger(sprintf(_("Unable to create root '%s' link"), $link), "error");
   }
 
   private function addThemeFiles(DOMElement $e) {
@@ -281,9 +279,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $db = new DOMBuilder();
     $xsl = $db->buildDOMPlus($fileName,true,$user);
     if(!@$proc->importStylesheet($xsl))
-      throw new Exception("XSLT '$fileName' compilation error");
+      throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
     if(($x = @$proc->transformToDoc($content) ) === false)
-      throw new Exception("XSLT '$fileName' transformation fail");
+      throw new Exception(sprintf(_("XSLT '%s' transformation fail"), $fileName));
     #echo $x->saveXML();
     return $x;
   }
@@ -316,9 +314,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $f = false;
     }
     if(!strlen($f)) {
-      $comment = "[$rel] file '$file' not found";
+      $comment = sprintf(_("Link [%s] file '%s' not found"), $rel, $file);
       $parent->appendChild(new DOMComment(" $comment "));
-      new Logger($comment,"error");
+      new Logger($comment, "error");
       return;
     }
     if($rel == "shortcut icon") $this->createRootFavicon($f);
@@ -336,8 +334,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($filePath,$priority = 10,$append = self::APPEND_HEAD,$user=false) {
-    global $cms;
-    $cms->addVariableItem("javascripts",$filePath);
+    Cms::addVariableItem("javascripts",$filePath);
     $this->jsFiles[$filePath] = array(
       "file" => $filePath,
       "append" => $append,
@@ -366,8 +363,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
-    global $cms;
-    $cms->addVariableItem("styles",$filePath);
+    Cms::addVariableItem("styles",$filePath);
     $this->cssFiles[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
@@ -378,8 +374,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
 
   public function addTransformation($filePath, $priority = 10, $user = true) {
-    global $cms;
-    $cms->addVariableItem("transformations",$filePath);
+    Cms::addVariableItem("transformations",$filePath);
     $this->transformations[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
@@ -401,9 +396,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $f = findFile($this->jsFiles[$k]["file"],$this->jsFiles[$k]["user"],true,true);
         } catch (Exception $ex) {}
         if($f === false) {
-          $comment = "JS file '$k' not found";
+          $comment = sprintf(_("Javascript file '%s' not found"), $k);
           $parent->appendChild(new DOMComment(" $comment "));
-          new Logger($comment,"error");
+          new Logger($comment, "error");
           continue;
         }
       }
