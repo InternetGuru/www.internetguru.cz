@@ -27,9 +27,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    global $cms;
     if($subject->getStatus() == STATUS_PROCESS) {
-      $os = $cms->getOutputStrategy()->addTransformation($this->getDir()."/Admin.xsl");
+      $os = Cms::getOutputStrategy()->addTransformation($this->getDir()."/Admin.xsl");
     }
     if($subject->getStatus() != STATUS_INIT) return;
     if(!isset($_GET[get_class($this)])) {
@@ -45,7 +44,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if(!$this->isPost()) return;
       $this->savePost();
     } catch (Exception $e) {
-      $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
+      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
       $this->error = true;
     }
   }
@@ -55,8 +54,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $content) {
-    global $cms;
-    $cms->getOutputStrategy()->addJsFile($this->getDir() . '/Admin.js', 100, "body");
+    Cms::getOutputStrategy()->addJsFile($this->getDir() . '/Admin.js', 100, "body");
 
     $format = $this->type;
     if($this->type == "html") $format = "html+";
@@ -267,8 +265,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(saveRewrite($this->dataFile, $this->contentValue) === false)
       throw new Exception(_("Unable to save changes, administration may be locked"));
     if($this->error) return;
-    global $cms;
-    $cms->addMessage(_("Content successfully saved"), $cms::FLASH_INFO, true);
+    Cms::addMessage(_("Content successfully saved"), Cms::MSG_SUCCESS, true);
     $this->redir($this->defaultFile);
   }
 

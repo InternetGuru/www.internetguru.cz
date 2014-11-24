@@ -117,9 +117,8 @@ class DOMBuilder {
 
   private function loadDOM($filePath, DOMDocumentPlus $doc) {
     if($doc instanceof HTMLPlus) {
-      global $cms;
       $remove = array("?".USER_FOLDER."/","?".ADMIN_FOLDER."/","?".CMS_FOLDER."/");
-      if(isset($cms)) $cms->addVariableItem("html",str_replace($remove,array(),"?$filePath"));
+      Cms::addVariableItem("html",str_replace($remove,array(),"?$filePath"));
     }
     // load
     if(!@$doc->load($filePath))

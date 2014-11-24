@@ -34,7 +34,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   private function processPost() {
-    global $cms;
     try {
       $subdom = null;
       $succes = null;
@@ -73,10 +72,10 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       new InitServer($subdom, false, true);
       $link = getCurLink()."?".get_class($this)."=$subdom";
       if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
-      else $cms->addMessage($succes, $cms::FLASH_INFO, true);
+      else Cms::addMessage($succes, Cms::MSG_SUCCESS, true);
       redirTo($link, null, true);
     } catch(Exception $e) {
-      $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
+      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
     }
   }
 
@@ -144,9 +143,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   public function getContent(HTMLPlus $content) {
-    global $cms;
-    $cms->getOutputStrategy()->addCssFile($this->getDir() ."/SubdomManager.css");
-    $cms->getOutputStrategy()->addJs("
+    Cms::getOutputStrategy()->addCssFile($this->getDir() ."/SubdomManager.css");
+    Cms::getOutputStrategy()->addJs("
     var forms = document.getElementsByTagName('form');
     for(var i=0; i<forms.length; i++) {
       if(typeof forms[i]['delete'] !== 'object') continue;
@@ -200,8 +198,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         $this->subdoms[] = $subdom;
         new InitServer($subdom); // clone existing subdoms (no update)
       } catch(Exception $e) {
-        global $cms;
-        $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
+        Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
       }
     }
   }

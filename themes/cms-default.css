@@ -80,7 +80,7 @@ p object {
 }
 
 #flashMsg {
-  background: black;
+  background: rgb(37,37,37);
 }
 #flashMsg ul {
   margin-top: 0;
@@ -96,6 +96,9 @@ p object {
 }
 #flashMsg li.info {
   color: rgb(232, 232, 232);
+}
+#flashMsg li.success {
+  color: rgb(88, 195, 106);
 }
 .warning {
   /*todo*/

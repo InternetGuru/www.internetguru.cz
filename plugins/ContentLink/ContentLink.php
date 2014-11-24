@@ -18,8 +18,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $c) {
-    global $cms;
-    $cf = $cms->getContentFull();
+    $cf = Cms::getContentFull();
     $link = getCurLink();
     $curH = $cf->getElementById($link,"link");
     if(is_null($curH)) {
@@ -73,8 +72,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $hs[] = $bc->importNode($h, true);
       $li->appendChild(end($hs));
     }
-    global $cms;
-    $cms->insertVariables($bc);
+    Cms::insertVariables($bc);
     $subtitles = array();
     foreach($hs as $h) {
       $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
@@ -88,8 +86,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     end($subtitles);
     $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
-    $cms->setVariable("bc", $bc->documentElement);
-    $cms->setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
+    Cms::setVariable("bc", $bc->documentElement);
+    Cms::setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
   }
 
   private function setAncestorValue(DOMElement $e, $attName=null) {

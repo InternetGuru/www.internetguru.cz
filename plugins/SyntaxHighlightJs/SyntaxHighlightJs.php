@@ -26,9 +26,7 @@ class SyntaxHighlightJs extends Plugin implements SplObserver, ContentStrategyIn
       $this->subject->detach($this);
       return $content;
     }
-
-    global $cms;
-    $os = $cms->getOutputStrategy();
+    $os = Cms::getOutputStrategy();
 
     $os->addCssFile(LIB_DIR."/highlight/styles/tomorrow.css");
     $os->addCssFile($this->getDir() ."/SyntaxHighlightJs.css");

@@ -37,8 +37,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
       default:
       $fPath = $this->getFilePath($fName);
       if(!is_null($fPath)) break;
-      global $cms;
-      $cms->addMessage(sprintf(_("File or extension '%s' not found"), $fName), $cms::FLASH_WARNING);
+      Cms::addMessage(sprintf(_("File or extension '%s' not found"), $fName), Cms::MSG_WARNING);
       $fPath = current($this->logFiles);
       $fName = key($this->logFiles);
     }

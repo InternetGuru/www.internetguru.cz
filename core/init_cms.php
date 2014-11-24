@@ -10,29 +10,28 @@ try {
   $l->finished();
   $l = new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), null, 0);
 
-  $cms = new Cms();
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 
   checkUrl();
-  $cms->init(); // because of dombulder to set variable into cms
+  Cms::init(); // because of dombulder to set variable into cms
   $plugins->setStatus(STATUS_INIT);
   $plugins->notify();
 
-  $cms->getFlashMessages();
-  $cms->buildContent();
+  Cms::getFlashMessages();
+  Cms::buildContent();
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
 
-  $cms->processVariables();
+  Cms::processVariables();
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
   duplicateDir(USER_FOLDER);
   duplicateDir(ADMIN_FOLDER);
   if(defined("SUBDOM_FOLDER")) duplicateDir(SUBDOM_FOLDER, false);
-  echo $cms->getOutput();
+  echo Cms::getOutput();
   $l->finished();
 
 } catch(Exception $e) {

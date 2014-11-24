@@ -22,12 +22,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
-      global $cms;
-      $cms->setOutputStrategy($this);
+      Cms::setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
       if(isAtLocalhost()) $domain .= substr(getRoot(),0,-1);
-      $cms->setVariable("url", $domain);
-      $cms->setVariable("link", getCurLink());
+      Cms::setVariable("url", $domain);
+      Cms::setVariable("link", getCurLink());
     }
     if($subject->getStatus() == STATUS_PROCESS) {
       $cfg = $this->getDOMPlus();
@@ -40,7 +39,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @return void
    */
   public function getOutput(HTMLPlus $content) {
-    global $cms;
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
 
@@ -55,22 +53,22 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // add root element
     $html = $doc->createElement("html");
     $html->setAttribute("xmlns","http://www.w3.org/1999/xhtml");
-    $html->setAttribute("xml:lang",$cms->getVariable("cms-lang"));
-    $html->setAttribute("lang",$cms->getVariable("cms-lang"));
+    $html->setAttribute("xml:lang",Cms::getVariable("cms-lang"));
+    $html->setAttribute("lang",Cms::getVariable("cms-lang"));
     $doc->appendChild($html);
 
     // add head element
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title",$this->getTitle($cms)));
+    $head->appendChild($doc->createElement("title",$this->getTitle()));
     $this->appendMeta($head,"Content-Type","text/html; charset=utf-8");
     $this->appendMeta($head,"viewport","initial-scale=1");
-    $this->appendMeta($head,"Content-Language", $cms->getVariable("cms-lang"));
-    $this->appendMeta($head,"generator", $cms->getVariable("cms-name"));
-    $author = $cms->getVariable("cms-author");
+    $this->appendMeta($head,"Content-Language", Cms::getVariable("cms-lang"));
+    $this->appendMeta($head,"generator", Cms::getVariable("cms-name"));
+    $author = Cms::getVariable("cms-author");
     if(strlen($author)) $this->appendMeta($head, "author", $author);
-    $desc = $cms->getVariable("cms-desc");
+    $desc = Cms::getVariable("cms-desc");
     if(strlen($desc)) $this->appendMeta($head, "description", $desc);
-    $kw = $cms->getVariable("cms-kw");
+    $kw = Cms::getVariable("cms-kw");
     if(strlen($kw)) $this->appendMeta($head, "keywords", $kw);
     if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head,$this->favIcon,"shortcut icon",false,false,false);
@@ -80,7 +78,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // apply transformations
     $proc = new XSLTProcessor();
-    $proc->setParameter('',$this->getProcParams($cms));
+    $proc->setParameter('',$this->getProcParams());
     stableSort($this->transformationsPriority);
     foreach($this->transformationsPriority as $xslt => $priority) {
       try {
@@ -101,8 +99,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->validateLinks("a","href",true);
     $contentPlus->validateLinks("form","action",true);
     $contentPlus->validateLinks("object","data",true);
-    $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"a","href");
-    $contentPlus->fragToLinks($cms->getContentFull(),getRoot(),"form","action");
+    $contentPlus->fragToLinks(Cms::getContentFull(),getRoot(),"a","href");
+    $contentPlus->fragToLinks(Cms::getContentFull(),getRoot(),"form","action");
 
     // check object.data mime/size
     $this->validateImages($contentPlus);
@@ -182,18 +180,18 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
   */
 
-  private function getTitle(Cms $cms) {
-    $title = $cms->getVariable("cms-title");
+  private function getTitle() {
+    $title = Cms::getVariable("cms-title");
     foreach($this->subject->getIsInterface("ContentStrategyInterface") as $clsName => $cls) {
-      $tmp = $cms->getVariable(strtolower($clsName)."-cms-title");
+      $tmp = Cms::getVariable(strtolower($clsName)."-cms-title");
       if(!is_null($tmp)) $title = $tmp;
     }
     return $title;
   }
 
-  private function getProcParams(Cms $cms) {
+  private function getProcParams() {
     $o = array();
-    foreach($cms->getAllVariables() as $k => $v) {
+    foreach(Cms::getAllVariables() as $k => $v) {
       $valid = true;
       if($v instanceof DOMElement) {
         $d = new DOMDocumentPlus();
@@ -336,8 +334,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($filePath,$priority = 10,$append = self::APPEND_HEAD,$user=false) {
-    global $cms;
-    $cms->addVariableItem("javascripts",$filePath);
+    Cms::addVariableItem("javascripts",$filePath);
     $this->jsFiles[$filePath] = array(
       "file" => $filePath,
       "append" => $append,
@@ -366,8 +363,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
-    global $cms;
-    $cms->addVariableItem("styles",$filePath);
+    Cms::addVariableItem("styles",$filePath);
     $this->cssFiles[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
@@ -378,8 +374,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
 
   public function addTransformation($filePath, $priority = 10, $user = true) {
-    global $cms;
-    $cms->addVariableItem("transformations",$filePath);
+    Cms::addVariableItem("transformations",$filePath);
     $this->transformations[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,

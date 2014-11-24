@@ -52,9 +52,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
       $this->subject->detach($this);
       return $content;
     }
-
-    global $cms;
-    $os = $cms->getOutputStrategy();
+    $os = Cms::getOutputStrategy();
 
     $os->addCssFile(LIB_DIR."/codemirror/lib/codemirror.css");
     $os->addCssFile(LIB_DIR."/codemirror/theme/tomorrow-night-eighties.css");

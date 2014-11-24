@@ -31,8 +31,7 @@ class InputVar extends Plugin implements SplObserver {
     } else {
       $value = $this->parse($var->nodeValue);
     }
-    global $cms;
-    $cms->setVariable($var->getAttribute("id"), $value);
+    Cms::setVariable($var->getAttribute("id"), $value);
   }
 
   private function fnHash(DOMElement $var) {
@@ -59,8 +58,7 @@ class InputVar extends Plugin implements SplObserver {
       return false;
     }
     $name = $this->parse($var->getAttribute("name"));
-    global $cms;
-    $lang = $cms->getVariable("cms-lang");
+    $lang = Cms::getVariable("cms-lang");
     $translation = false;
     foreach($var->getElementsByTagName("data") as $e) {
       if(!$e->hasAttribute("lang") && $e->getAttribute("lang") != $lang) continue;
@@ -106,16 +104,15 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function parse($string) {
-    global $cms;
     $subStr = explode('\$', $string);
     $output = array();
     foreach($subStr as $s) {
       $r = array();
       preg_match_all('/@?\$('.VARIABLE_PATTERN.')/',$s,$match);
       foreach($match[1] as $k => $var) {
-        $varVal = $cms->getVariable($var);
+        $varVal = Cms::getVariable($var);
         if(is_null($varVal))
-          $varVal = $cms->getVariable("inputvar-$var");
+          $varVal = Cms::getVariable("inputvar-$var");
         if(is_null($varVal)) {
           if(strpos($match[0][$k],"@") !== 0)
             new Logger(sprintf(_("Variable '%s' does not exist"), $var), "warning");
