@@ -12,11 +12,15 @@ class Auth extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PREINIT) $this->handleRequest();
     if($subject->getStatus() != STATUS_INIT) return;
+    global $cms;
+    if(isAtLocalhost()) {
+      $cms->setVariable("logged_user", "admin");
+      return;
+    }
     if(!is_null($this->loggedUser)) {
       if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
       $_SESSION[get_class($this)]["loggedUser"] = $this->loggedUser;
     }
-    global $cms;
     if(isset($_SESSION[get_class($this)]["loggedUser"]))
       $this->loggedUser = $_SESSION[get_class($this)]["loggedUser"];
     $cms->setVariable("logged_user", $this->loggedUser);
@@ -37,7 +41,7 @@ class Auth extends Plugin implements SplObserver {
       $this->loggedUser = $_SERVER['REMOTE_USER'];
     }
     if($access || !is_null($this->loggedUser)) return;
-    new ErrorPage(_("Authentication required"), 403);
+    new ErrorPage(_("Authorization Required"), 401);
   }
 
 }
