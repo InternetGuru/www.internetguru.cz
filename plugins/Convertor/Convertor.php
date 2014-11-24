@@ -5,10 +5,10 @@
 #todo: js copy content to clipboard
 #todo: files/import to usr/temp (const)
 #todo: fix empty link
+#todo: detect '=' in empty get
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $err = array();
-  private $info = array();
+  private $error = false;
   private $html = null;
   private $file = null;
   private $importedFiles = array();
@@ -19,7 +19,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_PREINIT) return;
+    if($subject->getStatus() != STATUS_INIT) return;
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;
@@ -36,11 +36,12 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function processImport($fileUrl) {
+    global $cms;
     try {
       $f = $this->getFile($fileUrl);
     } catch(Exception $e) {
-      $this->err[] = $e->getMessage();
-      new Logger($e->getMessage(), "warning");
+      $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
+      $this->error = true;
       return;
     }
     $mime = getFileMime(TEMP_FOLDER."/$f");
@@ -54,7 +55,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->file = $f;
       break;
       default:
-      $this->err[] = sprintf(_("Unsupported file MIME type '%s'"), $mime);
+      $cms->addMessage(sprintf(_("Unsupported file MIME type '%s'"), $mime), $cms::FLASH_WARNING);
+      $this->error = true;
     }
   }
 
@@ -74,11 +76,11 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->html = $doc->saveXML();
     $this->html = str_replace(array_keys($ids),$ids,$this->html);
 
-    if(empty($this->err)) $this->info[] = _("File successfully imported");
+    global $cms;
+    if(!$this->error) $cms->addMessage(_("File successfully imported"), $cms::FLASH_INFO);
     $this->file = "$f.html";
     if(@file_put_contents(TEMP_FOLDER ."/$f.html", $this->html) !== false) return;
     $m = sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f);
-    $this->err[] = $m;
     new Logger($m, "error");
   }
 
@@ -86,7 +88,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     try {
       $doc->validatePlus(true);
     } catch(Exception $e) {
-      $this->err[] = $e->getMessage();
+      global $cms;
+      $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
     }
   }
 
@@ -110,8 +113,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     global $cms;
     $cms->getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("warning", $this->err);
-    $newContent->insertVar("info", $this->info);
     $newContent->insertVar("link", $_GET[get_class($this)]);
     if(!empty($this->importedFiles)) $newContent->insertVar("importedhtml", $this->importedFiles);
     $newContent->insertVar("filename",$this->file);
