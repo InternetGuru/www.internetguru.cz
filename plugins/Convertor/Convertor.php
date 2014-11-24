@@ -192,7 +192,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $dom = $this->transform("removePrefix.xsl",$dom);
       #file_put_contents($file,$xml);
       $dom->save($file);
-      $variables[$varName] = "file:///".dirname($_SERVER['SCRIPT_FILENAME'])."/".$file;
+      $variables[$varName] = "file:///$file";
     }
     $wordDoc = "word/document.xml";
     $xml = readZippedFile($f, $wordDoc);
