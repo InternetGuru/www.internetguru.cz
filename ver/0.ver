@@ -1,3 +1,21 @@
+0.3.8 2014-11-24
+SubdomManager: detekce uložení beze změn (ed164af)
+DOMBuilder: zkrácení cest v logu (9d30707)
+SubdomManager: oprava CSS (981c011)
+SubdomManager: přidána podpora systémových hlášení (6e0a929)
+LogViewer: přidána podpora systémových hlášení (6312c43)
+Convertor: změna cesty dočasných souborů (28e9021)
+Convertor: přidána podpora systémových hlášení (6d34719)
+Logger: přidána podpora systémových hlášení (495fe75)
+Admin: přidána podpora systémových hlášení (686d93f)
+Cms: přidána podpora systémových hlášení (d3a7c36)
+Xhtml11: Přidané nové výchozí téma adminmenu.xsl (8f10d31)
+Auth: přidána nová proměnna auth-logged_user (926c424)
+Admin: zobrazuje Content.html pokud neexistuje uživatelský obsah (b4f874a)
+Změněn výchozí obsah Content.html (fc29b74)
+Podpora českých systémových hlášení (4c98a2c)
+Přidána podpora odkazování na soubory (ea80a5c)
+
 0.3.7 2014-11-21
 Proměnná contentlink-bc je dostupná pro HTML+ (b3a0877)
 
