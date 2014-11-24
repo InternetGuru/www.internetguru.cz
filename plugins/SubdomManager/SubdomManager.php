@@ -60,7 +60,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         if(is_null($userDir))
           throw new Exception(sprintf(_("Subdom '%s' configuration file not found"), $_POST["mirror"]));
         if(is_dir(USER_ROOT_FOLDER."/$subdom"))
-          throw new Exception(sprintf(_("Subdom '%s' user folder exists"), $_POST["mirror"]));
+          throw new Exception(sprintf(_("Subdom '%s' user folder exists"), $subdom));
         duplicateDir(SUBDOM_ROOT_FOLDER."/".$_POST["mirror"], false);
         duplicateDir(USER_ROOT_FOLDER."/$userDir");
         $sFolder = SUBDOM_ROOT_FOLDER."/$subdom";
