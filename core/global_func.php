@@ -151,7 +151,8 @@ function matchFiles($pattern, $dir) {
     if(strpos($val, "*") === false) {
       if(is_file($filePath))
         $files[getFileHash($filePath)] = substr($filePath, strlen(realpath($dir))+1);
-      new Logger(sprintf(_("File '%s' not found"), $val), Logger::LOGGER_WARNING);
+      else
+        new Logger(sprintf(_("File '%s' not found"), $val), Logger::LOGGER_WARNING);
       continue;
     }
     $fp = str_replace("\*", ".*", preg_quote(basename($val), "/"));
@@ -316,8 +317,13 @@ function checkUrl($folder = null) {
 }
 
 function getFileHash($filePath) {
-  if(!file_exists($filePath)) return "";
-  return hash_file(FILE_HASH_ALGO,$filePath);
+  if(!is_file($filePath)) return "";
+  return hash_file(FILE_HASH_ALGO, $filePath);
+}
+
+function getDirHash($dirPath) {
+  if(!is_dir($dirPath)) return "";
+  return hash(FILE_HASH_ALGO, implode("", scandir($dirPath)));
 }
 
 ?>
