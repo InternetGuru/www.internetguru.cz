@@ -134,8 +134,8 @@ class Cms {
 
   public static function addMessage($message, $type, $flash = false) {
     $caller = self::getCallerClass();
-    new Logger("$caller $type: $message", Logger::LOGGER_INFO);
     if(!in_array($type, array(self::MSG_WARNING, self::MSG_INFO, self::MSG_SUCCESS))) $type = self::MSG_INFO;
+    if($type != self::MSG_INFO) new Logger("$caller $type: $message", Logger::LOGGER_INFO);
     if(!$flash && self::$forceFlash) {
       new Logger(_("Adding message after output - forcing flash"), Logger::LOGGER_WARNING);
       $flash = true;

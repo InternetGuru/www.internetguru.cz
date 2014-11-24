@@ -130,7 +130,7 @@ class DOMBuilder {
     $this->insertImports($doc,$filePath);
   }
 
-  private function insertImports(HTMLPlus $doc,$filePath) {
+  private function insertImports(HTMLPlus $doc, $filePath) {
     $this->imported[] = $filePath;
     $headings = array();
     $dir = pathinfo($filePath, PATHINFO_DIRNAME);
@@ -140,11 +140,11 @@ class DOMBuilder {
     if(!count($headings)) return;
     $l = new Logger(_("Importing HTML+"), null, 0);
     foreach($headings as $h) {
-      $files = matchFiles($h->getAttribute("import"),$dir);
+      $files = matchFiles($h->getAttribute("import"), $dir);
       $h->removeAttribute("import");
       if(!count($files)) continue;
       $before = count($this->imported);
-      foreach($files as $f) $this->insertHtmlPlus($h,$f);
+      foreach($files as $f) $this->insertHtmlPlus($h, $f);
       if($before < count($this->imported)) {
         $h->ownerDocument->removeUntilSame($h);
       }
@@ -160,8 +160,8 @@ class DOMBuilder {
       $this->loadDOM($file, $doc);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $file, $e->getMessage());
+      new Logger($msg, Logger::LOGGER_ERROR);
       $c = new DOMComment(" $msg ");
-      new Logger($msg,"error");
       $h->parentNode->insertBefore($c,$h);
       return;
     }

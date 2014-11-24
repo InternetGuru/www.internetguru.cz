@@ -10,8 +10,8 @@ class Auth extends Plugin implements SplObserver {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_PREINIT) $this->handleRequest();
-    if($subject->getStatus() != STATUS_INIT) return;
+    if($subject->getStatus() != STATUS_PREINIT) return;
+    $this->handleRequest();
     if(isAtLocalhost()) {
       Cms::setVariable("logged_user", "admin");
       return;
