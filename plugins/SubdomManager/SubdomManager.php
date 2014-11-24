@@ -2,7 +2,6 @@
 
 class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
-  private $err = array();
   private $cmsVersions;
   private $cmsVariants;
   private $cmsPlugins = array();
@@ -35,18 +34,23 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   private function processPost() {
+    global $cms;
     try {
       $subdom = null;
+      $succes = null;
       if(isset($_POST["new_subdom"])) {
         $subdom = $this->processCreateSubdom($_POST["new_subdom"]);
+        $succes = sprintf(_("Subdom %s successfully created"), $subdom);
       } elseif(strlen($_GET[get_class($this)])) {
         if(!is_file("../".$_GET[get_class($this)]."/USER_ID.".USER_ID))
           throw new Exception(sprintf(_("Unauthorized subdom '%s' modification by '%s'"), $_GET[get_class($this)], USER_ID));
         if(isset($_POST["delete"])) {
           $subdom = $this->processDeleteSubdom($_GET[get_class($this)]);
+          $succes = sprintf(_("Subdom %s successfully deleted"), $subdom);
         } else {
           $subdom = $this->processUpdateSubdom($_GET[get_class($this)]);
           if(!isset($_POST["apply"]) && !isset($_POST["redir"])) return;
+          $succes = sprintf(_("Subdom %s successfully updated"), $subdom);
         }
       }
       if(is_null($subdom)) throw new Exception(_("Unrecognized POST request"));
@@ -69,10 +73,10 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       new InitServer($subdom, false, true);
       $link = getCurLink()."?".get_class($this)."=$subdom";
       if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
+      else $cms->addMessage($succes, $cms::FLASH_INFO, true);
       redirTo($link, null, true);
-    } catch(Exception $e) { // this should never happen
-      new Logger($e->getMessage(), "error");
-      $this->err[] = $e->getMessage();
+    } catch(Exception $e) {
+      $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
     }
   }
 
@@ -154,7 +158,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }");
 
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("errors", $this->err);
     $newContent->insertVar("domain", getDomain());
     $newContent->insertVar("curlink", getCurLink()."?".get_class($this));
 
@@ -197,7 +200,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         $this->subdoms[] = $subdom;
         new InitServer($subdom); // clone existing subdoms (no update)
       } catch(Exception $e) {
-        $this->err[] = $e->getMessage();
+        global $cms;
+        $cms->addMessage($e->getMessage(), $cms::FLASH_WARNING);
       }
     }
   }
