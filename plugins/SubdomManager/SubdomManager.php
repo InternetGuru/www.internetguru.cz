@@ -119,6 +119,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       throw new Exception(sprintf(_("Unable to create user subdom directory '%s'"), $subdom));
     if(!isset($_POST["PLUGINS"]) || !is_array($_POST["PLUGINS"]))
       throw new Exception(_("Missing POST data 'PLUGINS'"));
+    $origHash = getDirHash($subdomFolder);
     foreach(scandir($subdomFolder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $var = explode(".", $f, 2);
@@ -139,6 +140,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       if(touch("$subdomFolder/PLUGIN.$p", 0644)) continue;
       throw new Exception(sprintf(_("Unable to enable plugin from subdom '%s'"), $subdom));
     }
+    if($origHash == getDirHash($subdomFolder))
+      throw new Exception(sprintf(_("No changes made in '%s'"), $subdom));
     return $subdom;
   }
 
