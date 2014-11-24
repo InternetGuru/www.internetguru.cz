@@ -133,18 +133,17 @@ class DOMBuilder {
   private function insertImports(HTMLPlus $doc, $filePath) {
     $this->imported[] = $filePath;
     $headings = array();
-    $dir = pathinfo($filePath, PATHINFO_DIRNAME);
     foreach($doc->getElementsByTagName("h") as $h) {
       if($h->hasAttribute("import")) $headings[] = $h;
     }
     if(!count($headings)) return;
     $l = new Logger(_("Importing HTML+"), null, 0);
     foreach($headings as $h) {
-      $files = matchFiles($h->getAttribute("import"), $dir);
+      $files = matchFiles($h->getAttribute("import"), dirname($filePath));
       $h->removeAttribute("import");
       if(!count($files)) continue;
       $before = count($this->imported);
-      foreach($files as $f) $this->insertHtmlPlus($h, $f);
+      foreach($files as $f) $this->insertHtmlPlus($h, $f, dirname($filePath));
       if($before < count($this->imported)) {
         $h->ownerDocument->removeUntilSame($h);
       }
@@ -152,12 +151,13 @@ class DOMBuilder {
     $l->finished();
   }
 
-  private function insertHtmlPlus(DOMElement $h, $file) {
+  private function insertHtmlPlus(DOMElement $h, $file, $dir) {
+    $filePath = "$dir/$file";
     try {
-      if(in_array($file, $this->imported))
+      if(in_array($filePath, $this->imported))
         throw new Exception(sprintf(_("Cyclic import '%s' found in '%s'"), $file, $h->getAttribute("import")));
       $doc = new HTMLPlus();
-      $this->loadDOM($file, $doc);
+      $this->loadDOM($filePath, $doc);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $file, $e->getMessage());
       new Logger($msg, Logger::LOGGER_ERROR);
@@ -174,7 +174,7 @@ class DOMBuilder {
     }
     if(!$h->ownerDocument->validatePlus(true))
       new Logger(sprintf(_("Import '%s' HTML+ autocorrected"), $file), "warning");
-    $this->imported[] = $file;
+    $this->imported[] = $filePath;
   }
 
   private function getSectionLang($s) {

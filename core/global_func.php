@@ -150,7 +150,7 @@ function matchFiles($pattern, $dir) {
     }
     if(strpos($val, "*") === false) {
       if(is_file($filePath))
-        $files[getFileHash($filePath)] = "$dir/".substr($filePath, strlen(realpath($dir))+1);
+        $files[getFileHash($filePath)] = substr($filePath, strlen(realpath($dir))+1);
       new Logger(sprintf(_("File '%s' not found"), $val), Logger::LOGGER_WARNING);
       continue;
     }
@@ -158,7 +158,7 @@ function matchFiles($pattern, $dir) {
     $i = count($files);
     foreach(scandir($dirPath) as $f) {
       if(!preg_match("/^$fp$/", $f)) continue;
-      $files[getFileHash("$dirPath/$f")] = "$dir/".substr("$dirPath/$f", strlen(realpath($dir))+1);
+      $files[getFileHash("$dirPath/$f")] = substr("$dirPath/$f", strlen(realpath($dir))+1);
     }
     if($i == count($files))
       new Logger(sprintf(_("No files matching '%s' found"), $val), Logger::LOGGER_WARNING);
