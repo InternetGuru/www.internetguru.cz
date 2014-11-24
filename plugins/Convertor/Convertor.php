@@ -3,19 +3,21 @@
 #todo: export
 #todo: support file upload
 #todo: js copy content to clipboard
-#todo: files/import to usr/temp (const)
-#todo: fix empty link
-#todo: detect '=' in empty get
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
   private $error = false;
   private $html = null;
   private $file = null;
+  private $tmpFolder;
   private $importedFiles = array();
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this,5);
+    $this->tmpFolder = TEMP_FOLDER."/".PLUGINS_DIR."/".get_class($this);
+    global $cms;
+    if(is_dir($this->tmpFolder) || mkdir($this->tmpFolder, 0755, true)) return;
+    throw new Exception(_("Unable to create convertor tmp folder"));
   }
 
   public function update(SplSubject $subject) {
@@ -25,12 +27,16 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       return;
     }
     if(strlen($_GET[get_class($this)])) $this->processImport($_GET[get_class($this)]);
+    elseif(substr(getCurLink(true), -1) == "=") {
+      global $cms;
+      $cms->addMessage(_("File URL cannot be empty"), $cms::FLASH_WARNING);
+    }
     $this->getImportedFiles();
   }
 
   private function getImportedFiles() {
-    foreach(scandir(TEMP_FOLDER, SCANDIR_SORT_ASCENDING) as $f) {
-      if(pathinfo(TEMP_FOLDER."/$f", PATHINFO_EXTENSION) != "html") continue;
+    foreach(scandir($this->tmpFolder, SCANDIR_SORT_ASCENDING) as $f) {
+      if(pathinfo($this->tmpFolder."/$f", PATHINFO_EXTENSION) != "html") continue;
       $this->importedFiles[] = "<a href='?Convertor=$f'>$f</a>";
     }
   }
@@ -44,14 +50,14 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->error = true;
       return;
     }
-    $mime = getFileMime(TEMP_FOLDER."/$f");
+    $mime = getFileMime($this->tmpFolder."/$f");
     switch($mime) {
       case "application/zip":
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
       $this->parseZippedDoc($f);
       break;
       case "application/xml": // just display (may be xml or broken html+)
-      $this->html = file_get_contents(TEMP_FOLDER."/$f");
+      $this->html = file_get_contents($this->tmpFolder."/$f");
       $this->file = $f;
       break;
       default:
@@ -61,7 +67,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function parseZippedDoc($f) {
-    $doc = $this->transformFile(TEMP_FOLDER ."/$f");
+    $doc = $this->transformFile($this->tmpFolder ."/$f");
     $xml = $doc->saveXML();
     $xml = str_replace("·\n","\n",$xml); // remove "format hack" from transformation
 
@@ -79,7 +85,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     global $cms;
     if(!$this->error) $cms->addMessage(_("File successfully imported"), $cms::FLASH_INFO);
     $this->file = "$f.html";
-    if(@file_put_contents(TEMP_FOLDER ."/$f.html", $this->html) !== false) return;
+    if(@file_put_contents($this->tmpFolder ."/$f.html", $this->html) !== false) return;
     $m = sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f);
     new Logger($m, "error");
   }
@@ -136,7 +142,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private function getFile($dest) {
     $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
-    if(!is_file(TEMP_FOLDER ."/$dest"))
+    if(!is_file($this->tmpFolder ."/$dest"))
       throw new Exception(sprintf(_("File '%s' not found in temp folder"), $dest));
     return $dest;
   }
@@ -159,7 +165,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       throw new Exception(sprintf(_("Destination URL '%s' error: %s"), $url, $headers[0]));
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header,$url);
-    file_put_contents(TEMP_FOLDER ."/$filename", $data);
+    file_put_contents($this->tmpFolder ."/$filename", $data);
     return $filename;
   }
 
