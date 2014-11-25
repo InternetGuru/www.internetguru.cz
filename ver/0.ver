@@ -1,3 +1,11 @@
+0.3.9 2014-11-25
+HTML+ bezpečný import, odstraněna podpora znaku * (d7fb082)
+Admin: upozornění na skryté elementy (6d676d0)
+Admin: výchozí obsah nových souborů je prázdný kořenový element (3b38d10)
+Admin: de/aktivace souboru pomocí zaškrtávacího pole (79306d0)
+Autokorektura nyní hlásí (první) opravenou chybu (fecf559)
+Nový vzhled systémových hlášek, přidána možnost skrytí (eaf7f04)
+
 0.3.8 2014-11-24
 SubdomManager: detekce uložení beze změn (ed164af)
 DOMBuilder: zkrácení cest v logu (9d30707)
