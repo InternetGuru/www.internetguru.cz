@@ -7,10 +7,9 @@
 
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEFAULT_FILE = "Content.html";
-  const STATUS_NEW = 3;
-  const STATUS_DISABLED = 2;
+  const STATUS_NEW = 0;
   const STATUS_ENABLED = 1;
-  const STATUS_UNKNOWN = 0;
+  const STATUS_DISABLED = 2;
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
   private $content = null;
@@ -20,7 +19,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private $replace = true;
   private $error = false;
   private $dataFile = null;
-  private $dataFileStatus = 0;
+  private $dataFileStatus;
   private $defaultFile = "n/a";
   private $changeStatus = false;
   private $dataFileStatuses;
@@ -28,7 +27,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this,5);
-    $this->dataFileStatuses = array(_("uknown"), _("active"), _("inactive"), _("new file"));
+    $this->dataFileStatuses = array(_("new"), _("active"), _("inactive"));
   }
 
   public function update(SplSubject $subject) {
@@ -103,7 +102,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("resultcontent", $this->getResContent());
     $newContent->insertVar("status", $this->dataFileStatuses[$this->dataFileStatus]);
     $newContent->insertVar("userfilehash", $usrDestHash);
-    if($this->dataFileStatus == self::STATUS_ENABLED
+    if($this->dataFileStatus != self::STATUS_DISABLED
       || isset($_POST["active"]))
       $newContent->insertVar("checked", "checked");
 
@@ -218,7 +217,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function processXml() {
     if(!in_array($this->type,array("xml","xsl","html"))) return;
-
     // get default schema
     if($df = findFile($this->defaultFile,false)) {
       $this->schema = $this->getSchema($df);
@@ -227,17 +225,18 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(is_null($this->schema) && file_exists($this->dataFile)) {
       $this->schema = $this->getSchema($this->dataFile);
     }
-
-    if($this->type == "html") {
-      $doc = new HTMLPlus();
-      $doc->load(CMS_FOLDER."/".self::DEFAULT_FILE);
-    } else $doc = new DOMDocumentPlus();
-    if($this->contentValue == "n/a") {
+    if($this->dataFileStatus == self::STATUS_NEW) {
+      $doc = new DOMDocumentPlus();
+      $rootName = "html";
+      if($this->type != "html") {
+        $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
+      }
+      $root = $doc->appendChild($doc->createElement($rootName));
+      $root->appendChild($doc->createTextNode(""));
       $this->contentValue = $doc->saveXML();
-      return;
-    }
-    if(!@$doc->loadXml($this->contentValue))
+    } elseif(!@$doc->loadXml($this->contentValue)) {
       throw new Exception(_("Invalid XML syntax"));
+    }
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
@@ -246,10 +245,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if($this->type != "xml" || $this->isPost()) return;
     $this->replace = false;
-    if($this->dataFileStatus == self::STATUS_NEW) {
-      $doc->documentElement->removeChildNodes();
-      $this->contentValue = $doc->saveXML();
-    }
     if($df && $doc->removeNodes("//*[@readonly]"))
       $this->contentValue = $doc->saveXML();
     $this->validateXml($doc);
