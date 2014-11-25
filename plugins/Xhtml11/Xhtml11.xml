@@ -32,7 +32,7 @@
   <jsFile append="body">themes/toggleHidables.js</jsFile>
 
   <!-- <xslt readonly="readonly"/> -->
-  <xslt>themes/flashMessages.xsl</xslt>
+  <xslt>themes/cmsMessages.xsl</xslt>
 
   <!-- <favicon>myFavicon.ico</favicon> -->
 
