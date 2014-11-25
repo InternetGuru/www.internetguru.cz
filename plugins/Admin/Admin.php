@@ -3,27 +3,32 @@
 #TODO: success message
 #TODO: js button 'copy default to user'
 #TODO: nohide default if no user file
+#TODO: js warning if saving inactive file
 
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEFAULT_FILE = "Content.html";
-  const FILE_NEW = "new file";
-  const FILE_DISABLED = "inactive";
-  const FILE_ENABLED = "active";
+  const STATUS_NEW = 3;
+  const STATUS_DISABLED = 2;
+  const STATUS_ENABLED = 1;
+  const STATUS_UNKNOWN = 0;
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
   private $content = null;
   private $contentValue = "n/a";
   private $schema = null;
-  private $type = "unknown";
+  private $type = "n/a";
   private $replace = true;
   private $error = false;
   private $dataFile = null;
-  private $dataFileStatus = "unknown";
+  private $dataFileStatus = 0;
   private $defaultFile = "n/a";
+  private $changeStatus = false;
+  private $dataFileStatuses;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this,5);
+    $this->dataFileStatuses = array(_("uknown"), _("active"), _("inactive"), _("new file"));
   }
 
   public function update(SplSubject $subject) {
@@ -64,12 +69,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
     $la = "?" . get_class($this) . "=" . $this->defaultFile;
     $statusChange = self::FILE_DISABLE;
-    if($this->dataFileStatus == self::FILE_DISABLED) {
+    if($this->dataFileStatus == self::STATUS_DISABLED) {
       $newContent->insertVar("warning", "warning");
       $statusChange = self::FILE_ENABLE;
     }
     $usrDestHash = getFileHash($this->dataFile);
-    $mode = $this->replace ? "replace" : "modify";
+    $mode = $this->replace ? _("replace") : _("modify");
     switch($this->type) {
       case "html":
       case "xsl":
@@ -89,7 +94,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("heading", $d->documentElement);
     $newContent->insertVar("link", getCurLink());
     $newContent->insertVar("linkadmin", $la);
-    $newContent->insertVar("linkadminstatus", "$la&$statusChange");
     $newContent->insertVar("content", $this->contentValue);
     $newContent->insertVar("filename", $this->defaultFile);
     $newContent->insertVar("schema", $format);
@@ -97,11 +101,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("classtype", $type);
     $newContent->insertVar("defaultcontent", $this->getDefContent());
     $newContent->insertVar("resultcontent", $this->getResContent());
-    $newContent->insertVar("status", $this->dataFileStatus);
+    $newContent->insertVar("status", $this->dataFileStatuses[$this->dataFileStatus]);
     $newContent->insertVar("userfilehash", $usrDestHash);
+    if($this->dataFileStatus == self::STATUS_ENABLED
+      || isset($_POST["active"]))
+      $newContent->insertVar("checked", "checked");
 
-    if($this->dataFileStatus == self::FILE_NEW || $this->dataFileStatus == "unknown") {
-      $newContent->insertVar("statuschange", null);
+    if($this->dataFileStatus == self::STATUS_NEW
+      || $this->dataFileStatus == self::STATUS_UNKNOWN) {
       $newContent->insertVar("warning", "warning");
       $newContent->insertVar("nohide", "nohide");
     }
@@ -198,14 +205,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(isset($_GET[self::FILE_ENABLE]) && file_exists($fd)) rename($fd,$f);
     if(isset($_GET[self::FILE_DISABLE]) && file_exists($f)) rename($f,$fd);
     if(file_exists($f)) {
-      $this->dataFileStatus = self::FILE_ENABLED;
+      $this->dataFileStatus = self::STATUS_ENABLED;
       return $f;
     }
     if(file_exists($fd)) {
-      $this->dataFileStatus = self::FILE_DISABLED;
+      $this->dataFileStatus = self::STATUS_DISABLED;
       return $fd;
     }
-    $this->dataFileStatus = self::FILE_NEW;
+    $this->dataFileStatus = self::STATUS_NEW;
     return $f;
   }
 
@@ -239,7 +246,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if($this->type != "xml" || $this->isPost()) return;
     $this->replace = false;
-    if($this->dataFileStatus == self::FILE_NEW) {
+    if($this->dataFileStatus == self::STATUS_NEW) {
       $doc->documentElement->removeChildNodes();
       $this->contentValue = $doc->saveXML();
     }
@@ -252,10 +259,20 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $post_n = str_replace("\r\n", "\n", $_POST["content"]);
     $post_rn = str_replace("\n", "\r\n", $post_n);
     $this->contentValue = $post_n;
-    if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn))))
-      throw new Exception(_("No changes made"));
+    if(isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_DISABLED) {
+      $this->changeStatus = true;
+    } elseif(!isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_ENABLED) {
+      $this->changeStatus = true;
+    }
     if($_POST["userfilehash"] != getFileHash($this->dataFile))
       throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
+    if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn)))) {
+      if($this->changeStatus) {
+        $this->savePost(false);
+        return;
+      }
+      throw new Exception(_("No changes made"));
+    }
   }
 
   private function setContent() {
@@ -266,12 +283,36 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       throw new Exception(sprintf(_("Unable to get contents from '%s'"), $this->dataFile));
   }
 
-  private function savePost() {
-    if(saveRewrite($this->dataFile, $this->contentValue) === false)
-      throw new Exception(_("Unable to save changes, administration may be locked"));
-    if($this->error) return;
-    Cms::addMessage(_("Content successfully saved"), Cms::MSG_SUCCESS, true);
+  private function savePost($content=true) {
+    $statusSuccess = true;
+    if($content) {
+      if(saveRewrite($this->dataFile, $this->contentValue) === false)
+        throw new Exception(_("Unable to save changes, administration may be locked"));
+      if($this->error) return;
+    }
+    if($this->changeStatus) {
+      try {
+        $this->changeStatus($this->dataFile);
+        if(!$content) Cms::addMessage(_("Status successfully changed"), Cms::MSG_SUCCESS, true);
+      } catch(Exception $e) {
+        Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
+        $statusSuccess = false;
+      }
+    }
+    if($content) {
+      Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $statusSuccess);
+    }
+    if(!$statusSuccess) return;
     $this->redir($this->defaultFile);
+  }
+
+  private function changeStatus($f) {
+    if(strpos(basename($f), ".") === 0) {
+      if(rename($f, dirname($f)."/".substr(basename($f), 1))) return;
+    } else {
+      if(rename($f, dirname($f)."/.".basename($f))) return;
+    }
+    throw new Excepiton("Unable to change file status");
   }
 
   private function validateXml(DOMDocumentPlus $doc) {

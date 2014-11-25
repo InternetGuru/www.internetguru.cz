@@ -60,6 +60,8 @@ class DOMDocumentPlus extends DOMDocument {
         case "NULL":
         $this->removeVar($e, $attr);
         break;
+        case "integer":
+        $varValue = (string) $varValue;
         case "string":
         if(!strlen($varValue)) {
           $this->removeVar($e, $attr);

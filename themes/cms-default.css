@@ -109,5 +109,6 @@ p object {
   padding: 0.5em;
 }
 .warning {
-  /*todo*/
+  border-color: #E78181;
+  background-color: #F99F9F;
 }
