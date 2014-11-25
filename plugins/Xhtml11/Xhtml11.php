@@ -93,6 +93,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       }
     }
 
+    // no more direct system messages
+    Cms::setForceFlash();
+
     // correct links
     $contentPlus = new DOMDocumentPlus();
     $contentPlus->loadXML($content->saveXML());

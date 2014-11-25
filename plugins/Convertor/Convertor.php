@@ -3,6 +3,13 @@
 #todo: export
 #todo: support file upload
 #todo: js copy content to clipboard
+#todo: support short heading after @
+#todo: default short if no @
+#todo: join tags (inline?)
+#todo: fix normalize() ??
+#todo: internal links
+#todo: external links
+#todo: delete empty elements
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
   private $error = false;

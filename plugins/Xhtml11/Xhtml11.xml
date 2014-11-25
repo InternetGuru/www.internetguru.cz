@@ -6,14 +6,12 @@
     <theme id="basic">
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/basicLayout.xsl</xslt>
-      <xslt>themes/flashMessages.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
       <favicon>themes/igcms.ico</favicon>
     </theme>
     <theme id="simple">
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/simpleLayout.xsl</xslt>
-      <xslt>themes/flashMessages.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
       <stylesheet media="screen">themes/simple.css</stylesheet>
       <favicon>themes/igcms.ico</favicon>
@@ -24,7 +22,6 @@
   <!-- available themes: basic or simple -->
   <var id="theme">simple</var>
 
-  <!-- <xslt readonly="readonly"/> -->
   <stylesheet>themes/cms-default.css</stylesheet>
   <stylesheet media="print">themes/cms-print.css</stylesheet>
   <stylesheet>themes/toggleHidables.css</stylesheet>
@@ -33,6 +30,9 @@
   <jsFile readonly="readonly" />
   <jsFile append="body">themes/headingFragment.js</jsFile>
   <jsFile append="body">themes/toggleHidables.js</jsFile>
+
+  <!-- <xslt readonly="readonly"/> -->
+  <xslt>themes/flashMessages.xsl</xslt>
 
   <!-- <favicon>myFavicon.ico</favicon> -->
 

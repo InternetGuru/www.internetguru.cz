@@ -44,7 +44,7 @@ class Cms {
     self::$flashList->firstElement->appendChild($li);
   }
 
-  public static function getFlashMessages() {
+  private static function getFlashMessages() {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
     if(is_null(self::$flashList)) self::createFlashList();
     foreach($_SESSION["cms"]["flash"] as $class => $item) {
@@ -58,6 +58,7 @@ class Cms {
   }
 
   public static function buildContent() {
+    self::getFlashMessages();
     if(is_null(self::$contentFull)) throw new Exception(_("Full content must be set to build content"));
     if(!is_null(self::$content)) throw new Exception(_("Method cannot run twice"));
     self::$content = clone self::$contentFull;
@@ -190,8 +191,11 @@ class Cms {
     return self::$variables;
   }
 
-  public static function getOutput() {
+  public static function setForceFlash() {
     self::$forceFlash = true;
+  }
+
+  public static function getOutput() {
     if(is_null(self::$content)) throw new Exception(_("Content is not set"));
     if(!is_null(self::$outputStrategy)) return self::$outputStrategy->getOutput(self::$content);
     return self::$content->saveXML();

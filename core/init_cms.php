@@ -19,7 +19,6 @@ try {
   $plugins->setStatus(STATUS_INIT);
   $plugins->notify();
 
-  Cms::getFlashMessages();
   Cms::buildContent();
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();

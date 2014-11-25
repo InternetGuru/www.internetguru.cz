@@ -81,6 +81,8 @@ p object {
 
 #flashMsg {
   background: rgb(37,37,37);
+  font-family: "Emilbus Mono","Lucida Console",monospace;
+  /*font-size: 1.15em;*/
 }
 #flashMsg ul {
   margin-top: 0;
@@ -89,16 +91,22 @@ p object {
   list-style: none;
 }
 #flashMsg li {
-  margin: 0;
+  margin: 0.5em 0;
 }
 #flashMsg li.warning {
-  color: #ffcc66;
+  background: rgb(255, 45, 45);
+  color: #fff;
+  padding: 0.5em;
 }
+#flashMsg > span,
+#flashMsg a,
 #flashMsg li.info {
-  color: rgb(232, 232, 232);
+  color: #ccc;
 }
 #flashMsg li.success {
-  color: rgb(88, 195, 106);
+  background: rgb(53, 144, 61);
+  color: #fff;
+  padding: 0.5em;
 }
 .warning {
   /*todo*/

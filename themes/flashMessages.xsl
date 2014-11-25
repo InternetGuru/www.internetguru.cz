@@ -9,9 +9,9 @@
 
   <xsl:template match="body/*[1]">
     <xsl:if test="not($cms-messages = '')">
-      <div id="flashMsg">
-        <xsl:value-of disable-output-escaping="yes" select="$cms-messages"/>
-      </div>
+        <div id="flashMsg" class="hidable nohide"><span>Hlášení systému</span>
+          <xsl:value-of disable-output-escaping="yes" select="$cms-messages"/>
+        </div>
     </xsl:if>
     <xsl:copy>
       <xsl:apply-templates select="node()|@*"/>
