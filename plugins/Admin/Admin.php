@@ -105,8 +105,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       || isset($_POST["active"]))
       $newContent->insertVar("checked", "checked");
 
-    if($this->dataFileStatus == self::STATUS_NEW
-      || $this->dataFileStatus == self::STATUS_UNKNOWN) {
+    if($this->dataFileStatus == self::STATUS_NEW) {
       $newContent->insertVar("warning", "warning");
       $newContent->insertVar("nohide", "nohide");
     }
@@ -224,8 +223,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(is_null($this->schema) && file_exists($this->dataFile)) {
       $this->schema = $this->getSchema($this->dataFile);
     }
+    $doc = new DOMDocumentPlus();
     if($this->dataFileStatus == self::STATUS_NEW) {
-      $doc = new DOMDocumentPlus();
       $rootName = "html";
       if($this->type != "html") {
         $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
@@ -233,7 +232,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $root = $doc->appendChild($doc->createElement($rootName));
       $root->appendChild($doc->createTextNode(""));
       $this->contentValue = $doc->saveXML();
-    } elseif(!@$doc->loadXml($this->contentValue)) {
+    } elseif(!$doc->loadXml($this->contentValue)) {
       throw new Exception(_("Invalid XML syntax"));
     }
     try {

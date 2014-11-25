@@ -136,6 +136,7 @@ class DOMBuilder {
   }
 
   private function insertImports(HTMLPlus $doc, $filePath) {
+    $filePath = realpath($filePath);
     $this->imported[$filePath] = null;
     $headings = array();
     foreach($doc->getElementsByTagName("h") as $h) {
@@ -161,16 +162,16 @@ class DOMBuilder {
   }
 
   private function insertHtmlPlus($val, DOMElement $h, $homeDir) {
-    $file = "$homeDir/$val";
+    $file = realpath("$homeDir/$val");
+    if($file === false)
+      throw new Exception(sprintf(_("Imported file '%s' not found"), $val));
     if(array_key_exists($file, $this->imported))
       throw new Exception(sprintf(_("File '%s' already imported"), $val));
     $this->imported[$file] = null;
     if(pathinfo($val, PATHINFO_EXTENSION) != "html")
       throw new Exception(sprintf(_("Imported file extension '%s' must be .html"), $val));
-    if(realpath($file) === false)
-      throw new Exception(sprintf(_("Imported file '%s' not found"), $val));
-    if(strpos($file, "$homeDir/") !== 0)
-      throw new Exception(sprintf(_("Imported file is out of '%s' working directory"), $val));
+    if(strpos($file, realpath("$homeDir/")) !== 0)
+      throw new Exception(sprintf(_("Imported file '%s' is out of working directory"), $val));
     try {
       $doc = new HTMLPlus();
       $this->loadDOM($file, $doc);
