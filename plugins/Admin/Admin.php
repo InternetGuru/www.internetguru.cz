@@ -1,9 +1,8 @@
 <?php
 
-#TODO: success message
 #TODO: js button 'copy default to user'
-#TODO: nohide default if no user file
 #TODO: js warning if saving inactive file
+#TODO: enable to use readonly?
 
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEFAULT_FILE = "Content.html";
@@ -27,7 +26,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this,5);
-    $this->dataFileStatuses = array(_("new"), _("active"), _("inactive"));
+    $this->dataFileStatuses = array(_("new file"), _("active file"), _("inactive file"));
   }
 
   public function update(SplSubject $subject) {

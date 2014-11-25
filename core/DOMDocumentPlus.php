@@ -198,7 +198,7 @@ class DOMDocumentPlus extends DOMDocument {
     $toRemove = array();
     foreach($xpath->query($query) as $n) $toRemove[] = $n;
     foreach($toRemove as $n) {
-      $n->parentNode->removeChild($n);
+      $n->stripElement(_("Readonly element hidden"));
     }
     return count($toRemove);
   }
