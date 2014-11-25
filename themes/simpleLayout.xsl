@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:param name="cms-ig" select="''"/>
   <xsl:param name="cms-ez" select="''"/>
@@ -53,7 +53,7 @@
 
   <xsl:template match="/body/p[contains(@class,'description')]">
     <div>
-      <xsl:copy-of select="." />
+      <xsl:copy-of select="."/>
     </div>
   </xsl:template>
 

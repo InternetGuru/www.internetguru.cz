@@ -69,8 +69,12 @@ class Cms {
         $c = $cs->getContent(self::$content);
         if(!($c instanceof HTMLPlus))
           throw new Exception(_("Content must be an instance of HTML+"));
-        if(!$c->validatePlus(true))
-          new Logger(sprintf(_("Plugin '%s' HTML+ autocorrected"), get_class($cs)), "warning");
+        try {
+          $c->validatePlus();
+        } catch(Exception $e) {
+          $c->validatePlus(true);
+          new Logger(sprintf(_("Plugin '%s' HTML+ autocorrected: %s"), get_class($cs), $e->getMessage()), "warning");
+        }
         self::$content = $c;
         self::loadDefaultVariables(self::$content);
       }

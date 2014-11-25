@@ -123,8 +123,13 @@ class DOMBuilder {
     // load
     if(!@$doc->load($filePath))
       throw new LoggerException(sprintf(_("Unable to load DOM from file '%s'"), $filePath));
-    // validate
-    if(!$doc->validatePlus(true)) saveRewrite($filePath, $doc->saveXML());
+    // validate, save if repaired
+    try {
+      $doc->validatePlus();
+    } catch(Exception $e) {
+      $doc->validatePlus(true);
+      saveRewrite($filePath, $doc->saveXML());
+    }
     // HTMLPlus import
     if(!($doc instanceof HTMLPlus)) return;
     $this->insertImports($doc,$filePath);
@@ -172,8 +177,12 @@ class DOMBuilder {
     foreach($doc->documentElement->childElements as $n) {
       $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
     }
-    if(!$h->ownerDocument->validatePlus(true))
-      new Logger(sprintf(_("Import '%s' HTML+ autocorrected"), $file), "warning");
+    try {
+      $h->ownerDocument->validatePlus();
+    } catch(Exception $e) {
+      $h->ownerDocument->validatePlus(true);
+      new Logger(sprintf(_("Import '%s' HTML+ autocorrected: %s"), $file, $e->getMessage()), "warning");
+    }
     $this->imported[] = $filePath;
   }
 

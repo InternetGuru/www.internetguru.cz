@@ -202,16 +202,8 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function validatePlus($repair=false) {
-    try {
-      if($this instanceof HTMLPlus) $this->validateHTMLPlus(false);
-      else $this->validateDOMPlus(false);
-      return true;
-    } catch(Exception $e) {
-      if(!$repair) throw $e;
-    }
-    if($this instanceof HTMLPlus) $this->validateHTMLPlus(true);
-    else $this->validateDOMPlus(true);
-    return false;
+    if($this instanceof HTMLPlus) $this->validateHTMLPlus($repair);
+    else $this->validateDOMPlus($repair);
   }
 
   private function validateDOMPlus($repair) {

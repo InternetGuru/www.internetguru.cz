@@ -231,7 +231,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if(!@$doc->loadXml($this->contentValue))
       throw new Exception(_("Invalid XML syntax"));
-    if(!$doc->validatePlus(true)) $this->contentValue = $doc->saveXML();
+    try {
+      $doc->validatePlus();
+    } catch(Exception $e) {
+      $doc->validatePlus(true);
+      $this->contentValue = $doc->saveXML();
+    }
     if($this->type != "xml" || $this->isPost()) return;
     $this->replace = false;
     if($this->dataFileStatus == self::FILE_NEW) {
