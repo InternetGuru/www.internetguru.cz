@@ -136,7 +136,7 @@ class DOMBuilder {
   }
 
   private function insertImports(HTMLPlus $doc, $filePath) {
-    $this->imported[] = $filePath;
+    $this->imported[$filePath] = null;
     $headings = array();
     foreach($doc->getElementsByTagName("h") as $h) {
       if($h->hasAttribute("import")) $headings[] = $h;
@@ -144,46 +144,55 @@ class DOMBuilder {
     if(!count($headings)) return;
     $l = new Logger(_("Importing HTML+"), null, 0);
     foreach($headings as $h) {
-      $files = matchFiles($h->getAttribute("import"), dirname($filePath));
-      $h->removeAttribute("import");
-      if(!count($files)) continue;
-      $before = count($this->imported);
-      foreach($files as $f) $this->insertHtmlPlus($h, $f, dirname($filePath));
-      if($before < count($this->imported)) {
-        $h->ownerDocument->removeUntilSame($h);
+      $somethingImported = false;
+      foreach(explode(" ", $h->getAttribute("import")) as $val) {
+        try {
+          $this->insertHtmlPlus($val, $h, dirname($filePath));
+          $somethingImported = true;
+        } catch(Exception $e) {
+          new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+        }
       }
+      $h->removeAttribute("import");
+      if(!$somethingImported) continue;
+      $h->ownerDocument->removeUntilSame($h);
     }
     $l->finished();
   }
 
-  private function insertHtmlPlus(DOMElement $h, $file, $dir) {
-    $filePath = "$dir/$file";
+  private function insertHtmlPlus($val, DOMElement $h, $homeDir) {
+    $file = "$homeDir/$val";
+    if(array_key_exists($file, $this->imported))
+      throw new Exception(sprintf(_("File '%s' already imported"), $val));
+    $this->imported[$file] = null;
+    if(pathinfo($val, PATHINFO_EXTENSION) != "html")
+      throw new Exception(sprintf(_("Imported file extension '%s' must be .html"), $val));
+    if(realpath($file) === false)
+      throw new Exception(sprintf(_("Imported file '%s' not found"), $val));
+    if(strpos($file, "$homeDir/") !== 0)
+      throw new Exception(sprintf(_("Imported file is out of '%s' working directory"), $val));
     try {
-      if(in_array($filePath, $this->imported))
-        throw new Exception(sprintf(_("Cyclic import '%s' found in '%s'"), $file, $h->getAttribute("import")));
       $doc = new HTMLPlus();
-      $this->loadDOM($filePath, $doc);
+      $this->loadDOM($file, $doc);
     } catch(Exception $e) {
-      $msg = sprintf(_("Unable to import '%s': %s"), $file, $e->getMessage());
-      new Logger($msg, Logger::LOGGER_ERROR);
+      $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
-      $h->parentNode->insertBefore($c,$h);
-      return;
+      $h->parentNode->insertBefore($c, $h);
+      throw new Exception($msg);
     }
     $sectLang = $this->getSectionLang($h->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $file), "warning");
+      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
     foreach($doc->documentElement->childElements as $n) {
-      $h->parentNode->insertBefore($h->ownerDocument->importNode($n,true),$h);
+      $h->parentNode->insertBefore($h->ownerDocument->importNode($n, true), $h);
     }
     try {
       $h->ownerDocument->validatePlus();
     } catch(Exception $e) {
       $h->ownerDocument->validatePlus(true);
-      new Logger(sprintf(_("Import '%s' HTML+ autocorrected: %s"), $file, $e->getMessage()), "warning");
+      new Logger(sprintf(_("Import '%s' HTML+ autocorrected: %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }
-    $this->imported[] = $filePath;
   }
 
   private function getSectionLang($s) {

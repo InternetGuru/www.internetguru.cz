@@ -124,49 +124,6 @@ function saveRewrite($dest,$content) {
   return $b;
 }
 
-/**
- * Match files relative to given directory
- * @param  String $pattern [description]
- * @param  String $dir     [description]
- * @return Array           [description]
- */
-function matchFiles($pattern, $dir) {
-  $files = array();
-  $values = explode(" ",$pattern);
-  foreach($values as $val) {
-    $dirPath = realpath(dirname("$dir/$val"));
-    $filePath = "$dirPath/".basename($val);
-    if($dirPath === false) {
-      new Logger(sprintf(_("Path to '%s' not found"), $val), Logger::LOGGER_WARNING);
-      continue;
-    }
-    if(strpos($dirPath, realpath("$dir/")) !== 0) {
-      new Logger(sprintf(_("Path '%s' is out of root directory"), $val), Logger::LOGGER_WARNING);
-      continue;
-    }
-    if(!is_dir($dirPath)) {
-      new Logger(sprintf(_("Directory '%s' not found"), $val), Logger::LOGGER_WARNING);
-      continue;
-    }
-    if(strpos($val, "*") === false) {
-      if(is_file($filePath))
-        $files[getFileHash($filePath)] = substr($filePath, strlen(realpath($dir))+1);
-      else
-        new Logger(sprintf(_("File '%s' not found"), $val), Logger::LOGGER_WARNING);
-      continue;
-    }
-    $fp = str_replace("\*", ".*", preg_quote(basename($val), "/"));
-    $i = count($files);
-    foreach(scandir($dirPath) as $f) {
-      if(!preg_match("/^$fp$/", $f)) continue;
-      $files[getFileHash("$dirPath/$f")] = substr("$dirPath/$f", strlen(realpath($dir))+1);
-    }
-    if($i == count($files))
-      new Logger(sprintf(_("No files matching '%s' found"), $val), Logger::LOGGER_WARNING);
-  }
-  return $files;
-}
-
 function duplicateDir($dir, $deep=true) {
   if(!is_dir($dir)) throw new Exception("Directory '".basename($dir)."' not found");
   $info = pathinfo($dir);
