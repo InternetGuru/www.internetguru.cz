@@ -137,8 +137,7 @@ class DOMBuilder {
   }
 
   private function insertImports(HTMLPlus $doc, $filePath) {
-    $filePath = realpath($filePath);
-    $this->imported[$filePath] = null;
+    $this->imported[realpath($filePath)] = null;
     $imports = array();
     foreach($doc->getElementsByTagName("import") as $import) $imports[] = $import;
     if(!count($imports)) return;
@@ -173,7 +172,7 @@ class DOMBuilder {
       throw new Exception(sprintf(_("Imported file '%s' is out of working directory"), $val));
     try {
       $doc = new HTMLPlus();
-      $this->loadDOM($file, $doc);
+      $this->loadDOM("$homeDir/$val", $doc);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");

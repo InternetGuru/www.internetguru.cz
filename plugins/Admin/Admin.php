@@ -225,7 +225,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     $doc = new DOMDocumentPlus();
     if($this->dataFileStatus == self::STATUS_NEW) {
-      $rootName = "html";
+      $rootName = "body";
       if($this->type != "html") {
         $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
       }
