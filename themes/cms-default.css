@@ -94,7 +94,8 @@ p object {
   margin: 0.5em 0;
 }
 #flashMsg li.warning {
-  background: rgb(255, 45, 45);
+  /*background: rgb(255, 45, 45);*/
+  background: rgb(187, 33, 33);
   color: #fff;
   padding: 0.5em;
 }
