@@ -113,12 +113,12 @@ msgstr "Atribut ID '%s' koliduje s elementem '%s'"
 #: D:\wamp\www\cms/core/DOMDocumentPlus.php:17
 #, php-format
 msgid "Duplicit %s found for value '%s'"
-msgstr "Nalezena duplicitní hodnota %2s atibutu '%1s'"
+msgstr "Nalezena duplicitní hodnota %2$s atibutu '%1$s'"
 
 #: D:\wamp\www\cms/core/DOMDocumentPlus.php:55
 #, php-format
 msgid "Variable '%s' destination element '%s' no longer exists"
-msgstr "Cílový element '%2s' proměnné '%1s' již neexistuje"
+msgstr "Cílový element '%2$s' proměnné '%1$s' již neexistuje"
 
 #: D:\wamp\www\cms/core/DOMDocumentPlus.php:86
 #, php-format

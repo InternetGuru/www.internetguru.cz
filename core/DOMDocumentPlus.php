@@ -36,8 +36,8 @@ class DOMDocumentPlus extends DOMDocument {
           $keep[] = $v;
           continue;
         }
-        if(isset($p[1])) $replaceAttr[] = array($e, $p[1]);
-        else $replaceCont[] = array($e, null);
+        if(isset($p[1])) $replaceAttr[] = array($e, $p[1], $e->nodeName);
+        else $replaceCont[] = array($e, null, $e->nodeName);
       }
       if(empty($keep)) {
         $e->removeAttribute("var");
@@ -52,7 +52,7 @@ class DOMDocumentPlus extends DOMDocument {
       $e = $item[0];
       $attr = $item[1];
       if(is_null(@$e->getNodePath())) {
-        new Logger(sprintf(_("Variable '%s' destination element '%s' no longer exists"), $varName, $e->nodeName), "warning");
+        new Logger(sprintf(_("Variable '%s' destination element '%s' no longer exists"), $varName, $item[2]), "warning");
         continue;
       }
       if(is_null($e->parentNode)) continue;
