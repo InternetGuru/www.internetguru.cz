@@ -51,6 +51,7 @@ if(isAtLocalhost()) {
   define('USER_BACKUP_FOLDER', '../../'.USER_BACKUP_DIR.'/'.CURRENT_SUBDOM_DIR);
   define('LOG_FOLDER', '../../'.LOG_DIR.'/'.CURRENT_SUBDOM_DIR);
   define('CACHE_FOLDER', '../../'.CACHE_DIR.'/'.CURRENT_SUBDOM_DIR);
+  define('CMS_BEST_RELEASE', setCmsBestRelease());
 }
 define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
 define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
@@ -74,6 +75,16 @@ define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MOD
 
 #todo: date_default_timezone_set()
 #todo: localize lang
+
+function setCmsBestRelease() {
+  $cbr = null;
+  foreach(scandir(CMS_ROOT_FOLDER) as $v) {
+    if(!preg_match("/^\d+\.\d+$/",$v)) continue;
+    if(version_compare($cbr, $v) < 0) $cbr = $v;
+  }
+  if(is_null($cbr)) throw new LoggerException(_("No stable IGCMS variant found"));
+  return $cbr;
+}
 
 function __autoload($className) {
   $fp = PLUGINS_FOLDER."/$className/$className.php";

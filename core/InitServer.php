@@ -42,7 +42,7 @@ class InitServer {
     if(!file_exists("$serverSubdomDir/CMS_VER.".$this->subdomVars["CMS_VER"])) {
       if(!$update && is_link("$serverSubdomDir/index.php"))
         $this->subdomVars["CMS_VER"] = basename(dirname(readlink("$serverSubdomDir/index.php")));
-      else $this->subdomVars["CMS_VER"] = $this->getNewestStableVersion();
+      else $this->subdomVars["CMS_VER"] = CMS_BEST_RELEASE;
     }
     $folders = $this->setFolderVars($serverSubdomDir);
     if($update && !is_file("$serverSubdomDir/CONFIG.user"))
@@ -128,16 +128,6 @@ class InitServer {
       throw new Exception(_("Unable to create USER_ID file"));
     if(!touch("$dir/CONFIG.user"))
       throw new Exception(_("Unable to create CONFIG file"));
-  }
-
-  private function getNewestStableVersion() {
-    $nsv = null;
-    foreach(scandir(CMS_ROOT_FOLDER) as $v) {
-      if(!preg_match("/^\d+\.\d+$/",$v)) continue;
-      if(version_compare($nsv, $v) < 0) $nsv = $v;
-    }
-    if(is_null($nsv)) throw new Exception(_("No stable IGCMS variant found"));
-    return $nsv;
   }
 
   private function completeStructure($subdomDir) {
