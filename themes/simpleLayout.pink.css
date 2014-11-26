@@ -1,5 +1,5 @@
 h2 {
-  color: #FF1493;
+  color: #DB1580;
 }
 
 div.contentbalancer a,
@@ -8,15 +8,15 @@ div.contentbalancer a,
 }
 
 ol.contentlink-bc li a[href] {
-  color: #FF1493;
+  color: #DB1580;
 }
 
 a:link {
-  color: #FF1493;
+  color: #DB1580;
 }
 
 a:visited {
-  color: black;
+  color: rgb(190, 0, 93);
 }
 
 #footer {
@@ -24,5 +24,5 @@ a:visited {
 }
 
 #footer > ul.globalmenu > li a.current {
-  color: #FF1493;
+  color: #DB1580;
 }
