@@ -3,122 +3,96 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-11-22 21:24+0100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2014-11-26 16:14+0100\n"
+"PO-Revision-Date: 2014-11-26 16:21+0100\n"
+"Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
+"Language-Team: cs_CZ.UTF8\n"
+"Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.6.10\n"
+"X-Poedit-Basepath: .\n"
+"X-Poedit-SearchPath-0: D:\\wamp\\www\\cms\n"
 
-#: core/global_const.php:82 /cygdrive/d/wamp/www/cms/core/global_const.php:82
-#: /cygdrive/d/wamp/www/cms/core/global_const.php:83
-#, php-format
-msgid "Unable to find class '%s' in '%s' nor '%s'"
-msgstr "Nepodařilo se najít třídu '%s' v '%s' ani v '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_const.php:123
-#, php-format
-msgid "Forbidden file name '%s' format to copy to '%s' folder"
-msgstr "Zakázaný název souboru '%s' formát pro kopírování do složky '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_const.php:127
-#, php-format
-msgid "Forbidden MIME type '%s' to copy '%s' to '%s' folder"
-msgstr "Zakázaný MIME typ '%s' pro kopírování '%s' do složky '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_const.php:132
-#, php-format
-msgid "Unable to create directory structure '%s'"
-msgstr "Nelze vytvořit adresářovou strukturu '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_const.php:136
-#, php-format
-msgid "Unable to create symlink '%s' for '%s'"
-msgstr "Nelze vytvořit symbolický odkaz '%s' pro '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_const.php:148
-#, php-format
-msgid "Unable to create symlink '%s'"
-msgstr "Nelze vytvořit symbolický odkaz '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_const.php:150
-#, php-format
-msgid "Unable to force symlink cache update"
-msgstr "Nepodařilo se aktualizovat symbolické linky v mezipaměti"
-
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:34
+#: D:\wamp\www\cms/core/Cms.php:62
 msgid "Full content must be set to build content"
-msgstr "Plný obsah musí existovat, aby ho bylo možné zpracovat"
+msgstr "Obsah musí existovat, aby ho bylo možné zpracovat"
 
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:35
+#: D:\wamp\www\cms/core/Cms.php:63
 msgid "Method cannot run twice"
 msgstr "Metoda nemůže být zavolána dvakrát"
 
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:43
+#: D:\wamp\www\cms/core/Cms.php:71
 msgid "Content must be an instance of HTML+"
 msgstr "Obsah musí být instancí HTML+"
 
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:45
+#: D:\wamp\www\cms/core/Cms.php:76
 #, php-format
-msgid "Plugin '%s' HTML+ autocorrected"
-msgstr "Rozšíření '%s' bylo automaticky opraveno"
+msgid "Plugin '%s' HTML+ autocorrected: %s"
+msgstr "HTML+ rozšíření '%s' bylo automaticky opraveno: %s"
 
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:63
+#: D:\wamp\www\cms/core/Cms.php:108
 #, php-format
-msgid "Some variable generates invalid HTML+: %s"
-msgstr "Některá proměnná generuje nevalidní HTML+: %s"
+msgid "Following variable(s) causing HTML+ error: %s"
+msgstr "Následující proměnné způsobují chybu v HTML+: %s"
 
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:115
+#: D:\wamp\www\cms/core/Cms.php:145
+msgid "Adding message after output - forcing flash"
+msgstr "Vynucený 'flash' pro systémouvou zprávu přidanou po výpise"
+
+#: D:\wamp\www\cms/core/Cms.php:182
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:124
-#, php-format
-msgid "Unsupported variable '%s' type"
-msgstr "Nepodporovaný typ proměnné '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:131
-#, php-format
-msgid "Input variable '%s' is not XML valid"
-msgstr "Vstupní proměnná  '%s' není XML validní"
-
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:157
-#: /cygdrive/d/wamp/www/cms/core/Cms.php:155
+#: D:\wamp\www\cms/core/Cms.php:203
 msgid "Content is not set"
 msgstr "Obsah není nastaven"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:89
+#: D:\wamp\www\cms/core/DOMBuilder.php:89
 #, php-format
 msgid "File '%s' not found"
 msgstr "Soubor '%s' nebyl nalezen"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:126
+#: D:\wamp\www\cms/core/DOMBuilder.php:125
 #, php-format
 msgid "Unable to load DOM from file '%s'"
 msgstr "Nelze načíst DOM ze souboru '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:142
+#: D:\wamp\www\cms/core/DOMBuilder.php:146
 msgid "Importing HTML+"
 msgstr "Importuji HTML+"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:159
+#: D:\wamp\www\cms/core/DOMBuilder.php:167
 #, php-format
-msgid "Cyclic import '%s' found in '%s'"
-msgstr "Cyklický import '%s' nalezen v '%s'"
+msgid "Imported file '%s' not found"
+msgstr "Nepodařilo se nalézt importovaný soubor '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:163
+#: D:\wamp\www\cms/core/DOMBuilder.php:169
+#, php-format
+msgid "File '%s' already imported"
+msgstr "Soubor '%s' byl již importovaný"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:172
+#, php-format
+msgid "Imported file extension '%s' must be .html"
+msgstr "Přípona importovaného souboru '%s' musí být .html"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:174
+#, php-format
+msgid "Imported file '%s' is out of working directory"
+msgstr "Importovaný soubor '%s' leží mimo pracovní adresář"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:179
 #, php-format
 msgid "Unable to import '%s': %s"
-msgstr "Nepodařilo se importovat '%s': '%s'"
+msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:172
+#: D:\wamp\www\cms/core/DOMBuilder.php:187
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -126,613 +100,733 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:177
+#: D:\wamp\www\cms/core/DOMBuilder.php:195
 #, php-format
-msgid "Import '%s' HTML+ autocorrected"
-msgstr "Import '%s' byl automaticky opraven na HTML+"
+msgid "Import '%s' HTML+ autocorrected: %s"
+msgstr "HTML+ import '%s' byl úspěšně opraven: %s"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMBuilder.php:227
+#: D:\wamp\www\cms/core/DOMBuilder.php:245
 #, php-format
-msgid "ID conflicts with element '%s'"
-msgstr "ID je v konfliktu s elementem '%s'"
+msgid "ID '%s' conflicts with element '%s'"
+msgstr "Atribut ID '%s' koliduje s elementem '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:17
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:17
 #, php-format
 msgid "Duplicit %s found for value '%s'"
-msgstr "Nalezena duplicita %s pro hodnotu '%s'"
+msgstr "Nalezena duplicitní hodnota %2s atibutu '%1s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:76
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:55
 #, php-format
-msgid "Unsupported variable type '%s' for '%s'"
-msgstr "Nepodporovaný typ proměnné '%s' pro '%s'"
+msgid "Variable '%s' destination element '%s' no longer exists"
+msgstr "Cílový element '%2s' proměnné '%1s' již neexistuje"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:89
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:86
+#, php-format
+msgid "Unsupported variable type '%s' in '%s'"
+msgstr "Nepodoporovaný typ '%s' proměnné '%s'"
+
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:99
 #, php-format
 msgid "Invalid repairable link '%s'"
-msgstr "Neplatný opravitelný odkaz '%s'"
+msgstr "Nalezen chybný leč opravitelný odkaz '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:104
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:114
 #, php-format
 msgid "Unable to parse href '%s'"
-msgstr "Nepodařilo se parsovat atribut href '%s'"
+msgstr "Nelze zpracovat atribut href '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:132
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:142
 #, php-format
 msgid "Link '%s' not found"
 msgstr "Odkaz '%s' nebyl nalezen"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:136
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:146
 msgid "Cyclic link found"
 msgstr "Nalezen cyklický odkaz"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:147
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:157
 msgid "Cyclic fragment found"
 msgstr "Nalezen cyklický fragment"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:153
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:163
 #, php-format
 msgid "Identifier '%s' not found"
 msgstr "Identifikátor '%s' nebyl nalezen"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:223
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:201
+msgid "Readonly element hidden"
+msgstr "Skrytý element s atributem 'readonly'"
+
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:225
 #, php-format
 msgid "Duplicit %s attribute '%s' found"
-msgstr "Duplicitní %s atribut '%s' byl nalezen"
+msgstr "Byl nalezen duplicitní atribut %s s hodnotou '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:251
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:253
 #, php-format
 msgid "Unable to find HTML+ RNG schema '%s'"
 msgstr "Nepodařilo se nalézt HTML+ RNG schéma '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:255
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:257
 msgid "relaxNGValidate() internal error occured"
-msgstr "relaxNGValidate() došlo k vnitřní chybě"
+msgstr "Došlo k vnitřní chybě funkce relaxNGValidate()"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:259
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:261
 msgid "Caution: this message may be misleading"
 msgstr "Upozornění: tato informace může být zavádějící"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:327
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:333
 #, php-format
 msgid "Unable to insert array variable '%s' into '%s'"
-msgstr "Nepodařilo se vložit proměnnou '%s' typu array do '%s'"
+msgstr "Obsah proměnné '%s' se nepodařilo vložit do '%s' jako pole"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMDocumentPlus.php:341
-msgid "Unable to parse variable"
-msgstr "Nepodařilo se parsovat proměnnou"
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:347
+#, php-format
+msgid "Unable to parse variable '%s'"
+msgstr "Proměnnou '%s' se nepodařilo zpracovat"
 
-#: /cygdrive/d/wamp/www/cms/core/DOMElementPlus.php:35
+#: D:\wamp\www\cms/core/DOMElementPlus.php:41
 #, php-format
 msgid "Attribute '%s' stripped"
 msgstr "Atribut '%s' byl odstraněn"
 
-#: /cygdrive/d/wamp/www/cms/core/global_func.php:17
-#, php-format
-msgid "Unable to parse URL '%s'"
-msgstr "Nepodařilo se parsovat URL '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_func.php:30
-#, php-format
-msgid "Cyclic redirection to '%s'"
-msgstr "Cyklické přesměrování na '%s'"
-
-#: /cygdrive/d/wamp/www/cms/core/global_func.php:33
-#, php-format
-msgid "Redirecting to '%s' with status code %s"
-msgstr "Přesměrování na '%s' se statusem %s"
-
-#: /cygdrive/d/wamp/www/cms/core/global_func.php:97
-#, php-format
-msgid "Invalid extended expression '%s'"
-msgstr "Rozšířený výraz '%s' není validní"
-
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:156
+#: D:\wamp\www\cms/core/HTMLPlus.php:156
 msgid "Root element not found"
 msgstr "Nebyl nalezen kořenový element"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:159
+#: D:\wamp\www\cms/core/HTMLPlus.php:158
 msgid "Root element must be 'body'"
 msgstr "Kořenový element musí být 'body'"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:164
+#: D:\wamp\www\cms/core/HTMLPlus.php:163
 msgid "Attribute 'xml:lang' is missing in element body"
 msgstr "V elementu body chybí atribut 'xml:lang'"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:169
+#: D:\wamp\www\cms/core/HTMLPlus.php:168
 msgid "Element section cannot be empty"
 msgstr "Element section nesmí být prázdný"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:178
+#: D:\wamp\www\cms/core/HTMLPlus.php:177
 msgid "There must be exactly one heading in body element"
 msgstr "V elementu body musí být právě jeden nadpis"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:182
+#: D:\wamp\www\cms/core/HTMLPlus.php:181
 msgid "Missing heading in body element"
 msgstr "V elementu body chybí nadpis"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:196
+#: D:\wamp\www\cms/core/HTMLPlus.php:195
 msgid "Web title"
 msgstr "Titulek webu"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:198
+#: D:\wamp\www\cms/core/HTMLPlus.php:197
 msgid "Web description"
 msgstr "Popisek webu"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:207
+#: D:\wamp\www\cms/core/HTMLPlus.php:206
 msgid "Empty section(s) found"
 msgstr "Nalezen jeden nebo více prázdných elementů section"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:209
+#: D:\wamp\www\cms/core/HTMLPlus.php:208
 msgid "Empty section deleted"
-msgstr "Smazán prázdný element section"
+msgstr "Byl smazán prázdný element section"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:217
+#: D:\wamp\www\cms/core/HTMLPlus.php:215
 msgid "Lang attribute without xml namespace"
-msgstr "Atribut lang je bez jmenného prostu xml"
+msgstr "Atributu lang postrádá jmenný prostor xml"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:228
+#: D:\wamp\www\cms/core/HTMLPlus.php:226
 msgid "Missing id attribute in element h"
 msgstr "V elementu h chybí atribut id"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:235
+#: D:\wamp\www\cms/core/HTMLPlus.php:233
 #, php-format
 msgid "Invalid id attribute value '%s'"
 msgstr "Chybná hodnota '%s' atributu id"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:245
+#: D:\wamp\www\cms/core/HTMLPlus.php:243
 msgid "Heading content must not be empty"
 msgstr "Nadpis nesmí být prázdný"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:254
+#: D:\wamp\www\cms/core/HTMLPlus.php:252
 msgid "Missing element 'desc'"
 msgstr "Chybí element 'desc'"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:277
+#: D:\wamp\www\cms/core/HTMLPlus.php:275
 #, php-format
 msgid "Normalize link leads to empty value '%s'"
-msgstr "Normalizovaný odkaz '%s' má prázdnou hodnotu"
+msgstr "Normalizace odkazu '%s' vede k prázné hodnotě"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:278
+#: D:\wamp\www\cms/core/HTMLPlus.php:276
 msgid "Empty link found"
 msgstr "Nalezen prázdný odkaz"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:281
+#: D:\wamp\www\cms/core/HTMLPlus.php:279
 #, php-format
 msgid "Invalid link value found '%s'"
-msgstr "Nalezena nevalidní hodnota odkazu '%s'"
+msgstr "Odkaz '%s' má chybnoý formát"
 
-#: /cygdrive/d/wamp/www/cms/core/HTMLPlus.php:283
+#: D:\wamp\www\cms/core/HTMLPlus.php:281
 #, php-format
 msgid "Normalize link leads to duplicit value '%s'"
-msgstr "Normalizovaný odkaz '%s' je duplicitní"
+msgstr "Normalizace odkazu '%s' způsobuje duplicitu"
 
-#: /cygdrive/d/wamp/www/cms/core/init_cms.php:10
-#, php-format
-msgid "IGCMS successfully finished"
-msgstr "IGCMS úspěšně dokončen"
-
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:13
+#: D:\wamp\www\cms/core/InitServer.php:13
 #, php-format
 msgid "Invalid subdom format '%s'"
-msgstr "Špatný formát poddomény '%s'"
+msgstr "Poddoména '%s' má chybný formát"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:27
+#: D:\wamp\www\cms/core/InitServer.php:27
 #, php-format
 msgid "Subdom '%s' does not exist; try forcing updateSubdom"
 msgstr "Poddoména '%s' neexistuje; zkuste použít updateSubdom"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:31
+#: D:\wamp\www\cms/core/InitServer.php:31
 #, php-format
 msgid "Subdom '%s' is not available; try forcing updateSubdom"
 msgstr "Poddoména '%s' není dostupná; zkuste použít updateSubdom"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:35
+#: D:\wamp\www\cms/core/InitServer.php:35
 #, php-format
-msgid "Unauthorized subdom modification '%s' - USER_ID mismatch"
-msgstr "Nepovolená změna poddomény '%s' - USER_ID nesoulad"
+msgid "Unauthorized subdom '%s' modification - user names mismatch"
+msgstr "Nepovolená změna poddomény '%s' - nesoulad uživatelských jmen"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:49
+#: D:\wamp\www\cms/core/InitServer.php:49
 msgid "User subdom setup disabled; file CONFIG.user not found"
 msgstr ""
 "Uživatelské nastavení poddomény je zakázáno; soubor CONFIG.user nebyl nalezen"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:78
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:123
+#: D:\wamp\www\cms/core/InitServer.php:78
+#: D:\wamp\www\cms/core/InitServer.php:123
 #, php-format
 msgid "Unable to create folder '%s'"
 msgstr "Nepodařilo se vytvořit složku '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:80
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:262
+#: D:\wamp\www\cms/core/InitServer.php:80
+#: D:\wamp\www\cms/core/InitServer.php:252
 #, php-format
 msgid "Unable to set permissions to '%s'"
 msgstr "Nepodařilo se nastavit práva na '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:110
+#: D:\wamp\www\cms/core/InitServer.php:110
 #, php-format
 msgid "Unable to remove folder '%s'"
 msgstr "Nepodařilo se odstranit složku '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:116
+#: D:\wamp\www\cms/core/InitServer.php:116
 #, php-format
 msgid "Unable to rename folder '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:121
+#: D:\wamp\www\cms/core/InitServer.php:121
 #, php-format
-msgid "New subdom must start with USER_ID '%s'"
-msgstr "Nová poddoména musí začínat na USER_ID '%s'"
+msgid "New subdom must start with user id '%s'"
+msgstr "Nová poddoména musí začínat na uživatelské jméno  '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:128
+#: D:\wamp\www\cms/core/InitServer.php:128
 msgid "Unable to create USER_ID file"
 msgstr "Nepodařilo se vytvořit soubor USER_ID"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:130
+#: D:\wamp\www\cms/core/InitServer.php:130
 msgid "Unable to create CONFIG file"
 msgstr "Nepodařilo se vytvořit soubor CONFIG"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:139
-msgid "No stable IGCMS variant found"
-msgstr "Nebyla nalezena žádná stabilní verze IGCMS"
-
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:177
+#: D:\wamp\www\cms/core/InitServer.php:167
 msgid "Unable to reset server subdom setup"
 msgstr "Nepodařilo se resetovat serverové nastavení poddomény"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:186
+#: D:\wamp\www\cms/core/InitServer.php:176
 msgid "Unable to create configuration file(s)"
 msgstr "Nepodařilo se vytvořit konfigurační soubor(y)"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:198
+#: D:\wamp\www\cms/core/InitServer.php:188
 #, php-format
 msgid "CMS variant '%s' is not available"
 msgstr "Varianta CMS '%s' není dostupná"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:205
+#: D:\wamp\www\cms/core/InitServer.php:195
 #, php-format
 msgid "Plugin '%s' is not available"
 msgstr "Rozšíření '%s' není dostupné"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:207
+#: D:\wamp\www\cms/core/InitServer.php:197
 #, php-format
 msgid "Plugin '%s' is forbidden"
 msgstr "Rozšíření '%s' je zakázané"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:209
+#: D:\wamp\www\cms/core/InitServer.php:199
 #, php-format
 msgid "Unable to enable plugin '%s'"
 msgstr "Nepodařilo se zapnout rozšíření '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:214
+#: D:\wamp\www\cms/core/InitServer.php:204
 #, php-format
 msgid "Cannot modify '%s' in subdom '%s'"
 msgstr "Nelze upravit '%s' na poddoméně '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:216
+#: D:\wamp\www\cms/core/InitServer.php:206
 #, php-format
 msgid "Unable to copy '%s' into subdom '%s'"
 msgstr "Nepodařilo se zkopírovat '%s' do poddomény '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:230
+#: D:\wamp\www\cms/core/InitServer.php:220
 msgid "Unable to update user subdom setup"
 msgstr "Nepodařilo se aktualizovat uživatelské nastavení poddomény"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:233
+#: D:\wamp\www\cms/core/InitServer.php:223
 #, php-format
 msgid "Unable to setup '%s'"
 msgstr "Nepodařilo se nastavit '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:237
+#: D:\wamp\www\cms/core/InitServer.php:227
 #, php-format
 msgid "Unable to disable plugin '%s'"
 msgstr "Nepodařilo se vypnout rozšíření '%s'"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:269
+#: D:\wamp\www\cms/core/InitServer.php:259
 msgid "Unable to create forbidden plugin files"
-msgstr "Nepořadilo se vytvořit nastavení zakazující rozšíření"
+msgstr "Nepořadilo se vytvořit soubory zakázaných rozšíření"
 
-#: /cygdrive/d/wamp/www/cms/core/InitServer.php:275
+#: D:\wamp\www\cms/core/InitServer.php:265
 msgid "Unable to create plugin files"
-msgstr "Nepodařilo se vytvořit nastavení rozšíření"
+msgstr "Nepodařilo se vytvořit soubory rozšíření"
 
-#: /cygdrive/d/wamp/www/cms/core/init_cms.php:39
+#: D:\wamp\www\cms/core/Logger.php:14
+#, php-format
+msgid "Unable to create log dir '%s'"
+msgstr "Nepodařilo se vytvořit složku '%s'"
+
+#: D:\wamp\www\cms/core/Plugin.php:17
+#, php-format
+msgid "Detaching '%s' due to '%s' dependancy"
+msgstr ""
+"Rozšíření '%s' bylo odpojeno kvůli závislosti na neaktivním rozšíření '%s'"
+
+#: D:\wamp\www\cms/core/Plugin.php:49
+msgid "Unable to build DOM if SplSubject not set"
+msgstr "Nelze vytvořit DOM když není nastavený SplSubject"
+
+#: D:\wamp\www\cms/core/Plugins.php:33
+#, php-format
+msgid "Missing plugin folder '%s'"
+msgstr "Umístění rozšíření '%s' nebylo nalezeno"
+
+#: D:\wamp\www\cms/core/global_const.php:86
+msgid "No stable IGCMS variant found"
+msgstr "Nebyla nalezena žádná stabilní verze IGCMS"
+
+#: D:\wamp\www\cms/core/global_const.php:96
+#, php-format
+msgid "Unable to find class '%s' in '%s' nor '%s'"
+msgstr "Nepodařilo se najít třídu '%s' v '%s' ani v '%s'"
+
+#: D:\wamp\www\cms/core/global_const.php:136
+#, php-format
+msgid "Forbidden file name '%s' format to copy to '%s' folder"
+msgstr "Zakázaný formát souboru '%s' pro kopírování do složky '%s'"
+
+#: D:\wamp\www\cms/core/global_const.php:140
+#, php-format
+msgid "Forbidden MIME type '%s' to copy '%s' to '%s' folder"
+msgstr "Zakázaný MIME typ '%s' pro kopírování '%s' do složky '%s'"
+
+#: D:\wamp\www\cms/core/global_const.php:145
+#, php-format
+msgid "Unable to create directory structure '%s'"
+msgstr "Nelze vytvořit adresářovou strukturu '%s'"
+
+#: D:\wamp\www\cms/core/global_const.php:149
+#, php-format
+msgid "Unable to create symlink '%s' for '%s'"
+msgstr "Nelze vytvořit symbolický odkaz '%s' pro '%s'"
+
+#: D:\wamp\www\cms/core/global_const.php:161
+#, php-format
+msgid "Unable to create symlink '%s'"
+msgstr "Nelze vytvořit symbolický odkaz '%s'"
+
+#: D:\wamp\www\cms/core/global_const.php:163
+msgid "Unable to force symlink cache update: may take longer to apply"
+msgstr ""
+"Nepodařilo se aktualizovat symbolické linky v mezipaměti: projevení změn "
+"může trvat déle"
+
+#: D:\wamp\www\cms/core/global_func.php:17
+#, php-format
+msgid "Unable to parse URL '%s'"
+msgstr "Odkaz '%s' má chybný formát"
+
+#: D:\wamp\www\cms/core/global_func.php:30
+#, php-format
+msgid "Cyclic redirection to '%s'"
+msgstr "Cyklické přesměrování na '%s'"
+
+#: D:\wamp\www\cms/core/global_func.php:33
+#, php-format
+msgid "Redirecting to '%s' with status code %s"
+msgstr "Přesměrování na '%s' s návratovým kódem %s"
+
+#: D:\wamp\www\cms/core/global_func.php:97
+#, php-format
+msgid "Invalid extended expression '%s'"
+msgstr "Rozšířený výraz '%s' má chybnou syntaxi"
+
+#: D:\wamp\www\cms/core/init_cms.php:11
+#, php-format
+msgid "IGCMS successfully finished"
+msgstr "IGCMS standardně ukončen"
+
+#: D:\wamp\www\cms/core/init_cms.php:39
 #, php-format
 msgid "Exception: %s in %s on line %s"
 msgstr "Výjimka: %s v %s na řádku %s"
 
-#: /cygdrive/d/wamp/www/cms/core/Logger.php:10
-#, php-format
-msgid "Unable to create log dir '%s'"
-msgstr "Nepodařilo se vytvořit složku log '%s'"
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:29
+msgid "new file"
+msgstr "nový soubor"
 
-#: /cygdrive/d/wamp/www/cms/core/Plugin.php:17
-#, php-format
-msgid "Detaching '%s' due to '%s' dependancy"
-msgstr "Odpojuji '%s' kvůli '%s' závislosti"
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:29
+msgid "active file"
+msgstr "aktivní soubor"
 
-#: /cygdrive/d/wamp/www/cms/core/Plugin.php:49
-msgid "Unable to build DOM if SplSubject not set"
-msgstr "Nelze vytvořit DOM když není nastavený SplSubject"
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:29
+msgid "inactive file"
+msgstr "neaktivní soubor"
 
-#: /cygdrive/d/wamp/www/cms/core/Plugins.php:33
-#, php-format
-msgid "Missing plugin folder '%s'"
-msgstr "Chybí složka pro rozšíření '%s'"
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:75
+msgid "replace"
+msgstr "nahrazení"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:185
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:75
+msgid "modify"
+msgstr "modifikace"
+
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:185
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:237
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:236
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:255
-msgid "No changes made"
-msgstr "Nebyly provedeny žádné změny"
-
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:257
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:261
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:265
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:267
+msgid "No changes made"
+msgstr "Nebyly provedeny žádné změny"
+
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:276
 #, php-format
 msgid "Unable to get contents from '%s'"
-msgstr "Nepodařilo se získat obsah z '%s'"
+msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:270
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:283
 msgid "Unable to save changes, administration may be locked"
-msgstr "Nepodařilo se uložit změny, administrace je nejspíše uzamčená"
+msgstr "Nepodařilo se uložit změny, administrace je pravděpodobně uzamčená"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:281
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:289
+msgid "Status successfully changed"
+msgstr "Stav byl úspěšně změněn"
+
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:296
+msgid "Changes successfully saved"
+msgstr "Změny byly úspěšně uloženy"
+
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:318
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Admin/Admin.php:293
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:330
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Auth/Auth.php:28
-msgid "Authentication required"
-msgstr "Je vyžadováno přihlášení"
+#: D:\wamp\www\cms/plugins/Auth/Auth.php:20
+msgid "Unable to regenerate session ID"
+msgstr "Nepodařilo se obnovit identifikátor relace"
 
-#: /cygdrive/d/wamp/www/cms/plugins/ContentBalancer/ContentBalancer.php:46
+#: D:\wamp\www\cms/plugins/Auth/Auth.php:43
+msgid "Authorization Required"
+msgstr "Přístup na tuto stránku je podmíněn autorizací"
+
+#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:46
 #, php-format
 msgid "Unable to find parent heading for %s"
 msgstr "Nepodařilo se nelézt nadřazený nadpis pro '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/ContentLink/ContentLink.php:26
+#: D:\wamp\www\cms/plugins/ContentLink/ContentLink.php:25
 #, php-format
 msgid "Page '%s' not found"
 msgstr "Stránka '%s' nebyla nalezena"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:77
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:26
+msgid "Unable to create convertor tmp folder"
+msgstr "Nepodařilo se vytvořit složku pro dočasné soubory"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:37
+msgid "File URL cannot be empty"
+msgstr "Vložte odkaz na soubor"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:68
+#, php-format
+msgid "Unsupported file MIME type '%s'"
+msgstr "Soubor '%s' má nepodporovaný MIME typ"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:88
 msgid "File successfully imported"
 msgstr "Soubor byl úspěšně importován"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:80
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:91
 #, php-format
 msgid "Unable to save imported file '%s.html' into temp folder"
 msgstr ""
-"Nepodařilo se uložit importovaný soubor '%s'.html do složky dočasných "
+"Nepodařilo se uložit importovaný soubor '%s.html' do složky dočasných "
 "souborů."
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:140
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:147
 #, php-format
 msgid "File '%s' not found in temp folder"
-msgstr "Soubor '%s' nebyl v dočasných souborech nalezen"
+msgstr "Soubor '%s' nebyl nalezen mezi dočasnými soubory"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:146
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:153
 msgid "Unable to parse link"
-msgstr "Nepodařilo se parsovat odkaz"
+msgstr "Odkaz má neplatný formát"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:157
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:164
 #, php-format
 msgid "Destination URL '%s' is unaccessible; must be shared publically"
-msgstr "Cílova URL adresa '%s' není přístupná; musí být dostupná pro veřejnost"
+msgstr ""
+"Cílova URL adresa '%s' není přístupná; soubor musí být dostupný pro veřejnost"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:159
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:166
 #, php-format
 msgid "Destination URL '%s' error: %s"
-msgstr "Cílová URL '%s', chyba: %s"
+msgstr "Chyba požadavku '%s', kód %s"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:201
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:208
 #, php-format
 msgid "Unable to locate '%s' in '%s'"
-msgstr "Nepodařilo se nalézt '%s' v '%s'"
+msgstr "Nepodařilo se nalézt soubor '%s' v archivu '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:216
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:223
 #, php-format
 msgid "Failed to apply transformation '%s'"
 msgstr "Nepodařilo se aplikovat transformaci '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/FileHandler/FileHandler.php:26
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:26
 #, php-format
 msgid "Unable to read file '%s'"
 msgstr "Nepodařilo se přečíst soubor '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/GA/GA.php:28
+#: D:\wamp\www\cms/plugins/GA/GA.php:27
 #, php-format
 msgid "Invalid ga_id format '%s'"
-msgstr "Nevalidní formát ga_id '%s'"
+msgstr "Chybný formát ga_id '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/InputVar/InputVar.php:58
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:57
 msgid "Attribute 'name' required for translate function"
-msgstr "Pro funkci translate je vyžadován atribut 'name'"
+msgstr "Funkce translate vyžaduje atribut 'name'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/InputVar/InputVar.php:88
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:86
 msgid "Unrecognized date value or format"
-msgstr "Nerozpoznatelný formát data"
+msgstr "Datum má neplatný formát"
 
-#: /cygdrive/d/wamp/www/cms/plugins/InputVar/InputVar.php:121
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:118
 #, php-format
 msgid "Variable '%s' does not exist"
 msgstr "Proměnná '%s' neexistuje"
 
-#: /cygdrive/d/wamp/www/cms/plugins/LogViewer/LogViewer.php:41
+#: D:\wamp\www\cms/plugins/LogViewer/LogViewer.php:40
 #, php-format
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:44
-#, php-format
-msgid "Unauthorized subdom '%s' modification by '%s'"
-msgstr "Nepovolená úprava poddomény '%s' od '%s'"
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:63
+msgid "Invalid POST request"
+msgstr "Neplatný požadavek POST"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:52
-msgid "Unrecognized POST request"
-msgstr "Nerozpoznatelný požadavek POST"
-
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:55
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:66
 msgid "Invalid mirror subdom format"
-msgstr "Nevalidní formát zrcadla poddomény"
+msgstr "Název zrcadlené poddomény má chybný formát"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:58
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:69
 #, php-format
 msgid "Subdom '%s' configuration file not found"
 msgstr "Konfigurační soubory poddomény '%s' nebyly nalezeny"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:60
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:71
 #, php-format
 msgid "Subdom '%s' user folder exists"
 msgstr "Uživatelský adresář pro poddoménu '%s' již existuje"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:67
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:78
 msgid "Unable to create subdom mirror"
 msgstr "Nepodařilo se vytvořit zrcadlo poddomény"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:95
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:97
+#, php-format
+msgid "Unauthorized subdom '%s' modification by '%s'"
+msgstr "Nepovolená úprava poddomény '%s' uživatelem '%s'"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:119
 #, php-format
 msgid "Unable to backup subdom '%s' setup"
 msgstr "Nepodřailo se zálohovat nastavení poddomény '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:98
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:122
 #, php-format
 msgid "Unable to create '%s' dir"
 msgstr "Nepodařilo se vytvořit složku '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:106
-msgid "Invalid subdom format"
-msgstr "Nevalidní formát poddomény"
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:124
+#, php-format
+msgid "Subdom %s successfully deleted"
+msgstr "Poddoména %s byla úspěšně smazána"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:108
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:130
+msgid "Invalid subdom format"
+msgstr "Název poddomény má chybný formát"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:132
 #, php-format
 msgid "Subdom '%s' already exists"
 msgstr "Poddoména '%s' již existuje"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:116
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:133
+#, php-format
+msgid "Subdom %s successfully created"
+msgstr "Poddoména %s byla úspěšně vytvořena"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:141
 #, php-format
 msgid "Unable to create user subdom directory '%s'"
 msgstr "Nepodařilo se vytvořit uživatelský adresář pro poddoménu '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:118
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:143
 msgid "Missing POST data 'PLUGINS'"
-msgstr "Chybí POST data 'PLUGINS'"
+msgstr "V požadavku POST chybí proměnná 'PLUGINS'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:126
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:152
 #, php-format
 msgid "Missing POST data '%s'"
-msgstr "Chybí POST data '%s'"
+msgstr "Chybí data požadavku POST '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:128
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:154
 #, php-format
 msgid "Unable to set '%s' to '%s'"
 msgstr "Nepodařilo se nastavit '%s' na '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:132
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:158
 #, php-format
 msgid "Unable to disable plugin from subdom '%s'"
-msgstr "Nepodařilo se vypnout rozšíření poddomény '%s'"
+msgstr "Nepodařilo se vypnout rozšíření na poddoméně '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/SubdomManager/SubdomManager.php:137
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:163
 #, php-format
 msgid "Unable to enable plugin from subdom '%s'"
-msgstr "Nepořadilo se zapnout rozšíření poddomény '%s'"
+msgstr "Nepořadilo se zapnout rozšíření na poddoméně '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/TOC/TOC.php:24
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:166
+#, php-format
+msgid "No changes made in '%s'"
+msgstr "Na poddoméně %s nebyly provedeny žádné změny"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:167
+#, php-format
+msgid "Subdom %s successfully updated"
+msgstr "Aktualizace poddomény %s proběhla úspěšně"
+
+#: D:\wamp\www\cms/plugins/TOC/TOC.php:23
 msgid "Table of Contents"
 msgstr "Obsah"
 
-#: /cygdrive/d/wamp/www/cms/plugins/UrlHandler/UrlHandler.php:38
+#: D:\wamp\www\cms/plugins/UrlHandler/UrlHandler.php:37
 #, php-format
 msgid "Redirection link '%s' not found"
-msgstr "Přesměrování odkazu '%s' nebylo nalezeno"
+msgstr "Cílový odkaz '%s' neexistuje"
 
-#: /cygdrive/d/wamp/www/cms/plugins/UrlHandler/UrlHandler.php:79
+#: D:\wamp\www\cms/plugins/UrlHandler/UrlHandler.php:77
 #, php-format
 msgid "Link '%s' not found, redir to '%s'"
 msgstr "Odkaz '%s' nebyl nalezen, přesměrování na '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:91
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:89
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
-msgstr "Nevalidní transformace nebo parametr v '%s'"
+msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:125
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:126
 #, php-format
 msgid "Invalid object data '%s' format"
-msgstr "Nevalidní object data '%s' formát"
+msgstr "Chybná cesta zdrojového souboru '%s' v elementu object"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:135
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:136
 #, php-format
 msgid "Object data '%s' not found"
-msgstr "Oject data '%s' nebyl nenalezen"
+msgstr "Cílový soubor elementu object '%s' nebyl nenalezen"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:151
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:152
 #, php-format
 msgid "Invalid object '%s' MIME type '%s'"
-msgstr "Element object '%s' má nevalidní MIME typ '%s'"
+msgstr "Element object '%s' má chybný MIME typ '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:154
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:155
 #, php-format
 msgid "Object '%s' attribute type set to '%s'"
 msgstr "Atribut elementu '%s' byl nastaven na '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:158
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:159
 #, php-format
 msgid "Object '%s' suspiciously big: %s"
 msgstr "Element object '%s' je podezřele velký: '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:205
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:206
 #, php-format
 msgid "Unable to convert variable '%s' to string"
-msgstr "Nepodařilo se převést proměnnou '%s' na řetězec"
+msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:238
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:239
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:251
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:252
 #, php-format
 msgid "Unable to create root '%s' link"
-msgstr "Nepodařilo se vytvořit kořenový odkaz '%s'"
+msgstr "Nepodařilo se vytvořit symbolický odkaz '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:284
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:285
 #, php-format
 msgid "XSLT '%s' compilation error"
-msgstr "Chyba při kompilaci XSLT '%s'"
+msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:286
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:287
 #, php-format
 msgid "XSLT '%s' transformation fail"
-msgstr "Chyba při transformaci XSLT '%s'"
+msgstr "Selhání transformace '%s'"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:319
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:320
 #, php-format
 msgid "Link [%s] file '%s' not found"
-msgstr "Odkaz [%s] souboru '%s' nebyl nalezen"
+msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 
-#: /cygdrive/d/wamp/www/cms/plugins/Convertor/Convertor.php:57
-#, php-format
-msgid "Unsupported file MIME type '%s'"
-msgstr "Nepodporovaný MIME typ souboru '%s'"
-
-#: /cygdrive/d/wamp/www/cms/plugins/Xhtml11/Xhtml11.php:404
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:402
 #, php-format
 msgid "Javascript file '%s' not found"
-msgstr "Soubor javascriptu '%s' nebyl nalezen"
+msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "Some variable generates invalid HTML+: %s"
+#~ msgstr "Některá proměnná generuje nevalidní HTML+: %s"
+
+#~ msgid "Unsupported variable '%s' type"
+#~ msgstr "Nepodporovaný typ proměnné '%s'"
+
+#~ msgid "Input variable '%s' is not XML valid"
+#~ msgstr "Vstupní proměnná  '%s' není XML validní"
+
+#~ msgid "Cyclic import '%s' found in '%s'"
+#~ msgstr "Cyklický import '%s' nalezen v '%s'"

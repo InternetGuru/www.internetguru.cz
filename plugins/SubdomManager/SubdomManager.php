@@ -60,7 +60,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private function processPost() {
     try {
       $subdom = $this->getSubdomFromRequest();
-      if(is_null($subdom)) throw new Exception(_("Unrecognized POST request"));
+      if(is_null($subdom)) throw new Exception(_("Invalid POST request"));
       if(isset($_POST["mirror"]) && strlen($_POST["mirror"])) {
         if(!preg_match("/^".SUBDOM_PATTERN."$/", $_POST["mirror"]))
           throw new Exception(_("Invalid mirror subdom format"));

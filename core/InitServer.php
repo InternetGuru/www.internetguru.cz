@@ -32,7 +32,7 @@ class InitServer {
       $this->acquireSubdom($serverSubdomDir);
     }
     if($update && !is_file("$serverSubdomDir/USER_ID.". $this->subdomVars["USER_ID"]))
-      throw new Exception(sprintf(_("Unauthorized subdom modification '%s' - USER_ID mismatch"), $this->subdom));
+      throw new Exception(sprintf(_("Unauthorized subdom '%s' modification - user names mismatch"), $this->subdom));
     $userDelDir = dirname($userSubdomDir)."/.$subdom";
     if($update && is_dir($userDelDir)) {
       $this->safeDeleteSubdom($userDelDir, $serverSubdomDir);
@@ -118,7 +118,7 @@ class InitServer {
 
   private function createSubdom($dir) {
     if(!preg_match("/^".$this->subdomVars["USER_ID"].SUBDOM_PATTERN."$/", $this->subdom))
-      throw new Exception(sprintf(_("New subdom must start with USER_ID '%s'"), $this->subdomVars["USER_ID"]));
+      throw new Exception(sprintf(_("New subdom must start with user id '%s'"), $this->subdomVars["USER_ID"]));
     if(!@mkdir($dir, 0755, true))
       throw new Exception(sprintf(_("Unable to create folder '%s'"), $dir));
   }

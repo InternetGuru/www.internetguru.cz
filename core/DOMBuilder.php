@@ -242,7 +242,7 @@ class DOMBuilder {
           continue;
         }
         if($sameIdElement->nodeName != $n->nodeName)
-          throw new Exception(sprintf(_("ID conflicts with element '%s'"), $n->nodeName));
+          throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $n->getAttribute("id"),$n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
         $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
       } else {

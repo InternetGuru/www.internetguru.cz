@@ -52,7 +52,7 @@ class DOMDocumentPlus extends DOMDocument {
       $e = $item[0];
       $attr = $item[1];
       if(is_null(@$e->getNodePath())) {
-        new Logger(sprintf(_("Unable to insert variable '%s' because destination element no longer exists"), $varName), "warning");
+        new Logger(sprintf(_("Variable '%s' destination element '%s' no longer exists"), $varName, $e->nodeName), "warning");
         continue;
       }
       if(is_null($e->parentNode)) continue;
@@ -83,7 +83,7 @@ class DOMDocumentPlus extends DOMDocument {
           $this->insertVarDOMElement($varValue, $e, $attr, $varName);
           break;
         }
-        new Logger(sprintf(_("Unsupported variable type '%s' for '%s'"), get_class($varValue), $varName), "error");
+        new Logger(sprintf(_("Unsupported variable type '%s' in '%s'"), get_class($varValue), $varName), "error");
       }
     }
   }
@@ -299,7 +299,7 @@ class DOMDocumentPlus extends DOMDocument {
       $e->setAttribute($attr,$varValue);
       return;
     }
-    $this->insertInnerHTML($varValue, $e);
+    $this->insertInnerHTML($varValue, $e, "", $varName);
     #$e->nodeValue = $varValue;
   }
 
@@ -333,10 +333,10 @@ class DOMDocumentPlus extends DOMDocument {
       new Logger(sprintf(_("Unable to insert array variable '%s' into '%s'"), $varName, $e->nodeName), "error");
       return;
     }
-    $this->insertInnerHTML($varValue, $e, $sep);
+    $this->insertInnerHTML($varValue, $e, $sep, $varName);
   }
 
-  private function insertInnerHTML($html, DOMElement $dest, $sep = "") {
+  private function insertInnerHTML($html, DOMElement $dest, $sep = "", $varName = "") {
     if(!is_array($html)) $html = array($html);
     $dom = new DOMDocument();
     $eNam = $dest->nodeName;
@@ -344,7 +344,7 @@ class DOMDocumentPlus extends DOMDocument {
     if(!@$dom->loadXML($xml)) {
       foreach($html as $k => $v) $html[$k] = htmlspecialchars($v);
       $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$html)."</$eNam></var>";
-      if(!@$dom->loadXML($xml)) throw new Exception(_("Unable to parse variable"));
+      if(!@$dom->loadXML($xml)) throw new Exception(sprintf(_("Unable to parse variable '%s'"), $varName));
     }
     $this->insertVarDOMElement($dom->documentElement, $dest);
   }
