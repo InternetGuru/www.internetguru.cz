@@ -65,9 +65,10 @@ if(CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
 } else {
-  if(isAtLocalhost()) setlocale(LC_ALL, "cs_CZ.utf8");
-  else setlocale(LC_ALL, "czech");
-  putenv("LANG=cs_CZ"); // for gettext
+  #if(!isAtLocalhost())
+  setlocale(LC_ALL, "cs_CZ.UTF-8");
+  #else setlocale(LC_ALL, "czech");
+  putenv("LANG=cs_CZ.UTF-8"); // for gettext
   bindtextdomain("messages", LIB_FOLDER."/locale");
   textdomain("messages");
 }
@@ -159,7 +160,7 @@ function createSymlink($link, $target) {
   if(!symlink($target, "$link~") || !rename("$link~", $link))
     throw new Exception(sprintf(_("Unable to create symlink '%s'"), $link));
   if($restart && !touch(APACHE_RESTART_FILEPATH))
-    new Logger(_("Unable to force symlink cache update"), "error");
+    new Logger(_("Unable to force symlink cache update: may take longer to apply"), "error");
 }
 
 ?>
