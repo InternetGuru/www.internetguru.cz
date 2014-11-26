@@ -23,10 +23,24 @@
       <element name="section">
         <ref name="Common.attrib"/>
         <oneOrMore>
-          <ref name="contentBlock"/>
+          <choice>
+            <ref name="contentBlock"/>
+            <ref name="import"/>
+          </choice>
         </oneOrMore>
       </element>
     </optional>
+  </define>
+
+  <define name="import">
+    <element name="import">
+      <attribute name="src">
+        <data type="string">
+          <param name="pattern">[a-z][a-z0-9_/.-]*</param>
+        </data>
+      </attribute>
+      <ref name="contentBlock"/>
+    </element>
   </define>
 
   <define name="htmlplus.h">
@@ -46,9 +60,6 @@
             <param name="pattern">[a-z][a-z0-9_/-]*</param>
           </data>
         </attribute>
-      </optional>
-      <optional>
-        <attribute name="import"/>
       </optional>
       <optional>
         <attribute name="author">

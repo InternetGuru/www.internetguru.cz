@@ -69,7 +69,7 @@ class DOMBuilder {
     try {
       if(is_file($f)) $this->updateDOM($f,true);
     } catch(Exception $e) {
-      new Logger($e->getMessage,"error");
+      new Logger($e->getMessage(),"error");
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
@@ -79,7 +79,7 @@ class DOMBuilder {
     try {
       if(is_file($f)) $this->updateDOM($f);
     } catch(Exception $e) {
-      new Logger($e->getMessage,"error");
+      new Logger($e->getMessage(),"error");
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
   }
@@ -103,8 +103,9 @@ class DOMBuilder {
     $e = null;
     foreach($files as $f => $void) {
       try {
-        $this->loadDOM($f,$doc);
+        $this->loadDOM($f, $doc);
       } catch(Exception $e) {
+        new Logger(sprintf(_("Unable to load '%s': %s"), $f, $e->getMessage()), "error");
         continue;
       }
       $success = true;
@@ -138,30 +139,28 @@ class DOMBuilder {
   private function insertImports(HTMLPlus $doc, $filePath) {
     $filePath = realpath($filePath);
     $this->imported[$filePath] = null;
-    $headings = array();
-    foreach($doc->getElementsByTagName("h") as $h) {
-      if($h->hasAttribute("import")) $headings[] = $h;
-    }
-    if(!count($headings)) return;
+    $imports = array();
+    foreach($doc->getElementsByTagName("import") as $import) $imports[] = $import;
+    if(!count($imports)) return;
     $l = new Logger(_("Importing HTML+"), null, 0);
-    foreach($headings as $h) {
-      $somethingImported = false;
-      foreach(explode(" ", $h->getAttribute("import")) as $val) {
-        try {
-          $this->insertHtmlPlus($val, $h, dirname($filePath));
-          $somethingImported = true;
-        } catch(Exception $e) {
-          new Logger($e->getMessage(), Logger::LOGGER_ERROR);
-        }
+    $toStripElement = array();
+    $toStripTag = array();
+    foreach($imports as $import) {
+      try {
+        $this->insertHtmlPlus($import, dirname($filePath));
+        $toStripElement[] = $import;
+      } catch(Exception $e) {
+        $toStripTag[] = $import;
+        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
       }
-      $h->removeAttribute("import");
-      if(!$somethingImported) continue;
-      $h->ownerDocument->removeUntilSame($h);
     }
+    foreach($toStripTag as $import) $import->stripTag();
+    foreach($toStripElement as $import) $import->stripElement();
     $l->finished();
   }
 
-  private function insertHtmlPlus($val, DOMElement $h, $homeDir) {
+  private function insertHtmlPlus(DOMElement $import, $homeDir) {
+    $val = $import->getAttribute("src");
     $file = realpath("$homeDir/$val");
     if($file === false)
       throw new Exception(sprintf(_("Imported file '%s' not found"), $val));
@@ -178,20 +177,20 @@ class DOMBuilder {
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
-      $h->parentNode->insertBefore($c, $h);
+      $import->parentNode->insertBefore($c, $import);
       throw new Exception($msg);
     }
-    $sectLang = $this->getSectionLang($h->parentNode);
+    $sectLang = $this->getSectionLang($import->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
       new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
     foreach($doc->documentElement->childElements as $n) {
-      $h->parentNode->insertBefore($h->ownerDocument->importNode($n, true), $h);
+      $import->parentNode->insertBefore($import->ownerDocument->importNode($n, true), $import);
     }
     try {
-      $h->ownerDocument->validatePlus();
+      $import->ownerDocument->validatePlus();
     } catch(Exception $e) {
-      $h->ownerDocument->validatePlus(true);
+      $import->ownerDocument->validatePlus(true);
       new Logger(sprintf(_("Import '%s' HTML+ autocorrected: %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }
   }

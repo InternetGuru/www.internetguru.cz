@@ -234,6 +234,7 @@ class DOMDocumentPlus extends DOMDocument {
     return count($duplicit);
   }
 
+  #UNUSED
   public function removeUntilSame(DOMElement $e) {
     $name = $e->nodeName;
     $toRemove = array();
