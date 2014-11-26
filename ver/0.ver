@@ -1,3 +1,7 @@
+0.3.10 2014-11-26
+HTML+: importování souborů pomocí elementu 'import' (a48048e)
+SubdomManager: zohledňuje nastavení v uživateském adresáři (a111927)
+
 0.3.9 2014-11-25
 HTML+ bezpečný import, odstraněna podpora znaku * (d7fb082)
 Admin: upozornění na skryté elementy (6d676d0)
