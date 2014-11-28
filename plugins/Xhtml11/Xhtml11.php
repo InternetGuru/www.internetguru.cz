@@ -120,44 +120,39 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $toStrip = array();
     foreach($dom->getElementsByTagName("object") as $o) {
       if(!$o->hasAttribute("data")) continue;
-      $filePath = $o->getAttribute("data");
-      $pUrl = parse_url($filePath);
+      $dataFile = $o->getAttribute("data");
+      $pUrl = parse_url($dataFile);
       if(!is_array($pUrl)) {
-        $toStrip[] = array($o, sprintf(_("Invalid object data '%s' format"), $filePath));
+        $toStrip[] = array($o, sprintf(_("Invalid object data '%s' format"), $dataFile));
         continue;
       }
-      if(array_key_exists("scheme",$pUrl)) {
-        #todo: $this->asynchronousExternalImageCheck($filePath);
+      if(array_key_exists("scheme", $pUrl)) {
+        #todo: $this->asynchronousExternalImageCheck($dataFile);
         continue;
       }
+      $filePath = FILES_FOLDER ."/$dataFile";
       if(!is_file($filePath)) {
-        $filePath = FILES_FOLDER ."/$filePath";
-        if(!is_file($filePath)) {
-          $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $filePath));
-          continue;
-        }
+        $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $filePath));
+        continue;
       }
       try {
-        $this->validateImage($o, $filePath);
+        $mime = getFileMime($filePath);
+        if(strpos($mime, "image/") !== 0)
+          throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $dataFile, $mime));
+        if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
+          $o->setAttribute("type", $mime);
+          new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime), Logger::LOGGER_WARNING);
+        }
+        $size = filesize($filePath);
+        if($size > 350*1024) {
+          new Logger(sprintf(_("Object '%s' suspiciously big: %s"), $dataFile, fileSizeConvert($size)), Logger::LOGGER_WARNING);
+        }
       } catch(Exception $e) {
+        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
         $toStrip[] = array($o, $e->getMessage());
       }
     }
     foreach($toStrip as $o) $o[0]->stripTag($o[1]);
-  }
-
-  private function validateImage(DOMElement $o, $filePath) {
-    $mime = getFileMime($filePath);
-    if(strpos($mime, "image/") !== 0)
-      throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $filePath, $mime));
-    if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
-      $o->setAttribute("type", $mime);
-      new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $filePath, $mime), "warning");
-    }
-    $size = filesize($filePath);
-    if($size > 350*1024) {
-      new Logger(sprintf(_("Object '%s' suspiciously big: %s"), $filePath, fileSizeConvert($size)), "warning");
-    }
   }
 
   /*
@@ -313,7 +308,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function appendLinkElement(DOMElement $parent,$file,$rel,$type=false,$media=false,$user=true) {
     try {
       $f = findFile($file,$user,true,true);
-    } catch (Exception $ex) {
+    } catch (Exception $e) {
       $f = false;
     }
     if(!strlen($f)) {

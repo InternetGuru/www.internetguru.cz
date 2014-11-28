@@ -1,3 +1,6 @@
+0.3.11 2014-11-28
+Oprava chyb
+
 0.3.10 2014-11-26
 HTML+: importování souborů pomocí elementu 'import' (a48048e)
 SubdomManager: zohledňuje nastavení v uživateském adresáři (a111927)
