@@ -1,5 +1,6 @@
 0.3.11 2014-11-28
-HTML+: spojování HTML+ souborů pomocí elementu 'html' ()
+HTML+: automatická oprava prázdných elementů (0d83411)
+HTML+: spojování HTML+ souborů pomocí elementu 'html' (b08c5cf)
 
 0.3.10 2014-11-26
 HTML+: importování souborů pomocí elementu 'import' (a48048e)
