@@ -144,6 +144,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateLinks("form","action",$repair);
     $this->validateDates($repair);
     $this->validateAuthor($repair);
+    $this->validateEmptyContent($repair);
     $this->relaxNGValidatePlus();
   }
 
@@ -206,6 +207,25 @@ class HTMLPlus extends DOMDocumentPlus {
     if(!$repair && count($emptySect)) throw new Exception(_("Empty section(s) found"));
     if(!count($emptySect)) return;
     foreach($emptySect as $s) $s->stripTag(_("Empty section deleted"));
+  }
+
+  private function validateEmptyContent($repair) {
+    $xpath = new DOMXPath($this);
+    $emptyElOk = array("desc", "input", "br");
+    $emptyEl = array();
+    $emptyElNam = array();
+    foreach($xpath->query("//*[not(node())]") as $e) {
+      if(in_array($e->nodeName, $emptyElOk)) continue;
+      $emptyEl[] = $e;
+      $emptyElNam[$e->nodeName] = null;
+    }
+    if(!count($emptyEl)) return;
+    if(!$repair)
+      throw new Exception(sprintf(_("Empty element(s) found: %s"), implode(", ", array_keys($emptyElNam))));
+    foreach($emptyEl as $e) {
+      if($e->hasAttribute("var")) $e->nodeValue = "n/a";
+      else $e->stripElement(sprintf(_("Empty element '%s' deleted"), $e->nodeName));
+    }
   }
 
   private function validateLang($repair) {

@@ -130,6 +130,7 @@ class DOMBuilder {
     } catch(Exception $e) {
       $doc->validatePlus(true);
       saveRewrite($filePath, $doc->saveXML());
+      new Logger(sprintf(_("HTML+ autocorrected: %s"), $e->getMessage()), Logger::LOGGER_INFO);
     }
     // HTMLPlus import
     if(!($doc instanceof HTMLPlus)) return;
@@ -191,7 +192,7 @@ class DOMBuilder {
       $import->ownerDocument->validatePlus();
     } catch(Exception $e) {
       $import->ownerDocument->validatePlus(true);
-      new Logger(sprintf(_("Import '%s' HTML+ autocorrected: %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
+      new Logger(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }
   }
 
