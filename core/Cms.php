@@ -8,7 +8,7 @@ class Cms {
   private static $variables = array();
   private static $forceFlash = false;
   private static $flashList = null;
-  const DEBUG = true;
+  const DEBUG = false;
   const MSG_WARNING = "warning";
   const MSG_INFO = "info";
   const MSG_SUCCESS = "success";

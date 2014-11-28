@@ -9,7 +9,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,3);
+    $s->setPriority($this, 5);
     if(self::DEBUG) new Logger("DEBUG");
   }
 
