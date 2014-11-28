@@ -139,7 +139,7 @@ class DOMBuilder {
   private function insertImports(HTMLPlus $doc, $filePath) {
     $this->imported[realpath($filePath)] = null;
     $imports = array();
-    foreach($doc->getElementsByTagName("import") as $import) $imports[] = $import;
+    foreach($doc->getElementsByTagName("html") as $import) $imports[] = $import;
     if(!count($imports)) return;
     $l = new Logger(_("Importing HTML+"), null, 0);
     $toStripElement = array();

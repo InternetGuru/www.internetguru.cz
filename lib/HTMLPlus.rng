@@ -25,15 +25,15 @@
         <oneOrMore>
           <choice>
             <ref name="contentBlock"/>
-            <ref name="import"/>
+            <ref name="html"/>
           </choice>
         </oneOrMore>
       </element>
     </optional>
   </define>
 
-  <define name="import">
-    <element name="import">
+  <define name="html">
+    <element name="html">
       <attribute name="src">
         <data type="string">
           <param name="pattern">[a-z][a-z0-9_/.-]*</param>
