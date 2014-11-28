@@ -5,11 +5,10 @@ try {
   session_start();
   require_once('global_func.php');
   require_once('global_const.php');
-  $l = new Logger(CMS_NAME, null, microtime(true) - $start_time);
   proceedServerInit("InitServer.php");
-  $l->finished();
-  $l = new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), null, 0);
+  new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);
 
+  $start_time = microtime(true);
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
@@ -31,13 +30,13 @@ try {
   duplicateDir(ADMIN_FOLDER);
   if(defined("SUBDOM_FOLDER")) duplicateDir(SUBDOM_FOLDER, false);
   echo Cms::getOutput();
-  $l->finished();
+  new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time);
 
 } catch(Exception $e) {
 
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf(_("Exception: %s in %s on line %s"), $m, $e->getFile(), $e->getLine());
-  if(isset($l)) $l->finished();
+  new Logger(sprintf(_("IGCMS failed to finish"), CMS_RELEASE), Logger::LOGGER_FATAL, $start_time);
   if(class_exists("ErrorPage")) new ErrorPage($m, 500, true);
 
   http_response_code(500);

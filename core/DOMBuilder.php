@@ -141,7 +141,7 @@ class DOMBuilder {
     $imports = array();
     foreach($doc->getElementsByTagName("html") as $import) $imports[] = $import;
     if(!count($imports)) return;
-    $l = new Logger(_("Importing HTML+"), null, 0);
+    $start_time = microtime(true);
     $toStripElement = array();
     $toStripTag = array();
     foreach($imports as $import) {
@@ -155,7 +155,8 @@ class DOMBuilder {
     }
     foreach($toStripTag as $import) $import->stripTag();
     foreach($toStripElement as $import) $import->stripElement();
-    $l->finished();
+    $l = new Logger(sprintf(_("Inserted %s of %s HTML+ file(s)"),
+      count($toStripElement), count($imports)), null, $start_time);
   }
 
   private function insertHtmlPlus(DOMElement $import, $homeDir) {

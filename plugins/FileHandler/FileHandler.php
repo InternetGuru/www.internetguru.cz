@@ -18,7 +18,7 @@ class FileHandler extends Plugin implements SplObserver {
     if(is_null($filepath)) return;
     $filesize = filesize($filepath);
     $shortPath = substr($filepath,strlen(FILES_FOLDER)+1);
-    $l = new Logger("File download '$shortPath' ".fileSizeConvert($filesize), null, 0);
+    $start_time = microtime(true);
     header("Content-Type: " . $fInfo["filemime"]);
     header("Content-Length: $filesize");
     set_time_limit(0);
@@ -30,7 +30,7 @@ class FileHandler extends Plugin implements SplObserver {
       flush();
     }
     fclose($handle);
-    $l->finished();
+    new Logger("File download '$shortPath' ".fileSizeConvert($filesize), Logger::LOGGER_INFO, $start_time);
     die();
   }
 
