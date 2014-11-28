@@ -45,48 +45,48 @@ class DOMBuilder {
     return $this->doc;
   }
 
-  private function build($filePath,$replace,$user) {
+  private function build($fileName,$replace,$user) {
     /*
-    $dc = new DOMCache(hash(FILE_HASH_ALGO,"$filePath,$replace,$user"));
+    $dc = new DOMCache(hash(FILE_HASH_ALGO,"$fileName,$replace,$user"));
     if($dc->isValid()) return $dc->getCache();
-    $dc->addSurceFile($filePath);
-    $dc->addSurceFile(ADMIN_FOLDER . "/$filePath");
-    $dc->addSurceFile(USER_FOLDER . "/$filePath");
+    $dc->addSurceFile($fileName);
+    $dc->addSurceFile(ADMIN_FOLDER . "/$fileName");
+    $dc->addSurceFile(USER_FOLDER . "/$fileName");
     */
 
     if(self::DEBUG) $this->doc->formatOutput = true;
 
     if($replace) {
-      $this->safeLoadDOM($filePath,$this->doc,$user,true);
+      $this->safeLoadDOM($fileName,$this->doc,$user,true);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
       return;
     }
 
-    $this->loadDOM($this->findFile($filePath,false,false),$this->doc);
+    $this->loadDOM($this->findFile($fileName,false,false),$this->doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
-    $f = ADMIN_FOLDER . "/$filePath";
+    $f = ADMIN_FOLDER . "/$fileName";
     try {
       if(is_file($f)) $this->updateDOM($f,true);
     } catch(Exception $e) {
-      new Logger($e->getMessage(),"error");
+      new Logger(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
 
     if(!$user) return;
 
-    $f = USER_FOLDER . "/$filePath";
+    $f = USER_FOLDER . "/$fileName";
     try {
       if(is_file($f)) $this->updateDOM($f);
     } catch(Exception $e) {
-      new Logger($e->getMessage(),"error");
+      new Logger(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
   }
 
-  private function findFile($filePath,$user=true,$admin=true) {
-    $f = findFile($filePath,$user,$admin);
-    if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $filePath));
+  private function findFile($fileName,$user=true,$admin=true) {
+    $f = findFile($fileName,$user,$admin);
+    if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
     return $f;
   }
 
@@ -123,7 +123,7 @@ class DOMBuilder {
     }
     // load
     if(!@$doc->load($filePath))
-      throw new LoggerException(sprintf(_("Unable to load DOM from file '%s'"), $filePath));
+      throw new Exception(sprintf(_("Invalid XML file")));
     // validate, save if repaired
     try {
       $doc->validatePlus();
@@ -241,7 +241,7 @@ class DOMBuilder {
           continue;
         }
         if($sameIdElement->nodeName != $n->nodeName)
-          throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $n->getAttribute("id"),$n->nodeName));
+          throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $n->getAttribute("id"), $n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
         $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
       } else {
