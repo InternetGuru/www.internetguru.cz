@@ -156,7 +156,7 @@ class DOMBuilder {
     }
     foreach($toStripTag as $import) $import->stripTag();
     foreach($toStripElement as $import) $import->stripElement();
-    $l = new Logger(sprintf(_("Inserted %s of %s HTML+ file(s)"),
+    new Logger(sprintf(_("Inserted %s of %s HTML+ file(s)"),
       count($toStripElement), count($imports)), null, $start_time);
   }
 

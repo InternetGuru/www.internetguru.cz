@@ -194,7 +194,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       if($v instanceof DOMElement) {
         $d = new DOMDocumentPlus();
         foreach($v->childNodes as $n) $d->appendChild($d->importNode($n, true));
-        $v = html_entity_decode($d->saveHTML());
+        $v = $d->saveHTML();
       } elseif(is_array($v)) {
         $v = implode(",",$v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
@@ -204,9 +204,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $v = (string) $v;
       }
       if(false) {
-        #continue;
-        if($k != "cms-ig") continue;
-        $v = "&copy;2014 &amp; <a href='http://www.internetguru.cz'>InternetGuru</a>";
+        if($k != "globalmenu") continue;
+        #$v = "&copy;2014 &amp; <a href='http://www.internetguru.cz'>InternetGuru</a>";
         echo ($v)."\n";
         echo html_entity_decode($v)."\n";
         echo htmlentities($v)."\n";

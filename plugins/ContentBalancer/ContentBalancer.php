@@ -29,7 +29,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
         $li = $content->createElement("li");
         $textContent = $h->nodeValue;
         if($h->hasAttribute("short")) $textContent = $h->getAttribute("short");
-        $a = $content->createElement("a",$textContent);
+        $a = $content->createElement("a", $textContent);
         $a->setAttribute("href","#".$h->getAttribute("id"));
         $li->appendChild($a);
         $ul->appendChild($li);

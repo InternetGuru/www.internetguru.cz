@@ -9,6 +9,11 @@ class DOMDocumentPlus extends DOMDocument {
     $r = $this->registerNodeClass("DOMElement","DOMElementPlus");
   }
 
+  public function createElement($name, $value=null) {
+    if(is_null($value)) return parent::createElement($name);
+    return parent::createElement($name, htmlspecialchars($value));
+  }
+
   public function getElementById($id,$attribute="id") {
     $xpath = new DOMXPath($this);
     $q = $xpath->query("//*[@$attribute='$id']");

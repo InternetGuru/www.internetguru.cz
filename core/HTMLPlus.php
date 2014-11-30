@@ -217,14 +217,19 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($xpath->query("//*[not(node())]") as $e) {
       if(in_array($e->nodeName, $emptyElOk)) continue;
       $emptyEl[] = $e;
-      $emptyElNam[$e->nodeName] = null;
+      if(isset($emptyElNam[$e->nodeName])) $emptyElNam[$e->nodeName]++;
+      else $emptyElNam[$e->nodeName] = 1;
     }
     if(!count($emptyEl)) return;
-    if(!$repair)
-      throw new Exception(sprintf(_("Empty element(s) found: %s"), implode(", ", array_keys($emptyElNam))));
+    if(!$repair) {
+      $stat = array();
+      foreach($emptyElNam as $eNam => $eCnt) $stat[] = "$eNam ($eCnt"."x)";
+      throw new Exception(sprintf(_("Empty element(s) found: %s"), implode(", ", $stat)));
+    }
     foreach($emptyEl as $e) {
-      if($e->hasAttribute("var")) $e->nodeValue = "n/a";
-      else $e->stripElement(sprintf(_("Empty element '%s' deleted"), $e->nodeName));
+      $e->nodeValue = "n/a";
+      #if($e->hasAttribute("var")) $e->nodeValue = "n/a";
+      #else $e->stripElement(sprintf(_("Empty element '%s' deleted"), $e->nodeName));
     }
   }
 

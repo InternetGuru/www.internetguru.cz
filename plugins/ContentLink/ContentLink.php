@@ -97,7 +97,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
         $e->setAttribute($attName,$ancestor->getAttribute($attName));
         break;
       } elseif(is_null($attName) && strlen($ancestor->nodeValue)) {
-        $e->nodeValue = $ancestor->nodeValue;
+        $e->nodeValue = htmlspecialchars($ancestor->nodeValue);
         break;
       }
       $ancestor = $ancestor->parentNode;
