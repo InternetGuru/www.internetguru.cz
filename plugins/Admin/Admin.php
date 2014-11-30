@@ -46,8 +46,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->setDataFiles();
       if($this->isPost()) $this->processPost();
       else $this->setContent();
+      $this->processXml();
       if($this->contentChanged) {
-        $this->processXml();
         $this->savePost();
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
         throw new Exception(_("No changes made"));
@@ -245,7 +245,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if($this->type == "html") $doc = new HTMLPlus();
     else $doc = new DOMDocumentPlus();
-    if($this->dataFileStatus == self::STATUS_NEW) {
+    if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
       $rootName = "body";
       if($this->type != "html") {
         $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
@@ -309,7 +309,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function disableDataFile() {
     if(!touch($this->dataFileDisabled))
-      throw new Exception(sprintf(_("Unable to disable file %s"), USER_ROOT_DIR."/".$this->defaultFile));
+      throw new Exception(_("Unable to disable file"));
     $this->statusChanged = true;
   }
 

@@ -162,7 +162,7 @@ class HTMLPlus extends DOMDocumentPlus {
     if(!$this->documentElement->hasAttribute("lang")
       && !$this->documentElement->hasAttribute("xml:lang")) {
       if(!$repair) throw new Exception(_("Attribute 'xml:lang' is missing in element body"));
-      $this->documentElement->setAttribute("xml:lang", "en");
+      $this->documentElement->setAttribute("xml:lang", _("en"));
     }
     if($this->documentElement->childElements->length == 1
       && $this->documentElement->childElements->item(0)->nodeName == "section") {
@@ -179,7 +179,11 @@ class HTMLPlus extends DOMDocumentPlus {
       break;
     }
     if($hRoot == 1) return;
-    if($hRoot == 0) throw new Exception(_("Missing heading in body element"));
+    if($hRoot == 0) {
+      if(!$repair) throw new Exception(_("Missing heading in body element"));
+      $this->documentElement->appendChild($this->createElement("h"));
+      return;
+    }
     $children = array();
     foreach($this->documentElement->childNodes as $e) $children[] = $e;
     $s = $this->createElement("section");
@@ -266,7 +270,7 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->headings as $h) {
       if(strlen(trim($h->nodeValue))) continue;
       if(!$repair) throw new Exception(_("Heading content must not be empty"));
-      $h->nodeValue = "Some Heading";
+      $h->nodeValue = _("Some Heading");
     }
   }
 
