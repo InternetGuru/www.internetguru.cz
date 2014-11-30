@@ -105,7 +105,7 @@ class DOMBuilder {
       try {
         $this->loadDOM($f, $doc);
       } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to load '%s': %s"), $f, $e->getMessage()), "error");
+        new Logger(sprintf(_("Unable to load '%s': %s"), $filePath, $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
       }
       $success = true;
@@ -119,8 +119,10 @@ class DOMBuilder {
   private function loadDOM($filePath, DOMDocumentPlus $doc) {
     if($doc instanceof HTMLPlus) {
       $remove = array("?".USER_FOLDER."/","?".ADMIN_FOLDER."/","?".CMS_FOLDER."/");
-      Cms::addVariableItem("html",str_replace($remove,array(),"?$filePath"));
+      Cms::addVariableItem("html", str_replace($remove, array(), "?$filePath"));
     }
+    if(is_file(dirname($filePath)."/.".basename($filePath)))
+      throw new Exception(sprintf(_("File disabled")));
     // load
     if(!@$doc->load($filePath))
       throw new Exception(sprintf(_("Invalid XML file")));
@@ -163,8 +165,10 @@ class DOMBuilder {
   private function insertHtmlPlus(DOMElement $import, $homeDir) {
     $val = $import->getAttribute("src");
     $file = realpath("$homeDir/$val");
-    if($file === false)
+    if($file === false) {
+      Cms::addVariableItem("html", $val);
       throw new Exception(sprintf(_("Imported file '%s' not found"), $val));
+    }
     if(array_key_exists($file, $this->imported))
       throw new Exception(sprintf(_("File '%s' already imported"), $val));
     $this->imported[$file] = null;

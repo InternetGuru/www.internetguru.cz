@@ -34,6 +34,7 @@ class Logger {
     $c = array();
     if(isset($callers[3]['class'])) $c[] = $callers[3]['class'];
     if(CMS_DEBUG && isset($callers[3]['function'])) $c[] = $callers[3]['function'];
+    if(empty($c)) return "core";
     return implode(".",$c);
   }
 

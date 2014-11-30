@@ -15,13 +15,16 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private $contentValue = "n/a";
   private $schema = null;
   private $type = "n/a";
+  private $redir = false;
   private $replace = true;
   private $error = false;
   private $dataFile = null;
+  private $dataFileDisabled = null;
   private $dataFileStatus;
   private $defaultFile = "n/a";
-  private $changeStatus = false;
+  private $statusChanged = false;
   private $dataFileStatuses;
+  private $contentChanged = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -40,16 +43,26 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     try {
       $this->setDefaultFile();
-      $this->dataFile = $this->getDataFile();
+      $this->setDataFiles();
       if($this->isPost()) $this->processPost();
       else $this->setContent();
-      $this->processXml();
-      if(!$this->isPost()) return;
-      $this->savePost();
+      if($this->contentChanged) {
+        $this->processXml();
+        $this->savePost();
+      } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
+        throw new Exception(_("No changes made"));
+      }
+      if($this->isToEnable()) $this->enableDataFile();
+      elseif($this->isToDisable()) $this->disableDataFile();
+      if(!$this->contentChanged && $this->statusChanged) {
+        $this->redir = true;
+        Cms::addMessage(_("File status successfully changed"), Cms::MSG_SUCCESS, $this->redir);
+      }
     } catch (Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
-      $this->error = true;
+      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING, $this->redir);
+      return;
     }
+    if($this->redir) $this->redir($this->defaultFile);
   }
 
   private function isPost() {
@@ -66,10 +79,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $newContent = $this->getHTMLPlus();
 
     $la = "?" . get_class($this) . "=" . $this->defaultFile;
-    $statusChange = self::FILE_DISABLE;
+    $statusChanged = self::FILE_DISABLE;
     if($this->dataFileStatus == self::STATUS_DISABLED) {
       $newContent->insertVar("warning", "warning");
-      $statusChange = self::FILE_ENABLE;
+      $statusChanged = self::FILE_ENABLE;
     }
     $usrDestHash = getFileHash($this->dataFile);
     $mode = $this->replace ? _("replace") : _("modify");
@@ -101,7 +114,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("resultcontent", $this->getResContent());
     $newContent->insertVar("status", $this->dataFileStatuses[$this->dataFileStatus]);
     $newContent->insertVar("userfilehash", $usrDestHash);
-    if($this->dataFileStatus != self::STATUS_DISABLED
+    if((!$this->isPost() && $this->dataFileStatus != self::STATUS_DISABLED)
       || isset($_POST["active"]))
       $newContent->insertVar("checked", "checked");
 
@@ -196,21 +209,28 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   }
 
-  private function getDataFile() {
-    $f = USER_FOLDER ."/". $this->defaultFile;
-    $fd = pathinfo($f,PATHINFO_DIRNAME) ."/.". pathinfo($f,PATHINFO_BASENAME);
-    if(isset($_GET[self::FILE_ENABLE]) && file_exists($fd)) rename($fd,$f);
-    if(isset($_GET[self::FILE_DISABLE]) && file_exists($f)) rename($f,$fd);
-    if(file_exists($f)) {
-      $this->dataFileStatus = self::STATUS_ENABLED;
-      return $f;
-    }
-    if(file_exists($fd)) {
-      $this->dataFileStatus = self::STATUS_DISABLED;
-      return $fd;
-    }
+  private function setDataFiles() {
+    $this->dataFile = USER_FOLDER ."/". $this->defaultFile;
+    $this->dataFileDisabled = dirname($this->dataFile) ."/.". basename($this->dataFile);
+    // disabled if .file or both files exist, else new
     $this->dataFileStatus = self::STATUS_NEW;
-    return $f;
+    if(file_exists($this->dataFile)) $this->dataFileStatus = self::STATUS_ENABLED;
+    if(file_exists($this->dataFileDisabled)) $this->dataFileStatus = self::STATUS_DISABLED;
+    if(!file_exists($this->dataFile) && file_exists($this->dataFileDisabled)) $this->dataFile = $this->dataFileDisabled;
+  }
+
+  private function isToDisable() {
+    if(!is_file($this->dataFile)) return false;
+    if(isset($_GET[self::FILE_DISABLE])) return true;
+    if(count($_POST) && !isset($_POST["active"])) return true;
+    return false;
+  }
+
+  private function isToEnable() {
+    if(!is_file($this->dataFileDisabled)) return false;
+    if(isset($_GET[self::FILE_ENABLE])) return true;
+    if(count($_POST) && isset($_POST["active"])) return true;
+    return false;
   }
 
   private function processXml() {
@@ -223,7 +243,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(is_null($this->schema) && file_exists($this->dataFile)) {
       $this->schema = $this->getSchema($this->dataFile);
     }
-    $doc = new DOMDocumentPlus();
+    if($this->type == "html") $doc = new HTMLPlus();
+    else $doc = new DOMDocumentPlus();
     if($this->dataFileStatus == self::STATUS_NEW) {
       $rootName = "body";
       if($this->type != "html") {
@@ -232,13 +253,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $root = $doc->appendChild($doc->createElement($rootName));
       $root->appendChild($doc->createTextNode(""));
       $this->contentValue = $doc->saveXML();
-    } elseif(!$doc->loadXml($this->contentValue)) {
+    } elseif(!@$doc->loadXml($this->contentValue)) {
       throw new Exception(_("Invalid XML syntax"));
     }
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
       $doc->validatePlus(true);
+      #TODO: log autocorrected
       $this->contentValue = $doc->saveXML();
     }
     if($this->type != "xml" || $this->isPost()) return;
@@ -252,60 +274,43 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $post_n = str_replace("\r\n", "\n", $_POST["content"]);
     $post_rn = str_replace("\n", "\r\n", $post_n);
     $this->contentValue = $post_n;
-    if(isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_DISABLED) {
-      $this->changeStatus = true;
-    } elseif(!isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_ENABLED) {
-      $this->changeStatus = true;
-    }
     if($_POST["userfilehash"] != getFileHash($this->dataFile))
       throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
-    if(in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn)))) {
-      if($this->changeStatus) {
-        $this->savePost(false);
-        return;
-      }
-      throw new Exception(_("No changes made"));
+    #if((isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_DISABLED)
+    #  || (!isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_ENABLED)) {
+    #  $this->dataFile = $this->changeStatus($this->dataFile);
+    #  $this->statusChanged = true;
+    #}
+    if(!in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn)))) {
+      $this->contentChanged = true;
     }
   }
 
   private function setContent() {
-    $f = $this->dataFile;
-    if(!file_exists($f)) return;
-    #if(!file_exists($f)) $f = findFile($this->defaultFile);
-    if(!($this->contentValue = file_get_contents($f)))
+    if(!file_exists($this->dataFile)) return;
+    if(!($this->contentValue = file_get_contents($this->dataFile)))
       throw new Exception(sprintf(_("Unable to get contents from '%s'"), $this->dataFile));
   }
 
-  private function savePost($content=true) {
-    $statusSuccess = true;
-    if($content) {
-      if(saveRewrite($this->dataFile, $this->contentValue) === false)
-        throw new Exception(_("Unable to save changes, administration may be locked"));
-      if($this->error) return;
-    }
-    if($this->changeStatus) {
-      try {
-        $this->changeStatus($this->dataFile);
-        if(!$content) Cms::addMessage(_("Status successfully changed"), Cms::MSG_SUCCESS, true);
-      } catch(Exception $e) {
-        Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
-        $statusSuccess = false;
-      }
-    }
-    if($content) {
-      Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $statusSuccess);
-    }
-    if(!$statusSuccess) return;
-    $this->redir($this->defaultFile);
+  private function savePost() {
+    if(saveRewrite($this->dataFile, $this->contentValue) === false)
+      throw new Exception(_("Unable to save changes, administration may be locked"));
+    $this->redir = true;
+    Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $this->redir);
   }
 
-  private function changeStatus($f) {
-    if(strpos(basename($f), ".") === 0) {
-      if(rename($f, dirname($f)."/".substr(basename($f), 1))) return;
-    } else {
-      if(rename($f, dirname($f)."/.".basename($f))) return;
-    }
-    throw new Excepiton("Unable to change file status");
+  private function enableDataFile() {
+    if(($this->dataFile == $this->dataFileDisabled
+      && !rename($this->dataFileDisabled, $this->dataFile))
+      || !unlink($this->dataFileDisabled))
+      throw new Excepiton(_("Unable to enable file"));
+    $this->statusChanged = true;
+  }
+
+  private function disableDataFile() {
+    if(!touch($this->dataFileDisabled))
+      throw new Exception(sprintf(_("Unable to disable file %s"), USER_ROOT_DIR."/".$this->defaultFile));
+    $this->statusChanged = true;
   }
 
   private function validateXml(DOMDocumentPlus $doc) {
