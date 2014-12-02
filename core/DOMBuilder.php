@@ -134,9 +134,25 @@ class DOMBuilder {
       saveRewrite($filePath, $doc->saveXML());
       new Logger(sprintf(_("HTML+ autocorrected: %s"), $e->getMessage()), Logger::LOGGER_INFO);
     }
-    // HTMLPlus include
     if(!($doc instanceof HTMLPlus)) return;
-    $this->insertIncludes($doc,$filePath);
+    // generate ctime/mtime from file if not set
+    $this->generateDates($doc, $filePath);
+    // HTML+ include
+    $this->insertIncludes($doc, $filePath);
+  }
+
+  private function generateDates(HTMLPlus $doc, $filePath) {
+    $h = $doc->documentElement->firstElement;
+    if(!$h->hasAttribute("ctime")) {
+      $c = new DateTime();
+      $c->setTimeStamp(filectime($filePath));
+      $h->setAttribute("ctime", $c->format(DateTime::W3C));
+    }
+    if(!$h->hasAttribute("mtime")) {
+      $m = new DateTime();
+      $m->setTimeStamp(filemtime($filePath));
+      $h->setAttribute("mtime", $m->format(DateTime::W3C));
+    }
   }
 
   private function insertIncludes(HTMLPlus $doc, $filePath) {
