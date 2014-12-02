@@ -25,15 +25,15 @@
         <oneOrMore>
           <choice>
             <ref name="contentBlock"/>
-            <ref name="htmlplus.html"/>
+            <ref name="htmlplus.include"/>
           </choice>
         </oneOrMore>
       </element>
     </optional>
   </define>
 
-  <define name="htmlplus.html">
-    <element name="html">
+  <define name="htmlplus.include">
+    <element name="include">
       <attribute name="src">
         <data type="string">
           <param name="pattern">[a-z][a-z0-9_/.-]*</param>

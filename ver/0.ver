@@ -1,9 +1,10 @@
+0.3.13 2014-12-02
+HTML+: spojování HTML+ souborů pomocí elementu 'include' ()
+
 0.3.11 2014-11-28
 HTML+: automatická oprava prázdných elementů (0d83411)
-HTML+: spojování HTML+ souborů pomocí elementu 'html' (b08c5cf)
 
 0.3.10 2014-11-26
-HTML+: importování souborů pomocí elementu 'import' (a48048e)
 SubdomManager: zohledňuje nastavení v uživateském adresáři (a111927)
 
 0.3.9 2014-11-25
@@ -48,17 +49,8 @@ Přidána podpora elementu span a proměnných v nadpisech (c4fbf3c)
 Auth: nové rozšíření pro autentifikaci (1956d94)
 Nová konstanta cms-name (4c75f4c)
 
-0.3.3 2014-11-13
-Oprava chyb
-
-0.3.2 2014-11-12
-Oprava chyb
-
 0.3.1 2014-11-12
 SubdomManager: název poddomény v parametru URL (10c12af)
-
-0.3.0 2014-11-12
-Oprava chyb
 
 0.2.0 2014-11-09
 SubdomManager: nové rozšíření pro správu poddomén (4a3d04b)

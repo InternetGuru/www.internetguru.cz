@@ -12,7 +12,7 @@ class DOMBuilder {
   const USE_CACHE = true;
   private $doc; // DOMDocument (HTMLPlus)
   private $replace; // bool
-  private $imported = array();
+  private $included = array();
 
   public function __construct() {
     if(self::DEBUG) new Logger("DEBUG");
@@ -134,68 +134,68 @@ class DOMBuilder {
       saveRewrite($filePath, $doc->saveXML());
       new Logger(sprintf(_("HTML+ autocorrected: %s"), $e->getMessage()), Logger::LOGGER_INFO);
     }
-    // HTMLPlus import
+    // HTMLPlus include
     if(!($doc instanceof HTMLPlus)) return;
-    $this->insertImports($doc,$filePath);
+    $this->insertIncludes($doc,$filePath);
   }
 
-  private function insertImports(HTMLPlus $doc, $filePath) {
-    $this->imported[realpath($filePath)] = null;
-    $imports = array();
-    foreach($doc->getElementsByTagName("html") as $import) $imports[] = $import;
-    if(!count($imports)) return;
+  private function insertIncludes(HTMLPlus $doc, $filePath) {
+    $this->included[realpath($filePath)] = null;
+    $includes = array();
+    foreach($doc->getElementsByTagName("include") as $include) $includes[] = $include;
+    if(!count($includes)) return;
     $start_time = microtime(true);
     $toStripElement = array();
     $toStripTag = array();
-    foreach($imports as $import) {
+    foreach($includes as $include) {
       try {
-        $this->insertHtmlPlus($import, dirname($filePath));
-        $toStripElement[] = $import;
+        $this->insertHtmlPlus($include, dirname($filePath));
+        $toStripElement[] = $include;
       } catch(Exception $e) {
-        $toStripTag[] = $import;
+        $toStripTag[] = $include;
         new Logger($e->getMessage(), Logger::LOGGER_ERROR);
       }
     }
-    foreach($toStripTag as $import) $import->stripTag();
-    foreach($toStripElement as $import) $import->stripElement();
+    foreach($toStripTag as $include) $include->stripTag();
+    foreach($toStripElement as $include) $include->stripElement();
     new Logger(sprintf(_("Inserted %s of %s HTML+ file(s)"),
-      count($toStripElement), count($imports)), null, $start_time);
+      count($toStripElement), count($includes)), null, $start_time);
   }
 
-  private function insertHtmlPlus(DOMElement $import, $homeDir) {
-    $val = $import->getAttribute("src");
+  private function insertHtmlPlus(DOMElement $include, $homeDir) {
+    $val = $include->getAttribute("src");
     $file = realpath("$homeDir/$val");
     if($file === false) {
       Cms::addVariableItem("html", $val);
-      throw new Exception(sprintf(_("Imported file '%s' not found"), $val));
+      throw new Exception(sprintf(_("Included file '%s' not found"), $val));
     }
-    if(array_key_exists($file, $this->imported))
-      throw new Exception(sprintf(_("File '%s' already imported"), $val));
-    $this->imported[$file] = null;
+    if(array_key_exists($file, $this->included))
+      throw new Exception(sprintf(_("File '%s' already included"), $val));
+    $this->included[$file] = null;
     if(pathinfo($val, PATHINFO_EXTENSION) != "html")
-      throw new Exception(sprintf(_("Imported file extension '%s' must be .html"), $val));
+      throw new Exception(sprintf(_("Included file extension '%s' must be .html"), $val));
     if(strpos($file, realpath("$homeDir/")) !== 0)
-      throw new Exception(sprintf(_("Imported file '%s' is out of working directory"), $val));
+      throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $val));
     try {
       $doc = new HTMLPlus();
       $this->loadDOM("$homeDir/$val", $doc);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
-      $import->parentNode->insertBefore($c, $import);
+      $include->parentNode->insertBefore($c, $include);
       throw new Exception($msg);
     }
-    $sectLang = $this->getSectionLang($import->parentNode);
+    $sectLang = $this->getSectionLang($include->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
       new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
     foreach($doc->documentElement->childElements as $n) {
-      $import->parentNode->insertBefore($import->ownerDocument->importNode($n, true), $import);
+      $include->parentNode->insertBefore($include->ownerDocument->importNode($n, true), $include);
     }
     try {
-      $import->ownerDocument->validatePlus();
+      $include->ownerDocument->validatePlus();
     } catch(Exception $e) {
-      $import->ownerDocument->validatePlus(true);
+      $include->ownerDocument->validatePlus(true);
       new Logger(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }
   }
