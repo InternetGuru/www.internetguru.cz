@@ -14,7 +14,6 @@ define("USER_ROOT_DIR", "usr");
 define("FILES_ROOT_DIR", "files");
 define("TEMP_DIR", "temp");
 define("CACHE_DIR", "cache");
-define('CORE_DIR', 'core');
 define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
 define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}");
@@ -23,12 +22,9 @@ define('STATUS_PREINIT', 'preinit');
 define('STATUS_INIT', 'init');
 define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
-define('CORE_FOLDER', dirname(__FILE__));
 if(isAtLocalhost()) {
   define('CMS_DEBUG', true);
   define('USER_ID', "n/a");
-  define('CMS_FOLDER', "../cms");
-  define('CMS_RELEASE', "localhost");
   define('ADMIN_FOLDER', ADMIN_ROOT_DIR);
   define('USER_FOLDER', USER_ROOT_DIR);
   define('FILES_FOLDER', FILES_ROOT_DIR);
@@ -40,9 +36,7 @@ if(isAtLocalhost()) {
   define("APACHE_RESTART_FILEPATH", null);
 } else {
   define('CMS_DEBUG', is_file("CMS_DEBUG"));
-  define('CMS_FOLDER', dirname(CORE_FOLDER));
   define('CMS_ROOT_FOLDER', dirname(CMS_FOLDER));
-  define('CMS_RELEASE', basename(CMS_FOLDER));
   define('CMSRES_ROOT_DIR', "cmsres");
   define('CMSRES_ROOT_FOLDER', realpath(CMS_ROOT_FOLDER."/../".CMSRES_ROOT_DIR));
   define("APACHE_RESTART_FILEPATH", CMSRES_ROOT_FOLDER."/APACHE_RESTART");

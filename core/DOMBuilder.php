@@ -135,7 +135,7 @@ class DOMBuilder {
         $this->setAuthor($doc, $author);
       }
       $doc->validatePlus(true);
-      saveRewrite($filePath, $doc->saveXML());
+      saveRewrite($doc->saveXML(), $filePath);
       new Logger(sprintf(_("HTML+ autocorrected: %s"), $e->getMessage()), Logger::LOGGER_INFO);
     }
     if(!($doc instanceof HTMLPlus)) return;

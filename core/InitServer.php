@@ -40,9 +40,7 @@ class InitServer {
     }
     // create CMS_VER file from index or newest stable available version
     if(!file_exists("$serverSubdomDir/CMS_VER.".$this->subdomVars["CMS_VER"])) {
-      if(!$update && is_link("$serverSubdomDir/index.php"))
-        $this->subdomVars["CMS_VER"] = basename(dirname(readlink("$serverSubdomDir/index.php")));
-      else $this->subdomVars["CMS_VER"] = CMS_BEST_RELEASE;
+      $this->subdomVars["CMS_VER"] = CMS_BEST_RELEASE;
     }
     $folders = $this->setFolderVars($serverSubdomDir);
     if($update && !is_file("$serverSubdomDir/CONFIG.user"))
@@ -131,11 +129,16 @@ class InitServer {
   }
 
   private function completeStructure($subdomDir) {
+    // copy index
+    if(is_link("$subdomDir/index.php")
+      || !is_file("$subdomDir/index.php")
+      || getFileHash(CMS_FOLDER."/index.php") =! getFileHash("$subdomDir/index.php"))
+      saveRewriteFile("$subdomDir/index.php", CMS_FOLDER."/index.php", false);
     // create symlinks
     $rob = preg_match("/^ig\d/", $this->subdom) ? "robots_off.txt" : "robots_default.txt";
     $files = array(
       "$subdomDir/".CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER,
-      "$subdomDir/index.php" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php",
+      #"$subdomDir/index.php" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php",
       "$subdomDir/.htaccess" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/.htaccess",
       "$subdomDir/robots.txt" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/$rob",
     );

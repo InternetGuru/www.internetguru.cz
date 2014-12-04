@@ -100,7 +100,7 @@ function normalize($s,$extKeep="",$tolower=true,$convertToUtf8=false) {
   return $ext;
 }
 
-function saveRewriteFile($dest,$src) {
+function saveRewriteFile($src, $dest, $keepOld=true) {
   if(!file_exists($src))
     throw new LoggerException("Source file '$src' not found");
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0775,true))
@@ -111,10 +111,12 @@ function saveRewriteFile($dest,$src) {
     throw new LoggerException("Unable to backup destination file");
   if(!rename("$dest.new",$dest))
     throw new LoggerException("Unable to rename new file to destination");
+  if(!$keepOld && !unlink("$dest.old"))
+    throw new LoggerException("Unable to delete .old file");
   return true;
 }
 
-function saveRewrite($dest,$content) {
+function saveRewrite($content, $dest) {
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0775,true)) return false;
   if(!file_exists($dest)) return file_put_contents($dest, $content);
   $b = file_put_contents("$dest.new", $content);
