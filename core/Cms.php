@@ -124,12 +124,12 @@ class Cms {
     $h1 = $doc->getElementsByTagName("h")->item(0);
     self::setVariable("lang", $doc->documentElement->getAttribute("xml:lang"));
     self::setVariable("desc", $desc->nodeValue);
+    self::setVariable("title", $h1->nodeValue);
     if($h1->hasAttribute("short")) self::setVariable("title", $h1->getAttribute("short"));
-    else self::setVariable("title", $h1->nodeValue);
-    if($h1->hasAttribute("author")) self::setVariable("author", $h1->getAttribute("author"));
-    if($desc->hasAttribute("kw")) self::setVariable("kw", $desc->getAttribute("kw"));
-    if($h1->hasAttribute("mtime")) self::setVariable("mtime", $h1->getAttribute("mtime"));
-    if($h1->hasAttribute("ctime")) self::setVariable("ctime", $h1->getAttribute("ctime"));
+    self::setVariable("author", $h1->getAttribute("author"));
+    self::setVariable("kw", $desc->getAttribute("kw"));
+    self::setVariable("mtime", $h1->getAttribute("mtime"));
+    self::setVariable("ctime", $h1->getAttribute("ctime"));
     self::setVariable("variables", array_keys(self::$variables));
   }
 

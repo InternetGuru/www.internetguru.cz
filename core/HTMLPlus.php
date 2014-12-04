@@ -145,7 +145,35 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->validateEmptyContent($repair);
+    $this->validateFirstHeadingLink($repair);
+    $this->validateFirstHeadingAuthor();
+    $this->validateMeta();
     $this->relaxNGValidatePlus();
+  }
+
+  private function validateMeta() {
+    foreach($this->headings as $h) {
+      if(!$h->hasAttribute("link")) continue;
+      if(!strlen(trim($h->nextElement->nodeValue)))
+        throw new Exception("Empty element desc following heading with attribute link found");
+      if(!$h->nextElement->hasAttribute("kw") || !strlen(trim($h->nextElement->getAttribute("kw"))))
+        throw new Exception("Attribute kw following heading with link not found or empty");
+    }
+  }
+
+  private function validateFirstHeadingLink($repair) {
+    $h = $this->headings->item(0);
+    if($h->hasAttribute("link")) return;
+    if(!$repair) throw new Exception(_("First heading attribude 'link' missing or empty"));
+    if($h->hasAttribute("short")) $link = normalize($h->getAttribute("short"));
+    else $link = normalize($h->nodeValue);
+    $h->setAttribute("link", $link);
+  }
+
+  private function validateFirstHeadingAuthor() {
+    $h = $this->headings->item(0);
+    if($h->hasAttribute("author")) return;
+    throw new Exception(_("First heading attribute 'author' missing or empty"));
   }
 
   public function relaxNGValidatePlus($f=null) {

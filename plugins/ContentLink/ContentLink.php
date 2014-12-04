@@ -29,18 +29,16 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->setBc($c);
     if($this->isRoot) return $c;
 
-    $this->setAncestorValue($curH, "author");
-    $this->setAncestorValue($curH->parentNode, "xml:lang");
+    $curH->setAncestorValue("author");
+    $curH->parentNode->setAncestorValue("xml:lang");
     if(!$curH->parentNode->hasAttribute("xml:lang")) {
       $bodyLang = $cf->documentElement->getAttribute("xml:lang");
       $curH->parentNode->setAttribute("xml:lang",$bodyLang);
     }
-    $this->setAncestorValue($curH, "ctime");
-    $this->setAncestorValue($curH, "mtime");
-    #echo $cf->saveXML(); exit();
-    #echo $curH->nextElement->nodeName; exit;
-    $this->setAncestorValue($curH->nextElement);
-    $this->setAncestorValue($curH->nextElement, "kw");
+    $curH->setAncestorValue("ctime");
+    $curH->setAncestorValue("mtime");
+    $curH->nextElement->setAncestorValue();
+    $curH->nextElement->setAncestorValue("kw");
 
     $content = new HTMLPlus();
     $content->formatOutput = true;
@@ -88,22 +86,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
     Cms::setVariable("bc", $bc->documentElement);
     Cms::setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
-  }
-
-  private function setAncestorValue(DOMElement $e, $attName=null) {
-    $ancestor = $e;
-    while(!is_null($ancestor)) {
-      if(!is_null($attName) && $ancestor->hasAttribute($attName)) {
-        $e->setAttribute($attName,$ancestor->getAttribute($attName));
-        break;
-      } elseif(is_null($attName) && strlen($ancestor->nodeValue)) {
-        $e->nodeValue = htmlspecialchars($ancestor->nodeValue);
-        break;
-      }
-      $ancestor = $ancestor->parentNode;
-      if(is_null($ancestor)) return;
-      $ancestor = $ancestor->getPreviousElement($e->nodeName);
-    }
   }
 
   private function appendUntilSame(DOMElement $e, DOMElement $into) {

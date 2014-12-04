@@ -116,7 +116,7 @@ class DOMBuilder {
     if(!is_null($e)) throw $e;
   }
 
-  private function loadDOM($filePath, DOMDocumentPlus $doc) {
+  private function loadDOM($filePath, DOMDocumentPlus $doc, $author=null) {
     if($doc instanceof HTMLPlus) {
       $remove = array("?".USER_FOLDER."/","?".ADMIN_FOLDER."/","?".CMS_FOLDER."/");
       Cms::addVariableItem("html", str_replace($remove, array(), "?$filePath"));
@@ -130,6 +130,12 @@ class DOMBuilder {
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
+      if(!is_null($author)) {
+        $h = $doc->documentElement->firstElement;
+        if($h->nodeName == "h" && !$h->hasAttribute("author")) {
+          $h->setAttribute("author", $author);
+        }
+      }
       $doc->validatePlus(true);
       saveRewrite($filePath, $doc->saveXML());
       new Logger(sprintf(_("HTML+ autocorrected: %s"), $e->getMessage()), Logger::LOGGER_INFO);
@@ -165,6 +171,7 @@ class DOMBuilder {
     $toStripTag = array();
     foreach($includes as $include) {
       try {
+        $include->setAncestorValue("author", "h");
         $this->insertHtmlPlus($include, dirname($filePath));
         $toStripElement[] = $include;
       } catch(Exception $e) {
@@ -194,7 +201,7 @@ class DOMBuilder {
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $val));
     try {
       $doc = new HTMLPlus();
-      $this->loadDOM("$homeDir/$val", $doc);
+      $this->loadDOM("$homeDir/$val", $doc, $include->getAttribute("author"));
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
