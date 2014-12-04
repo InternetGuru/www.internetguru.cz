@@ -1,5 +1,6 @@
 0.3.13 2014-12-02
-HTML+: spojování HTML+ souborů pomocí elementu 'include' ()
+HTML+: automatické generování neuvedených atributů 'ctime' a 'mtime' z datového souboru (9b771ec)
+HTML+: spojování HTML+ souborů pomocí elementu 'include' (123c90d)
 
 0.3.11 2014-11-28
 HTML+: automatická oprava prázdných elementů (0d83411)
