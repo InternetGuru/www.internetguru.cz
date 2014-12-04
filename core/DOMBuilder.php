@@ -130,11 +130,9 @@ class DOMBuilder {
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
-      if(!is_null($author)) {
-        $h = $doc->documentElement->firstElement;
-        if($h->nodeName == "h" && !$h->hasAttribute("author")) {
-          $h->setAttribute("author", $author);
-        }
+      if($doc instanceof HTMLPlus) {
+        $this->setCtime($doc, $filePath);
+        $this->setAuthor($doc, $author);
       }
       $doc->validatePlus(true);
       saveRewrite($filePath, $doc->saveXML());
@@ -142,23 +140,35 @@ class DOMBuilder {
     }
     if(!($doc instanceof HTMLPlus)) return;
     // generate ctime/mtime from file if not set
-    $this->generateDates($doc, $filePath);
+    $this->setMtime($doc, $filePath);
     // HTML+ include
     $this->insertIncludes($doc, $filePath);
   }
 
-  private function generateDates(HTMLPlus $doc, $filePath) {
+  private function setAuthor(HTMLPlus $doc, $author) {
+    if(is_null($author)) return;
     $h = $doc->documentElement->firstElement;
-    if(!$h->hasAttribute("ctime")) {
-      $c = new DateTime();
-      $c->setTimeStamp(filectime($filePath));
-      $h->setAttribute("ctime", $c->format(DateTime::W3C));
-    }
-    if(!$h->hasAttribute("mtime")) {
-      $m = new DateTime();
-      $m->setTimeStamp(filemtime($filePath));
-      $h->setAttribute("mtime", $m->format(DateTime::W3C));
-    }
+    if($h->nodeName != "h" || $h->hasAttribute("author")) return;
+    $h->setAttribute("author", $author);
+  }
+
+  private function setCtime(HTMLPlus $doc, $filePath) {
+    $h = $doc->documentElement->firstElement;
+    if($h->hasAttribute("ctime")) return;
+    $c = new DateTime();
+    $c->setTimeStamp(filectime($filePath));
+    $h->setAttribute("ctime", $c->format(DateTime::W3C));
+  }
+
+  private function setMtime(HTMLPlus $doc, $filePath) {
+    $h = $doc->documentElement->firstElement;
+    if($h->hasAttribute("mtime")) return;
+    if(!$h->hasAttribute("ctime")) return;
+    $m = new DateTime();
+    $m->setTimeStamp(filemtime($filePath));
+    $c = new DateTime($h->getAttribute("ctime"));
+    if($c > $m) return;
+    $h->setAttribute("mtime", $m->format(DateTime::W3C));
   }
 
   private function insertIncludes(HTMLPlus $doc, $filePath) {

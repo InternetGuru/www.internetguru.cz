@@ -147,6 +147,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateEmptyContent($repair);
     $this->validateFirstHeadingLink($repair);
     $this->validateFirstHeadingAuthor();
+    $this->validateFirstHeadingCtime();
     $this->validateMeta();
     $this->relaxNGValidatePlus();
   }
@@ -164,7 +165,7 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateFirstHeadingLink($repair) {
     $h = $this->headings->item(0);
     if($h->hasAttribute("link")) return;
-    if(!$repair) throw new Exception(_("First heading attribude 'link' missing or empty"));
+    if(!$repair) throw new Exception(_("First heading attribude 'link' missing"));
     if($h->hasAttribute("short")) $link = normalize($h->getAttribute("short"));
     else $link = normalize($h->nodeValue);
     $h->setAttribute("link", $link);
@@ -173,7 +174,13 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateFirstHeadingAuthor() {
     $h = $this->headings->item(0);
     if($h->hasAttribute("author")) return;
-    throw new Exception(_("First heading attribute 'author' missing or empty"));
+    throw new Exception(_("First heading attribute 'author' missing"));
+  }
+
+  private function validateFirstHeadingCtime() {
+    $h = $this->headings->item(0);
+    if($h->hasAttribute("ctime")) return;
+    throw new Exception(_("First heading attribute 'ctime' missing"));
   }
 
   public function relaxNGValidatePlus($f=null) {
