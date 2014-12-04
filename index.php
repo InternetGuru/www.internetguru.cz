@@ -1,13 +1,14 @@
 <?php
-
+define('CURRENT_SUBDOM_FOLDER',getcwd());
+define('CURRENT_SUBDOM_DIR',basename(CURRENT_SUBDOM_FOLDER));
 define("CORE_DIR", "core");
 $initCmsFile = "init_cms.php";
 
 $cmsVer = null;
-foreach(scandir(".") as $f) {
+foreach(scandir(CURRENT_SUBDOM_FOLDER) as $f) {
   $var = explode(".", $f, 2);
   if($var[0] != "CMS_VER") continue;
-  $cmsVer = $ver[1];
+  $cmsVer = $var[1];
   break;
 }
 

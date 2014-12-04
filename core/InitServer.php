@@ -132,8 +132,8 @@ class InitServer {
     // copy index
     if(is_link("$subdomDir/index.php")
       || !is_file("$subdomDir/index.php")
-      || getFileHash(CMS_FOLDER."/index.php") =! getFileHash("$subdomDir/index.php"))
-      saveRewriteFile("$subdomDir/index.php", CMS_FOLDER."/index.php", false);
+      || getFileHash(CMS_FOLDER."/index.php") != getFileHash("$subdomDir/index.php"))
+      saveRewriteFile(CMS_FOLDER."/index.php", "$subdomDir/index.php", false);
     // create symlinks
     $rob = preg_match("/^ig\d/", $this->subdom) ? "robots_off.txt" : "robots_default.txt";
     $files = array(

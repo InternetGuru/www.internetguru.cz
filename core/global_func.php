@@ -105,13 +105,13 @@ function saveRewriteFile($src, $dest, $keepOld=true) {
     throw new LoggerException("Source file '$src' not found");
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0775,true))
     throw new LoggerException("Unable to create directory structure");
-  if(!touch($dest))
-    throw new LoggerException("Unable to touch destination file");
-  if(!copy($dest,"$dest.old"))
+  if(!is_link($dest) && !copy($dest,"$dest.old"))
     throw new LoggerException("Unable to backup destination file");
+  if(!copy($src, "$dest.new"))
+    throw new LoggerException("Unable to copy source file");
   if(!rename("$dest.new",$dest))
     throw new LoggerException("Unable to rename new file to destination");
-  if(!$keepOld && !unlink("$dest.old"))
+  if(!$keepOld && is_file("$dest.old") && !unlink("$dest.old"))
     throw new LoggerException("Unable to delete .old file");
   return true;
 }

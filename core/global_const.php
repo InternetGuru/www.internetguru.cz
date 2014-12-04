@@ -1,6 +1,5 @@
 <?php
 
-define('CURRENT_SUBDOM_DIR',basename(dirname($_SERVER["PHP_SELF"])));
 define("PLUGINS_DIR", "plugins");
 define("THEMES_DIR", "themes");
 define("VER_DIR", "ver");
