@@ -168,25 +168,22 @@ class DOMDocumentPlus extends DOMDocument {
         $toStrip[] = array($a, sprintf(_("Identifier '%s' not found"), $frag));
         continue; // id not exists
       }
+      $rootHeading = $src->documentElement->firstElement;
       if($linkedElement->nodeName == "h" && $linkedElement->hasAttribute("link")) {
-        $a->setAttribute($aName,$root.$linkedElement->getAttribute("link"));
-        continue; // is outter h1
+        if($linkedElement->isSameNode($rootHeading))
+          $a->setAttribute($aName, $root);
+        else
+          $a->setAttribute($aName, $root.$linkedElement->getAttribute("link"));
+        continue; // is root heading, else outter heading
       }
       $h = $linkedElement->parentNode->getPreviousElement("h");
       while(!is_null($h) && !$h->hasAttribute("link")) {
         $h = $h->parentNode->getPreviousElement("h");
       }
-      if(is_null($h)) {
-        $h1 = $src->documentElement->firstElement;
-        #die($h1->getAttribute("id") . " -- $frag");
-        if($h1->getAttribute("id") == $frag) {
-          $a->setAttribute($aName,$root);
-          continue; // link to root heading
-        }
-        $a->setAttribute($aName,$root."#".$frag);
-        continue; // no link attribute until root heading
-      }
-      $a->setAttribute($aName,$root.$h->getAttribute("link")."#".$frag);
+      if($h->isSameNode($rootHeading))
+        $a->setAttribute($aName, $root."#".$frag);
+      else
+        $a->setAttribute($aName, $root.$h->getAttribute("link")."#".$frag);
     }
     foreach($toStrip as $a) $a[0]->stripAttr($aName,$a[1]);
   }

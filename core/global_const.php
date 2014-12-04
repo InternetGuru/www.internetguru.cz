@@ -35,7 +35,6 @@ if(isAtLocalhost()) {
   define("APACHE_RESTART_FILEPATH", null);
 } else {
   define('CMS_DEBUG', is_file("CMS_DEBUG"));
-  define('CMS_ROOT_FOLDER', dirname(CMS_FOLDER));
   define('CMSRES_ROOT_DIR', "cmsres");
   define('CMSRES_ROOT_FOLDER', realpath(CMS_ROOT_FOLDER."/../".CMSRES_ROOT_DIR));
   define("APACHE_RESTART_FILEPATH", CMSRES_ROOT_FOLDER."/APACHE_RESTART");

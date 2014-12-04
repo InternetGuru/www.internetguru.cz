@@ -77,7 +77,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $subtitles[] = $content;
       $href = "#". $h->getAttribute("id");
       $a = $h->parentNode->appendChild($bc->createElement("a",$content));
-      $a->setAttribute("href",$href);
+      $a->setAttribute("href", $href);
       if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
       else $a->setAttribute("title",$h->nodeValue);
       $h->parentNode->removeChild($h);
