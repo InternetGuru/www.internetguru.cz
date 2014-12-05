@@ -22,7 +22,7 @@
     for(var i = 0; i < hidables.length; i++) {
       var firstElement = hidables[i].children[0];
       var link = document.createElement("a");
-      link.href = "";
+      link.href = "Javascript:void(0);";
       link.innerHTML = COLLAPSE;
       link.classList.add("switch")
       link.addEventListener("click",toggle,false);
@@ -43,7 +43,7 @@
     for(var i = 0; i < e.childNodes.length; i++) {
       var ch = e.childNodes[i];
       if(ch.nodeType != 1) continue;
-      if(ch.isSameNode(link.parentNode)) continue;
+      if(ch == link.parentNode) continue;
       if(ch.classList.contains(HIDE_CLASS)) {
         ch.classList.remove(HIDE_CLASS);
         link.innerHTML = COLLAPSE;
