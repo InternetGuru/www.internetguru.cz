@@ -19,10 +19,9 @@ class Logger {
       self::LOGGER_ERROR,
       self::LOGGER_WARNING,
       self::LOGGER_INFO))) $type = self::LOGGER_INFO;
-    if(!is_null(Cms::getVariable("auth-logged_user"))
-      && ($type == self::LOGGER_ERROR || $type == self::LOGGER_WARNING)) {
-      Cms::addMessage($message.' ['. $this->getCaller()
-        .']', Cms::MSG_INFO, Cms::isForceFlash());
+    if(!is_null(Cms::getVariable("auth-logged_user")) && $type != self::LOGGER_INFO) {
+      Cms::addMessage("$message [". $this->getCaller()
+        .":$type]", Cms::MSG_INFO, Cms::isForceFlash());
     }
     $this->message = $message;
     $this->type = $type;

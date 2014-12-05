@@ -52,6 +52,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       try {
         new InitServer($subdom, file_exists(SUBDOM_ROOT_FOLDER."/.$subdom"));
       } catch(Exception $e) {
+        new Logger($e->getMessage());
         Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
       }
     }
@@ -83,6 +84,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       else Cms::addMessage($this->successMsg, Cms::MSG_SUCCESS, true);
       redirTo($link, null, true);
     } catch(Exception $e) {
+      new Logger($e->getMessage());
       Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
     }
   }
