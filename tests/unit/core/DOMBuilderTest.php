@@ -14,13 +14,11 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
     * @var \UnitTester
     */
     protected $tester;
-    private $builder;
     private $xml = array();
     private $html = array();
 
     protected function _before()
     {
-      $this->builder = new DOMBuilder();
 
       $xml = "testXml.xml";
       $this->xml = array($xml,ADMIN_FOLDER."/$xml",USER_FOLDER."/$xml");
@@ -64,7 +62,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
 
     public function testBuildDOM()
     {
-      $doc = $this->builder->buildDOMPlus($this->xml[0]);
+      $doc = DOMBuilder::buildDOMPlus($this->xml[0]);
       $s1 = $doc->C14N(true,false);
       $doc = new DOMDocumentPlus();
       $doc->loadXML('<test><a>1</a><d id="d" readonly="readonly">2</d><c readonly="readonly">2</c><b>3</b><c>3</c></test>');
@@ -75,7 +73,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
 
     public function testBuildHTML()
     {
-      $doc = $this->builder->buildHTMLPlus($this->html[0]);
+      $doc = DOMBuilder::buildHTMLPlus($this->html[0]);
       $s1 = $doc->C14N(true,false);
       $doc = new HTMLPlus();
       $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="3">Three</h><desc/></body>');

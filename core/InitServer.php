@@ -5,8 +5,8 @@
 class InitServer {
   private $subdom;
   private $subdomVars;
-  const FORBIDDEN_PLUGINS = array("Slider" => null);
-  const DISABLED_PLUGINS = array("Slider" => null);
+  private $forbiddenPlugins = array("Slider" => null);
+  private $disabledPlugins = array("Slider" => null);
 
   public function __construct($subdom, $setConst = false, $update = false) {
     if(!preg_match("/^" . SUBDOM_PATTERN . "$/", $subdom))
@@ -257,13 +257,13 @@ class InitServer {
   }
 
   private function createDefaultPlugins($srcDir, $destDir) {
-    foreach(self::FORBIDDEN_PLUGINS as $p => $null) {
+    foreach($this->forbiddenPlugins as $p => $null) {
       if(!is_file("$destDir/.PLUGIN.$p") && !touch("$destDir/.PLUGIN.$p"))
         throw new Exception(_("Unable to create forbidden plugin files"));
     }
     foreach(scandir($srcDir) as $f) {
       if(strpos($f,".") === 0) continue; // skip folders starting with a dot
-      if(array_key_exists($f, self::DISABLED_PLUGINS)) continue;
+      if(array_key_exists($f, $this->disabledPlugins)) continue;
       if(!touch("$destDir/PLUGIN.$f"))
         throw new Exception(_("Unable to create plugin files"));
     }

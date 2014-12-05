@@ -283,8 +283,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function transform(DOMDocument $content,$fileName,$user, XSLTProcessor $proc) {
     #var_dump($fileName);
-    $db = new DOMBuilder();
-    $xsl = $db->buildDOMPlus($fileName,true,$user);
+    $xsl = DOMBuilder::buildDOMPlus($fileName,true,$user);
     if(!@$proc->importStylesheet($xsl))
       throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
     if(($x = @$proc->transformToDoc($content) ) === false)

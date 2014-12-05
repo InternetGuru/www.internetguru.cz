@@ -28,7 +28,7 @@ class Cms {
     self::setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     self::setVariable("plugins", array_keys($plugins->getObservers()));
     self::setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
-    self::loadContent();
+    self::$contentFull = DOMBuilder::buildHTMLPlus("Content.html");
     self::loadDefaultVariables(self::$contentFull);
   }
 
@@ -132,11 +132,6 @@ class Cms {
     self::setVariable("mtime", $h1->getAttribute("mtime"));
     self::setVariable("ctime", $h1->getAttribute("ctime"));
     self::setVariable("variables", array_keys(self::$variables));
-  }
-
-  private static function loadContent() {
-    $db = new DOMBuilder();
-    self::$contentFull = $db->buildHTMLPlus("Content.html");
   }
 
   public static function addMessage($message, $type, $flash = false) {

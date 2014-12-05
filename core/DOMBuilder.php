@@ -9,26 +9,26 @@
 class DOMBuilder {
 
   const DEBUG = false;
-  const USE_CACHE = true;
-  private $doc; // DOMDocument (HTMLPlus)
-  private $replace; // bool
-  private $included = array();
+  #const USE_CACHE = true;
+  private static $included = array();
 
-  public function __construct() {
-    if(self::DEBUG) new Logger("DEBUG");
+  public static function buildHTMLPlus($filePath, $user=true) {
+    $doc = new HTMLPlus();
+    self::build($doc, $filePath, true, $user);
+    return $doc;
   }
 
-  public function buildDOMPlus($filePath,$replace=false,$user=true) {
-    $this->doc = new DOMDocumentPlus();
-    $this->build($filePath,$replace,$user);
-    if($replace) return $this->doc;
-    $this->globalReadonly();
-    return $this->doc;
+  public static function buildDOMPlus($filePath, $replace=false, $user=true) {
+    $doc = new DOMDocumentPlus();
+    self::build($doc, $filePath, $replace, $user);
+    if($replace) return $doc;
+    self::globalReadonly($doc);
+    return $doc;
   }
 
-  private function globalReadonly() {
+  private static function globalReadonly(DOMDocumentPlus $doc) {
     $nodes = array();
-    foreach($this->doc->documentElement->childElements as $n) {
+    foreach($doc->documentElement->childElements as $n) {
       if($n->nodeValue == "" && $n->hasAttribute("readonly")) $nodes[] = $n;
     }
     foreach($nodes as $n) {
@@ -39,13 +39,7 @@ class DOMBuilder {
     }
   }
 
-  public function buildHTMLPlus($filePath,$user=true) {
-    $this->doc = new HTMLPlus();
-    $this->build($filePath,true,$user);
-    return $this->doc;
-  }
-
-  private function build($fileName,$replace,$user) {
+  private static function build(DOMDocumentPlus $doc, $fileName,$replace,$user) {
     /*
     $dc = new DOMCache(hash(FILE_HASH_ALGO,"$fileName,$replace,$user"));
     if($dc->isValid()) return $dc->getCache();
@@ -54,48 +48,48 @@ class DOMBuilder {
     $dc->addSurceFile(USER_FOLDER . "/$fileName");
     */
 
-    if(self::DEBUG) $this->doc->formatOutput = true;
+    if(self::DEBUG) $doc->formatOutput = true;
 
     if($replace) {
-      $this->safeLoadDOM($fileName,$this->doc,$user,true);
-      if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+      self::safeLoadDOM($fileName, $doc, $user, true);
+      if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
       return;
     }
 
-    $this->loadDOM($this->findFile($fileName,false,false),$this->doc);
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+    self::loadDOM(self::findFile($fileName, false, false), $doc);
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
     $f = ADMIN_FOLDER . "/$fileName";
     try {
-      if(is_file($f)) $this->updateDOM($f,true);
+      if(is_file($f)) self::updateDOM($doc, $f, true);
     } catch(Exception $e) {
       new Logger(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
     if(!$user) return;
 
     $f = USER_FOLDER . "/$fileName";
     try {
-      if(is_file($f)) $this->updateDOM($f);
+      if(is_file($f)) self::updateDOM($doc, $f);
     } catch(Exception $e) {
       new Logger(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($this->doc->saveXML())."</pre>";
+    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
   }
 
-  private function findFile($fileName,$user=true,$admin=true) {
+  private static function findFile($fileName,$user=true,$admin=true) {
     $f = findFile($fileName,$user,$admin);
     if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
     return $f;
   }
 
-  private function safeLoadDOM($filePath,DOMDocumentPlus $doc,$user,$admin) {
+  private static function safeLoadDOM($filePath,DOMDocumentPlus $doc,$user,$admin) {
     $files = array();
     try {
-      $files[$this->findFile($filePath,$user,$admin)] = null;
-      $files[$this->findFile($filePath,false,true)] = null;
-      $files[$this->findFile($filePath,false,false)] = null;
+      $files[self::findFile($filePath,$user,$admin)] = null;
+      $files[self::findFile($filePath,false,true)] = null;
+      $files[self::findFile($filePath,false,false)] = null;
     } catch(Exception $e) {
       if(empty($files)) throw $e;
     }
@@ -103,7 +97,7 @@ class DOMBuilder {
     $e = null;
     foreach($files as $f => $void) {
       try {
-        $this->loadDOM($f, $doc);
+        self::loadDOM($f, $doc);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to load '%s': %s"), $filePath, $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
@@ -116,7 +110,7 @@ class DOMBuilder {
     if(!is_null($e)) throw $e;
   }
 
-  private function loadDOM($filePath, DOMDocumentPlus $doc, $author=null) {
+  private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null) {
     if($doc instanceof HTMLPlus) {
       $remove = array("?".USER_FOLDER."/","?".ADMIN_FOLDER."/","?".CMS_FOLDER."/");
       Cms::addVariableItem("html", str_replace($remove, array(), "?$filePath"));
@@ -131,8 +125,8 @@ class DOMBuilder {
       $doc->validatePlus();
     } catch(Exception $e) {
       if($doc instanceof HTMLPlus) {
-        $this->setCtime($doc, $filePath);
-        $this->setAuthor($doc, $author);
+        self::setCtime($doc, $filePath);
+        self::setAuthor($doc, $author);
       }
       $doc->validatePlus(true);
       saveRewrite($doc->saveXML(), $filePath);
@@ -140,19 +134,19 @@ class DOMBuilder {
     }
     if(!($doc instanceof HTMLPlus)) return;
     // generate ctime/mtime from file if not set
-    $this->setMtime($doc, $filePath);
+    self::setMtime($doc, $filePath);
     // HTML+ include
-    $this->insertIncludes($doc, $filePath);
+    self::insertIncludes($doc, $filePath);
   }
 
-  private function setAuthor(HTMLPlus $doc, $author) {
+  private static function setAuthor(HTMLPlus $doc, $author) {
     if(is_null($author)) return;
     $h = $doc->documentElement->firstElement;
     if($h->nodeName != "h" || $h->hasAttribute("author")) return;
     $h->setAttribute("author", $author);
   }
 
-  private function setCtime(HTMLPlus $doc, $filePath) {
+  private static function setCtime(HTMLPlus $doc, $filePath) {
     $h = $doc->documentElement->firstElement;
     if($h->hasAttribute("ctime")) return;
     $c = new DateTime();
@@ -160,7 +154,7 @@ class DOMBuilder {
     $h->setAttribute("ctime", $c->format(DateTime::W3C));
   }
 
-  private function setMtime(HTMLPlus $doc, $filePath) {
+  private static function setMtime(HTMLPlus $doc, $filePath) {
     $h = $doc->documentElement->firstElement;
     if($h->hasAttribute("mtime")) return;
     if(!$h->hasAttribute("ctime")) return;
@@ -171,8 +165,8 @@ class DOMBuilder {
     $h->setAttribute("mtime", $m->format(DateTime::W3C));
   }
 
-  private function insertIncludes(HTMLPlus $doc, $filePath) {
-    $this->included[realpath($filePath)] = null;
+  private static function insertIncludes(HTMLPlus $doc, $filePath) {
+    self::$included[realpath($filePath)] = null;
     $includes = array();
     foreach($doc->getElementsByTagName("include") as $include) $includes[] = $include;
     if(!count($includes)) return;
@@ -182,7 +176,7 @@ class DOMBuilder {
     foreach($includes as $include) {
       try {
         $include->setAncestorValue("author", "h");
-        $this->insertHtmlPlus($include, dirname($filePath));
+        self::insertHtmlPlus($include, dirname($filePath));
         $toStripElement[] = $include;
       } catch(Exception $e) {
         $toStripTag[] = $include;
@@ -195,30 +189,30 @@ class DOMBuilder {
       count($toStripElement), count($includes)), null, $start_time);
   }
 
-  private function insertHtmlPlus(DOMElement $include, $homeDir) {
+  private static function insertHtmlPlus(DOMElement $include, $homeDir) {
     $val = $include->getAttribute("src");
     $file = realpath("$homeDir/$val");
     if($file === false) {
       Cms::addVariableItem("html", $val);
       throw new Exception(sprintf(_("Included file '%s' not found"), $val));
     }
-    if(array_key_exists($file, $this->included))
+    if(array_key_exists($file, self::$included))
       throw new Exception(sprintf(_("File '%s' already included"), $val));
-    $this->included[$file] = null;
+    self::$included[$file] = null;
     if(pathinfo($val, PATHINFO_EXTENSION) != "html")
       throw new Exception(sprintf(_("Included file extension '%s' must be .html"), $val));
     if(strpos($file, realpath("$homeDir/")) !== 0)
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $val));
     try {
       $doc = new HTMLPlus();
-      $this->loadDOM("$homeDir/$val", $doc, $include->getAttribute("author"));
+      self::loadDOM("$homeDir/$val", $doc, $include->getAttribute("author"));
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
       $include->parentNode->insertBefore($c, $include);
       throw new Exception($msg);
     }
-    $sectLang = $this->getSectionLang($include->parentNode);
+    $sectLang = self::getSectionLang($include->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
       new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
@@ -233,7 +227,7 @@ class DOMBuilder {
     }
   }
 
-  private function getSectionLang($s) {
+  private static function getSectionLang($s) {
     while(!is_null($s)) {
       if($s->hasAttribute("xml:lang")) return $s->getAttribute("xml:lang");
       $s = $s->parentNode;
@@ -248,47 +242,47 @@ class DOMBuilder {
    * @return void
    * @throws Exception   if unable to load XML file incl. backup file
    */
-  private function updateDOM($filePath,$ignoreReadonly=false) {
-    $doc = new DOMDocumentPlus();
-    $this->loadDOM($filePath,$doc);
+  private static function updateDOM(DOMDocumentPlus $doc, $filePath, $ignoreReadonly=false) {
+    $newDoc = new DOMDocumentPlus();
+    self::loadDOM($filePath,$newDoc);
     // create root element if not exists
-    if(is_null($this->doc->documentElement)) {
-      $this->doc->appendChild($this->doc->importNode($doc->documentElement));
+    if(is_null($doc->documentElement)) {
+      $doc->appendChild($doc->importNode($newDoc->documentElement));
     }
-    foreach($doc->documentElement->childElements as $n) {
+    foreach($newDoc->documentElement->childElements as $n) {
       // if empty && readonly => user cannot modify
-      foreach($this->doc->getElementsByTagName($n->nodeName) as $d) {
+      foreach($doc->getElementsByTagName($n->nodeName) as $d) {
         if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
       }
       if(!$n instanceof DOMElement) continue;
-      if($this->doRemove($n)) {
+      if(self::doRemove($n)) {
         $remove = array();
-        foreach($this->doc->documentElement->childElements as $d) {
+        foreach($doc->documentElement->childElements as $d) {
           if($d->nodeName != $n->nodeName) continue;
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
         }
         #if(!count($remove)) {
-        #  $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
+        #  $doc->documentElement->appendChild($doc->importNode($n,true));
         #  continue;
         #}
         foreach($remove as $d) $d->parentNode->removeChild($d);
       } elseif($n->hasAttribute("id")) {
-        $sameIdElement = $this->doc->getElementById($n->getAttribute("id"));
+        $sameIdElement = $doc->getElementById($n->getAttribute("id"));
         if(is_null($sameIdElement)) {
-          $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
+          $doc->documentElement->appendChild($doc->importNode($n,true));
           continue;
         }
         if($sameIdElement->nodeName != $n->nodeName)
           throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $n->getAttribute("id"), $n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
-        $this->doc->documentElement->replaceChild($this->doc->importNode($n,true),$sameIdElement);
+        $doc->documentElement->replaceChild($doc->importNode($n,true),$sameIdElement);
       } else {
-        $this->doc->documentElement->appendChild($this->doc->importNode($n,true));
+        $doc->documentElement->appendChild($doc->importNode($n,true));
       }
     }
   }
 
-  private function doRemove(DOMElement $n) {
+  private static function doRemove(DOMElement $n) {
     if($n->nodeValue != "") return false;
     if($n->attributes->length > 1) return false;
     if($n->attributes->length == 1 && !$n->hasAttribute("readonly")) return false;
