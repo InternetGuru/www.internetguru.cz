@@ -250,6 +250,7 @@
   <xsl:template match="p">
     <xsl:param name="pIndent" select="'  '"/>
 
+    <xsl:if test="r/t">
     <xsl:choose>
       <!-- list items -->
       <xsl:when test="pPr/numPr">
@@ -282,10 +283,12 @@
           </xsl:choose>
         </xsl:if>
       </xsl:when>
-      <xsl:when test="r/t">·
+      <xsl:otherwise>·
   <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
-      </xsl:when>
+      </xsl:otherwise>
     </xsl:choose>
+    </xsl:if>
+
   </xsl:template>
 
   <xsl:template name="insertDefListItem">
@@ -293,6 +296,7 @@
     <xsl:param name="pIndent" select="'  '"/>
     <xsl:variable name="item" select="following-sibling::p[$i]"/>
 
+    <xsl:if test="$item/r/t">
     <xsl:choose>
       <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ($item/r[1]/rPr/b/@val = 1 or following-sibling::p[$i+1]/pPr/numPr/ilvl/@val &gt; 0)">·
     <xsl:copy-of select="$pIndent"/><dt>
@@ -306,6 +310,7 @@
         </dd>
       </xsl:otherwise>
     </xsl:choose>
+    </xsl:if>
     <xsl:if test="following-sibling::p[$i+1]/pPr/numPr/numId/@val = $item/pPr/numPr/numId/@val">
       <xsl:call-template name="insertDefListItem">
         <xsl:with-param name="i" select="$i+1"/>

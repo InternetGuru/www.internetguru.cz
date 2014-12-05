@@ -3,13 +3,6 @@
 #todo: export
 #todo: support file upload
 #todo: js copy content to clipboard
-#todo: support short heading after @
-#todo: default short if no @
-#todo: join tags (inline?)
-#todo: fix normalize() ??
-#todo: internal links
-#todo: external links
-#todo: delete empty elements
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
   private $error = false;
@@ -74,6 +67,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $doc = $this->transformFile($this->tmpFolder ."/$f");
     $xml = $doc->saveXML();
     $xml = str_replace("·\n","\n",$xml); // remove "format hack" from transformation
+    $mergable = array("strong", "em", "sub", "sup", "ins", "del", "q", "cite", "acronym", "code", "dfn", "kbd", "samp");
+    foreach($mergable as $tag) $xml = preg_replace("/<\/$tag>(\s)*<$tag>/", "$1", $xml);
+    foreach($mergable as $tag) $xml = preg_replace("/(\s)*(<\/$tag>)/", "$2$1", $xml);
 
     $doc = new HTMLPlus();
     $doc->loadXML($xml);
