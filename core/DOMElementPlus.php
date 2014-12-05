@@ -116,7 +116,7 @@ class DOMElementPlus extends DOMElement {
 
   private function getChildElements() {
     $xpath = new DOMXPath($this->ownerDocument);
-    return $xpath->query($this->getNodePath() . "/node()[not(self::text() or self::comment() or self::processing-instruction())]");
+    return $xpath->query($this->getNodePath()."/node()[not(self::text() or self::comment() or self::processing-instruction())]");
   }
 
 }

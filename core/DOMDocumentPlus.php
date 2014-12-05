@@ -118,17 +118,17 @@ class DOMDocumentPlus extends DOMDocument {
     $pLink = parse_url($link);
     if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
-      $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"] . getRoot();
+      $curDomain = $_SERVER["REQUEST_SCHEME"]."://".$_SERVER["HTTP_HOST"].getRoot();
       if(strpos(str_replace(array("?", "#"), array("/", "/"), $link), $curDomain) !== 0) return $link; // link is external
     }
-    $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
-    if(isset($pLink["fragment"])) return $query . "#" . $pLink["fragment"];
+    $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
+    if(isset($pLink["fragment"])) return $query."#".$pLink["fragment"];
     $path = isset($pLink["path"]) ? $pLink["path"] : "";
     while(strpos($path, ".") === 0) $path = substr($path, 1);
     if(isAtLocalhost() && strpos($path, substr(getRoot(), 0, -1)) === 0)
       $path = substr($path, strlen(getRoot())-1);
     while(strpos($path, "/") === 0) $path = substr($path, 1);
-    return $path . $query;
+    return $path.$query;
   }
 
   public function fragToLinks(HTMLPlus $src, $root="/", $eName="a", $aName="href") {
@@ -158,7 +158,7 @@ class DOMDocumentPlus extends DOMDocument {
       $linkedElement = $this->getElementById($frag);
       if(!is_null($linkedElement)) {
         $h1id = $this->getElementsByTagName("h1")->item(0)->getAttribute("id");
-        if(getCurLink(true) == getCurLink() . $queryUrl && $h1id == $frag) {
+        if(getCurLink(true) == getCurLink().$queryUrl && $h1id == $frag) {
           $toStrip[] = array($a, _("Cyclic fragment found"));
         }
         continue; // ignore visible headings
@@ -229,8 +229,8 @@ class DOMDocumentPlus extends DOMDocument {
     }
     foreach($duplicit as $e) {
       $i = 1;
-      while(array_key_exists($e->getAttribute($attr) . $i, $identifiers)) $i++;
-      $e->setAttribute($attr, $e->getAttribute($attr) . $i);
+      while(array_key_exists($e->getAttribute($attr).$i, $identifiers)) $i++;
+      $e->setAttribute($attr, $e->getAttribute($attr).$i);
       $identifiers[$e->getAttribute($attr)] = null;
     }
     return count($duplicit);
@@ -263,7 +263,7 @@ class DOMDocumentPlus extends DOMDocument {
       if(count($internal_errors)) {
         $note = " ["._("Caution: this message may be misleading")."]";
         if(self::DEBUG) die($this->saveXML());
-        $e = new Exception(current($internal_errors)->message . $note);
+        $e = new Exception(current($internal_errors)->message.$note);
       }
     }
     // finally
@@ -274,7 +274,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function setUniqueId(DOMElement $e) {
-    $id = $e->nodeName .".". substr(md5(microtime()), 0, 3);
+    $id = $e->nodeName.".".substr(md5(microtime()), 0, 3);
     if(!$this->isValidId($id)) $this->setUniqueId($e);
     if(!is_null($this->getElementById($id))) $this->setUniqueId($e);
     $e->setAttribute("id", $id);

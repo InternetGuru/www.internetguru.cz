@@ -43,12 +43,12 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   /**
    * sync real owned subdoms to user subdom folder
-   * delete if .usersubdom
+   * delete if.usersubdom
    * @return void
    */
   private function syncSubdomsToUser() {
     foreach($this->getSubdirs("..", "/^".SUBDOM_PATTERN."$/") as $subdom => $null) {
-      if(!is_file("../$subdom/USER_ID.". USER_ID)) continue;
+      if(!is_file("../$subdom/USER_ID.".USER_ID)) continue;
       try {
         new InitServer($subdom, file_exists(SUBDOM_ROOT_FOLDER."/.$subdom"));
       } catch(Exception $e) {
@@ -80,7 +80,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       }
       new InitServer($subdom, false, true);
       $link = getCurLink()."?".get_class($this)."=$subdom";
-      if(isset($_POST["redir"])) $link = "http://$subdom.". getDomain();
+      if(isset($_POST["redir"])) $link = "http://$subdom.".getDomain();
       else Cms::addMessage($this->successMsg, Cms::MSG_SUCCESS, true);
       redirTo($link, null, true);
     } catch(Exception $e) {
@@ -152,7 +152,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
         case "USER_DIR":
         case "FILES_DIR":
         if(!isset($_POST[$var[0]])) throw new Exception(sprintf(_("Missing POST data '%s'"), $var[0]));
-        if(!rename("$subdomFolder/$f", "$subdomFolder/{$var[0]}.". $_POST[$var[0]]))
+        if(!rename("$subdomFolder/$f", "$subdomFolder/{$var[0]}.".$_POST[$var[0]]))
           throw new Exception(sprintf(_("Unable to set '%s' to '%s'"), $var[0], $_POST[$var[0]]));
         break;
         case "PLUGIN":
@@ -171,7 +171,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   public function getContent(HTMLPlus $content) {
-    Cms::getOutputStrategy()->addCssFile($this->getDir() ."/SubdomManager.css");
+    Cms::getOutputStrategy()->addCssFile($this->getDir()."/SubdomManager.css");
     Cms::getOutputStrategy()->addJs("
     var forms = document.getElementsByTagName('form');
     for(var i=0; i<forms.length; i++) {

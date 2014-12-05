@@ -44,8 +44,8 @@ class DOMBuilder {
     $dc = new DOMCache(hash(FILE_HASH_ALGO, "$fileName, $replace, $user"));
     if($dc->isValid()) return $dc->getCache();
     $dc->addSurceFile($fileName);
-    $dc->addSurceFile(ADMIN_FOLDER . "/$fileName");
-    $dc->addSurceFile(USER_FOLDER . "/$fileName");
+    $dc->addSurceFile(ADMIN_FOLDER."/$fileName");
+    $dc->addSurceFile(USER_FOLDER."/$fileName");
     */
 
     if(self::DEBUG) $doc->formatOutput = true;
@@ -59,7 +59,7 @@ class DOMBuilder {
     self::loadDOM(self::findFile($fileName, false, false), $doc);
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
-    $f = ADMIN_FOLDER . "/$fileName";
+    $f = ADMIN_FOLDER."/$fileName";
     try {
       if(is_file($f)) self::updateDOM($doc, $f, true);
     } catch(Exception $e) {
@@ -69,7 +69,7 @@ class DOMBuilder {
 
     if(!$user) return;
 
-    $f = USER_FOLDER . "/$fileName";
+    $f = USER_FOLDER."/$fileName";
     try {
       if(is_file($f)) self::updateDOM($doc, $f);
     } catch(Exception $e) {
@@ -240,7 +240,7 @@ class DOMBuilder {
    * Respect subdom attribute
    * @param  string      $filePath File to be loaded into document
    * @return void
-   * @throws Exception   if unable to load XML file incl. backup file
+   * @throws Exception   if unable to load XML file incl.backup file
    */
   private static function updateDOM(DOMDocumentPlus $doc, $filePath, $ignoreReadonly=false) {
     $newDoc = new DOMDocumentPlus();

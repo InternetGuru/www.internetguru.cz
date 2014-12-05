@@ -25,7 +25,7 @@ class AcceptanceTester extends \Codeception\Actor
 {
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      *
      * @see \Codeception\Module\PhpBrowser::setHeader()
@@ -36,10 +36,10 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Sets 'url' configuration parameter to hosts subdomain.
-     * It does not open a page on subdomain. Use `amOnPage` for that
+     * It does not open a page on subdomain.Use `amOnPage` for that
      *
      * ``` php
      * <?php
@@ -64,7 +64,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Low-level API method.
      * If Codeception commands are not enough, use [Guzzle HTTP Client](http://guzzlephp.org/) methods directly
@@ -91,7 +91,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Authenticates user for HTTP_AUTH
      *
@@ -105,7 +105,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Opens the page.
      * Requires relative uri as parameter
@@ -130,7 +130,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Perform a click on link or button.
      * Link or button are found by their names or CSS selector.
@@ -171,7 +171,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Check if current page contains the text specified.
      * Specify the css selector to match only specific region.
@@ -195,7 +195,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('see', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Check if current page contains the text specified.
      * Specify the css selector to match only specific region.
@@ -220,7 +220,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Check if current page doesn't contain the text specified.
      * Specify the css selector to match only specific region.
@@ -244,7 +244,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSee', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Check if current page doesn't contain the text specified.
      * Specify the css selector to match only specific region.
@@ -269,7 +269,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if there is a link with text specified.
      * Specify url to match link with exact this url.
@@ -292,7 +292,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeLink', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if there is a link with text specified.
      * Specify url to match link with exact this url.
@@ -316,7 +316,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if page doesn't contain the link with text specified.
      * Specify url to narrow the results.
@@ -338,7 +338,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeLink', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if page doesn't contain the link with text specified.
      * Specify url to narrow the results.
@@ -361,7 +361,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current uri contains a value
      *
@@ -382,7 +382,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeInCurrentUrl', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current uri contains a value
      *
@@ -404,7 +404,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current uri does not contain a value
      *
@@ -422,7 +422,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeInCurrentUrl', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current uri does not contain a value
      *
@@ -441,7 +441,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url is equal to value.
      * Unlike `seeInCurrentUrl` performs a strict check.
@@ -461,7 +461,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeCurrentUrlEquals', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url is equal to value.
      * Unlike `seeInCurrentUrl` performs a strict check.
@@ -482,7 +482,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url is not equal to value.
      * Unlike `dontSeeInCurrentUrl` performs a strict check.
@@ -502,7 +502,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCurrentUrlEquals', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url is not equal to value.
      * Unlike `dontSeeInCurrentUrl` performs a strict check.
@@ -523,7 +523,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url is matches a RegEx value
      *
@@ -542,7 +542,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeCurrentUrlMatches', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url is matches a RegEx value
      *
@@ -562,7 +562,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url does not match a RegEx value
      *
@@ -581,7 +581,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCurrentUrlMatches', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that current url does not match a RegEx value
      *
@@ -601,7 +601,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Takes a parameters from current URI by RegEx.
      * If no url provided returns full URI.
@@ -625,7 +625,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Assert if the specified checkbox is checked.
      * Use css selector or xpath to match.
@@ -648,7 +648,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeCheckboxIsChecked', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Assert if the specified checkbox is checked.
      * Use css selector or xpath to match.
@@ -672,7 +672,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Assert if the specified checkbox is unchecked.
      * Use css selector or xpath to match.
@@ -694,7 +694,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCheckboxIsChecked', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Assert if the specified checkbox is unchecked.
      * Use css selector or xpath to match.
@@ -717,7 +717,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that an input field or textarea contains value.
      * Field is matched either by label or CSS or Xpath
@@ -744,7 +744,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeInField', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that an input field or textarea contains value.
      * Field is matched either by label or CSS or Xpath
@@ -772,7 +772,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that an input field or textarea doesn't contain value.
      * Field is matched either by label or CSS or Xpath
@@ -798,7 +798,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeInField', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that an input field or textarea doesn't contain value.
      * Field is matched either by label or CSS or Xpath
@@ -825,7 +825,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Submits a form located on page.
      * Specify the form by it's css or xpath selector.
@@ -873,7 +873,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Fills a text field or textarea with value.
      *
@@ -896,7 +896,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Selects an option in select tag or in radio button group.
      *
@@ -928,7 +928,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Ticks a checkbox.
      * For radio buttons use `selectOption` method.
@@ -950,7 +950,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Unticks a checkbox.
      *
@@ -971,7 +971,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Attaches file from Codeception data directory to upload field.
      *
@@ -994,7 +994,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * If your page triggers an ajax request, you can perform it manually.
      * This action sends a GET ajax request with specified params.
@@ -1011,7 +1011,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * If your page triggers an ajax request, you can perform it manually.
      * This action sends a POST ajax request with specified params.
@@ -1039,7 +1039,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * If your page triggers an ajax request, you can perform it manually.
      * This action sends an ajax request with specified method and params.
@@ -1065,7 +1065,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Finds and returns text contents of element.
      * Element is searched by CSS selector, XPath or matcher by regex.
@@ -1091,7 +1091,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Grabs attribute value from an element.
      * Fails if element is not found.
@@ -1115,7 +1115,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * @param $field
      *
@@ -1128,7 +1128,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Sets a cookie.
      *
@@ -1144,7 +1144,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Grabs a cookie value.
      *
@@ -1159,7 +1159,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that cookie is set.
      *
@@ -1173,7 +1173,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeCookie', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that cookie is set.
      *
@@ -1188,7 +1188,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that cookie doesn't exist
      *
@@ -1202,7 +1202,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeCookie', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that cookie doesn't exist
      *
@@ -1217,7 +1217,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Unsets cookie
      *
@@ -1232,7 +1232,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if element exists on a page, matching it by CSS or XPath.
      * You can also specify expected attributes of this element.
@@ -1259,7 +1259,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeElement', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if element exists on a page, matching it by CSS or XPath.
      * You can also specify expected attributes of this element.
@@ -1287,7 +1287,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if element does not exist (or is visible) on a page, matching it by CSS or XPath
      * You can also specify expected attributes of this element.
@@ -1311,7 +1311,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeElement', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if element does not exist (or is visible) on a page, matching it by CSS or XPath
      * You can also specify expected attributes of this element.
@@ -1336,7 +1336,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if option is selected in select field.
      *
@@ -1357,7 +1357,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeOptionIsSelected', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if option is selected in select field.
      *
@@ -1379,7 +1379,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if option is not selected in select field.
      *
@@ -1400,7 +1400,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeOptionIsSelected', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if option is not selected in select field.
      *
@@ -1422,7 +1422,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Asserts that current page has 404 response status code.
      * Conditional Assertion: Test won't be stopped on fail
@@ -1432,7 +1432,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seePageNotFound', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Asserts that current page has 404 response status code.
      * @see \Codeception\Lib\InnerBrowser::seePageNotFound()
@@ -1443,7 +1443,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that response code is equal to value provided.
      *
@@ -1457,7 +1457,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeResponseCodeIs', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that response code is equal to value provided.
      *
@@ -1472,7 +1472,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that page title contains text.
      *
@@ -1492,7 +1492,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeInTitle', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that page title contains text.
      *
@@ -1513,7 +1513,7 @@ class AcceptanceTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that page title does not contain text.
      *
@@ -1527,7 +1527,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeInTitle', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that page title does not contain text.
      *

@@ -18,14 +18,14 @@ class ErrorPage {
       "@ERROR@" => $message
     );
     if(!$extended) {
-      $html = file_get_contents($dir ."/". $this->errSimpleFile);
+      $html = file_get_contents($dir."/".$this->errSimpleFile);
     } else {
-      $html = file_get_contents($dir ."/". $this->errFile);
-      $headings = file($dir ."/". $this->headingFile, FILE_SKIP_EMPTY_LINES);
+      $html = file_get_contents($dir."/".$this->errFile);
+      $headings = file($dir."/".$this->headingFile, FILE_SKIP_EMPTY_LINES);
       $tt["@HEADING@"] = $headings[array_rand($headings)];
-      $messages = file($dir ."/". $this->msgFile, FILE_SKIP_EMPTY_LINES);
+      $messages = file($dir."/".$this->msgFile, FILE_SKIP_EMPTY_LINES);
       $tt["@MESSAGE@"] = $messages[array_rand($messages)];
-      $whatnow = file($dir ."/". $this->whatnowFile, FILE_SKIP_EMPTY_LINES);
+      $whatnow = file($dir."/".$this->whatnowFile, FILE_SKIP_EMPTY_LINES);
       $tt["@WHATNOW@"] = array_shift($whatnow);
       $tt["@TIPS@"] = implode("</dd>\n      <dd>", $whatnow);
       $images = $this->getImages($dir);
@@ -42,7 +42,7 @@ class ErrorPage {
     foreach(scandir($dir) as $img) {
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
       $resFolder = isAtLocalhost() ? false : CMSRES_ROOT_DIR."/".CMS_RELEASE;
-      $i[] = getRes("$dir/$img", LIB_DIR."/".$this->relDir ."/$img", $resFolder);
+      $i[] = getRes("$dir/$img", LIB_DIR."/".$this->relDir."/$img", $resFolder);
     }
     return $i;
   }

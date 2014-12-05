@@ -9,7 +9,7 @@ class InitServer {
   private $disabledPlugins = array("Slider" => null);
 
   public function __construct($subdom, $setConst = false, $update = false) {
-    if(!preg_match("/^" . SUBDOM_PATTERN . "$/", $subdom))
+    if(!preg_match("/^".SUBDOM_PATTERN."$/", $subdom))
       throw new Exception(sprintf(_("Invalid subdom format '%s'"), $subdom));
     $this->subdom = $subdom;
     $this->subdomVars = array(
@@ -22,7 +22,7 @@ class InitServer {
     );
     $serverSubdomDir = "../$subdom";
     $this->updateSubdomVars($serverSubdomDir);
-    $userSubdomDir = "../../" . $this->subdomVars["USER_ID"] . "/subdom/$subdom";
+    $userSubdomDir = "../../".$this->subdomVars["USER_ID"]."/subdom/$subdom";
     if(!is_dir($serverSubdomDir)) {
       if(!$update) throw new Exception(sprintf(_("Subdom '%s' does not exist; try forcing updateSubdom"), $subdom));
       $this->createSubdom($serverSubdomDir);
@@ -31,7 +31,7 @@ class InitServer {
       if(!$update) throw new Exception(sprintf(_("Subdom '%s' is not available; try forcing updateSubdom"), $subdom));
       $this->acquireSubdom($serverSubdomDir);
     }
-    if($update && !is_file("$serverSubdomDir/USER_ID.". $this->subdomVars["USER_ID"]))
+    if($update && !is_file("$serverSubdomDir/USER_ID.".$this->subdomVars["USER_ID"]))
       throw new Exception(sprintf(_("Unauthorized subdom '%s' modification - user names mismatch"), $this->subdom));
     $userDelDir = dirname($userSubdomDir)."/.$subdom";
     if($update && is_dir($userDelDir)) {
@@ -95,7 +95,7 @@ class InitServer {
   }
 
   private function safeDeleteSubdom($userDotSubdom, $destDir) {
-    // safely remove/rename user .subdom folder
+    // safely remove/rename user.subdom folder
     $this->safelyRemoveDir($userDotSubdom);
     // disable server subdom
     if(!is_dir($destDir)) return;
@@ -122,7 +122,7 @@ class InitServer {
   }
 
   private function acquireSubdom($dir) {
-    if(!touch("$dir/USER_ID.". $this->subdomVars["USER_ID"]))
+    if(!touch("$dir/USER_ID.".$this->subdomVars["USER_ID"]))
       throw new Exception(_("Unable to create USER_ID file"));
     if(!touch("$dir/CONFIG.user"))
       throw new Exception(_("Unable to create CONFIG file"));
@@ -147,7 +147,7 @@ class InitServer {
       createSymlink($link, $target);
     }
     // init default plugin files
-    if(!is_file("$subdomDir/CONFIG.". $this->subdomVars["CONFIG"])) {
+    if(!is_file("$subdomDir/CONFIG.".$this->subdomVars["CONFIG"])) {
       $this->createDefaultPlugins(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_DIR, $subdomDir);
     }
     // create missing data files
@@ -166,7 +166,7 @@ class InitServer {
       switch($var[0]) {
         case "USER_DIR":
         case "FILES_DIR":
-        if(!rename("$dir/$f", "$dir/{$var[0]}.". $this->subdomVars[$var[0]]))
+        if(!rename("$dir/$f", "$dir/{$var[0]}.".$this->subdomVars[$var[0]]))
           throw new Exception(_("Unable to reset server subdom setup"));
         break;
         case "PLUGIN":
@@ -218,7 +218,7 @@ class InitServer {
         case "CMS_VER":
         case "USER_DIR":
         case "FILES_DIR":
-        $newFile = "{$var[0]}.". $this->subdomVars[$var[0]];
+        $newFile = "{$var[0]}.".$this->subdomVars[$var[0]];
         if(!is_file("$destDir/$newFile") && !touch("$destDir/$newFile"))
           throw new Exception(_("Unable to update user subdom setup"));
         if($this->subdomVars[$var[0]] == $var[1]) continue;

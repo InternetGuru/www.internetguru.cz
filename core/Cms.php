@@ -24,7 +24,7 @@ class Cms {
     self::setVariable("version", CMS_VERSION);
     self::setVariable("name", CMS_NAME);
     self::setVariable("user_id", USER_ID);
-    self::setVariable("ig", "&copy;" . date("Y") . " <a href='http://www.internetguru.cz'>InternetGuru</a>");
+    self::setVariable("ig", "&copy;".date("Y")." <a href='http://www.internetguru.cz'>InternetGuru</a>");
     self::setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     self::setVariable("plugins", array_keys($plugins->getObservers()));
     self::setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
@@ -82,7 +82,7 @@ class Cms {
       }
     } catch (Exception $e) {
       if(self::DEBUG) echo $c->saveXML();
-      throw new Exception($e->getMessage() . " (" . get_class($cs) . ")");
+      throw new Exception($e->getMessage()." (".get_class($cs).")");
     }
   }
 

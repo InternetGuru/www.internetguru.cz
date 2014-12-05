@@ -25,7 +25,7 @@ class FunctionalTester extends \Codeception\Actor
 {
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Enters a directory In local filesystem.
      * Project root directory is used by default
@@ -39,7 +39,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Opens a file and stores it's content.
      *
@@ -61,7 +61,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Deletes a file
      *
@@ -80,7 +80,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Deletes directory with all subdirectories
      *
@@ -99,7 +99,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Copies directory with all contents
      *
@@ -119,7 +119,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks If opened file has `text` in it.
      *
@@ -140,7 +140,7 @@ class FunctionalTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeInThisFile', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks If opened file has `text` in it.
      *
@@ -162,7 +162,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks the strict matching of file contents.
      * Unlike `seeInThisFile` will fail if file has something more then expected lines.
@@ -184,7 +184,7 @@ class FunctionalTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeFileContentsEqual', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks the strict matching of file contents.
      * Unlike `seeInThisFile` will fail if file has something more then expected lines.
@@ -207,7 +207,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks If opened file doesn't contain `text` in it
      *
@@ -226,7 +226,7 @@ class FunctionalTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeInThisFile', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks If opened file doesn't contain `text` in it
      *
@@ -246,7 +246,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Deletes a file
      * @see \Codeception\Module\Filesystem::deleteThisFile()
@@ -257,7 +257,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if file exists in path.
      * Opens a file when it's exists
@@ -277,7 +277,7 @@ class FunctionalTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('seeFileFound', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if file exists in path.
      * Opens a file when it's exists
@@ -298,7 +298,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if file does not exists in path
      *
@@ -311,7 +311,7 @@ class FunctionalTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\ConditionalAssertion('dontSeeFileFound', func_get_args()));
     }
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks if file does not exists in path
      *
@@ -325,7 +325,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Erases directory contents
      *
@@ -344,7 +344,7 @@ class FunctionalTester extends \Codeception\Actor
 
 
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Saves contents to file
      *

@@ -48,8 +48,8 @@ class InputVar extends Plugin implements SplObserver {
     $title = null;
     if($var->hasAttribute("href")) $href = $this->parse($var->getAttribute("href"));
     if($var->hasAttribute("title")) $title = $var->getAttribute("title");
-    return "<a href='$href'" . (is_null($title) ? "" : " title='$title'")
-    . ">" . $this->parse($var->nodeValue) . "</a>";
+    return "<a href='$href'".(is_null($title) ? "" : " title='$title'")
+   .">".$this->parse($var->nodeValue)."</a>";
   }
 
   private function fnTranslate(DOMElement $var) {

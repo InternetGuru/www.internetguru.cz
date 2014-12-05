@@ -23,9 +23,9 @@ use Codeception\Module\UnitHelper;
 */
 class UnitTester extends \Codeception\Actor
 {
-   
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that two variables are equal.
      *
@@ -40,9 +40,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertEquals', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that two variables are not equal
      *
@@ -55,9 +55,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertNotEquals', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that expected is greater then actual
      *
@@ -70,9 +70,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertGreaterThen', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that expected is greater or equal then actual
      *
@@ -85,9 +85,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertGreaterThenOrEqual', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that haystack contains needle
      *
@@ -100,9 +100,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertContains', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that haystack doesn't contain needle.
      *
@@ -115,9 +115,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertNotContains', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that variable is empty.
      *
@@ -129,9 +129,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertEmpty', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that variable is not empty.
      *
@@ -143,9 +143,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertNotEmpty', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that variable is NULL
      *
@@ -157,9 +157,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertNull', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that variable is not NULL
      *
@@ -171,9 +171,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertNotNull', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that condition is positive.
      *
@@ -185,9 +185,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertTrue', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Checks that condition is negative.
      *
@@ -199,9 +199,9 @@ class UnitTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('assertFalse', func_get_args()));
     }
 
- 
+
     /**
-     * [!] Method is generated. Documentation taken from corresponding module.
+     * [!] Method is generated.Documentation taken from corresponding module.
      *
      * Fails the test with message.
      *

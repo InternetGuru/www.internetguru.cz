@@ -64,7 +64,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function parseZippedDoc($f) {
-    $doc = $this->transformFile($this->tmpFolder ."/$f");
+    $doc = $this->transformFile($this->tmpFolder."/$f");
     $xml = $doc->saveXML();
     $xml = str_replace("·\n", "\n", $xml); // remove "format hack" from transformation
     $mergable = array("strong", "em", "sub", "sup", "ins", "del", "q", "cite", "acronym", "code", "dfn", "kbd", "samp");
@@ -83,7 +83,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->html = str_replace(array_keys($ids), $ids, $this->html);
     if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
     $this->file = "$f.html";
-    if(@file_put_contents($this->tmpFolder ."/$f.html", $this->html) !== false) return;
+    if(@file_put_contents($this->tmpFolder."/$f.html", $this->html) !== false) return;
     $m = sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f);
     new Logger($m, "error");
   }
@@ -133,7 +133,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function getContent(HTMLPlus $c) {
-    Cms::getOutputStrategy()->addCssFile($this->getDir() . '/Convertor.css');
+    Cms::getOutputStrategy()->addCssFile($this->getDir().'/Convertor.css');
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("link", $_GET[get_class($this)]);
     $newContent->insertVar("path", TEMP_DIR."/".PLUGINS_DIR."/".get_class($this));
@@ -159,7 +159,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private function getFile($dest) {
     $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
-    if(!is_file($this->tmpFolder ."/$dest"))
+    if(!is_file($this->tmpFolder."/$dest"))
       throw new Exception(sprintf(_("File '%s' not found in temp folder"), $dest));
     return $dest;
   }
@@ -169,10 +169,10 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if($purl === false) throw new Exception(_("Unable to parse link"));
     if(!isset($purl["scheme"])) return null;
     if($purl["host"] == "docs.google.com") {
-      $url = $purl["scheme"] ."://". $purl["host"] . $purl["path"] . "/export?format=doc";
+      $url = $purl["scheme"]."://".$purl["host"].$purl["path"]."/export?format=doc";
       $headers = @get_headers($url);
       if(strpos($headers[0], '404') !== false) {
-        $url = $purl["scheme"] ."://". $purl["host"] . dirname($purl["path"]) . "/export?format=doc";
+        $url = $purl["scheme"]."://".$purl["host"].dirname($purl["path"])."/export?format=doc";
         $headers = @get_headers($url);
       }
     } else $headers = @get_headers($url);
@@ -182,7 +182,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       throw new Exception(sprintf(_("Destination URL '%s' error: %s"), $url, $headers[0]));
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header, $url);
-    file_put_contents($this->tmpFolder ."/$filename", $data);
+    file_put_contents($this->tmpFolder."/$filename", $data);
     return $filename;
   }
 
@@ -231,7 +231,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
-    $xsl = $this->getDOMPlus($this->getDir() ."/$xslFile", false, false);
+    $xsl = $this->getDOMPlus($this->getDir()."/$xslFile", false, false);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);

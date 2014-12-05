@@ -24,7 +24,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
       Cms::setOutputStrategy($this);
-      $domain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"];
+      $domain = $_SERVER["REQUEST_SCHEME"]."://".$_SERVER["HTTP_HOST"];
       if(isAtLocalhost()) $domain .= substr(getRoot(), 0, -1);
       Cms::setVariable("url", $domain);
       Cms::setVariable("link", getCurLink());
@@ -119,7 +119,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // select all settings
 
-    #var_dump($doc->schemaValidate(CMS_FOLDER . "/" . self::DTD_FILE));
+    #var_dump($doc->schemaValidate(CMS_FOLDER."/".self::DTD_FILE));
     return $doc->saveXML();
   }
 
@@ -137,7 +137,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         #todo: $this->asynchronousExternalImageCheck($dataFile);
         continue;
       }
-      $filePath = FILES_FOLDER ."/$dataFile";
+      $filePath = FILES_FOLDER."/$dataFile";
       if(!is_file($filePath)) {
         $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $filePath));
         continue;
@@ -230,7 +230,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->getDir() ."/Xhtml11.xsl", 0, false);
+    $this->addTransformation($this->getDir()."/Xhtml11.xsl", 0, false);
 
     // add template files
     $theme = $cfg->getElementById("theme");
@@ -297,7 +297,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param  DOMElement $e            Element to which meta is to be appended
    * @param  string     $nameValue    Value of attribute name/http-equiv
    * @param  string     $contentValue Value of attribute content
-   * @param  boolean    $httpEquiv    Use attr. http-equiv instead of name
+   * @param  boolean    $httpEquiv    Use attr.http-equiv instead of name
    * @return void
    */
   private function appendMeta(DOMElement $e, $nameValue, $contentValue, $httpEquiv=false) {
@@ -355,7 +355,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJs($content, $priority = 10, $append = self::APPEND_BODY) {
-    $key = "k" . count($this->jsFiles);
+    $key = "k".count($this->jsFiles);
     $this->jsFiles[$key] = array(
       "file" => null,
       "append" => $append,

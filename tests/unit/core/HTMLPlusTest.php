@@ -45,7 +45,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testDuplicitId()
     {
       $this->doc->loadXML('<body xml:lang="en"><h id="a">x</h><desc/>'
-        .'<section><h id="a">x</h><desc/></section></body>');
+       .'<section><h id="a">x</h><desc/></section></body>');
 
       $e = null;
       try {
@@ -65,7 +65,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testDuplicitLink()
     {
       $this->doc->loadXML('<body xml:lang="en"><h id="a" link="x/x">x</h><desc/>'
-        .'<section><h id="b" link="x/x">x</h><desc/></section></body>');
+       .'<section><h id="b" link="x/x">x</h><desc/></section></body>');
 
       $e = null;
       try {
@@ -316,7 +316,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testHLinkInvalidRepairUnable()
     {
       $this->doc->loadXML('<body xml:lang="en"><h id="a" link="á bé">x</h><desc/>'
-        .'<section><h id="a" link="a_be">x</h><desc/></section></body>');
+       .'<section><h id="a" link="a_be">x</h><desc/></section></body>');
 
       $e = null;
       try {

@@ -21,7 +21,7 @@ class Plugin {
   }
 
   protected function getDir() {
-    return PLUGINS_DIR ."/". get_class($this);
+    return PLUGINS_DIR."/".get_class($this);
   }
 
   protected function getHTMLPlus($filePath=null, $user=true) {
@@ -31,7 +31,7 @@ class Plugin {
 
   protected function getDOMExt($ext=null, $htmlPlus=false, $user=true) {
     if(is_null($ext)) $ext = "xml";
-    return $this->getDOMPlus($this->getDir() ."/". get_class($this) .".$ext", $htmlPlus, $user);
+    return $this->getDOMPlus($this->getDir()."/".get_class($this).".$ext", $htmlPlus, $user);
   }
 
   protected function getDOMPlus($filePath=null, $htmlPlus=false, $user=true) {

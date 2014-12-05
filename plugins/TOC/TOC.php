@@ -18,8 +18,8 @@ class TOC extends Plugin implements SplObserver, ContentStrategyInterface {
       break;
     }
     if(!$foundTocClass) return;
-    Cms::getOutputStrategy()->addCssFile($this->getDir() ."/TOC.css");
-    Cms::getOutputStrategy()->addJsFile($this->getDir() ."/TOC.js", 5, "body");
+    Cms::getOutputStrategy()->addCssFile($this->getDir()."/TOC.css");
+    Cms::getOutputStrategy()->addJsFile($this->getDir()."/TOC.js", 5, "body");
     $tocTitle = _("Table of Contents");
     Cms::getOutputStrategy()->addJs("TOC.init({tocTitle: \"$tocTitle\"});", 6);
   }

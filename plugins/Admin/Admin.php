@@ -70,15 +70,15 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $content) {
-    Cms::getOutputStrategy()->addJsFile($this->getDir() . '/Admin.js', 100, "body");
+    Cms::getOutputStrategy()->addJsFile($this->getDir().'/Admin.js', 100, "body");
 
     $format = $this->type;
     if($this->type == "html") $format = "html+";
-    if(!is_null($this->schema)) $format .= " (" . pathinfo($this->schema, PATHINFO_BASENAME) . ")";
+    if(!is_null($this->schema)) $format .= " (".pathinfo($this->schema, PATHINFO_BASENAME).")";
 
     $newContent = $this->getHTMLPlus();
 
-    $la = "?" . get_class($this) . "=" . $this->defaultFile;
+    $la = "?".get_class($this)."=".$this->defaultFile;
     $statusChanged = self::FILE_DISABLE;
     if($this->dataFileStatus == self::STATUS_DISABLED) {
       $newContent->insertVar("warning", "warning");
@@ -173,7 +173,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $f = $_GET[get_class($this)];
     if(strpos($f, "/") === 0) $f = substr($f, 1); // remove trailing slash
     if(!strlen($f)) {
-      $l = getCurLink() . ".html";
+      $l = getCurLink().".html";
       if(findFile($l)) $f = $l;
       else $f = self::DEFAULT_FILE;
       $this->redir($f);
@@ -203,16 +203,16 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     // no direct match with extension [and path]
     if(findFile($f, false)) return;
     // check/redir to plugin dir
-    if(!findFile(PLUGINS_DIR . "/$f", false)) return;
+    if(!findFile(PLUGINS_DIR."/$f", false)) return;
     // found plugin file
-    $this->redir(PLUGINS_DIR . "/$f");
+    $this->redir(PLUGINS_DIR."/$f");
 
   }
 
   private function setDataFiles() {
-    $this->dataFile = USER_FOLDER ."/". $this->defaultFile;
-    $this->dataFileDisabled = dirname($this->dataFile) ."/.". basename($this->dataFile);
-    // disabled if .file or both files exist, else new
+    $this->dataFile = USER_FOLDER."/".$this->defaultFile;
+    $this->dataFileDisabled = dirname($this->dataFile)."/.".basename($this->dataFile);
+    // disabled if.file or both files exist, else new
     $this->dataFileStatus = self::STATUS_NEW;
     if(file_exists($this->dataFile)) $this->dataFileStatus = self::STATUS_ENABLED;
     if(file_exists($this->dataFileDisabled)) $this->dataFileStatus = self::STATUS_DISABLED;
@@ -339,7 +339,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function redir($f="") {
     $redir = getRoot().getCurLink();
     if(!isset($_POST["saveandgo"]))
-      $redir .= "?" . get_class($this) . (strlen($f) ? "=$f" : "");
+      $redir .= "?".get_class($this).(strlen($f) ? "=$f" : "");
     redirTo($redir, null, true);
   }
 

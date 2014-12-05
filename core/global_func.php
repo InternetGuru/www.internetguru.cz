@@ -112,7 +112,7 @@ function saveRewriteFile($src, $dest, $keepOld=true) {
   if(!rename("$dest.new", $dest))
     throw new LoggerException("Unable to rename new file to destination");
   if(!$keepOld && is_file("$dest.old") && !unlink("$dest.old"))
-    throw new LoggerException("Unable to delete .old file");
+    throw new LoggerException("Unable to delete.old file");
   return true;
 }
 
@@ -245,7 +245,7 @@ function checkUrl($folder = null) {
     new ErrorPage("The requested URL '$rUri' was not understood by this server.", 400);
   if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/", $rUri, $m)) return null;
 
-  $fInfo["filepath"] = "$folder/". $m[1];
+  $fInfo["filepath"] = "$folder/".$m[1];
   if(!is_file($fInfo["filepath"]))
     new ErrorPage("The requested URL '$rUri' was not found on this server.", 404);
 

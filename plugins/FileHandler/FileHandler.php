@@ -19,7 +19,7 @@ class FileHandler extends Plugin implements SplObserver {
     $filesize = filesize($filepath);
     $shortPath = substr($filepath, strlen(FILES_FOLDER)+1);
     $start_time = microtime(true);
-    header("Content-Type: " . $fInfo["filemime"]);
+    header("Content-Type: ".$fInfo["filemime"]);
     header("Content-Length: $filesize");
     set_time_limit(0);
     $handle = @fopen($filepath, "rb");

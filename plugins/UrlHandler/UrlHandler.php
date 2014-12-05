@@ -39,7 +39,7 @@ class UrlHandler extends Plugin implements SplObserver {
       }
       $query = parse_url($var->nodeValue, PHP_URL_QUERY);
       if(strlen($query)) $query = $this->alterQuery($query, $pNam);
-      redirTo(getRoot() . $path . (strlen($query) ? "?$query" : ""), $code);
+      redirTo(getRoot().$path.(strlen($query) ? "?$query" : ""), $code);
     }
   }
 
@@ -51,7 +51,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $param[$parName] = $parValue;
     }
     $query = array();
-    foreach($param as $k => $v) $query[] = $k . (strlen($v) ? "=$v" : "");
+    foreach($param as $k => $v) $query[] = $k.(strlen($v) ? "=$v" : "");
     return implode("&", $query);
   }
 

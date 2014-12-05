@@ -94,7 +94,7 @@ function proceedServerInit($initServerFileName) {
     $subdom = CURRENT_SUBDOM_DIR;
     if(strlen($_GET["updateSubdom"])) $subdom = $_GET["updateSubdom"];
     new InitServer($subdom, false, true);
-    redirTo("http://$subdom.". getDomain());
+    redirTo("http://$subdom.".getDomain());
   }
   new InitServer(CURRENT_SUBDOM_DIR, true);
 }
@@ -103,14 +103,14 @@ function findFile($file, $user=true, $admin=true, $res=false) {
   while(strpos($file, "/") === 0) $file = substr($file, 1);
   try {
     $resFolder = $res && !isAtLocalhost() ? $resFolder = RES_DIR : false;
-    $f = USER_FOLDER . "/$file";
+    $f = USER_FOLDER."/$file";
     if($user && is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
-    $f = ADMIN_FOLDER . "/$file";
+    $f = ADMIN_FOLDER."/$file";
     if($admin && is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
     $f = $file;
     if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
     if($res && !isAtLocalhost()) $resFolder = CMSRES_ROOT_DIR."/".CMS_RELEASE;
-    $f = CMS_FOLDER . "/$file";
+    $f = CMS_FOLDER."/$file";
     if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
   } catch(Exception $e) {
     new Logger($e->getMessage(), "error");
@@ -131,7 +131,7 @@ function getRes($res, $dest, $resFolder) {
   if(strpos($res, CMS_FOLDER) !== 0 && $mime != "text/plain" && strpos($mime, "image/") !== 0) {
     throw new Exception(sprintf(_("Forbidden MIME type '%s' to copy '%s' to '%s' folder"), $mime, $m[1], $resFolder));
   }
-  $newRes = $resFolder . "/$dest";
+  $newRes = $resFolder."/$dest";
   $newDir = pathinfo($newRes, PATHINFO_DIRNAME);
   if(!is_dir($newDir) && !mkdirGroup($newDir, 0775, true)) {
     throw new Exception(sprintf(_("Unable to create directory structure '%s'"), $newDir));

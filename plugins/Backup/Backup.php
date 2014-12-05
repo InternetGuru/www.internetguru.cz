@@ -26,7 +26,7 @@ class Backup extends Plugin implements SplObserver {
         continue;
       }
       if(in_array(pathinfo($file, PATHINFO_EXTENSION), $deny)) continue;
-      smartCopy("$dir/$file", $backupDir ."/". $this->getBackupFileName("$dir/$file"), 60*60);
+      smartCopy("$dir/$file", $backupDir."/".$this->getBackupFileName("$dir/$file"), 60*60);
     }
   }
 
