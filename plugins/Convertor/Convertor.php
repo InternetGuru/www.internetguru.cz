@@ -102,18 +102,38 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function addLinks(HTMLPlus $doc) {
     foreach($doc->getElementsByTagName("h") as $h) {
-      if($h->isSameNode($doc->documentElement->firstElement)) continue; // skip first h
+      $var = explode("@", $h->nodeValue);
+      if(count($var) > 1) {
+        $h->setAttribute("short", trim(array_pop($var)));
+        $h->nodeValue = trim(implode("@", $var));
+      }
       $e = $h->nextElement;
       while(!is_null($e)) {
         if($e->nodeName == "h") break;
         if($e->nodeName == "section") {
-          $h->setAttribute("short", $h->nodeValue);
-          $h->setAttribute("link", normalize($h->nodeValue));
+          if(!$h->hasAttribute("short"))
+            $h->setAttribute("short", $this->getShortString($h->nodeValue));
+          $h->setAttribute("link", normalize($h->getAttribute("short")));
           break;
         }
         $e = $e->nextElement;
       }
     }
+  }
+
+  private function getShortString($str) {
+    $lLimit = 9;
+    $hLimit = 16;
+    if(strlen($str) < $hLimit) return $str;
+    $w = explode(" ", $str);
+    $sStr = $w[0];
+    $i = 1;
+    while(strlen($sStr) < $lLimit) {
+      if(!isset($w[$i])) break;
+      $sStr .= " ".$w[$i++];
+    }
+    if(strlen($str) - strlen($sStr) < $hLimit - $lLimit) return $str;
+    return $sStr."…";
   }
 
   public function getContent(HTMLPlus $c) {
@@ -200,7 +220,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $dom = $this->transform("removePrefix.xsl",$dom);
       #file_put_contents($file,$xml);
       $dom->save($file);
-      $variables[$varName] = "file:///$file";
+      $variables[$varName] = str_replace("\\", '/', realpath($file));
     }
     $wordDoc = "word/document.xml";
     $xml = readZippedFile($f, $wordDoc);
