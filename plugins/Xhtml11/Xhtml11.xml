@@ -29,6 +29,7 @@
 
   <jsFile readonly="readonly" />
   <jsFile append="body">themes/headingFragment.js</jsFile>
+  <jsFile append="body" priority="5">themes/selectable.js</jsFile>
   <jsFile append="body">themes/toggleHidables.js</jsFile>
 
   <!-- <xslt readonly="readonly"/> -->

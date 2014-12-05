@@ -36,6 +36,7 @@ class Cms {
     $doc = new DOMDocumentPlus();
     self::$flashList = $doc->appendChild($doc->createElement("root"));
     $ul = self::$flashList->appendChild($doc->createElement("ul"));
+    $ul->setAttribute("class", "selectable");
     self::setVariable("messages", self::$flashList);
   }
 
