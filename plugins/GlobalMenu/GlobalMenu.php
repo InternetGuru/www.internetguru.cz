@@ -4,7 +4,7 @@ class GlobalMenu extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,60);
+    $s->setPriority($this, 60);
   }
 
   public function update(SplSubject $subject) {
@@ -18,12 +18,12 @@ class GlobalMenu extends Plugin implements SplObserver {
     $xpath = new DOMXPath(Cms::getContentFull());
     $sect = $xpath->query("/body/section")->item(0);
     if(is_null($sect)) return;
-    $menu = $this->getMenu($doc,$sect);
+    $menu = $this->getMenu($doc, $sect);
     $root = $doc->appendChild($doc->createElement("root"));
     $root->appendChild($menu);
-    $menu->setAttribute("class","globalmenu");
+    $menu->setAttribute("class", "globalmenu");
     $this->trimList($menu);
-    Cms::setVariable("globalmenu",$root);
+    Cms::setVariable("globalmenu", $root);
   }
 
   private function trimList(DOMElement $ul) {
@@ -52,7 +52,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     $li = null;
     foreach($section->childElements as $n) {
       if($n->nodeName == "section") {
-        $menu = $this->getMenu($doc,$n);
+        $menu = $this->getMenu($doc, $n);
         if(!is_null($menu)) {
           $li->appendChild($menu);
         }
@@ -65,12 +65,12 @@ class GlobalMenu extends Plugin implements SplObserver {
       $a = $doc->createElement("a", $n->nodeValue);
       if($n->hasAttribute("short")) {
         $a->nodeValue = htmlspecialchars($n->getAttribute("short"));
-        $a->setAttribute("title",$n->nodeValue);
+        $a->setAttribute("title", $n->nodeValue);
       }
-      if(getCurLink() === $link) $a->setAttribute("class","current");
-      if(!is_null($link)) $a->setAttribute("href",$link);
-      else $a->setAttribute("href","#".$n->getAttribute("id"));
-      if(is_null($link)) $a->setAttribute("class","fragment");
+      if(getCurLink() === $link) $a->setAttribute("class", "current");
+      if(!is_null($link)) $a->setAttribute("href", $link);
+      else $a->setAttribute("href", "#".$n->getAttribute("id"));
+      if(is_null($link)) $a->setAttribute("class", "fragment");
       $li->appendChild($a);
       $ul->appendChild($li);
     }

@@ -21,7 +21,7 @@ class Slider extends Plugin implements SplObserver {
     // get js resources
     foreach($cfg->getElementsByTagName("jsLib") as $r) {
       $user = !$r->hasAttribute("readonly");
-      $this->cms->getOutputStrategy()->addJsFile($r->nodeValue,10,"head",$user);
+      $this->cms->getOutputStrategy()->addJsFile($r->nodeValue, 10, "head", $user);
     }
     // set css
     #todo:fixme
@@ -34,8 +34,8 @@ class Slider extends Plugin implements SplObserver {
       $setters[$r->nodeName] = "Slider." . $r->nodeName . "('" . $r->nodeValue . "');";
     }
     $f = PLUGINS_FOLDER ."/". get_class($this) ."/Slider.js";
-    $this->cms->getOutputStrategy()->addJsFile($f,10,"head",false);
-    $this->cms->getOutputStrategy()->addJs(implode($setters),20);
+    $this->cms->getOutputStrategy()->addJsFile($f, 10, "head", false);
+    $this->cms->getOutputStrategy()->addJs(implode($setters), 20);
   }
 
 }

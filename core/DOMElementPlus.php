@@ -26,7 +26,7 @@ class DOMElementPlus extends DOMElement {
   public function stripTag($comment = null, $keepContent = true) {
     if(!is_null($comment)) {
       $cmt = $this->ownerDocument->createComment(" $comment ");
-      $this->parentNode->insertBefore($cmt,$this);
+      $this->parentNode->insertBefore($cmt, $this);
     }
     if($keepContent) {
       foreach($this->childNodes as $n) $children[] = $n;
@@ -59,7 +59,7 @@ class DOMElementPlus extends DOMElement {
     $ancestor = $this;
     while(!is_null($ancestor)) {
       if(!is_null($attName) && $ancestor->hasAttribute($attName)) {
-        $this->setAttribute($attName,$ancestor->getAttribute($attName));
+        $this->setAttribute($attName, $ancestor->getAttribute($attName));
         break;
       } elseif(is_null($attName) && strlen($ancestor->nodeValue)) {
         $this->nodeValue = htmlspecialchars($ancestor->nodeValue);

@@ -13,7 +13,7 @@ class Backup extends Plugin implements SplObserver {
     $this->backupFilesDeep(USER_FOLDER, USER_BACKUP_FOLDER);
   }
 
-  private function backupFilesDeep($dir,$backupDir) {
+  private function backupFilesDeep($dir, $backupDir) {
     if(!is_dir($dir)) return;
     $cfg = $this->getDOMPlus();
     $xpath = new DOMXPath($cfg);
@@ -22,17 +22,17 @@ class Backup extends Plugin implements SplObserver {
     foreach(scandir($dir) as $file) {
       if(strpos($file, ".") === 0) continue;
       if(is_dir("$dir/$file")) {
-        $this->backupFilesDeep("$dir/$file","$backupDir/$file");
+        $this->backupFilesDeep("$dir/$file", "$backupDir/$file");
         continue;
       }
-      if(in_array(pathinfo($file,PATHINFO_EXTENSION), $deny)) continue;
+      if(in_array(pathinfo($file, PATHINFO_EXTENSION), $deny)) continue;
       smartCopy("$dir/$file", $backupDir ."/". $this->getBackupFileName("$dir/$file"), 60*60);
     }
   }
 
   private function getBackupFileName($filePath) {
     $pi = pathinfo($filePath);
-    return sprintf("%s.%s",$pi["basename"],getFileHash($filePath));
+    return sprintf("%s.%s", $pi["basename"], getFileHash($filePath));
   }
 
 }

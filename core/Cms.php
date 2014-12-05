@@ -161,7 +161,7 @@ class Cms {
     return self::$variables[$id];
   }
 
-  public static function addVariableItem($name,$value) {
+  public static function addVariableItem($name, $value) {
     $varId = self::getVarId($name);
     $var = self::getVariable($varId);
     if(is_null($var)) {
@@ -181,7 +181,7 @@ class Cms {
     return $varId;
   }
 
-  public static function setVariable($name,$value) {
+  public static function setVariable($name, $value) {
     $varId = self::getVarId($name);
     self::$variables[$varId] = $value;
     return $varId;

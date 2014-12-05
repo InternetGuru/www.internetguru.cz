@@ -23,7 +23,7 @@ use Codeception\Module\AcceptanceHelper;
 */
 class AcceptanceTester extends \Codeception\Actor
 {
-   
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -34,7 +34,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('setHeader', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -62,7 +62,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Condition('amOnSubdomain', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -89,7 +89,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('executeInGuzzle', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -103,7 +103,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Condition('amHttpAuthenticated', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -128,7 +128,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Condition('amOnPage', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -169,7 +169,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('click', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -181,8 +181,8 @@ class AcceptanceTester extends \Codeception\Actor
      * ``` php
      * <?php
      * $I->see('Logout'); // I can suppose user is logged in
-     * $I->see('Sign Up','h1'); // I can suppose it's a signup page
-     * $I->see('Sign Up','//body/h1'); // with XPath
+     * $I->see('Sign Up', 'h1'); // I can suppose it's a signup page
+     * $I->see('Sign Up', '//body/h1'); // with XPath
      * ?>
      * ```
      *
@@ -205,8 +205,8 @@ class AcceptanceTester extends \Codeception\Actor
      * ``` php
      * <?php
      * $I->see('Logout'); // I can suppose user is logged in
-     * $I->see('Sign Up','h1'); // I can suppose it's a signup page
-     * $I->see('Sign Up','//body/h1'); // with XPath
+     * $I->see('Sign Up', 'h1'); // I can suppose it's a signup page
+     * $I->see('Sign Up', '//body/h1'); // with XPath
      * ?>
      * ```
      *
@@ -218,7 +218,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('see', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -230,8 +230,8 @@ class AcceptanceTester extends \Codeception\Actor
      * ```php
      * <?php
      * $I->dontSee('Login'); // I can suppose user is already logged in
-     * $I->dontSee('Sign Up','h1'); // I can suppose it's not a signup page
-     * $I->dontSee('Sign Up','//body/h1'); // with XPath
+     * $I->dontSee('Sign Up', 'h1'); // I can suppose it's not a signup page
+     * $I->dontSee('Sign Up', '//body/h1'); // with XPath
      * ?>
      * ```
      *
@@ -254,8 +254,8 @@ class AcceptanceTester extends \Codeception\Actor
      * ```php
      * <?php
      * $I->dontSee('Login'); // I can suppose user is already logged in
-     * $I->dontSee('Sign Up','h1'); // I can suppose it's not a signup page
-     * $I->dontSee('Sign Up','//body/h1'); // with XPath
+     * $I->dontSee('Sign Up', 'h1'); // I can suppose it's not a signup page
+     * $I->dontSee('Sign Up', '//body/h1'); // with XPath
      * ?>
      * ```
      *
@@ -267,7 +267,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSee', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -279,7 +279,7 @@ class AcceptanceTester extends \Codeception\Actor
      * ``` php
      * <?php
      * $I->seeLink('Logout'); // matches <a href="#">Logout</a>
-     * $I->seeLink('Logout','/logout'); // matches <a href="/logout">Logout</a>
+     * $I->seeLink('Logout', '/logout'); // matches <a href="/logout">Logout</a>
      * ?>
      * ```
      *
@@ -302,7 +302,7 @@ class AcceptanceTester extends \Codeception\Actor
      * ``` php
      * <?php
      * $I->seeLink('Logout'); // matches <a href="#">Logout</a>
-     * $I->seeLink('Logout','/logout'); // matches <a href="/logout">Logout</a>
+     * $I->seeLink('Logout', '/logout'); // matches <a href="/logout">Logout</a>
      * ?>
      * ```
      *
@@ -314,7 +314,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeLink', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -359,7 +359,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeLink', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -402,7 +402,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeInCurrentUrl', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -439,7 +439,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeInCurrentUrl', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -480,7 +480,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeCurrentUrlEquals', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -521,7 +521,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeCurrentUrlEquals', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -560,7 +560,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeCurrentUrlMatches', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -599,7 +599,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeCurrentUrlMatches', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -623,7 +623,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('grabFromCurrentUrl', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -670,7 +670,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeCheckboxIsChecked', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -715,7 +715,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeCheckboxIsChecked', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -726,11 +726,11 @@ class AcceptanceTester extends \Codeception\Actor
      *
      * ``` php
      * <?php
-     * $I->seeInField('Body','Type your comment here');
-     * $I->seeInField('form textarea[name=body]','Type your comment here');
-     * $I->seeInField('form input[type=hidden]','hidden_value');
-     * $I->seeInField('#searchform input','Search');
-     * $I->seeInField('//form/*[@name=search]','Search');
+     * $I->seeInField('Body', 'Type your comment here');
+     * $I->seeInField('form textarea[name=body]', 'Type your comment here');
+     * $I->seeInField('form input[type=hidden]', 'hidden_value');
+     * $I->seeInField('#searchform input', 'Search');
+     * $I->seeInField('//form/*[@name=search]', 'Search');
      * $I->seeInField(['name' => 'search'], 'Search');
      * ?>
      * ```
@@ -753,11 +753,11 @@ class AcceptanceTester extends \Codeception\Actor
      *
      * ``` php
      * <?php
-     * $I->seeInField('Body','Type your comment here');
-     * $I->seeInField('form textarea[name=body]','Type your comment here');
-     * $I->seeInField('form input[type=hidden]','hidden_value');
-     * $I->seeInField('#searchform input','Search');
-     * $I->seeInField('//form/*[@name=search]','Search');
+     * $I->seeInField('Body', 'Type your comment here');
+     * $I->seeInField('form textarea[name=body]', 'Type your comment here');
+     * $I->seeInField('form input[type=hidden]', 'hidden_value');
+     * $I->seeInField('#searchform input', 'Search');
+     * $I->seeInField('//form/*[@name=search]', 'Search');
      * $I->seeInField(['name' => 'search'], 'Search');
      * ?>
      * ```
@@ -770,7 +770,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeInField', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -780,11 +780,11 @@ class AcceptanceTester extends \Codeception\Actor
      *
      * ``` php
      * <?php
-     * $I->dontSeeInField('Body','Type your comment here');
-     * $I->dontSeeInField('form textarea[name=body]','Type your comment here');
-     * $I->dontSeeInField('form input[type=hidden]','hidden_value');
-     * $I->dontSeeInField('#searchform input','Search');
-     * $I->dontSeeInField('//form/*[@name=search]','Search');
+     * $I->dontSeeInField('Body', 'Type your comment here');
+     * $I->dontSeeInField('form textarea[name=body]', 'Type your comment here');
+     * $I->dontSeeInField('form input[type=hidden]', 'hidden_value');
+     * $I->dontSeeInField('#searchform input', 'Search');
+     * $I->dontSeeInField('//form/*[@name=search]', 'Search');
      * $I->seeInField(['name' => 'search'], 'Search');
      * ?>
      * ```
@@ -806,11 +806,11 @@ class AcceptanceTester extends \Codeception\Actor
      *
      * ``` php
      * <?php
-     * $I->dontSeeInField('Body','Type your comment here');
-     * $I->dontSeeInField('form textarea[name=body]','Type your comment here');
-     * $I->dontSeeInField('form input[type=hidden]','hidden_value');
-     * $I->dontSeeInField('#searchform input','Search');
-     * $I->dontSeeInField('//form/*[@name=search]','Search');
+     * $I->dontSeeInField('Body', 'Type your comment here');
+     * $I->dontSeeInField('form textarea[name=body]', 'Type your comment here');
+     * $I->dontSeeInField('form input[type=hidden]', 'hidden_value');
+     * $I->dontSeeInField('#searchform input', 'Search');
+     * $I->dontSeeInField('//form/*[@name=search]', 'Search');
      * $I->seeInField(['name' => 'search'], 'Search');
      * ?>
      * ```
@@ -823,7 +823,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeInField', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -871,7 +871,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('submitForm', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -894,7 +894,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('fillField', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -914,7 +914,7 @@ class AcceptanceTester extends \Codeception\Actor
      *
      * ``` php
      * <?php
-     * $I->selectOption('Which OS do you use?', array('Windows','Linux'));
+     * $I->selectOption('Which OS do you use?', array('Windows', 'Linux'));
      * ?>
      * ```
      *
@@ -926,7 +926,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('selectOption', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -948,7 +948,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('checkOption', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -969,7 +969,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('uncheckOption', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -992,7 +992,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('attachFile', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1009,7 +1009,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('sendAjaxGetRequest', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1037,7 +1037,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('sendAjaxPostRequest', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1063,7 +1063,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('sendAjaxRequest', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1089,7 +1089,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('grabTextFrom', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1113,7 +1113,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('grabAttributeFrom', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1126,7 +1126,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('grabValueFrom', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1142,7 +1142,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('setCookie', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1157,7 +1157,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('grabCookie', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1186,7 +1186,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeCookie', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1215,7 +1215,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeCookie', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1230,7 +1230,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Action('resetCookie', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1285,7 +1285,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeElement', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1334,7 +1334,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeElement', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1377,7 +1377,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeOptionIsSelected', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1420,7 +1420,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('dontSeeOptionIsSelected', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1441,7 +1441,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seePageNotFound', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1470,7 +1470,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeResponseCodeIs', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *
@@ -1511,7 +1511,7 @@ class AcceptanceTester extends \Codeception\Actor
         return $this->scenario->runStep(new \Codeception\Step\Assertion('seeInTitle', func_get_args()));
     }
 
- 
+
     /**
      * [!] Method is generated. Documentation taken from corresponding module.
      *

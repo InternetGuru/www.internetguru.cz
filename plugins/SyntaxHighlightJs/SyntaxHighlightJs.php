@@ -7,7 +7,7 @@ class SyntaxHighlightJs extends Plugin implements SplObserver, ContentStrategyIn
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,100);
+    $s->setPriority($this, 100);
   }
 
   public function update(SplSubject $subject) {

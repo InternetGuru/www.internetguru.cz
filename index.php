@@ -1,6 +1,6 @@
 <?php
-define('CURRENT_SUBDOM_FOLDER',getcwd());
-define('CURRENT_SUBDOM_DIR',basename(CURRENT_SUBDOM_FOLDER));
+define('CURRENT_SUBDOM_FOLDER', getcwd());
+define('CURRENT_SUBDOM_DIR', basename(CURRENT_SUBDOM_FOLDER));
 define("CORE_DIR", "core");
 $initCmsFile = "init_cms.php";
 

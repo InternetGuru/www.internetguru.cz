@@ -82,8 +82,8 @@ class InputVar extends Plugin implements SplObserver {
       $time = strtotime($time);
     }
     if($time === false) $date = strftime($format);
-    else $date = strftime($format,$time);
-    if($date === false) new Logger(_("Unrecognized date value or format"),"error");
+    else $date = strftime($format, $time);
+    if($date === false) new Logger(_("Unrecognized date value or format"), "error");
     return $date;
   }
 
@@ -108,24 +108,24 @@ class InputVar extends Plugin implements SplObserver {
     $output = array();
     foreach($subStr as $s) {
       $r = array();
-      preg_match_all('/@?\$('.VARIABLE_PATTERN.')/',$s,$match);
+      preg_match_all('/@?\$('.VARIABLE_PATTERN.')/', $s, $match);
       foreach($match[1] as $k => $var) {
         $varVal = Cms::getVariable($var);
         if(is_null($varVal))
           $varVal = Cms::getVariable("inputvar-$var");
         if(is_null($varVal)) {
-          if(strpos($match[0][$k],"@") !== 0)
+          if(strpos($match[0][$k], "@") !== 0)
             new Logger(sprintf(_("Variable '%s' does not exist"), $var), "warning");
           continue;
         }
         $r[$var] = $varVal;
       }
       foreach($r as $var => $varVal) {
-        $s = str_replace($match[0][$k],$varVal,$s);
+        $s = str_replace($match[0][$k], $varVal, $s);
       }
       $output[] = $s;
     }
-    return implode('$',$output);
+    return implode('$', $output);
   }
 
 }

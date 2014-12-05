@@ -7,7 +7,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,4);
+    $s->setPriority($this, 4);
   }
 
   public function update(SplSubject $subject) {
@@ -20,7 +20,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   public function getContent(HTMLPlus $c) {
     $cf = Cms::getContentFull();
     $link = getCurLink();
-    $curH = $cf->getElementById($link,"link");
+    $curH = $cf->getElementById($link, "link");
     if(is_null($curH)) {
       if(strlen($link)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
       $curH = $cf->documentElement->firstElement;
@@ -33,7 +33,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $curH->parentNode->setAncestorValue("xml:lang");
     if(!$curH->parentNode->hasAttribute("xml:lang")) {
       $bodyLang = $cf->documentElement->getAttribute("xml:lang");
-      $curH->parentNode->setAttribute("xml:lang",$bodyLang);
+      $curH->parentNode->setAttribute("xml:lang", $bodyLang);
     }
     $curH->setAncestorValue("ctime");
     $curH->setAncestorValue("mtime");
@@ -46,7 +46,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     foreach($curH->parentNode->attributes as $attName => $attNode) {
       $body->setAttributeNode($content->importNode($attNode));
     }
-    $this->appendUntilSame($curH,$body);
+    $this->appendUntilSame($curH, $body);
 
     #$content->fragToLinks($cf);
     return $content;
@@ -64,7 +64,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $bc = new DOMDocumentPlus();
     $root = $bc->appendChild($bc->createElement("root"));
     $ol = $root->appendChild($bc->createElement("ol"));
-    $ol->setAttribute("class","contentlink-bc");
+    $ol->setAttribute("class", "contentlink-bc");
     foreach(array_reverse($this->headings) as $h) {
       $li = $ol->appendChild($bc->createElement("li"));
       $hs[] = $bc->importNode($h, true);
@@ -76,10 +76,10 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
       $subtitles[] = $content;
       $href = "#". $h->getAttribute("id");
-      $a = $h->parentNode->appendChild($bc->createElement("a",$content));
+      $a = $h->parentNode->appendChild($bc->createElement("a", $content));
       $a->setAttribute("href", $href);
-      if($h->hasAttribute("title")) $a->setAttribute("title",$h->getAttribute("title"));
-      else $a->setAttribute("title",$h->nodeValue);
+      if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
+      else $a->setAttribute("title", $h->nodeValue);
       $h->parentNode->removeChild($h);
     }
     end($subtitles);
@@ -90,11 +90,11 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function appendUntilSame(DOMElement $e, DOMElement $into) {
     $doc = $into->ownerDocument;
-    $into->appendChild($doc->importNode($e,true));
+    $into->appendChild($doc->importNode($e, true));
     $untilName = $e->nodeName;
     while(($e = $e->nextElement) !== null) {
       if($e->nodeName == $untilName) break;
-      $into->appendChild($doc->importNode($e,true));
+      $into->appendChild($doc->importNode($e, true));
     }
   }
 

@@ -33,15 +33,15 @@ class DOMBuilder {
     }
     foreach($nodes as $n) {
       foreach($n->ownerDocument->getElementsByTagName($n->nodeName) as $e) {
-        $e->setAttribute("readonly","readonly");
+        $e->setAttribute("readonly", "readonly");
       }
       $n->parentNode->removeChild($n);
     }
   }
 
-  private static function build(DOMDocumentPlus $doc, $fileName,$replace,$user) {
+  private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user) {
     /*
-    $dc = new DOMCache(hash(FILE_HASH_ALGO,"$fileName,$replace,$user"));
+    $dc = new DOMCache(hash(FILE_HASH_ALGO, "$fileName, $replace, $user"));
     if($dc->isValid()) return $dc->getCache();
     $dc->addSurceFile($fileName);
     $dc->addSurceFile(ADMIN_FOLDER . "/$fileName");
@@ -78,18 +78,18 @@ class DOMBuilder {
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
   }
 
-  private static function findFile($fileName,$user=true,$admin=true) {
-    $f = findFile($fileName,$user,$admin);
+  private static function findFile($fileName, $user=true, $admin=true) {
+    $f = findFile($fileName, $user, $admin);
     if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
     return $f;
   }
 
-  private static function safeLoadDOM($filePath,DOMDocumentPlus $doc,$user,$admin) {
+  private static function safeLoadDOM($filePath, DOMDocumentPlus $doc, $user, $admin) {
     $files = array();
     try {
-      $files[self::findFile($filePath,$user,$admin)] = null;
-      $files[self::findFile($filePath,false,true)] = null;
-      $files[self::findFile($filePath,false,false)] = null;
+      $files[self::findFile($filePath, $user, $admin)] = null;
+      $files[self::findFile($filePath, false, true)] = null;
+      $files[self::findFile($filePath, false, false)] = null;
     } catch(Exception $e) {
       if(empty($files)) throw $e;
     }
@@ -112,7 +112,7 @@ class DOMBuilder {
 
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null) {
     if($doc instanceof HTMLPlus) {
-      $remove = array("?".USER_FOLDER."/","?".ADMIN_FOLDER."/","?".CMS_FOLDER."/");
+      $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
       Cms::addVariableItem("html", str_replace($remove, array(), "?$filePath"));
     }
     if(is_file(dirname($filePath)."/.".basename($filePath)))
@@ -244,7 +244,7 @@ class DOMBuilder {
    */
   private static function updateDOM(DOMDocumentPlus $doc, $filePath, $ignoreReadonly=false) {
     $newDoc = new DOMDocumentPlus();
-    self::loadDOM($filePath,$newDoc);
+    self::loadDOM($filePath, $newDoc);
     // create root element if not exists
     if(is_null($doc->documentElement)) {
       $doc->appendChild($doc->importNode($newDoc->documentElement));
@@ -262,22 +262,22 @@ class DOMBuilder {
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
         }
         #if(!count($remove)) {
-        #  $doc->documentElement->appendChild($doc->importNode($n,true));
+        #  $doc->documentElement->appendChild($doc->importNode($n, true));
         #  continue;
         #}
         foreach($remove as $d) $d->parentNode->removeChild($d);
       } elseif($n->hasAttribute("id")) {
         $sameIdElement = $doc->getElementById($n->getAttribute("id"));
         if(is_null($sameIdElement)) {
-          $doc->documentElement->appendChild($doc->importNode($n,true));
+          $doc->documentElement->appendChild($doc->importNode($n, true));
           continue;
         }
         if($sameIdElement->nodeName != $n->nodeName)
           throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $n->getAttribute("id"), $n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
-        $doc->documentElement->replaceChild($doc->importNode($n,true),$sameIdElement);
+        $doc->documentElement->replaceChild($doc->importNode($n, true), $sameIdElement);
       } else {
-        $doc->documentElement->appendChild($doc->importNode($n,true));
+        $doc->documentElement->appendChild($doc->importNode($n, true));
       }
     }
   }

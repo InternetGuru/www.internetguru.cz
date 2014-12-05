@@ -7,12 +7,12 @@ class UrlHandler extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,3);
+    $s->setPriority($this, 3);
   }
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
+    if($this->detachIfNotAttached(array("Xhtml11", "ContentLink"))) return;
     $this->cfgRedir();
     if(getCurLink() == "") {
       $subject->detach($this);
@@ -32,8 +32,8 @@ class UrlHandler extends Plugin implements SplObserver {
       $code = $var->hasAttribute("code") && $var->getAttribute("code") == "permanent" ? 301 : 302;
       $path = parse_url($var->nodeValue, PHP_URL_PATH);
       if(!strlen($path)) $path = getCurLink(); // current link if empty string
-      while(strpos($path,"/") === 0) $path = substr($path,1); // empty string if root
-      if($path != getCurLink() && strlen($path) && is_null(Cms::getContentFull()->getElementById($path,"link"))) {
+      while(strpos($path, "/") === 0) $path = substr($path, 1); // empty string if root
+      if($path != getCurLink() && strlen($path) && is_null(Cms::getContentFull()->getElementById($path, "link"))) {
         new Logger(sprintf(_("Redirection link '%s' not found"), $path), "warning");
         continue;
       }
@@ -45,64 +45,64 @@ class UrlHandler extends Plugin implements SplObserver {
 
   private function alterQuery($query, $pNam) {
     $param = array();
-    foreach(explode("&",$query) as $p) {
-      list($parName, $parValue) = explode("=","$p="); // ensure there is always parValue
+    foreach(explode("&", $query) as $p) {
+      list($parName, $parValue) = explode("=", "$p="); // ensure there is always parValue
       if(!strlen($parValue)) $parValue = $_GET[$pNam];
       $param[$parName] = $parValue;
     }
     $query = array();
     foreach($param as $k => $v) $query[] = $k . (strlen($v) ? "=$v" : "");
-    return implode("&",$query);
+    return implode("&", $query);
   }
 
   private function queryMatch($pNam, $pVal) {
-    foreach(explode("&",parse_url(getCurLink(true),PHP_URL_QUERY)) as $q) {
-      if(is_null($pVal) && strpos("$q=","$pNam=$pVal") === 0) return true;
+    foreach(explode("&", parse_url(getCurLink(true), PHP_URL_QUERY)) as $q) {
+      if(is_null($pVal) && strpos("$q=", "$pNam=$pVal") === 0) return true;
       if(!is_null($pVal) && "$q=" == "$pNam=$pVal") return true;
     }
     return false;
   }
 
   private function proceed() {
-    $h = Cms::getContentFull()->getElementById(getCurLink(),"link");
+    $h = Cms::getContentFull()->getElementById(getCurLink(), "link");
     if(!is_null($h)) return;
     $newLink = normalize(getCurLink());
     $links = array();
     foreach(Cms::getContentFull()->getElementsByTagName("h") as $h) {
       if($h->hasAttribute("link")) $links[] = $h->getAttribute("link");
     }
-    $linkId = $this->findSimilar($links,$newLink);
+    $linkId = $this->findSimilar($links, $newLink);
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];
     new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $newLink), "info");
-    redirTo(getRoot().$newLink,404);
+    redirTo(getRoot().$newLink, 404);
   }
 
   /**
    * exists: aa/bb/cc/dd, aa/bb/cc/ee, aa/bb/dd, aa/dd
    * call: aa/b/cc/dd -> find aa/bb/cc/dd (not aa/dd)
    */
-  private function findSimilar(Array $links,$link) {
+  private function findSimilar(Array $links, $link) {
     if(!strlen($link)) return null;
     // zero pos substring
-    if(($newLink = $this->minPos($links,$link,0)) !== false) return $newLink;
+    if(($newLink = $this->minPos($links, $link, 0)) !== false) return $newLink;
     // low levenstein first
-    if(($newLink = $this->minLev($links,$link,1)) !== false) return $newLink;
+    if(($newLink = $this->minLev($links, $link, 1)) !== false) return $newLink;
 
     $parts = explode("/", $link);
     $first = array_shift($parts);
     $subset = array();
     foreach($links as $k => $l) {
-      if(strpos($l,$first) !== 0) continue;
-      if(strpos($l,"/") === false) continue;
-      else $subset[$k] = substr($l,strpos($l,"/")+1);
+      if(strpos($l, $first) !== 0) continue;
+      if(strpos($l, "/") === false) continue;
+      else $subset[$k] = substr($l, strpos($l, "/")+1);
     }
     if(count($subset) == 1) return key($subset);
     if(empty($subset)) $subset = $links;
-    return $this->findSimilar($subset,implode("/",$parts));
+    return $this->findSimilar($subset, implode("/", $parts));
   }
 
-  private function minPos(Array $links,$link,$max) {
+  private function minPos(Array $links, $link, $max) {
     $linkpos = array();
     foreach ($links as $k => $l) {
       $pos = strpos($l, $link);
@@ -113,27 +113,27 @@ class UrlHandler extends Plugin implements SplObserver {
     if(!empty($linkpos)) return key($linkpos);
     $sublinks = array();
     foreach($links as $k => $l) {
-      $l = str_replace(array("_","-"), "/", $l);
-      if(strpos($l,"/") === false) continue;
-      $sublinks[$k] = substr($l,strpos($l,"/")+1);
+      $l = str_replace(array("_", "-"), "/", $l);
+      if(strpos($l, "/") === false) continue;
+      $sublinks[$k] = substr($l, strpos($l, "/")+1);
     }
     if(empty($sublinks)) return false;
-    return $this->minPos($sublinks,$link,$max);
+    return $this->minPos($sublinks, $link, $max);
   }
 
-  private function minLev(Array $links,$link,$limit) {
+  private function minLev(Array $links, $link, $limit) {
     $leven = array();
     foreach ($links as $k => $l) $leven[$k] = levenshtein($l, $link);
     asort($leven);
     if(reset($leven) <= $limit) return key($leven);
     $sublinks = array();
     foreach($links as $k => $l) {
-      $l = str_replace(array("_","-"), "/", $l);
-      if(strpos($l,"/") === false) continue;
-      $sublinks[$k] = substr($l,strpos($l,"/")+1);
+      $l = str_replace(array("_", "-"), "/", $l);
+      if(strpos($l, "/") === false) continue;
+      $sublinks[$k] = substr($l, strpos($l, "/")+1);
     }
     if(empty($sublinks)) return false;
-    return $this->minLev($sublinks,$link,$limit);
+    return $this->minLev($sublinks, $link, $limit);
   }
 
 }

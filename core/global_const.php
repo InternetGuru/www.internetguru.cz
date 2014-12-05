@@ -15,7 +15,7 @@ define("TEMP_DIR", "temp");
 define("CACHE_DIR", "cache");
 define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
-define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}");
+define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2, 4}");
 define('FILE_HASH_ALGO', 'crc32b');
 define('STATUS_PREINIT', 'preinit');
 define('STATUS_INIT', 'init');
@@ -72,7 +72,7 @@ define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MOD
 function setCmsBestRelease() {
   $cbr = null;
   foreach(scandir(CMS_ROOT_FOLDER) as $v) {
-    if(!preg_match("/^\d+\.\d+$/",$v)) continue;
+    if(!preg_match("/^\d+\.\d+$/", $v)) continue;
     if(version_compare($cbr, $v) < 0) $cbr = $v;
   }
   if(is_null($cbr)) throw new LoggerException(_("No stable IGCMS variant found"));
@@ -100,7 +100,7 @@ function proceedServerInit($initServerFileName) {
 }
 
 function findFile($file, $user=true, $admin=true, $res=false) {
-  while(strpos($file,"/") === 0) $file = substr($file,1);
+  while(strpos($file, "/") === 0) $file = substr($file, 1);
   try {
     $resFolder = $res && !isAtLocalhost() ? $resFolder = RES_DIR : false;
     $f = USER_FOLDER . "/$file";
@@ -121,10 +121,10 @@ function findFile($file, $user=true, $admin=true, $res=false) {
 function getRes($res, $dest, $resFolder) {
   if($resFolder === false) return $res;
   #TODO: check mime==ext, allowed types, max size
-  $folders = array(preg_quote(CMS_FOLDER,"/"));
-  if(defined("ADMIN_FOLDER")) $folders[] = preg_quote(ADMIN_FOLDER,"/");
-  if(defined("USER_FOLDER")) $folders[] = preg_quote(USER_FOLDER,"/");
-  if(!preg_match("/^(?:".implode("|",$folders).")\/(".FILEPATH_PATTERN.")$/", $res, $m)) {
+  $folders = array(preg_quote(CMS_FOLDER, "/"));
+  if(defined("ADMIN_FOLDER")) $folders[] = preg_quote(ADMIN_FOLDER, "/");
+  if(defined("USER_FOLDER")) $folders[] = preg_quote(USER_FOLDER, "/");
+  if(!preg_match("/^(?:".implode("|", $folders).")\/(".FILEPATH_PATTERN.")$/", $res, $m)) {
     throw new Exception(sprintf(_("Forbidden file name '%s' format to copy to '%s' folder"), $m[1], $resFolder));
   }
   $mime = getFileMime($res);
@@ -132,15 +132,15 @@ function getRes($res, $dest, $resFolder) {
     throw new Exception(sprintf(_("Forbidden MIME type '%s' to copy '%s' to '%s' folder"), $mime, $m[1], $resFolder));
   }
   $newRes = $resFolder . "/$dest";
-  $newDir = pathinfo($newRes,PATHINFO_DIRNAME);
-  if(!is_dir($newDir) && !mkdirGroup($newDir,0775,true)) {
+  $newDir = pathinfo($newRes, PATHINFO_DIRNAME);
+  if(!is_dir($newDir) && !mkdirGroup($newDir, 0775, true)) {
     throw new Exception(sprintf(_("Unable to create directory structure '%s'"), $newDir));
   }
   if(is_link($newRes) && readlink($newRes) == $res) return $newRes;
   if(!symlink($res, "$newRes~") || !rename("$newRes~", $newRes)) {
     throw new Exception(sprintf(_("Unable to create symlink '%s' for '%s'"), $newRes, $m[1]));
   }
-  #if(!chmodGroup($newRes,0664))
+  #if(!chmodGroup($newRes, 0664))
   #  throw new Exception(sprintf(_("Unable to chmod resource file '%x'"), $newRes);
   return $newRes;
 }

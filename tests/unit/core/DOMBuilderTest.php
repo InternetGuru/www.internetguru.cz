@@ -21,7 +21,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
     {
 
       $xml = "testXml.xml";
-      $this->xml = array($xml,ADMIN_FOLDER."/$xml",USER_FOLDER."/$xml");
+      $this->xml = array($xml, ADMIN_FOLDER."/$xml", USER_FOLDER."/$xml");
       foreach($this->xml as $xml) if(file_exists($xml)) {
         $this->xml = array();
         throw new Exception("Test file '$xml' exists");
@@ -36,7 +36,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
       $doc->save($this->xml[2]);
 
       $html = "testHtmlPlus.xml";
-      $this->html = array($html,ADMIN_FOLDER."/$html",USER_FOLDER."/$html");
+      $this->html = array($html, ADMIN_FOLDER."/$html", USER_FOLDER."/$html");
       foreach($this->html as $html) if(file_exists($html)) {
         $this->html = array();
         throw new Exception("Test file '$html' exists");
@@ -63,10 +63,10 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
     public function testBuildDOM()
     {
       $doc = DOMBuilder::buildDOMPlus($this->xml[0]);
-      $s1 = $doc->C14N(true,false);
+      $s1 = $doc->C14N(true, false);
       $doc = new DOMDocumentPlus();
       $doc->loadXML('<test><a>1</a><d id="d" readonly="readonly">2</d><c readonly="readonly">2</c><b>3</b><c>3</c></test>');
-      $s2 = $doc->C14N(true,false);
+      $s2 = $doc->C14N(true, false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);
     }
@@ -74,10 +74,10 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
     public function testBuildHTML()
     {
       $doc = DOMBuilder::buildHTMLPlus($this->html[0]);
-      $s1 = $doc->C14N(true,false);
+      $s1 = $doc->C14N(true, false);
       $doc = new HTMLPlus();
       $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="3">Three</h><desc/></body>');
-      $s2 = $doc->C14N(true,false);
+      $s2 = $doc->C14N(true, false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);
     }

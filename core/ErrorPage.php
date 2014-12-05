@@ -10,7 +10,7 @@ class ErrorPage {
 
   public function __construct($message, $code, $extended=false) {
     http_response_code($code);
-    new Logger($message,"fatal");
+    new Logger($message, "fatal");
     $dir = LIB_FOLDER."/".$this->relDir;
     $tt = array(
       "@CODE@" => $code,
@@ -21,18 +21,18 @@ class ErrorPage {
       $html = file_get_contents($dir ."/". $this->errSimpleFile);
     } else {
       $html = file_get_contents($dir ."/". $this->errFile);
-      $headings = file($dir ."/". $this->headingFile,FILE_SKIP_EMPTY_LINES);
+      $headings = file($dir ."/". $this->headingFile, FILE_SKIP_EMPTY_LINES);
       $tt["@HEADING@"] = $headings[array_rand($headings)];
-      $messages = file($dir ."/". $this->msgFile,FILE_SKIP_EMPTY_LINES);
+      $messages = file($dir ."/". $this->msgFile, FILE_SKIP_EMPTY_LINES);
       $tt["@MESSAGE@"] = $messages[array_rand($messages)];
-      $whatnow = file($dir ."/". $this->whatnowFile,FILE_SKIP_EMPTY_LINES);
+      $whatnow = file($dir ."/". $this->whatnowFile, FILE_SKIP_EMPTY_LINES);
       $tt["@WHATNOW@"] = array_shift($whatnow);
-      $tt["@TIPS@"] = implode("</dd>\n      <dd>",$whatnow);
+      $tt["@TIPS@"] = implode("</dd>\n      <dd>", $whatnow);
       $images = $this->getImages($dir);
       $tt["@IMAGE@"] = $images[array_rand($images)];
       $tt["@ROOT@"] = getRoot();
     }
-    echo str_replace(array_keys($tt),$tt,$html);
+    echo str_replace(array_keys($tt), $tt, $html);
     die();
   }
 

@@ -28,16 +28,16 @@ class GA extends Plugin implements SplObserver {
       $this->subject->detach($this);
       return;
     }
-    Cms::getOutputStrategy()->addJs("var ga_id = '$ga_id';",1,"body");
+    Cms::getOutputStrategy()->addJs("var ga_id = '$ga_id';", 1, "body");
     foreach($this->getDOMPlus()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
       $f = $this->getDir() ."/". $jsFile->nodeValue;
-      Cms::getOutputStrategy()->addJsFile($f,1,"body",$user);
+      Cms::getOutputStrategy()->addJsFile($f, 1, "body", $user);
     }
   }
 
   private function isValidId($id) {
-    return preg_match("/^UA-\d+-\d+$/",$id);
+    return preg_match("/^UA-\d+-\d+$/", $id);
   }
 
 }

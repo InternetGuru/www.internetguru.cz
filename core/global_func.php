@@ -3,16 +3,16 @@
 function isAtLocalhost() {
   if(!isset($_SERVER["REMOTE_ADDR"])) return true;
   if($_SERVER["REMOTE_ADDR"] == "127.0.0.1") return true;
-  if(substr($_SERVER["REMOTE_ADDR"],0,8) == "192.168.") return true;
-  if(substr($_SERVER["REMOTE_ADDR"],0,3) == "10.") return true;
+  if(substr($_SERVER["REMOTE_ADDR"], 0, 8) == "192.168.") return true;
+  if(substr($_SERVER["REMOTE_ADDR"], 0, 3) == "10.") return true;
   if($_SERVER["REMOTE_ADDR"] == "::1") return true;
   return false;
 }
 
 function absoluteLink($link=null) {
   if(is_null($link)) $link = $_SERVER["REQUEST_URI"];
-  if(substr($link,0,1) == "/") $link = substr($link,1);
-  if(substr($link,-1) == "/") $link = substr($link,0,-1);
+  if(substr($link, 0, 1) == "/") $link = substr($link, 1);
+  if(substr($link, -1) == "/") $link = substr($link, 0, -1);
   $pLink = parse_url($link);
   if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse URL '%s'"), $link));
   $scheme = isset($pLink["scheme"]) ? $pLink["scheme"] : $_SERVER["REQUEST_SCHEME"];
@@ -22,7 +22,7 @@ function absoluteLink($link=null) {
   return "$scheme://$host$path$query";
 }
 
-function redirTo($link,$code=null,$force=false) {
+function redirTo($link, $code=null, $force=false) {
   if(!$force) {
     $curLink = absoluteLink();
     $absLink = absoluteLink($link);
@@ -35,41 +35,41 @@ function redirTo($link,$code=null,$force=false) {
     header("Location: $link");
     exit();
   }
-  header("Location: $link",true,$code);
+  header("Location: $link", true, $code);
   header("Refresh: 0; url=$link");
   exit();
 }
 
-function chmodGroup($file,$mode) {
+function chmodGroup($file, $mode) {
   $oldMask = umask(002);
-  $chmod = chmod($file,$mode);
+  $chmod = chmod($file, $mode);
   umask($oldMask);
   return $chmod;
 }
 
-function mkdirGroup($dir,$mode=0777,$rec=false) {
+function mkdirGroup($dir, $mode=0777, $rec=false) {
   $oldMask = umask(002);
-  $dirMade = mkdir($dir,$mode,$rec);
+  $dirMade = mkdir($dir, $mode, $rec);
   umask($oldMask);
   return $dirMade;
 }
 
 function __toString($o) {
   echo "|";
-  if(is_array($o)) return implode(",",$o);
+  if(is_array($o)) return implode(", ", $o);
   return (string) $o;
 }
 
 function stableSort(Array &$a) {
   if(count($a) < 2) return;
-  $order = range(1,count($a));
-  array_multisort($a,SORT_ASC,$order,SORT_ASC);
+  $order = range(1, count($a));
+  array_multisort($a, SORT_ASC, $order, SORT_ASC);
 }
 
 function getCurLink($query=false) {
   if(!$query) return isset($_GET["page"]) ? $_GET["page"] : "";
   $query = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
-  return substr($query,strlen(getRoot()));
+  return substr($query, strlen(getRoot()));
 }
 
 function getRoot() {
@@ -81,21 +81,21 @@ function getRoot() {
 }
 
 function getDomain() {
-  $d = explode(".",$_SERVER["HTTP_HOST"]);
+  $d = explode(".", $_SERVER["HTTP_HOST"]);
   while(count($d) > 2) array_shift($d);
-  return implode(".",$d);
+  return implode(".", $d);
 }
 
-function normalize($s,$extKeep="",$tolower=true,$convertToUtf8=false) {
+function normalize($s, $extKeep="", $tolower=true, $convertToUtf8=false) {
   if($convertToUtf8) $s = utf8_encode($s);
-  if($tolower) $s = mb_strtolower($s,"utf-8");
+  if($tolower) $s = mb_strtolower($s, "utf-8");
   $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
   if($tolower) $s = strtolower($s);
-  $s = str_replace(" ","_",$s);
+  $s = str_replace(" ", "_", $s);
   $keep = "~[^a-zA-Z0-9/_%s-]~";
-  if(is_null($ext = @preg_replace(sprintf($keep,$extKeep),"",$s))) {
-    new Logger(sprintf(_("Invalid extended expression '%s'"), sprintf($keep,$extKeep)), "error");
-    return preg_replace(sprintf($keep,""),"",$s);
+  if(is_null($ext = @preg_replace(sprintf($keep, $extKeep), "", $s))) {
+    new Logger(sprintf(_("Invalid extended expression '%s'"), sprintf($keep, $extKeep)), "error");
+    return preg_replace(sprintf($keep, ""), "", $s);
   }
   return $ext;
 }
@@ -103,13 +103,13 @@ function normalize($s,$extKeep="",$tolower=true,$convertToUtf8=false) {
 function saveRewriteFile($src, $dest, $keepOld=true) {
   if(!file_exists($src))
     throw new LoggerException("Source file '$src' not found");
-  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0775,true))
+  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true))
     throw new LoggerException("Unable to create directory structure");
-  if(!is_link($dest) && !copy($dest,"$dest.old"))
+  if(!is_link($dest) && !copy($dest, "$dest.old"))
     throw new LoggerException("Unable to backup destination file");
   if(!copy($src, "$dest.new"))
     throw new LoggerException("Unable to copy source file");
-  if(!rename("$dest.new",$dest))
+  if(!rename("$dest.new", $dest))
     throw new LoggerException("Unable to rename new file to destination");
   if(!$keepOld && is_file("$dest.old") && !unlink("$dest.old"))
     throw new LoggerException("Unable to delete .old file");
@@ -117,12 +117,12 @@ function saveRewriteFile($src, $dest, $keepOld=true) {
 }
 
 function saveRewrite($content, $dest) {
-  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest),0775,true)) return false;
+  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true)) return false;
   if(!file_exists($dest)) return file_put_contents($dest, $content);
   $b = file_put_contents("$dest.new", $content);
   if($b === false) return false;
-  if(!copy($dest,"$dest.old")) return false;
-  if(!rename("$dest.new",$dest)) return false;
+  if(!copy($dest, "$dest.old")) return false;
+  if(!rename("$dest.new", $dest)) return false;
   return $b;
 }
 
@@ -160,9 +160,9 @@ function smartCopy($src, $dest, $delay=0) {
 function deleteRedundantFiles($in, $according) {
   if(!is_dir($in)) return;
   foreach(scandir($in) as $f) {
-    if(in_array($f,array(".",".."))) continue;
+    if(in_array($f, array(".", ".."))) continue;
     if(is_dir("$in/$f")) {
-      deleteRedundantFiles("$in/$f","$according/$f");
+      deleteRedundantFiles("$in/$f", "$according/$f");
       if(!is_dir("$according/$f")) rmdir("$in/$f");
       continue;
     }
@@ -174,7 +174,7 @@ function copyFiles($src, $dest, $deep) {
   if(!is_dir($dest) && !@mkdir($dest))
     throw new LoggerException("Unable to create '$dest' folder");
   foreach(scandir($src) as $f) {
-    if(in_array($f,array(".",".."))) continue;
+    if(in_array($f, array(".", ".."))) continue;
     if(is_dir("$src/$f") && !is_link("$src/$f")) {
       if($deep) copyFiles("$src/$f", "$dest/$f", $deep);
       continue;
@@ -230,12 +230,12 @@ function getFileMime($file) {
 function fileSizeConvert($b) {
     if(!is_numeric($b)) return $b;
     $i = 0;
-    $iec = array("B","KB","MB","GB","TB","PB","EB","ZB","YB");
+    $iec = array("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB");
     while(($b/1024) > 1) {
         $b = $b/1024;
         $i++;
     }
-    return round($b,1)." ".$iec[$i];
+    return round($b, 1)." ".$iec[$i];
 }
 
 function checkUrl($folder = null) {
@@ -243,7 +243,7 @@ function checkUrl($folder = null) {
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
     new ErrorPage("The requested URL '$rUri' was not understood by this server.", 400);
-  if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/",$rUri,$m)) return null;
+  if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/", $rUri, $m)) return null;
 
   $fInfo["filepath"] = "$folder/". $m[1];
   if(!is_file($fInfo["filepath"]))

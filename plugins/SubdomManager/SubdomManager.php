@@ -12,7 +12,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,3);
+    $s->setPriority($this, 3);
     if(self::DEBUG) new Logger("DEBUG");
   }
 
@@ -105,7 +105,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private function getSubdomVar($varName, $subdom) {
     if(is_dir("../$subdom")) foreach(scandir("../$subdom") as $f) {
       if(strpos($f, "$varName.") !== 0) continue;
-      return substr($f,strlen($varName)+1);
+      return substr($f, strlen($varName)+1);
     }
     return null;
   }

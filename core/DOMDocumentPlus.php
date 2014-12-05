@@ -3,10 +3,10 @@
 class DOMDocumentPlus extends DOMDocument {
   const DEBUG = false;
 
-  function __construct($version="1.0",$encoding="utf-8") {
+  function __construct($version="1.0", $encoding="utf-8") {
     if(self::DEBUG) new Logger("DEBUG");
-    parent::__construct($version,$encoding);
-    $r = $this->registerNodeClass("DOMElement","DOMElementPlus");
+    parent::__construct($version, $encoding);
+    $r = $this->registerNodeClass("DOMElement", "DOMElementPlus");
   }
 
   public function createElement($name, $value=null) {
@@ -14,7 +14,7 @@ class DOMDocumentPlus extends DOMDocument {
     return parent::createElement($name, htmlspecialchars($value));
   }
 
-  public function getElementById($id,$attribute="id") {
+  public function getElementById($id, $attribute="id") {
     $xpath = new DOMXPath($this);
     $q = $xpath->query("//*[@$attribute='$id']");
     if($q->length == 0) return null;
@@ -25,18 +25,18 @@ class DOMDocumentPlus extends DOMDocument {
 
   public function insertVar($varName, $varValue) {
     $xpath = new DOMXPath($this);
-    $noparse = "*[not(contains(@class,'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class,'noparse'))])]";
+    $noparse = "*[not(contains(@class, 'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class, 'noparse'))])]";
     #$noparse = "*";
     // find elements with current var
-    $matches = $xpath->query(sprintf("//%s[contains(@var,'%s')]",$noparse,$varName));
+    $matches = $xpath->query(sprintf("//%s[contains(@var, '%s')]", $noparse, $varName));
     $replaceCont = array();
     $replaceAttr = array();
     // check for attributes and real match (xpath accepts substrings)
     foreach($matches as $k => $e) {
-      $vars = explode(" ",$e->getAttribute("var"));
+      $vars = explode(" ", $e->getAttribute("var"));
       $keep = array();
       foreach($vars as $v) {
-        $p = explode("@",$v);
+        $p = explode("@", $v);
         if($varName != $p[0]) {
           $keep[] = $v;
           continue;
@@ -48,7 +48,7 @@ class DOMDocumentPlus extends DOMDocument {
         $e->removeAttribute("var");
         continue;
       }
-      $e->setAttribute("var",implode(" ",$keep));
+      $e->setAttribute("var", implode(" ", $keep));
     }
     $replaces = array_merge($replaceAttr, $replaceCont); // attributes first!
     if(!count($replaces)) return;
@@ -93,7 +93,7 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function validateLinks($elName,$attName,$repair) {
+  public function validateLinks($elName, $attName, $repair) {
     $toStrip = array();
     foreach($this->getElementsByTagName($elName) as $e) {
       if(!$e->hasAttribute($attName)) continue;
@@ -102,13 +102,13 @@ class DOMDocumentPlus extends DOMDocument {
         if($link === $e->getAttribute($attName)) continue;
         if(!$repair)
           throw new Exception(sprintf(_("Invalid repairable link '%s'"), $e->getAttribute($attName)));
-        $e->setAttribute($attName,$link);
+        $e->setAttribute($attName, $link);
       } catch(Exception $ex) {
         if(!$repair) throw $ex;
-        $toStrip[] = array($e,$ex->getMessage());
+        $toStrip[] = array($e, $ex->getMessage());
       }
     }
-    foreach($toStrip as $a) $a[0]->stripAttr($attName,$a[1]);
+    foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
     return count($toStrip);
   }
 
@@ -119,19 +119,19 @@ class DOMDocumentPlus extends DOMDocument {
     if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
     if(isset($pLink["scheme"])) { // link is in absolute form
       $curDomain = $_SERVER["REQUEST_SCHEME"] . "://" . $_SERVER["HTTP_HOST"] . getRoot();
-      if(strpos(str_replace(array("?","#"),array("/","/"),$link), $curDomain) !== 0) return $link; // link is external
+      if(strpos(str_replace(array("?", "#"), array("/", "/"), $link), $curDomain) !== 0) return $link; // link is external
     }
     $query = isset($pLink["query"]) ? "?" . $pLink["query"] : "";
     if(isset($pLink["fragment"])) return $query . "#" . $pLink["fragment"];
     $path = isset($pLink["path"]) ? $pLink["path"] : "";
-    while(strpos($path,".") === 0) $path = substr($path,1);
-    if(isAtLocalhost() && strpos($path,substr(getRoot(),0,-1)) === 0)
-      $path = substr($path,strlen(getRoot())-1);
-    while(strpos($path,"/") === 0) $path = substr($path,1);
+    while(strpos($path, ".") === 0) $path = substr($path, 1);
+    if(isAtLocalhost() && strpos($path, substr(getRoot(), 0, -1)) === 0)
+      $path = substr($path, strlen(getRoot())-1);
+    while(strpos($path, "/") === 0) $path = substr($path, 1);
     return $path . $query;
   }
 
-  public function fragToLinks(HTMLPlus $src,$root="/",$eName="a",$aName="href") {
+  public function fragToLinks(HTMLPlus $src, $root="/", $eName="a", $aName="href") {
     $toStrip = array();
     foreach($this->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
@@ -143,7 +143,7 @@ class DOMDocumentPlus extends DOMDocument {
       if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
         $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
         if($path == "/") $path = "";
-        if(strlen($path) && is_null($src->getElementById($path,"link"))) {
+        if(strlen($path) && is_null($src->getElementById($path, "link"))) {
           $toStrip[] = array($a, sprintf(_("Link '%s' not found"), $path));
           continue; // link not exists
         }
@@ -151,7 +151,7 @@ class DOMDocumentPlus extends DOMDocument {
           $toStrip[] = array($a, _("Cyclic link found"));
           continue; // link is cyclic (except form@action)
         }
-        $a->setAttribute($aName,$root.$path.$queryUrl);
+        $a->setAttribute($aName, $root.$path.$queryUrl);
         continue; // localize link
       }
       $frag = $pLink["fragment"];
@@ -185,13 +185,13 @@ class DOMDocumentPlus extends DOMDocument {
       else
         $a->setAttribute($aName, $root.$h->getAttribute("link")."#".$frag);
     }
-    foreach($toStrip as $a) $a[0]->stripAttr($aName,$a[1]);
+    foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
 
-  private function prepareIfDl(DOMElement $e,$varName) {
+  private function prepareIfDl(DOMElement $e, $varName) {
     if($e->nodeName != "dl") return $e;
     $e->removeChildNodes();
-    $e->appendChild($e->ownerDocument->createElement("dt",$varName));
+    $e->appendChild($e->ownerDocument->createElement("dt", $varName));
     return $e->appendChild($e->ownerDocument->createElement("dd"));
   }
 
@@ -211,10 +211,10 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   private function validateDOMPlus($repair) {
-    $this->validateId(null,$repair);
+    $this->validateId(null, $repair);
   }
 
-  public function validateId($attr=null,$repair=false) {
+  public function validateId($attr=null, $repair=false) {
     if(is_null($attr)) $attr = "id";
     $xpath = new DOMXPath($this);
     $identifiers = array();
@@ -230,7 +230,7 @@ class DOMDocumentPlus extends DOMDocument {
     foreach($duplicit as $e) {
       $i = 1;
       while(array_key_exists($e->getAttribute($attr) . $i, $identifiers)) $i++;
-      $e->setAttribute($attr,$e->getAttribute($attr) . $i);
+      $e->setAttribute($attr, $e->getAttribute($attr) . $i);
       $identifiers[$e->getAttribute($attr)] = null;
     }
     return count($duplicit);
@@ -274,14 +274,14 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function setUniqueId(DOMElement $e) {
-    $id = $e->nodeName .".". substr(md5(microtime()),0,3);
+    $id = $e->nodeName .".". substr(md5(microtime()), 0, 3);
     if(!$this->isValidId($id)) $this->setUniqueId($e);
     if(!is_null($this->getElementById($id))) $this->setUniqueId($e);
-    $e->setAttribute("id",$id);
+    $e->setAttribute("id", $id);
   }
 
   protected function isValidId($id) {
-    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/",$id);
+    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/", $id);
   }
 
   private function removeVar($e, $attr) {
@@ -292,21 +292,21 @@ class DOMDocumentPlus extends DOMDocument {
     $e->parentNode->removeChild($e);
   }
 
-  private function insertVarString($varValue,DOMElement $e,$attr,$varName) {
+  private function insertVarString($varValue, DOMElement $e, $attr, $varName) {
     if(!is_null($attr)) {
       if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
-        $e->setAttribute($attr,$varValue);
+        $e->setAttribute($attr, $varValue);
         return;
       }
       if($attr == "class") $varValue = $e->getAttribute($attr)." ".$varValue;
-      $e->setAttribute($attr,$varValue);
+      $e->setAttribute($attr, $varValue);
       return;
     }
     $this->insertInnerHTML($varValue, $e, "", $varName);
     #$e->nodeValue = $varValue;
   }
 
-  private function insertVarArray(Array $varValue,DOMElement $e,$varName) {
+  private function insertVarArray(Array $varValue, DOMElement $e, $varName) {
     $sep = null;
     switch($e->nodeName) {
       case "li":
@@ -343,10 +343,10 @@ class DOMDocumentPlus extends DOMDocument {
     if(!is_array($html)) $html = array($html);
     $dom = new DOMDocument();
     $eNam = $dest->nodeName;
-    $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$html)."</$eNam></var>";
+    $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
     if(!@$dom->loadXML($xml)) {
       foreach($html as $k => $v) $html[$k] = htmlspecialchars($v);
-      $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>",$html)."</$eNam></var>";
+      $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
       if(!@$dom->loadXML($xml)) throw new Exception(sprintf(_("Unable to parse variable '%s'"), $varName));
     }
     $this->insertVarDOMElement($dom->documentElement, $dest);

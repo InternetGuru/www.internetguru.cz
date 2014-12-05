@@ -5,7 +5,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
-      if($this->detachIfNotAttached(array("Xhtml11","ContentLink"))) return;
+      if($this->detachIfNotAttached(array("Xhtml11", "ContentLink"))) return;
     }
   }
 
@@ -23,18 +23,18 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       foreach($section->childElements as $e) if($e->nodeName == "h") $hs[] = $e;
       $force = $section->getPreviousElement("h")->hasAttribute("link");
       $ul = $content->createElement("ul");
-      $ul->setAttribute("class","contentbalancer");
+      $ul->setAttribute("class", "contentbalancer");
       foreach($hs as $h) {
         if(!$force && !$h->hasAttribute("link")) continue 2;
         $li = $content->createElement("li");
         $textContent = $h->nodeValue;
         if($h->hasAttribute("short")) $textContent = $h->getAttribute("short");
         $a = $content->createElement("a", $textContent);
-        $a->setAttribute("href","#".$h->getAttribute("id"));
+        $a->setAttribute("href", "#".$h->getAttribute("id"));
         $li->appendChild($a);
         $ul->appendChild($li);
       }
-      $section->parentNode->replaceChild($ul,$section);
+      $section->parentNode->replaceChild($ul, $section);
     }
   }
 

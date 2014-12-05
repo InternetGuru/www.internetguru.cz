@@ -19,7 +19,7 @@ class Plugins implements SplSubject {
   }
 
   public function isAttachedPlugin($pluginName) {
-    return array_key_exists($pluginName,$this->observers);
+    return array_key_exists($pluginName, $this->observers);
   }
 
   public function printObservers() {
@@ -32,7 +32,7 @@ class Plugins implements SplSubject {
     if(!is_dir($dir))
       throw new Exception(sprintf(_("Missing plugin folder '%s'"), $dir));
     foreach(scandir($dir) as $p) {
-      if(strpos($p,".") === 0 || file_exists("$dir/.$p")) continue; // skip .plugin
+      if(strpos($p, ".") === 0 || file_exists("$dir/.$p")) continue; // skip .plugin
       if(isAtLocalhost() && file_exists(PLUGINS_FOLDER."/.$p")) {
         $this->availableObservers[$p] = null;
         continue;
@@ -54,21 +54,21 @@ class Plugins implements SplSubject {
     return $this->status;
   }
 
-  public function attach(SplObserver $observer,$priority=10) {
+  public function attach(SplObserver $observer, $priority=10) {
     $o = get_class($observer);
     $this->observers[$o] = $observer;
     if(array_key_exists($o, $this->observerPriority)) return;
     $this->observerPriority[$o] = $priority;
   }
 
-  public function setPriority(SplObserver $observer,$priority) {
+  public function setPriority(SplObserver $observer, $priority) {
     $this->observerPriority[get_class($observer)] = $priority;
   }
 
   public function detach(SplObserver $observer) {
     $o = get_class($observer);
-    if(array_key_exists($o,$this->observers)) $this->observers[$o] = null;
-    if(array_key_exists($o,$this->observerPriority)) unset($this->observerPriority[$o]);
+    if(array_key_exists($o, $this->observers)) $this->observers[$o] = null;
+    if(array_key_exists($o, $this->observerPriority)) unset($this->observerPriority[$o]);
   }
 
   public function notify() {

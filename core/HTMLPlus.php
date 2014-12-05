@@ -4,19 +4,19 @@ class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
   const RNG_FILE = "HTMLPlus.rng";
 
-  function __construct($version="1.0",$encoding="utf-8") {
-    parent::__construct($version,$encoding);
+  function __construct($version="1.0", $encoding="utf-8") {
+    parent::__construct($version, $encoding);
   }
 
   public function __clone() {
     $doc = new HTMLPlus();
-    $root = $doc->importNode($this->documentElement,true);
+    $root = $doc->importNode($this->documentElement, true);
     $doc->appendChild($root);
     return $doc;
   }
 
   public function applySyntax() {
-    $extend = array("strong","em","ins","del","sub","sup","a","h","desc");
+    $extend = array("strong", "em", "ins", "del", "sub", "sup", "a", "h", "desc");
 
     // hide noparse
     $noparse = array();
@@ -31,14 +31,14 @@ class HTMLPlus extends DOMDocumentPlus {
     // restore noparse
     foreach($noparse as $n) {
       $newNode = $this->createTextNode($n[1]);
-      $n[0]->parentNode->insertBefore($newNode,$n[0]);
+      $n[0]->parentNode->insertBefore($newNode, $n[0]);
       $n[0]->parentNode->removeChild($n[0]);
     }
   }
 
   private function getInlineTextNodes($extend = array()) {
     $textNodes = array();
-    foreach(array_merge(array("p","dd","li"),$extend) as $eNam) {
+    foreach(array_merge(array("p", "dd", "li"), $extend) as $eNam) {
       foreach($this->getElementsByTagName($eNam) as $e) {
         foreach($e->childNodes as $n) {
           if($n->nodeType == XML_TEXT_NODE) $textNodes[] = $n;
@@ -51,7 +51,7 @@ class HTMLPlus extends DOMDocumentPlus {
   private function parseSyntaxNoparse(DOMText $n) {
     $noparse = array();
     $pat = "/<noparse>(.+?)<\/noparse>/";
-    $p = preg_split($pat,$n->nodeValue,-1,PREG_SPLIT_DELIM_CAPTURE);
+    $p = preg_split($pat, $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return $noparse;
     foreach($p as $i => $v) {
       if($i % 2 == 0) $newNode = $this->createTextNode($v);
@@ -59,7 +59,7 @@ class HTMLPlus extends DOMDocumentPlus {
         $newNode = $this->createElement("noparse");
         $noparse[] = array($newNode, $v);
       }
-      $n->parentNode->insertBefore($newNode,$n);
+      $n->parentNode->insertBefore($newNode, $n);
     }
     $n->parentNode->removeChild($n);
     return $noparse;
@@ -67,38 +67,38 @@ class HTMLPlus extends DOMDocumentPlus {
 
   private function parseSyntaxCodeTag(DOMText $n) {
     $pat = "/<code(?: [a-z]+)?>(.+?)<\/code>/";
-    $p = preg_split($pat,$n->nodeValue,-1,PREG_SPLIT_DELIM_CAPTURE);
+    $p = preg_split($pat, $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
     foreach($p as $i => $v) {
       if($i % 2 == 0) $newNode = $this->createTextNode($v);
       else {
         $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
-        $r = array('"','"','"',"'","'");
-        $v = str_replace($s,$r,translateUtf8Entities($v,true));
-        $newNode = $this->createElement("code",translateUtf8Entities($v));
-        if(preg_match("/<code ([a-z]+)>/",$n->nodeValue,$match)) {
-          $newNode->setAttribute("class",$match[1]);
+        $r = array('"', '"', '"', "'", "'");
+        $v = str_replace($s, $r, translateUtf8Entities($v, true));
+        $newNode = $this->createElement("code", translateUtf8Entities($v));
+        if(preg_match("/<code ([a-z]+)>/", $n->nodeValue, $match)) {
+          $newNode->setAttribute("class", $match[1]);
         }
       }
-      $n->parentNode->insertBefore($newNode,$n);
+      $n->parentNode->insertBefore($newNode, $n);
     }
     $n->parentNode->removeChild($n);
   }
 
   private function parseSyntaxCode(DOMText $n) {
     $pat = "/(?:&lsquo;|&rsquo;|'){2}(.+?)(?:&lsquo;|&rsquo;|'){2}/";
-    $src = translateUtf8Entities($n->nodeValue,true);
-    $p = preg_split($pat,$src,-1,PREG_SPLIT_DELIM_CAPTURE);
+    $src = translateUtf8Entities($n->nodeValue, true);
+    $p = preg_split($pat, $src, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
     foreach($p as $i => $v) {
       if($i % 2 == 0) $newNode = $this->createTextNode(translateUtf8Entities($v));
       else {
         $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
-        $r = array('"','"','"',"'","'");
-        $v = str_replace($s,$r,$v);
-        $newNode = $this->createElement("code",translateUtf8Entities($v));
+        $r = array('"', '"', '"', "'", "'");
+        $v = str_replace($s, $r, $v);
+        $newNode = $this->createElement("code", translateUtf8Entities($v));
       }
-      $n->parentNode->insertBefore($newNode,$n);
+      $n->parentNode->insertBefore($newNode, $n);
     }
     $n->parentNode->removeChild($n);
   }
@@ -106,7 +106,7 @@ class HTMLPlus extends DOMDocumentPlus {
   private function parseSyntaxVariable(DOMText $n) {
     if(strpos($n->nodeValue, 'cms-') === false) return;
     foreach(explode('\$', $n->nodeValue) as $src) {
-      $p = preg_split('/\$('.VARIABLE_PATTERN.")/",$src,-1,PREG_SPLIT_DELIM_CAPTURE);
+      $p = preg_split('/\$('.VARIABLE_PATTERN.")/", $src, -1, PREG_SPLIT_DELIM_CAPTURE);
       if(count($p) < 2) return;
       foreach($p as $i => $v) {
         if($i % 2 == 0) $newNode = $this->createTextNode($v);
@@ -116,14 +116,14 @@ class HTMLPlus extends DOMDocumentPlus {
           // else
           // <p>aaa $varname</p> -> <p>aaa <em var="varname"/></p>
           if($n->parentNode->nodeValue == "\$$v") {
-            $n->parentNode->setAttribute("var",$v);
+            $n->parentNode->setAttribute("var", $v);
             continue;
           } else {
             $newNode = $this->createElement("em");
-            $newNode->setAttribute("var",$v);
+            $newNode->setAttribute("var", $v);
           }
         }
-        $n->parentNode->insertBefore($newNode,$n);
+        $n->parentNode->insertBefore($newNode, $n);
       }
     }
     $n->parentNode->removeChild($n);
@@ -134,14 +134,14 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateRoot($repair);
     $this->validateSections($repair);
     $this->validateLang($repair);
-    $this->validateId("id",$repair);
-    $this->validateId("link",$repair);
+    $this->validateId("id", $repair);
+    $this->validateId("link", $repair);
     $this->validateHid($repair);
     $this->validateHempty($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
-    $this->validateLinks("a","href",$repair);
-    $this->validateLinks("form","action",$repair);
+    $this->validateLinks("a", "href", $repair);
+    $this->validateLinks("form", "action", $repair);
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->validateEmptyContent($repair);
@@ -315,7 +315,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(is_null($h->nextElement) || $h->nextElement->nodeName != "desc") {
         if(!$repair) throw new Exception(_("Missing element 'desc'"));
         $desc = $h->ownerDocument->createElement("desc");
-        $h->parentNode->insertBefore($desc,$h->nextElement);
+        $h->parentNode->insertBefore($desc, $h->nextElement);
       }
     }
   }
@@ -331,9 +331,9 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHLink($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("link")) continue;
-      #$this->getElementById($h->getAttribute("link"),"link");
+      #$this->getElementById($h->getAttribute("link"), "link");
       $link = normalize($h->getAttribute("link"));
-      while(preg_match("/^[^a-z]/",$link)) $link = substr($link,1); // must start with a-z
+      while(preg_match("/^[^a-z]/", $link)) $link = substr($link, 1); // must start with a-z
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))
           throw new Exception(sprintf(_("Normalize link leads to empty value '%s'"), $h->getAttribute("link")));
@@ -341,7 +341,7 @@ class HTMLPlus extends DOMDocumentPlus {
       }
       if($link != $h->getAttribute("link")) {
         if(!$repair) throw new Exception(sprintf(_("Invalid link value found '%s'"), $h->getAttribute("link")));
-        if(!is_null($this->getElementById($link,"link"))) {
+        if(!is_null($this->getElementById($link, "link"))) {
           throw new Exception(sprintf(_("Normalize link leads to duplicit value '%s'"), $h->getAttribute("link")));
         }
         $h->setAttribute("link", $link);
@@ -354,7 +354,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$h->hasAttribute("author")) continue;
       if(strlen(trim($h->getAttribute("author")))) continue;
       if(!$repair) throw new Exception("Attr 'author' cannot be empty");
-      $h->parentNode->insertBefore(new DOMComment(" empty attr 'author' removed "),$h);
+      $h->parentNode->insertBefore(new DOMComment(" empty attr 'author' removed "), $h);
       $h->removeAttribute("author");
     }
   }
@@ -369,24 +369,24 @@ class HTMLPlus extends DOMDocumentPlus {
       if(is_null($ctime)) {
         if(!$repair) throw new Exception("Attribute 'mtime' requires 'ctime'");
         $ctime = $mtime;
-        $h->setAttribute("ctime",$ctime);
+        $h->setAttribute("ctime", $ctime);
       }
       $ctime_date = $this->createDate($ctime);
       if(is_null($ctime_date)) {
         if(!$repair) throw new Exception("Invalid 'ctime' attribute format");
-        $h->parentNode->insertBefore(new DOMComment(" invalid ctime='$ctime' "),$h);
+        $h->parentNode->insertBefore(new DOMComment(" invalid ctime='$ctime' "), $h);
         $h->removeAttribute("ctime");
       }
       if(is_null($mtime)) return;
       $mtime_date = $this->createDate($mtime);
       if(is_null($mtime_date)) {
         if(!$repair) throw new Exception("Invalid 'mtime' attribute format");
-        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
+        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "), $h);
         $h->removeAttribute("mtime");
       }
       if($mtime_date < $ctime_date) {
         if(!$repair) throw new Exception("'mtime' cannot be lower than 'ctime'");
-        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "),$h);
+        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "), $h);
         $h->removeAttribute("mtime");
       }
     }

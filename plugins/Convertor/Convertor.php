@@ -13,7 +13,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,5);
+    $s->setPriority($this, 5);
     $this->tmpFolder = TEMP_FOLDER."/".PLUGINS_DIR."/".get_class($this);
     if(is_dir($this->tmpFolder) || mkdir($this->tmpFolder, 0755, true)) return;
     throw new Exception(_("Unable to create convertor tmp folder"));
@@ -66,21 +66,21 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private function parseZippedDoc($f) {
     $doc = $this->transformFile($this->tmpFolder ."/$f");
     $xml = $doc->saveXML();
-    $xml = str_replace("·\n","\n",$xml); // remove "format hack" from transformation
+    $xml = str_replace("·\n", "\n", $xml); // remove "format hack" from transformation
     $mergable = array("strong", "em", "sub", "sup", "ins", "del", "q", "cite", "acronym", "code", "dfn", "kbd", "samp");
     foreach($mergable as $tag) $xml = preg_replace("/<\/$tag>(\s)*<$tag>/", "$1", $xml);
     foreach($mergable as $tag) $xml = preg_replace("/(\s)*(<\/$tag>)/", "$2$1", $xml);
 
     $doc = new HTMLPlus();
     $doc->loadXML($xml);
-    $doc->documentElement->firstElement->setAttribute("ctime",date("Y-m-d\TH:i:sP"));
+    $doc->documentElement->firstElement->setAttribute("ctime", date("Y-m-d\TH:i:sP"));
     $this->addLinks($doc);
     $this->safeValidate($doc);
     $doc->applySyntax();
 
     $ids = $this->regenerateIds($doc);
     $this->html = $doc->saveXML();
-    $this->html = str_replace(array_keys($ids),$ids,$this->html);
+    $this->html = str_replace(array_keys($ids), $ids, $this->html);
     if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
     $this->file = "$f.html";
     if(@file_put_contents($this->tmpFolder ."/$f.html", $this->html) !== false) return;
@@ -138,7 +138,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $newContent->insertVar("link", $_GET[get_class($this)]);
     $newContent->insertVar("path", TEMP_DIR."/".PLUGINS_DIR."/".get_class($this));
     if(!empty($this->importedFiles)) $newContent->insertVar("importedhtml", $this->importedFiles);
-    $newContent->insertVar("filename",$this->file);
+    $newContent->insertVar("filename", $this->file);
     if(!is_null($this->html)) {
       $newContent->insertVar("nohide", "nohide");
       $newContent->insertVar("content", $this->html);
@@ -171,26 +171,26 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if($purl["host"] == "docs.google.com") {
       $url = $purl["scheme"] ."://". $purl["host"] . $purl["path"] . "/export?format=doc";
       $headers = @get_headers($url);
-      if(strpos($headers[0],'404') !== false) {
+      if(strpos($headers[0], '404') !== false) {
         $url = $purl["scheme"] ."://". $purl["host"] . dirname($purl["path"]) . "/export?format=doc";
         $headers = @get_headers($url);
       }
     } else $headers = @get_headers($url);
-    if(strpos($headers[0],'302') !== false)
+    if(strpos($headers[0], '302') !== false)
       throw new Exception(sprintf(_("Destination URL '%s' is unaccessible; must be shared publically"), $url));
-    elseif(strpos($headers[0],'200') === false)
+    elseif(strpos($headers[0], '200') === false)
       throw new Exception(sprintf(_("Destination URL '%s' error: %s"), $url, $headers[0]));
     $data = file_get_contents($url);
-    $filename = $this->get_real_filename($http_response_header,$url);
+    $filename = $this->get_real_filename($http_response_header, $url);
     file_put_contents($this->tmpFolder ."/$filename", $data);
     return $filename;
   }
 
-  private function get_real_filename($headers,$url) {
+  private function get_real_filename($headers, $url) {
     foreach($headers as $header) {
-      if (strpos(strtolower($header),'content-disposition') !== false) {
+      if (strpos(strtolower($header), 'content-disposition') !== false) {
         $tmp_name = explode('=', $header);
-        if($tmp_name[1]) return normalize(trim($tmp_name[1],'";\''),".",false,true);
+        if($tmp_name[1]) return normalize(trim($tmp_name[1], '";\''), ".", false, true);
       }
     }
     $stripped_url = preg_replace('/\\?.*/', '', $url);
@@ -213,8 +213,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $xml = readZippedFile($f, $p);
       if(is_null($xml)) continue;
       $dom->loadXML($xml);
-      $dom = $this->transform("removePrefix.xsl",$dom);
-      #file_put_contents($file,$xml);
+      $dom = $this->transform("removePrefix.xsl", $dom);
+      #file_put_contents($file, $xml);
       $dom->save($file);
       $variables[$varName] = str_replace("\\", '/', realpath($file));
     }
@@ -223,15 +223,15 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if(is_null($xml))
       throw new Exception(sprintf(_("Unable to locate '%s' in '%s'"), "word/document.xml", $f));
     $dom->loadXML($xml);
-    $dom = $this->transform("removePrefix.xsl",$dom);
+    $dom = $this->transform("removePrefix.xsl", $dom);
     // add an empty paragraph to prevent li:following-sibling fail
     $dom->getElementsByTagName("body")->item(0)->appendChild($dom->createElement("p"));
     $dom->save($f."_document.xml"); // for debug purpose
-    return $this->transform("docx2html.xsl",$dom, $variables);
+    return $this->transform("docx2html.xsl", $dom, $variables);
   }
 
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
-    $xsl = $this->getDOMPlus($this->getDir() ."/$xslFile",false,false);
+    $xsl = $this->getDOMPlus($this->getDir() ."/$xslFile", false, false);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);

@@ -262,7 +262,7 @@ class InitServer {
         throw new Exception(_("Unable to create forbidden plugin files"));
     }
     foreach(scandir($srcDir) as $f) {
-      if(strpos($f,".") === 0) continue; // skip folders starting with a dot
+      if(strpos($f, ".") === 0) continue; // skip folders starting with a dot
       if(array_key_exists($f, $this->disabledPlugins)) continue;
       if(!touch("$destDir/PLUGIN.$f"))
         throw new Exception(_("Unable to create plugin files"));

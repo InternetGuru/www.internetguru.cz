@@ -13,7 +13,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,100);
+    $s->setPriority($this, 100);
   }
 
   public function update(SplSubject $subject) {
@@ -41,7 +41,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     $libs = array();
     foreach($ta as $t) {
       if(!$t->hasAttribute("class")) continue;
-      foreach(explode(" ",$t->getAttribute("class")) as $c) {
+      foreach(explode(" ", $t->getAttribute("class")) as $c) {
         if(array_key_exists($c, $modes)) {
           $libs[] = $modes[$c];
           break;

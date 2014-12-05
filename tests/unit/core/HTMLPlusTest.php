@@ -33,13 +33,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted empty XML");
+      $this->assertNotNull($e, "HTMLPlus accepted empty XML");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted empty XML");
+      $this->assertNotNull($e, "RelaxNG schema accepted empty XML");
     }
 
     public function testDuplicitId()
@@ -53,13 +53,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         #echo $e->getMessage();die();
       }
-      $this->assertNotNull($e,"HTMLPlus accepted duplicit ID");
+      $this->assertNotNull($e, "HTMLPlus accepted duplicit ID");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted duplicit ID");
+      $this->assertNotNull($e, "RelaxNG schema accepted duplicit ID");
     }
 
     public function testDuplicitLink()
@@ -73,13 +73,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         #echo $e->getMessage();die();
       }
-      $this->assertNotNull($e,"HTMLPlus accepted duplicit link");
+      $this->assertNotNull($e, "HTMLPlus accepted duplicit link");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted duplicit link (known issue #3)");
+      $this->assertNotNull($e, "RelaxNG schema accepted duplicit link (known issue #3)");
     }
 
     public function testHNoId()
@@ -90,13 +90,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted h with no ID");
+      $this->assertNotNull($e, "HTMLPlus accepted h with no ID");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted h with no ID");
+      $this->assertNotNull($e, "RelaxNG schema accepted h with no ID");
     }
 
     public function testHNoDescription()
@@ -107,13 +107,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted h with no desc");
+      $this->assertNotNull($e, "HTMLPlus accepted h with no desc");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted h with no desc");
+      $this->assertNotNull($e, "RelaxNG schema accepted h with no desc");
     }
 
     public function testHNoIdAdd()
@@ -126,7 +126,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
-      $this->assertTrue(is_null($e),$e);
+      $this->assertTrue(is_null($e), $e);
     }
 
     public function testHEmptyIdAdd()
@@ -138,7 +138,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
-      $this->assertTrue(is_null($e),$e);
+      $this->assertTrue(is_null($e), $e);
     }
 
     public function testHNoDescAdd()
@@ -150,7 +150,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
-      $this->assertTrue(is_null($e),$e);
+      $this->assertTrue(is_null($e), $e);
     }
 
     public function testBodyNoLang()
@@ -161,13 +161,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted body with no lang");
+      $this->assertNotNull($e, "HTMLPlus accepted body with no lang");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted body with no lang");
+      $this->assertNotNull($e, "RelaxNG schema accepted body with no lang");
     }
 
     public function testValidXML()
@@ -179,7 +179,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
-      $this->assertTrue(is_null($e),$e);
+      $this->assertTrue(is_null($e), $e);
     }
 
     public function testH1InForm()
@@ -190,13 +190,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted h1 in form (known issue #1)");
+      $this->assertNotNull($e, "HTMLPlus accepted h1 in form (known issue #1)");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted h1 in form (known issue #1)");
+      $this->assertNotNull($e, "RelaxNG schema accepted h1 in form (known issue #1)");
     }
 
     public function testListInPar()
@@ -208,7 +208,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         $e = $e->getMessage();
       }
-      $this->assertTrue(is_null($e),$e);
+      $this->assertTrue(is_null($e), $e);
     }
 
     public function testHEmpty()
@@ -219,13 +219,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted empty h");
+      $this->assertNotNull($e, "HTMLPlus accepted empty h");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted empty h (known issue #18)");
+      $this->assertNotNull($e, "RelaxNG schema accepted empty h (known issue #18)");
     }
 
     public function testHEmptyTrim()
@@ -236,13 +236,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted white-spaced h (known issue #2)");
+      $this->assertNotNull($e, "HTMLPlus accepted white-spaced h (known issue #2)");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted white-spaced h (known issue #2)");
+      $this->assertNotNull($e, "RelaxNG schema accepted white-spaced h (known issue #2)");
     }
 
     public function testHShortEmpty()
@@ -253,13 +253,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted h with empty attr short");
+      $this->assertNotNull($e, "HTMLPlus accepted h with empty attr short");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted h with empty attr short");
+      $this->assertNotNull($e, "RelaxNG schema accepted h with empty attr short");
     }
 
     public function testHLinkEmpty()
@@ -270,13 +270,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted h with empty attr link");
+      $this->assertNotNull($e, "HTMLPlus accepted h with empty attr link");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted h with empty attr link");
+      $this->assertNotNull($e, "RelaxNG schema accepted h with empty attr link");
     }
 
     public function testHLinkInvalid()
@@ -287,13 +287,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus accepted invalid link value");
+      $this->assertNotNull($e, "HTMLPlus accepted invalid link value");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted ivalid link value");
+      $this->assertNotNull($e, "RelaxNG schema accepted ivalid link value");
     }
 
     public function testHLinkInvalidRepair()
@@ -305,10 +305,10 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         echo $e->getMessage();die();
       }
-      $s1 = $this->doc->C14N(true,false);
+      $s1 = $this->doc->C14N(true, false);
       $doc = new HTMLPlus();
       $doc->loadXML('<body xml:lang="en"><h id="h.abc" link="a_be">x</h><desc/></body>');
-      $s2 = $doc->C14N(true,false);
+      $s2 = $doc->C14N(true, false);
       #echo "\n$s1\n$s2";die();
       $this->assertTrue($s1 == $s2, 'Link is not repaired as expected');
     }
@@ -322,13 +322,13 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       try {
         $this->doc->validatePlus(true);
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"HTMLPlus invalid link repair (?)");
+      $this->assertNotNull($e, "HTMLPlus invalid link repair (?)");
 
       $e = null;
       try {
         $this->doc->relaxNGValidatePlus();
       } catch (Exception $e) {}
-      $this->assertNotNull($e,"RelaxNG schema accepted invalid link value");
+      $this->assertNotNull($e, "RelaxNG schema accepted invalid link value");
     }
 
     public function testListNoItems()
@@ -340,15 +340,15 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
       } catch (Exception $e) {
         #echo $e->getMessage();die();
       }
-      $this->assertNotNull($e,"RelaxNG schema accepted list with no items");
+      $this->assertNotNull($e, "RelaxNG schema accepted list with no items");
     }
 
    public function testClone()
     {
       $this->doc->loadXML('<body xml:lang="en"><h id="h.abc">x</h><desc/></body>');
-      $s1 = $this->doc->C14N(true,false);
+      $s1 = $this->doc->C14N(true, false);
       $doc = clone $this->doc;
-      $s2 = $doc->C14N(true,false);
+      $s2 = $doc->C14N(true, false);
       $this->assertTrue($s1 == $s2, 'Clones are not equal');
     }
 

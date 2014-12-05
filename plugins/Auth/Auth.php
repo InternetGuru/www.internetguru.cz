@@ -6,7 +6,7 @@ class Auth extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,0);
+    $s->setPriority($this, 0);
   }
 
   public function update(SplSubject $subject) {
@@ -36,7 +36,7 @@ class Auth extends Plugin implements SplObserver {
       else $access = false;
     }
     if(isset($_SERVER['REMOTE_USER'])
-      && in_array($_SERVER['REMOTE_USER'], array(USER_ID,"admin"))) {
+      && in_array($_SERVER['REMOTE_USER'], array(USER_ID, "admin"))) {
       $this->loggedUser = $_SERVER['REMOTE_USER'];
     }
     if($access || !is_null($this->loggedUser)) return;

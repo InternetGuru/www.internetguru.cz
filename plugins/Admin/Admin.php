@@ -28,7 +28,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this,5);
+    $s->setPriority($this, 5);
     $this->dataFileStatuses = array(_("new file"), _("active file"), _("inactive file"));
   }
 
@@ -66,7 +66,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function isPost() {
-    return isset($_POST["content"],$_POST["userfilehash"]);
+    return isset($_POST["content"], $_POST["userfilehash"]);
   }
 
   public function getContent(HTMLPlus $content) {
@@ -74,7 +74,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
     $format = $this->type;
     if($this->type == "html") $format = "html+";
-    if(!is_null($this->schema)) $format .= " (" . pathinfo($this->schema,PATHINFO_BASENAME) . ")";
+    if(!is_null($this->schema)) $format .= " (" . pathinfo($this->schema, PATHINFO_BASENAME) . ")";
 
     $newContent = $this->getHTMLPlus();
 
@@ -137,12 +137,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function showContent($user) {
 
     if($this->replace) {
-      $df = findFile($this->defaultFile,$user);
+      $df = findFile($this->defaultFile, $user);
       if(!$df) return "n/a";
       return file_get_contents($df);
     }
 
-    $doc = $this->getDOMPlus($this->defaultFile,false,$user);
+    $doc = $this->getDOMPlus($this->defaultFile, false, $user);
     $doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();
@@ -150,7 +150,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function getHash($data) {
-    return hash(FILE_HASH_ALGO,$data);
+    return hash(FILE_HASH_ALGO, $data);
   }
 
   /**
@@ -171,7 +171,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function setDefaultFile() {
 
     $f = $_GET[get_class($this)];
-    if(strpos($f,"/") === 0) $f = substr($f,1); // remove trailing slash
+    if(strpos($f, "/") === 0) $f = substr($f, 1); // remove trailing slash
     if(!strlen($f)) {
       $l = getCurLink() . ".html";
       if(findFile($l)) $f = $l;
@@ -180,11 +180,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
 
     // direct user/admin file input is disallowed
-    if(strpos($f,USER_ROOT_DIR."/") === 0) {
-      $this->redir(substr($f,strlen(USER_ROOT_DIR)+1));
+    if(strpos($f, USER_ROOT_DIR."/") === 0) {
+      $this->redir(substr($f, strlen(USER_ROOT_DIR)+1));
     }
-    if(strpos($f,ADMIN_ROOT_DIR."/") === 0) {
-      $this->redir(substr($f,strlen(ADMIN_ROOT_DIR)+1));
+    if(strpos($f, ADMIN_ROOT_DIR."/") === 0) {
+      $this->redir(substr($f, strlen(ADMIN_ROOT_DIR)+1));
     }
 
     // redir to plugin if no path or extension
@@ -194,16 +194,16 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->redir($pluginFile);
     }
 
-    if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{2,4}$~", $f))
+    if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{2, 4}$~", $f))
       throw new Exception(sprintf(_("Unsupported file name format '%s'"), $f));
 
     $this->defaultFile = $f;
-    $this->type = pathinfo($f,PATHINFO_EXTENSION);
+    $this->type = pathinfo($f, PATHINFO_EXTENSION);
 
     // no direct match with extension [and path]
-    if(findFile($f,false)) return;
+    if(findFile($f, false)) return;
     // check/redir to plugin dir
-    if(!findFile(PLUGINS_DIR . "/$f",false)) return;
+    if(!findFile(PLUGINS_DIR . "/$f", false)) return;
     // found plugin file
     $this->redir(PLUGINS_DIR . "/$f");
 
@@ -234,9 +234,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function processXml() {
-    if(!in_array($this->type,array("xml","xsl","html"))) return;
+    if(!in_array($this->type, array("xml", "xsl", "html"))) return;
     // get default schema
-    if($df = findFile($this->defaultFile,false)) {
+    if($df = findFile($this->defaultFile, false)) {
       $this->schema = $this->getSchema($df);
     }
     // get user schema if default schema not exists
@@ -281,7 +281,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     #  $this->dataFile = $this->changeStatus($this->dataFile);
     #  $this->statusChanged = true;
     #}
-    if(!in_array($_POST["userfilehash"],array($this->getHash($post_n),$this->getHash($post_rn)))) {
+    if(!in_array($_POST["userfilehash"], array($this->getHash($post_n), $this->getHash($post_rn)))) {
       $this->contentChanged = true;
     }
   }
@@ -315,7 +315,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function validateXml(DOMDocumentPlus $doc) {
     if(is_null($this->schema)) return;
-    switch(pathinfo($this->schema,PATHINFO_EXTENSION)) {
+    switch(pathinfo($this->schema, PATHINFO_EXTENSION)) {
       case "rng":
       $doc->relaxNGValidatePlus($this->schema);
       break;
@@ -325,12 +325,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function getSchema($f) {
-    $h = fopen($f,"r");
+    $h = fopen($f, "r");
     fgets($h); // skip first line
-    $line = str_replace("'",'"',fgets($h));
+    $line = str_replace("'", '"', fgets($h));
     fclose($h);
-    if(!preg_match('<\?xml-model href="([^"]+)" ?\?>',$line,$m)) return;
-    $schema = findFile($m[1],false,false);
+    if(!preg_match('<\?xml-model href="([^"]+)" ?\?>', $line, $m)) return;
+    $schema = findFile($m[1], false, false);
     if(!file_exists($schema))
       throw new Exception(sprintf(_("Schema file '%s' not found"), $schema));
     return $schema;
@@ -340,7 +340,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $redir = getRoot().getCurLink();
     if(!isset($_POST["saveandgo"]))
       $redir .= "?" . get_class($this) . (strlen($f) ? "=$f" : "");
-    redirTo($redir,null,true);
+    redirTo($redir, null, true);
   }
 
 }

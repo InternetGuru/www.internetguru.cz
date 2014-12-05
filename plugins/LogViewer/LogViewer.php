@@ -62,8 +62,8 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function file_get_contents($file) {
-    if(substr($file,-4) != ".zip") return file_get_contents($file);
-    return readZippedFile($file,substr(pathinfo($file,PATHINFO_BASENAME),0,-4));
+    if(substr($file, -4) != ".zip") return file_get_contents($file);
+    return readZippedFile($file, substr(pathinfo($file, PATHINFO_BASENAME), 0, -4));
   }
 
   private function getFilePath($fName) {
@@ -78,7 +78,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $files = array();
     foreach(scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {
       if(!is_file("$dir/$f")) continue;
-      $id = (substr($f,-4) == ".zip") ? substr($f,0,-4) : $f;
+      $id = (substr($f, -4) == ".zip") ? substr($f, 0, -4) : $f;
       $files[$id] = "$dir/$f";
       if(count($files) == $limit) break;
     }
