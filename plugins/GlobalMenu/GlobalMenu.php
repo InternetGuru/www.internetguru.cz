@@ -4,7 +4,7 @@ class GlobalMenu extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 60);
+    $s->setPriority($this, 1);
   }
 
   public function update(SplSubject $subject) {

@@ -15,7 +15,7 @@ define("TEMP_DIR", "temp");
 define("CACHE_DIR", "cache");
 define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
-define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2, 4}");
+define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-z0-9]{2,4}");
 define('FILE_HASH_ALGO', 'crc32b');
 define('STATUS_PREINIT', 'preinit');
 define('STATUS_INIT', 'init');

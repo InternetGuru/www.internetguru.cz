@@ -106,8 +106,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->validateLinks("a", "href", true);
     $contentPlus->validateLinks("form", "action", true);
     $contentPlus->validateLinks("object", "data", true);
-    $contentPlus->fragToLinks(Cms::getContentFull(), getRoot(), "a", "href");
-    $contentPlus->fragToLinks(Cms::getContentFull(), getRoot(), "form", "action");
+    $contentPlus->fragToLinks(Cms::getContentFull(), "a", "href");
+    $contentPlus->fragToLinks(Cms::getContentFull(), "form", "action");
 
     // check object.data mime/size
     $this->validateImages($contentPlus);

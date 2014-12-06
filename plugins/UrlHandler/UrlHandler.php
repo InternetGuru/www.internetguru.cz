@@ -33,7 +33,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $path = parse_url($var->nodeValue, PHP_URL_PATH);
       if(!strlen($path)) $path = getCurLink(); // current link if empty string
       while(strpos($path, "/") === 0) $path = substr($path, 1); // empty string if root
-      if($path != getCurLink() && strlen($path) && is_null(Cms::getContentFull()->getElementById($path, "link"))) {
+      if($path != getCurLink() && strlen($path) && !DOMBuilder::isLink($path)) {
         new Logger(sprintf(_("Redirection link '%s' not found"), $path), "warning");
         continue;
       }
@@ -64,13 +64,9 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function proceed() {
-    $h = Cms::getContentFull()->getElementById(getCurLink(), "link");
-    if(!is_null($h)) return;
+    if(DOMBuilder::isLink(getCurLink())) return;
     $newLink = normalize(getCurLink());
-    $links = array();
-    foreach(Cms::getContentFull()->getElementsByTagName("h") as $h) {
-      if($h->hasAttribute("link")) $links[] = $h->getAttribute("link");
-    }
+    $links = DOMBuilder::getLinks();
     $linkId = $this->findSimilar($links, $newLink);
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];

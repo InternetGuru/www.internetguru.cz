@@ -11,6 +11,8 @@ class DOMBuilder {
   const DEBUG = false;
   #const USE_CACHE = true;
   private static $included = array();
+  private static $identifiers = array(); // id => closest or self link
+  private static $links = array(); // link => self id
 
   public static function buildHTMLPlus($filePath, $user=true) {
     $doc = new HTMLPlus();
@@ -24,6 +26,23 @@ class DOMBuilder {
     if($replace) return $doc;
     self::globalReadonly($doc);
     return $doc;
+  }
+
+  public static function getLink($frag) {
+    if(!array_key_exists($frag, self::$identifiers)) return null;
+    if($frag == key(self::$identifiers)) return getRoot();
+    $link = self::$identifiers[$frag];
+    if($link == current(self::$links)) return getRoot()."#$frag";
+    if(self::$links[$link] != $frag) $link .= "#".self::$links[$link];
+    return $link;
+  }
+
+  public static function getLinks() {
+    return array_keys(self::$links);
+  }
+
+  public static function isLink($link) {
+    return array_key_exists($link, self::$links);
   }
 
   private static function globalReadonly(DOMDocumentPlus $doc) {
@@ -113,7 +132,11 @@ class DOMBuilder {
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null) {
     if($doc instanceof HTMLPlus) {
       $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
-      Cms::addVariableItem("html", str_replace($remove, array(), "?$filePath"));
+      $fShort = str_replace($remove, array(), "?$filePath");
+      if(array_key_exists(realpath($filePath), self::$included))
+        throw new Exception(sprintf(_("File '%s' already included"), $fShort));
+      self::$included[realpath($filePath)] = null;
+      Cms::addVariableItem("html", $fShort);
     }
     if(is_file(dirname($filePath)."/.".basename($filePath)))
       throw new Exception(sprintf(_("File disabled")));
@@ -135,8 +158,28 @@ class DOMBuilder {
     if(!($doc instanceof HTMLPlus)) return;
     // generate ctime/mtime from file if not set
     self::setMtime($doc, $filePath);
+    // register ids; repair if duplicit
+    self::registerIds($doc);
     // HTML+ include
     self::insertIncludes($doc, $filePath);
+  }
+
+  private static function registerIds(HTMLPlus $doc) {
+    $doc->validateId("id", true, self::$identifiers);
+    $doc->validateId("link", true, self::$links);
+    foreach(self::$identifiers as $id => $null) {
+      if(!is_null($null)) continue;
+      $e = $doc->getElementById($id);
+      if($e->hasAttribute("link")) {
+        self::$identifiers[$id] = $e->getAttribute("link");
+        continue;
+      }
+      $h = $e->getPreviousElement("h");
+      while(!is_null($h) && !$h->hasAttribute("link")) {
+        $h = $h->parentNode->getPreviousElement("h");
+      }
+      self::$identifiers[$id] = $h->getAttribute("link");
+    }
   }
 
   private static function setAuthor(HTMLPlus $doc, $author) {
@@ -166,7 +209,6 @@ class DOMBuilder {
   }
 
   private static function insertIncludes(HTMLPlus $doc, $filePath) {
-    self::$included[realpath($filePath)] = null;
     $includes = array();
     foreach($doc->getElementsByTagName("include") as $include) $includes[] = $include;
     if(!count($includes)) return;
@@ -175,8 +217,8 @@ class DOMBuilder {
     $toStripTag = array();
     foreach($includes as $include) {
       try {
-        $include->setAncestorValue("author", "h");
-        self::insertHtmlPlus($include, dirname($filePath));
+        $author = $include->getAncestorValue("author", "h");
+        self::insertHtmlPlus($include, dirname($filePath), $author);
         $toStripElement[] = $include;
       } catch(Exception $e) {
         $toStripTag[] = $include;
@@ -189,23 +231,20 @@ class DOMBuilder {
       count($toStripElement), count($includes)), null, $start_time);
   }
 
-  private static function insertHtmlPlus(DOMElement $include, $homeDir) {
+  private static function insertHtmlPlus(DOMElement $include, $homeDir, $author) {
     $val = $include->getAttribute("src");
     $file = realpath("$homeDir/$val");
     if($file === false) {
       Cms::addVariableItem("html", $val);
       throw new Exception(sprintf(_("Included file '%s' not found"), $val));
     }
-    if(array_key_exists($file, self::$included))
-      throw new Exception(sprintf(_("File '%s' already included"), $val));
-    self::$included[$file] = null;
     if(pathinfo($val, PATHINFO_EXTENSION) != "html")
       throw new Exception(sprintf(_("Included file extension '%s' must be .html"), $val));
     if(strpos($file, realpath("$homeDir/")) !== 0)
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $val));
     try {
       $doc = new HTMLPlus();
-      self::loadDOM("$homeDir/$val", $doc, $include->getAttribute("author"));
+      self::loadDOM("$homeDir/$val", $doc, $author);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
@@ -222,6 +261,8 @@ class DOMBuilder {
     try {
       $include->ownerDocument->validatePlus();
     } catch(Exception $e) {
+      echo $include->ownerDocument->saveXML();
+      die();
       $include->ownerDocument->validatePlus(true);
       new Logger(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }

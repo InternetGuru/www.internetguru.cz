@@ -131,7 +131,7 @@ class DOMDocumentPlus extends DOMDocument {
     return $path.$query;
   }
 
-  public function fragToLinks(HTMLPlus $src, $root="/", $eName="a", $aName="href") {
+  public function fragToLinks(HTMLPlus $src, $eName="a", $aName="href") {
     $toStrip = array();
     foreach($this->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
@@ -143,7 +143,7 @@ class DOMDocumentPlus extends DOMDocument {
       if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
         $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
         if($path == "/") $path = "";
-        if(strlen($path) && is_null($src->getElementById($path, "link"))) {
+        if(strlen($path) && !DOMBuilder::isLink($path)) {
           $toStrip[] = array($a, sprintf(_("Link '%s' not found"), $path));
           continue; // link not exists
         }
@@ -151,7 +151,7 @@ class DOMDocumentPlus extends DOMDocument {
           $toStrip[] = array($a, _("Cyclic link found"));
           continue; // link is cyclic (except form@action)
         }
-        $a->setAttribute($aName, $root.$path.$queryUrl);
+        $a->setAttribute($aName, getRoot().$path.$queryUrl);
         continue; // localize link
       }
       $frag = $pLink["fragment"];
@@ -163,27 +163,12 @@ class DOMDocumentPlus extends DOMDocument {
         }
         continue; // ignore visible headings
       }
-      $linkedElement = $src->getElementById($frag);
-      if(is_null($linkedElement)) {
+      $link = DOMBuilder::getLink($frag);
+      if(is_null($link)) {
         $toStrip[] = array($a, sprintf(_("Identifier '%s' not found"), $frag));
         continue; // id not exists
       }
-      $rootHeading = $src->documentElement->firstElement;
-      if($linkedElement->nodeName == "h" && $linkedElement->hasAttribute("link")) {
-        if($linkedElement->isSameNode($rootHeading))
-          $a->setAttribute($aName, $root);
-        else
-          $a->setAttribute($aName, $root.$linkedElement->getAttribute("link"));
-        continue; // is root heading, else outter heading
-      }
-      $h = $linkedElement->parentNode->getPreviousElement("h");
-      while(!is_null($h) && !$h->hasAttribute("link")) {
-        $h = $h->parentNode->getPreviousElement("h");
-      }
-      if($h->isSameNode($rootHeading))
-        $a->setAttribute($aName, $root."#".$frag);
-      else
-        $a->setAttribute($aName, $root.$h->getAttribute("link")."#".$frag);
+      $a->setAttribute($aName, $link);
     }
     foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
@@ -214,26 +199,27 @@ class DOMDocumentPlus extends DOMDocument {
     $this->validateId(null, $repair);
   }
 
-  public function validateId($attr=null, $repair=false) {
+  public function validateId($attr=null, $repair=false, &$identifiers = array()) {
     if(is_null($attr)) $attr = "id";
     $xpath = new DOMXPath($this);
-    $identifiers = array();
     $duplicit = array();
     foreach($xpath->query("//*[@$attr]") as $e) {
       if(!array_key_exists($e->getAttribute($attr), $identifiers)) {
-        $identifiers[$e->getAttribute($attr)] = null;
+        $val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
+        $identifiers[$e->getAttribute($attr)] = $val;
         continue;
       }
       if(!$repair) throw new Exception(sprintf(_("Duplicit %s attribute '%s' found"), $attr, $e->getAttribute($attr)));
       $duplicit[] = $e;
     }
+    if(!count($duplicit)) return;
     foreach($duplicit as $e) {
       $i = 1;
       while(array_key_exists($e->getAttribute($attr).$i, $identifiers)) $i++;
       $e->setAttribute($attr, $e->getAttribute($attr).$i);
-      $identifiers[$e->getAttribute($attr)] = null;
+      $val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
+      $identifiers[$e->getAttribute($attr)] = $val;
     }
-    return count($duplicit);
   }
 
   #UNUSED
