@@ -146,8 +146,8 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateAuthor($repair);
     $this->validateEmptyContent($repair);
     $this->validateFirstHeadingLink($repair);
-    $this->validateFirstHeadingAuthor();
     $this->validateFirstHeadingCtime();
+    $this->validateFirstHeadingAuthor();
     $this->validateMeta();
     $this->relaxNGValidatePlus();
   }

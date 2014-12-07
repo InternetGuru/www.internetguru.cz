@@ -91,7 +91,7 @@ function normalize($s, $extKeep="", $tolower=true, $convertToUtf8=false) {
   return $ext;
 }
 
-function saveRewriteFile($src, $dest, $keepOld=true) {
+function safeRewriteFile($src, $dest, $keepOld=true) {
   if(!file_exists($src))
     throw new LoggerException("Source file '$src' not found");
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true))
@@ -107,7 +107,7 @@ function saveRewriteFile($src, $dest, $keepOld=true) {
   return true;
 }
 
-function saveRewrite($content, $dest) {
+function safeRewrite($content, $dest) {
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true)) return false;
   if(!file_exists($dest)) return file_put_contents($dest, $content);
   $b = file_put_contents("$dest.new", $content);

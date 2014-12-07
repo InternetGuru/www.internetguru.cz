@@ -145,15 +145,16 @@ class DOMBuilder {
     if(!@$doc->load($filePath))
       throw new Exception(sprintf(_("Invalid XML file")));
     // validate, save if repaired
+    if($doc instanceof HTMLPlus
+      && (self::setCtime($doc, $filePath) || self::setAuthor($doc, $author))
+      && (!safeRewrite($doc->saveXML(), $filePath)))
+      throw new Exception(sprintf(_("Unable to autocorrect ctime/author")));
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
-      if($doc instanceof HTMLPlus) {
-        self::setCtime($doc, $filePath);
-        self::setAuthor($doc, $author);
-      }
       $doc->validatePlus(true);
-      saveRewrite($doc->saveXML(), $filePath);
+      if(!safeRewrite($doc->saveXML(), $filePath))
+        throw new Exception(sprintf(_("Unable to save autocorrected file: %s"), $e->getMessage()));
       new Logger(sprintf(_("HTML+ autocorrected: %s"), $e->getMessage()), Logger::LOGGER_INFO);
     }
     if(!($doc instanceof HTMLPlus)) return;
@@ -186,18 +187,20 @@ class DOMBuilder {
   }
 
   private static function setAuthor(HTMLPlus $doc, $author) {
-    if(is_null($author)) return;
+    if(is_null($author)) return false;
     $h = $doc->documentElement->firstElement;
-    if($h->nodeName != "h" || $h->hasAttribute("author")) return;
+    if($h->nodeName != "h" || $h->hasAttribute("author")) return false;
     $h->setAttribute("author", $author);
+    return true;
   }
 
   private static function setCtime(HTMLPlus $doc, $filePath) {
     $h = $doc->documentElement->firstElement;
-    if($h->hasAttribute("ctime")) return;
+    if($h->hasAttribute("ctime")) return false;
     $c = new DateTime();
     $c->setTimeStamp(filectime($filePath));
     $h->setAttribute("ctime", $c->format(DateTime::W3C));
+    return true;
   }
 
   private static function setMtime(HTMLPlus $doc, $filePath) {
