@@ -73,9 +73,28 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
     $doc = new HTMLPlus();
     $doc->loadXML($xml);
-    $doc->documentElement->firstElement->setAttribute("ctime", date("Y-m-d\TH:i:sP"));
+    if(is_null($doc->documentElement->firstElement)
+      || $doc->documentElement->firstElement->nodeName != "h") {
+      Cms::addMessage(_("Unable to import document; probably missing heading"), Cms::MSG_WARNING);
+      return;
+    }
+    try {
+      $doc->validatePlus(true);
+    } catch(Exception $e) {}
+    $this->parseContent($doc, "h", "short");
+    $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
-    $this->safeValidate($doc);
+    $doc->documentElement->firstElement->setAttribute("ctime", date("Y-m-d\TH:i:sP"));
+    $doc->documentElement->firstElement->setAttribute("author", Cms::getVariable("cms-author"));
+    try {
+      $doc->validatePlus(true);
+    } catch(Exception $e) {
+      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
+      Cms::addMessage(_("Use @ to specify short/link attributes for heading"), Cms::MSG_INFO);
+      Cms::addMessage(_("Eg. This Is Long Heading @ Short Heading"), Cms::MSG_INFO);
+      Cms::addMessage(_("Use @ to specify kw attribute for description"), Cms::MSG_INFO);
+      Cms::addMessage(_("Eg. This is description @ these, are, some, keywords"), Cms::MSG_INFO);
+    }
     $doc->applySyntax();
 
     $ids = $this->regenerateIds($doc);
@@ -84,52 +103,23 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
     $this->file = "$f.html";
     if(@file_put_contents($this->tmpFolder."/$f.html", $this->html) !== false) return;
-    $m = sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f);
-    new Logger($m, "error");
+    new Logger(sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f), "error");
   }
 
-  private function safeValidate(HTMLPlus $doc) {
-    try {
-      $doc->validatePlus(true);
-    } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
+  private function parseContent(HTMLPlus $doc, $eName, $aName) {
+    foreach($doc->getElementsByTagName($eName) as $e) {
+      $var = explode("@", $e->nodeValue);
+      if(count($var) < 2) continue;
+      $e->setAttribute($aName, trim(array_pop($var)));
+      $e->nodeValue = trim(implode("@", $var));
     }
   }
 
   private function addLinks(HTMLPlus $doc) {
-    foreach($doc->getElementsByTagName("h") as $h) {
-      $var = explode("@", $h->nodeValue);
-      if(count($var) > 1) {
-        $h->setAttribute("short", trim(array_pop($var)));
-        $h->nodeValue = trim(implode("@", $var));
-      }
-      $e = $h->nextElement;
-      while(!is_null($e)) {
-        if($e->nodeName == "h") break;
-        if($e->nodeName == "section") {
-          if(!$h->hasAttribute("short"))
-            $h->setAttribute("short", $this->getShortString($h->nodeValue));
-          $h->setAttribute("link", normalize($h->getAttribute("short")));
-          break;
-        }
-        $e = $e->nextElement;
-      }
+    foreach($doc->getElementsByTagName("h") as $e) {
+      if(!$e->hasAttribute("short")) continue;
+      $e->setAttribute("link", normalize($e->getAttribute("short")));
     }
-  }
-
-  private function getShortString($str) {
-    $lLimit = 9;
-    $hLimit = 16;
-    if(strlen($str) < $hLimit) return $str;
-    $w = explode(" ", $str);
-    $sStr = $w[0];
-    $i = 1;
-    while(strlen($sStr) < $lLimit) {
-      if(!isset($w[$i])) break;
-      $sStr .= " ".$w[$i++];
-    }
-    if(strlen($str) - strlen($sStr) < $hLimit - $lLimit) return $str;
-    return $sStr."…";
   }
 
   public function getContent(HTMLPlus $c) {
