@@ -125,7 +125,7 @@ class DOMDocumentPlus extends DOMDocument {
     if(isset($pLink["fragment"])) return $query."#".$pLink["fragment"];
     $path = isset($pLink["path"]) ? $pLink["path"] : "";
     while(strpos($path, ".") === 0) $path = substr($path, 1);
-    if(isAtLocalhost() && strpos($path, substr(getRoot(), 0, -1)) === 0)
+    if(IS_LOCALHOST && strpos($path, substr(getRoot(), 0, -1)) === 0)
       $path = substr($path, strlen(getRoot())-1);
     while(strpos($path, "/") === 0) $path = substr($path, 1);
     return $path.$query;

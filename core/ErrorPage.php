@@ -41,7 +41,7 @@ class ErrorPage {
     // http://xkcd.com/1350/#p:10e7f9b6-b9b8-11e3-8003-002590d77bdd
     foreach(scandir($dir) as $img) {
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
-      $resFolder = isAtLocalhost() ? false : CMSRES_ROOT_DIR."/".CMS_RELEASE;
+      $resFolder = IS_LOCALHOST ? false : CMSRES_ROOT_DIR."/".CMS_RELEASE;
       $i[] = getRes("$dir/$img", LIB_DIR."/".$this->relDir."/$img", $resFolder);
     }
     return $i;

@@ -25,7 +25,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($subject->getStatus() == STATUS_INIT) {
       Cms::setOutputStrategy($this);
       $domain = $_SERVER["REQUEST_SCHEME"]."://".$_SERVER["HTTP_HOST"];
-      if(isAtLocalhost()) $domain .= substr(getRoot(), 0, -1);
+      if(IS_LOCALHOST) $domain .= substr(getRoot(), 0, -1);
       Cms::setVariable("url", $domain);
       Cms::setVariable("link", getCurLink());
     }
@@ -246,7 +246,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function createRootFavicon($target) {
-    if(isAtLocalhost()) return;
+    if(IS_LOCALHOST) return;
     $link = "favicon.ico";
     if(is_link($link) && readlink($link) == $target) return;
     if(symlink($target, "$link~") && rename("$link~", $link)) return;

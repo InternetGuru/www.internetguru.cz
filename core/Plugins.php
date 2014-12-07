@@ -33,11 +33,11 @@ class Plugins implements SplSubject {
       throw new Exception(sprintf(_("Missing plugin folder '%s'"), $dir));
     foreach(scandir($dir) as $p) {
       if(strpos($p, ".") === 0 || file_exists("$dir/.$p")) continue; // skip.plugin
-      if(isAtLocalhost() && file_exists(PLUGINS_FOLDER."/.$p")) {
+      if(IS_LOCALHOST && file_exists(PLUGINS_FOLDER."/.$p")) {
         $this->availableObservers[$p] = null;
         continue;
       }
-      if(!isAtLocalhost() && (file_exists(".PLUGIN.$p") || !file_exists("PLUGIN.$p"))) {
+      if(!IS_LOCALHOST && (file_exists(".PLUGIN.$p") || !file_exists("PLUGIN.$p"))) {
         if(!file_exists(".PLUGIN.$p")) $this->availableObservers[$p] = null;
         continue;
       }

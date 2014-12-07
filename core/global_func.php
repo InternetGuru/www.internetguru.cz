@@ -1,14 +1,5 @@
 <?php
 
-function isAtLocalhost() {
-  if(!isset($_SERVER["REMOTE_ADDR"])) return true;
-  if($_SERVER["REMOTE_ADDR"] == "127.0.0.1") return true;
-  if(substr($_SERVER["REMOTE_ADDR"], 0, 8) == "192.168.") return true;
-  if(substr($_SERVER["REMOTE_ADDR"], 0, 3) == "10.") return true;
-  if($_SERVER["REMOTE_ADDR"] == "::1") return true;
-  return false;
-}
-
 function absoluteLink($link=null) {
   if(is_null($link)) $link = $_SERVER["REQUEST_URI"];
   if(substr($link, 0, 1) == "/") $link = substr($link, 1);
@@ -73,7 +64,7 @@ function getCurLink($query=false) {
 }
 
 function getRoot() {
-  if(isAtLocalhost()) {
+  if(IS_LOCALHOST) {
     $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
     return "/".$dir[1]."/";
   }

@@ -12,7 +12,7 @@ class Auth extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
     $this->handleRequest();
-    if(isAtLocalhost()) {
+    if(IS_LOCALHOST) {
       Cms::setVariable("logged_user", "admin");
       return;
     }
@@ -26,7 +26,7 @@ class Auth extends Plugin implements SplObserver {
   }
 
   private function handleRequest() {
-    if(isAtLocalhost()) return;
+    if(IS_LOCALHOST) return;
     $cfg = $this->getDOMPlus();
     $url = getCurLink(true);
     $access = true;

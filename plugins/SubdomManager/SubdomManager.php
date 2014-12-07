@@ -17,7 +17,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   public function update(SplSubject $subject) {
-    if(isAtLocalhost() || !isset($_GET[get_class($this)])) {
+    if(IS_LOCALHOST || !isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;
     }
