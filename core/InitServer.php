@@ -45,7 +45,8 @@ class InitServer {
     }
     // create CMS_VER file from index or newest stable available version
     if(!file_exists("$serverSubdomDir/CMS_VER.".$this->subdomVars["CMS_VER"])) {
-      $this->subdomVars["CMS_VER"] = CMS_BEST_RELEASE;
+      if(!is_null(CMS_BEST_RELEASE)) $this->subdomVars["CMS_VER"] = CMS_BEST_RELEASE;
+      else $this->subdomVars["CMS_VER"] = CMS_RELEASE;
     }
     $folders = $this->setFolderVars($serverSubdomDir);
     if($update && !is_file("$serverSubdomDir/CONFIG.user"))

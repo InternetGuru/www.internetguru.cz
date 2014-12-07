@@ -62,22 +62,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     try {
       $subdom = $this->getSubdomFromRequest();
       if(is_null($subdom)) throw new Exception(_("Invalid POST request"));
-      if(isset($_POST["mirror"]) && strlen($_POST["mirror"])) {
-        if(!preg_match("/^".SUBDOM_PATTERN."$/", $_POST["mirror"]))
-          throw new Exception(_("Invalid mirror subdom format"));
-        $userDir = $this->getSubdomVar("USER_DIR", $_POST["mirror"]);
-        if(is_null($userDir))
-          throw new Exception(sprintf(_("Subdom '%s' configuration file not found"), $_POST["mirror"]));
-        if(is_dir(USER_ROOT_FOLDER."/$subdom"))
-          throw new Exception(sprintf(_("Subdom '%s' user folder exists"), $subdom));
-        duplicateDir(SUBDOM_ROOT_FOLDER."/".$_POST["mirror"], false);
-        duplicateDir(USER_ROOT_FOLDER."/$userDir");
-        $sFolder = SUBDOM_ROOT_FOLDER."/$subdom";
-        if(!rename(SUBDOM_ROOT_FOLDER."/~".$_POST["mirror"], $sFolder)
-          || !rename(USER_ROOT_FOLDER."/~$userDir", USER_ROOT_FOLDER."/$subdom")
-          || !rename("$sFolder/USER_DIR.$userDir", "$sFolder/USER_DIR.$subdom")
-          ) throw new Exception(_("Unable to create subdom mirror"));
-      }
       new InitServer($subdom, false, true);
       $link = getCurLink()."?".get_class($this)."=$subdom";
       if(isset($_POST["redir"])) $link = "http://$subdom.".getDomain();
@@ -96,7 +80,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     if(isset($_POST["activate"])) {
       return $this->processActivateSubdom($_GET[get_class($this)]);
     }
-    if(!is_dir($_GET[get_class($this)]) && !isset($_POST["deactivate"])) {
+    if(!is_dir("../".$_GET[get_class($this)]) && !isset($_POST["deactivate"])) {
       return $this->processCreateSubdom($_GET[get_class($this)]);
     }
     if(!is_file("../".$_GET[get_class($this)]."/USER_ID.".USER_ID))
@@ -143,7 +127,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   private function processCreateSubdom($subdom) {
     if(!preg_match("/^".USER_ID.SUBDOM_PATTERN."$/", $subdom))
-      throw new Exception(_("Invalid subdom format"));
+      throw new Exception(sprintf(_("Invalid subdom format; must start with '%s'"), USER_ID));
     if(is_dir(SUBDOM_ROOT_FOLDER."/$subdom") && is_dir("../$subdom"))
       throw new Exception(sprintf(_("Subdom '%s' already exists"), $subdom));
     $this->successMsg = sprintf(_("Subdom %s successfully created"), $subdom);
@@ -163,11 +147,11 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $var = explode(".", $f, 2);
       switch($var[0]) {
         case "CMS_VER":
-        case "USER_DIR":
         case "FILES_DIR":
-        if(!isset($_POST[$var[0]])) throw new Exception(sprintf(_("Missing POST data '%s'"), $var[0]));
-        if(!rename("$subdomFolder/$f", "$subdomFolder/{$var[0]}.".$_POST[$var[0]]))
-          throw new Exception(sprintf(_("Unable to set '%s' to '%s'"), $var[0], $_POST[$var[0]]));
+        $this->updateVarFile($subdomFolder, $f, $var[0]);
+        break;
+        case "USER_DIR":
+        $this->updateVarFile($subdomFolder, $f, $var[0], isset($_POST["duplicate"]) ? USER_ROOT_FOLDER : null);
         break;
         case "PLUGIN":
         if(!in_array($var[1], $_POST["PLUGINS"]) && !unlink("$subdomFolder/$f"))
@@ -182,6 +166,24 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       throw new Exception(sprintf(_("No changes made in '%s'"), $subdom));
     $this->successMsg = sprintf(_("Subdom %s successfully updated"), $subdom);
     return $subdom;
+  }
+
+  private function updateVarFile($subdomFolder, $f, $varName, $root = null) {
+    if(!isset($_POST[$varName]))
+      throw new Exception(sprintf(_("Missing POST data '%s'"), $varName));
+    if(!is_null($root)) {
+      $bakDir = duplicateDir("$root/".$_POST[$varName]);
+      $i = 1;
+      $newDir = $_POST[$varName];
+      while(file_exists("$root/$newDir$i")) $i++;
+      if(!rename($bakDir, "$root/$newDir$i"))
+        throw new Exception(sprintf(_("Unable to duplicate directory '%s'"), $_POST[$varName]));
+      $newFile = "$varName.$newDir$i";
+    } else {
+      $newFile = "$varName.".$_POST[$varName];
+    }
+    if(rename("$subdomFolder/$f", "$subdomFolder/$newFile")) return;
+    throw new Exception(sprintf(_("Unable to update '%s'"), $varName));
   }
 
   public function getContent(HTMLPlus $content) {
@@ -202,21 +204,6 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("domain", getDomain());
     $newContent->insertVar("curlink", getCurLink()."?".get_class($this));
-
-    $d = new DOMDocumentPlus();
-    $set = $d->appendChild($d->createElement("var"));
-    $o = $d->createElement("option", "n/a");
-    $o->setAttribute("value", "");
-    $set->appendChild($o);
-    foreach($this->userSubdoms as $subdom => $null) {
-      $o = $d->createElement("option", $subdom);
-      if(isset($_POST["mirror"]) && $_POST["mirror"] == $subdom) {
-        $o->setAttribute("selected", "selected");
-      }
-      #$o->setAttribute("value", $subdom);
-      $set->appendChild($o);
-    }
-    if($set->childNodes->length) $newContent->insertVar("subdoms", $set);
 
     if(isset($_POST["new_subdom"])) {
       $newContent->insertVar("new_nohide", "nohide");
@@ -285,6 +272,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       if($dir == $current) $o->setAttribute("selected", "selected");
     }
     $doc->insertVar("userDirs", $set);
+    if($subdom == $showSubdom && isset($_POST["duplicate"]))
+      $doc->insertVar("checked", "checked");
 
     // files directories
     $current = $this->getSubdomVar("FILES_DIR", $subdom);
@@ -327,8 +316,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $subdirs = array();
     foreach(scandir($dir) as $f) {
       if(is_null($filter) && strpos($f, ".") === 0) continue;
-      if(!is_dir("$dir/$f")) continue;
       if(!is_null($filter) && !preg_match($filter, $f)) continue;
+      if(!is_dir("$dir/$f")) continue;
       $subdirs[$f] = !file_exists("$dir/.$f");
     }
     return $subdirs;

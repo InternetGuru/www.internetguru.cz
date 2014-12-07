@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <body xml:lang="cs">
-  <h id="h.adf" author="InternetGuru">Manažer poddomén</h>
+  <h id="h.adf" author="InternetGuru" ctime="2014-11-22" link="subdom_manager">Manažer poddomén</h>
   <desc kw="manažer, správa, poddomény, plugin">Správa poddomén uživatele <em var="cms-user_id">n/a</em> na doméně <em var="domain">n/a</em>.</desc>
   <form action="/" method="post" var="curlink@action">
     <fieldset class="hidable" var="new_nohide@class"><legend><strong>Nová</strong> poddoména</legend>
@@ -8,9 +8,6 @@
         <dt><label for="new_subdom">Název nové poddomény</label></dt>
         <dd><samp var="cms-user_id">n/a</samp><input type="text" name="new_subdom" id="new_subdom" var="new_subdom@value"/><samp var="domain">.%s</samp></dd>
         <dd>Nová poddoména musí začínat písmenem a dále může obsahovat písmena nebo čísla (<samp>[a-z][a-z0-9]*</samp>).</dd>
-        <dt><label for="mirror">Vytvořit jako zrcadlo (kopii) z existující poddomény</label></dt>
-        <dd><select name="mirror" id="mirror"><option var="subdoms">n/a</option></select></dd>
-        <dd>Zduplikují se pouze uživatelská data a uživatelské nastavení poddomény.</dd>
         <dt>Akce</dt>
         <dd><input type="submit" value="Vytvořit poddoménu"/></dd>
         <dd><input type="submit" name="redir" value="Vytvořit poddoménu a přesměrovat"/></dd>
@@ -25,6 +22,7 @@
         <dd>Při změně verze se některé soubory (.htaccess a robots.txt) mohou aktualizovat se zpožděním; běžně do minuty.</dd>
         <dt><label var="userDirId@for">Datové a konfigurační soubory, aktuálně <samp var="USER_DIR">neznámé</samp></label></dt>
         <dd><select name="USER_DIR" var="userDirId@id"><option var="userDirs">n/a</option></select></dd>
+        <dd><label><input type="checkbox" name="duplicate" var="checked@checked"/> Vytvořit jako zrcadlo (kopii) existujících souborů</label></dd>
         <dt><label var="filesDirId@for">Veřejně dostupný adresář, aktuálně <samp var="FILES_DIR">neznámý</samp></label></dt>
         <dd><select name="FILES_DIR" var="filesDirId@id"><option var="filesDirs">n/a</option></select></dd>
         <dt>Dostupná rozšíření (konstanta <samp>PLUGIN</samp>)</dt>

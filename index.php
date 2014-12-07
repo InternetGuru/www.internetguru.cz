@@ -46,6 +46,7 @@ if(IS_LOCALHOST) {
   define('CACHE_FOLDER', '../'.CURRENT_SUBDOM_DIR.'/'.CACHE_DIR);
   define("APACHE_RESTART_FILEPATH", null);
 } else {
+  define("CMS_ROOT_FOLDER", "/var/www/cms");
   $cmsVer = null;
   foreach(scandir(CMS_ROOT_FOLDER) as $v) {
     if(!preg_match("/^\d+\.\d+$/", $v)) continue;
@@ -64,7 +65,6 @@ if(IS_LOCALHOST) {
     exit;
   }
   define('CMS_RELEASE', $cmsVer);
-  define("CMS_ROOT_FOLDER", "/var/www/cms");
   define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
   define('CMS_DEBUG', is_file("CMS_DEBUG"));
   define('CMSRES_ROOT_DIR', "cmsres");
