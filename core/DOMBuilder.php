@@ -30,10 +30,11 @@ class DOMBuilder {
 
   public static function getLink($frag) {
     if(!array_key_exists($frag, self::$identifiers)) return null;
+    reset(self::$identifiers);
     if($frag == key(self::$identifiers)) return getRoot();
     $link = self::$identifiers[$frag];
     if($link == current(self::$links)) return getRoot()."#$frag";
-    if(self::$links[$link] != $frag) $link .= "#".self::$links[$link];
+    if(self::$links[$link] != $frag) $link .= "#$frag";
     return $link;
   }
 
@@ -162,6 +163,8 @@ class DOMBuilder {
     self::registerIds($doc);
     // HTML+ include
     self::insertIncludes($doc, $filePath);
+    #print_r(self::$identifiers);
+    #print_r(self::$links);
   }
 
   private static function registerIds(HTMLPlus $doc) {
