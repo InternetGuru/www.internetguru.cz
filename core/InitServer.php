@@ -21,21 +21,26 @@ class InitServer {
       "FILES_DIR" => $subdom,
     );
     $serverSubdomDir = "../$subdom";
-    $this->updateSubdomVars($serverSubdomDir);
+    $serverSubdomDelDir = "../.$subdom";
     $userSubdomDir = "../../".$this->subdomVars["USER_ID"]."/subdom/$subdom";
+    $userSubdomDelDir = "../../".$this->subdomVars["USER_ID"]."/subdom/.$subdom";
+    $this->updateSubdomVars($serverSubdomDir);
     if(!is_dir($serverSubdomDir)) {
       if(!$update) throw new Exception(sprintf(_("Subdom '%s' does not exist; try forcing updateSubdom"), $subdom));
-      $this->createSubdom($serverSubdomDir);
+      if(is_dir($serverSubdomDelDir)) {
+        $this->activateSubdom($serverSubdomDelDir, $serverSubdomDir);
+        return;
+      } else $this->createSubdom($serverSubdomDir);
     }
     if(count(scandir($serverSubdomDir)) == 2) {
       if(!$update) throw new Exception(sprintf(_("Subdom '%s' is not available; try forcing updateSubdom"), $subdom));
       $this->acquireSubdom($serverSubdomDir);
     }
-    if($update && !is_file("$serverSubdomDir/USER_ID.".$this->subdomVars["USER_ID"]))
-      throw new Exception(sprintf(_("Unauthorized subdom '%s' modification - user names mismatch"), $this->subdom));
-    $userDelDir = dirname($userSubdomDir)."/.$subdom";
-    if($update && is_dir($userDelDir)) {
-      $this->safeDeleteSubdom($userDelDir, $serverSubdomDir);
+    if($update) $this->verifySubdomOwner($serverSubdomDir);
+    if($update && is_dir($userSubdomDelDir)) {
+      $this->safelyRemoveDir($userSubdomDelDir);
+      if(!is_dir($serverSubdomDir)) return;
+      $this->safelyRemoveDir($serverSubdomDir, $serverSubdomDelDir);
       return;
     }
     // create CMS_VER file from index or newest stable available version
@@ -54,6 +59,17 @@ class InitServer {
     }
     $this->completeStructure($serverSubdomDir);
     if($setConst) $this->setConst($folders);
+  }
+
+  private function activateSubdom($src, $dest) {
+    $this->verifySubdomOwner($src);
+    if(rename($src, $dest)) return;
+    throw new Exception(sprintf(_("Unable to activate subdom '%s'"), $this->subdom));
+  }
+
+  private function verifySubdomOwner($dir) {
+    if(is_file("$dir/USER_ID.".$this->subdomVars["USER_ID"])) return;
+    throw new Exception(sprintf(_("Unauthorized subdom '%s' modification - user names mismatch"), $this->subdom));
   }
 
   private function setFolderVars($serverSubdomDir) {
@@ -94,24 +110,14 @@ class InitServer {
     }
   }
 
-  private function safeDeleteSubdom($userDotSubdom, $destDir) {
-    // safely remove/rename user.subdom folder
-    $this->safelyRemoveDir($userDotSubdom);
-    // disable server subdom
-    if(!is_dir($destDir)) return;
-    $this->safelyRemoveDir($destDir);
-  }
-
-  private function safelyRemoveDir($dir) {
-    if(count(scandir($dir)) == 2) {
-      if(rmdir($dir)) return;
+  private function safelyRemoveDir($src, $dest=null) {
+    if(count(scandir($src)) == 2) {
+      if(rmdir($src)) return;
       throw new Exception(sprintf(_("Unable to remove folder '%s'"), ".".$this->subdom));
     }
-    $i = 0;
-    $newDir = basename($dir)."~";
-    while(file_exists(dirname($dir)."/$newDir")) $newDir = basename($dir)."~".++$i;
-    if(rename($dir, dirname($dir)."/$newDir")) return;
-    throw new Exception(sprintf(_("Unable to rename folder '%s'"), basename($dir)));
+    if(is_null($dest)) return;
+    if(!is_dir($dest) && rename($src, $dest)) return;
+    throw new Exception(sprintf(_("Unable to deactivate subdom '%s'"), $this->subdom));
   }
 
   private function createSubdom($dir) {
@@ -130,10 +136,9 @@ class InitServer {
 
   private function completeStructure($subdomDir) {
     // copy index
-    if(is_link("$subdomDir/index.php")
-      || !is_file("$subdomDir/index.php")
-      || getFileHash(CMS_FOLDER."/index.php") != getFileHash("$subdomDir/index.php"))
-      saveRewriteFile(CMS_FOLDER."/index.php", "$subdomDir/index.php", false);
+    if(is_link("$subdomDir/index.php") || !is_file("$subdomDir/index.php")
+      || getFileHash(CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php") != getFileHash("$subdomDir/index.php"))
+      saveRewriteFile(CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php", "$subdomDir/index.php", false);
     // create symlinks
     $rob = preg_match("/^ig\d/", $this->subdom) ? "robots_off.txt" : "robots_default.txt";
     $files = array(

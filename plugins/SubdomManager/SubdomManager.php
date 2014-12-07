@@ -23,7 +23,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
     if($subject->getStatus() != STATUS_PREINIT) return;
     if(!empty($_POST)) $this->processPost();
-    $this->cmsVariants = $this->getSubdirs(CMS_ROOT_FOLDER, "/^[a-z0-9.]+$/");
+    $this->cmsVariants = $this->getSubdirs(CMS_ROOT_FOLDER, "/^[a-z0-9][a-z0-9.]+$/");
     foreach($this->cmsVariants as $verDir => $active) { // including deprecated
       $verFile = CMS_ROOT_FOLDER."/$verDir/".CMS_VERSION_FILENAME;
       $this->cmsVersions[$verDir] = is_file($verFile) ? file_get_contents($verFile) : "unknown";
@@ -32,7 +32,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     $this->userDirs = $this->getSubdirs(USER_ROOT_FOLDER, "/^".SUBDOM_PATTERN."$/");
     $this->filesDirs = $this->getSubdirs(FILES_ROOT_FOLDER);
     $this->syncSubdomsToUser();
-    $this->userSubdoms = $this->getSubdirs(SUBDOM_ROOT_FOLDER, "/^".SUBDOM_PATTERN."$/");
+    $this->userSubdoms = $this->getSubdirs(SUBDOM_ROOT_FOLDER, "/^\.?".SUBDOM_PATTERN."$/");
     foreach($this->userSubdoms as $subdom => $null) {
       if(!isset($this->userDirs[$subdom])) $this->userDirs[$subdom] = true;
       if(!isset($this->filesDirs[$subdom])) $this->filesDirs[$subdom] = true;
@@ -93,13 +93,29 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     if(isset($_POST["new_subdom"]))
       return $this->processCreateSubdom(USER_ID.$_POST["new_subdom"]);
     if(!strlen($_GET[get_class($this)])) return null;
-    if(!is_dir($_GET[get_class($this)]) && !isset($_POST["delete"]))
+    if(isset($_POST["activate"])) {
+      return $this->processActivateSubdom($_GET[get_class($this)]);
+    }
+    if(!is_dir($_GET[get_class($this)]) && !isset($_POST["deactivate"])) {
       return $this->processCreateSubdom($_GET[get_class($this)]);
+    }
     if(!is_file("../".$_GET[get_class($this)]."/USER_ID.".USER_ID))
-      throw new Exception(sprintf(_("Unauthorized subdom '%s' modification by '%s'"), $_GET[get_class($this)], USER_ID));
-    if(isset($_POST["delete"]))
-      return $this->processDeleteSubdom($_GET[get_class($this)]);
+      throw new Exception(sprintf(_("Unauthorized subdom '%s' modification by '%s'")
+        , $_GET[get_class($this)], USER_ID));
+    if(isset($_POST["deactivate"]))
+      return $this->processDeactivateSubdom($_GET[get_class($this)]);
     return $this->processUpdateSubdom($_GET[get_class($this)]);
+  }
+
+  private function processActivateSubdom($subdom) {
+    $aDir = SUBDOM_ROOT_FOLDER."/".$subdom;
+    $dDir = SUBDOM_ROOT_FOLDER."/.".$subdom;
+    if(!is_dir($aDir)) {
+      if(!is_dir($dDir) || !rename($dDir, $aDir))
+        throw new Exception(sprintf(_("Unable to activate subdom '%s'"), $subdom));
+    }
+    $this->successMsg = sprintf(_("Subdom %s successfully activated"), $subdom);
+    return $subdom;
   }
 
   private function getSubdomVar($varName, $subdom) {
@@ -110,20 +126,18 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     return null;
   }
 
-  private function processDeleteSubdom($subdom) {
+  private function processDeactivateSubdom($subdom) {
     $activeDir = SUBDOM_ROOT_FOLDER."/$subdom";
     $inactiveDir = SUBDOM_ROOT_FOLDER."/.$subdom";
     if(is_dir($activeDir)) {
-      $i = 0;
-      $newSubdom = "$subdom~";
-      while(file_exists(SUBDOM_ROOT_FOLDER."/$newSubdom")) $newSubdom = "$subdom~".++$i;
-      if(!rename($activeDir, SUBDOM_ROOT_FOLDER."/$newSubdom"))
-        throw new Exception(sprintf(_("Unable to backup subdom '%s' setup"), $subdom));
-    }
-    if(!is_dir($inactiveDir) && !mkdir($inactiveDir)) {
+      if(is_dir($inactiveDir))
+        throw new Exception(sprintf(_("Deactivate directory '%s' already exists"), ".$subdom"));
+      if(!rename($activeDir, $inactiveDir))
+        throw new Exception(sprintf(_("Unable to rename '%s' dir to '%s'"), $subom, ".$subdom"));
+    } elseif(!is_dir($inactiveDir) && !mkdir($inactiveDir)) {
       throw new Exception(sprintf(_("Unable to create '%s' dir"), ".$subdom"));
     }
-    $this->successMsg = sprintf(_("Subdom %s successfully deleted"), $subdom);
+    $this->successMsg = sprintf(_("Subdom %s successfully deactivated"), $subdom);
     return $subdom;
   }
 
@@ -172,13 +186,15 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   public function getContent(HTMLPlus $content) {
     Cms::getOutputStrategy()->addCssFile($this->getDir()."/SubdomManager.css");
+    $q = sprintf(_("Deactivate subdom '%s'?"), '$subdom');
     Cms::getOutputStrategy()->addJs("
     var forms = document.getElementsByTagName('form');
     for(var i=0; i<forms.length; i++) {
-      if(typeof forms[i]['delete'] !== 'object') continue;
-      forms[i]['delete'].addEventListener('click', function(e){
+      if(typeof forms[i]['deactivate'] !== 'object') continue;
+      forms[i]['deactivate'].addEventListener('click', function(e){
         var subdom = e.target.form['action'].split('=')[1];
-        if(confirm('Delete subdom \"' + subdom + '\"?')) return;
+        var question = '$q';
+        if(confirm(question.replace('\$subdom', subdom))) return;
         e.preventDefault();
       }, false);
     }");
@@ -220,6 +236,10 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   private function modifyDOM(DOMDocumentPlus $doc, $subdom) {
+    if(strpos($subdom, ".") === 0) {
+      $doc->insertVar("inactive", null);
+      $subdom = substr($subdom, 1);
+    } else $doc->insertVar("active", null);
     $doc->insertVar("linkName", "<strong>$subdom</strong>.".getDomain());
     $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
     $doc->insertVar("userDirId", "$subdom-USER_DIR");
@@ -306,7 +326,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   private function getSubdirs($dir, $filter = null) {
     $subdirs = array();
     foreach(scandir($dir) as $f) {
-      if(strpos($f, ".") === 0 || !is_dir("$dir/$f")) continue;
+      if(is_null($filter) && strpos($f, ".") === 0) continue;
+      if(!is_dir("$dir/$f")) continue;
       if(!is_null($filter) && !preg_match($filter, $f)) continue;
       $subdirs[$f] = !file_exists("$dir/.$f");
     }

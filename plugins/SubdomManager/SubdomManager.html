@@ -22,6 +22,7 @@
       <dl>
         <dt><label var="cmsVerId@for">Verze IGCMS, aktuálně <samp var="CMS_VER">neznámá</samp> <strong var="deprecated">(nepodporovaná verze)</strong></label></dt>
         <dd><select name="CMS_VER" var="cmsVerId@id"><option var="cmsVers">n/a</option></select></dd>
+        <dd>Při změně verze se některé soubory (.htaccess a robots.txt) mohou aktualizovat se zpožděním; běžně do minuty.</dd>
         <dt><label var="userDirId@for">Datové a konfigurační soubory, aktuálně <samp var="USER_DIR">neznámé</samp></label></dt>
         <dd><select name="USER_DIR" var="userDirId@id"><option var="userDirs">n/a</option></select></dd>
         <dt><label var="filesDirId@for">Veřejně dostupný adresář, aktuálně <samp var="FILES_DIR">neznámý</samp></label></dt>
@@ -30,11 +31,11 @@
         <dd class="plugins"><samp var="plugins">n/a</samp></dd>
         <dd>*) Uložené neaplikované změny</dd>
         <dt>Akce</dt>
-        <dd><input type="submit" value="Aplikovat změny"/></dd>
-        <dd><input type="submit" name="redir" value="Aplikovat změny a přesměrovat"/></dd>
-        <dd>Změna verze se může projevit se zpožděním (běžně do minuty)!</dd>
-        <dd><input type="submit" name="delete" value="Zrušit poddoménu"/></dd>
-        <dd>Zrušení poddomény nemá vliv na uživatelská data!</dd>
+        <dd var="inactive"><input type="submit" value="Aplikovat změny"/></dd>
+        <dd var="inactive"><input type="submit" name="redir" value="Aplikovat změny a přesměrovat"/></dd>
+        <dd var="inactive"><input type="submit" name="deactivate" value="Deaktivovat poddoménu"/></dd>
+        <dd var="inactive">Deaktivace poddomény nemá vliv na uživatelská data!</dd>
+        <dd var="active"><input type="submit" name="activate" value="Aktivovat poddoménu"/></dd>
       </dl>
     </fieldset>
   </form>
