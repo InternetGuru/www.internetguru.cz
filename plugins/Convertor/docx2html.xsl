@@ -118,7 +118,7 @@
                   </desc>
                 </xsl:when>
                 <xsl:otherwise>·
-  <xsl:copy-of select="$secIndent"/><desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found --></xsl:text></desc>
+  <xsl:copy-of select="$secIndent"/><desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found (use @ to specify keywords) --></xsl:text></desc>
                   <xsl:if test="not($nextHPos = $curHPos+1)">
                     <xsl:apply-templates select="//p[position() = $curHPos+1]">
                       <xsl:with-param name="pIndent" select="$secIndent"/>

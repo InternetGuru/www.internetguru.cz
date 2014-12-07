@@ -3,6 +3,7 @@
 #todo: export
 #todo: support file upload
 #todo: js copy content to clipboard
+#todo: get real creation date?
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
   private $error = false;
@@ -84,7 +85,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->parseContent($doc, "h", "short");
     $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
-    $doc->documentElement->firstElement->setAttribute("ctime", date("Y-m-d\TH:i:sP"));
+    $c = new DateTime("now");
+    $doc->documentElement->firstElement->setAttribute("ctime", $c->format(DateTime::W3C));
     $doc->documentElement->firstElement->setAttribute("author", Cms::getVariable("cms-author"));
     try {
       $doc->validatePlus(true);
