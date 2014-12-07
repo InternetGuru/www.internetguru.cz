@@ -2,10 +2,34 @@
 
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
+  private $defaultAuthor = null;
+  private $defaultCtime = null;
+  private $defaultHeading = null;
+  private $defaultDesc = null;
+  private $defaultKw = null;
   const RNG_FILE = "HTMLPlus.rng";
 
   function __construct($version="1.0", $encoding="utf-8") {
     parent::__construct($version, $encoding);
+    $c = new DateTime("now");
+    $this->defaultCtime = $c->format(DateTime::W3C);
+    $this->defaultHeading = _("Some Required Heading");
+    $this->defaultDesc = _("Some required description");
+    $this->defaultKw = _("some, required, keywords");
+  }
+
+  public function __set($vName, $vValue) {
+
+    if(!is_null($vValue) && (!is_string($vValue) || !strlen($vValue)))
+      throw new Exception(_("Variable value must be non-empty string or null"));
+    switch($vName) {
+      case "defaultAuthor":
+      case "defaultCtime":
+      case "defaultHeading":
+      case "defaultDesc":
+      case "defaultKw":
+      $this->$vName = $vValue;
+    }
   }
 
   public function __clone() {
@@ -146,19 +170,25 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateAuthor($repair);
     $this->validateEmptyContent($repair);
     $this->validateFirstHeadingLink($repair);
-    $this->validateFirstHeadingCtime();
-    $this->validateFirstHeadingAuthor();
-    $this->validateMeta();
+    $this->validateFirstHeadingCtime($repair);
+    $this->validateFirstHeadingAuthor($repair);
+    $this->validateMeta($repair);
     $this->relaxNGValidatePlus();
   }
 
-  private function validateMeta() {
+  private function validateMeta($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("link")) continue;
-      if(!strlen(trim($h->nextElement->nodeValue)))
-        throw new Exception("Empty element desc following heading with attribute link found");
-      if(!$h->nextElement->hasAttribute("kw") || !strlen(trim($h->nextElement->getAttribute("kw"))))
-        throw new Exception("Attribute kw following heading with link not found or empty");
+      if(!strlen(trim($h->nextElement->nodeValue))) {
+        if(!$repair || is_null($this->defaultDesc))
+          throw new Exception("Empty element desc following heading with attribute link found");
+        $h->nextElement->nodeValue = $this->defaultDesc;
+      }
+      if(!$h->nextElement->hasAttribute("kw") || !strlen(trim($h->nextElement->getAttribute("kw")))) {
+        if(!$repair || is_null($this->defaultKw))
+          throw new Exception("Attribute kw following heading with link not found or empty");
+        $h->nextElement->setAttribute("kw", $this->defaultKw);
+      }
     }
   }
 
@@ -171,16 +201,20 @@ class HTMLPlus extends DOMDocumentPlus {
     $h->setAttribute("link", $link);
   }
 
-  private function validateFirstHeadingAuthor() {
+  private function validateFirstHeadingAuthor($repair) {
     $h = $this->headings->item(0);
     if($h->hasAttribute("author")) return;
-    throw new Exception(_("First heading attribute 'author' missing"));
+    if(!$repair || is_null($this->defaultAuthor))
+      throw new Exception(_("First heading attribute 'author' missing"));
+    $h->setAttribute("author", $this->defaultAuthor);
   }
 
-  private function validateFirstHeadingCtime() {
+  private function validateFirstHeadingCtime($repair) {
     $h = $this->headings->item(0);
     if($h->hasAttribute("ctime")) return;
-    throw new Exception(_("First heading attribute 'ctime' missing"));
+    if(!$repair || is_null($this->defaultCtime))
+      throw new Exception(_("First heading attribute 'ctime' missing"));
+    $h->setAttribute("ctime", $this->defaultCtime);
   }
 
   public function relaxNGValidatePlus($f=null) {
@@ -304,8 +338,9 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHempty($repair) {
     foreach($this->headings as $h) {
       if(strlen(trim($h->nodeValue))) continue;
-      if(!$repair) throw new Exception(_("Heading content must not be empty"));
-      $h->nodeValue = _("Some Heading");
+      if(!$repair || is_null($this->defaultHeading))
+        throw new Exception(_("Heading content must not be empty"));
+      $h->nodeValue = $this->defaultHeading;
     }
   }
 

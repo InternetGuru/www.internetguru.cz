@@ -73,6 +73,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     foreach($mergable as $tag) $xml = preg_replace("/(\s)*(<\/$tag>)/", "$2$1", $xml);
 
     $doc = new HTMLPlus();
+    #todo: $doc->defaultCtime = ???;
+    $doc->defaultAuthor = Cms::getVariable("cms-author");
+    $doc->documentElement->firstElement->setAttribute("author", Cms::getVariable("cms-author"));
     $doc->loadXML($xml);
     if(is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h") {
@@ -85,9 +88,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->parseContent($doc, "h", "short");
     $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
-    $c = new DateTime("now");
-    $doc->documentElement->firstElement->setAttribute("ctime", $c->format(DateTime::W3C));
-    $doc->documentElement->firstElement->setAttribute("author", Cms::getVariable("cms-author"));
     try {
       $doc->validatePlus(true);
     } catch(Exception $e) {

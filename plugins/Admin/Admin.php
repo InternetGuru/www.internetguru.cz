@@ -243,8 +243,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(is_null($this->schema) && file_exists($this->dataFile)) {
       $this->schema = $this->getSchema($this->dataFile);
     }
-    if($this->type == "html") $doc = new HTMLPlus();
-    else $doc = new DOMDocumentPlus();
+    if($this->type == "html") {
+      $doc = new HTMLPlus();
+      $doc->defaultAuthor = Cms::getVariable("cms-author");
+    } else $doc = new DOMDocumentPlus();
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
       $rootName = "body";
       if($this->type != "html") {
