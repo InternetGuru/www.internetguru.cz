@@ -167,7 +167,7 @@ class HTMLPlus extends DOMDocumentPlus {
     if($h->hasAttribute("link")) return;
     if(!$repair) throw new Exception(_("First heading attribude 'link' missing"));
     if($h->hasAttribute("short")) $link = normalize($h->getAttribute("short"));
-    else $link = normalize($h->nodeValue);
+    else $link = normalize(getShortString($h->nodeValue));
     $h->setAttribute("link", $link);
   }
 

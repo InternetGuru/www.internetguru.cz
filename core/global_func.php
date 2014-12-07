@@ -285,4 +285,19 @@ function getDirHash($dirPath) {
   return hash(FILE_HASH_ALGO, implode("", scandir($dirPath)));
 }
 
+function getShortString($str) {
+  $lLimit = 9;
+  $hLimit = 16;
+  if(strlen($str) < $hLimit) return $str;
+  $w = explode(" ", $str);
+  $sStr = $w[0];
+  $i = 1;
+  while(strlen($sStr) < $lLimit) {
+    if(!isset($w[$i])) break;
+    $sStr .= " ".$w[$i++];
+  }
+  if(strlen($str) - strlen($sStr) < $hLimit - $lLimit) return $str;
+  return $sStr."…";
+}
+
 ?>
