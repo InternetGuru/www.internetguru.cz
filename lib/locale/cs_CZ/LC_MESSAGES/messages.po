@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-05 21:09+0100\n"
-"PO-Revision-Date: 2014-12-05 21:11+0100\n"
+"POT-Creation-Date: 2014-12-08 15:52+0100\n"
+"PO-Revision-Date: 2014-12-08 16:12+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: cs_CZ.UTF8\n"
 "Language: cs_CZ\n"
@@ -41,84 +41,90 @@ msgstr "HTML+ generované rozšířením %s bylo automaticky opraveno: %s"
 msgid "Following variable(s) causing HTML+ error: %s"
 msgstr "Následující proměnné způsobují chybu v HTML+: %s"
 
-#: D:\wamp\www\cms/core/Cms.php:147
+#: D:\wamp\www\cms/core/Cms.php:141
 msgid "Adding message after output - forcing flash"
 msgstr "Vynucený 'flash' pro systémouvou zprávu přidanou po výpise"
 
-#: D:\wamp\www\cms/core/Cms.php:184
+#: D:\wamp\www\cms/core/Cms.php:178
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: D:\wamp\www\cms/core/Cms.php:205
+#: D:\wamp\www\cms/core/Cms.php:199
 msgid "Content is not set"
 msgstr "Obsah není nastaven"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:72
+#: D:\wamp\www\cms/core/DOMBuilder.php:88
 #, php-format
 msgid "Unable to admin-update XML: %s"
 msgstr "Nepodařilo se aplikovat administrátorské XML: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:82
+#: D:\wamp\www\cms/core/DOMBuilder.php:98
 #, php-format
 msgid "Unable to user-update XML: %s"
 msgstr "Nepodařilo se aplikovat uživatelské XML: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:89
+#: D:\wamp\www\cms/core/DOMBuilder.php:105
+#: D:\wamp\www\cms/core/global_func.php:132
 #, php-format
 msgid "File '%s' not found"
 msgstr "Soubor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:108
+#: D:\wamp\www\cms/core/DOMBuilder.php:124
 #, php-format
 msgid "Unable to load '%s': %s"
 msgstr "Nepodařilo se načíst soubor '%s': %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:125
-#, php-format
-msgid "File disabled"
-msgstr "Soubor je neaktivní"
-
-#: D:\wamp\www\cms/core/DOMBuilder.php:128
-#, php-format
-msgid "Invalid XML file"
-msgstr "Nevalidní syntaxe XML"
-
-#: D:\wamp\www\cms/core/DOMBuilder.php:139
-#, php-format
-msgid "HTML+ autocorrected: %s"
-msgstr "HTML+ byl automaticky opraven: %s"
-
-#: D:\wamp\www\cms/core/DOMBuilder.php:194
-#, php-format
-msgid "Inserted %s of %s HTML+ file(s)"
-msgstr "Vloženo %s z %s HTML+ souborů"
-
-#: D:\wamp\www\cms/core/DOMBuilder.php:203
-#, php-format
-msgid "Included file '%s' not found"
-msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
-
-#: D:\wamp\www\cms/core/DOMBuilder.php:206
+#: D:\wamp\www\cms/core/DOMBuilder.php:140
 #, php-format
 msgid "File '%s' already included"
 msgstr "Soubor '%s' byl již vložen"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:209
+#: D:\wamp\www\cms/core/DOMBuilder.php:145
+#, php-format
+msgid "File disabled"
+msgstr "Soubor je neaktivní"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:149
+#, php-format
+msgid "Invalid XML file"
+msgstr "Nevalidní syntaxe XML"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:162
+#, php-format
+msgid "Unable to save autocorrected file: %s"
+msgstr "Nepodařilo se uložit soubor po automatické opravě: '%s'"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:163
+#, php-format
+msgid "HTML+ autocorrected: %s"
+msgstr "HTML+ byl automaticky opraven: %s"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:224
+#, php-format
+msgid "Inserted %s of %s HTML+ file(s)"
+msgstr "Vloženo %s z %s HTML+ souborů"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:233
+#, php-format
+msgid "Included file '%s' not found"
+msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:236
 #, php-format
 msgid "Included file extension '%s' must be .html"
 msgstr "Přípona vkládaného souboru '%s' musí být .html"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:211
+#: D:\wamp\www\cms/core/DOMBuilder.php:238
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:216
+#: D:\wamp\www\cms/core/DOMBuilder.php:243
 #, php-format
 msgid "Unable to import '%s': %s"
 msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:224
+#: D:\wamp\www\cms/core/DOMBuilder.php:251
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -126,12 +132,12 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:232
+#: D:\wamp\www\cms/core/DOMBuilder.php:261
 #, php-format
 msgid "HTML+ autocorrected after inserting '%s': %s"
 msgstr "HTML+ automaticky opraven po vložení souboru '%s': %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:282
+#: D:\wamp\www\cms/core/DOMBuilder.php:311
 #, php-format
 msgid "ID '%s' conflicts with element '%s'"
 msgstr "Atribut ID '%s' koliduje s elementem '%s'"
@@ -179,34 +185,34 @@ msgstr "Nalezen cyklický fragment"
 msgid "Identifier '%s' not found"
 msgstr "Identifikátor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/DOMDocumentPlus.php:203
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:188
 msgid "Readonly element hidden"
 msgstr "Skrytý element s atributem 'readonly'"
 
-#: D:\wamp\www\cms/core/DOMDocumentPlus.php:227
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:212
 #, php-format
 msgid "Duplicit %s attribute '%s' found"
 msgstr "Byl nalezen duplicitní atribut %s s hodnotou '%s'"
 
-#: D:\wamp\www\cms/core/DOMDocumentPlus.php:256
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:242
 #, php-format
 msgid "Unable to find HTML+ RNG schema '%s'"
 msgstr "Nepodařilo se nalézt HTML+ RNG schéma '%s'"
 
-#: D:\wamp\www\cms/core/DOMDocumentPlus.php:260
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:246
 msgid "relaxNGValidate() internal error occured"
 msgstr "Došlo k vnitřní chybě funkce relaxNGValidate()"
 
-#: D:\wamp\www\cms/core/DOMDocumentPlus.php:264
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:250
 msgid "Caution: this message may be misleading"
 msgstr "Upozornění: tato informace může být zavádějící"
 
-#: D:\wamp\www\cms/core/DOMDocumentPlus.php:336
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:322
 #, php-format
 msgid "Unable to insert array variable '%s' into '%s'"
 msgstr "Obsah proměnné '%s' se nepodařilo vložit do '%s' jako pole"
 
-#: D:\wamp\www\cms/core/DOMDocumentPlus.php:350
+#: D:\wamp\www\cms/core/DOMDocumentPlus.php:336
 #, php-format
 msgid "Unable to parse variable '%s'"
 msgstr "Proměnnou '%s' se nepodařilo zpracovat"
@@ -216,108 +222,120 @@ msgstr "Proměnnou '%s' se nepodařilo zpracovat"
 msgid "Attribute '%s' stripped"
 msgstr "Atribut '%s' byl odstraněn"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:168
+#: D:\wamp\www\cms/core/HTMLPlus.php:16
+msgid "Some Required Heading"
+msgstr "Nějaký povinný nadpis"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:17
+msgid "Some required description"
+msgstr "Nějaké povinné shrnutí"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:18
+msgid "some, required, keywords"
+msgstr "nějaká, klíčová, slova"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:24
+msgid "Variable value must be non-empty string or null"
+msgstr "Hodnota proměnné musí být neprázdný řetězec nebo null"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:198
 msgid "First heading attribude 'link' missing"
 msgstr "V prvním nadpisu chybí atribut 'link'"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:177
+#: D:\wamp\www\cms/core/HTMLPlus.php:208
 msgid "First heading attribute 'author' missing"
 msgstr "V prvním nadpisu chybí atribut 'author'"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:183
+#: D:\wamp\www\cms/core/HTMLPlus.php:216
 msgid "First heading attribute 'ctime' missing"
 msgstr "V prvním nadpisu chybí atribut 'ctime'"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:192
+#: D:\wamp\www\cms/core/HTMLPlus.php:226
 msgid "Root element not found"
 msgstr "Nebyl nalezen kořenový element"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:194
+#: D:\wamp\www\cms/core/HTMLPlus.php:228
 msgid "Root element must be 'body'"
 msgstr "Kořenový element musí být 'body'"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:199
+#: D:\wamp\www\cms/core/HTMLPlus.php:233
 msgid "Attribute 'xml:lang' is missing in element body"
 msgstr "V elementu body chybí atribut 'xml:lang'"
 
 # Hodnota atributu xml:lang v elementu body nového HTML+ dokumentu
-#: D:\wamp\www\cms/core/HTMLPlus.php:200
+#: D:\wamp\www\cms/core/HTMLPlus.php:234
 msgid "en"
 msgstr "cs"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:204
+#: D:\wamp\www\cms/core/HTMLPlus.php:238
 msgid "Element section cannot be empty"
 msgstr "Element section nesmí být prázdný"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:213
+#: D:\wamp\www\cms/core/HTMLPlus.php:247
 msgid "There must be exactly one heading in body element"
 msgstr "V elementu body musí být právě jeden nadpis"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:218
+#: D:\wamp\www\cms/core/HTMLPlus.php:252
 msgid "Missing heading in body element"
 msgstr "V elementu body chybí nadpis"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:235
+#: D:\wamp\www\cms/core/HTMLPlus.php:269
 msgid "Web title"
 msgstr "Titulek webu"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:237
+#: D:\wamp\www\cms/core/HTMLPlus.php:271
 msgid "Web description"
 msgstr "Popisek webu"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:246
+#: D:\wamp\www\cms/core/HTMLPlus.php:280
 msgid "Empty section(s) found"
 msgstr "Nalezen jeden nebo více prázdných elementů section"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:248
+#: D:\wamp\www\cms/core/HTMLPlus.php:282
 msgid "Empty section deleted"
 msgstr "Byl smazán prázdný element section"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:266
+#: D:\wamp\www\cms/core/HTMLPlus.php:300
 #, php-format
 msgid "Empty element(s) found: %s"
 msgstr "Nalezen jeden nebo více prázdných elementů: %s"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:279
+#: D:\wamp\www\cms/core/HTMLPlus.php:313
 msgid "Lang attribute without xml namespace"
 msgstr "Atributu lang postrádá jmenný prostor xml"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:290
+#: D:\wamp\www\cms/core/HTMLPlus.php:324
 msgid "Missing id attribute in element h"
 msgstr "V elementu h chybí atribut id"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:297
+#: D:\wamp\www\cms/core/HTMLPlus.php:331
 #, php-format
 msgid "Invalid id attribute value '%s'"
 msgstr "Chybná hodnota '%s' atributu id"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:307
+#: D:\wamp\www\cms/core/HTMLPlus.php:342
 msgid "Heading content must not be empty"
 msgstr "Nadpis nesmí být prázdný"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:308
-msgid "Some Heading"
-msgstr "Nějaký nadpis"
-
-#: D:\wamp\www\cms/core/HTMLPlus.php:316
+#: D:\wamp\www\cms/core/HTMLPlus.php:351
 msgid "Missing element 'desc'"
 msgstr "Chybí element 'desc'"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:339
+#: D:\wamp\www\cms/core/HTMLPlus.php:374
 #, php-format
 msgid "Normalize link leads to empty value '%s'"
 msgstr "Normalizace odkazu '%s' vede k prázné hodnotě"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:340
+#: D:\wamp\www\cms/core/HTMLPlus.php:375
 msgid "Empty link found"
 msgstr "Nalezen prázdný odkaz"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:343
+#: D:\wamp\www\cms/core/HTMLPlus.php:378
 #, php-format
 msgid "Invalid link value found '%s'"
 msgstr "Odkaz '%s' má chybnoý formát"
 
-#: D:\wamp\www\cms/core/HTMLPlus.php:345
+#: D:\wamp\www\cms/core/HTMLPlus.php:380
 #, php-format
 msgid "Normalize link leads to duplicit value '%s'"
 msgstr "Normalizace odkazu '%s' způsobuje duplicitu"
@@ -327,118 +345,124 @@ msgstr "Normalizace odkazu '%s' způsobuje duplicitu"
 msgid "Invalid subdom format '%s'"
 msgstr "Poddoména '%s' má chybný formát"
 
-#: D:\wamp\www\cms/core/InitServer.php:27
+#: D:\wamp\www\cms/core/InitServer.php:29
 #, php-format
 msgid "Subdom '%s' does not exist; try forcing updateSubdom"
 msgstr "Poddoména '%s' neexistuje; zkuste použít updateSubdom"
 
-#: D:\wamp\www\cms/core/InitServer.php:31
+#: D:\wamp\www\cms/core/InitServer.php:36
 #, php-format
 msgid "Subdom '%s' is not available; try forcing updateSubdom"
 msgstr "Poddoména '%s' není dostupná; zkuste použít updateSubdom"
 
-#: D:\wamp\www\cms/core/InitServer.php:35
-#, php-format
-msgid "Unauthorized subdom '%s' modification - user names mismatch"
-msgstr "Nepovolená změna poddomény '%s' - nesoulad uživatelských jmen"
-
-#: D:\wamp\www\cms/core/InitServer.php:47
+#: D:\wamp\www\cms/core/InitServer.php:53
 msgid "User subdom setup disabled; file CONFIG.user not found"
 msgstr ""
 "Uživatelské nastavení poddomény je zakázáno; soubor CONFIG.user nebyl nalezen"
 
-#: D:\wamp\www\cms/core/InitServer.php:76
-#: D:\wamp\www\cms/core/InitServer.php:121
+#: D:\wamp\www\cms/core/InitServer.php:68
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:99
+#, php-format
+msgid "Unable to activate subdom '%s'"
+msgstr "Nepodařilo se aktivovat poddoménu '%s'"
+
+#: D:\wamp\www\cms/core/InitServer.php:73
+#, php-format
+msgid "Unauthorized subdom '%s' modification - user names mismatch"
+msgstr "Nepovolená změna poddomény '%s' - nesoulad uživatelských jmen"
+
+#: D:\wamp\www\cms/core/InitServer.php:93
+#: D:\wamp\www\cms/core/InitServer.php:128
 #, php-format
 msgid "Unable to create folder '%s'"
 msgstr "Nepodařilo se vytvořit složku '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:78
-#: D:\wamp\www\cms/core/InitServer.php:255
+#: D:\wamp\www\cms/core/InitServer.php:95
+#: D:\wamp\www\cms/core/InitServer.php:270
 #, php-format
 msgid "Unable to set permissions to '%s'"
 msgstr "Nepodařilo se nastavit práva na '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:108
+#: D:\wamp\www\cms/core/InitServer.php:117
 #, php-format
 msgid "Unable to remove folder '%s'"
 msgstr "Nepodařilo se odstranit složku '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:114
+#: D:\wamp\www\cms/core/InitServer.php:121
 #, php-format
-msgid "Unable to rename folder '%s'"
-msgstr "Nepodařilo se přejmenovat složku '%s'"
+msgid "Unable to deactivate subdom '%s'"
+msgstr "Nepodařilo se deaktivovat poddoménu '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:119
+#: D:\wamp\www\cms/core/InitServer.php:126
 #, php-format
 msgid "New subdom must start with user id '%s'"
 msgstr "Nová poddoména musí začínat na uživatelské jméno  '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:126
+#: D:\wamp\www\cms/core/InitServer.php:133
 msgid "Unable to create USER_ID file"
 msgstr "Nepodařilo se vytvořit soubor USER_ID"
 
-#: D:\wamp\www\cms/core/InitServer.php:128
+#: D:\wamp\www\cms/core/InitServer.php:135
 msgid "Unable to create CONFIG file"
 msgstr "Nepodařilo se vytvořit soubor CONFIG"
 
-#: D:\wamp\www\cms/core/InitServer.php:170
+#: D:\wamp\www\cms/core/InitServer.php:185
 msgid "Unable to reset server subdom setup"
 msgstr "Nepodařilo se resetovat serverové nastavení poddomény"
 
-#: D:\wamp\www\cms/core/InitServer.php:179
+#: D:\wamp\www\cms/core/InitServer.php:194
 msgid "Unable to create configuration file(s)"
 msgstr "Nepodařilo se vytvořit konfigurační soubor(y)"
 
-#: D:\wamp\www\cms/core/InitServer.php:191
+#: D:\wamp\www\cms/core/InitServer.php:206
 #, php-format
 msgid "CMS variant '%s' is not available"
 msgstr "Varianta CMS '%s' není dostupná"
 
-#: D:\wamp\www\cms/core/InitServer.php:198
+#: D:\wamp\www\cms/core/InitServer.php:213
 #, php-format
 msgid "Plugin '%s' is not available"
 msgstr "Rozšíření '%s' není dostupné"
 
-#: D:\wamp\www\cms/core/InitServer.php:200
+#: D:\wamp\www\cms/core/InitServer.php:215
 #, php-format
 msgid "Plugin '%s' is forbidden"
 msgstr "Rozšíření '%s' je zakázané"
 
-#: D:\wamp\www\cms/core/InitServer.php:202
+#: D:\wamp\www\cms/core/InitServer.php:217
 #, php-format
 msgid "Unable to enable plugin '%s'"
 msgstr "Nepodařilo se zapnout rozšíření '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:207
+#: D:\wamp\www\cms/core/InitServer.php:222
 #, php-format
 msgid "Cannot modify '%s' in subdom '%s'"
 msgstr "Nelze upravit '%s' na poddoméně '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:209
+#: D:\wamp\www\cms/core/InitServer.php:224
 #, php-format
 msgid "Unable to copy '%s' into subdom '%s'"
 msgstr "Nepodařilo se zkopírovat '%s' do poddomény '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:223
+#: D:\wamp\www\cms/core/InitServer.php:238
 msgid "Unable to update user subdom setup"
 msgstr "Nepodařilo se aktualizovat uživatelské nastavení poddomény"
 
-#: D:\wamp\www\cms/core/InitServer.php:226
+#: D:\wamp\www\cms/core/InitServer.php:241
 #, php-format
 msgid "Unable to setup '%s'"
 msgstr "Nepodařilo se nastavit '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:230
+#: D:\wamp\www\cms/core/InitServer.php:245
 #, php-format
 msgid "Unable to disable plugin '%s'"
 msgstr "Nepodařilo se vypnout rozšíření '%s'"
 
-#: D:\wamp\www\cms/core/InitServer.php:262
+#: D:\wamp\www\cms/core/InitServer.php:277
 msgid "Unable to create forbidden plugin files"
 msgstr "Nepořadilo se vytvořit soubory zakázaných rozšíření"
 
-#: D:\wamp\www\cms/core/InitServer.php:268
+#: D:\wamp\www\cms/core/InitServer.php:283
 msgid "Unable to create plugin files"
 msgstr "Nepodařilo se vytvořit soubory rozšíření"
 
@@ -462,65 +486,129 @@ msgstr "Nelze vytvořit DOM když není nastavený SplSubject"
 msgid "Missing plugin folder '%s'"
 msgstr "Umístění rozšíření '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/core/global_const.php:78
-msgid "No stable IGCMS variant found"
-msgstr "Nebyla nalezena žádná stabilní verze IGCMS"
-
-#: D:\wamp\www\cms/core/global_const.php:88
+#: D:\wamp\www\cms/core/global_const.php:9
 #, php-format
 msgid "Unable to find class '%s' in '%s' nor '%s'"
 msgstr "Nepodařilo se najít třídu '%s' v '%s' ani v '%s'"
 
-#: D:\wamp\www\cms/core/global_const.php:128
+#: D:\wamp\www\cms/core/global_const.php:49
 #, php-format
 msgid "Forbidden file name '%s' format to copy to '%s' folder"
 msgstr "Zakázaný formát souboru '%s' pro kopírování do složky '%s'"
 
-#: D:\wamp\www\cms/core/global_const.php:132
+#: D:\wamp\www\cms/core/global_const.php:53
 #, php-format
 msgid "Forbidden MIME type '%s' to copy '%s' to '%s' folder"
 msgstr "Zakázaný MIME typ '%s' pro kopírování '%s' do složky '%s'"
 
-#: D:\wamp\www\cms/core/global_const.php:137
+#: D:\wamp\www\cms/core/global_const.php:58
 #, php-format
 msgid "Unable to create directory structure '%s'"
 msgstr "Nelze vytvořit adresářovou strukturu '%s'"
 
-#: D:\wamp\www\cms/core/global_const.php:141
+#: D:\wamp\www\cms/core/global_const.php:62
 #, php-format
 msgid "Unable to create symlink '%s' for '%s'"
 msgstr "Nelze vytvořit symbolický odkaz '%s' pro '%s'"
 
-#: D:\wamp\www\cms/core/global_const.php:153
+#: D:\wamp\www\cms/core/global_const.php:74
 #, php-format
 msgid "Unable to create symlink '%s'"
 msgstr "Nelze vytvořit symbolický odkaz '%s'"
 
-#: D:\wamp\www\cms/core/global_const.php:155
+#: D:\wamp\www\cms/core/global_const.php:76
 msgid "Unable to force symlink cache update: may take longer to apply"
 msgstr ""
 "Nepodařilo se aktualizovat symbolické linky v mezipaměti: projevení změn "
 "může trvat déle"
 
-#: D:\wamp\www\cms/core/global_func.php:17
+#: D:\wamp\www\cms/core/global_func.php:8
 #, php-format
 msgid "Unable to parse URL '%s'"
 msgstr "Odkaz '%s' má chybný formát"
 
-#: D:\wamp\www\cms/core/global_func.php:30
+#: D:\wamp\www\cms/core/global_func.php:21
 #, php-format
 msgid "Cyclic redirection to '%s'"
 msgstr "Cyklické přesměrování na '%s'"
 
-#: D:\wamp\www\cms/core/global_func.php:33
+#: D:\wamp\www\cms/core/global_func.php:24
 #, php-format
 msgid "Redirecting to '%s' with status code %s"
 msgstr "Přesměrování na '%s' s návratovým kódem %s"
 
-#: D:\wamp\www\cms/core/global_func.php:97
+#: D:\wamp\www\cms/core/global_func.php:88
 #, php-format
 msgid "Invalid extended expression '%s'"
 msgstr "Rozšířený výraz '%s' má chybnou syntaxi"
+
+#: D:\wamp\www\cms/core/global_func.php:96
+#, php-format
+msgid "Source file '%s' not found"
+msgstr "Zdrojový soubor '%s' nebyl nalezen"
+
+#: D:\wamp\www\cms/core/global_func.php:98
+msgid "Unable to create directory structure"
+msgstr "Nelze vytvořit adresářovou strukturu"
+
+#: D:\wamp\www\cms/core/global_func.php:100
+msgid "Unable to backup destination file"
+msgstr "Nepodařilo se zálohovat cílový soubor"
+
+#: D:\wamp\www\cms/core/global_func.php:102
+msgid "Unable to copy source file"
+msgstr "Nepodařilo se zakopírovat zdrojový soubor"
+
+#: D:\wamp\www\cms/core/global_func.php:104
+msgid "Unable to rename new file to destination"
+msgstr "Nový soubor se nepdařilo přejmenovat"
+
+#: D:\wamp\www\cms/core/global_func.php:106
+msgid "Unable to delete.old file"
+msgstr "Nepodařilo se smazat soubor .old"
+
+#: D:\wamp\www\cms/core/global_func.php:122
+#, php-format
+msgid "Directory '%s' not found"
+msgstr "Složka '%s' nebyla nalezena"
+
+#: D:\wamp\www\cms/core/global_func.php:143
+#, php-format
+msgid "Unable to create directory '%s'"
+msgstr "Nelze vytvořit složku '%s'"
+
+#: D:\wamp\www\cms/core/global_func.php:149
+#, php-format
+msgid "Unable to copy '%s' to '%s'"
+msgstr "Nepodařilo se zkopírovat '%s' na '%s'"
+
+#: D:\wamp\www\cms/core/global_func.php:168
+#, php-format
+msgid "Unable to create '%s' folder"
+msgstr "Nepodařilo se vytvořit složku '%s'"
+
+#: D:\wamp\www\cms/core/global_func.php:202
+msgid "Unable to open file"
+msgstr "Nepodařilo se otevřít soubor"
+
+#: D:\wamp\www\cms/core/global_func.php:216
+msgid "Function finfo_file() not supported"
+msgstr "Funkce finfo_file() není podporovaná"
+
+#: D:\wamp\www\cms/core/global_func.php:238
+#, php-format
+msgid "The requested URL '%s' was not understood by this server."
+msgstr "Adresu URL '%s' má neznámý formát"
+
+#: D:\wamp\www\cms/core/global_func.php:243
+#, php-format
+msgid "The requested URL '%s' was not found on this server."
+msgstr "Požadovaná URL adresa '%s' nebyla na serveru nalezena"
+
+#: D:\wamp\www\cms/core/global_func.php:267
+#, php-format
+msgid "Unsupported mime type '%s'"
+msgstr "Nepodporovaný MIME typ '%s'"
 
 #: D:\wamp\www\cms/core/init_cms.php:33
 #, php-format
@@ -565,50 +653,60 @@ msgstr "nahrazení"
 msgid "modify"
 msgstr "modifikace"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:198
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:184
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:257
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:245
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:278
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:266
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:292
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:280
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:297
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:285
 msgid "Unable to save changes, administration may be locked"
 msgstr "Nepodařilo se uložit změny, administrace je pravděpodobně uzamčená"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:299
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:287
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:306
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:294
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:312
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:300
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:323
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:311
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:335
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:323
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
+
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:45
+#, php-format
+msgid "Wrong folder format '%s'"
+msgstr "Chybný formát složky '%s'"
+
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:68
+#, php-format
+msgid "Agregator skipped file '%s'"
+msgstr "Agregátor vynechal soubor '%s'"
 
 #: D:\wamp\www\cms/plugins/Auth/Auth.php:20
 msgid "Unable to regenerate session ID"
@@ -628,56 +726,76 @@ msgstr "Nepodařilo se nelézt nadřazený nadpis pro '%s'"
 msgid "Page '%s' not found"
 msgstr "Stránka '%s' nebyla nalezena"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:19
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:20
 msgid "Unable to create convertor tmp folder"
 msgstr "Nepodařilo se vytvořit složku pro dočasné soubory"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:30
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:31
 msgid "File URL cannot be empty"
 msgstr "Vložte odkaz na soubor"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:61
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:62
 #, php-format
 msgid "Unsupported file MIME type '%s'"
 msgstr "Soubor '%s' má nepodporovaný MIME typ"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:84
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:82
+msgid "Unable to import document; probably missing heading"
+msgstr "Nepodařilo se importovat dokument; pravděpodobně v něm chybí nadpis"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:95
+msgid "Use @ to specify short/link attributes for heading"
+msgstr "Pro specifikaci atributu short/link v nadpisu použijte @"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:96
+msgid "Eg. This Is Long Heading @ Short Heading"
+msgstr "Například: Toto je dlouhý nadpis @ Krátký nadpis"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:97
+msgid "Use @ to specify kw attribute for description"
+msgstr "Pro specifikaci atributu kw použijte @"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:98
+msgid "Eg. This is description @ these, are, some, keywords"
+msgstr "Například: Toto je popisek @ toto, jsou, klíčová, slova"
+
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:105
 msgid "File successfully imported"
 msgstr "Soubor byl úspěšně importován"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:87
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:108
 #, php-format
 msgid "Unable to save imported file '%s.html' into temp folder"
 msgstr ""
 "Nepodařilo se uložit importovaný soubor '%s.html' do složky dočasných "
 "souborů."
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:163
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:155
 #, php-format
 msgid "File '%s' not found in temp folder"
 msgstr "Soubor '%s' nebyl nalezen mezi dočasnými soubory"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:169
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:161
 msgid "Unable to parse link"
 msgstr "Odkaz má neplatný formát"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:180
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:172
 #, php-format
 msgid "Destination URL '%s' is unaccessible; must be shared publically"
 msgstr ""
 "Cílova URL adresa '%s' není přístupná; soubor musí být dostupný pro veřejnost"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:182
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:174
 #, php-format
 msgid "Destination URL '%s' error: %s"
 msgstr "Chyba požadavku '%s', kód %s"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:224
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:216
 #, php-format
 msgid "Unable to locate '%s' in '%s'"
 msgstr "Nepodařilo se nalézt soubor '%s' v archivu '%s'"
 
-#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:239
+#: D:\wamp\www\cms/plugins/Convertor/Convertor.php:231
 #, php-format
 msgid "Failed to apply transformation '%s'"
 msgstr "Nepodařilo se aplikovat transformaci '%s'"
@@ -710,37 +828,29 @@ msgstr "Proměnná '%s' neexistuje"
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:63
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:64
 msgid "Invalid POST request"
 msgstr "Neplatný požadavek POST"
 
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:66
-msgid "Invalid mirror subdom format"
-msgstr "Název zrcadlené poddomény má chybný formát"
-
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:69
-#, php-format
-msgid "Subdom '%s' configuration file not found"
-msgstr "Konfigurační soubory poddomény '%s' nebyly nalezeny"
-
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:71
-#, php-format
-msgid "Subdom '%s' user folder exists"
-msgstr "Uživatelský adresář pro poddoménu '%s' již existuje"
-
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:78
-msgid "Unable to create subdom mirror"
-msgstr "Nepodařilo se vytvořit zrcadlo poddomény"
-
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:97
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:87
 #, php-format
 msgid "Unauthorized subdom '%s' modification by '%s'"
 msgstr "Nepovolená úprava poddomény '%s' uživatelem '%s'"
 
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:119
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:101
 #, php-format
-msgid "Unable to backup subdom '%s' setup"
-msgstr "Nepodřailo se zálohovat nastavení poddomény '%s'"
+msgid "Subdom %s successfully activated"
+msgstr "Poddoména %s byla úspěšně aktivována"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:118
+#, php-format
+msgid "Deactivate directory '%s' already exists"
+msgstr "Deaktivovaná složka '%s' již existuje"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:120
+#, php-format
+msgid "Unable to rename '%s' dir to '%s'"
+msgstr "Nepodařilo se přejmenovat '%s' na '%s'"
 
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:122
 #, php-format
@@ -749,12 +859,13 @@ msgstr "Nepodařilo se vytvořit složku '%s'"
 
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:124
 #, php-format
-msgid "Subdom %s successfully deleted"
-msgstr "Poddoména %s byla úspěšně smazána"
+msgid "Subdom %s successfully deactivated"
+msgstr "Poddoména %s byla úspěšně deaktivována"
 
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:130
-msgid "Invalid subdom format"
-msgstr "Název poddomény má chybný formát"
+#, php-format
+msgid "Invalid subdom format; must start with '%s'"
+msgstr "Poddoména musí začínat na '%s'"
 
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:132
 #, php-format
@@ -774,16 +885,6 @@ msgstr "Nepodařilo se vytvořit uživatelský adresář pro poddoménu '%s'"
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:143
 msgid "Missing POST data 'PLUGINS'"
 msgstr "V požadavku POST chybí proměnná 'PLUGINS'"
-
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:152
-#, php-format
-msgid "Missing POST data '%s'"
-msgstr "Chybí data požadavku POST '%s'"
-
-#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:154
-#, php-format
-msgid "Unable to set '%s' to '%s'"
-msgstr "Nepodařilo se nastavit '%s' na '%s'"
 
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:158
 #, php-format
@@ -805,6 +906,26 @@ msgstr "Na poddoméně %s nebyly provedeny žádné změny"
 msgid "Subdom %s successfully updated"
 msgstr "Aktualizace poddomény %s proběhla úspěšně"
 
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:173
+#, php-format
+msgid "Missing POST data '%s'"
+msgstr "Chybí data požadavku POST '%s'"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:180
+#, php-format
+msgid "Unable to duplicate directory '%s'"
+msgstr "Složku '%s' se nepodařilo zduplikovat"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:186
+#, php-format
+msgid "Unable to update '%s'"
+msgstr "Nepodařilo se nastavit '%s'"
+
+#: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:191
+#, php-format
+msgid "Deactivate subdom '%s'?"
+msgstr "Dektivovat poddoménu '%s'?"
+
 #: D:\wamp\www\cms/plugins/TOC/TOC.php:23
 msgid "Table of Contents"
 msgstr "Obsah"
@@ -814,7 +935,7 @@ msgstr "Obsah"
 msgid "Redirection link '%s' not found"
 msgstr "Cílový odkaz '%s' neexistuje"
 
-#: D:\wamp\www\cms/plugins/UrlHandler/UrlHandler.php:77
+#: D:\wamp\www\cms/plugins/UrlHandler/UrlHandler.php:73
 #, php-format
 msgid "Link '%s' not found, redir to '%s'"
 msgstr "Odkaz '%s' nebyl nalezen, přesměrování na '%s'"
@@ -868,25 +989,46 @@ msgstr "Téma '%s' nebylo nalezeno"
 msgid "Unable to create root '%s' link"
 msgstr "Nepodařilo se vytvořit symbolický odkaz '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:289
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:288
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:291
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:290
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:324
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:323
 #, php-format
 msgid "Link [%s] file '%s' not found"
 msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:406
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:405
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "No stable IGCMS variant found"
+#~ msgstr "Nebyla nalezena žádná stabilní verze IGCMS"
+
+#~ msgid "Invalid mirror subdom format"
+#~ msgstr "Název zrcadlené poddomény má chybný formát"
+
+#~ msgid "Subdom '%s' configuration file not found"
+#~ msgstr "Konfigurační soubory poddomény '%s' nebyly nalezeny"
+
+#~ msgid "Subdom '%s' user folder exists"
+#~ msgstr "Uživatelský adresář pro poddoménu '%s' již existuje"
+
+#~ msgid "Unable to create subdom mirror"
+#~ msgstr "Nepodařilo se vytvořit zrcadlo poddomény"
+
+#~ msgid "Unable to backup subdom '%s' setup"
+#~ msgstr "Nepodřailo se zálohovat nastavení poddomény '%s'"
+
+#~ msgid "Invalid subdom format"
+#~ msgstr "Název poddomény má chybný formát"
 
 #~ msgid "Unable to load DOM from file '%s'"
 #~ msgstr "Nelze načíst DOM ze souboru '%s'"

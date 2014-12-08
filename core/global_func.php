@@ -93,17 +93,17 @@ function normalize($s, $extKeep="", $tolower=true, $convertToUtf8=false) {
 
 function safeRewriteFile($src, $dest, $keepOld=true) {
   if(!file_exists($src))
-    throw new LoggerException("Source file '$src' not found");
+    throw new LoggerException(sprinft(_("Source file '%s' not found"), $src);
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true))
-    throw new LoggerException("Unable to create directory structure");
+    throw new LoggerException(_("Unable to create directory structure"));
   if(!is_link($dest) && is_file($dest) && !copy($dest, "$dest.old"))
-    throw new LoggerException("Unable to backup destination file");
+    throw new LoggerException(_("Unable to backup destination file"));
   if(!copy($src, "$dest.new"))
-    throw new LoggerException("Unable to copy source file");
+    throw new LoggerException(_("Unable to copy source file"));
   if(!rename("$dest.new", $dest))
-    throw new LoggerException("Unable to rename new file to destination");
+    throw new LoggerException(_("Unable to rename new file to destination"));
   if(!$keepOld && is_file("$dest.old") && !unlink("$dest.old"))
-    throw new LoggerException("Unable to delete.old file");
+    throw new LoggerException(_("Unable to delete.old file"));
   return true;
 }
 
@@ -118,7 +118,8 @@ function safeRewrite($content, $dest) {
 }
 
 function duplicateDir($dir, $deep=true) {
-  if(!is_dir($dir)) throw new Exception("Directory '".basename($dir)."' not found");
+  if(!is_dir($dir))
+    throw new Exception(sprintf(_("Directory '%s' not found"),basename($dir)));
   $info = pathinfo($dir);
   $bakDir = $info["dirname"]."/~".$info["basename"];
   copyFiles($dir, $bakDir, $deep);
@@ -128,7 +129,7 @@ function duplicateDir($dir, $deep=true) {
 }
 
 function smartCopy($src, $dest, $delay=0) {
-  if(!file_exists($src)) throw new Exception("File '".basename($src)."' not found");
+  if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"),basename($src)));
   if(file_exists($dest)) {
     // both are links with same target
     if(is_link($dest) && is_link($src)
@@ -139,13 +140,13 @@ function smartCopy($src, $dest, $delay=0) {
   }
   $destDir = pathinfo($dest, PATHINFO_DIRNAME);
   if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
-    throw new Exception("Unable to create directory '$destDir'");
+    throw new Exception(sprintf(_("Unable to create directory '%s'"), $destDir));
   if(is_link($src)) {
     createSymlink($dest, readlink($src));
     return;
   }
   if(!copy($src, $dest)) {
-    throw new Exception("Unable to copy '$src' to '$dest'");
+    throw new Exception(sprintf(_("Unable to copy '%s' to '%s'"), $src, $dest));
   }
 }
 
@@ -164,7 +165,7 @@ function deleteRedundantFiles($in, $according) {
 
 function copyFiles($src, $dest, $deep) {
   if(!is_dir($dest) && !@mkdir($dest))
-    throw new LoggerException("Unable to create '$dest' folder");
+    throw new LoggerException(sprintf(_("Unable to create '%s' folder"), $dest));
   foreach(scandir($src) as $f) {
     if(in_array($f, array(".", ".."))) continue;
     if(is_dir("$src/$f") && !is_link("$src/$f")) {
@@ -198,7 +199,7 @@ function readZippedFile($archiveFile, $dataFile) {
   $zip = new ZipArchive;
   // Open received archive file
   if(!$zip->open($archiveFile))
-    throw new Exception("Unable to open file");
+    throw new Exception(_("Unable to open file"));
   // If done, search for the data file in the archive
   $index = $zip->locateName($dataFile);
   // If file not found, return null
@@ -212,7 +213,7 @@ function readZippedFile($archiveFile, $dataFile) {
 }
 
 function getFileMime($file) {
-  if(!function_exists("finfo_file")) throw new Exception("Function finfo_file() not supported");
+  if(!function_exists("finfo_file")) throw new Exception(_("Function finfo_file() not supported"));
   $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
   $mime = finfo_file($finfo, $file);
   finfo_close($finfo);
@@ -234,12 +235,12 @@ function checkUrl($folder = null) {
   $rUri = $_SERVER["REQUEST_URI"];
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
-    new ErrorPage("The requested URL '$rUri' was not understood by this server.", 400);
+    new ErrorPage(sprintf(_("The requested URL '%s' was not understood by this server."), $rUri)), 400);
   if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/", $rUri, $m)) return null;
 
   $fInfo["filepath"] = "$folder/".$m[1];
   if(!is_file($fInfo["filepath"]))
-    new ErrorPage("The requested URL '$rUri' was not found on this server.", 404);
+    new ErrorPage(sprintf(_("The requested URL '%s' was not found on this server."), $rUri)), 404);
 
   $disallowedMime = array(
     "application/x-msdownload" => null,
@@ -263,7 +264,7 @@ function checkUrl($folder = null) {
   );
   $fInfo["filemime"] = getFileMime($fInfo["filepath"]);
   if(array_key_exists($fInfo["filemime"], $disallowedMime))
-    new ErrorPage("Unsupported mime type '".$fInfo["filemime"]."'", 415);
+    new ErrorPage(sprintf(_("Unsupported mime type '%s'"), $fInfo["filemime"])), 415);
   return $fInfo;
 }
 
