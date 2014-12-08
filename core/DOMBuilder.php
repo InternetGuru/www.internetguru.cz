@@ -67,7 +67,6 @@ class DOMBuilder {
     $dc->addSurceFile(ADMIN_FOLDER."/$fileName");
     $dc->addSurceFile(USER_FOLDER."/$fileName");
     */
-
     if(self::DEBUG) $doc->formatOutput = true;
 
     if($replace) {
@@ -76,8 +75,11 @@ class DOMBuilder {
       return;
     }
 
-    self::loadDOM(self::findFile($fileName, false, false), $doc);
-    if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
+    $f = findFile($fileName, false, false);
+    if($f) {
+      self::loadDOM($f, $doc);
+      if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
+    }
 
     $f = ADMIN_FOLDER."/$fileName";
     try {
@@ -141,6 +143,7 @@ class DOMBuilder {
     }
     if(is_file(dirname($filePath)."/.".basename($filePath)))
       throw new Exception(sprintf(_("File disabled")));
+
     // load
     if(!@$doc->load($filePath))
       throw new Exception(sprintf(_("Invalid XML file")));
@@ -149,7 +152,7 @@ class DOMBuilder {
       $c = new DateTime();
       $c->setTimeStamp(filectime($filePath));
       $doc->defaultCtime = $c->format(DateTime::W3C);
-      $doc->defaultAuthor = $author;
+      $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
     }
     try {
       $doc->validatePlus();

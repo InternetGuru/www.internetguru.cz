@@ -110,8 +110,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $newContent->insertVar("schema", $format);
     $newContent->insertVar("mode", $mode);
     $newContent->insertVar("classtype", $type);
-    $newContent->insertVar("defaultcontent", $this->getDefContent());
-    $newContent->insertVar("resultcontent", $this->getResContent());
+    $newContent->insertVar("defaultcontent", $this->showContent(false));
+    $newContent->insertVar("resultcontent", $this->showContent(true));
     $newContent->insertVar("status", $this->dataFileStatuses[$this->dataFileStatus]);
     $newContent->insertVar("userfilehash", $usrDestHash);
     if((!$this->isPost() && $this->dataFileStatus != self::STATUS_DISABLED)
@@ -122,31 +122,17 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $newContent->insertVar("warning", "warning");
       $newContent->insertVar("nohide", "nohide");
     }
-
     return $newContent;
   }
 
-  private function getResContent() {
-    return $this->showContent(true);
-  }
-
-  private function getDefContent() {
-    return $this->showContent(false);
-  }
-
   private function showContent($user) {
-
-    if($this->replace) {
-      $df = findFile($this->defaultFile, $user);
-      if(!$df) return "n/a";
-      return file_get_contents($df);
-    }
-
+    $df = findFile($this->defaultFile, $user);
+    if(!$df) return "n/a";
+    if($this->replace) return file_get_contents($df);
     $doc = $this->getDOMPlus($this->defaultFile, false, $user);
     $doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();
-
   }
 
   private function getHash($data) {
