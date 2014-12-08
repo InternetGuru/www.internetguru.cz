@@ -21,7 +21,7 @@ function proceedServerInit($initServerFileName) {
 }
 
 function findFile($file, $user=true, $admin=true, $res=false) {
-  while(strpos($file, "/") === 0) $file = substr($file, 1);
+  #while(strpos($file, "/") === 0) $file = substr($file, 1);
   try {
     $resFolder = $res && !IS_LOCALHOST ? $resFolder = RES_DIR : false;
     $f = USER_FOLDER."/$file";

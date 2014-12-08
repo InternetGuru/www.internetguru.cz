@@ -65,7 +65,7 @@ class Agregator extends Plugin implements SplObserver {
           $this->links[$h->getAttribute("link")] = "$src/$f";
         }
       } catch(Exception $e) {
-        #new Logger(sprintf(_("Unable to load '%s': %s"), $f, $e->getMessage()), Logger::LOGGER_WARNING);
+        new Logger(sprintf(_("Agregator skipped file '%s'"), $f), Logger::LOGGER_WARNING);
       }
     }
     if(empty($this->html)) return;
