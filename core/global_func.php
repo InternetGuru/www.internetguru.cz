@@ -93,7 +93,7 @@ function normalize($s, $extKeep="", $tolower=true, $convertToUtf8=false) {
 
 function safeRewriteFile($src, $dest, $keepOld=true) {
   if(!file_exists($src))
-    throw new LoggerException(sprinft(_("Source file '%s' not found"), $src);
+    throw new LoggerException(sprinft(_("Source file '%s' not found"), $src));
   if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true))
     throw new LoggerException(_("Unable to create directory structure"));
   if(!is_link($dest) && is_file($dest) && !copy($dest, "$dest.old"))
@@ -235,12 +235,12 @@ function checkUrl($folder = null) {
   $rUri = $_SERVER["REQUEST_URI"];
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
-    new ErrorPage(sprintf(_("The requested URL '%s' was not understood by this server."), $rUri)), 400);
+    new ErrorPage(sprintf(_("The requested URL '%s' was not understood by this server."), $rUri), 400);
   if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.+)?$/", $rUri, $m)) return null;
 
   $fInfo["filepath"] = "$folder/".$m[1];
   if(!is_file($fInfo["filepath"]))
-    new ErrorPage(sprintf(_("The requested URL '%s' was not found on this server."), $rUri)), 404);
+    new ErrorPage(sprintf(_("The requested URL '%s' was not found on this server."), $rUri), 404);
 
   $disallowedMime = array(
     "application/x-msdownload" => null,
@@ -264,7 +264,7 @@ function checkUrl($folder = null) {
   );
   $fInfo["filemime"] = getFileMime($fInfo["filepath"]);
   if(array_key_exists($fInfo["filemime"], $disallowedMime))
-    new ErrorPage(sprintf(_("Unsupported mime type '%s'"), $fInfo["filemime"])), 415);
+    new ErrorPage(sprintf(_("Unsupported mime type '%s'"), $fInfo["filemime"]), 415);
   return $fInfo;
 }
 
