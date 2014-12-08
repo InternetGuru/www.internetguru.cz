@@ -58,7 +58,7 @@ class InitServer {
       $this->updateServerFromUser($userSubdomDir, $serverSubdomDir);
       $folders = $this->setFolderVars($serverSubdomDir);
     }
-    $this->completeStructure($serverSubdomDir);
+    $this->completeStructure($serverSubdomDir, $folders["USER_FOLDER"]);
     if($setConst) $this->setConst($folders);
   }
 
@@ -135,18 +135,27 @@ class InitServer {
       throw new Exception(_("Unable to create CONFIG file"));
   }
 
-  private function completeStructure($subdomDir) {
-    // copy index
-    if(is_link("$subdomDir/index.php") || !is_file("$subdomDir/index.php")
-      || getFileHash(CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php") != getFileHash("$subdomDir/index.php"))
-      safeRewriteFile(CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php", "$subdomDir/index.php", false);
+  private function completeStructure($subdomDir, $userFolder) {
     // create symlinks
-    $rob = preg_match("/^ig\d/", $this->subdom) ? "robots_off.txt" : "robots_default.txt";
+    if(preg_match("/^ig\d/", $this->subdom))
+      $rob = CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"] ."/robots_off.txt";
+    else {
+      if(is_file("$userFolder/robots.txt"))
+        $rob = "$userFolder/robots.txt";
+      $rob = CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"] ."/robots_default.txt";
+    }
     $files = array(
-      "$subdomDir/".CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER,
-      #"$subdomDir/index.php" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php",
+      "$subdomDir/robots.txt" => $rob,
+      "$subdomDir/index.php" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/index.php",
       "$subdomDir/.htaccess" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/.htaccess",
-      "$subdomDir/robots.txt" => CMS_ROOT_FOLDER."/".$this->subdomVars["CMS_VER"]."/$rob",
+    );
+    foreach($files as $dest => $source) {
+      if(is_link($dest) || !is_file($dest)
+      || getFileHash($source) != getFileHash($dest))
+      safeRewriteFile($source, $dest, false);
+    }
+    $files = array(
+      "$subdomDir/".CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER
     );
     foreach($files as $link => $target) {
       if(is_file($link) && !is_link($link)) continue; // skip individual files
