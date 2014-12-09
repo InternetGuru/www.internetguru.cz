@@ -63,32 +63,20 @@ function getCurLink($query=false) {
   return substr($query, strlen(getRoot()));
 }
 
-function getRoot() {
-  if(IS_LOCALHOST) {
-    $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
-    return "/".$dir[1]."/";
-  }
-  return "/";
-}
-
 function getDomain() {
   $d = explode(".", $_SERVER["HTTP_HOST"]);
   while(count($d) > 2) array_shift($d);
   return implode(".", $d);
 }
 
-function normalize($s, $extKeep="", $tolower=true, $convertToUtf8=false) {
+function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
   if($convertToUtf8) $s = utf8_encode($s);
   if($tolower) $s = mb_strtolower($s, "utf-8");
   $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
   if($tolower) $s = strtolower($s);
   $s = str_replace(" ", "_", $s);
-  $keep = "~[^a-zA-Z0-9/_%s-]~";
-  if(is_null($ext = @preg_replace(sprintf($keep, $extKeep), "", $s))) {
-    new Logger(sprintf(_("Invalid extended expression '%s'"), sprintf($keep, $extKeep)), "error");
-    return preg_replace(sprintf($keep, ""), "", $s);
-  }
-  return $ext;
+  if(is_null($keep)) $keep = "a-zA-Z0-9/_-";
+  return preg_replace("~[^".preg_quote($keep, "~")."]~", "", $s);
 }
 
 function safeRewriteFile($src, $dest, $keepOld=true) {

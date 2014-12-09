@@ -5,6 +5,8 @@ class HTMLPlus extends DOMDocumentPlus {
   private $defaultAuthor = null;
   private $defaultCtime = null;
   private $defaultHeading = null;
+  private $defaultLink = null;
+  private $defaultNs = null;
   private $defaultDesc = null;
   private $defaultKw = null;
   const RNG_FILE = "HTMLPlus.rng";
@@ -14,6 +16,8 @@ class HTMLPlus extends DOMDocumentPlus {
     $c = new DateTime("now");
     $this->defaultCtime = $c->format(DateTime::W3C);
     $this->defaultHeading = _("Some Required Heading");
+    $this->defaultLink = "";
+    $this->defaultNs = getUrl(false);
     $this->defaultDesc = _("Some required description");
     $this->defaultKw = _("some, required, keywords");
   }
@@ -23,8 +27,9 @@ class HTMLPlus extends DOMDocumentPlus {
     if(!is_null($vValue) && (!is_string($vValue) || !strlen($vValue)))
       throw new Exception(_("Variable value must be non-empty string or null"));
     switch($vName) {
-      case "defaultAuthor":
       case "defaultCtime":
+      case "defaultLink":
+      case "defaultAuthor":
       case "defaultHeading":
       case "defaultDesc":
       case "defaultKw":
@@ -169,6 +174,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->validateEmptyContent($repair);
+    $this->validateFirstHeadingNs($repair);
     $this->validateFirstHeadingLink($repair);
     $this->validateFirstHeadingCtime($repair);
     $this->validateFirstHeadingAuthor($repair);
@@ -192,13 +198,20 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  private function validateFirstHeadingNs($repair) {
+    $h = $this->headings->item(0);
+    if($h->hasAttribute("ns")) return;
+    if(!$repair || is_null($this->defaultNs))
+      throw new Exception(_("First heading attribude 'ns' missing"));
+    $h->setAttribute("ns", $this->defaultNs);
+  }
+
   private function validateFirstHeadingLink($repair) {
     $h = $this->headings->item(0);
     if($h->hasAttribute("link")) return;
-    if(!$repair) throw new Exception(_("First heading attribude 'link' missing"));
-    if($h->hasAttribute("short")) $link = normalize($h->getAttribute("short"));
-    else $link = normalize(getShortString($h->nodeValue));
-    $h->setAttribute("link", $link);
+    if(!$repair || is_null($this->defaultLink))
+      throw new Exception(_("First heading attribude 'link' missing"));
+    $h->setAttribute("link", $this->defaultLink);
   }
 
   private function validateFirstHeadingAuthor($repair) {
@@ -364,7 +377,9 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function validateHLink($repair) {
+    $i = -1;
     foreach($this->headings as $h) {
+      $i++;
       if(!$h->hasAttribute("link")) continue;
       #$this->getElementById($h->getAttribute("link"), "link");
       $link = normalize($h->getAttribute("link"));
@@ -372,6 +387,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))
           throw new Exception(sprintf(_("Normalize link leads to empty value '%s'"), $h->getAttribute("link")));
+        if($i == 0) continue; // first link can be empty
         throw new Exception(_("Empty link found"));
       }
       if($link != $h->getAttribute("link")) {

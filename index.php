@@ -1,5 +1,6 @@
 <?php
 
+define("INDEX_HTML", "index.html");
 define("PLUGINS_DIR", "plugins");
 define("THEMES_DIR", "themes");
 define("VER_DIR", "ver");

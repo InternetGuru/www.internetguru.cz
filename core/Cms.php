@@ -28,7 +28,7 @@ class Cms {
     self::setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     self::setVariable("plugins", array_keys($plugins->getObservers()));
     self::setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
-    self::$contentFull = DOMBuilder::buildHTMLPlus("Content.html");
+    self::$contentFull = DOMBuilder::buildHTMLPlus(INDEX_HTML);
     self::loadDefaultVariables(self::$contentFull);
   }
 
@@ -80,6 +80,7 @@ class Cms {
         self::$content = $c;
         self::loadDefaultVariables(self::$content);
       }
+      #echo $c->saveXML();die();
     } catch (Exception $e) {
       if(self::DEBUG) echo $c->saveXML();
       throw new Exception($e->getMessage()." (".get_class($cs).")");

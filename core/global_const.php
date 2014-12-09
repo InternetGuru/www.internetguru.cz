@@ -9,6 +9,21 @@ function __autoload($className) {
   throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
+function getRoot() {
+  if(IS_LOCALHOST) {
+    $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
+    return "/".$dir[1]."/";
+  }
+  return "/";
+}
+
+function getUrl($schema=true) {
+  $domain = $_SERVER["HTTP_HOST"];
+  if($schema) $domain = $_SERVER["REQUEST_SCHEME"]."://".$domain;
+  if(IS_LOCALHOST) return $domain . substr(getRoot(), 0, -1);
+  return $domain;
+}
+
 function proceedServerInit($initServerFileName) {
   if(IS_LOCALHOST) return;
   if(isset($_GET["updateSubdom"])) {

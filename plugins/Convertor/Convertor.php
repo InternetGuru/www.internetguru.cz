@@ -182,7 +182,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     foreach($headers as $header) {
       if (strpos(strtolower($header), 'content-disposition') !== false) {
         $tmp_name = explode('=', $header);
-        if($tmp_name[1]) return normalize(trim($tmp_name[1], '";\''), ".", false, true);
+        if($tmp_name[1]) return normalize(trim($tmp_name[1], '";\''), "a-zA-Z0-9/_.-", false, true);
       }
     }
     $stripped_url = preg_replace('/\\?.*/', '', $url);

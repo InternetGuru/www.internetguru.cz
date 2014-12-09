@@ -5,7 +5,6 @@
 #TODO: enable to use readonly?
 
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
-  const DEFAULT_FILE = "Content.html";
   const STATUS_NEW = 0;
   const STATUS_ENABLED = 1;
   const STATUS_DISABLED = 2;
@@ -141,13 +140,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   /**
    * LOGIC (-> == redir if exists)
-   * null -> [current_link].html -> Content.html
+   * null -> [current_link].html -> INDEX_HTML
    * F -> plugins/$0/$0.xml -> $0.xml
    * [dir/]+F -> $0.xml
    * [dir/]*F.ext (direct match) -> plugins/$0
    *
    * EXAMPLES
-   * /about?admin -> /about?admin=about.html -> /about?admin=Content.html
+   * /about?admin -> /about?admin=about.html -> /about?admin=INDEX_HTML
    * Xhtml11 -> plugins/Xhtml11/Xhtml11.xml (F default plugin config)
    * Xhtml11/Xhtml11.xsl -> plugins/Xhtml11/Xhtml11.xsl (dir/F.ext plugin)
    * Cms.xml -> Cms.xml (F.ext direct match)
@@ -161,7 +160,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(!strlen($f)) {
       $l = getCurLink().".html";
       if(findFile($l)) $f = $l;
-      else $f = self::DEFAULT_FILE;
+      else $f = INDEX_HTML;
       $this->redir($f);
     }
 
