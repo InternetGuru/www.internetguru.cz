@@ -218,13 +218,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       throw new Exception(sprintf(_("Missing POST data '%s'"), $varName));
     if(!is_null($root)) {
       $bakDir = duplicateDir("$root/".$_POST[$varName]);
-      #todo: increment trailing number part
-      $i = 1;
-      $newDir = $_POST[$varName];
-      while(file_exists("$root/$newDir$i")) $i++;
-      if(!rename($bakDir, "$root/$newDir$i"))
-        throw new Exception(sprintf(_("Unable to duplicate directory '%s'"), $_POST[$varName]));
-      $newFile = "$varName.$newDir$i";
+      $newDir = incrementalRename($bakDir, "$root/".$_POST[$varName]);
+      $newFile = "$varName.".basename($newDir);
     } else {
       $newFile = "$varName.".$_POST[$varName];
     }

@@ -117,9 +117,22 @@ function safeRemoveDir($dir) {
   return rename($dir, $delDir.$i);
 }
 
+function incrementalRename($src, $dest) {
+  if(!file_exists($src))
+    throw new Exception(sprintf(_("Source file '%s' not found"), basename($src)));
+  preg_match("/\d*$/", $dest, $m);
+  $iLength = strlen($m[0]);
+  $i = (int) $m[0];
+  $dest = substr($dest, 0, -$iLength);
+  while(file_exists($dest.$i)) $i++;
+  if(!rename($src, $dest.$i))
+    throw new Exception(sprintf(_("Unable to rename directory '%s'"), basename($src)));
+  return $dest.$i;
+}
+
 function duplicateDir($dir, $deep=true) {
   if(!is_dir($dir))
-    throw new Exception(sprintf(_("Directory '%s' not found"),basename($dir)));
+    throw new Exception(sprintf(_("Directory '%s' not found"), basename($dir)));
   $info = pathinfo($dir);
   $bakDir = $info["dirname"]."/~".$info["basename"];
   copyFiles($dir, $bakDir, $deep);
