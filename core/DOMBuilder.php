@@ -152,15 +152,18 @@ class DOMBuilder {
       $c = new DateTime();
       $c->setTimeStamp(filectime($filePath));
       $doc->defaultCtime = $c->format(DateTime::W3C);
+      $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
       $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
     }
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
       $doc->validatePlus(true);
-      if(!safeRewrite($doc->saveXML(), $filePath))
-        throw new Exception(sprintf(_("Unable to save autocorrected file: %s"), $e->getMessage()));
-      new Logger(sprintf(_("HTML+ autocorrected: %s"), $e->getMessage()), Logger::LOGGER_INFO);
+      if(strpos($filePath, CMS_FOLDER) !== 0) {
+        #if(!safeRewrite($doc->saveXML(), $filePath))
+        #  throw new Exception(sprintf(_("Unable to save autocorrected file: %s"), $e->getMessage()));
+        new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+      }
     }
     if(!($doc instanceof HTMLPlus)) return;
     // generate ctime/mtime from file if not set

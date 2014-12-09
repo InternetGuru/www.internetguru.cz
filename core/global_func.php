@@ -76,7 +76,10 @@ function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
   if($tolower) $s = strtolower($s);
   $s = str_replace(" ", "_", $s);
   if(is_null($keep)) $keep = "a-zA-Z0-9/_-";
-  return preg_replace("~[^".preg_quote($keep, "~")."]~", "", $s);
+  $s = @preg_replace("~[^$keep]~", "", $s);
+  if(is_null($s))
+    throw new Exception(_("Normalize invalid keep parameter"));
+  return $s;
 }
 
 function safeRewriteFile($src, $dest, $keepOld=true) {

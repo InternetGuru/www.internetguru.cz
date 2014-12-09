@@ -24,6 +24,7 @@ class Cms {
     self::setVariable("version", CMS_VERSION);
     self::setVariable("name", CMS_NAME);
     self::setVariable("user_id", USER_ID);
+    self::setVariable("author", "InternetGuru");
     self::setVariable("ig", "&copy;".date("Y")." <a href='http://www.internetguru.cz'>InternetGuru</a>");
     self::setVariable("ez", "<a href='http://www.ezakladna.cz'>E-Základna</a>");
     self::setVariable("plugins", array_keys($plugins->getObservers()));

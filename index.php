@@ -36,7 +36,7 @@ if(IS_LOCALHOST) {
   define("CMS_ROOT_FOLDER", "../cms");
   define("CMS_FOLDER", CMS_ROOT_FOLDER);
   define('CMS_DEBUG', true);
-  define('USER_ID', "n/a");
+  define('USER_ID', "LocalUser");
   define('ADMIN_FOLDER', ADMIN_ROOT_DIR);
   define('USER_FOLDER', USER_ROOT_DIR);
   define('FILES_FOLDER', FILES_ROOT_DIR);

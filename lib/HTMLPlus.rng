@@ -57,7 +57,7 @@
       <optional>
         <attribute name="link">
           <data type="string">
-            <param name="pattern">|([a-z][a-z0-9_/-]*)</param>
+            <param name="pattern">[a-z][a-z0-9_/-]*</param>
           </data>
         </attribute>
       </optional>

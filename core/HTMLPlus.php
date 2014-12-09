@@ -16,10 +16,9 @@ class HTMLPlus extends DOMDocumentPlus {
     $c = new DateTime("now");
     $this->defaultCtime = $c->format(DateTime::W3C);
     $this->defaultHeading = _("Some Required Heading");
-    $this->defaultLink = "";
     $this->defaultNs = getUrl(false);
-    $this->defaultDesc = _("Some required description");
-    $this->defaultKw = _("some, required, keywords");
+    $this->defaultDesc = _("Some required description content");
+    $this->defaultKw = _("some, required, comma, separated, keywords");
   }
 
   public function __set($vName, $vValue) {
@@ -174,10 +173,10 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->validateEmptyContent($repair);
-    $this->validateFirstHeadingNs($repair);
+    $this->validateFirstHeadingAuthor($repair);
     $this->validateFirstHeadingLink($repair);
     $this->validateFirstHeadingCtime($repair);
-    $this->validateFirstHeadingAuthor($repair);
+    $this->validateFirstHeadingNs($repair);
     $this->validateMeta($repair);
     $this->relaxNGValidatePlus();
   }
@@ -377,9 +376,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function validateHLink($repair) {
-    $i = -1;
     foreach($this->headings as $h) {
-      $i++;
       if(!$h->hasAttribute("link")) continue;
       #$this->getElementById($h->getAttribute("link"), "link");
       $link = normalize($h->getAttribute("link"));
@@ -387,7 +384,6 @@ class HTMLPlus extends DOMDocumentPlus {
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))
           throw new Exception(sprintf(_("Normalize link leads to empty value '%s'"), $h->getAttribute("link")));
-        if($i == 0) continue; // first link can be empty
         throw new Exception(_("Empty link found"));
       }
       if($link != $h->getAttribute("link")) {

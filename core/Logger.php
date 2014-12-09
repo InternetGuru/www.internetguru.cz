@@ -51,7 +51,7 @@ class Logger {
       $msg[] = '"UNKNOWN UNKNOWN UNKNOWN"';
     }
     $msg[] = http_response_code();
-    $msg[] = normalize($this->type);
+    $msg[] = $this->type;
     $msg[] = '"'.$this->message.'"';
     $msg[] = '['.$this->getCaller().']';
     $msg[] = $this->duration;
