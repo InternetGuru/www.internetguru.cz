@@ -117,6 +117,15 @@ function safeRewrite($content, $dest) {
   return $b;
 }
 
+function safeRemoveDir($dir) {
+  if(!is_dir($dir)) return true;
+  if(count(scandir($dir)) == 2) return rmdir($dir);
+  $i = 1;
+  $delDir = "$dir~";
+  while(is_dir($delDir.$i)) $i++;
+  return rename($dir, $delDir.$i);
+}
+
 function duplicateDir($dir, $deep=true) {
   if(!is_dir($dir))
     throw new Exception(sprintf(_("Directory '%s' not found"),basename($dir)));
@@ -129,7 +138,7 @@ function duplicateDir($dir, $deep=true) {
 }
 
 function smartCopy($src, $dest, $delay=0) {
-  if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"),basename($src)));
+  if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"), basename($src)));
   if(file_exists($dest)) {
     // both are links with same target
     if(is_link($dest) && is_link($src)
@@ -138,7 +147,7 @@ function smartCopy($src, $dest, $delay=0) {
     elseif(!is_link($dest) && !is_link($src)
       && $delay && filectime($dest) > time()-$delay) return;
   }
-  $destDir = pathinfo($dest, PATHINFO_DIRNAME);
+  $destDir = dirname($dest);
   if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
     throw new Exception(sprintf(_("Unable to create directory '%s'"), $destDir));
   if(is_link($src)) {
@@ -163,8 +172,8 @@ function deleteRedundantFiles($in, $according) {
   }
 }
 
-function copyFiles($src, $dest, $deep) {
-  if(!is_dir($dest) && !@mkdir($dest))
+function copyFiles($src, $dest, $deep=false) {
+  if(!is_dir($dest) && !mkdir($dest))
     throw new LoggerException(sprintf(_("Unable to create '%s' folder"), $dest));
   foreach(scandir($src) as $f) {
     if(in_array($f, array(".", ".."))) continue;

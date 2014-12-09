@@ -75,7 +75,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   private function getSubdomFromRequest() {
     if(isset($_POST["new_subdom"]))
-      return $this->processCreateSubdom(USER_ID.$_POST["new_subdom"]);
+      return $this->processCreateSubdom($_POST["new_subdom"]);
     if(!strlen($_GET[get_class($this)])) return null;
     if(isset($_POST["activate"])) {
       return $this->processActivateSubdom($_GET[get_class($this)]);
@@ -83,12 +83,15 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     if(!is_dir("../".$_GET[get_class($this)]) && !isset($_POST["deactivate"])) {
       return $this->processCreateSubdom($_GET[get_class($this)]);
     }
-    if(!is_file("../".$_GET[get_class($this)]."/USER_ID.".USER_ID))
-      throw new Exception(sprintf(_("Unauthorized subdom '%s' modification by '%s'")
-        , $_GET[get_class($this)], USER_ID));
+    $this->authorizeSubdom($_GET[get_class($this)]);
     if(isset($_POST["deactivate"]))
       return $this->processDeactivateSubdom($_GET[get_class($this)]);
     return $this->processUpdateSubdom($_GET[get_class($this)]);
+  }
+
+  private function authorizeSubdom($subdom) {
+    if(count(scandir("../$subdom")) == 2 || is_file("../$subdom/USER_ID.".USER_ID)) return;
+    throw new Exception(sprintf(_("Unauthorized subdom '%s' modification by '%s'"), $subdom, USER_ID));
   }
 
   private function processActivateSubdom($subdom) {
@@ -126,12 +129,54 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   }
 
   private function processCreateSubdom($subdom) {
-    if(!preg_match("/^".USER_ID.SUBDOM_PATTERN."$/", $subdom))
-      throw new Exception(sprintf(_("Invalid subdom format; must start with '%s'"), USER_ID));
-    if(is_dir(SUBDOM_ROOT_FOLDER."/$subdom") && is_dir("../$subdom"))
-      throw new Exception(sprintf(_("Subdom '%s' already exists"), $subdom));
+    if(!preg_match("/^".SUBDOM_PATTERN."$/", $subdom))
+      throw new Exception(_("Invalid subdom format"));
+    if(!isset($_POST["new_subdom_option"])) $action = "new";
+    else $action = $_POST["new_subdom_option"];
+    switch($action) {
+      case "new":
+      $this->prepareSubdomFolder($subdom);
+      if(!mkdir("../$subdom"))
+        throw new Exception(_("Unable to create new subdom '%s'"));
+      break;
+      case "copy":
+      if(!isset($_POST["copy_subdom_dir"]) || !is_dir("../".$_POST["copy_subdom_dir"]))
+        throw new Exception(_("Subdom copy parameter missing or invalid"));
+      $this->authorizeSubdom($_POST["copy_subdom_dir"]);
+      if(!(safeRemoveDir(SUBDOM_ROOT_FOLDER."/$subdom"))
+        || !(safeRemoveDir(SUBDOM_ROOT_FOLDER."/".$_POST["copy_subdom_dir"])))
+        throw new Exception(_("Unable to remove old subdom setup"));
+      $this->prepareSubdomFolder($subdom);
+      copyFiles("../".$_POST["copy_subdom_dir"], "../$subdom");
+      break;
+      case "rename":
+      if(!isset($_POST["rename_subdom_dir"]) || !is_dir("../".$_POST["rename_subdom_dir"]))
+        throw new Exception(_("Subdom rename parameter missing or invalid"));
+      $this->authorizeSubdom($_POST["rename_subdom_dir"]);
+      if(!(safeRemoveDir(SUBDOM_ROOT_FOLDER."/$subdom"))
+        || !(safeRemoveDir(SUBDOM_ROOT_FOLDER."/".$_POST["rename_subdom_dir"])))
+        throw new Exception(_("Unable to remove old subdom setup"));
+      $this->prepareSubdomFolder($subdom);
+      rename("../".$_POST["rename_subdom_dir"], "../$subdom");
+      break;
+      default:
+      throw new Exception(_("Unrecognized new subdom request"));
+    }
     $this->successMsg = sprintf(_("Subdom %s successfully created"), $subdom);
     return $subdom;
+  }
+
+  private function prepareSubdomFolder($subdom) {
+    if(is_dir("../$subdom")) {
+      if(!isset($_POST["force"]))
+        throw new Exception(sprintf(_("Subdom '%s' already exists"), $subdom));
+      $this->authorizeSubdom($subdom);
+      if(!(safeRemoveDir("../$subdom")))
+        throw new Exception(_("Unable to remove old subdom"));
+    } else {
+      if(!preg_match("/^".USER_ID.SUBDOM_PATTERN."$/", $subdom))
+        throw new Exception(sprintf(_("Invalid user subdom format; must start with '%s'"), USER_ID));
+    }
   }
 
   // process post (changes) into USER_ID/subdom
@@ -173,6 +218,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       throw new Exception(sprintf(_("Missing POST data '%s'"), $varName));
     if(!is_null($root)) {
       $bakDir = duplicateDir("$root/".$_POST[$varName]);
+      #todo: increment trailing number part
       $i = 1;
       $newDir = $_POST[$varName];
       while(file_exists("$root/$newDir$i")) $i++;
@@ -188,27 +234,83 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   public function getContent(HTMLPlus $content) {
     Cms::getOutputStrategy()->addCssFile($this->getDir()."/SubdomManager.css");
-    $q = sprintf(_("Deactivate subdom '%s'?"), '$subdom');
+    $qDeacitvate = sprintf(_("Deactivate subdom @subdom?"), '@subdom');
+    $qRename = _("Renaming will make current subdom unaccessible."); #todo: sprintf subdom
     Cms::getOutputStrategy()->addJs("
     var forms = document.getElementsByTagName('form');
     for(var i=0; i<forms.length; i++) {
       if(typeof forms[i]['deactivate'] !== 'object') continue;
       forms[i]['deactivate'].addEventListener('click', function(e){
         var subdom = e.target.form['action'].split('=')[1];
-        var question = '$q';
-        if(confirm(question.replace('\$subdom', subdom))) return;
+        var question = '$qDeacitvate';
+        if(confirm(question.replace('@subdom', subdom))) return;
         e.preventDefault();
       }, false);
     }");
 
+    Cms::getOutputStrategy()->addJs("
+      var form = document.getElementById('new_subdom_form');
+      form['copy_subdom_dir'].addEventListener('change', selectRadio, false);
+      form['copy_subdom_dir'].addEventListener('click', selectRadio, false);
+      form['rename_subdom_dir'].addEventListener('change', selectRadio, false);
+      form['rename_subdom_dir'].addEventListener('click', selectRadio, false);
+      function selectRadio(event) {
+        target = event.target.previousSibling;
+        while(target != null) {
+          if(target.nodeName.toLowerCase() == 'input' && target.type == 'radio') {
+            target.checked = true;
+            return true;
+          }
+          target = target.previousSibling;
+        }
+      }
+      form.addEventListener('submit', function(e) {
+        if(!form['new_subdom_option'][2].checked) return;
+        if(confirm('$qRename')) return;
+        e.preventDefault();
+      }, false);
+    ");
+
     $newContent = $this->getHTMLPlus();
     $newContent->insertVar("domain", getDomain());
+    $newContent->insertVar("cbr", CMS_BEST_RELEASE);
     $newContent->insertVar("curlink", getCurLink()."?".get_class($this));
+    if(isset($_POST['force'])) $newContent->insertVar("force", "checked");
+
+    $radioCheked = "new";
+    if(isset($_POST['new_subdom_option'])) {
+      $radioCheked = $_POST['new_subdom_option'];
+    }
+    $newContent->insertVar($radioCheked, "checked");
 
     if(isset($_POST["new_subdom"])) {
       $newContent->insertVar("new_nohide", "nohide");
       $newContent->insertVar("new_subdom", $_POST["new_subdom"]);
     }
+    else $newContent->insertVar("new_subdom", Cms::getVariable("cms-user_id"));
+
+    $d = new DOMDocumentPlus();
+    $set = $d->appendChild($d->createElement("var"));
+    foreach($this->userSubdoms as $subdom => $null) {
+      $o = $d->createElement("option", $subdom);
+      if(isset($_POST["copy_subdom_dir"]) && $_POST["copy_subdom_dir"] == $subdom)
+        $o->setAttribute("selected", "selected");
+      #$o->setAttribute("value", $subdom);
+      $set->appendChild($o);
+    }
+    $newContent->insertVar("copySubdomDirs", $d->documentElement);
+
+    $d = new DOMDocumentPlus();
+    $set = $d->appendChild($d->createElement("var"));
+    foreach($this->userSubdoms as $subdom => $null) {
+      $o = $d->createElement("option", $subdom);
+      if(isset($_POST["rename_subdom_dir"]) && $_POST["rename_subdom_dir"] == $subdom)
+        $o->setAttribute("selected", "selected");
+      #$o->setAttribute("value", $subdom);
+      $set->appendChild($o);
+    }
+    $newContent->insertVar("renameSubdomDirs", $d->documentElement);
+
 
     $form = $newContent->getElementsByTagName("form")->item(1);
     foreach($this->userSubdoms as $subdom => $null) {

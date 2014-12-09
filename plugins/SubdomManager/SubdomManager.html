@@ -2,12 +2,17 @@
 <body xml:lang="cs">
   <h id="h.adf" author="InternetGuru" ctime="2014-11-22" link="subdom_manager">Manažer poddomén</h>
   <desc kw="manažer, správa, poddomény, plugin">Správa poddomén uživatele <em var="cms-user_id">n/a</em> na doméně <em var="domain">n/a</em>.</desc>
-  <form action="/" method="post" var="curlink@action">
-    <fieldset class="hidable" var="new_nohide@class"><legend><strong>Nová</strong> poddoména</legend>
+  <form action="/" method="post" var="curlink@action" id="new_subdom_form">
+    <fieldset class="hidable" var="new_nohide@class"><legend>Vytvoření, kopie a přejmenování poddomény</legend>
       <dl>
-        <dt><label for="new_subdom">Název nové poddomény</label></dt>
-        <dd><samp var="cms-user_id">n/a</samp><input type="text" name="new_subdom" id="new_subdom" var="new_subdom@value"/><samp var="domain">.%s</samp></dd>
+        <dt><label for="new_subdom">Vytvoření nové poddomény</label></dt>
+        <dd><input type="text" name="new_subdom" id="new_subdom" var="new_subdom@value"/><samp var="domain">.%s</samp></dd>
+        <dd><label><input type="checkbox" name="force" var="force@checked"/> Přepsat současnou poddoménu, pokud existuje.</label></dd>
         <dd>Nová poddoména musí začínat písmenem a dále může obsahovat písmena nebo čísla (<samp>[a-z][a-z0-9]*</samp>).</dd>
+        <dt>Jako</dt>
+        <dd><label><input var="new@checked" type="radio" name="new_subdom_option" value="new"/> výchozí nastavení nejnovější stabilní verze <samp var="cbr">n/a</samp></label></dd>
+        <dd><label><input var="copy@checked" type="radio" name="new_subdom_option" value="copy"/> kopie poddomény <select name="copy_subdom_dir"><option var="copySubdomDirs">n/a</option></select></label></dd>
+        <dd><label><input var="rename@checked" type="radio" name="new_subdom_option" value="rename"/> přejmenování poddomény <select name="rename_subdom_dir"><option var="renameSubdomDirs">n/a</option></select></label></dd>
         <dt>Akce</dt>
         <dd><input type="submit" value="Vytvořit poddoménu"/></dd>
         <dd><input type="submit" name="redir" value="Vytvořit poddoménu a přesměrovat"/></dd>

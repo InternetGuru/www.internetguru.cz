@@ -30,11 +30,14 @@ class InitServer {
       if(is_dir($serverSubdomDelDir)) {
         $this->activateSubdom($serverSubdomDelDir, $serverSubdomDir);
         return;
-      } else $this->createSubdom($serverSubdomDir);
+      } else {
+        $this->createSubdom($serverSubdomDir);
+      }
     }
     if(count(scandir($serverSubdomDir)) == 2) {
       if(!$update) throw new Exception(sprintf(_("Subdom '%s' is not available; try forcing updateSubdom"), $subdom));
       $this->acquireSubdom($serverSubdomDir);
+      $this->resetServerSubdom($serverSubdomDir);
     }
     if($update) $this->verifySubdomOwner($serverSubdomDir);
     if($update && is_dir($userSubdomDelDir)) {
@@ -52,7 +55,7 @@ class InitServer {
     if($update && !is_file("$serverSubdomDir/CONFIG.user"))
       throw new Exception(_("User subdom setup disabled; file CONFIG.user not found"));
     if(count(scandir($userSubdomDir)) == 2) {
-      if($update) $this->userResetServerSubdom($serverSubdomDir);
+      #if($update) $this->resetServerSubdom($serverSubdomDir);
       $this->syncServerToUser($serverSubdomDir, $userSubdomDir);
     } elseif($update) {
       $this->updateServerFromUser($userSubdomDir, $serverSubdomDir);
@@ -172,7 +175,7 @@ class InitServer {
     }
   }
 
-  private function userResetServerSubdom($dir) {
+  private function resetServerSubdom($dir) {
     $this->subdomVars["USER_DIR"] = $this->subdom;
     $this->subdomVars["FILES_DIR"] = $this->subdom;
     foreach(scandir($dir) as $f) {
@@ -219,7 +222,7 @@ class InitServer {
         case "robots":
         if($f != "robots.txt") continue;
         if(preg_match("/^ig\d/", $this->subdom))
-          throw new Exception(sprintf(_("Cannot modify '%s' in subdom '%s'"), $f, $this->subdom));
+          throw new Exception(sprintf(_("User cannot modify '%s' in user subdoms"), $f));
         if(!copy("$srcDir/$f", "$destDir/$f"))
           throw new Exception(sprintf(_("Unable to copy '%s' into subdom '%s'"), $f, $this->subdom));
         break;
@@ -261,9 +264,9 @@ class InitServer {
         case "PLUGIN":
         if(touch("$destDir/$f")) $ch = true;
         break;
-        case "robots":
-        if($f != "robots.txt" || is_link("$srcDir/$f")) continue;
-        if(copy("$srcDir/$f", "$destDir/$f")) $ch = true;
+        #case "robots":
+        #if($f != "robots.txt" || is_link("$srcDir/$f")) continue;
+        #if(copy("$srcDir/$f", "$destDir/$f")) $ch = true;
       }
       if(!$ch) continue;
       if(chgrp("$destDir/$f", $fGroup) && chmodGroup("$destDir/$f", 0664)) continue;
