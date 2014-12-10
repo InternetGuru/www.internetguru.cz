@@ -1,3 +1,13 @@
+0.4.0 2014-12-10
+HTML+ nový povinný atribut ns (65ff501)
+SubdomManager nová poddoména jako výchozí/kopie/přejmenování (60c2d61)
+SubdomManager umožňuje vytvořit kopii datového adresáře (ab94a7e)
+SubdomManager podporuje de/aktivaci poddomény (f44a438)
+Xhtml11: tlačítko pro označení obsahu pomocí třídy selectable (0191d40)
+Convertor podporuje zápis některých atributů pomocí znaku @ (6bd5fdb)
+HTML+ atribut ctime na nejvyšší úrovni je povinný (a095510)
+HTML+ atributy author, kw, link a element desc na nejvyšší úrovni jsou povinně neprázdné (10b0eae)
+
 0.3.13 2014-12-02
 HTML+: automatické generování neuvedených atributů 'ctime' a 'mtime' z datového souboru (9b771ec)
 HTML+: spojování HTML+ souborů pomocí elementu 'include' (123c90d)
