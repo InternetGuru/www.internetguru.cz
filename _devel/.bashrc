@@ -77,14 +77,15 @@ alias cms='cd "$CMS_FOLDER"'
 alias gaa='git add -A'
 alias gaas='gaa; gs'
 alias gd='git diff'
+alias gdc='_(){ git log $1^..$1 -p; }; _' # git diff commit [param HASH]
 alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _'
 alias gc='git commit'
 alias gcv='TAG=$( git show-ref --tags | tail -1 ); echo "Version history until" $( echo "$TAG" | cut -f3 -d"/" ); echo "---"; gv $( echo "$TAG" | cut -f1 -d" " )..'
 alias gl='git log --decorate --all --oneline --graph'
-alias gp='git push --all; git push --tags'
+alias gp='gpush'
+alias gpush='git push --all; git push --tags'
 alias gpull='git pull --all && git fetch -p'
 alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _'
-alias gv='_(){ git log --oneline $1 | cut -f2- -d" " | grep -v "^\."; }; _'
 alias gs='git status'
 
 # BASH
