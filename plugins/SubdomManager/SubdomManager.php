@@ -229,8 +229,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   public function getContent(HTMLPlus $content) {
     Cms::getOutputStrategy()->addCssFile($this->getDir()."/SubdomManager.css");
-    $qDeacitvate = sprintf(_("Deactivate subdom @subdom?"), '@subdom');
-    $qRename = _("Renaming will make current subdom unaccessible."); #todo: sprintf subdom
+    $qDeacitvate = sprintf(_("Deactivate subdom %s?"), '@subdom');
+    $qRename = _("Renaming will make current subdom unaccessible"); #todo: sprintf subdom
     Cms::getOutputStrategy()->addJs("
     var forms = document.getElementsByTagName('form');
     for(var i=0; i<forms.length; i++) {

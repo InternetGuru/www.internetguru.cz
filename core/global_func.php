@@ -78,7 +78,7 @@ function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
   if(is_null($keep)) $keep = "a-zA-Z0-9/_-";
   $s = @preg_replace("~[^$keep]~", "", $s);
   if(is_null($s))
-    throw new Exception(_("Normalize invalid keep parameter"));
+    throw new Exception(_("Invalid parameter 'keep'"));
   return $s;
 }
 
