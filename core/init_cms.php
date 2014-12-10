@@ -6,6 +6,11 @@ try {
   require_once('global_func.php');
   require_once('global_const.php');
   proceedServerInit("InitServer.php");
+  //////////////////////
+  // patch 0.3 to 0.4
+  if(is_file(USER_FOLDER."/Content.html") && defined("INDEX_HTML"))
+    rename(USER_FOLDER."/Content.html", USER_FOLDER."/".INDEX_HTML);
+  //////////////////////
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);
 
   $start_time = microtime(true);
