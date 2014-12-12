@@ -182,7 +182,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
   // process post (changes) into USER_ID/subdom
   private function processUpdateSubdom($subdom) {
     $subdomFolder = SUBDOM_ROOT_FOLDER."/$subdom";
-    if(!is_dir($subdomFolder) && !mkdir($subdomFolder, 0755, true))
+    if(!is_dir($subdomFolder) && !mkdir($subdomFolder, 0775, true))
       throw new Exception(sprintf(_("Unable to create user subdom directory '%s'"), $subdom));
     if(!isset($_POST["PLUGINS"]) || !is_array($_POST["PLUGINS"]))
       throw new Exception(_("Missing POST data 'PLUGINS'"));
@@ -204,8 +204,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       }
     }
     foreach($_POST["PLUGINS"] as $p) {
-      if(touch("$subdomFolder/PLUGIN.$p", 0644)) continue;
-      throw new Exception(sprintf(_("Unable to enable plugin from subdom '%s'"), $subdom));
+      if(is_file("$subdomFolder/PLUGIN.$p") || touch("$subdomFolder/PLUGIN.$p", 0664)) continue;
+      throw new Exception(sprintf(_("Unable to enable plugin in subdom '%s'"), $subdom));
     }
     if($origHash == getDirHash($subdomFolder))
       throw new Exception(sprintf(_("No changes made in '%s'"), $subdom));

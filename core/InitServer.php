@@ -22,9 +22,9 @@ class InitServer {
     );
     $serverSubdomDir = "../$subdom";
     $serverSubdomDelDir = "../.$subdom";
+    $this->updateSubdomVars($serverSubdomDir);
     $userSubdomDir = "../../".$this->subdomVars["USER_ID"]."/subdom/$subdom";
     $userSubdomDelDir = "../../".$this->subdomVars["USER_ID"]."/subdom/.$subdom";
-    $this->updateSubdomVars($serverSubdomDir);
     if(!is_dir($serverSubdomDir)) {
       if(!$update) throw new Exception(sprintf(_("Subdom '%s' does not exist; try forcing updateSubdom"), $subdom));
       if(is_dir($serverSubdomDelDir)) {

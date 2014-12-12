@@ -66,6 +66,17 @@ if(IS_LOCALHOST) {
   define('LOG_FOLDER', '../../'.LOG_DIR.'/'.CURRENT_SUBDOM_DIR);
   define('CACHE_FOLDER', '../../'.CACHE_DIR.'/'.CURRENT_SUBDOM_DIR);
 }
+define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
+define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
+define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
+define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
+define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
+define('CMS_VERSION_FILENAME', "cms_version.txt");
+define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
+define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
+#print_r(get_defined_constants(true)); die();
+#todo: date_default_timezone_set()
+#todo: localize lang
 
 if(CMS_DEBUG) {
   error_reporting(E_ALL);
@@ -78,18 +89,6 @@ if(CMS_DEBUG) {
   bindtextdomain("messages", LIB_FOLDER."/locale");
   textdomain("messages");
 }
-
-define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
-define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
-define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
-define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
-define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
-define('CMS_VERSION_FILENAME', "cms_version.txt");
-define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
-define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
-#print_r(get_defined_constants(true)); die();
-#todo: date_default_timezone_set()
-#todo: localize lang
 
 function __autoload($className) {
   $fp = PLUGINS_FOLDER."/$className/$className.php";

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-10 20:49+0100\n"
-"PO-Revision-Date: 2014-12-10 20:50+0100\n"
+"POT-Creation-Date: 2014-12-12 19:49+0100\n"
+"PO-Revision-Date: 2014-12-12 19:49+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -705,12 +705,12 @@ msgstr "Nepodporované schéma '%s'"
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:45
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:46
 #, php-format
 msgid "Wrong folder format '%s'"
 msgstr "Chybný formát složky '%s'"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:68
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:69
 #, php-format
 msgid "Agregator skipped file '%s'"
 msgstr "Agregátor vynechal soubor '%s'"
@@ -930,7 +930,7 @@ msgstr "Nepodařilo se vypnout rozšíření na poddoméně '%s'"
 
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:208
 #, php-format
-msgid "Unable to enable plugin from subdom '%s'"
+msgid "Unable to enable plugin in subdom '%s'"
 msgstr "Nepořadilo se zapnout rozšíření na poddoméně '%s'"
 
 #: D:\wamp\www\cms/plugins/SubdomManager/SubdomManager.php:211
@@ -1044,6 +1044,9 @@ msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "Unable to enable plugin from subdom '%s'"
+#~ msgstr "Nepořadilo se zapnout rozšíření na poddoméně '%s'"
 
 #~ msgid "Renaming will make current subdom unaccessible."
 #~ msgstr "Po přejmenování nebude současná doména dostupná."
