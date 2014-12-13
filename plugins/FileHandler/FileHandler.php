@@ -16,6 +16,7 @@ class FileHandler extends Plugin implements SplObserver {
     $fInfo = checkUrl(FILES_FOLDER);
     $filepath = $fInfo["filepath"];
     if(is_null($filepath)) return;
+    #todo: image handling
     $filesize = filesize($filepath);
     $shortPath = substr($filepath, strlen(FILES_FOLDER)+1);
     $start_time = microtime(true);

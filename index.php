@@ -1,5 +1,10 @@
 <?php
 try {
+  $initCmsFile = "../cms/core/init_cms.php";
+  if(is_file($initCmsFile)) {
+    include($initCmsFile);
+    exit;
+  }
   foreach(scandir(getCwd()) as $f) {
     $var = explode(".", $f, 2);
     if($var[0] != "CMS_VER") continue;

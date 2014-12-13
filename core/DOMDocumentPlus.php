@@ -260,7 +260,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function setUniqueId(DOMElement $e) {
-    $id = $e->nodeName.".".substr(md5(microtime()), 0, 3);
+    $id = $e->nodeName.".".substr(md5(microtime().rand()), 0, 3);
     if(!$this->isValidId($id)) $this->setUniqueId($e);
     if(!is_null($this->getElementById($id))) $this->setUniqueId($e);
     $e->setAttribute("id", $id);
