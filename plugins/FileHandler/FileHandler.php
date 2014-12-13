@@ -2,6 +2,8 @@
 
 class FileHandler extends Plugin implements SplObserver {
 
+  private $fileMime;
+
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1);
@@ -14,17 +16,30 @@ class FileHandler extends Plugin implements SplObserver {
 
   private function handleRequest() {
     $fInfo = checkUrl(FILES_FOLDER);
-    $filepath = $fInfo["filepath"];
-    if(is_null($filepath)) return;
-    #todo: image handling
-    $filesize = filesize($filepath);
-    $shortPath = substr($filepath, strlen(FILES_FOLDER)+1);
+    if(is_null($fInfo["filepath"])) return;
+    $filePath = realpath($fInfo["filepath"]);
+    $this->fileMime = $fInfo["filemime"];
+    if($filePath === false) return;
+    if(strpos($this->fileMime, "image/") !== 0)
+      $this->downloadFile($filePath);
+    try {
+      $this->handleImage($filePath);
+    } catch(Exception $e) {
+      new ErrorPage(sprintf(_("Unable to handle image: %s")
+        , CMS_DEBUG ? $e->getMessage() : $fInfo["filepath"]), 400);
+    }
+  }
+
+  private function downloadFile($filePath) {
+    $filesize = filesize($filePath);
+    $shortPath = substr($filePath, strlen(FILES_FOLDER)+1);
     $start_time = microtime(true);
-    header("Content-Type: ".$fInfo["filemime"]);
+    header("Content-Type: ".$this->fileMime);
     header("Content-Length: $filesize");
     set_time_limit(0);
-    $handle = @fopen($filepath, "rb");
-    if($handle === false) throw new Exception(sprintf(_("Unable to read file '%s'"), $shortPath));
+    $handle = @fopen($filePath, "rb");
+    if($handle === false)
+      new ErrorPage(sprintf(_("Unable to read file '%s'"), $shortPath), 500);
     while(!feof($handle)) {
       print(fread($handle, 1024*8));
       ob_flush();
@@ -33,6 +48,42 @@ class FileHandler extends Plugin implements SplObserver {
     fclose($handle);
     new Logger("File download '$shortPath' ".fileSizeConvert($filesize), Logger::LOGGER_INFO, $start_time);
     die();
+  }
+
+  private function handleImage($filePath) {
+    $var = array(
+      "thumb" => array(200, 200, 50*1024),
+      "normal" => array(1000, 1000, 300*1024),
+      "full" => array(0, 0, 0)
+      );
+    $vName = "normal";
+    foreach($var as $name => $v) {
+      if(!isset($_GET[$name])) continue;
+      $vName = $name;
+      break;
+    }
+    $v = $var[$vName];
+    if(!$v[0] || !$v[1]) $this->downloadFile($filePath); // handle as a file
+    $tmpDir = TEMP_FOLDER."/".PLUGINS_DIR."/".get_class($this)."/$vName";
+    if(!is_dir($tmpDir) && !mkdir($tmpDir, 0775, true))
+      throw new Exception(_("Unable to create temporary folder"));
+    $tmpPath = $tmpDir."/".basename($filePath);
+    if(is_file($tmpPath) && filemtime($filePath) < filemtime($tmpPath)) {
+      $i = getimagesize($tmpPath);
+      if($i[0] > $v[0] || $i[1] > $v[1] || filesize($tmpPath) > $v[2])
+        throw new Exception(_("Ivalid temporary image parameters"));
+      $this->downloadFile($tmpPath);
+    }
+    $im = new Imagick(realpath($filePath));
+    if(!$im->thumbnailImage($v[0], 0) || !$im->thumbnailImage(0, $v[1]))
+      throw new Exception(sprintf(_("Unable to resize image %s"), basename($filePath)));
+    $size = $im->getImageLength();
+    if($v[2] && $size > $v[2])
+      throw new Exception(sprintf(_("Image %s size %s is over limit %s"),
+        basename($filePath), fileSizeConvert($size), fileSizeConvert($v[2])));
+    if(!file_put_contents($tmpPath, $im->__toString()))
+      throw new Exception(_("Unable to create temporary image"));
+    $this->downloadFile($tmpPath);
   }
 
 }
