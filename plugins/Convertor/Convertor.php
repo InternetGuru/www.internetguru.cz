@@ -120,7 +120,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private function addLinks(HTMLPlus $doc) {
     foreach($doc->getElementsByTagName("h") as $e) {
       if(!$e->hasAttribute("short")) continue;
-      $e->setAttribute("link", normalize($e->getAttribute("short")));
+      $e->setAttribute("link", normalize($e->getAttribute("short"), "a-zA-Z0-9/_-"));
     }
   }
 

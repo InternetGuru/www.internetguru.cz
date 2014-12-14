@@ -230,7 +230,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if($this->type == "html") {
       $doc = new HTMLPlus();
-      $doc->defaultLink = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME));
+      $doc->defaultLink = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME), "a-zA-Z0-9/_-");
       $doc->defaultAuthor = Cms::getVariable("cms-author");
     } else $doc = new DOMDocumentPlus();
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {

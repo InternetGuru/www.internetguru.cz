@@ -373,7 +373,7 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("link")) continue;
       #$this->getElementById($h->getAttribute("link"), "link");
-      $link = normalize($h->getAttribute("link"));
+      $link = normalize($h->getAttribute("link"), "a-zA-Z0-9/_-");
       while(preg_match("/^[^a-z]/", $link)) $link = substr($link, 1); // must start with a-z
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))

@@ -65,7 +65,7 @@ class UrlHandler extends Plugin implements SplObserver {
 
   private function proceed() {
     if(DOMBuilder::isLink(getCurLink())) return;
-    $newLink = normalize(getCurLink());
+    $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
     $links = DOMBuilder::getLinks();
     $linkId = $this->findSimilar($links, $newLink);
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp

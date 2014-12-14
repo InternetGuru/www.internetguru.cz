@@ -14,15 +14,15 @@ class DOMBuilder {
   private static $identifiers = array(); // id => closest or self link
   private static $links = array(); // link => self id
 
-  public static function buildHTMLPlus($filePath, $user=true) {
+  public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
     $doc = new HTMLPlus();
-    self::build($doc, $filePath, true, $user);
+    self::build($doc, $filePath, true, $user, $linkPrefix);
     return $doc;
   }
 
   public static function buildDOMPlus($filePath, $replace=false, $user=true) {
     $doc = new DOMDocumentPlus();
-    self::build($doc, $filePath, $replace, $user);
+    self::build($doc, $filePath, $replace, $user, null);
     if($replace) return $doc;
     self::globalReadonly($doc);
     return $doc;
@@ -59,7 +59,7 @@ class DOMBuilder {
     }
   }
 
-  private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user) {
+  private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user, $linkPrefix) {
     /*
     $dc = new DOMCache(hash(FILE_HASH_ALGO, "$fileName, $replace, $user"));
     if($dc->isValid()) return $dc->getCache();
@@ -70,7 +70,7 @@ class DOMBuilder {
     if(self::DEBUG) $doc->formatOutput = true;
 
     if($replace) {
-      self::safeLoadDOM($fileName, $doc, $user, true);
+      self::safeLoadDOM($fileName, $doc, $user, true, $linkPrefix);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
       return;
     }
@@ -106,7 +106,7 @@ class DOMBuilder {
     return $f;
   }
 
-  private static function safeLoadDOM($filePath, DOMDocumentPlus $doc, $user, $admin) {
+  private static function safeLoadDOM($filePath, DOMDocumentPlus $doc, $user, $admin, $linkPrefix) {
     $files = array();
     try {
       $files[self::findFile($filePath, $user, $admin)] = null;
@@ -119,7 +119,7 @@ class DOMBuilder {
     $e = null;
     foreach($files as $f => $void) {
       try {
-        self::loadDOM($f, $doc);
+        self::loadDOM($f, $doc, null, $linkPrefix);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to load '%s': %s"), $filePath, $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
@@ -132,7 +132,7 @@ class DOMBuilder {
     if(!is_null($e)) throw $e;
   }
 
-  private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null) {
+  private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $linkPrefix=null) {
     if($doc instanceof HTMLPlus) {
       $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
       $fShort = str_replace($remove, array(), "?$filePath");
@@ -154,6 +154,7 @@ class DOMBuilder {
       $doc->defaultCtime = $c->format(DateTime::W3C);
       $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
       $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
+      if(!is_null($linkPrefix)) self::prefixLinks($linkPrefix, $doc);
     }
     try {
       $doc->validatePlus();
@@ -174,6 +175,13 @@ class DOMBuilder {
     self::insertIncludes($doc, $filePath);
     #print_r(self::$identifiers);
     #print_r(self::$links);
+  }
+
+  private static function prefixLinks($prefix, HTMLPlus $doc) {
+    foreach($doc->getElementsByTagName("h") as $h) {
+      if(!$h->hasAttribute("link")) continue;
+      $h->setAttribute("link", "$prefix/".$h->getAttribute("link"));
+    }
   }
 
   private static function registerIds(HTMLPlus $doc) {

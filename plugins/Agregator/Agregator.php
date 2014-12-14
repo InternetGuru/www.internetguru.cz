@@ -39,37 +39,33 @@ class Agregator extends Plugin implements SplObserver {
   private function buildLists() {
     $dir = USER_FOLDER."/".$this->getDir();
     if(!is_dir($dir)) return;
-    foreach(scandir($dir) as $f) {
-      if(strpos($f, ".") === 0) continue;
-      if(!is_dir("$dir/$f")) continue;
-      if(!preg_match("/^[a-z]+$/", $f)) {
-        new Logger(sprintf(_("Wrong folder format '%s'"), $f), Logger::LOGGER_WARNING);
-        continue;
-      }
-      $this->createVarList("$dir/$f");
-    }
+    $this->createVarList($dir);
   }
 
-  private function createVarList($src) {
+  private function createVarList($rootDir, $subDir=null) {
     $ctime = array();
-    foreach(scandir($src) as $f) {
-      if(!is_file("$src/$f")) continue;
+    $workingDir = is_null($subDir) ? $rootDir : "$rootDir/$subDir";
+    foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
-      if(is_file("$src/.$f")) continue;
+      if(is_dir("$workingDir/$f")) {
+        $this->createVarList($rootDir, is_null($subDir) ? $f : "$subDir/$f");
+        continue;
+      }
+      if(is_file("$workingDir/.$f")) continue;
       if(pathinfo($f, PATHINFO_EXTENSION) != "html") continue;
       try {
-        $doc = DOMBuilder::buildHTMLPlus("$src/$f");
-        $this->html["$src/$f"] = $doc;
-        $ctime["$src/$f"] = strtotime($doc->documentElement->firstElement->getAttribute("ctime"));
+        $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir);
+        $this->html["$workingDir/$f"] = $doc;
+        $ctime["$workingDir/$f"] = strtotime($doc->documentElement->firstElement->getAttribute("ctime"));
         foreach($doc->getElementsByTagName("h") as $h) {
           if(!$h->hasAttribute("link")) continue;
-          $this->links[$h->getAttribute("link")] = "$src/$f";
+          $this->links[$h->getAttribute("link")] = "$workingDir/$f";
         }
       } catch(Exception $e) {
         new Logger(sprintf(_("Agregator skipped file '%s'"), $f), Logger::LOGGER_WARNING);
       }
     }
-    if(empty($this->html)) return;
+    if(empty($ctime)) return;
     stableSort($ctime);
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
@@ -80,7 +76,8 @@ class Agregator extends Plugin implements SplObserver {
       $a->setAttribute("href", $this->html[$k]->documentElement->firstElement->getAttribute("link"));
       $a->nodeValue = $this->html[$k]->documentElement->firstElement->nodeValue;
     }
-    Cms::setVariable("list_".basename($src), $root);
+
+    Cms::setVariable("list".(is_null($subDir) ? "" : "_".str_replace("/", "_", $subDir)), $root);
   }
 
 }
