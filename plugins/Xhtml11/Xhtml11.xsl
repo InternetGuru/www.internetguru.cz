@@ -14,6 +14,7 @@
     <xsl:element name="h{$level+1}">
       <xsl:copy-of select="@*[
         name() != 'short' and
+        name() != 'ns' and
         name() != 'link' and
         name() != 'public' and
         name() != 'author' and

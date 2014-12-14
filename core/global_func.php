@@ -249,7 +249,8 @@ function checkUrl($folder = null) {
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
     new ErrorPage(sprintf(_("The requested URL '%s' was not understood by this server."), $rUri), 400);
-  if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.*)?$/", $rUri, $m)) return null;
+  if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.*)?$/", $rUri, $m))
+    return null;
 
   $fInfo["filepath"] = "$folder/".$m[1];
   if(!is_file($fInfo["filepath"]))
