@@ -1,12 +1,13 @@
 <?php
 
 class FileHandler extends Plugin implements SplObserver {
-
+  private $maxFileSize;
   private $fileMime;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1);
+    $this->maxFileSize = 50*1024*1024;
   }
 
   public function update(SplSubject $subject) {
@@ -26,16 +27,24 @@ class FileHandler extends Plugin implements SplObserver {
       $this->handleImage($filePath);
     } catch(Exception $e) {
       new ErrorPage(sprintf(_("Unable to handle image: %s")
-        , CMS_DEBUG ? $e->getMessage() : $fInfo["filepath"]), 400);
+        , CMS_DEBUG ? $e->getMessage() : $fInfo["filepath"]), 500);
     }
   }
 
-  private function downloadFile($filePath) {
-    $filesize = filesize($filePath);
-    $shortPath = substr($filePath, strlen(FILES_FOLDER)+1);
+  private function downloadFile($filePath, $maxSize = 0, $log = true) {
+    $fileSize = filesize($filePath);
+    $shortPath = substr($filePath, strlen(FILES_FOLDER));
+    if(!$fileSize)
+      new ErrorPage(sprintf(_("File %s is empty"), $shortPath), 500);
+    if($maxSize && $fileSize > $maxSize)
+      new ErrorPage(sprintf(_("File %s size %s is exceeding variable limit %s"),
+        $shortPath, fileSizeConvert($fileSize), fileSizeConvert($maxSize)), 500);
+    if($fileSize > $this->maxFileSize)
+      new ErrorPage(sprintf(_("File %s size %s is exceeding global limit %s"),
+        $shortPath, fileSizeConvert($fileSize), fileSizeConvert($this->maxFileSize)), 500);
     $start_time = microtime(true);
     header("Content-Type: ".$this->fileMime);
-    header("Content-Length: $filesize");
+    header("Content-Length: $fileSize");
     set_time_limit(0);
     $handle = @fopen($filePath, "rb");
     if($handle === false)
@@ -46,7 +55,7 @@ class FileHandler extends Plugin implements SplObserver {
       flush();
     }
     fclose($handle);
-    new Logger("File download '$shortPath' ".fileSizeConvert($filesize), Logger::LOGGER_INFO, $start_time);
+    if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time);
     die();
   }
 
@@ -63,27 +72,23 @@ class FileHandler extends Plugin implements SplObserver {
       break;
     }
     $v = $var[$vName];
-    if(!$v[0] || !$v[1]) $this->downloadFile($filePath); // handle as a file
+    if(!$v[0] || !$v[1]) $this->downloadFile($filePath, $v[2]); // handle as a file
     $tmpDir = TEMP_FOLDER."/".PLUGINS_DIR."/".get_class($this)."/$vName";
     if(!is_dir($tmpDir) && !mkdir($tmpDir, 0775, true))
       throw new Exception(_("Unable to create temporary folder"));
     $tmpPath = $tmpDir."/".basename($filePath);
     if(is_file($tmpPath) && filemtime($filePath) < filemtime($tmpPath)) {
       $i = getimagesize($tmpPath);
-      if($i[0] > $v[0] || $i[1] > $v[1] || filesize($tmpPath) > $v[2])
-        throw new Exception(_("Ivalid temporary image parameters"));
-      $this->downloadFile($tmpPath);
+      if($i[0] > $v[0] || $i[1] > $v[1])
+        throw new Exception(_("Temporary image dimensions are over limit"));
+      $this->downloadFile($tmpPath, $v[2], false);
     }
     $im = new Imagick(realpath($filePath));
     if(!$im->thumbnailImage($v[0], 0) || !$im->thumbnailImage(0, $v[1]))
       throw new Exception(sprintf(_("Unable to resize image %s"), basename($filePath)));
-    $size = $im->getImageLength();
-    if($v[2] && $size > $v[2])
-      throw new Exception(sprintf(_("Image %s size %s is over limit %s"),
-        basename($filePath), fileSizeConvert($size), fileSizeConvert($v[2])));
     if(!file_put_contents($tmpPath, $im->__toString()))
       throw new Exception(_("Unable to create temporary image"));
-    $this->downloadFile($tmpPath);
+    $this->downloadFile($tmpPath, $v[2], false);
   }
 
 }

@@ -135,9 +135,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         #todo: $this->asynchronousExternalImageCheck($dataFile);
         continue;
       }
-      $filePath = FILES_FOLDER."/$dataFile";
+      $filePath = FILES_FOLDER."/".$pUrl["path"];
       if(!is_file($filePath)) {
-        $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $filePath));
+        $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $pUrl["path"]));
         continue;
       }
       try {
@@ -148,9 +148,16 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $o->setAttribute("type", $mime);
           new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime), Logger::LOGGER_WARNING);
         }
-        $size = filesize($filePath);
-        if($size > 350*1024) {
-          new Logger(sprintf(_("Object '%s' suspiciously big: %s"), $dataFile, fileSizeConvert($size)), Logger::LOGGER_WARNING);
+        $query = explode("&", $pUrl["query"]);
+        $fullRemoved = false;
+        foreach($query as $k => $q) {
+          if($q != "full" && strpos($q, "full=") !== 0) continue;
+          unset($query[$k]);
+          $fullRemoved = true;
+        }
+        if($fullRemoved) {
+          $o->setAttribute("data", $pUrl["path"].(count($query) ? "?".implode("&", $query) : ""));
+          new Logger(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile), Logger::LOGGER_WARNING);
         }
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_ERROR);

@@ -70,8 +70,8 @@ ol.img li, ul.img li {
 }
 
 object {
-  max-width: auto;
-  width: 100%;
+  max-width: 100%;
+  width: auto;
 }
 
 p object {

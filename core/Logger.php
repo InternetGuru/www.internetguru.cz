@@ -43,7 +43,7 @@ class Logger {
       $msg[] = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
     else
       $msg[] = "0.0.0.0:0000";
-    $msg[] = "unknown"; // logged user
+    $msg[] = is_null(Cms::getVariable("auth-logged_user")) ? "unknown" : Cms::getVariable("auth-logged_user"); // logged user
     $msg[] = date(DATE_ATOM); // http://php.net/manual/en/class.datetime.php
     if(isset($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], $_SERVER["SERVER_PROTOCOL"]))
       $msg[] = '"'.$_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"]." ".$_SERVER["SERVER_PROTOCOL"].'"';
