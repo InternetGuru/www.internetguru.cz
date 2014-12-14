@@ -121,15 +121,33 @@ class Agregator extends Plugin implements SplObserver {
       }
       if(empty($ctime)) return;
       stableSort($ctime);
+
       $doc = new DOMDocumentPlus();
       $root = $doc->appendChild($doc->createElement("root"));
       $ol = $root->appendChild($doc->createElement("ol"));
+
+      $docTop = new DOMDocumentPlus();
+      $rootTop = $docTop->appendChild($docTop->createElement("root"));
+      $dl = $rootTop->appendChild($docTop->createElement("dl"));
+      $i = 0;
       foreach($ctime as $k => $null) {
+        $i++;
         $li = $ol->appendChild($doc->createElement("li"));
         $a = $li->appendChild($doc->createElement("a"));
-        $a->setAttribute("href", $this->html[$k]->documentElement->firstElement->getAttribute("link"));
-        $a->nodeValue = $this->html[$k]->documentElement->firstElement->nodeValue;
+        $href = $this->html[$k]->documentElement->firstElement->getAttribute("link");
+        $a->setAttribute("href", $href);
+        $hContent = $this->html[$k]->documentElement->firstElement->nodeValue;
+        $a->nodeValue = $hContent;
+        if($i > 3) continue;
+        $dt = $dl->appendChild($docTop->createElement("dt"));
+        $a = $dt->appendChild($docTop->createElement("a"));
+        $a->setAttribute("href", $href);
+        $a->nodeValue = $hContent;
+        if($i > 1) continue;
+        $dd = $dl->appendChild($docTop->createElement("dd"));
+        $dd->nodeValue = $this->html[$k]->documentElement->firstElement->nextElement->nodeValue;
       }
+      Cms::setVariable("htmltop".($subDir == "." ? "" : "_".str_replace("/", "_", $subDir)), $rootTop);
       Cms::setVariable("html".($subDir == "." ? "" : "_".str_replace("/", "_", $subDir)), $root);
     }
   }
