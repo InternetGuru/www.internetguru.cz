@@ -50,7 +50,7 @@ class DOMDocumentPlus extends DOMDocument {
       }
       $e->setAttribute("var", implode(" ", $keep));
     }
-    $replaces = array_merge($replaceAttr, $replaceCont); // attributes first!
+    $replaces = array_merge($replaceAttr, array_reverse($replaceCont, true)); // attributes first!
     if(!count($replaces)) return;
     $type = gettype($varValue);
     foreach($replaces as $item) {

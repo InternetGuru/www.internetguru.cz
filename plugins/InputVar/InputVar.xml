@@ -1,6 +1,23 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
-  <fn id="formatdate" fn="strftime" format="%e. %B %G" />
+  <process id="mydate">
+  </process>
+  <fn id="formatdate" fn="strftime" format="%e. %B %Y"/>
+  <fn id="tr_mon" fn="translate">
+    <data name="leden">ledna</data>
+    <data name="únor">února</data>
+    <data name="březen">března</data>
+    <data name="duben">dubna</data>
+    <data name="květen">května</data>
+    <data name="červen">června</data>
+    <data name="červenec">července</data>
+    <data name="srpen">srpna</data>
+    <data name="září">září</data>
+    <data name="říjen">října</data>
+    <data name="listopad">listopadu</data>
+    <data name="prosinec">prosince</data>
+  </fn>
+
   <!-- format creation time -->
   <var id="ctime_mm" fn="date" format="%m" date="@$cms-ctime"/>
   <var id="ctime_mon" fn="translate" name="$ctime_mm">
@@ -19,6 +36,7 @@
     <data lang="cs">n/a</data>
   </var>
   <var id="ctime" fn="date" format="Vytvořeno %e. $ctime_mon %Y" date="@$cms-ctime"/>
+
   <!-- format modification time -->
   <var id="mtime_mm" fn="date" format="%m" date="@$cms-mtime"/>
   <var id="mtime_mon" fn="translate" name="$mtime_mm">

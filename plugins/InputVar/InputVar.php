@@ -30,13 +30,31 @@ class InputVar extends Plugin implements SplObserver {
     if($e->hasAttribute("fn")) switch($e->getAttribute("fn")) {
       case "strftime":
       if(!$e->hasAttribute("format")) {
-        new Logger(_("Function strftime required attribute format"));
+        new Logger(_("Function strftime missing attribute format"));
         return;
       }
       $format = $this->crossPlatformCompatibleFormat($e->getAttribute("format"));
       Cms::setVariable($e->getAttribute("id"), function($value) use ($format) {
-        $date = strftime($format, strtotime($value));
+        $date = trim(strftime($format, strtotime($value)));
         return $date ? $date : $value;
+      });
+      break;
+      case "translate":
+      $tr = array();
+      foreach($e->childElements as $data) {
+        if($data->nodeName != "data") continue;
+        if(!$data->hasAttribute("name")) {
+          new Logger(_("Function translate missing attribute name"));
+          continue;
+        }
+        $tr[$data->getAttribute("name")] = $data->nodeValue;
+      }
+      if(empty($tr)) {
+        new Logger(_("No data found for function translate"));
+        return;
+      }
+      Cms::setVariable($e->getAttribute("id"), function($value) use ($tr) {
+        return str_replace(array_keys($tr), $tr, $value);
       });
       break;
       default:
