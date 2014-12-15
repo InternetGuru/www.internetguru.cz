@@ -84,6 +84,10 @@ class DOMDocumentPlus extends DOMDocument {
         $this->insertVarArray($varValue, $e, $varName);
         break;
         default:
+        if($varValue instanceof Closure) {
+          $e->nodeValue = call_user_func($varValue, $e->nodeValue);
+          break;
+        }
         if($varValue instanceof DOMElement) {
           $this->insertVarDOMElement($varValue, $e, $attr, $varName);
           break;

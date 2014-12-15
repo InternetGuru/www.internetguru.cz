@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
+  <fn id="formatdate" fn="strftime" format="%e. %B %G" />
   <!-- format creation time -->
   <var id="ctime_mm" fn="date" format="%m" date="@$cms-ctime"/>
   <var id="ctime_mon" fn="translate" name="$ctime_mm">

@@ -5,14 +5,17 @@ class Agregator extends Plugin implements SplObserver {
   private $links = array();  // link => filePath
   private $html = array();  // filePath => HTMLPlus
   private $files = array();  // filePath => fileInfo(?)
+  private $cfg;
 
   public function __construct(SplSubject $s) {
+    parent::__construct($s);
     $s->setPriority($this, 2);
   }
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
+    $this->cfg = $this->getDOMPlus();
     $this->createList($this->html, USER_FOLDER."/".$this->getDir());
     $this->createHtmlVar(USER_FOLDER."/".$this->getDir());
     $this->createList($this->files, FILES_FOLDER);
@@ -55,13 +58,13 @@ class Agregator extends Plugin implements SplObserver {
         continue;
       }
       if(is_file("$workingDir/.$f")) continue;
-      $list[is_null($subDir) ? "." : $subDir][$f] = null;
+      $list[$subDir][$f] = null;
     }
   }
 
   private function createImgVar($rootDir) {
     foreach($this->files as $subDir => $null) {
-      $workingDir = $subDir == "." ? $rootDir : "$rootDir/$subDir";
+      $workingDir = $subDir == "" ? $rootDir : "$rootDir/$subDir";
       $doc = new DOMDocumentPlus();
       $root = $doc->appendChild($doc->createElement("root"));
       $ol = $root->appendChild($doc->createElement("ol"));
@@ -71,7 +74,7 @@ class Agregator extends Plugin implements SplObserver {
         if(strpos($mime, "image/") !== 0) continue;
         $li = $ol->appendChild($doc->createElement("li"));
         $a = $li->appendChild($doc->createElement("a"));
-        $href = $subDir == "." ? $f : "$subDir/$f";
+        $href = $subDir == "" ? $f : "$subDir/$f";
         $a->setAttribute("href", $href);
         $o = $a->appendChild($doc->createElement("object"));
         $o->setAttribute("data", "$href?thumb");
@@ -80,36 +83,36 @@ class Agregator extends Plugin implements SplObserver {
         $found = true;
       }
       if(!$found) continue;
-      Cms::setVariable("img".($subDir == "." ? "" : "_".str_replace("/", "_", $subDir)), $root);
+      Cms::setVariable("img".($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)), $root);
     }
   }
 
   private function createFilesVar($rootDir) {
     foreach($this->files as $subDir => $null) {
-      $workingDir = $subDir == "." ? $rootDir : "$rootDir/$subDir";
+      $workingDir = $subDir == "" ? $rootDir : "$rootDir/$subDir";
       $doc = new DOMDocumentPlus();
       $root = $doc->appendChild($doc->createElement("root"));
       $ol = $root->appendChild($doc->createElement("ol"));
       foreach($this->files[$subDir] as $f => $null) {
         $li = $ol->appendChild($doc->createElement("li"));
         $a = $li->appendChild($doc->createElement("a"));
-        $href = $subDir == "." ? $f : "$subDir/$f";
+        $href = $subDir == "" ? $f : "$subDir/$f";
         $a->setAttribute("href", $href);
         $a->nodeValue = $href;
       }
-      Cms::setVariable("files".($subDir == "." ? "" : "_".str_replace("/", "_", $subDir)), $root);
+      Cms::setVariable("files".($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)), $root);
     }
   }
 
   private function createHtmlVar($rootDir) {
     foreach($this->html as $subDir => $null) {
-      $workingDir = $subDir == "." ? $rootDir : "$rootDir/$subDir";
+      $workingDir = $subDir == "" ? $rootDir : "$rootDir/$subDir";
       $ctime = array();
       foreach($this->html[$subDir] as $f => $null) {
         if(pathinfo($f, PATHINFO_EXTENSION) != "html") continue;
         try {
-          $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir == "." ? null : $subDir);
-          $this->html["$workingDir/$f"] = $doc;
+          $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir == "" ? null : $subDir);
+          $this->html[$subDir][$f] = $doc;
           $ctime["$workingDir/$f"] = strtotime($doc->documentElement->firstElement->getAttribute("ctime"));
           foreach($doc->getElementsByTagName("h") as $h) {
             if(!$h->hasAttribute("link")) continue;
@@ -121,35 +124,82 @@ class Agregator extends Plugin implements SplObserver {
       }
       if(empty($ctime)) return;
       stableSort($ctime);
-
-      $doc = new DOMDocumentPlus();
-      $root = $doc->appendChild($doc->createElement("root"));
-      $ol = $root->appendChild($doc->createElement("ol"));
-
-      $docTop = new DOMDocumentPlus();
-      $rootTop = $docTop->appendChild($docTop->createElement("root"));
-      $dl = $rootTop->appendChild($docTop->createElement("dl"));
-      $i = 0;
-      foreach($ctime as $k => $null) {
-        $i++;
-        $li = $ol->appendChild($doc->createElement("li"));
-        $a = $li->appendChild($doc->createElement("a"));
-        $href = $this->html[$k]->documentElement->firstElement->getAttribute("link");
-        $a->setAttribute("href", $href);
-        $hContent = $this->html[$k]->documentElement->firstElement->nodeValue;
-        $a->nodeValue = $hContent;
-        if($i > 3) continue;
-        $dt = $dl->appendChild($docTop->createElement("dt"));
-        $a = $dt->appendChild($docTop->createElement("a"));
-        $a->setAttribute("href", $href);
-        $a->nodeValue = $hContent;
-        if($i > 1) continue;
-        $dd = $dl->appendChild($docTop->createElement("dd"));
-        $dd->nodeValue = $this->html[$k]->documentElement->firstElement->nextElement->nodeValue;
+      foreach($this->cfg->documentElement->childElements as $html) {
+        if($html->nodeName != "html") continue;
+        if(!$html->hasAttribute("id")) {
+          new Logger(_("Configuration element html missing attribute id"));
+          continue;
+        }
+        if(!$html->hasAttribute("wrapper")) {
+          new Logger(_("Configuration element html missing attribute wrapper"));
+          continue;
+        }
+        try {
+          Cms::setVariable($html->getAttribute("id")
+            .($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)),
+            $this->getDOM($html->childElements, $html->getAttribute("wrapper"), $subDir));
+        } catch(Exception $e) {
+          new Logger($e->getMessage());
+          continue;
+        }
       }
-      Cms::setVariable("htmltop".($subDir == "." ? "" : "_".str_replace("/", "_", $subDir)), $rootTop);
-      Cms::setVariable("html".($subDir == "." ? "" : "_".str_replace("/", "_", $subDir)), $root);
     }
+  }
+
+  private function getDOM(DOMNodeList $items, $wrapper, $subDir) {
+    $doc = new DOMDocumentPlus();
+    $root = $doc->appendChild($doc->createElement("root"));
+    $list = $root->appendChild($doc->createElement($wrapper));
+
+    $patterns = array();
+    foreach($items as $item) {
+      if($item->nodeName != "item") continue;
+      if($item->hasAttribute("since"))
+        $patterns[$item->getAttribute("since")-1] = $item->childElements;
+      else $patterns[] = $item->childElements;
+    }
+    if(empty($patterns)) throw new Exception(_("No item element found"));
+    $i = -1;
+    $pattern = null;
+    foreach($this->html[$subDir] as $k => $htmlPlus) {
+      if(is_null($htmlPlus)) continue;
+      $i++;
+      if(isset($patterns[$i])) $pattern = $patterns[$i];
+      if(is_null($pattern) || !$pattern->length) continue;
+      foreach($pattern as $p) {
+        $vars = $this->getHTMLVariables($htmlPlus);
+        $p = $this->replaceVariables($p, $vars);
+        $item = $list->appendChild($doc->importNode($p, true));
+      }
+    }
+    return $root;
+  }
+
+  private function replaceVariables(DOMElementPlus $element, Array $vars) {
+    $doc = new DOMDocumentPlus();
+    $doc->appendChild($doc->importNode($element, true));
+    $parts = explode('\$', $doc->saveXML());
+    foreach($parts as $k => $p) {
+      $parts[$k] = str_replace(array_keys($vars), $vars, $p);
+    }
+    $doc->loadXML(implode('$', $parts));
+    return $doc->documentElement;
+  }
+
+  private function getHTMLVariables(HTMLPlus $doc) {
+    $vars = array();
+    $h = $doc->documentElement->firstElement;
+    $desc = $h->nextElement;
+    $vars['$heading'] = $h->nodeValue;
+    $vars['$link'] = $h->getAttribute("link");
+    $vars['$ns'] = $h->getAttribute("ns");
+    $vars['$author'] = $h->getAttribute("author");
+    $vars['$ctime'] = $h->getAttribute("ctime");
+    $vars['$mtime'] = $h->getAttribute("mtime");
+    $vars['$short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
+    $vars['$desc'] = $desc->nodeValue;
+    $vars['$kw'] = $desc->getAttribute("kw");
+    return $vars;
   }
 
 }

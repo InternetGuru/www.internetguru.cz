@@ -8,8 +8,41 @@ class InputVar extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     $dom = $this->getDOMPlus();
-    $vars = $dom->getElementsByTagName("var");
-    foreach($vars as $var) $this->parseVar($var);
+    foreach($dom->documentElement->childElements as $e) {
+      if(!$e->hasAttribute("id")) {
+        new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName));
+        continue;
+      }
+      switch($e->nodeName) {
+        case "var":
+        $this->parseVar($e);
+        break;
+        case "fn":
+        $this->parseFn($e);
+        break;
+        default:
+        new Logger(sprintf(_("Unknown element name %s"), $e->nodeName));
+      }
+    }
+  }
+
+  private function parseFn(DOMElement $e) {
+    if($e->hasAttribute("fn")) switch($e->getAttribute("fn")) {
+      case "strftime":
+      if(!$e->hasAttribute("format")) {
+        new Logger(_("Function strftime required attribute format"));
+        return;
+      }
+      $format = $this->crossPlatformCompatibleFormat($e->getAttribute("format"));
+      Cms::setVariable($e->getAttribute("id"), function($value) use ($format) {
+        $date = strftime($format, strtotime($value));
+        return $date ? $date : $value;
+      });
+      break;
+      default:
+      new Logger(sprintf(_("Unknown element name %s"), $e->nodeName));
+    }
+
   }
 
   private function parseVar(DOMElement $var) {
