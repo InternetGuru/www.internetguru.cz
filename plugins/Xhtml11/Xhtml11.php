@@ -80,7 +80,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // apply transformations
     $proc = new XSLTProcessor();
-    $proc->setParameter('', $this->getProcParams($proc));
+    $proc->setParameter('', $this->getProcParams());
     stableSort($this->transformationsPriority);
     foreach($this->transformationsPriority as $xslt => $priority) {
       try {
@@ -199,16 +199,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     return $title;
   }
 
-  private function getProcParams(XSLTProcessor $proc) {
+  private function getProcParams() {
     $o = array();
     foreach(Cms::getAllVariables() as $k => $v) {
       $valid = true;
-      if($v instanceof Closure) {
-        #$$k = $v;
-        #echo $k("2014");
-        #$proc->registerPHPFunctions($k);
-        continue;
-      }
+      if($v instanceof Closure) continue;
       elseif($v instanceof DOMElement) {
         $d = new DOMDocumentPlus();
         foreach($v->childNodes as $n) $d->appendChild($d->importNode($n, true));

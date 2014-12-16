@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
-  <process id="mydate">
-  </process>
-  <fn id="formatdate" fn="strftime" format="%e. %B %Y"/>
-  <fn id="tr_mon" fn="translate">
+
+  <fn id="monthcs" fn="replace">
     <data name="leden">ledna</data>
     <data name="únor">února</data>
     <data name="březen">března</data>
@@ -12,53 +10,21 @@
     <data name="červen">června</data>
     <data name="červenec">července</data>
     <data name="srpen">srpna</data>
-    <data name="září">září</data>
+    <!-- <data name="září">září</data> -->
     <data name="říjen">října</data>
     <data name="listopad">listopadu</data>
     <data name="prosinec">prosince</data>
   </fn>
-
-  <!-- format creation time -->
-  <var id="ctime_mm" fn="date" format="%m" date="@$cms-ctime"/>
-  <var id="ctime_mon" fn="translate" name="$ctime_mm">
-    <data lang="cs" name="01">ledna</data>
-    <data lang="cs" name="02">února</data>
-    <data lang="cs" name="03">března</data>
-    <data lang="cs" name="04">dubna</data>
-    <data lang="cs" name="05">května</data>
-    <data lang="cs" name="06">června</data>
-    <data lang="cs" name="07">července</data>
-    <data lang="cs" name="08">srpna</data>
-    <data lang="cs" name="09">září</data>
-    <data lang="cs" name="10">října</data>
-    <data lang="cs" name="11">listopadu</data>
-    <data lang="cs" name="12">prosince</data>
-    <data lang="cs">n/a</data>
+  <fn id="dateformat" fn="strftime" format="%e. %B %Y"/>
+  <fn id="dateformatcs" fn="sequence">
+    <call fn="dateformat"/>
+    <call fn="monthcs"/>
+  </fn>
+  <var id="myauthor" fn="sequence" data="$cms-author">
+    <call fn="link" href="#@$cms-authorid"/>
   </var>
-  <var id="ctime" fn="date" format="Vytvořeno %e. $ctime_mon %Y" date="@$cms-ctime"/>
+  <var id="myctime" fn="dateformatcs" data="$cms-ctime"/>
+  <var id="mymtime" fn="dateformatcs" data="$cms-mtime"/>
+  <var id="creation" data="Autorem článku je $myauthor ze dne $myctime:"/>
 
-  <!-- format modification time -->
-  <var id="mtime_mm" fn="date" format="%m" date="@$cms-mtime"/>
-  <var id="mtime_mon" fn="translate" name="$mtime_mm">
-    <data lang="cs" name="01">ledna</data>
-    <data lang="cs" name="02">února</data>
-    <data lang="cs" name="03">března</data>
-    <data lang="cs" name="04">dubna</data>
-    <data lang="cs" name="05">května</data>
-    <data lang="cs" name="06">června</data>
-    <data lang="cs" name="07">července</data>
-    <data lang="cs" name="08">srpna</data>
-    <data lang="cs" name="09">září</data>
-    <data lang="cs" name="10">října</data>
-    <data lang="cs" name="11">listopadu</data>
-    <data lang="cs" name="12">prosince</data>
-    <data lang="cs">n/a</data>
-  </var>
-  <var id="mtime" fn="date" format="Poslední úpravy %e. $mtime_mon %Y" date="@$cms-mtime"/>
-<!--
-  <var id="hash" fn="hash">$cms-author</var>
-  <var id="link" fn="local_link" href="$hash">$cms-author</var>
-  <var id="date" fn="date" format="%B %Y" date="$cms-ctime"/>
-  <var id="creation">Created by $link in $date</var>
- -->
 </InputVar>

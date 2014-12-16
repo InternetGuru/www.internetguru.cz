@@ -207,6 +207,15 @@ class Cms {
     return self::$outputStrategy;
   }
 
+  public static function applyUserFn($fName, $value) {
+    $fn = self::getVariable($fName);
+    if(is_null($fn)) {
+      new Logger(sprintf(_("Function %s not found"), $fName), Logger::LOGGER_WARNING);
+      return $value;
+    }
+    return call_user_func($fn, $value);
+  }
+
 }
 
 ?>

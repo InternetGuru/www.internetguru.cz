@@ -17,8 +17,8 @@
   <xsl:param name="cms-mtime" select="''"/>
   <xsl:param name="xhtml11-url" select="''"/>
   <xsl:param name="xhtml11-link" select="''"/>
-  <xsl:param name="inputvar-ctime" select="''"/>
-  <xsl:param name="inputvar-mtime" select="''"/>
+  <xsl:param name="inputvar-myctime" select="''"/>
+  <xsl:param name="inputvar-mymtime" select="''"/>
 
   <xsl:template match="/body">
     <body>
@@ -32,10 +32,10 @@
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-ig"/></li>
             <li><xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
             <xsl:if test="not($cms-ctime = '')">
-              <li><xsl:value-of select="php:function('inputvar-formatdate', $cms-ctime)"/></li>
+              <li><xsl:value-of select="$inputvar-myctime"/></li>
             </xsl:if>
             <xsl:if test="not($cms-mtime = '')">
-              <li><xsl:value-of select="$inputvar-mtime"/></li>
+              <li><xsl:value-of select="$inputvar-mymtime"/></li>
             </xsl:if>
             <li><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/>/<xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
             <!-- <li><xsl:value-of select="$cms-version"/></li> -->

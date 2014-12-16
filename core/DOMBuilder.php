@@ -133,9 +133,9 @@ class DOMBuilder {
   }
 
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $linkPrefix=null) {
+    $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
+    $fShort = str_replace($remove, array(), "?$filePath");
     if($doc instanceof HTMLPlus) {
-      $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
-      $fShort = str_replace($remove, array(), "?$filePath");
       if(array_key_exists(realpath($filePath), self::$included))
         throw new Exception(sprintf(_("File '%s' already included"), $fShort));
       self::$included[realpath($filePath)] = null;
@@ -146,7 +146,7 @@ class DOMBuilder {
 
     // load
     if(!@$doc->load($filePath))
-      throw new Exception(sprintf(_("Invalid XML file")));
+      throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
     // validate, save if repaired
     if($doc instanceof HTMLPlus) {
       $c = new DateTime();

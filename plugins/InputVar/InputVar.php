@@ -8,134 +8,167 @@ class InputVar extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     $dom = $this->getDOMPlus();
+    $this->registerFnHash("hash", null, "crc32b");
+    $this->registerFnStrftime("strftime", null);
     foreach($dom->documentElement->childElements as $e) {
       if(!$e->hasAttribute("id")) {
-        new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName));
+        new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName), Logger::LOGGER_WARNING);
         continue;
       }
+      $data = null;
       switch($e->nodeName) {
         case "var":
-        $this->parseVar($e);
-        break;
-        case "fn":
-        $this->parseFn($e);
-        break;
-        default:
-        new Logger(sprintf(_("Unknown element name %s"), $e->nodeName));
-      }
-    }
-  }
-
-  private function parseFn(DOMElement $e) {
-    if($e->hasAttribute("fn")) switch($e->getAttribute("fn")) {
-      case "strftime":
-      if(!$e->hasAttribute("format")) {
-        new Logger(_("Function strftime missing attribute format"));
-        return;
-      }
-      $format = $this->crossPlatformCompatibleFormat($e->getAttribute("format"));
-      Cms::setVariable($e->getAttribute("id"), function($value) use ($format) {
-        $date = trim(strftime($format, strtotime($value)));
-        return $date ? $date : $value;
-      });
-      break;
-      case "translate":
-      $tr = array();
-      foreach($e->childElements as $data) {
-        if($data->nodeName != "data") continue;
-        if(!$data->hasAttribute("name")) {
-          new Logger(_("Function translate missing attribute name"));
+        if(!$e->hasAttribute("data")) {
+          new Logger(sprintf(_("Element var id=%s missing attribute data"), $e->getAttribute("id")), Logger::LOGGER_WARNING);
           continue;
         }
-        $tr[$data->getAttribute("name")] = $data->nodeValue;
+        $data = $e->getAttribute("data");
+        case "fn":
+        $this->processRule($e, $data);
+        break;
+        default:
+        new Logger(sprintf(_("Unknown element name %s"), $e->nodeName), Logger::LOGGER_WARNING);
       }
-      if(empty($tr)) {
-        new Logger(_("No data found for function translate"));
+    }
+  }
+
+  private function processRule(DOMElement $e, $data) {
+    $value = $this->parse($data);
+    if(!$e->hasAttribute("fn")) {
+      Cms::setVariable($e->getAttribute("id"), $value);
+      return;
+    }
+    $fn = Cms::getVariable($e->getAttribute("fn"));
+    echo $e->getAttribute("fn");
+    print_r(array_keys(Cms::getAllVariables()));
+    var_dump($fn);
+    if(!is_null($fn)) {
+      if(!$fn instanceof Closure) {
+        new Logger(sprintf(_("Variable %s is not a function"), $e->getAttribute("fn")), Logger::LOGGER_WARNING);
         return;
       }
-      Cms::setVariable($e->getAttribute("id"), function($value) use ($tr) {
-        return str_replace(array_keys($tr), $tr, $value);
-      });
+      Cms::setVariable($e->getAttribute("id"), $fn($value));
+      return;
+    }
+    switch($e->getAttribute("fn")) {
+      case "hash":
+      $algo = $e->hasAttribute("algo") ? $e->getAttribute("algo") : null;
+      $this->registerFnHash($e->getAttribute("id"), $data, $this->parse($algo));
+      break;
+      case "strftime":
+      $format = $e->hasAttribute("format") ? $e->getAttribute("format") : null;
+      $this->registerFnStrftime($e->getAttribute("id"), $data, $this->parse($format));
+      break;
+      case "replace":
+      $tr = array();
+      foreach($e->childElements as $d) {
+        if($d->nodeName != "data") continue;
+        if(!$d->hasAttribute("name")) {
+          new Logger(_("Function translate missing attribute name"), Logger::LOGGER_WARNING);
+          continue;
+        }
+        $tr[$d->getAttribute("name")] = $this->parse($d->nodeValue);
+      }
+      $this->registerFnReplace($e->getAttribute("id"), $data, $tr);
+      break;
+      case "sequence":
+      $fn = array();
+      foreach($e->childElements as $call) {
+        if($call->nodeName != "call") continue;
+        if(!$call->hasAttribute("fn")) {
+          new Logger(_("Function sequence missing attribute fn"), Logger::LOGGER_WARNING);
+          continue;
+        }
+        $fn[] = $call->getAttribute("fn");
+      }
+      $this->registerFnSequence($e->getAttribute("id"), $data, $fn);
+      break;
+      case "link":
+      $href = "";
+      $title = null;
+      if($e->hasAttribute("href")) $href = $e->getAttribute("href");
+      if($e->hasAttribute("title")) $title = $e->getAttribute("title");
+      $this->registerFnLink($e->getAttribute("id"), $data, $this->parse($href), $this->parse($title));
       break;
       default:
-      new Logger(sprintf(_("Unknown element name %s"), $e->nodeName));
+      new Logger(sprintf(_("Unknown function name %s"), $e->getAttribute("fn")), Logger::LOGGER_WARNING);
     }
-
   }
 
-  private function parseVar(DOMElement $var) {
-    if($var->hasAttribute("fn")) switch($var->getAttribute("fn")) {
-      case "hash":
-      $value = $this->fnHash($var);
-      break;
-      case "local_link":
-      $value = $this->fnLocal_link($var);
-      break;
-      case "translate":
-      $value = $this->fnTranslate($var);
-      if($value === false) return;
-      break;
-      case "date":
-      $value = $this->fnDate($var);
-      if($value === false) return;
-      break;
-    } else {
-      $value = $this->parse($var->nodeValue);
+  private function parse($value) {
+    if(is_null($value)) return null;
+    $output = array();
+    foreach(explode('\$', $value) as $s) {
+      $r = array();
+      preg_match_all('/@?\$('.VARIABLE_PATTERN.')/', $s, $match);
+      foreach($match[1] as $k => $var) {
+        $varVal = Cms::getVariable($var);
+        if(is_null($varVal))
+          $varVal = Cms::getVariable(get_class($this)."-$var");
+        if(is_null($varVal)) {
+          if(strpos($match[0][$k], "@") !== 0)
+            new Logger(sprintf(_("Variable '%s' does not exist"), $var), Logger::LOGGER_WARNING);
+          continue;
+        }
+        $r[$var] = $varVal;
+      }
+      foreach($r as $var => $varVal) {
+        $s = str_replace($match[0][$k], $varVal, $s);
+      }
+      $output[] = $s;
     }
-    Cms::setVariable($var->getAttribute("id"), $value);
+    return implode('$', $output);
   }
 
-  private function fnHash(DOMElement $var) {
-    $algo = "crc32b";
-    if($var->hasAttribute("algo")) {
-      $userAlgo = $this->parse($var->getAttribute("algo"));
-      if(in_array($userAlgo, hash_algos())) $algo = $userAlgo;
-    }
-    return hash($algo, $this->parse($var->nodeValue));
+  private function registerFnHash($id, $data, $algo=null) {
+    if(!in_array($algo, hash_algos())) $algo = "crc32b";
+    $fn = function($value) use ($algo) {
+      return hash($algo, $value);
+    };
+    Cms::setVariable($id, is_null($data) ? $fn : $fn($data));
   }
 
-  private function fnLocal_link(DOMElement $var) {
-    $href = "";
-    $title = null;
-    if($var->hasAttribute("href")) $href = $this->parse($var->getAttribute("href"));
-    if($var->hasAttribute("title")) $title = $var->getAttribute("title");
-    return "<a href='$href'".(is_null($title) ? "" : " title='$title'")
-   .">".$this->parse($var->nodeValue)."</a>";
+  private function registerFnStrftime($id, $data, $format=null) {
+    if(is_null($format)) $format = "%m/%d/%Y";
+    $format = $this->crossPlatformCompatibleFormat($format);
+    $fn = function($value) use ($format) {
+      $date = trim(strftime($format, strtotime($value)));
+      return $date ? $date : $value;
+    };
+    Cms::setVariable($id, is_null($data) ? $fn : $fn($data));
   }
 
-  private function fnTranslate(DOMElement $var) {
-    if(!$var->hasAttribute("name")) {
-      new Logger(_("Attribute 'name' required for translate function"), "error");
-      return false;
+  private function registerFnReplace($id, $data, Array $replace) {
+    if(empty($replace)) {
+      new Logger(_("No data found for function translate"), Logger::LOGGER_WARNING);
+      return;
     }
-    $name = $this->parse($var->getAttribute("name"));
-    $lang = Cms::getVariable("cms-lang");
-    $translation = false;
-    foreach($var->getElementsByTagName("data") as $e) {
-      if(!$e->hasAttribute("lang") && $e->getAttribute("lang") != $lang) continue;
-      if($e->hasAttribute("name") && $e->getAttribute("name") != $name) continue;
-      if(!$e->hasAttribute("name") && $translation !== false) continue;
-      $translation = $e->nodeValue;
-    }
-    return $translation;
+    $fn = function($value) use ($replace) {
+      return str_replace(array_keys($replace), $replace, $value);
+    };
+    Cms::setVariable($id, is_null($data) ? $fn : $fn($data));
   }
 
-  private function fnDate(DOMElement $var) {
-    $format = "%m/%d/%Y";
-    if($var->hasAttribute("format")) {
-      $format = $this->parse($var->getAttribute("format"));
-      $format = $this->crossPlatformCompatibleFormat($format);
+  private function registerFnSequence($id, $data, Array $call) {
+    if(empty($call)) {
+      new Logger(_("No data found for function sequence"), Logger::LOGGER_WARNING);
+      return;
     }
-    $time = false;
-    if($var->hasAttribute("date")) {
-      $time = $this->parse($var->getAttribute("date"));
-      if(strlen($time) == 4) $time .= "-01"; // strtotime unable to parse year only
-      $time = strtotime($time);
-    }
-    if($time === false) $date = strftime($format);
-    else $date = strftime($format, $time);
-    if($date === false) new Logger(_("Unrecognized date value or format"), "error");
-    return $date;
+    $fn = function($value) use ($call) {
+      foreach($call as $f) {
+        $value = Cms::applyUserFn($f, $value);
+      }
+      return $value;
+    };
+    Cms::setVariable($id, is_null($data) ? $fn : $fn($data));
+  }
+
+  private function registerFnLink($id, $data, $href="", $title=null) {
+    $fn = function($value) use ($href, $title) {
+      return "<a href='$href'".(is_null($title) ? "" : " title='$title'")
+        .">".$value."</a>";
+     };
+    Cms::setVariable($id, is_null($data) ? $fn : $fn($data));
   }
 
   /**
@@ -152,31 +185,6 @@ class InputVar extends Plugin implements SplObserver {
     }
 
     return $format;
-  }
-
-  private function parse($string) {
-    $subStr = explode('\$', $string);
-    $output = array();
-    foreach($subStr as $s) {
-      $r = array();
-      preg_match_all('/@?\$('.VARIABLE_PATTERN.')/', $s, $match);
-      foreach($match[1] as $k => $var) {
-        $varVal = Cms::getVariable($var);
-        if(is_null($varVal))
-          $varVal = Cms::getVariable("inputvar-$var");
-        if(is_null($varVal)) {
-          if(strpos($match[0][$k], "@") !== 0)
-            new Logger(sprintf(_("Variable '%s' does not exist"), $var), "warning");
-          continue;
-        }
-        $r[$var] = $varVal;
-      }
-      foreach($r as $var => $varVal) {
-        $s = str_replace($match[0][$k], $varVal, $s);
-      }
-      $output[] = $s;
-    }
-    return implode('$', $output);
   }
 
 }
