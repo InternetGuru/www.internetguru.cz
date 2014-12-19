@@ -56,7 +56,7 @@ class Agregator extends Plugin implements SplObserver {
       return;
     }
     $workingDir = is_null($subDir) ? $rootDir : "$rootDir/$subDir";
-    foreach(scandir($workingDir, SCANDIR_SORT_ASCENDING) as $f) {
+    foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
       if(is_dir("$workingDir/$f")) {
         $this->createList($list, $rootDir, is_null($subDir) ? $f : "$subDir/$f");
@@ -111,14 +111,14 @@ class Agregator extends Plugin implements SplObserver {
 
   private function createHtmlVar($rootDir) {
     foreach($this->html as $subDir => $null) {
-      $workingDir = $subDir == "" ? $rootDir : "$rootDir/$subDir";
+      $workingDir = ($subDir == "" ? $rootDir : "$rootDir/$subDir");
       $ctime = array();
       foreach($this->html[$subDir] as $f => $null) {
         if(pathinfo($f, PATHINFO_EXTENSION) != "html") continue;
         try {
           $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir == "" ? null : $subDir);
           $this->html[$subDir][$f] = $doc;
-          $ctime["$workingDir/$f"] = strtotime($doc->documentElement->firstElement->getAttribute("ctime"));
+          $ctime[$subDir][$f] = strtotime($doc->documentElement->firstElement->getAttribute("ctime"));
           foreach($doc->getElementsByTagName("h") as $h) {
             if(!$h->hasAttribute("link")) continue;
             $this->links[$h->getAttribute("link")] = "$workingDir/$f";
@@ -127,31 +127,31 @@ class Agregator extends Plugin implements SplObserver {
           new Logger(sprintf(_("Agregator skipped file '%s'"), "$subDir/$f"), Logger::LOGGER_WARNING);
         }
       }
-      if(empty($ctime)) return;
-      stableSort($ctime);
+      if(empty($ctime)) continue;
+      foreach($ctime as $s => $a) stableSort($a);
       foreach($this->cfg->documentElement->childElements as $html) {
         if($html->nodeName != "html") continue;
         if(!$html->hasAttribute("id")) {
-          new Logger(_("Configuration element html missing attribute id"));
+          new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
           continue;
         }
         if(!$html->hasAttribute("wrapper")) {
-          new Logger(_("Configuration element html missing attribute wrapper"));
+          new Logger(_("Configuration element html missing attribute wrapper"), Logger::LOGGER_WARNING);
           continue;
         }
         try {
           Cms::setVariable($html->getAttribute("id")
             .($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)),
-            $this->getDOM($html->childElements, $html->getAttribute("wrapper"), $subDir));
+            $this->getDOM($ctime, $html->childElements, $html->getAttribute("wrapper"), $subDir));
         } catch(Exception $e) {
-          new Logger($e->getMessage());
+          new Logger($e->getMessage(), Logger::LOGGER_WARNING);
           continue;
         }
       }
     }
   }
 
-  private function getDOM(DOMNodeList $items, $wrapper, $subDir) {
+  private function getDOM(Array $htmlOrder, DOMNodeList $items, $wrapper, $subDir) {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
     $list = $root->appendChild($doc->createElement($wrapper));
@@ -166,7 +166,8 @@ class Agregator extends Plugin implements SplObserver {
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
     $pattern = null;
-    foreach($this->html[$subDir] as $k => $htmlPlus) {
+    foreach($htmlOrder[$subDir] as $k => $null) {
+      $htmlPlus = $this->html[$subDir][$k];
       if(is_null($htmlPlus)) continue;
       $i++;
       if(isset($patterns[$i])) $pattern = $patterns[$i];
