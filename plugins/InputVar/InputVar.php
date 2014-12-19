@@ -76,7 +76,7 @@ class InputVar extends Plugin implements SplObserver {
       foreach($e->childElements as $d) {
         if($d->nodeName != "data") continue;
         if(!$d->hasAttribute("name")) {
-          new Logger(_("Function translate missing attribute name"), Logger::LOGGER_WARNING);
+          new Logger(_("Function replace missing attribute name"), Logger::LOGGER_WARNING);
           continue;
         }
         $tr[$d->getAttribute("name")] = $this->parse($d->nodeValue);
@@ -154,7 +154,7 @@ class InputVar extends Plugin implements SplObserver {
 
   private function createFnReplace($id, Array $replace) {
     if(empty($replace)) {
-      new Logger(_("No data found for function translate"), Logger::LOGGER_WARNING);
+      new Logger(_("No data found for function replace"), Logger::LOGGER_WARNING);
       return;
     }
     return function($value) use ($replace) {

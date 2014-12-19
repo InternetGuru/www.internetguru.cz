@@ -118,7 +118,7 @@ class Cms {
     try {
       $newContent->validatePlus();
     } catch(Exception $e) {
-      throw new Exception(_("Some variable causing HTML+ error"));
+      throw new Exception(_("Some variable(s) causing HTML+ error"));
     }
     return $newContent;
   }
@@ -206,7 +206,7 @@ class Cms {
 
   public static function setFunction($name, $value) {
     if(!$value instanceof Closure) {
-      new Logger(sprintf(_("%s is not a function (instanceof Closure)"), $name), Logger::LOGGER_WARNING);
+      new Logger(sprintf(_("Unable to set function %s: not a function"), $name), Logger::LOGGER_WARNING);
       return null;
     }
     $varId = self::getVarId($name, "fn");
@@ -242,9 +242,6 @@ class Cms {
     $fn = self::getFunction($fName);
     if(is_null($fn))
       throw new Exception(sprintf(_("Function %s does not exist"), $fName));
-    if(!$fn instanceof Closure) {
-      throw new Exception(sprintf(_("Variable %s is not a function"), $fName));
-    }
     return $fn($value);
   }
 

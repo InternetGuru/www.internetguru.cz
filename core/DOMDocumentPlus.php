@@ -82,7 +82,7 @@ class DOMDocumentPlus extends DOMDocument {
         continue;
       }
       if(!$varValue instanceof Closure) {
-        new Logger(sprintf(_("%s is not a function"), $varName), "warning");
+        new Logger(sprintf(_("Unable to insert function %s: not a function"), $varName), "warning");
         return;
       }
       $e->nodeValue = call_user_func($varValue, $e->nodeValue);
