@@ -23,47 +23,20 @@ class DOMDocumentPlus extends DOMDocument {
     return $q->item(0);
   }
 
-  public function insertVar($varName, $varValue) {
-    $xpath = new DOMXPath($this);
-    $noparse = "*[not(contains(@class, 'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class, 'noparse'))])]";
-    #$noparse = "*";
-    // find elements with current var
-    $matches = $xpath->query(sprintf("//%s[contains(@var, '%s')]", $noparse, $varName));
-    $replaceCont = array();
-    $replaceAttr = array();
-    // check for attributes and real match (xpath accepts substrings)
-    foreach($matches as $k => $e) {
-      $vars = explode(" ", $e->getAttribute("var"));
-      $keep = array();
-      foreach($vars as $v) {
-        $p = explode("@", $v);
-        if($varName != $p[0]) {
-          $keep[] = $v;
-          continue;
-        }
-        if(isset($p[1])) $replaceAttr[] = array($e, $p[1], $e->nodeName);
-        else $replaceCont[] = array($e, null, $e->nodeName);
-      }
-      if(empty($keep)) {
-        $e->removeAttribute("var");
-        continue;
-      }
-      $e->setAttribute("var", implode(" ", $keep));
-    }
-    $replaces = array_merge($replaceAttr, array_reverse($replaceCont, true)); // attributes first!
-    if(!count($replaces)) return;
+  public function insertVar($varName, $varValue, $element=null) {
+    $elements = $this->parseAttr($varName, "var", $element);
     $type = gettype($varValue);
-    foreach($replaces as $item) {
+    foreach($elements as $item) {
       $e = $item[0];
       $attr = $item[1];
       if(is_null(@$e->getNodePath())) {
-        new Logger(sprintf(_("Variable '%s' destination element '%s' no longer exists"), $varName, $item[2]), "warning");
+        new Logger(sprintf(_("Variable %s destination element %s no longer exists"), $varName, $item[2]), "warning");
         continue;
       }
       if(is_null($e->parentNode)) continue;
       switch($type) {
         case "NULL":
-        $this->removeVar($e, $attr);
+        #$this->removeVar($e, $attr);
         break;
         case "integer":
         $varValue = (string) $varValue;
@@ -84,10 +57,6 @@ class DOMDocumentPlus extends DOMDocument {
         $this->insertVarArray($varValue, $e, $varName);
         break;
         default:
-        if($varValue instanceof Closure) {
-          $e->nodeValue = call_user_func($varValue, $e->nodeValue);
-          break;
-        }
         if($varValue instanceof DOMElement) {
           $this->insertVarDOMElement($varValue, $e, $attr, $varName);
           break;
@@ -95,6 +64,63 @@ class DOMDocumentPlus extends DOMDocument {
         new Logger(sprintf(_("Unsupported variable type '%s' in '%s'"), get_class($varValue), $varName), "error");
       }
     }
+  }
+
+  public function insertFn($varName, $varValue, $element=null) {
+    $elements = $this->parseAttr($varName, "fn", $element);
+    $type = gettype($varValue);
+    foreach($elements as $item) {
+      $e = $item[0];
+      $attr = $item[1];
+      if(is_null(@$e->getNodePath())) {
+        new Logger(sprintf(_("Function %s destination element %s no longer exists"), $varName, $item[2]), "warning");
+        continue;
+      }
+      if(is_null($e->parentNode)) continue;
+      if(is_null($varValue)) {
+        #$this->removeVar($e, $attr);
+        continue;
+      }
+      if(!$varValue instanceof Closure) {
+        new Logger(sprintf(_("%s is not a function"), $varName), "warning");
+        return;
+      }
+      $e->nodeValue = call_user_func($varValue, $e->nodeValue);
+    }
+  }
+
+  private function parseAttr($varName, $attr="var", DOMElement $e=null) {
+    $xpath = new DOMXPath($this);
+    #$noparse = "*[not(contains(@class, 'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class, 'noparse'))])]";
+    $noparse = "*";
+    // find elements with current var
+    if(is_null($e))
+      $matches = $xpath->query(sprintf("//%s[contains(@$attr, '%s')]", $noparse, $varName));
+    else
+      $matches = array($e);
+
+    $replaceCont = array();
+    $replaceAttr = array();
+    // check for attributes and real match (xpath accepts substrings)
+    foreach($matches as $e) {
+      $vars = explode(" ", $e->getAttribute($attr));
+      $keep = array();
+      foreach($vars as $v) {
+        $p = explode("@", $v);
+        if($varName != $p[0]) {
+          $keep[] = $v;
+          continue;
+        }
+        if(isset($p[1])) $replaceAttr[] = array($e, $p[1], $e->nodeName);
+        else $replaceCont[] = array($e, null, $e->nodeName);
+      }
+      if(empty($keep)) {
+        $e->removeAttribute($attr);
+        continue;
+      }
+      $e->setAttribute($attr, implode(" ", $keep));
+    }
+    return array_merge($replaceAttr, array_reverse($replaceCont, true)); // attributes first!
   }
 
   public function validateLinks($elName, $attName, $repair) {

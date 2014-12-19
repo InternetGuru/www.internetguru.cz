@@ -70,7 +70,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $hs[] = $bc->importNode($h, true);
       $li->appendChild(end($hs));
     }
-    Cms::insertVariables($bc);
     $subtitles = array();
     foreach($hs as $h) {
       $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
@@ -84,6 +83,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     end($subtitles);
     $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
+    $bc = Cms::processVariables($bc);
     Cms::setVariable("bc", $bc->documentElement);
     Cms::setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
   }

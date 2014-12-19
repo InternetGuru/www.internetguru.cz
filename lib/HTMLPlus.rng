@@ -46,6 +46,7 @@
   <define name="htmlplus.h">
     <element name="h">
       <ref name="CommonIdRequired.attrib"/>
+      <ref name="htmlplus.fn"/>
       <ref name="htmlplus.var"/>
       <optional>
         <attribute name="short">
@@ -73,6 +74,11 @@
           <data type="string">
             <param name="pattern">.*\S.*</param>
           </data>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="authorid">
+          <ref name="ID.datatype"/>
         </attribute>
       </optional>
       <optional>
@@ -245,7 +251,14 @@
   </define>
 
   <define name="Core.attrib" combine="interleave">
+    <ref name="htmlplus.fn"/>
     <ref name="htmlplus.var"/>
+  </define>
+
+  <define name="htmlplus.fn">
+    <optional>
+      <attribute name="fn"/>
+    </optional>
   </define>
 
   <define name="htmlplus.var">

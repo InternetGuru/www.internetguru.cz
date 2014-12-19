@@ -27,7 +27,7 @@ try {
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
 
-  Cms::processVariables();
+  Cms::contentProcessVariables();
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 

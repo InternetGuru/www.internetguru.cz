@@ -19,6 +19,14 @@ class DOMElementPlus extends DOMElement {
     return $newnode;
   }
 
+  public function insertVar($varName, $varValue) {
+    $this->ownerDocument->insertVar($varName, $varValue, $this);
+  }
+
+  public function insertFn($varName, $varValue) {
+    $this->ownerDocument->insertFn($varName, $varValue, $this);
+  }
+
   public function stripElement($comment = null) {
     $this->stripTag($comment, false);
   }

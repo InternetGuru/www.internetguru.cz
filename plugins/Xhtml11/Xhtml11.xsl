@@ -18,6 +18,7 @@
         name() != 'link' and
         name() != 'public' and
         name() != 'author' and
+        name() != 'authorid' and
         name() != 'ctime' and
         name() != 'mtime' ]"/>
       <xsl:apply-templates/>

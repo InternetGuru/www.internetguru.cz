@@ -26,8 +26,13 @@ class Agregator extends Plugin implements SplObserver {
 
   private function insertContent() {
     if(!array_key_exists(getCurLink(), $this->links)) return;
-    $doc = $this->html[$this->links[getCurLink()]];
-    $dest = Cms::getContentFull()->getElementById("dokumenty", "link");
+    $subDir = dirname(substr($this->links[getCurLink()]
+      , strlen(USER_FOLDER."/".$this->getDir()) + 1));
+    if($subDir == ".") $subDir = "";
+    $fName = basename($this->links[getCurLink()]);
+    $doc = $this->html[$subDir][$fName];
+    $dest = Cms::getContentFull()->getElementById($subDir, "link");
+    if(is_null($dest)) $dest = Cms::getContentFull()->documentElement->firstElement->nextElement;
     while($dest->nodeName != "section") {
       if(is_null($dest->nextElement)) {
         $dest = $dest->parentNode->appendChild($dest->ownerDocument->createElement("section"));
@@ -172,7 +177,8 @@ class Agregator extends Plugin implements SplObserver {
         $item = $list->appendChild($doc->importNode($p, true));
       }
     }
-    return $root;
+    $doc = Cms::processVariables($doc);
+    return $doc->documentElement;
   }
 
   private function replaceVariables(DOMElementPlus $element, Array $vars) {

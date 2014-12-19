@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Agregator>
   <html id="html" wrapper="ol">
-    <item><li><a href="$link" title="$short">$heading</a> (<em var="inputvar-dateformatcs">$ctime</em>)</li></item>
+    <item><li><a href="$link" title="$short">$heading</a> (<em fn="inputvar-dateformatcs">$ctime</em>)</li></item>
   </html>
   <html id="htmltop" wrapper="dl">
     <item>

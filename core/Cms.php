@@ -6,6 +6,7 @@ class Cms {
   private static $content = null; // HTMLPlus
   private static $outputStrategy = null; // OutputStrategyInterface
   private static $variables = array();
+  private static $functions = array();
   private static $forceFlash = false;
   private static $flashList = null;
   const DEBUG = false;
@@ -88,34 +89,45 @@ class Cms {
     }
   }
 
-  public static function processVariables() {
-    $newContent = clone self::$content;
-    self::loadDefaultVariables(self::$content);
-    self::insertVariables($newContent);
-    try {
-      $newContent->validatePlus();
-      self::$content = $newContent;
-    } catch(Exception $e) {
-      // Some variable generates invalid HTML+
-      $eVars = array();
-      $newContent = clone self::$content;
-      foreach(self::$variables as $varName => $varValue) {
-        $tmpContent = clone $newContent;
-        $tmpContent->insertVar($varName, $varValue);
-        try {
-          $tmpContent->validatePlus();
-          $newContent = $tmpContent;
-        } catch(Exception $e) {
-          $eVars[] = $varName;
-        }
-      }
-      new Logger(sprintf(_("Following variable(s) causing HTML+ error: %s"), implode(", ", $eVars)), "error");
-    }
-    return self::$content;
+  public static function contentProcessVariables() {
+    self::$content = self::processVariables(self::$content);
   }
 
-  public static function insertVariables(DOMDocumentPlus $doc) {
-    foreach(self::$variables as $varName => $varValue) $doc->insertVar($varName, $varValue);
+  public static function processVariables(DOMDocumentPlus $doc) {
+    $newContent = clone $doc;
+    if($doc instanceof HTMLPlus) self::loadDefaultVariables($doc);
+    $xpath = new DOMXPath($newContent);
+    $elements = array();
+    foreach($xpath->query("//*[@var or @fn]") as $e) {
+      $elements[] = $e;
+    }
+    foreach(array_reverse($elements) as $e) {
+      if($e->hasAttribute("var")) {
+        $name = $e->getAttribute("var");
+        $value = array_key_exists($name, self::$variables)
+          ? self::$variables[$name] : null;
+        $e->insertVar($name, $value);
+      }
+      if($e->hasAttribute("fn")) {
+        $name = $e->getAttribute("fn");
+        $value = array_key_exists($name, self::$functions)
+          ? self::$functions[$name] : null;
+        $e->insertFn($name, $value);
+      }
+    }
+    try {
+      $newContent->validatePlus();
+    } catch(Exception $e) {
+      throw new Exception(_("Some variable causing HTML+ error"));
+    }
+    return $newContent;
+  }
+
+  private static function insertVar(HTMLPlus $newContent, $varName, $varValue) {
+    $tmpContent = clone $newContent;
+    $tmpContent->insertVar($varName, $varValue);
+    $tmpContent->validatePlus();
+    $newContent = $tmpContent;
   }
 
   public static function setOutputStrategy(OutputStrategyInterface $strategy) {
@@ -128,7 +140,10 @@ class Cms {
     self::setVariable("lang", $doc->documentElement->getAttribute("xml:lang"));
     self::setVariable("desc", $desc->nodeValue);
     self::setVariable("title", $h1->nodeValue);
-    if($h1->hasAttribute("short")) self::setVariable("title", $h1->getAttribute("short"));
+    if($h1->hasAttribute("short"))
+      self::setVariable("title", $h1->getAttribute("short"));
+    if($h1->hasAttribute("authorid"))
+      self::setVariable("authorid", $h1->getAttribute("authorid"));
     self::setVariable("author", $h1->getAttribute("author"));
     self::setVariable("kw", $desc->getAttribute("kw"));
     self::setVariable("mtime", $h1->getAttribute("mtime"));
@@ -163,6 +178,12 @@ class Cms {
     return self::$variables[$id];
   }
 
+  public static function getFunction($name) {
+    $id = strtolower($name);
+    if(!array_key_exists($id, self::$functions)) return null;
+    return self::$functions[$id];
+  }
+
   public static function addVariableItem($name, $value) {
     $varId = self::getVarId($name);
     $var = self::getVariable($varId);
@@ -179,7 +200,17 @@ class Cms {
     $d = debug_backtrace();
     if(!isset($d[2]["class"])) throw new LoggerException(_("Unknown caller class"));
     $varId = strtolower($d[2]["class"]);
-    if($varId != $name) $varId .= (strlen($name) ? "-".normalize($name) : "");
+    if($varId == $name) return $varId;
+    return $varId.(strlen($name) ? "-".normalize($name) : "");
+  }
+
+  public static function setFunction($name, $value) {
+    if(!$value instanceof Closure) {
+      new Logger(sprintf(_("%s is not a function (instanceof Closure)"), $name), Logger::LOGGER_WARNING);
+      return null;
+    }
+    $varId = self::getVarId($name, "fn");
+    self::$functions[$varId] = $value;
     return $varId;
   }
 
@@ -208,12 +239,13 @@ class Cms {
   }
 
   public static function applyUserFn($fName, $value) {
-    $fn = self::getVariable($fName);
-    if(is_null($fn)) {
-      new Logger(sprintf(_("Function %s not found"), $fName), Logger::LOGGER_WARNING);
-      return $value;
+    $fn = self::getFunction($fName);
+    if(is_null($fn))
+      throw new Exception(sprintf(_("Function %s does not exist"), $fName));
+    if(!$fn instanceof Closure) {
+      throw new Exception(sprintf(_("Variable %s is not a function"), $fName));
     }
-    return call_user_func($fn, $value);
+    return $fn($value);
   }
 
 }
