@@ -33,9 +33,9 @@ class DOMBuilder {
     reset(self::$identifiers);
     if($frag == key(self::$identifiers)) return getRoot();
     $link = self::$identifiers[$frag];
-    if($link == current(self::$links)) return getRoot()."#$frag";
+    if($link == current(self::$identifiers)) return getRoot()."#$frag";
     if(self::$links[$link] != $frag) $link .= "#$frag";
-    return $link;
+    return getRoot().$link;
   }
 
   public static function getLinks() {
