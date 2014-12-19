@@ -226,11 +226,18 @@ function readZippedFile($archiveFile, $dataFile) {
 }
 
 function getFileMime($file) {
-  if(!function_exists("finfo_file")) throw new Exception(_("Function finfo_file() not supported"));
-  $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
-  $mime = finfo_file($finfo, $file);
-  finfo_close($finfo);
-  return $mime;
+  #if(IS_LOCALHOST) {
+    if(!function_exists("finfo_file")) throw new Exception(_("Function finfo_file() not supported"));
+    $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+    $mime = finfo_file($finfo, $file); // avg. 2ms
+    finfo_close($finfo);
+    return $mime;
+  #}
+  #$file = escapeshellarg($file);
+  #$mime = shell_exec("file -bi ".$file." 2>&1"); // command file not found: TODO create script in cms
+  #var_dump($mime);
+  #$mime = explode(";", $mime);
+  #return $mime[0];
 }
 
 function fileSizeConvert($b) {
