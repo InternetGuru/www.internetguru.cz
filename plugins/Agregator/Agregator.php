@@ -118,7 +118,7 @@ class Agregator extends Plugin implements SplObserver {
         try {
           $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir == "" ? null : $subDir);
           $this->html[$subDir][$f] = $doc;
-          $ctime[$subDir][$f] = strtotime($doc->documentElement->firstElement->getAttribute("ctime"));
+          $ctime[$subDir][$f] = $doc->documentElement->firstElement->getAttribute("ctime");
           foreach($doc->getElementsByTagName("h") as $h) {
             if(!$h->hasAttribute("link")) continue;
             $this->links[$h->getAttribute("link")] = "$workingDir/$f";
@@ -128,7 +128,10 @@ class Agregator extends Plugin implements SplObserver {
         }
       }
       if(empty($ctime)) continue;
-      foreach($ctime as $s => $a) stableSort($a);
+      foreach($ctime as $s => $a) {
+        stableSort($a);
+        $ctime[$s] = array_reverse($a);
+      }
       foreach($this->cfg->documentElement->childElements as $html) {
         if($html->nodeName != "html") continue;
         if(!$html->hasAttribute("id")) {
