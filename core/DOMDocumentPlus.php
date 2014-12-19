@@ -311,12 +311,23 @@ class DOMDocumentPlus extends DOMDocument {
   private function insertVarString($varValue, DOMElement $e, $attr, $varName) {
     if(!is_null($attr)) {
       if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
-        $e->setAttribute($attr, $varValue);
+        if(strlen($varValue)) $e->setAttribute($attr, $varValue);
+        elseif($e->hasAttribute($attr)) $e->removeAttribute($attr);
+        return;
+      }
+      $temp = @sprintf($e->getAttribute($attr), $varValue);
+      if($temp !== false && $temp != $e->getAttribute($attr)) {
+        $e->setAttribute($attr, $temp);
+        return;
+      }
+      if(!strlen($varValue)) {
+        $e->removeAttribute($attr);
         return;
       }
       if($attr == "class") $varValue = $e->getAttribute($attr)." ".$varValue;
       $e->setAttribute($attr, $varValue);
       return;
+
     }
     $this->insertInnerHTML($varValue, $e, "", $varName);
     #$e->nodeValue = $varValue;
