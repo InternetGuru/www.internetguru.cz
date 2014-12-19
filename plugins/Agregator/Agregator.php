@@ -188,11 +188,12 @@ class Agregator extends Plugin implements SplObserver {
   private function replaceVariables(DOMElementPlus $element, Array $vars) {
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($element, true));
-    $parts = explode('\$', $doc->saveXML());
-    foreach($parts as $k => $p) {
-      $parts[$k] = str_replace(array_keys($vars), $vars, $p);
-    }
-    $doc->loadXML(implode('$', $parts));
+    foreach($vars as $k => $v) $doc->insertVar($k, $v);
+    #$parts = explode('\$', $doc->saveXML());
+    #foreach($parts as $k => $p) {
+    #  $parts[$k] = str_replace(array_keys($vars), $vars, $p);
+    #}
+    #$doc->loadXML(implode('$', $parts));
     return $doc->documentElement;
   }
 
@@ -200,15 +201,15 @@ class Agregator extends Plugin implements SplObserver {
     $vars = array();
     $h = $doc->documentElement->firstElement;
     $desc = $h->nextElement;
-    $vars['$heading'] = $h->nodeValue;
-    $vars['$link'] = $h->getAttribute("link");
-    $vars['$ns'] = $h->getAttribute("ns");
-    $vars['$author'] = $h->getAttribute("author");
-    $vars['$ctime'] = $h->getAttribute("ctime");
-    $vars['$mtime'] = $h->getAttribute("mtime");
-    $vars['$short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
-    $vars['$desc'] = $desc->nodeValue;
-    $vars['$kw'] = $desc->getAttribute("kw");
+    $vars['heading'] = $h->nodeValue;
+    $vars['link'] = $h->getAttribute("link");
+    $vars['ns'] = $h->getAttribute("ns");
+    $vars['author'] = $h->getAttribute("author");
+    $vars['ctime'] = $h->getAttribute("ctime");
+    $vars['mtime'] = $h->getAttribute("mtime");
+    $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
+    $vars['desc'] = $desc->nodeValue;
+    $vars['kw'] = $desc->getAttribute("kw");
     return $vars;
   }
 
