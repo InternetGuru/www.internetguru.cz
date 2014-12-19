@@ -5,10 +5,10 @@
   </html>
   <html id="htmltop" wrapper="dl">
     <item>
-      <dt><a href="$link" title="$short">$heading</a> ($ctime)</dt>
+      <dt><a href="$link" title="$short">$heading</a> (<em fn="inputvar-dateformatcs">$ctime</em>)</dt>
       <dd>$desc</dd>
     </item>
-    <item><dt><a href="$link" title="$short">$heading</a> ($ctime)</dt></item>
+    <item><dt><a href="$link" title="$short">$heading</a> (<em fn="inputvar-dateformatcs">$ctime</em>)</dt></item>
     <item since="4" />
   </html>
 </Agregator>
