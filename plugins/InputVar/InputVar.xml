@@ -20,9 +20,9 @@
     <call fn="dateformat"/>
     <call fn="monthcs"/>
   </fn>
-  <var id="myauthor" fn="link" href="#@$cms-authorid" data="$cms-author" title="x"/>
+  <var id="myauthor" fn="link" href="#@$cms-authorid" data="$cms-author"/>
   <var id="myctime" fn="dateformatcs" data="$cms-ctime"/>
   <var id="mymtime" fn="dateformatcs" data="$cms-mtime"/>
-  <var id="creation" data="Autorem článku je &lt;strong&gt;$myauthor&lt;/strong&gt; ze dne $myctime:"/>
+  <var id="creation" data="Autorem článku je $myauthor, ze dne $myctime"/>
 
 </InputVar>

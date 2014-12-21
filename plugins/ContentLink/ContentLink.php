@@ -29,6 +29,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->setBc($c);
     if($this->isRoot) return $c;
 
+    $curH->setAncestorValue("ns");
     $curH->setAncestorValue("author");
     $curH->parentNode->setAncestorValue("xml:lang");
     if(!$curH->parentNode->hasAttribute("xml:lang")) {

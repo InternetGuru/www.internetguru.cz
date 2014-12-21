@@ -78,7 +78,9 @@
       </optional>
       <optional>
         <attribute name="authorid">
-          <ref name="ID.datatype"/>
+          <data type="string">
+            <param name="pattern">[a-z][a-z0-9._/-]*</param>
+          </data>
         </attribute>
       </optional>
       <optional>
