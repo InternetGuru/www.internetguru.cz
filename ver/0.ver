@@ -1,3 +1,12 @@
+0.4.1 2014-12-21
+Přidána podpora formátovaného vkládání proměnných do atributů (50927d9)
+Agregátor: nový výchozí typ seznamu htmltop (3187b07)
+Přidána podpora globálních funkcí (c11cd88)
+Agregator: přidána podpora obrázků a obecných souborů (4c59579)
+Agregator: přidána podpora skupin souborů (8162960)
+FileHandler: výchozí formáty obrázků thumb, normal a full (57551d7)
+FileHandler: přidána podpora automatické tvorby náhledů (c4711a7)
+
 0.4.0 2014-12-10
 HTML+ nový atribut ns (65ff501)
 SubdomManager nová poddoména jako výchozí/kopie/přejmenování (60c2d61)

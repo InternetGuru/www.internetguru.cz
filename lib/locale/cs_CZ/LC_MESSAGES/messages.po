@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-12-19 16:09+0100\n"
-"PO-Revision-Date: 2014-12-19 16:14+0100\n"
+"POT-Creation-Date: 2014-12-21 21:15+0100\n"
+"PO-Revision-Date: 2014-12-21 21:16+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -863,15 +863,19 @@ msgid "Unable to create temporary folder"
 msgstr "Nepodařilo se vytvořit dočasnou složku"
 
 #: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:83
-msgid "Temporary image dimensions are over limit"
-msgstr "Rozměry dočasného obrázku přesahují nastavený limit"
+msgid "Failed to get image dimensions"
+msgstr "Nepodařilo se načíst rozměry obrázku"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:88
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:85
+msgid "Image dimensions are over limit"
+msgstr "Rozměry obrázku přesahují limit"
+
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:90
 #, php-format
 msgid "Unable to resize image %s"
 msgstr "Nepodařilo se zmenšit obrázek %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:90
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:94
 msgid "Unable to create temporary image"
 msgstr "Nepodařilo se vytvořit dočasný soubor s obrázkem"
 
@@ -885,48 +889,48 @@ msgstr "Chybný formát ga_id '%s'"
 msgid "Missing attribute id in element %s"
 msgstr "Element %s postrádá atribut id"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:25
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:26
 #, php-format
 msgid "Element var id=%s missing attribute data"
 msgstr "Element var id=%s postrádá atribut data"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:33
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:36
 #, php-format
 msgid "Unknown element name %s"
 msgstr "Neznámý název elementu %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:56
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:59
 #, php-format
 msgid "Unable to apply function: %s"
 msgstr "Nepodařilo se aplikovat funkci: %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:79
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:82
 msgid "Function replace missing attribute name"
 msgstr "Funkce replace postrádá atribut name"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:91
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:94
 msgid "Function sequence missing attribute fn"
 msgstr "Funkce sequence postrádá atribut fn"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:106
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:109
 #, php-format
 msgid "Unknown function name %s"
 msgstr "Neznámý název funkce %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:125
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:128
 #, php-format
 msgid "Variable '%s' does not exist"
 msgstr "Proměnná '%s' neexistuje"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:157
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:160
 msgid "No data found for function replace"
 msgstr "Pro funkci replace nebyla nalezena žádná data"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:167
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:170
 msgid "No data found for function sequence"
 msgstr "Pro funkci sequence nebyla nalezena žádná data"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:176
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:179
 #, php-format
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"
@@ -1145,6 +1149,9 @@ msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "Temporary image dimensions are over limit"
+#~ msgstr "Rozměry dočasného obrázku přesahují nastavený limit"
 
 #~ msgid "Variable %s is not a function"
 #~ msgstr "Proměnná %s není funkcí"
