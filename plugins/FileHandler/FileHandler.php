@@ -21,8 +21,8 @@ class FileHandler extends Plugin implements SplObserver {
     $filePath = realpath($fInfo["filepath"]);
     $this->fileMime = $fInfo["filemime"];
     if($filePath === false) return;
-    if(strpos($this->fileMime, "image/") !== 0)
-      $this->downloadFile($filePath);
+    if($this->fileMime == "image/svg+xml") $this->downloadFile($filePath, 0, false);
+    if(strpos($this->fileMime, "image/") !== 0) $this->downloadFile($filePath);
     try {
       $this->handleImage($filePath);
     } catch(Exception $e) {
@@ -78,16 +78,21 @@ class FileHandler extends Plugin implements SplObserver {
       throw new Exception(_("Unable to create temporary folder"));
     $tmpPath = $tmpDir."/".basename($filePath);
     if(is_file($tmpPath) && filemtime($filePath) < filemtime($tmpPath)) {
-      $i = getimagesize($tmpPath);
+      $i = @getimagesize($tmpPath);
+      if(!is_array($i))
+        throw new Exception(_("Failed to get image dimensions"));
       if($i[0] > $v[0] || $i[1] > $v[1])
-        throw new Exception(_("Temporary image dimensions are over limit"));
+        throw new Exception(_("Image dimensions are over limit"));
       $this->downloadFile($tmpPath, $v[2], false);
     }
     $im = new Imagick(realpath($filePath));
     if(!$im->thumbnailImage($v[0], 0) || !$im->thumbnailImage(0, $v[1]))
       throw new Exception(sprintf(_("Unable to resize image %s"), basename($filePath)));
-    if(!file_put_contents($tmpPath, $im->__toString()))
+    $imBin = $im->__toString();
+    if(!strlen($imBin) || !file_put_contents($tmpPath, $imBin)) {
+      if(is_file($tmpPath)) @unlink($tmpPath);
       throw new Exception(_("Unable to create temporary image"));
+    }
     $this->downloadFile($tmpPath, $v[2], false);
   }
 

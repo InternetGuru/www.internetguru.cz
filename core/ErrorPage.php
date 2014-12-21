@@ -10,7 +10,7 @@ class ErrorPage {
 
   public function __construct($message, $code, $extended=false) {
     http_response_code($code);
-    new Logger($message, "fatal");
+    new Logger($message, Logger::LOGGER_FATAL);
     $dir = LIB_FOLDER."/".$this->relDir;
     $tt = array(
       "@CODE@" => $code,

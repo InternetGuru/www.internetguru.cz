@@ -148,7 +148,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $o->setAttribute("type", $mime);
           new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime), Logger::LOGGER_WARNING);
         }
-        $query = explode("&", $pUrl["query"]);
+        $query = isset($pUrl["query"]) ? explode("&", $pUrl["query"]) : array();
         $fullRemoved = false;
         foreach($query as $k => $q) {
           if($q != "full" && strpos($q, "full=") !== 0) continue;
