@@ -134,7 +134,7 @@ class Cms {
     self::$outputStrategy = $strategy;
   }
 
-  private static function loadDefaultVariables(HTMLPlus $doc) {
+  public static function loadDefaultVariables(HTMLPlus $doc) {
     $desc = $doc->getElementsByTagName("desc")->item(0);
     $h1 = $doc->getElementsByTagName("h")->item(0);
     self::setVariable("lang", $doc->documentElement->getAttribute("xml:lang"));

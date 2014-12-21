@@ -11,7 +11,7 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
+    if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
     $dom = $this->getDOMPlus();
     foreach($dom->documentElement->childElements as $e) {
       if(!$e->hasAttribute("id")) {
@@ -21,13 +21,16 @@ class InputVar extends Plugin implements SplObserver {
       $data = null;
       switch($e->nodeName) {
         case "var":
+        if($subject->getStatus() != STATUS_PROCESS) continue;
         if(!$e->hasAttribute("data")) {
           new Logger(sprintf(_("Element var id=%s missing attribute data"), $e->getAttribute("id")), Logger::LOGGER_WARNING);
           continue;
         }
         $data = $e->getAttribute("data");
-        case "fn":
         $this->processRule($e, $data);
+        case "fn":
+        if($subject->getStatus() != STATUS_INIT) continue;
+        $this->processRule($e, null);
         break;
         default:
         new Logger(sprintf(_("Unknown element name %s"), $e->nodeName), Logger::LOGGER_WARNING);

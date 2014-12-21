@@ -49,7 +49,7 @@
   <xsl:template match="/body/h1">
     <div>
       <div>
-        <xsl:if test="not($cms-ctime = '')">
+        <xsl:if test="not($cms-authorid = '')">
           <p><xsl:value-of disable-output-escaping="yes" select="$inputvar-creation"/></p>
         </xsl:if>
         <xsl:copy-of select="."/>
