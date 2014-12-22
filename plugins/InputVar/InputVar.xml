@@ -20,6 +20,8 @@
     <call fn="dateformat"/>
     <call fn="monthcs"/>
   </fn>
+  <var id="cyear" fn="strftime" format="%Y" data="$cms-ctime"/>
+  <var id="year" fn="strftime" format="%Y" data="now"/>
   <var id="myauthor" fn="link" href="#@$cms-authorid" data="$cms-author"/>
   <var id="myctime" fn="dateformatcs" data="$cms-ctime"/>
   <var id="mymtime" fn="dateformatcs" data="$cms-mtime"/>

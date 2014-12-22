@@ -21,6 +21,15 @@
   <xsl:param name="inputvar-myctime" select="''"/>
   <xsl:param name="inputvar-mymtime" select="''"/>
   <xsl:param name="inputvar-creation" select="''"/>
+  <xsl:param name="inputvar-cyear" select="''"/>
+  <xsl:param name="inputvar-year" select="''"/>
+
+  <xsl:variable name="copy">
+    <xsl:choose>
+      <xsl:when test="$inputvar-cyear = $inputvar-year">© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/></xsl:when>
+      <xsl:otherwise>© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/>–<xsl:value-of disable-output-escaping="yes" select="$inputvar-year"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <xsl:template match="/body">
     <body>
@@ -31,13 +40,10 @@
       <div id="footer">
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
-          <li>Webdesign <xsl:value-of disable-output-escaping="yes" select="$cms-ig"/></li>
-          <li>Běží na službě <xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
-          <xsl:if test="not($cms-ctime = '')">
-            <li>Vytvořeno <xsl:value-of select="$inputvar-myctime"/></li>
-          </xsl:if>
+          <li><xsl:value-of disable-output-escaping="yes" select="$copy"/> <xsl:value-of disable-output-escaping="yes" select="$cms-ig"/></li>
+          <li>Na službě <xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
           <xsl:if test="not($cms-mtime = '')">
-            <li>Poslední úpravy <xsl:value-of select="$inputvar-mymtime"/></li>
+            <li>Upraveno <xsl:value-of select="$inputvar-mymtime"/></li>
           </xsl:if>
           <li><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/>/<xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
