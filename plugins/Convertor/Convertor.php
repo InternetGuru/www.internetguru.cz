@@ -73,9 +73,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     foreach($mergable as $tag) $xml = preg_replace("/(\s)*(<\/$tag>)/", "$2$1", $xml);
 
     $doc = new HTMLPlus();
-    #todo: $doc->defaultCtime = ???;
     $doc->defaultAuthor = Cms::getVariable("cms-author");
-    $doc->documentElement->firstElement->setAttribute("author", Cms::getVariable("cms-author"));
+    $doc->defaultLink = pathinfo($f, PATHINFO_FILENAME);
     $doc->loadXML($xml);
     if(is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h") {
@@ -112,7 +111,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     foreach($doc->getElementsByTagName($eName) as $e) {
       $var = explode("@", $e->nodeValue);
       if(count($var) < 2) continue;
-      $e->setAttribute($aName, trim(array_pop($var)));
+      $aVal = trim(array_pop($var));
+      if(!strlen($aVal)) continue;
+      $e->setAttribute($aName, $aVal);
       $e->nodeValue = trim(implode("@", $var));
     }
   }
