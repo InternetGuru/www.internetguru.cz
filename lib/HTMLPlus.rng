@@ -65,7 +65,7 @@
       <optional>
         <attribute name="ns">
           <data type="string">
-            <param name="pattern">(localhost/[a-z0-9]+)|([a-z0-9]+\.[a-z0-9]+\.[a-z]+)</param>
+            <param name="pattern">(localhost/[a-z0-9]+)|([a-z0-9]+\.[a-z0-9-]+\.[a-z]+)</param>
           </data>
         </attribute>
       </optional>
