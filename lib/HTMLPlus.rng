@@ -77,6 +77,20 @@
         </attribute>
       </optional>
       <optional>
+        <attribute name="resp">
+          <data type="string">
+            <param name="pattern">.*\S.*</param>
+          </data>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="respid">
+          <data type="string">
+            <param name="pattern">[a-z][a-z0-9._/-]*</param>
+          </data>
+        </attribute>
+      </optional>
+      <optional>
         <attribute name="authorid">
           <data type="string">
             <param name="pattern">[a-z][a-z0-9._/-]*</param>
