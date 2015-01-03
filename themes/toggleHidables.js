@@ -6,6 +6,7 @@
   var HIDABLE_CLASS = "hidable";
   var HIDE_CLASS = "hide";
   var NO_HIDE_CLASS = "nohide";
+  var HIDDEN_CLASS = "hidden";
 
   function getHidables() {
     if (document.querySelectorAll) return document.querySelectorAll("." + HIDABLE_CLASS);
@@ -29,6 +30,7 @@
       firstElement.innerHTML = " " + firstElement.innerHTML;
       firstElement.insertBefore(link,firstElement.firstChild);
       if(hidables[i].classList.contains(NO_HIDE_CLASS)) continue;
+      hidables[i].classList.add(NO_HIDE_CLASS);
       toggleElement(link);
     }
   }
@@ -40,6 +42,13 @@
 
   function toggleElement(link) {
     var e = link.parentNode.parentNode;
+    if(e.classList.contains(NO_HIDE_CLASS)) {
+      e.classList.remove(NO_HIDE_CLASS);
+      e.classList.add(HIDDEN_CLASS);
+    } else {
+      e.classList.remove(HIDDEN_CLASS);
+      e.classList.add(NO_HIDE_CLASS);
+    }
     for(var i = 0; i < e.childNodes.length; i++) {
       var ch = e.childNodes[i];
       if(ch.nodeType != 1) continue;
