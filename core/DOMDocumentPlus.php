@@ -14,13 +14,27 @@ class DOMDocumentPlus extends DOMDocument {
     return parent::createElement($name, htmlspecialchars($value));
   }
 
-  public function getElementById($id, $attribute="id") {
-    $xpath = new DOMXPath($this);
-    $q = $xpath->query("//*[@$attribute='$id']");
-    if($q->length == 0) return null;
-    if($q->length > 1)
-      throw new Exception(sprintf(_("Duplicit %s found for value '%s'"), $attribute, $id));
-    return $q->item(0);
+  public function getElementById($id, $aName="id", $eName = null) {
+    try {
+      if(!is_null($eName)) {
+        $element = null;
+        foreach($this->getElementsByTagName($eName) as $e) {
+          if(!$e->hasAttribute($aName)) continue;
+          if($e->getAttribute($aName) != $id) continue;
+          if(!is_null($element)) throw new Exception();
+          $element = $e;
+        }
+        return $element;
+      } else {
+        $xpath = new DOMXPath($this);
+        $q = $xpath->query("//*[@$aName='$id']");
+        if($q->length == 0) return null;
+        if($q->length > 1) throw new Exception();
+        return $q->item(0);
+      }
+    } catch(Exception $e) {
+      throw new Exception(sprintf(_("Duplicit %s found for value '%s'"), $aName, $id));
+    }
   }
 
   public function insertVar($varName, $varValue, $element=null) {
@@ -235,8 +249,8 @@ class DOMDocumentPlus extends DOMDocument {
     $duplicit = array();
     foreach($xpath->query("//*[@$attr]") as $e) {
       if(!array_key_exists($e->getAttribute($attr), $identifiers)) {
-        $val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
-        $identifiers[$e->getAttribute($attr)] = $val;
+        #$val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
+        $identifiers[$e->getAttribute($attr)] = $e;
         continue;
       }
       if(!$repair) throw new Exception(sprintf(_("Duplicit %s attribute '%s' found"), $attr, $e->getAttribute($attr)));
@@ -247,8 +261,8 @@ class DOMDocumentPlus extends DOMDocument {
       $i = 1;
       while(array_key_exists($e->getAttribute($attr).$i, $identifiers)) $i++;
       $e->setAttribute($attr, $e->getAttribute($attr).$i);
-      $val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
-      $identifiers[$e->getAttribute($attr)] = $val;
+      #$val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
+      $identifiers[$e->getAttribute($attr)] = $e;
     }
   }
 

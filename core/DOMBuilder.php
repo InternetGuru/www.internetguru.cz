@@ -11,8 +11,8 @@ class DOMBuilder {
   const DEBUG = false;
   #const USE_CACHE = true;
   private static $included = array();
-  private static $identifiers = array(); // id => closest or self link
-  private static $links = array(); // link => self id
+  private static $idToLink = array(); // id => closest or self link
+  private static $linkToId = array(); // link => self id
 
   public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
     $doc = new HTMLPlus();
@@ -29,21 +29,21 @@ class DOMBuilder {
   }
 
   public static function getLink($frag) {
-    if(!array_key_exists($frag, self::$identifiers)) return null;
-    reset(self::$identifiers);
-    if($frag == key(self::$identifiers)) return getRoot();
-    $link = self::$identifiers[$frag];
-    if($link == current(self::$identifiers)) return getRoot()."#$frag";
-    if(self::$links[$link] != $frag) $link .= "#$frag";
+    if(!array_key_exists($frag, self::$idToLink)) return null;
+    reset(self::$idToLink);
+    if($frag == key(self::$idToLink)) return getRoot();
+    $link = self::$idToLink[$frag];
+    if($link == current(self::$idToLink)) return getRoot()."#$frag";
+    if(self::$linkToId[$link] != $frag) $link .= "#$frag";
     return getRoot().$link;
   }
 
   public static function getLinks() {
-    return array_keys(self::$links);
+    return array_keys(self::$linkToId);
   }
 
   public static function isLink($link) {
-    return array_key_exists($link, self::$links);
+    return array_key_exists($link, self::$linkToId);
   }
 
   private static function globalReadonly(DOMDocumentPlus $doc) {
@@ -185,20 +185,22 @@ class DOMBuilder {
   }
 
   private static function registerIds(HTMLPlus $doc) {
-    $doc->validateId("id", true, self::$identifiers);
-    $doc->validateId("link", true, self::$links);
-    foreach(self::$identifiers as $id => $null) {
-      if(!is_null($null)) continue;
-      $e = $doc->getElementById($id);
+    $identifiers = array();
+    $doc->validateId("id", true, $identifiers);
+    foreach($identifiers as $id => $e) {
       if($e->hasAttribute("link")) {
-        self::$identifiers[$id] = $e->getAttribute("link");
-        continue;
+        $link = $e->getAttribute("link");
+        if(isset(self::$linkToId[$link]))
+          throw new Exception(sprintf(_("Duplicit attribute link found '%s'")), $link);
+        self::$linkToId[$link] = $id;
+      } else {
+        $h = $e->getPreviousElement("h");
+        while(!is_null($h) && !$h->hasAttribute("link")) {
+          $h = $h->parentNode->getPreviousElement("h");
+        }
+        $link = $h->getAttribute("link");
       }
-      $h = $e->getPreviousElement("h");
-      while(!is_null($h) && !$h->hasAttribute("link")) {
-        $h = $h->parentNode->getPreviousElement("h");
-      }
-      self::$identifiers[$id] = $h->getAttribute("link");
+      self::$idToLink[$id] = $link;
     }
   }
 
