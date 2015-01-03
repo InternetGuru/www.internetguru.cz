@@ -39,11 +39,6 @@ samp, p code, li code, dt code, dd code {
   padding-right: 0.2em;
 }
 
-/*
-legend + * {
-  margin-top: 0.5em;
-}
-*/
 fieldset {
   min-width: initial;
   border: none;

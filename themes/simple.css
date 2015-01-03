@@ -90,6 +90,17 @@ h3, h4, h5, h6 {
   color: #fff;
 }
 
+p.creation {
+  margin-top: 0;
+  position: relative;
+  top: 1rem;
+  font-weight: 100;
+}
+
+p.creation a {
+  color: white;
+}
+
 /* breadcrumb navigation */
 
 ol.contentlink-bc {
@@ -278,4 +289,8 @@ div.contentbalancer a {
   padding: 0.25em 0.5em;
   margin-left: 0.7em;
   color: #551A8B;
+}
+
+#footer li.link {
+  display: none;
 }
