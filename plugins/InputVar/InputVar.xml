@@ -27,9 +27,9 @@
   <var id="mymtime" fn="dateformatcs" data="$cms-mtime"/>
   <var id="myauthor" fn="link" href="#@$cms-authorid" data="$cms-author"/>
 
-  <var id="linkctime" fn="dateformatcs" data="$contentlink-ctime"/>
-  <var id="linkmtime" fn="dateformatcs" data="$contentlink-mtime"/>
-  <var id="linkauthor" fn="link" href="#@$contentlink-authorid" data="$contentlink-author"/>
+  <var id="linkctime" fn="dateformatcs" data="@$contentlink-ctime"/>
+  <var id="linkmtime" fn="dateformatcs" data="@$contentlink-mtime"/>
+  <var id="linkauthor" fn="link" href="#@$contentlink-authorid" data="@$contentlink-author"/>
   <var id="creation" data="Autorem dokumentu je $linkauthor ze dne $linkctime"/>
 
 </InputVar>

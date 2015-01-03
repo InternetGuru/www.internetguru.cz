@@ -224,8 +224,7 @@ class DOMBuilder {
     $toStripTag = array();
     foreach($includes as $include) {
       try {
-        $author = $include->getAncestorValue("author", "h");
-        self::insertHtmlPlus($include, dirname($filePath), $author);
+        self::insertHtmlPlus($include, dirname($filePath));
         $toStripElement[] = $include;
       } catch(Exception $e) {
         $toStripTag[] = $include;
@@ -238,7 +237,7 @@ class DOMBuilder {
       count($toStripElement), count($includes)), null, $start_time);
   }
 
-  private static function insertHtmlPlus(DOMElement $include, $homeDir, $author) {
+  private static function insertHtmlPlus(DOMElement $include, $homeDir) {
     $val = $include->getAttribute("src");
     $file = realpath("$homeDir/$val");
     if($file === false) {
@@ -251,6 +250,7 @@ class DOMBuilder {
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $val));
     try {
       $doc = new HTMLPlus();
+      $author = $include->getAncestorValue("author", "h");
       self::loadDOM("$homeDir/$val", $doc, $author);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
@@ -261,7 +261,13 @@ class DOMBuilder {
     $sectLang = self::getSectionLang($include->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"), $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
+      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
+        $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
+    $impAuthor = $doc->documentElement->firstElement->getAttribute("author");
+    if($impAuthor != $author)
+      new Logger(sprintf(_("Imported file author '%s' does not match section author '%s' in '%s'"),
+        $impAuthor, $author, $val), Logger::LOGGER_WARNING);
+    $doc->documentElement->firstElement->removeAttribute("author"); // prevent "creation" info
     foreach($doc->documentElement->childElements as $n) {
       $include->parentNode->insertBefore($include->ownerDocument->importNode($n, true), $include);
     }
