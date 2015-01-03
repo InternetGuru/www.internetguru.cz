@@ -104,6 +104,10 @@ p object {
   color: #fff;
   padding: 0.5em;
 }
+#flashMsg.hidden {
+  float: left;
+  background: transparent;
+}
 .warning {
   border-color: #E78181;
   background-color: #F99F9F;
