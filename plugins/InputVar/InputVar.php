@@ -185,8 +185,7 @@ class InputVar extends Plugin implements SplObserver {
 
   private function createFnLink($id, $href="", $title=null) {
     return function($value) use ($href, $title) {
-      return "<a href='$href'".(is_null($title) ? "" : " title='$title'")
-        .">".$value."</a>";
+      return "<a href='$href'".(is_null($title) ? "" : " title='$title'").">".$value."</a>";
     };
   }
 

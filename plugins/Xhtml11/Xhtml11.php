@@ -61,7 +61,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // add head element
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title", $this->getTitle()));
+    $head->appendChild($doc->createElement("title", $this->getTitle($content)));
     $this->appendMeta($head, "Content-Type", "text/html; charset=utf-8");
     $this->appendMeta($head, "viewport", "initial-scale=1");
     $this->appendMeta($head, "Content-Language", Cms::getVariable("cms-lang"));
@@ -190,10 +190,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
   */
 
-  private function getTitle() {
-    $title = Cms::getVariable("cms-title");
+  private function getTitle(HTMLPlus $content) {
+    $h1 = $content->documentElement->firstElement;
+    $title = $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
     foreach($this->subject->getIsInterface("ContentStrategyInterface") as $clsName => $cls) {
-      $tmp = Cms::getVariable(strtolower($clsName)."-cms-title");
+      $tmp = Cms::getVariable(strtolower($clsName)."-title");
       if(!is_null($tmp)) $title = $tmp;
     }
     return $title;

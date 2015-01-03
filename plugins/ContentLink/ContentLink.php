@@ -20,37 +20,53 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   public function getContent(HTMLPlus $c) {
     $cf = Cms::getContentFull();
     $link = getCurLink();
-    $curH = $cf->getElementById($link, "link");
-    if(is_null($curH)) {
-      if(strlen($link)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
-      $curH = $cf->documentElement->firstElement;
+    if($this->isRoot) $h1 = $cf->documentElement->firstElement;
+    else {
+      $h1 = $cf->getElementById($link, "link", "h");
+      if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
-    $this->setPath($curH);
+    $this->setPath($h1);
     $this->setBc($c);
     if($this->isRoot) return $c;
 
-    $curH->setAncestorValue("ns");
-    $curH->setAncestorValue("author");
-    $curH->parentNode->setAncestorValue("xml:lang");
-    if(!$curH->parentNode->hasAttribute("xml:lang")) {
-      $bodyLang = $cf->documentElement->getAttribute("xml:lang");
-      $curH->parentNode->setAttribute("xml:lang", $bodyLang);
-    }
-    $curH->setAncestorValue("ctime");
-    $curH->setAncestorValue("mtime");
-    $curH->nextElement->setAncestorValue();
-    $curH->nextElement->setAncestorValue("kw");
+    $desc = $h1->nextElement;
+    if(!$h1->hasAttribute("ns")) $h1->setAttribute("ns", $h1->getAncestorValue("ns"));
+    if(!strlen($desc->nodeValue)) $desc->nodeValue = $desc->getAncestorValue();
+    if(!$desc->hasAttribute("kw")) $desc->setAttribute("kw", $desc->getAncestorValue("kw"));
+
+    $this->handleAttribute($h1, "ctime");
+    $this->handleAttribute($h1, "mtime");
+    $this->handleAttribute($h1, "author");
+    $this->handleAttribute($h1, "authorid");
+    $this->handleAttribute($h1, "resp");
+    $this->handleAttribute($h1, "respid");
+    $this->handleAttribute($h1->parentNode, "xml:lang", "lang", Cms::getVariable("cms-lang"));
 
     $content = new HTMLPlus();
     $content->formatOutput = true;
     $body = $content->appendChild($content->createElement("body"));
-    foreach($curH->parentNode->attributes as $attName => $attNode) {
+    foreach($h1->parentNode->attributes as $attName => $attNode) {
       $body->setAttributeNode($content->importNode($attNode));
     }
-    $this->appendUntilSame($curH, $body);
+    $this->appendUntilSame($h1, $body);
 
-    #$content->fragToLinks($cf);
     return $content;
+  }
+
+  private function handleAttribute(DOMElement $e, $aName, $vName=null, $def=null) {
+    if(is_null($vName)) $vName = $aName;
+    if($e->hasAttribute($aName)) {
+      Cms::setVariable($vName, $e->getAttribute($aName));
+      return;
+    }
+    $value = $e->getAncestorValue($aName);
+    if(is_null($value)) {
+      if(is_null($def)) return;
+      $value = $def;
+    }
+    $e->setAttribute($aName, $value);
+    if($value == Cms::getVariable("cms-$vName")) return;
+    Cms::setVariable($vName, $value);
   }
 
   private function setPath(DOMElement $h) {
@@ -86,7 +102,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
     $bc = Cms::processVariables($bc);
     Cms::setVariable("bc", $bc->documentElement);
-    Cms::setVariable("cms-title", implode(" - ", array_reverse($subtitles)));
+    Cms::setVariable("title", implode(" - ", array_reverse($subtitles)));
   }
 
   private function appendUntilSame(DOMElement $e, DOMElement $into) {
