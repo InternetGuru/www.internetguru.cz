@@ -321,9 +321,9 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
   private function modifyDOM(DOMDocumentPlus $doc, $subdom) {
     if(strpos($subdom, ".") === 0) {
-      $doc->insertVar("inactive", null);
+      $doc->insertVar("inactive", "");
       $subdom = substr($subdom, 1);
-    } else $doc->insertVar("active", null);
+    } else $doc->insertVar("active", "");
     $doc->insertVar("linkName", "<strong>$subdom</strong>.".getDomain());
     $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
     $doc->insertVar("userDirId", "$subdom-USER_DIR");
@@ -354,7 +354,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $o->setAttribute("value", $cmsVer);
       $set->appendChild($o);
     }
-    if(!$deprecated) $doc->insertVar("deprecated", null);
+    if(!$deprecated) $doc->insertVar("deprecated", "");
     if($set->childNodes->length) $doc->insertVar("cmsVers", $set);
 
     // user directories
