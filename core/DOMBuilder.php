@@ -193,13 +193,7 @@ class DOMBuilder {
         if(isset(self::$linkToId[$link]))
           throw new Exception(sprintf(_("Duplicit attribute link found '%s'")), $link);
         self::$linkToId[$link] = $id;
-      } else {
-        $h = $e->getPreviousElement("h");
-        while(!is_null($h) && !$h->hasAttribute("link")) {
-          $h = $h->parentNode->getPreviousElement("h");
-        }
-        $link = $h->getAttribute("link");
-      }
+      } else $link = $e->getAncestorValue("link", "h");
       self::$idToLink[$id] = $link;
     }
   }
