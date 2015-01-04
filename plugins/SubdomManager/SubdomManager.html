@@ -3,7 +3,7 @@
   <h>Manažer poddomén</h>
   <desc kw="manažer, správa, poddomény, plugin">Správa poddomén uživatele <em var="cms-user_id">n/a</em> na doméně <em var="domain">n/a</em>.</desc>
   <form action="/" method="post" var="curlink@action" id="new_subdom_form">
-    <fieldset class="hidable" var="new_nohide@class"><legend>Vytvoření, kopie a přejmenování poddomény</legend>
+    <fieldset class="hideable" var="new_nohide@class"><legend>Vytvoření, kopie a přejmenování poddomény</legend>
       <dl>
         <dt><label for="new_subdom">Vytvoření nové poddomény</label></dt>
         <dd><input type="text" name="new_subdom" id="new_subdom" var="new_subdom@value"/><samp var="domain">.%s</samp></dd>
@@ -20,7 +20,7 @@
     </fieldset>
   </form>
   <form action="/" method="post" var="curlinkSubdom@action">
-    <fieldset class="hidable" var="nohide@class"><legend>Poddoména <a var="linkName linkHref@href">n/a</a>, verze <em var="version">neznámá</em> <strong var="deprecated">(nepodporovaná)</strong></legend>
+    <fieldset class="hideable" var="nohide@class"><legend>Poddoména <a var="linkName linkHref@href">n/a</a>, verze <em var="version">neznámá</em> <strong var="deprecated">(nepodporovaná)</strong></legend>
       <dl>
         <dt><label var="cmsVerId@for">Verze IGCMS, aktuálně <samp var="CMS_VER">neznámá</samp> <strong var="deprecated">(nepodporovaná verze)</strong></label></dt>
         <dd><select name="CMS_VER" var="cmsVerId@id"><option var="cmsVers">n/a</option></select></dd>

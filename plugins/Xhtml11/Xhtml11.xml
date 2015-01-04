@@ -24,16 +24,15 @@
 
   <stylesheet>themes/cms-default.css</stylesheet>
   <stylesheet media="print">themes/cms-print.css</stylesheet>
-  <stylesheet>themes/toggleHidables.css</stylesheet>
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
   <jsFile readonly="readonly" />
-  <jsFile append="body">themes/headingFragment.js</jsFile>
+  <jsFile append="body">themes/fragments.js</jsFile>
   <jsFile append="body" priority="5">themes/selectable.js</jsFile>
-  <jsFile append="body">themes/toggleHidables.js</jsFile>
+  <jsFile append="body">themes/hideable.js</jsFile>
 
   <!-- <xslt readonly="readonly"/> -->
-  <xslt>themes/cmsMessages.xsl</xslt>
+  <xslt>themes/cms-messages.xsl</xslt>
 
   <!-- <favicon>myFavicon.ico</favicon> -->
 

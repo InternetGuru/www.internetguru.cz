@@ -3,25 +3,41 @@
 
   var EXPAND = "[+]";
   var COLLAPSE = "[–]";
-  var HIDABLE_CLASS = "hidable";
+  var HIDEABLE_CLASS = "hideable";
   var HIDE_CLASS = "hide";
   var NO_HIDE_CLASS = "nohide";
   var HIDDEN_CLASS = "hidden";
 
-  function getHidables() {
-    if (document.querySelectorAll) return document.querySelectorAll("." + HIDABLE_CLASS);
-    var hidables = [];
+  function getHideables() {
+    if (document.querySelectorAll) return document.querySelectorAll("." + HIDEABLE_CLASS);
+    var hideables = [];
     var allElements = document.getElementsByTagName("*");
     for(var i = 0; i < allElements.length; i++) {
-      if(allElements[i].classList.contains(HIDABLE_CLASS)) hidables.push(allElements[i]);
+      if(allElements[i].classList.contains(HIDEABLE_CLASS)) hideables.push(allElements[i]);
     }
-    return hidables;
+    return hideables;
   }
 
-  function toggleHidables() {
-    var hidables = getHidables();
-    for(var i = 0; i < hidables.length; i++) {
-      var firstElement = hidables[i].children[0];
+  function appendStyle() {
+    var css = '/* hideables.js */'
+      + ' .hide {display: none;}'
+      + ' .switch {text-decoration: none;'
+      + ' font-family: "Emilbus Mono","Lucida Console",monospace;'
+      + ' font-weight: bold; color: black; }';
+    var style = document.getElementsByTagName('style')[0];
+    if(style == undefined) {
+      var head = document.head || document.getElementsByTagName('head')[0];
+      style = document.createElement('style');
+      style.type = 'text/css';
+      head.appendChild(style);
+    }
+    style.appendChild(document.createTextNode(css));
+  }
+
+  function toggleHideables() {
+    var hideables = getHideables();
+    for(var i = 0; i < hideables.length; i++) {
+      var firstElement = hideables[i].children[0];
       var link = document.createElement("a");
       link.href = "Javascript:void(0);";
       link.innerHTML = COLLAPSE;
@@ -29,8 +45,8 @@
       link.addEventListener("click",toggle,false);
       firstElement.innerHTML = " " + firstElement.innerHTML;
       firstElement.insertBefore(link,firstElement.firstChild);
-      if(hidables[i].classList.contains(NO_HIDE_CLASS)) continue;
-      hidables[i].classList.add(NO_HIDE_CLASS);
+      if(hideables[i].classList.contains(NO_HIDE_CLASS)) continue;
+      hideables[i].classList.add(NO_HIDE_CLASS);
       toggleElement(link);
     }
   }
@@ -64,6 +80,7 @@
     }
   }
 
-  toggleHidables();
+  appendStyle();
+  toggleHideables();
 
 })(window);

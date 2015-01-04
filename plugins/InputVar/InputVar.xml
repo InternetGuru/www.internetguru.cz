@@ -30,10 +30,10 @@
   <var id="linkctime" fn="dateformatcs" data="@$contentlink-ctime"/>
   <var id="linkmtime" fn="dateformatcs" data="@$contentlink-mtime"/>
   <var id="linkauthor" fn="link" href="#@$contentlink-authorid" data="@$contentlink-author"/>
-  <var id="creation" data="Autorem dokumentu je $linkauthor ze dne $linkctime"/>
+  <var id="creation" data="Autorem následujícího obsahu je $linkauthor ze dne $linkctime"/>
 
   <var id="linkresp" fn="link" href="#@$contentlink-respid" data="@$contentlink-resp"/>
-  <var id="resp" data="Za obsah tohoto dokumentu zodpovídá $linkresp."/>
-  <var id="modified" data="Tento dokument byl naposledy upraven dne $linkmtime."/>
+  <var id="resp" data="Za obsah této stránky zodpovídá $linkresp."/>
+  <var id="modified" data="Obsah této stránky byl naposledy upraven dne $linkmtime."/>
 
 </InputVar>
