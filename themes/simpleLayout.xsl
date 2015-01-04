@@ -46,7 +46,7 @@
       <xsl:copy-of select="@*"/>
       <div id="content">
         <xsl:apply-templates/>
-        <xsl:if test="not($contentlink-resp = '')">
+        <xsl:if test="not($contentlink-resp = '') or not($contentlink-mtime = $contentlink-ctime)">
           <ul class="docinfo">
             <xsl:if test="not($contentlink-resp = '')">
               <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
