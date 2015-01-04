@@ -90,6 +90,12 @@ h3, h4, h5, h6 {
   color: #fff;
 }
 
+ul.docinfo {
+  list-style: none;
+  text-align: right;
+  font-style: italic;
+}
+
 p.creation {
   margin-top: 0;
   position: relative;
