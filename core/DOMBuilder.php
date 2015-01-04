@@ -264,10 +264,8 @@ class DOMBuilder {
       new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
         $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
     $impAuthor = $doc->documentElement->firstElement->getAttribute("author");
-    if($impAuthor != $author)
-      new Logger(sprintf(_("Imported file author '%s' does not match section author '%s' in '%s'"),
-        $impAuthor, $author, $val), Logger::LOGGER_WARNING);
-    $doc->documentElement->firstElement->removeAttribute("author"); // prevent "creation" info
+    if($impAuthor == $author)
+      $doc->documentElement->firstElement->removeAttribute("author"); // prevent "creation" info
     foreach($doc->documentElement->childElements as $n) {
       $include->parentNode->insertBefore($include->ownerDocument->importNode($n, true), $include);
     }
