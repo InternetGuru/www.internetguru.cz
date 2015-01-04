@@ -1,8 +1,9 @@
 0.4.2 2015-01-04
-optické vylepšené skrytí hlášení systému (19d21c2)
-contentLink: specifické globální proměnné aktuálního odkazu (284f5d1)
-simpleLayout: úprava položek v zápatí, informace o autorovi v záhlaví (0b1715d)
-html+ nový atribut res/respid značící zodpovědnou osobu (8fca8cd)
+Zobrazení zodpovědnosti a poslední modifikace dokumentu (95f6a3b)
+Optické vylepšené skrytí hlášení systému (19d21c2)
+ContentLink: specifické globální proměnné aktuálního odkazu (284f5d1)
+SimpleLayout: úprava položek v zápatí, informace o autorovi v záhlaví (0b1715d)
+HTML+ nový atribut res/respid značící zodpovědnou osobu (8fca8cd)
 Convertor: opravená kompatibilita zápisu se zavináčem, nový výchozí link (cd8a43f)
 
 0.4.1 2014-12-21
