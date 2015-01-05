@@ -36,8 +36,8 @@
 
   <xsl:variable name="copy">
     <xsl:choose>
-      <xsl:when test="$inputvar-cyear = $inputvar-year">©<xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/></xsl:when>
-      <xsl:otherwise>©<xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/>–<xsl:value-of disable-output-escaping="yes" select="$inputvar-year"/></xsl:otherwise>
+      <xsl:when test="$inputvar-cyear = $inputvar-year">© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/></xsl:when>
+      <xsl:otherwise>© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/>–<xsl:value-of disable-output-escaping="yes" select="$inputvar-year"/></xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
 
@@ -61,12 +61,12 @@
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
           <li><xsl:value-of disable-output-escaping="yes" select="$copy"/> <xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
-          <li>Pohání <a href='http://www.ezakladna.cz'>E-Základna</a></li>
+          <li>Na službě: <a href='http://www.ezakladna.cz'>E-Základna</a></li>
           <xsl:if test="not($cms-resp = '')">
-            <li>Zodpovídá <xsl:value-of select="$cms-resp"/></li>
+            <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
           </xsl:if>
           <xsl:if test="not($cms-mtime = '')">
-            <li>Upraveno <xsl:value-of select="$inputvar-mymtime"/></li>
+            <li>Upraveno: <xsl:value-of select="$inputvar-mymtime"/></li>
           </xsl:if>
           <li class="link"><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/>/<xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
