@@ -66,6 +66,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function parseZippedDoc($f) {
     $doc = $this->transformFile($this->tmpFolder."/$f");
+    $d = new DOMDocumentPlus();
     $xml = $doc->saveXML();
     $xml = str_replace("·\n", "\n", $xml); // remove "format hack" from transformation
     $mergable = array("strong", "em", "sub", "sup", "ins", "del", "q", "cite", "acronym", "code", "dfn", "kbd", "samp");

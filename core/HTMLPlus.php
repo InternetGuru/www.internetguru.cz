@@ -55,6 +55,7 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCodeTag($n);
     foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCode($n);
     foreach($this->getInlineTextNodes($extend) as $n) $this->parseSyntaxVariable($n);
+    foreach($this->getInlineTextNodes($extend) as $n) $this->parseSyntaxComment($n);
 
     // restore noparse
     foreach($noparse as $n) {
@@ -66,7 +67,7 @@ class HTMLPlus extends DOMDocumentPlus {
 
   private function getInlineTextNodes($extend = array()) {
     $textNodes = array();
-    foreach(array_merge(array("p", "dd", "li"), $extend) as $eNam) {
+    foreach(array_merge(array("p", "dt", "dd", "li"), $extend) as $eNam) {
       foreach($this->getElementsByTagName($eNam) as $e) {
         foreach($e->childNodes as $n) {
           if($n->nodeType == XML_TEXT_NODE) $textNodes[] = $n;
@@ -153,6 +154,16 @@ class HTMLPlus extends DOMDocumentPlus {
         }
         $n->parentNode->insertBefore($newNode, $n);
       }
+    }
+    $n->parentNode->removeChild($n);
+  }
+
+  private function parseSyntaxComment(DOMText $n) {
+    $p = preg_split('/\(\( ?(.+) ?\)\)/', $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
+    if(count($p) < 2) return;
+    foreach($p as $i => $v) {
+      if($i % 2 == 0) $n->parentNode->insertBefore($this->createTextNode($v), $n);
+      else $n->parentNode->insertBefore($this->createComment(" $v "), $n);
     }
     $n->parentNode->removeChild($n);
   }

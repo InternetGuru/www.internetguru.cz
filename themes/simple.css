@@ -98,6 +98,7 @@ ul.docinfo {
 
 p.creation {
   margin-top: 0;
+  margin-bottom: -1rem;
   position: relative;
   top: 1rem;
   font-weight: 100;

@@ -382,13 +382,15 @@ class DOMDocumentPlus extends DOMDocument {
 
   private function insertInnerHTML($html, DOMElement $dest, $sep = "", $varName = "") {
     if(!is_array($html)) $html = array($html);
-    $dom = new DOMDocument();
+    $dom = new DOMDocumentPlus();
     $eNam = $dest->nodeName;
     $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
     if(!@$dom->loadXML($xml)) {
-      foreach($html as $k => $v) $html[$k] = htmlspecialchars($v);
-      $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
-      if(!@$dom->loadXML($xml)) throw new Exception(sprintf(_("Unable to parse variable '%s'"), $varName));
+      $var = $dom->appendChild($dom->createElement("var"));
+      foreach($html as $k => $v) {
+        $e = $var->appendChild($dom->createElement($eNam));
+        $e->nodeValue = $html[$k];
+      }
     }
     $this->insertVarDOMElement($dom->documentElement, $dest);
   }
