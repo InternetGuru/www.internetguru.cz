@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Agregator>
 
-  <!-- HTML: heading, link, ns, author, ctime, mtime, short, desc, kw -->
+  <!-- HTML: heading, link, ns, author, authorid, resp, respid, ctime, mtime, short, desc, kw -->
   <html id="html" wrapper="ol">
     <item><li><a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</li></item>
   </html>

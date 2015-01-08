@@ -205,6 +205,9 @@ class Agregator extends Plugin implements SplObserver {
     $vars['link'] = $h->getAttribute("link");
     $vars['ns'] = $h->getAttribute("ns");
     $vars['author'] = $h->getAttribute("author");
+    $vars['authorid'] = $h->hasAttribute("authorid") ? $h->getAttribute("authorid") : null;
+    $vars['resp'] = $h->hasAttribute("resp") ? $h->getAttribute("resp") : null;
+    $vars['respid'] = $h->hasAttribute("respid") ? $h->getAttribute("respid") : null;
     $vars['ctime'] = $h->getAttribute("ctime");
     $vars['mtime'] = $h->getAttribute("mtime");
     $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
