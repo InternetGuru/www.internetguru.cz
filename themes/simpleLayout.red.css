@@ -15,9 +15,7 @@ a:link {
   color: #E02000;
 }
 
-a:visited {
-  color: black;
-}
+a:visited {}
 
 #footer {
   background: #FD563B;
