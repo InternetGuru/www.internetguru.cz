@@ -159,7 +159,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function parseSyntaxComment(DOMText $n) {
-    $p = preg_split('/\(\( ?(.+) ?\)\)/', $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
+    $p = preg_split('/\(\(\s*(.+)\s*\)\)/', $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
     foreach($p as $i => $v) {
       if($i % 2 == 0) $n->parentNode->insertBefore($this->createTextNode($v), $n);
