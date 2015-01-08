@@ -61,9 +61,10 @@ class FileHandler extends Plugin implements SplObserver {
 
   private function handleImage($filePath) {
     $var = array(
-      "thumb" => array(200, 200, 50*1024),
-      "normal" => array(1000, 1000, 300*1024),
-      "full" => array(0, 0, 0)
+      "thumb" => array(200, 200, 50*1024, 88),
+      "normal" => array(1000, 1000, 150*1024, 88),
+      "big" => array(1500, 1500, 320*1024, 75),
+      "full" => array(0, 0, 0, 0)
       );
     $vName = "normal";
     foreach($var as $name => $v) {
@@ -86,7 +87,7 @@ class FileHandler extends Plugin implements SplObserver {
       $this->downloadFile($tmpPath, $v[2], false);
     }
     $im = new Imagick(realpath($filePath));
-    $im->setImageCompressionQuality(88);
+    $im->setImageCompressionQuality($v[3]);
     if($i[0] > $i[1]) $result = $im->thumbnailImage($v[0], 0);
     else $result = $im->thumbnailImage(0, $v[1]);
     if(!$result)
