@@ -3,7 +3,7 @@
 class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface {
   private $lang = null;
   private $isRoot;
-  private $headings;
+  private $hPath;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -71,35 +71,33 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function setPath(DOMElement $h) {
     while(!is_null($h)) {
-      $this->headings[$h->getAttribute("id")] = $h;
+      $this->hPath[$h->getAttribute("id")] = $h;
       $h = $h->parentNode->getPreviousElement("h");
     }
   }
 
   private function setBc(HTMLPlus $src) {
-    $first = true;
     $bc = new DOMDocumentPlus();
     $root = $bc->appendChild($bc->createElement("root"));
     $ol = $root->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class", "contentlink-bc");
-    foreach(array_reverse($this->headings) as $h) {
-      $li = $ol->appendChild($bc->createElement("li"));
-      $hs[] = $bc->importNode($h, true);
-      $li->appendChild(end($hs));
-    }
     $subtitles = array();
-    foreach($hs as $h) {
-      $content = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
-      $subtitles[] = $content;
-      $href = "#".$h->getAttribute("id");
-      $a = $h->parentNode->appendChild($bc->createElement("a", $content));
-      $a->setAttribute("href", $href);
+    $a = null;
+    $h = null;
+    foreach(array_reverse($this->hPath) as $h) {
+      $li = $ol->appendChild($bc->createElement("li"));
+      $a = $li->appendChild($bc->createElement("a", $h->nodeValue));
+      $a->setAttribute("href", "#".$h->getAttribute("id"));
       if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
-      else $a->setAttribute("title", $h->nodeValue);
-      $h->parentNode->removeChild($h);
+      if(empty($subtitles)) {
+        $subtitles[] = $h->nodeValue;
+        if(!$this->isRoot && !$h->hasAttribute("title") && $h->hasAttribute("short"))
+          $a->setAttribute("title", $h->getAttribute("short"));
+      } else {
+        $subtitles[] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
+      }
     }
-    end($subtitles);
-    $subtitles[key($subtitles)] = $h->nodeValue; // keep first title item long
+    if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
     $bc = Cms::processVariables($bc);
     Cms::setVariable("bc", $bc->documentElement);
     Cms::setVariable("title", implode(" - ", array_reverse($subtitles)));
