@@ -1,6 +1,12 @@
-document.addEventListener("click", changeUrl);
+document.addEventListener("click", headingLookup);
 
-function changeUrl(event) {
-  if(/h[2-6]/.test(event.target.nodeName.toLowerCase()))
-    window.history.replaceState("", "", "#"+event.target.id);
+function headingLookup(event) {
+  if(changeFragment(event.target)) return;
+  if(changeFragment(event.target.parentNode)) return;
+}
+
+function changeFragment(e) {
+  if(!/h[2-6]/.test(e.nodeName.toLowerCase())) return false;
+  window.history.replaceState("", "", "#"+e.id);
+  return true;
 }
