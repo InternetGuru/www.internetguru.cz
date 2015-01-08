@@ -1,6 +1,5 @@
 <?php
 try {
-
   $start_time = microtime(true);
   session_cache_limiter("public");
   session_start();
@@ -36,6 +35,7 @@ try {
   duplicateDir(ADMIN_FOLDER);
   if(defined("SUBDOM_FOLDER")) duplicateDir(SUBDOM_FOLDER, false);
 
+  header("Cache-Control: public, max-age=10800, must-revalidate");
   $out = Cms::getOutput();
   //get a unique hash of this file (etag)
   $etagFile = hash("md5", $out);
@@ -44,7 +44,7 @@ try {
   //set etag-header
   header("Etag: $etagFile");
   //check if page has changed. If not, send 304 and exit
-  if ($etagHeader == $etagFile) {
+  if($etagHeader == $etagFile) {
     header("HTTP/1.1 304 Not Modified");
     new Logger(_("Page not modified"), Logger::LOGGER_INFO);
   } else {
