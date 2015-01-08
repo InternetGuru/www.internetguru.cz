@@ -174,7 +174,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       if(!(safeRemoveDir("../$subdom")))
         throw new Exception(_("Unable to remove old subdom"));
     } else {
-      if(!preg_match("/^".USER_ID.SUBDOM_PATTERN."$/", $subdom))
+      if(!preg_match("/^".USER_ID."(".SUBDOM_PATTERN.")?$/", $subdom))
         throw new Exception(sprintf(_("Invalid user subdom format; must start with '%s'"), USER_ID));
     }
   }
