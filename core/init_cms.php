@@ -1,7 +1,7 @@
 <?php
 try {
   $start_time = microtime(true);
-  session_cache_limiter("public");
+  session_cache_limiter("");
   session_start();
   require_once('global_func.php');
   require_once('global_const.php');
@@ -35,7 +35,7 @@ try {
   duplicateDir(ADMIN_FOLDER);
   if(defined("SUBDOM_FOLDER")) duplicateDir(SUBDOM_FOLDER, false);
 
-  header("Cache-Control: public, max-age=10800, must-revalidate");
+  #header("Cache-Control: public, max-age=10800, must-revalidate");
   $out = Cms::getOutput();
   //get a unique hash of this file (etag)
   $etagFile = hash("md5", $out);
