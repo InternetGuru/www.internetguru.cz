@@ -78,6 +78,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendCssFiles($head);
     $html->appendChild($head);
 
+    // no more direct system messages
+    Cms::setForceFlash();
+
     // apply transformations
     $proc = new XSLTProcessor();
     $proc->setParameter('', $this->getProcParams());
@@ -91,12 +94,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
         $content = $newContent;
       } catch(Exception $e) {
-        new Logger($e->getMessage(), "error");
+        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
       }
     }
-
-    // no more direct system messages
-    Cms::setForceFlash();
 
     // correct links
     $contentPlus = new DOMDocumentPlus();
@@ -212,7 +212,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       } elseif(is_array($v)) {
         $v = implode(", ", $v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
-        new Logger(sprintf(_("Unable to convert variable '%s' to string"), $k), "error");
+        new Logger(sprintf(_("Unable to convert variable '%s' to string"), $k), Logger::LOGGER_ERROR);
         continue;
       } else {
         $v = (string) $v;
@@ -244,7 +244,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(!is_null($theme)) {
       $themeId = $theme->nodeValue;
       $t = $cfg->getElementById($themeId);
-      if(is_null($t)) new Logger(sprintf(_("Theme '%s' not found"), $themeId), "error");
+      if(is_null($t)) new Logger(sprintf(_("Theme '%s' not found"), $themeId), Logger::LOGGER_ERROR);
       else $this->addThemeFiles($t);
     }
 
@@ -257,7 +257,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $link = "favicon.ico";
     if(is_link($link) && readlink($link) == $target) return;
     if(symlink($target, "$link~") && rename("$link~", $link)) return;
-    new Logger(sprintf(_("Unable to create root '%s' link"), $link), "error");
+    new Logger(sprintf(_("Unable to create root '%s' link"), $link), Logger::LOGGER_ERROR);
   }
 
   private function addThemeFiles(DOMElement $e) {
@@ -329,7 +329,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if(!strlen($f)) {
       $comment = sprintf(_("Link [%s] file '%s' not found"), $rel, $file);
       $parent->appendChild(new DOMComment(" $comment "));
-      new Logger($comment, "error");
+      new Logger($comment, Logger::LOGGER_ERROR);
       return;
     }
     if($rel == "shortcut icon") $this->createRootFavicon($f);
@@ -411,7 +411,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         if($f === false) {
           $comment = sprintf(_("Javascript file '%s' not found"), $k);
           $parent->appendChild(new DOMComment(" $comment "));
-          new Logger($comment, "error");
+          new Logger($comment, Logger::LOGGER_ERROR);
           continue;
         }
       }

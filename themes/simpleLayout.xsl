@@ -34,43 +34,11 @@
   <xsl:param name="inputvar-cyear" select="''"/>
   <xsl:param name="inputvar-year" select="''"/>
 
-  <xsl:variable name="copy">
-    <xsl:choose>
-      <xsl:when test="$inputvar-cyear = $inputvar-year">© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/></xsl:when>
-      <xsl:otherwise>© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/>–<xsl:value-of disable-output-escaping="yes" select="$inputvar-year"/></xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-
   <xsl:template match="/body">
     <body>
       <xsl:copy-of select="@*"/>
       <div id="content">
         <xsl:apply-templates/>
-        <xsl:if test="not($contentlink-resp = '') or not($contentlink-mtime = $contentlink-ctime)">
-          <ul class="docinfo">
-            <xsl:if test="not($contentlink-resp = '')">
-              <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
-            </xsl:if>
-            <xsl:if test="not($contentlink-mtime = $contentlink-ctime)">
-              <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
-            </xsl:if>
-          </ul>
-        </xsl:if>
-      </div>
-      <div id="footer">
-        <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
-        <ul>
-          <li><xsl:value-of disable-output-escaping="yes" select="$copy"/> <xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
-          <li>Na službě: <a href='http://www.ezakladna.cz'>E-Základna</a></li>
-          <xsl:if test="not($cms-resp = '')">
-            <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
-          </xsl:if>
-          <xsl:if test="not($cms-mtime = '')">
-            <li>Upraveno: <xsl:value-of select="$inputvar-mymtime"/></li>
-          </xsl:if>
-          <li class="link"><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/>/<xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
-          <!-- <li><xsl:value-of select="$cms-version"/></li> -->
-        </ul>
       </div>
     </body>
   </xsl:template>

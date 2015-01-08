@@ -1,19 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
-  <xsl:param name="cms-ig" select="''"/>
-  <xsl:param name="cms-ez" select="''"/>
-  <xsl:param name="cms-title" select="''"/>
   <xsl:param name="contentlink-bc" select="''"/>
-  <xsl:param name="globalmenu" select="''"/>
-  <xsl:param name="cms-lang" select="''"/>
-  <xsl:param name="cms-author" select="''"/>
-  <xsl:param name="cms-desc" select="''"/>
-  <xsl:param name="cms-kw" select="''"/>
-  <xsl:param name="cms-ctime" select="''"/>
-  <xsl:param name="cms-mtime" select="''"/>
-  <xsl:param name="xhtml11-url" select="''"/>
-  <xsl:param name="xhtml11-link" select="''"/>
 
   <xsl:template match="/body">
     <body>
@@ -23,13 +11,6 @@
       </div>
       <div id="content">
         <xsl:apply-templates/>
-      </div>
-      <div id="footer">
-        <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
-        <ul>
-          <li><xsl:value-of disable-output-escaping="yes" select="$cms-ig"/></li>
-          <li><xsl:value-of disable-output-escaping="yes" select="$cms-ez"/></li>
-        </ul>
       </div>
     </body>
   </xsl:template>

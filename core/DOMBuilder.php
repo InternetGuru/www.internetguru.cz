@@ -129,7 +129,7 @@ class DOMBuilder {
     }
     if($success) return;
     $doc = null;
-    if(!is_null($e)) throw $e;
+    if(!is_null($e)) throw new Exception(sprintf(_("Failed to load user/admin/default file %s"), $filePath));
   }
 
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $linkPrefix=null) {
