@@ -61,9 +61,9 @@ class FileHandler extends Plugin implements SplObserver {
 
   private function handleImage($filePath) {
     $var = array(
-      "thumb" => array(200, 200, 50*1024, 88),
-      "normal" => array(1000, 1000, 150*1024, 88),
-      "big" => array(1500, 1500, 320*1024, 75),
+      "thumb" => array(200, 200, 50*1024, 85),
+      "normal" => array(1000, 1000, 225*1024, 85),
+      "big" => array(1500, 1500, 350*1024, 75),
       "full" => array(0, 0, 0, 0)
       );
     $vName = "normal";

@@ -389,7 +389,7 @@ class DOMDocumentPlus extends DOMDocument {
       $var = $dom->appendChild($dom->createElement("var"));
       foreach($html as $k => $v) {
         $e = $var->appendChild($dom->createElement($eNam));
-        $e->nodeValue = $html[$k];
+        $e->nodeValue = htmlspecialchars($html[$k]);
       }
     }
     $this->insertVarDOMElement($dom->documentElement, $dest);
