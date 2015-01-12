@@ -14,6 +14,14 @@
     <item><dt><a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt></item>
     <item since="4"/>
   </html>
+  <html id="htmldetail" wrapper="dl">
+    <item>
+      <dt><a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
+      <dd>Poslední změna: <strong fn="inputvar-dateformatcs" var="mtime">n/a</strong></dd>
+      <dd>Klíčová slova: <em var="kw">n/a</em></dd>
+      <dd var="desc">n/a</dd>
+    </item>
+  </html>
 
   <!-- XSLT (todo)
   <xslt htmldir="article" file="article.xsl"/>
