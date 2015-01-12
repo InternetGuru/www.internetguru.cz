@@ -125,7 +125,7 @@ class InitServer {
   }
 
   private function createSubdom($dir) {
-    if(!preg_match("/^".$this->subdomVars["USER_ID"].SUBDOM_PATTERN."$/", $this->subdom))
+    if(!preg_match("/^".$this->subdomVars["USER_ID"]."(".SUBDOM_PATTERN.")?$/", $this->subdom))
       throw new Exception(sprintf(_("New subdom must start with user id '%s'"), $this->subdomVars["USER_ID"]));
     if(!@mkdir($dir, 0755, true))
       throw new Exception(sprintf(_("Unable to create folder '%s'"), $dir));
