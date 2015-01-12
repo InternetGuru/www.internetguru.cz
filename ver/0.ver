@@ -1,3 +1,13 @@
+0.4.3 2015-01-12
+
+fragment.js podporuje vnořené elementy (2cb5524)
+ContentLink: vylepšená logika drobečkové navigace (f46be76)
+Agregator: přidány proměnné authorid, resp, respid (df7b284)
+Cms: přidána podpora http cache pomocí hlavičky Etag (bbc1669)
+Xhtml11: přidány basicLayout.xsl, footer.xsl (350f2ed)
+HTML+ přidána syntaxe pro komentář (( nějaký komentář )) (e8d6fd8)
+simpleLayout.xsl modifikace zápatí (b8d6f57)
+
 0.4.2 2015-01-04
 Zobrazení zodpovědnosti a poslední modifikace dokumentu (95f6a3b)
 Optické vylepšené skrytí hlášení systému (19d21c2)
