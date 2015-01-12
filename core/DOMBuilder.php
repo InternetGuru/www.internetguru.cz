@@ -117,12 +117,11 @@ class DOMBuilder {
     }
     $success = false;
     $e = null;
-    $fShort = substr($filePath, strlen(USER_ROOT_FOLDER));
     foreach($files as $f => $void) {
       try {
         self::loadDOM($f, $doc, null, $linkPrefix);
       } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to load '%s': %s"), $fShort, $e->getMessage()), Logger::LOGGER_ERROR);
+        new Logger(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
       }
       $success = true;
@@ -130,7 +129,8 @@ class DOMBuilder {
     }
     if($success) return;
     $doc = null;
-    if(!is_null($e)) throw new Exception(sprintf(_("Failed to load user/admin/default file %s"), $fShort));
+    if(!is_null($e))
+      throw new Exception(sprintf(_("Failed to load user/admin/default file %s"), basename($filePath)));
   }
 
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $linkPrefix=null) {
