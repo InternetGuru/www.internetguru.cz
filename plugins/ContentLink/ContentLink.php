@@ -26,7 +26,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
     $this->setPath($h1);
-    $this->setBc($c);
+    $this->generateBc($c);
     if($this->isRoot) return $c;
 
     $desc = $h1->nextElement;
@@ -76,7 +76,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
   }
 
-  private function setBc(HTMLPlus $src) {
+  private function generateBc(HTMLPlus $src) {
     $bc = new DOMDocumentPlus();
     $root = $bc->appendChild($bc->createElement("root"));
     $ol = $root->appendChild($bc->createElement("ol"));
@@ -88,6 +88,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $li = $ol->appendChild($bc->createElement("li"));
       $a = $li->appendChild($bc->createElement("a", $h->nodeValue));
       $a->setAttribute("href", "#".$h->getAttribute("id"));
+      #if($h->hasAttribute("var")) $a->setAttribute("var", $h->getAttribute("var"));
       if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
       if(empty($subtitles)) {
         $subtitles[] = $h->nodeValue;
@@ -98,7 +99,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       }
     }
     if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
-    $bc = Cms::processVariables($bc);
+    #$bc = Cms::processVariables($bc);
     Cms::setVariable("bc", $bc->documentElement);
     Cms::setVariable("title", implode(" - ", array_reverse($subtitles)));
   }
