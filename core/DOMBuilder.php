@@ -117,11 +117,12 @@ class DOMBuilder {
     }
     $success = false;
     $e = null;
+    $fShort = substr($filePath, strlen(USER_ROOT_FOLDER));
     foreach($files as $f => $void) {
       try {
         self::loadDOM($f, $doc, null, $linkPrefix);
       } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to load '%s': %s"), $filePath, $e->getMessage()), Logger::LOGGER_ERROR);
+        new Logger(sprintf(_("Unable to load '%s': %s"), $fShort, $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
       }
       $success = true;
@@ -129,7 +130,7 @@ class DOMBuilder {
     }
     if($success) return;
     $doc = null;
-    if(!is_null($e)) throw new Exception(sprintf(_("Failed to load user/admin/default file %s"), $filePath));
+    if(!is_null($e)) throw new Exception(sprintf(_("Failed to load user/admin/default file %s"), $fShort));
   }
 
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $linkPrefix=null) {
@@ -191,7 +192,7 @@ class DOMBuilder {
       if($e->hasAttribute("link")) {
         $link = $e->getAttribute("link");
         if(isset(self::$linkToId[$link]))
-          throw new Exception(sprintf(_("Duplicit attribute link found '%s'")), $link);
+          throw new Exception(sprintf(_("Duplicit attribute link found '%s'"), $link));
         self::$linkToId[$link] = $id;
       } else $link = $e->getAncestorValue("link", "h");
       self::$idToLink[$id] = $link;

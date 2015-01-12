@@ -389,7 +389,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(trim($link) == "") {
         if($link != $h->getAttribute("link"))
           throw new Exception(sprintf(_("Normalize link leads to empty value '%s'"), $h->getAttribute("link")));
-        throw new Exception(_("Empty link found"));
+        throw new Exception(_("Empty attribute link found"));
       }
       if($link != $h->getAttribute("link")) {
         if(!$repair) throw new Exception(sprintf(_("Invalid link value found '%s'"), $h->getAttribute("link")));
