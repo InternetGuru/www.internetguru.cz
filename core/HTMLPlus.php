@@ -168,13 +168,11 @@ class HTMLPlus extends DOMDocumentPlus {
     $n->parentNode->removeChild($n);
   }
 
-  protected function validateHTMLPlus($repair) {
+  public function validatePlus($repair = false) {
     $this->headings = $this->getElementsByTagName("h");
     $this->validateRoot($repair);
     $this->validateSections($repair);
     $this->validateLang($repair);
-    $this->validateId("id", $repair);
-    $this->validateId("link", $repair);
     $this->validateHid($repair);
     $this->validateHempty($repair);
     $this->validateDesc($repair);

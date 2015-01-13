@@ -245,7 +245,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       throw new Exception(_("Invalid XML syntax"));
     }
     try {
-      $doc->validatePlus();
+      if($this->type == "html") $doc->validatePlus();
     } catch(Exception $e) {
       $doc->validatePlus(true);
       #TODO: log autocorrected

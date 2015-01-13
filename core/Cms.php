@@ -118,7 +118,7 @@ class Cms {
       }
     }
     try {
-      $newContent->validatePlus(true);
+      if($newContent instanceof HTMLPlus) $newContent->validatePlus(true);
     } catch(Exception $e) {
       throw new Exception(sprintf(_("Some variable(s) causing HTML+ error: %s"), $e->getMessage()));
     }

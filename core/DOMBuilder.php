@@ -148,15 +148,15 @@ class DOMBuilder {
     // load
     if(!@$doc->load($filePath))
       throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
+    if(!($doc instanceof HTMLPlus)) return;
+
     // validate, save if repaired
-    if($doc instanceof HTMLPlus) {
-      $c = new DateTime();
-      $c->setTimeStamp(filectime($filePath));
-      $doc->defaultCtime = $c->format(DateTime::W3C);
-      $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
-      $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
-      if(!is_null($linkPrefix)) self::prefixLinks($linkPrefix, $doc);
-    }
+    $c = new DateTime();
+    $c->setTimeStamp(filectime($filePath));
+    $doc->defaultCtime = $c->format(DateTime::W3C);
+    $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
+    $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
+    if(!is_null($linkPrefix)) self::prefixLinks($linkPrefix, $doc);
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
@@ -167,15 +167,18 @@ class DOMBuilder {
         new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
       }
     }
-    if(!($doc instanceof HTMLPlus)) return;
     // generate ctime/mtime from file if not set
     self::setMtime($doc, $filePath);
-    // register ids; repair if duplicit
-    self::registerIds($doc);
+    try {
+      // register links/ids; repair if duplicit
+      self::registerKeys($doc);
+    } catch(Exception $e) {
+      new Logger(sprintf(_("HTML+ file %s duplicit keys renamed: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+    }
     // HTML+ include
     self::insertIncludes($doc, $filePath);
-    #print_r(self::$identifiers);
-    #print_r(self::$links);
+    #print_r(self::$idToLink);
+    #print_r(self::$linkToId);
   }
 
   private static function prefixLinks($prefix, HTMLPlus $doc) {
@@ -185,18 +188,43 @@ class DOMBuilder {
     }
   }
 
-  private static function registerIds(HTMLPlus $doc) {
-    $identifiers = array();
-    $doc->validateId("id", true, $identifiers);
-    foreach($identifiers as $id => $e) {
+  private static function registerKeys(HTMLPlus $doc) {
+    $duplicit = array();
+    foreach(self::getIdentifiers($doc) as $e) {
+      $id = $e->getAttribute("id");
+      if(array_key_exists($id, self::$idToLink)) {
+        $duplicit[] = $id;
+        $id = self::generateUniqueVal($id, self::$idToLink);
+        $e->setAttribute("id", $id);
+      }
       if($e->hasAttribute("link")) {
         $link = $e->getAttribute("link");
-        if(isset(self::$linkToId[$link]))
-          throw new Exception(sprintf(_("Duplicit attribute link found '%s'"), $link));
+        if(array_key_exists($link, self::$linkToId)) {
+          $duplicit[] = $link;
+          $link = self::generateUniqueVal($link, self::$linkToId);
+          $e->setAttribute("link", $link);
+        }
         self::$linkToId[$link] = $id;
-      } else $link = $e->getAncestorValue("link", "h");
+      } else {
+        $link = $e->getAncestorValue("link", "h");
+      }
       self::$idToLink[$id] = $link;
     }
+    if(empty($duplicit)) return;
+    throw new Exception(implode(", ", $duplicit));
+  }
+
+  private static function getIdentifiers(HTMLPlus $doc) {
+    $ids = array();
+    $xpath = new DOMXPath($doc);
+    foreach($xpath->query("//*[@id]") as $e) $ids[] = $e;
+    return $ids;
+  }
+
+  private static function generateUniqueVal($val, Array $reg) {
+    $i = 1;
+    while(array_key_exists($val.$i, $reg)) $i++;
+    return $val.$i;
   }
 
   private static function setMtime(HTMLPlus $doc, $filePath) {
@@ -267,8 +295,6 @@ class DOMBuilder {
     try {
       $include->ownerDocument->validatePlus();
     } catch(Exception $e) {
-      echo $include->ownerDocument->saveXML();
-      die();
       $include->ownerDocument->validatePlus(true);
       new Logger(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }

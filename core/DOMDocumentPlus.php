@@ -125,8 +125,13 @@ class DOMDocumentPlus extends DOMDocument {
           $keep[] = $v;
           continue;
         }
-        if(isset($p[1])) $replaceAttr[] = array($e, $p[1], $e->nodeName);
-        else $replaceCont[] = array($e, null, $e->nodeName);
+        if(isset($p[1])) {
+          if(in_array($p[1], array("id", "link"))) {
+            new Logger(_("Variable cannot modify attributes id, link"), "warning");
+            continue;
+          }
+          $replaceAttr[] = array($e, $p[1], $e->nodeName);
+        } else $replaceCont[] = array($e, null, $e->nodeName);
       }
       if(empty($keep)) {
         $e->removeAttribute($attr);
@@ -234,36 +239,8 @@ class DOMDocumentPlus extends DOMDocument {
     return count($toRemove);
   }
 
-  public function validatePlus($repair=false) {
-    if($this instanceof HTMLPlus) $this->validateHTMLPlus($repair);
-    else $this->validateDOMPlus($repair);
-  }
-
-  private function validateDOMPlus($repair) {
-    $this->validateId(null, $repair);
-  }
-
-  public function validateId($attr=null, $repair=false, &$identifiers = array()) {
-    if(is_null($attr)) $attr = "id";
-    $xpath = new DOMXPath($this);
-    $duplicit = array();
-    foreach($xpath->query("//*[@$attr]") as $e) {
-      if(!array_key_exists($e->getAttribute($attr), $identifiers)) {
-        #$val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
-        $identifiers[$e->getAttribute($attr)] = $e;
-        continue;
-      }
-      if(!$repair) throw new Exception(sprintf(_("Duplicit %s attribute '%s' found"), $attr, $e->getAttribute($attr)));
-      $duplicit[] = $e;
-    }
-    if(!count($duplicit)) return;
-    foreach($duplicit as $e) {
-      $i = 1;
-      while(array_key_exists($e->getAttribute($attr).$i, $identifiers)) $i++;
-      $e->setAttribute($attr, $e->getAttribute($attr).$i);
-      #$val = $attr != "id" && $e->hasAttribute("id") ? $e->getAttribute("id") : null;
-      $identifiers[$e->getAttribute($attr)] = $e;
-    }
+  public function validatePlus($repair = false) {
+    throw new Exception("Method no longer exists");
   }
 
   #UNUSED

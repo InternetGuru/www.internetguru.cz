@@ -44,7 +44,7 @@ try {
   //set etag-header
   header("Etag: $etagFile");
   //check if page has changed. If not, send 304 and exit
-  if($etagHeader == $etagFile) {
+  if(!IS_LOCALHOST && $etagHeader == $etagFile) {
     header("HTTP/1.1 304 Not Modified");
     new Logger(_("Page not modified"), Logger::LOGGER_INFO);
   } else {
