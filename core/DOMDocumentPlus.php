@@ -126,8 +126,8 @@ class DOMDocumentPlus extends DOMDocument {
           continue;
         }
         if(isset($p[1])) {
-          if(in_array($p[1], array("id", "link"))) {
-            new Logger(_("Variable cannot modify attributes id, link"), "warning");
+          if($e->nodeName == "h" && in_array($p[1], array("id", "link"))) {
+            new Logger(_("Variables cannot modify heading identifiers"), "warning");
             continue;
           }
           $replaceAttr[] = array($e, $p[1], $e->nodeName);
