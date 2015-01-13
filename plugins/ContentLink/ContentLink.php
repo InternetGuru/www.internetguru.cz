@@ -71,7 +71,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function setPath(DOMElement $h) {
     while(!is_null($h)) {
-      $this->hPath[$h->getAttribute("id")] = $h;
+      if($h->hasAttribute("link")) $this->hPath[$h->getAttribute("id")] = $h;
       $h = $h->parentNode->getPreviousElement("h");
     }
   }
