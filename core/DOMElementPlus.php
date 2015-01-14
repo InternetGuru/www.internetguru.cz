@@ -82,6 +82,7 @@ class DOMElementPlus extends DOMElement {
   private function emptyRecursive() {
     $p = $this->parentNode;
     $p->removeChild($this);
+    if($p->nodeType != XML_ELEMENT_NODE) return;
     if($p->childElements->length != 0) return;
     $p->emptyRecursive();
   }
@@ -172,6 +173,7 @@ class DOMElementPlus extends DOMElement {
     foreach($this->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     $nodes = array();
     foreach($var->childNodes as $n) $nodes[] = $n;
+    if(is_null($this->parentNode)) return;
     foreach($nodes as $n) {
       $this->parentNode->insertBefore($n, $this);
       if($n->nodeType != XML_ELEMENT_NODE) continue;

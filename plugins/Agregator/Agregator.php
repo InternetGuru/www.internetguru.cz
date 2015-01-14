@@ -179,6 +179,7 @@ class Agregator extends Plugin implements SplObserver {
       foreach($pattern as $p) {
         $vars = $this->getHTMLVariables($htmlPlus);
         $p = $this->replaceVariables($p, $vars);
+        if(is_null($p)) continue;
         $item = $list->appendChild($doc->importNode($p, true));
       }
     }
