@@ -267,22 +267,19 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     ");
 
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("domain", getDomain());
-    $newContent->insertVar("cbr", CMS_BEST_RELEASE);
-    $newContent->insertVar("curlink", getCurLink()."?".get_class($this));
-    if(isset($_POST['force'])) $newContent->insertVar("force", "checked");
+    $vars["domain"] = getDomain();
+    $vars["cbr"] = CMS_BEST_RELEASE;
+    $vars["curlink"] = getCurLink()."?".get_class($this);
+    if(isset($_POST['force'])) $vars["force"] = "checked";
 
-    $radioCheked = "new";
-    if(isset($_POST['new_subdom_option'])) {
-      $radioCheked = $_POST['new_subdom_option'];
-    }
-    $newContent->insertVar($radioCheked, "checked");
+    if(isset($_POST['new_subdom_option'])) $vars[$_POST['new_subdom_option']] = "checked";
+    else $vars["new"] = "checked";
 
     if(isset($_POST["new_subdom"])) {
-      $newContent->insertVar("new_nohide", "nohide");
-      $newContent->insertVar("new_subdom", $_POST["new_subdom"]);
+      $vars["new_nohide"] = "nohide";
+      $vars["new_subdom"] = $_POST["new_subdom"];
     }
-    else $newContent->insertVar("new_subdom", Cms::getVariable("cms-user_id"));
+    else $vars["new_subdom"] = Cms::getVariable("cms-user_id");
 
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
@@ -293,7 +290,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       #$o->setAttribute("value", $subdom);
       $set->appendChild($o);
     }
-    $newContent->insertVar("copySubdomDirs", $d->documentElement);
+    $vars["copySubdomDirs"] = $d->documentElement;
 
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
@@ -304,7 +301,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       #$o->setAttribute("value", $subdom);
       $set->appendChild($o);
     }
-    $newContent->insertVar("renameSubdomDirs", $d->documentElement);
+    $vars["renameSubdomDirs"] = $d->documentElement;
 
 
     $form = $newContent->getElementsByTagName("form")->item(1);
@@ -316,30 +313,31 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     }
 
     $form->parentNode->removeChild($form);
+    $newContent->processVariables($vars);
     return $newContent;
   }
 
   private function modifyDOM(DOMDocumentPlus $doc, $subdom) {
     if(strpos($subdom, ".") === 0) {
-      $doc->insertVar("inactive", "");
+      $vars["inactive"] = "";
       $subdom = substr($subdom, 1);
-    } else $doc->insertVar("active", "");
-    $doc->insertVar("linkName", "<strong>$subdom</strong>.".getDomain());
-    $doc->insertVar("cmsVerId", "$subdom-CMS_VER");
-    $doc->insertVar("userDirId", "$subdom-USER_DIR");
-    $doc->insertVar("filesDirId", "$subdom-FILES_DIR");
-    $doc->insertVar("curlinkSubdom", getCurLink()."?".get_class($this)."=$subdom");
+    } else $vars["active"] = "";
+    $vars["linkName"] = "<strong>$subdom</strong>.".getDomain();
+    $vars["cmsVerId"] = "$subdom-CMS_VER";
+    $vars["userDirId"] = "$subdom-USER_DIR";
+    $vars["filesDirId"] = "$subdom-FILES_DIR";
+    $vars["curlinkSubdom"] = getCurLink()."?".get_class($this)."=$subdom";
 
     $showSubdom = basename(dirname($_SERVER["PHP_SELF"]));
     if(strlen($_GET[get_class($this)])) $showSubdom = $_GET[get_class($this)];
-    if($subdom == $showSubdom) $doc->insertVar("nohide", "nohide");
+    if($subdom == $showSubdom) $vars["nohide"] = "nohide";
 
     // versions
     $current = $this->getSubdomVar("CMS_VER", $subdom);
     if(!is_null($current)) {
-      $doc->insertVar("linkHref", "http://$subdom.".getDomain());
-      $doc->insertVar("version", "$current/".$this->cmsVersions[$current]);
-      $doc->insertVar("CMS_VER", "CMS_VER.$current");
+      $vars["linkHref"] = "http://$subdom.".getDomain();
+      $vars["version"] = "$current/".$this->cmsVersions[$current];
+      $vars["CMS_VER"] = "CMS_VER.$current";
     } else $current = CMS_BEST_RELEASE;
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
@@ -354,12 +352,12 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $o->setAttribute("value", $cmsVer);
       $set->appendChild($o);
     }
-    if(!$deprecated) $doc->insertVar("deprecated", "");
-    if($set->childNodes->length) $doc->insertVar("cmsVers", $set);
+    if(!$deprecated) $vars["deprecated"] = "";
+    if($set->childNodes->length) $vars["cmsVers"] = $set;
 
     // user directories
     $current = $this->getSubdomVar("USER_DIR", $subdom);
-    if(!is_null($current)) $doc->insertVar("USER_DIR", "USER_DIR.$current");
+    if(!is_null($current)) $vars["USER_DIR"] = "USER_DIR.$current";
     else $current = $subdom;
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
@@ -368,13 +366,13 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $o = $set->appendChild($d->createElement("option", $dir));
       if($dir == $current) $o->setAttribute("selected", "selected");
     }
-    $doc->insertVar("userDirs", $set);
+    $vars["userDirs"] = $set;
     if($subdom == $showSubdom && isset($_POST["duplicate"]))
-      $doc->insertVar("checked", "checked");
+      $vars["checked"] = "checked";
 
     // files directories
     $current = $this->getSubdomVar("FILES_DIR", $subdom);
-    if(!is_null($current)) $doc->insertVar("FILES_DIR", "FILES_DIR.$current");
+    if(!is_null($current)) $vars["FILES_DIR"] = "FILES_DIR.$current";
     else $current = $subdom;
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
@@ -383,7 +381,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $o = $set->appendChild($d->createElement("option", $dir));
       if($dir == $current) $o->setAttribute("selected", "selected");
     }
-    $doc->insertVar("filesDirs", $set);
+    $vars["filesDirs"] = $set;
 
     // plugins
     $current = $this->getSubdomVar("CMS_VER", $subdom);
@@ -405,8 +403,9 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $l->appendChild($i);
       $l->appendChild(new DOMText(" $pName$changed"));
     }
-    $doc->insertVar("plugins", $set);
+    $vars["plugins"] = $set;
 
+    $doc->processVariables($vars);
   }
 
   private function getSubdirs($dir, $filter = null) {

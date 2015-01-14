@@ -129,14 +129,15 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   public function getContent(HTMLPlus $c) {
     Cms::getOutputStrategy()->addCssFile($this->getDir().'/Convertor.css');
     $newContent = $this->getHTMLPlus();
-    $newContent->insertVar("link", $_GET[get_class($this)]);
-    $newContent->insertVar("path", TEMP_DIR."/".PLUGINS_DIR."/".get_class($this));
-    if(!empty($this->importedFiles)) $newContent->insertVar("importedhtml", $this->importedFiles);
-    $newContent->insertVar("filename", $this->file);
+    $vars["link"] = $_GET[get_class($this)];
+    $vars["path"] = TEMP_DIR."/".PLUGINS_DIR."/".get_class($this);
+    if(!empty($this->importedFiles)) $vars["importedhtml"] = $this->importedFiles;
+    $vars["filename"] = $this->file;
     if(!is_null($this->html)) {
-      $newContent->insertVar("nohide", "nohide");
-      $newContent->insertVar("content", $this->html);
+      $vars["nohide"] = "nohide";
+      $vars["content"] = $this->html;
     }
+    $newContent->processVariables($vars);
     return $newContent;
   }
 

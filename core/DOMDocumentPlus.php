@@ -38,108 +38,35 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function insertVar($varName, $varValue, $element=null) {
-    $elements = $this->parseAttr($varName, "var", $element);
-    $type = gettype($varValue);
-    foreach($elements as $item) {
-      $e = $item[0];
-      $attr = $item[1];
-      if(is_null(@$e->getNodePath())) {
-        new Logger(sprintf(_("Variable %s destination element %s no longer exists"), $varName, $item[2]), "warning");
-        continue;
-      }
-      if(is_null($e->parentNode)) continue;
-      switch($type) {
-        case "NULL":
-        #$this->removeVar($e, $attr);
-        break;
-        case "integer":
-        $varValue = (string) $varValue;
-        case "string":
-        if(!strlen($varValue)) {
-          $this->removeVar($e, $attr);
-          continue;
-        }
-        $e = $this->prepareIfDl($e, $varName);
-        $this->insertVarString($varValue, $e, $attr, $varName);
-        break;
-        case "array":
-        if(empty($varValue)) {
-          $this->emptyVarArray($e);
-          continue;
-        }
-        $e = $this->prepareIfDl($e, $varName);
-        $this->insertVarArray($varValue, $e, $varName);
-        break;
-        default:
-        if($varValue instanceof DOMElement) {
-          $this->insertVarDOMElement($varValue, $e, $attr, $varName);
-          break;
-        }
-        new Logger(sprintf(_("Unsupported variable type '%s' in '%s'"), get_class($varValue), $varName), "error");
-      }
-    }
+    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    return;
   }
 
   public function insertFn($varName, $varValue, $element=null) {
-    $elements = $this->parseAttr($varName, "fn", $element);
-    $type = gettype($varValue);
-    foreach($elements as $item) {
-      $e = $item[0];
-      $attr = $item[1];
-      if(is_null(@$e->getNodePath())) {
-        new Logger(sprintf(_("Function %s destination element %s no longer exists"), $varName, $item[2]), "warning");
-        continue;
-      }
-      if(is_null($e->parentNode)) continue;
-      if(is_null($varValue)) {
-        #$this->removeVar($e, $attr);
-        continue;
-      }
-      if(!$varValue instanceof Closure) {
-        new Logger(sprintf(_("Unable to insert function %s: not a function"), $varName), "warning");
-        return;
-      }
-      $e->nodeValue = call_user_func($varValue, $e->nodeValue);
+    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    return;
+  }
+
+  public function processVariables(Array $variables, $ignore = array()) {
+    $xpath = new DOMXPath($this);
+    $elements = array();
+    foreach($xpath->query("//*[@var]") as $e) $elements[] = $e;
+    foreach(array_reverse($elements) as $e) {
+      if(array_key_exists($e->nodeName, $ignore))
+        $e->processVariables($variables, $ignore[$e->nodeName]);
+      else $e->processVariables($variables);
     }
   }
 
-  private function parseAttr($varName, $attr="var", DOMElement $e=null) {
+  public function processFunctions(Array $functions, $ignore = array()) {
     $xpath = new DOMXPath($this);
-    #$noparse = "*[not(contains(@class, 'noparse')) and (not(ancestor::*) or ancestor::*[not(contains(@class, 'noparse'))])]";
-    $noparse = "*";
-    // find elements with current var
-    if(is_null($e))
-      $matches = $xpath->query(sprintf("//%s[contains(@$attr, '%s')]", $noparse, $varName));
-    else
-      $matches = array($e);
-
-    $replaceCont = array();
-    $replaceAttr = array();
-    // check for attributes and real match (xpath accepts substrings)
-    foreach($matches as $e) {
-      $vars = explode(" ", $e->getAttribute($attr));
-      $keep = array();
-      foreach($vars as $v) {
-        $p = explode("@", $v);
-        if($varName != $p[0]) {
-          $keep[] = $v;
-          continue;
-        }
-        if(isset($p[1])) {
-          if($e->nodeName == "h" && in_array($p[1], array("id", "link"))) {
-            new Logger(_("Variables cannot modify heading identifiers"), "warning");
-            continue;
-          }
-          $replaceAttr[] = array($e, $p[1], $e->nodeName);
-        } else $replaceCont[] = array($e, null, $e->nodeName);
-      }
-      if(empty($keep)) {
-        $e->removeAttribute($attr);
-        continue;
-      }
-      $e->setAttribute($attr, implode(" ", $keep));
+    $elements = array();
+    foreach($xpath->query("//*[@fn]") as $e) $elements[] = $e;
+    foreach(array_reverse($elements) as $e) {
+      if(array_key_exists($e->nodeName, $ignore))
+        $e->processFunctions($functions, $ignore[$e->nodeName]);
+      else $e->processFunctions($functions);
     }
-    return array_merge($replaceAttr, array_reverse($replaceCont, true)); // attributes first!
   }
 
   public function validateLinks($elName, $attName, $repair) {
@@ -222,13 +149,6 @@ class DOMDocumentPlus extends DOMDocument {
     foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
 
-  private function prepareIfDl(DOMElement $e, $varName) {
-    if($e->nodeName != "dl") return $e;
-    $e->removeChildNodes();
-    $e->appendChild($e->ownerDocument->createElement("dt", $varName));
-    return $e->appendChild($e->ownerDocument->createElement("dd"));
-  }
-
   public function removeNodes($query) {
     $xpath = new DOMXPath($this);
     $toRemove = array();
@@ -240,22 +160,8 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function validatePlus($repair = false) {
-    throw new Exception("Method no longer exists");
-  }
-
-  #UNUSED
-  public function removeUntilSame(DOMElement $e) {
-    $name = $e->nodeName;
-    $toRemove = array();
-    while(true) {
-      $toRemove[] = $e;
-      $e = $e->nextElement;
-      if(is_null($e)) break;
-      if($e->nodeName == $name) break;
-    }
-    foreach($toRemove as $e) {
-      $e->parentNode->removeChild($e);
-    }
+    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    return;
   }
 
   public function relaxNGValidatePlus($f) {
@@ -297,104 +203,6 @@ class DOMDocumentPlus extends DOMDocument {
       return;
     }
     $e->parentNode->removeChild($e);
-  }
-
-  private function insertVarString($varValue, DOMElement $e, $attr, $varName) {
-    if(!is_null($attr)) {
-      if(!$e->hasAttribute($attr) || $e->getAttribute($attr) == "") {
-        if(strlen($varValue)) $e->setAttribute($attr, $varValue);
-        elseif($e->hasAttribute($attr)) $e->removeAttribute($attr);
-        return;
-      }
-      $temp = @sprintf($e->getAttribute($attr), $varValue);
-      if($temp !== false && $temp != $e->getAttribute($attr)) {
-        $e->setAttribute($attr, $temp);
-        return;
-      }
-      if(!strlen($varValue)) {
-        $e->removeAttribute($attr);
-        return;
-      }
-      if($attr == "class") $varValue = $e->getAttribute($attr)." ".$varValue;
-      $e->setAttribute($attr, $varValue);
-      return;
-
-    }
-    $this->insertInnerHTML($varValue, $e, "", $varName);
-    #$e->nodeValue = $varValue;
-  }
-
-  private function insertVarArray(Array $varValue, DOMElement $e, $varName) {
-    $sep = null;
-    switch($e->nodeName) {
-      case "li":
-      case "dd":
-      break;
-      case "em":
-      case "strong":
-      case "samp":
-      case "span":
-      case "del":
-      case "ins":
-      case "sub":
-      case "sup":
-      $sep = ", ";
-      break;
-      case "ul":
-      case "ol":
-      $e->removeChildNodes();
-      $e = $e->appendChild($e->ownerDocument->createElement("li"));
-      break;
-      #case "body":
-      #case "section":
-      #case "dl":
-      #case "form":
-      #case "fieldset":
-      default:
-      new Logger(sprintf(_("Unable to insert array variable '%s' into '%s'"), $varName, $e->nodeName), "error");
-      return;
-    }
-    $this->insertInnerHTML($varValue, $e, $sep, $varName);
-  }
-
-  private function insertInnerHTML($html, DOMElement $dest, $sep = "", $varName = "") {
-    if(!is_array($html)) $html = array($html);
-    $dom = new DOMDocumentPlus();
-    $eNam = $dest->nodeName;
-    $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
-    if(!@$dom->loadXML($xml)) {
-      $var = $dom->appendChild($dom->createElement("var"));
-      foreach($html as $k => $v) {
-        $e = $var->appendChild($dom->createElement($eNam));
-        $e->nodeValue = htmlspecialchars($html[$k]);
-      }
-    }
-    $this->insertVarDOMElement($dom->documentElement, $dest);
-  }
-
-  private function emptyVarArray(DOMElement $e) {
-    $p = $e->parentNode;
-    $p->removeChild($e);
-    if($p->childElements->length == 0)
-      $p->parentNode->removeChild($p);
-  }
-
-  private function insertVarDOMElement(DOMElement $varValue, DOMElement $e, $attr=null, $varName=null) {
-    if(!is_null($attr)) {
-      $this->insertVarstring($varValue->nodeValue, $e, $attr);
-      return;
-    }
-    $var = $e->ownerDocument->importNode($varValue, true);
-    $attributes = array();
-    foreach($e->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
-    $nodes = array();
-    foreach($var->childNodes as $n) $nodes[] = $n;
-    foreach($nodes as $n) {
-      foreach($attributes as $aName => $aValue) $n->setAttribute($aName, $aValue);
-      $e->parentNode->insertBefore($n, $e);
-    }
-    $e->parentNode->removeChild($e);
-    $e->removeChildNodes();
   }
 
 }

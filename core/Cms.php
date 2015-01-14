@@ -93,39 +93,25 @@ class Cms {
   }
 
   public static function contentProcessVariables() {
-    self::$content = self::processVariables(self::$content);
+    $oldContent = clone self::$content;
+    self::$content->processVariables(self::$variables);
+    self::$content->processFunctions(self::$functions);
+    try {
+      self::$content->validatePlus(true);
+    } catch(Exception $e) {
+      new Logger(sprintf(_("Some variables or functions causing HTML+ error: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      self::$content = $oldContent;
+    }
   }
 
   public static function processVariables(DOMDocumentPlus $doc) {
-    $newContent = clone $doc;
-    $xpath = new DOMXPath($newContent);
-    $elements = array();
-    foreach($xpath->query("//*[@var or @fn]") as $e) {
-      $elements[] = $e;
-    }
-    foreach(array_reverse($elements) as $e) {
-      if($e->hasAttribute("var")) {
-        $name = $e->getAttribute("var");
-        $value = array_key_exists($name, self::$variables)
-          ? self::$variables[$name] : null;
-        $e->insertVar($name, $value);
-      }
-      if($e->hasAttribute("fn")) {
-        $name = $e->getAttribute("fn");
-        $value = array_key_exists($name, self::$functions)
-          ? self::$functions[$name] : null;
-        $e->insertFn($name, $value);
-      }
-    }
-    try {
-      if($newContent instanceof HTMLPlus) $newContent->validatePlus(true);
-    } catch(Exception $e) {
-      throw new Exception(sprintf(_("Some variable(s) causing HTML+ error: %s"), $e->getMessage()));
-    }
-    return $newContent;
+    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    return $doc;
   }
 
   private static function insertVar(HTMLPlus $newContent, $varName, $varValue) {
+    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    return;
     $tmpContent = clone $newContent;
     $tmpContent->insertVar($varName, $varValue);
     $tmpContent->validatePlus();
@@ -208,6 +194,10 @@ class Cms {
 
   public static function getAllVariables() {
     return self::$variables;
+  }
+
+  public static function getAllFunctions() {
+    return self::$functions;
   }
 
   public static function setForceFlash() {

@@ -144,9 +144,9 @@ class Agregator extends Plugin implements SplObserver {
           continue;
         }
         try {
-          Cms::setVariable($html->getAttribute("id")
-            .($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)),
-            $this->getDOM($ctime, $html->childElements, $html->getAttribute("wrapper"), $subDir));
+          $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+          $vValue = $this->getDOM($ctime, $html->childElements, $html->getAttribute("wrapper"), $subDir);
+          Cms::setVariable($vName, $vValue);
         } catch(Exception $e) {
           new Logger($e->getMessage(), Logger::LOGGER_WARNING);
           continue;
@@ -182,19 +182,14 @@ class Agregator extends Plugin implements SplObserver {
         $item = $list->appendChild($doc->importNode($p, true));
       }
     }
-    $doc = Cms::processVariables($doc);
+    #$doc = Cms::processVariables($doc);
     return $doc->documentElement;
   }
 
   private function replaceVariables(DOMElementPlus $element, Array $vars) {
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($element, true));
-    foreach($vars as $k => $v) $doc->insertVar($k, $v);
-    #$parts = explode('\$', $doc->saveXML());
-    #foreach($parts as $k => $p) {
-    #  $parts[$k] = str_replace(array_keys($vars), $vars, $p);
-    #}
-    #$doc->loadXML(implode('$', $parts));
+    $doc->processVariables($vars);
     return $doc->documentElement;
   }
 

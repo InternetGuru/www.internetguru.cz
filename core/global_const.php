@@ -90,6 +90,9 @@ if(CMS_DEBUG) {
   textdomain("messages");
 }
 
+// general system messages
+define('METHOD_NA', _("Method %s is no longer available"));
+
 function __autoload($className) {
   $fp = PLUGINS_FOLDER."/$className/$className.php";
   if(@include $fp) return;

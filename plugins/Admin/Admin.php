@@ -80,7 +80,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $la = "?".get_class($this)."=".$this->defaultFile;
     $statusChanged = self::FILE_DISABLE;
     if($this->dataFileStatus == self::STATUS_DISABLED) {
-      $newContent->insertVar("warning", "warning");
+      $vars["warning"] = "warning";
       $statusChanged = self::FILE_ENABLE;
     }
     $usrDestHash = getFileHash($this->dataFile);
@@ -101,26 +101,27 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $v = $d->appendChild($d->createElement("var"));
     $v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
 
-    $newContent->insertVar("heading", $d->documentElement);
-    $newContent->insertVar("link", getCurLink());
-    $newContent->insertVar("linkadmin", $la);
-    $newContent->insertVar("content", $this->contentValue);
-    $newContent->insertVar("filename", $this->defaultFile);
-    $newContent->insertVar("schema", $format);
-    $newContent->insertVar("mode", $mode);
-    $newContent->insertVar("classtype", $type);
-    $newContent->insertVar("defaultcontent", $this->showContent(false));
-    $newContent->insertVar("resultcontent", $this->showContent(true));
-    $newContent->insertVar("status", $this->dataFileStatuses[$this->dataFileStatus]);
-    $newContent->insertVar("userfilehash", $usrDestHash);
+    $vars["heading"] = $d->documentElement;
+    $vars["link"] = getCurLink();
+    $vars["linkadmin"] = $la;
+    $vars["content"] = $this->contentValue;
+    $vars["filename"] = $this->defaultFile;
+    $vars["schema"] = $format;
+    $vars["mode"] = $mode;
+    $vars["classtype"] = $type;
+    $vars["defaultcontent"] = $this->showContent(false);
+    $vars["resultcontent"] = $this->showContent(true);
+    $vars["status"] = $this->dataFileStatuses[$this->dataFileStatus];
+    $vars["userfilehash"] = $usrDestHash;
     if((!$this->isPost() && $this->dataFileStatus != self::STATUS_DISABLED)
       || isset($_POST["active"]))
-      $newContent->insertVar("checked", "checked");
+      $vars["checked"] = "checked";
 
     if($this->dataFileStatus == self::STATUS_NEW) {
-      $newContent->insertVar("warning", "warning");
-      $newContent->insertVar("nohide", "nohide");
+      $vars["warning"] = "warning";
+      $vars["nohide"] = "nohide";
     }
+    $newContent->processVariables($vars);
     return $newContent;
   }
 

@@ -22,7 +22,6 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function __set($vName, $vValue) {
-
     if(!is_null($vValue) && (!is_string($vValue) || !strlen($vValue)))
       throw new Exception(_("Variable value must be non-empty string or null"));
     switch($vName) {
@@ -41,6 +40,14 @@ class HTMLPlus extends DOMDocumentPlus {
     $root = $doc->importNode($this->documentElement, true);
     $doc->appendChild($root);
     return $doc;
+  }
+
+  public function processVariables(Array $variables) {
+    parent::processVariables($variables, array("h" => array("id", "link")));
+  }
+
+  public function processFunctions(Array $functions) {
+    parent::processFunctions($functions, array("h" => array("id", "link")));
   }
 
   public function applySyntax() {
