@@ -83,7 +83,8 @@ class DOMBuilder {
 
     $f = ADMIN_FOLDER."/$fileName";
     try {
-      if(is_file($f)) self::updateDOM($doc, $f, true);
+      if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
+        self::updateDOM($doc, $f, true);
     } catch(Exception $e) {
       new Logger(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
@@ -93,7 +94,8 @@ class DOMBuilder {
 
     $f = USER_FOLDER."/$fileName";
     try {
-      if(is_file($f)) self::updateDOM($doc, $f);
+      if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
+        self::updateDOM($doc, $f);
     } catch(Exception $e) {
       new Logger(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
@@ -118,6 +120,7 @@ class DOMBuilder {
     $success = false;
     $e = null;
     foreach($files as $f => $void) {
+      if(file_exists(dirname($f)."/.".basename($f))) continue;
       try {
         self::loadDOM($f, $doc, null, $linkPrefix);
       } catch(Exception $e) {
