@@ -65,16 +65,23 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function proceed() {
-    if(DOMBuilder::isLink(getCurLink())) return;
-    $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
     $links = DOMBuilder::getLinks();
+    if(DOMBuilder::isLink(getCurLink())) {
+      if(getCurLink() != $links[0]) return;
+      $this->redirTo("", 301); // link to root heading permanent redir to root
+    }
+    $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
     if(self::DEBUG) print_r($links);
     $linkId = $this->findSimilarLinkId($links, $newLink);
-    if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
+    if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
     else $newLink = $links[$linkId];
-    new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $newLink), "info");
-    if(self::DEBUG) die("Redirecting to $newLink");
-    redirTo(getRoot().$newLink, 404);
+    $this->redirTo($newLink, 404);
+  }
+
+  private function redirTo($link, $code) {
+    new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $link), "info");
+    if(self::DEBUG) die("Redirecting to $link");
+    redirTo(getRoot().$link, $code);
   }
 
   private function getBestId(Array $links, Array $found) {
