@@ -4,6 +4,7 @@
 #TODO: user redir in preinit
 
 class UrlHandler extends Plugin implements SplObserver {
+  const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -67,10 +68,12 @@ class UrlHandler extends Plugin implements SplObserver {
     if(DOMBuilder::isLink(getCurLink())) return;
     $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
     $links = DOMBuilder::getLinks();
-    $linkId = $this->findSimilar($links, $newLink);
+    if(self::DEBUG) print_r($links);
+    $linkId = $this->findSimilarLinkId($links, $newLink);
     if(is_null($linkId)) $newLink = ""; // nothing found, redir to hp
     else $newLink = $links[$linkId];
     new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $newLink), "info");
+    if(self::DEBUG) die("Redirecting to $newLink");
     redirTo(getRoot().$newLink, 404);
   }
 
@@ -95,40 +98,55 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   /**
-   * exists: aa/bb/cc/dd, aa/bb/cc/ee, aa/bb/dd, aa/dd
-   * call: aa/b/cc/dd -> find aa/bb/cc/dd (not aa/dd)
+   * [suppose]
+   * - hotelpatriot (1)
+   * - hotelpatriot/archiv (2)
+   * - rsbstavebniny (3)
+   * - rsbstavebniny/archiv (4)
+   *
+   * [url (redir)]
+   * - hotel (1)
+   * - patriot (1)
+   * - patriot/a (2)
+   * - patriot/archvi (2)
+   * - rbstavebniny (3)
+   * - rbstavebniny/a (4)
+   * - rbstavebniny/archvi (4)
+   * - rbstavebniny/chiv (4)
    */
-  private function findSimilar(Array $links, $link) {
+  private function findSimilarLinkId(Array $links, $link) {
     if(!strlen($link)) return null;
+    if(self::DEBUG) echo "findSimilarLinkId(links, $link)";
     // zero pos substring
-    $found = $this->minPos($links, $link, 0);
+    $found = $this->minPos($links, $link);
+    if(self::DEBUG) print_r($found);
     if(count($found)) return $this->getBestId($links, $found);
     // low levenstein first
-    $found = $this->minLev($links, $link, 1);
+    $found = $this->minLev($links, $link, 2);
+    if(self::DEBUG) print_r($found);
     if(count($found)) return $this->getBestId($links, $found);
-
+    // first "directory" search
     $parts = explode("/", $link);
+    if(count($parts) == 1) return null;
     $first = array_shift($parts);
-    $subset = array();
-    foreach($links as $k => $l) {
-      if(strpos($l, $first) !== 0) continue;
-      if(strpos($l, "/") === false) continue;
-      else $subset[$k] = substr($l, strpos($l, "/")+1);
-    }
-    if(count($subset) == 1) return key($subset);
-    if(empty($subset)) $subset = $links;
-    return $this->findSimilar($subset, implode("/", $parts));
+    $foundId = $this->findSimilarLinkId($links, $first);
+    if(is_null($foundId)) return null;
+    array_unshift($parts, $links[$foundId]);
+    $newLink = implode("/", $parts);
+    if($newLink == $link) return $foundId;
+    $foundId = $this->findSimilarLinkId($links, $newLink);
+    return $foundId;
   }
 
-  private function minPos(Array $links, $link, $max) {
+  private function minPos(Array $links, $link, $max = null) {
     $linkpos = array();
     foreach ($links as $k => $l) {
       $pos = strpos($l, $link);
-      if($pos === false || $pos > $max) continue;
+      if($pos === false || (!is_null($max) && $pos > $max)) continue;
       $linkpos[$k] = $pos;
     }
-    #asort($linkpos);
-    if(!empty($linkpos)) return $linkpos;
+    asort($linkpos);
+    if(count($linkpos)) return $linkpos;
     $sublinks = array();
     foreach($links as $k => $l) {
       $l = str_replace(array("_", "-"), "/", $l);
@@ -141,9 +159,13 @@ class UrlHandler extends Plugin implements SplObserver {
 
   private function minLev(Array $links, $link, $limit) {
     $leven = array();
-    foreach ($links as $k => $l) $leven[$k] = levenshtein($l, $link);
-    #asort($leven);
-    if(reset($leven) <= $limit) return $leven;
+    foreach ($links as $k => $l) {
+      $lVal = levenshtein($l, $link);
+      if($lVal > $limit) continue;
+      $leven[$k] = $lVal;
+    }
+    asort($leven);
+    if(count($leven)) return $leven;
     $sublinks = array();
     foreach($links as $k => $l) {
       $l = str_replace(array("_", "-"), "/", $l);
