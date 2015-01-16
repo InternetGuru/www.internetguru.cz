@@ -335,6 +335,7 @@ class DOMBuilder {
         $remove = array();
         foreach($doc->documentElement->childElements as $d) {
           if($d->nodeName != $n->nodeName) continue;
+          if($d->hasAttribute("modifyonly")) continue;
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
         }
         #if(!count($remove)) {
