@@ -213,7 +213,7 @@ class InitServer {
         break;
         case "PLUGIN":
         if(!is_dir(CMS_ROOT_FOLDER."/{$this->subdomVars["CMS_VER"]}/".PLUGINS_DIR."/{$var[1]}"))
-          throw new Exception(sprintf(_("Plugin '%s' is not available"), $var[1]));
+          throw new Exception(sprintf(_("Plugin '%s' is not available for selected CMS version"), $var[1]));
         if(is_file("$destDir/.$f"))
           throw new Exception(sprintf(_("Plugin '%s' is forbidden"), $var[1]));
         if(!is_file("$destDir/$f") && !touch("$destDir/$f"))

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContactForm>
+
+  <var id="secret_phrase" modifyonly="modifyonly">SECRET_PHRASE</var>
+  <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána</var>
+
+  <!--
+    smtp: not supported
+
+    rule.name to associate by input.rule
+    rule.title (optional) rule description
+  -->
+  <rule name="fullname" title="Hodnota musí obsahovat písmeno.">\w</rule>
+  <rule name="telephone" title="Hodnota musí obsahovat číslo.">\d</rule>
+  <rule name="email" title="Hodnota musí mít formát e-mailové adresy">^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$</rule>
+
+  <!--
+    form.subject [text] e-mail subject (optional)
+    note: server address is "no-reply@domain" (cannot be modified)
+    form.servername [text] (optional)
+    form.adminaddr [text] (required)
+    form.adminname [text] (optional)
+    form.clientaddr [id] (optional)
+    form.clientname [id] (optional)
+    form.copycond [id] whether to send a copy (optional)
+    form.copymsg [text] prepend original message (optional)
+    input[type='text'].rule [id] (optional)
+    input.required [text or empty] (optional)
+    textarea.rule [id] (optional)
+    textarea.required [text or empty] (optional)
+  -->
+  <form id="basic"
+    subject="Spolupráce subject"
+    servername="InternetGuru"
+    adminaddr="pavelka.iix@gmail.com"
+    adminname="Jiří Pavelka"
+    clientaddr="email"
+    clientname="fullname"
+    copycond="copy"
+    copymsg="Toto je kopie zprávy, kterou jste poslal/a z webu">
+    <dl>
+      <dt><label for="fullname">Celé jméno</label></dt>
+      <dd><input type="text" rule="fullname" id="fullname" required=""/></dd>
+      <dd><label for="fullname" var="fullname">n/a</label></dd>
+      <dt><label for="email">E-mail</label></dt>
+      <dd><input type="text" rule="email" id="email" required="Napiš na sebe email!"/></dd>
+      <dd><label for="email" var="email">n/a</label></dd>
+      <dt><label for="telephone">Telefon (nepovinné)</label></dt>
+      <dd><input type="text" rule="telephone" id="telephone"/></dd>
+      <dd><label for="telephone" var="telephone">n/a</label></dd>
+      <dt><label for="msg">Zpráva</label></dt>
+      <dd><textarea id="msg" required="Napište nějaký vzkaz"></textarea></dd>
+      <dt><label for="copy">Poslat kopii na mejl odesílatele</label></dt>
+      <dd><input type="checkbox" id="copy" name="copy"/></dd>
+      <dt><label for="agree">Souhlas s podmínkami</label></dt>
+      <dd><input type="checkbox" id="agree" name="agree" checked="checked" required="Musíte souhlasit s obchodními podmínkami"/></dd>
+      <dt>Zájem o odebírání témat</dt>
+      <dd><label><input type="checkbox" name="t1"/> téma1</label></dd>
+      <dd><label><input type="checkbox" name="t2"/> téma2</label></dd>
+      <dd><label><input type="checkbox" name="t3"/> téma3</label></dd>
+      <dt>Pohlaví</dt>
+      <dd><label><input type="radio" name="gender" value="f"/> žena</label></dd>
+      <dd><label><input type="radio" name="gender" value="m" checked="checked"/> muž</label></dd>
+      <dt><label for="country">Země</label></dt>
+      <dd><select id="country">
+        <option>Česká republika</option>
+        <option value="england" selected="selected">Anglie</option>
+        <option>Německo</option>
+      </select></dd>
+      <dt><label for="submit">Odeslání formuláře</label></dt>
+      <dd><input type="submit" id="submit"/></dd>
+    </dl>
+  </form>
+
+
+
+</ContactForm>

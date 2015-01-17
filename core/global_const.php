@@ -14,6 +14,7 @@ define("USER_ROOT_DIR", "usr");
 define("FILES_ROOT_DIR", "files");
 define("TEMP_DIR", "temp");
 define("CACHE_DIR", "cache");
+define('EMAIL_PATTERN', "[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}");
 define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
 define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}");
