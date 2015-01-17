@@ -115,9 +115,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $html->appendChild($content);
     $this->appendJsFiles($content, self::APPEND_BODY);
 
-    // select all settings
-
     #var_dump($doc->schemaValidate(CMS_FOLDER."/".self::DTD_FILE));
+    $this->validateEmptyContent($doc);
     return $doc->saveXML();
   }
 
@@ -205,7 +204,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     foreach(Cms::getAllVariables() as $k => $v) {
       $valid = true;
       if($v instanceof Closure) continue;
-      elseif($v instanceof DOMElement) {
+      elseif($v instanceof DOMDocumentPlus) {
+        $v = $d->saveHTML();
+      } elseif($v instanceof DOMElement) {
         $d = new DOMDocumentPlus();
         foreach($v->childNodes as $n) $d->appendChild($d->importNode($n, true));
         $v = $d->saveHTML();
@@ -424,16 +425,27 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     }
   }
 
-  private function appendCdata(DOMElement $appendTo, $text) {
-    if(strlen($text)) {
-      $cm = $appendTo->ownerDocument->createTextNode("\n//");
-      if(strpos($text, "\n") !== 0) $text = "\n$text";
-      $ct = $appendTo->ownerDocument->createCDATASection("$text\n//");
-      $appendTo->appendChild($cm);
-      $appendTo->appendChild($ct);
-    } else {
-      $appendTo->appendChild($appendTo->ownerDocument->createTextNode("")); // force close tag </script>
+  private function validateEmptyContent(DOMDocument $doc) {
+    $xpath = new DOMXPath($doc);
+    $emptyElOk = array("input", "br", "hr");
+    $emptyEl = array();
+    foreach($xpath->query("//*[not(node()) or text()='']") as $e) {
+      if(in_array($e->nodeName, $emptyElOk)) continue;
+      $emptyEl[] = $e;
     }
+    if(!count($emptyEl)) return;
+    foreach($emptyEl as $e) {
+      $e->appendChild($doc->createTextNode(""));
+    }
+  }
+
+  private function appendCdata(DOMElement $appendTo, $text) {
+    if(!strlen($text)) return;
+    $cm = $appendTo->ownerDocument->createTextNode("\n//");
+    if(strpos($text, "\n") !== 0) $text = "\n$text";
+    $ct = $appendTo->ownerDocument->createCDATASection("$text\n//");
+    $appendTo->appendChild($cm);
+    $appendTo->appendChild($ct);
   }
 
   /**

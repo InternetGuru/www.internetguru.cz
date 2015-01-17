@@ -188,7 +188,6 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateLinks("form", "action", $repair);
     $this->validateDates($repair);
     $this->validateAuthor($repair);
-    $this->validateEmptyContent($repair);
     $this->validateFirstHeadingAuthor($repair);
     $this->validateFirstHeadingLink($repair);
     $this->validateFirstHeadingCtime($repair);
@@ -308,30 +307,6 @@ class HTMLPlus extends DOMDocumentPlus {
     if(!$repair && count($emptySect)) throw new Exception(_("Empty section(s) found"));
     if(!count($emptySect)) return;
     foreach($emptySect as $s) $s->stripTag(_("Empty section deleted"));
-  }
-
-  private function validateEmptyContent($repair) {
-    $xpath = new DOMXPath($this);
-    $emptyElOk = array("desc", "input", "br");
-    $emptyEl = array();
-    $emptyElNam = array();
-    foreach($xpath->query("//*[not(node())]") as $e) {
-      if(in_array($e->nodeName, $emptyElOk)) continue;
-      $emptyEl[] = $e;
-      if(isset($emptyElNam[$e->nodeName])) $emptyElNam[$e->nodeName]++;
-      else $emptyElNam[$e->nodeName] = 1;
-    }
-    if(!count($emptyEl)) return;
-    if(!$repair) {
-      $stat = array();
-      foreach($emptyElNam as $eNam => $eCnt) $stat[] = "$eNam ($eCnt"."x)";
-      throw new Exception(sprintf(_("Empty element(s) found: %s"), implode(", ", $stat)));
-    }
-    foreach($emptyEl as $e) {
-      $e->nodeValue = "n/a";
-      #if($e->hasAttribute("var")) $e->nodeValue = "n/a";
-      #else $e->stripElement(sprintf(_("Empty element '%s' deleted"), $e->nodeName));
-    }
   }
 
   private function validateLang($repair) {

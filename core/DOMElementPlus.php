@@ -19,6 +19,11 @@ class DOMElementPlus extends DOMElement {
     return $newnode;
   }
 
+  public function addClass($class) {
+    if(!$this->hasAttribute("class")) $this->setAttribute("class", $class);
+    else $this->setAttribute("class", $this->getAttribute("class")." $class");
+  }
+
   public function processVariables(Array $variables, $ignore = array()) {
     foreach($this->getVariables("var", $ignore) as list($vName, $aName)) {
       $v = array_key_exists($vName, $variables) ? $variables[$vName] : null;
@@ -63,6 +68,10 @@ class DOMElementPlus extends DOMElement {
       $this->insertVarArray($value, $aName);
       break;
       default:
+      if($value instanceof DOMDocumentPlus) {
+        $this->insertVarDOMElement($value->documentElement, $aName);
+        break;
+      }
       if($value instanceof DOMElement) {
         $this->insertVarDOMElement($value, $aName);
         break;
@@ -106,9 +115,8 @@ class DOMElementPlus extends DOMElement {
       $this->removeAttribute($aName);
       return;
     }
-    if($aName == "class") $value = $this->getAttribute($aName)." ".$value;
-    $this->setAttribute($aName, $value);
-    return;
+    if($aName == "class") $this->addClass($value);
+    else $this->setAttribute($aName, $value);
   }
 
   private function insertVarArray(Array $value, $aName) {

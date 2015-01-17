@@ -47,7 +47,8 @@ class Cms {
   }
 
   private static function addFlashItem($message, $type, $class) {
-    $li = self::$flashList->ownerDocument->createElement("li", "$class: $message");
+    if(!is_null(self::getVariable("auth-logged_user"))) $message = "$class: $message";
+    $li = self::$flashList->ownerDocument->createElement("li", $message);
     $li->setAttribute("class", "$class $type");
     self::$flashList->firstElement->appendChild($li);
   }
