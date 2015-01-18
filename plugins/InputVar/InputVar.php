@@ -114,29 +114,7 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function parse($value) {
-    if(is_null($value)) return null;
-    $output = array();
-    foreach(explode('\$', $value) as $s) {
-      $r = array();
-      preg_match_all('/@?\$('.VARIABLE_PATTERN.')/', $s, $match);
-      foreach($match[1] as $k => $var) {
-        $varVal = Cms::getVariable($var);
-        if(is_null($varVal))
-          $varVal = Cms::getVariable(get_class($this)."-$var");
-        if(is_null($varVal)) {
-          if(strpos($match[0][$k], "@") !== 0)
-            new Logger(sprintf(_("Variable '%s' does not exist"), $var), Logger::LOGGER_WARNING);
-          continue;
-        }
-        $r[$var] = $varVal;
-      }
-      $i = 0;
-      foreach($r as $var => $varVal) {
-        $s = str_replace($match[0][$i++], $varVal, $s);
-      }
-      $output[] = $s;
-    }
-    return implode('$', $output);
+    return replaceVariables($value, Cms::getAllVariables(), strtolower(get_class($this)."-"));
   }
 
   private function createFnHash($id, $algo=null) {

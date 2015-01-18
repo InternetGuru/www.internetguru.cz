@@ -185,4 +185,37 @@ function createSymlink($link, $target) {
     new Logger(_("Unable to force symlink cache update: may take longer to apply"), "error");
 }
 
+function replaceVariables($string, Array $variables, $varPrefix=null) {
+  if(!strlen($string)) return $string;
+  $output = array();
+  foreach(explode('\$', $string) as $s) {
+    $r = array();
+    preg_match_all('/@?\$('.VARIABLE_PATTERN.')/i', $s, $match);
+    foreach($match[1] as $k => $varId) {
+      if(!array_key_exists($varId, $variables)) {
+        $varId = $varPrefix.$varId;
+        if(!array_key_exists($varId, $variables)) {
+          if(strpos($match[0][$k], "@") !== 0)
+            new Logger(sprintf(_("Variable '%s' does not exist"), $varId), Logger::LOGGER_WARNING);
+          continue;
+        }
+      }
+      $value = $variables[$varId];
+      if(is_array($value)) $value = implode(",", $value);
+      elseif(!is_string($value)) {
+        if(strpos($match[0][$k], "@") !== 0)
+          new Logger(sprintf(_("Variable '%s' is not string"), $varId), Logger::LOGGER_WARNING);
+        continue;
+      }
+      $r[$varId] = $value;
+    }
+    $i = 0;
+    foreach($r as $var => $varVal) {
+      $s = str_replace($match[0][$i++], $varVal, $s);
+    }
+    $output[] = $s;
+  }
+  return implode('$', $output);
+}
+
 ?>
