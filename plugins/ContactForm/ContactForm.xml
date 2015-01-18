@@ -1,65 +1,68 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContactForm>
 
-  <var id="secret_phrase" modifyonly="modifyonly">SECRET_PHRASE</var>
+  <!-- povinné proměnné rozšíření ContactForm -->
+  <var id="secret" modifyonly="modifyonly">SECRET_PHRASE</var> <!-- zabezpečení formulářů -->
+  <var id="adminaddr" modifyonly="modifyonly">[e-mail kontaktní osoby]</var> <!-- povinný údaj -->
+
+  <!-- nepovinné proměnné rozšíření ContactForm -->
+  <var id="adminname" modifyonly="modifyonly"></var> <!-- nepovinné jméno kontaktní osoby -->
+  <var id="servername" modifyonly="modifyonly"></var> <!-- nepovinný název společnosti -->
   <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána</var>
+  <var id="subject" modifyonly="modifyonly">Nová zpráva kontaktního formuláře</var>
+  <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z webu</var>
 
   <!--
-    smtp: not supported
-
-    rule.name to associate by input.rule
-    rule.title (optional) rule description
+    Pravidla kontrol textových prvků formuláře regulárním výrazem
+    rule.id identifikátor pro asociaci pravidla k formulářovému prvku
+    rule.title (nepovinné) popis pravidla zobrazený při chybě
   -->
-  <rule name="fullname" title="Hodnota musí obsahovat písmeno.">\w</rule>
-  <rule name="telephone" title="Hodnota musí obsahovat číslo.">\d</rule>
-  <rule name="email" title="Hodnota musí mít formát e-mailové adresy">^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$</rule>
+  <rule id="rule-telephone" title="Hodnota musí obsahovat aspoň 9 čísel">(\d\D*){9,}</rule>
+  <rule id="rule-email" title="Hodnota musí mít formát e-mailové adresy">^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$</rule>
 
   <!--
-    form.subject [text] e-mail subject (optional)
-    note: server address is "no-reply@domain" (cannot be modified)
-    form.servername [text] (optional)
-    form.adminaddr [text] (required)
-    form.adminname [text] (optional)
-    form.clientaddr [id] (optional)
-    form.clientname [id] (optional)
-    form.copycond [id] whether to send a copy (optional)
-    form.copymsg [text] prepend original message (optional)
-    input[type='text'].rule [id] (optional)
-    input.required [text or empty] (optional)
-    textarea.rule [id] (optional)
-    textarea.required [text or empty] (optional)
+    Specifické proměnné konkrétního formuláře a textových prvků
+
+    form.secret [text]
+    form.adminaddr [text]
+    form.adminname [text]
+    form.servername [text]
+    form.success [text]
+    form.subject [text]
+    form.copymsg [text]
+
+    form.clientaddr [input.name value]
+    form.clientname [input.name value]
+    form.copycond [input.name value] whether to send a copy
+
+    input[type='text'].rule [rule.name value]
+    input.required [text or empty]
+
+    textarea.rule [rule.name value]
+    textarea.required [text or empty]
   -->
-  <form id="basic"
-    subject="Spolupráce subject"
-    servername="InternetGuru"
-    adminaddr="pavelka.iix@gmail.com"
-    adminname="Jiří Pavelka"
-    clientaddr="email"
-    clientname="fullname"
-    copycond="copy"
-    copymsg="Toto je kopie zprávy, kterou jste poslal/a z webu">
+  <form id="basic" clientaddr="email" clientname="fullname" copycond="copy">
     <dl>
       <dt><label for="fullname">Celé jméno</label></dt>
-      <dd><input type="text" rule="fullname" id="fullname" required=""/></dd>
-      <dd><label for="fullname" var="fullname">n/a</label></dd>
+      <dd><input type="text" id="fullname" required="Jméno je povinné"/></dd>
       <dt><label for="email">E-mail</label></dt>
-      <dd><input type="text" rule="email" id="email" required="Napiš na sebe email!"/></dd>
-      <dd><label for="email" var="email">n/a</label></dd>
+      <dd><input type="text" rule="rule-email" id="email" required="Adresa musí být ve správném formátu"/></dd>
+      <!-- <dd><label for="email" var="email">n/a</label></dd> -->
       <dt><label for="telephone">Telefon (nepovinné)</label></dt>
-      <dd><input type="text" rule="telephone" id="telephone"/></dd>
-      <dd><label for="telephone" var="telephone">n/a</label></dd>
+      <dd><input type="text" rule="rule-telephone" id="telephone"/></dd>
+      <!-- <dd><label for="telephone" var="telephone">n/a</label></dd> -->
       <dt><label for="msg">Zpráva</label></dt>
-      <dd><textarea id="msg" required="Napište nějaký vzkaz"></textarea></dd>
+      <dd><textarea id="msg" required="Zpráva je povinná"></textarea></dd>
       <dt><label for="copy">Poslat kopii na mejl odesílatele</label></dt>
-      <dd><input type="checkbox" id="copy" name="copy"/></dd>
+      <dd><input type="checkbox" id="copy"/></dd>
       <dt><label for="agree">Souhlas s podmínkami</label></dt>
-      <dd><input type="checkbox" id="agree" name="agree" checked="checked" required="Musíte souhlasit s obchodními podmínkami"/></dd>
+      <dd><input type="checkbox" id="agree" checked="checked" required="Musíte souhlasit s obchodními podmínkami"/></dd>
       <dt>Zájem o odebírání témat</dt>
-      <dd><label><input type="checkbox" name="t1"/> téma1</label></dd>
-      <dd><label><input type="checkbox" name="t2"/> téma2</label></dd>
-      <dd><label><input type="checkbox" name="t3"/> téma3</label></dd>
+      <dd><label><input type="checkbox" name="t[]"/> téma1</label></dd>
+      <dd><label><input type="checkbox" name="t[]"/> téma2</label></dd>
+      <dd><label><input type="checkbox" name="t[]"/> téma3</label></dd>
       <dt>Pohlaví</dt>
-      <dd><label><input type="radio" name="gender" value="f"/> žena</label></dd>
+      <dd><label><input type="radio" name="gender" /> žena</label></dd>
       <dd><label><input type="radio" name="gender" value="m" checked="checked"/> muž</label></dd>
       <dt><label for="country">Země</label></dt>
       <dd><select id="country">
@@ -72,6 +75,6 @@
     </dl>
   </form>
 
-
+  <message for="basic">Jméno: $fullname, verze cms: $cms-version, témata: $t ddd</message>
 
 </ContactForm>

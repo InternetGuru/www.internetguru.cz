@@ -5,9 +5,13 @@ class ContactForm extends Plugin implements SplObserver {
   private $cfg;
   private $isPost;
   private $vars = array();
+  private $formVars;
+  private $formValues;
+  private $messages;
   private $rules = array();
   private $ruleTitles = array();
   private $errors = array();
+  const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -19,8 +23,6 @@ class ContactForm extends Plugin implements SplObserver {
     if($this->detachIfNotAttached("Xhtml11")) return;
     $this->cfg = $this->getDOMPlus();
     $this->createVars();
-    if($this->vars["secret_phrase"] == "SECRET_PHRASE")
-      new Logger(_("Default secret phrase should be changed"), Logger::LOGGER_WARNING);
     foreach($this->forms as $formId => $form) {
       try {
         $this->isPost = false;
@@ -28,8 +30,9 @@ class ContactForm extends Plugin implements SplObserver {
         if(!empty($this->errors))
           throw new Exception(sprintf(_("%s error(s) occured"), count($this->errors)));
         if(!$this->isPost) continue;
-        $this->sendForm($form);
-        Cms::addMessage($this->vars["success"], Cms::MSG_SUCCESS, true);
+        $msg = $this->createMessage($this->cfg, $formId);
+        $this->sendForm($form, $msg);
+        Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS, true);
         redirTo(getRoot().getCurLink(), 302, true);
       } catch(Exception $e) {
         $message = sprintf(_("Unable to send form: %s"), $e->getMessage());
@@ -41,48 +44,46 @@ class ContactForm extends Plugin implements SplObserver {
     }
   }
 
-  private function sendForm(DOMElementPlus $form) {
-    $v = array();
-    foreach($this->vars as $varId => $val) {
-      switch($varId) {
-        case "clientaddr":
-        case "clientname":
-        case "copycond":
-        if(is_null($val) || !isset($_POST[$val])) {
-          $v[$varId] = '';
-          break;
-        }
-        $v[$varId] = $_POST[$val];
-        break;
-      }
-    }
-    if(!strlen($this->vars["adminaddr"])) throw new Exception(_("Missing admin address"));
-    if(!preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"]))
-      throw new Exception(sprintf(_("Invalid admin email address: '%s'"), $this->vars["adminaddr"]));
-    if(strlen($v["clientaddr"]) && !preg_match("/".EMAIL_PATTERN."/", $v["clientaddr"]))
-      throw new Exception(sprintf(_("Invalid client email address: '%s'"), $v["clientaddr"]));
+  private function sendForm(DOMElementPlus $form, $msg) {
+    if(!strlen($this->formVars["adminaddr"])) throw new Exception(_("Missing admin address"));
+    if(!preg_match("/".EMAIL_PATTERN."/", $this->formVars["adminaddr"]))
+      throw new Exception(sprintf(_("Invalid admin email address: '%s'"), $this->formVars["adminaddr"]));
+    if(strlen($this->formVars["clientaddr"]) && !preg_match("/".EMAIL_PATTERN."/", $this->formVars["clientaddr"]))
+      throw new Exception(sprintf(_("Invalid client email address: '%s'"), $this->formVars["clientaddr"]));
     require LIB_FOLDER.'/PHPMailer/PHPMailerAutoload.php';
-    $this->sendMail($this->vars["adminaddr"], $this->vars["adminname"], $v["clientaddr"],
-      $v["clientname"], "");
-    if(strlen($v["copycond"])) {
-      if(!strlen($v["clientaddr"]))
+    $this->sendMail($this->formVars["adminaddr"], $this->formVars["adminname"], $this->formVars["clientaddr"],
+      $this->formVars["clientname"], $msg);
+    if(strlen($this->formVars["copycond"])) {
+      if(!strlen($this->formVars["clientaddr"]))
         throw new Exception(_("Unable to send copy to empty client address"));
-      $this->sendMail($v["clientaddr"], $v["clientname"], $this->vars["adminaddr"],
-        $this->vars["adminname"], $this->vars["copymsg"]);
+      $this->sendMail($this->formVars["clientaddr"], $this->formVars["clientname"], $this->formVars["adminaddr"],
+        $this->formVars["adminname"], $this->formVars["copymsg"].$msg);
     }
+    if(!self::DEBUG) return;
+    #print_r($_POST);
+    #print_r($this->formVars);
+    #echo $msg;
+    #print_r($this->formValues);
+    die("CONTACTFORM DEBUG DIE");
   }
 
   private function sendMail($mailto, $mailtoname, $replyto, $replytoname, $msg) {
+    if(self::DEBUG) {
+      echo $msg;
+      new Logger(sprintf(_("Sending e-mail to %s skipped"), $mailto));
+      return;
+    }
     $mail = new PHPMailer;
+    $mail->CharSet = 'UTF-8';
     $mail->From = "no-reply@".getDomain();
-    $mail->FromName = $this->vars["servername"];
+    $mail->FromName = $this->formVars["servername"];
     $mail->addAddress($mailto, $mailtoname);
     if(strlen($replyto)) {
       $mail->addReplyTo($replyto, $replytoname);
     }
     $mail->Subject = sprintf(_("New massage from %s"), getDomain());
-    if(strlen($this->vars["subject"])) $mail->Subject = $this->vars["subject"];
-    $mail->Body = $msg."\n".print_r($_POST, true);
+    if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
+    $mail->Body = $msg;
     if(!$mail->send()) {
       new Logger(sprintf(_("Failed to send e-mail: %s"), $mail->ErrorInfo));
       throw new Exception($mail->ErrorInfo);
@@ -92,33 +93,37 @@ class ContactForm extends Plugin implements SplObserver {
 
   private function createVars() {
     $this->rules = array();
-    $i = 1;
     foreach($this->cfg->documentElement->childElements as $e) {
-      switch($e->nodeName) {
-        case "var":
-        if(!$e->hasAttribute("id")) {
-          new Logger(_("Element var missing attribute id skipped"), Logger::LOGGER_WARNING);
+      try {
+        switch($e->nodeName) {
+          case "var":
+          $this->validateElement($e, "id");
+          $this->vars[$e->getAttribute("id")] = $e->nodeValue;
+          break;
+          case "rule":
+          $this->validateElement($e, "id");
+          $this->rules[$e->getAttribute("id")] = $e->nodeValue;
+          $this->ruleTitles[$e->getAttribute("id")] = $e->getAttribute("title");
+          break;
+          case "form":
+          $this->validateElement($e, "id");
+          $this->forms[$e->getAttribute("id")] = $e;
+          break;
+          case "message":
+          $this->validateElement($e, "for");
+          $this->messages[$e->getAttribute("for")] = $e->nodeValue;
           break;
         }
-        $this->vars[$e->getAttribute("id")] = $e->nodeValue;
-        break;
-        case "rule":
-        if(!$e->hasAttribute("name")) {
-          new Logger(_("Rule missing attribute name skipped"), Logger::LOGGER_WARNING);
-          break;
-        }
-        $this->rules[$e->getAttribute("name")] = $e->nodeValue;
-        $this->ruleTitles[$e->getAttribute("name")] = $e->getAttribute("title");
-        break;
-        case "form":
-        if(!$e->hasAttribute("id")) {
-          new Logger(_("Form missing attribute id skipped"), Logger::LOGGER_WARNING);
-          break;
-        }
-        $this->forms[$e->getAttribute("id")] = $e;
-        break;
+      } catch(Exception $ex) {
+        new Logger(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
       }
     }
+    if(self::DEBUG) $this->vars["adminaddr"] = "debug@somedomain.cz";
+  }
+
+  private function validateElement(DOMElementPlus $e, $aName) {
+    if($e->hasAttribute($aName)) return;
+    throw new Exception(sprintf(_("Missing attribute %s"), $aName));
   }
 
   private function parseForm(DOMElementPlus $form) {
@@ -126,32 +131,47 @@ class ContactForm extends Plugin implements SplObserver {
     $var = $doc->appendChild($doc->createElement("var"));
     $form = $var->appendChild($doc->importNode($form, true));
     $formId = $form->getAttribute("id");
-    foreach(array("subject", "servername", "adminaddr", "adminname", "clientaddr", "clientname", "copycond", "copymsg") as $attr) {
-      $this->vars[$attr] = $form->hasAttribute($attr) ? $form->getAttribute($attr) : '';
-      $form->removeAttribute($attr);
-    }
-    $form->setAttribute("method", "post");
-    $form->setAttribute("action", "/");
-    $form->setAttribute("var", "xhtml11-link@action");
-    $xpath = new DOMXPath($doc);
     $prefix = normalize(get_class($this));
-    $form->setAttribute("id", "$prefix-".$formId);
-    foreach($xpath->query("form//*[@id or @for]") as $e) {
-      if($e->hasAttribute("id")) $e->setAttribute("id", "$prefix-$formId-".$e->getAttribute("id"));
-      if($e->hasAttribute("for")) $e->setAttribute("for", "$prefix-$formId-".$e->getAttribute("for"));
-    }
-    $i = 1;
-    $e = null;
     $timeName = "$prefix-$formId-time";
     $tokenName = "$prefix-$formId-token";
     $time = time();
     $formError = null;
+    $this->formVars = array();
+    foreach($this->vars as $name => $value) {
+      $this->formVars[$name] = $value;
+      if(!$form->hasAttribute($name)) continue;
+      $this->formVars[$name] = $form->getAttribute($name);
+      $form->removeAttribute($name);
+    }
     try {
       $this->checkPost($timeName, $tokenName, $formId);
     } catch(Exception $e) {
       $formError = $e->getMessage();
     }
+    foreach(array("clientaddr", "clientname", "copycond") as $name) {
+      $this->formVars[$name] = '';
+      $aVal = $form->getAttribute($name);
+      $form->removeAttribute($name);
+      if(!$this->isPost) continue;
+      if(isset($_POST["$prefix-$formId-$aVal"])) {
+        $this->formVars[$name] = $_POST["$prefix-$formId-$aVal"];
+        continue;
+      }
+      if($name != "clientaddr") continue;
+      new Logger(sprintf(_("Client address not sent; attribute name '%s' not found"), $aVal), Logger::LOGGER_WARNING);
+    }
+    if($this->formVars["secret"] == "SECRET_PHRASE")
+      new Logger(_("Default secret phrase should be changed"), Logger::LOGGER_WARNING);
+    $form->setAttribute("method", "post");
+    $form->setAttribute("action", "/");
+    $form->setAttribute("var", "xhtml11-link@action");
+    $xpath = new DOMXPath($doc);
+    $form->setAttribute("id", "$prefix-".$formId);
+    $i = 1;
+    $e = null;
     $formItems = array();
+    $this->formValues = array();
+    $rcValues = array();
     foreach($xpath->query("//input | //textarea | //select") as $e) {
       $name = "$prefix-$formId-item".$i++;
       if($e->hasAttribute("name")) {
@@ -160,8 +180,24 @@ class ContactForm extends Plugin implements SplObserver {
           new Logger(_("Forbidden element name time or token replaced"), Logger::LOGGER_WARNING);
         } else $name = $aName;
       }
-      $e->setAttribute("name", $name);
+      $normName = normalize($name, null, false);
+      if(isset($_POST[$normName])) {
+        if($e->hasAttribute("id")) $this->formValues[$e->getAttribute("id")] = $_POST[$normName];
+        elseif($e->hasAttribute("name")) {
+          $this->formValues[normalize($e->getAttribute("name"), null, false)] = $_POST[$normName];
+        }
+      }
+      if($e->nodeName == "input" && in_array($e->getAttribute("type"), array("checkbox", "radio"))) {
+        if(!$e->hasAttribute("value")) {
+          $j = 1;
+          if(isset($rcValues[$name])) while(array_key_exists("i$j", $rcValues[$name])) $j++;
+          $e->setAttribute("value", "i$j");
+          $rcValues[$name]["i$j"] = null;
+        }
+        $rcValues[$name][$e->getAttribute("value")] = null;
+      }
       $formItems[] = $e;
+      $e->setAttribute("name", $name);
     }
     $timeInput = $e->parentNode->appendChild($doc->createElement("input"));
     $timeInput->setAttribute("name", $timeName);
@@ -170,7 +206,7 @@ class ContactForm extends Plugin implements SplObserver {
     $tokenInput = $e->parentNode->appendChild($doc->createElement("input"));
     $tokenInput->setAttribute("name", $tokenName);
     $tokenInput->setAttribute("type", "hidden");
-    $tokenInput->setAttribute("value", hash("sha1", $time.$this->vars["secret_phrase"].$formId));
+    $tokenInput->setAttribute("value", hash("sha1", $time.$this->formVars["secret"].$formId));
     foreach($formItems as $item) {
       if(is_null($item)) continue;
       $passed = true;
@@ -185,18 +221,16 @@ class ContactForm extends Plugin implements SplObserver {
           case "text":
           if($this->isPost) $passed = $this->verifyText($name, $item->getAttribute("rule"),
             $item->hasAttribute("required"), $item->getAttribute("required"));
-          if(isset($_POST[$name])) $item->setAttribute("value", $_POST[$name]);
+          if(!isset($_POST[$name])) break;
+          $item->setAttribute("value", $_POST[$name]);
           break;
           case "checkbox":
-          if(!$item->hasAttribute("value")) $item->setAttribute("value", "on");
+          $name = normalize($name, null, false);
           case "radio":
-          if(!$item->hasAttribute("value")) {
-            new Logger(_("Radio input missing attribute value skipped"), Logger::LOGGER_WARNING);
-            break;
-          }
           if($this->isPost) $passed = $this->verifyChecked($name, $item->getAttribute("value"),
             $item->hasAttribute("required"), $item->getAttribute("required"));
-          if(isset($_POST[$name]) && $_POST[$name] == $item->getAttribute("value")) {
+          if(isset($_POST[$name]) && ($_POST[$name] == $item->getAttribute("value")
+            || (is_array($_POST[$name]) && in_array($item->getAttribute("value"), $_POST[$name])))) {
             $item->setAttribute("checked", "checked");
           } elseif($this->isPost) {
             $item->removeAttribute("checked");
@@ -206,10 +240,11 @@ class ContactForm extends Plugin implements SplObserver {
         case "textarea":
         if($this->isPost) $passed = $this->verifyText($name, $item->getAttribute("rule"),
           $item->hasAttribute("required"), $item->getAttribute("required"));
-        if(isset($_POST[$name])) $item->nodeValue = $_POST[$name];
-        #if($e->nodeValue == "") $e->nodeValue= " ";
         if(!$item->hasAttribute("cols")) $item->setAttribute("cols", 40);
         if(!$item->hasAttribute("rows")) $item->setAttribute("rows", 20);
+        if(!isset($_POST[$name])) break;
+        $item->nodeValue = $_POST[$name];
+        #if($e->nodeValue == "") $e->nodeValue= " ";
         break;
         case "select":
         if(!isset($_POST[$name])) break;
@@ -230,10 +265,26 @@ class ContactForm extends Plugin implements SplObserver {
       $id = $item->getAttribute("id");
       foreach($xpath->query("//label[@for='$id']") as $e) $e->addClass("warning");
     }
+    foreach($xpath->query("form//*[@id or @for]") as $e) {
+      if($e->hasAttribute("id")) $e->setAttribute("id", "$prefix-$formId-".$e->getAttribute("id"));
+      if($e->hasAttribute("for")) $e->setAttribute("for", "$prefix-$formId-".$e->getAttribute("for"));
+    }
     Cms::setVariable($formId, $doc);
     $doc->processVariables($this->ruleTitles);
     if(!is_null($formError)) throw new Exception($formError);
     #echo $doc->saveXML();
+  }
+
+  private function createMessage(DOMDocumentPlus $cfg, $formId) {
+    if(!array_key_exists($formId, $this->messages)) {
+      foreach($_POST as $k => $v) {
+        if(is_array($v)) $v = implode(", ", $v);
+        $msg[] = "$k: $v";
+      }
+      return implode("\n", $msg);
+    }
+    $variables = array_merge($this->formValues, Cms::getAllVariables());
+    return replaceVariables($this->messages[$formId], $variables);
   }
 
   private function verifyChecked($name, $value, $required, $error) {
@@ -271,7 +322,7 @@ class ContactForm extends Plugin implements SplObserver {
     $this->isPost = true;
     if(time() - $_POST[$timeName] < 5) throw new Exception(_("Form has not been initialized"));
     if(time() - $_POST[$timeName] > 60*20) throw new Exception(_("Form has expired"));
-    $hash = hash("sha1", $_POST[$timeName].$this->vars["secret_phrase"].$formId);
+    $hash = hash("sha1", $_POST[$timeName].$this->formVars["secret"].$formId);
     if(strcmp($_POST[$tokenName], $hash) !== 0) throw new Exception(_("Security verification failed"));
   }
 
