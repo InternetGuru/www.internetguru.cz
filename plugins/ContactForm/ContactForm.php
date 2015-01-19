@@ -103,11 +103,11 @@ class ContactForm extends Plugin implements SplObserver {
     }
     if(!empty($this->errors))
       throw new Exception(sprintf(_("%s error(s) occured"), count($this->errors)));
-    foreach(array("clientaddr", "clientname", "copycond") as $name) {
+    foreach(array("email", "name", "sendcopy") as $name) {
       $this->formVars[$name] = isset($this->formValues[$name]) ? $this->formValues[$name] : "";
     }
-    if(!strlen($this->formVars["clientaddr"]))
-      new Logger(_("Attribute name clientaddr not sent or empty"), Logger::LOGGER_WARNING);
+    if(!strlen($this->formVars["email"]))
+      new Logger(_("Attribute name email not sent or empty"), Logger::LOGGER_WARNING);
     return true;
   }
 
@@ -115,15 +115,15 @@ class ContactForm extends Plugin implements SplObserver {
     if(!strlen($this->formVars["adminaddr"])) throw new Exception(_("Missing admin address"));
     if(!preg_match("/".EMAIL_PATTERN."/", $this->formVars["adminaddr"]))
       throw new Exception(sprintf(_("Invalid admin email address: '%s'"), $this->formVars["adminaddr"]));
-    if(strlen($this->formVars["clientaddr"]) && !preg_match("/".EMAIL_PATTERN."/", $this->formVars["clientaddr"]))
-      throw new Exception(sprintf(_("Invalid client email address: '%s'"), $this->formVars["clientaddr"]));
+    if(strlen($this->formVars["email"]) && !preg_match("/".EMAIL_PATTERN."/", $this->formVars["email"]))
+      throw new Exception(sprintf(_("Invalid client email address: '%s'"), $this->formVars["email"]));
     require LIB_FOLDER.'/PHPMailer/PHPMailerAutoload.php';
-    $this->sendMail($this->formVars["adminaddr"], $this->formVars["adminname"], $this->formVars["clientaddr"],
-      $this->formVars["clientname"], trim($msg));
-    if(is_array($this->formVars["copycond"])) {
-      if(!strlen($this->formVars["clientaddr"]))
+    $this->sendMail($this->formVars["adminaddr"], $this->formVars["adminname"], $this->formVars["email"],
+      $this->formVars["name"], trim($msg));
+    if(is_array($this->formVars["sendcopy"])) {
+      if(!strlen($this->formVars["email"]))
         throw new Exception(_("Unable to send copy to empty client address"));
-      $this->sendMail($this->formVars["clientaddr"], $this->formVars["clientname"], $this->formVars["adminaddr"],
+      $this->sendMail($this->formVars["email"], $this->formVars["name"], $this->formVars["adminaddr"],
         $this->formVars["adminname"], $this->formVars["copymsg"]."\n\n".trim($msg));
     }
     if(!self::DEBUG) return;
