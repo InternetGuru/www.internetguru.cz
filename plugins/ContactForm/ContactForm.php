@@ -3,7 +3,6 @@
 class ContactForm extends Plugin implements SplObserver {
 
   private $cfg;
-  private $isPost;
   private $vars = array();
   private $formVars;
   private $formValues;
@@ -11,7 +10,10 @@ class ContactForm extends Plugin implements SplObserver {
   private $rules = array();
   private $ruleTitles = array();
   private $errors = array();
-  const DEBUG = false;
+  const TOKEN_NAME = "token";
+  const TIME_NAME = "time";
+  const FORM_ITEMS_QUERY = "//input | //textarea | //select";
+  const DEBUG = true;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -22,26 +24,73 @@ class ContactForm extends Plugin implements SplObserver {
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
     $this->cfg = $this->getDOMPlus();
-    $this->createVars();
+    $this->createGlobalVars();
     foreach($this->forms as $formId => $form) {
       try {
-        $this->isPost = false;
         $this->parseForm($form);
-        if(!empty($this->errors))
-          throw new Exception(sprintf(_("%s error(s) occured"), count($this->errors)));
-        if(!$this->isPost) continue;
+        if(!$this->isValidPost($form)) continue;
         $msg = $this->createMessage($this->cfg, $formId);
         $this->sendForm($form, $msg);
         Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS, true);
         redirTo(getRoot().getCurLink(), 302, true);
       } catch(Exception $e) {
-        $message = sprintf(_("Unable to send form: %s"), $e->getMessage());
-        Cms::addMessage($message, Cms::MSG_WARNING);
-        foreach($this->errors as $name => $message) {
+        if(empty($this->errors)) {
+          $message = sprintf(_("Unable to send form: %s"), $e->getMessage());
+          Cms::addMessage($message, Cms::MSG_WARNING);
+        } else foreach($this->errors as $name => $message) {
           Cms::addMessage($message, Cms::MSG_WARNING);
         }
       }
     }
+  }
+
+  private function parseForm(DOMElementPlus $form) {
+    $prefix = normalize(get_class($this));
+    $doc = new DOMDocumentPlus();
+    $var = $doc->appendChild($doc->createElement("var"));
+    $htmlForm = $var->appendChild($doc->importNode($form, true));
+    $formId = $htmlForm->getAttribute("id");
+    $htmlForm->removeAllAttributes(array("id", "class"));
+    $htmlForm->setAttribute("method", "post");
+    $htmlForm->setAttribute("action", "/");
+    $htmlForm->setAttribute("var", "xhtml11-link@action");
+    $htmlForm->setAttribute("id", "$prefix-$formId");
+    $this->createFormVars($form);
+    $this->registerFormItems($htmlForm, "$prefix-$formId-");
+    Cms::setVariable($formId, $doc);
+    $doc->processVariables($this->ruleTitles);
+    #print_r($_POST);
+    #echo $doc->saveXML();
+  }
+
+  private function isValidPost(DOMElementPlus $form) {
+    $prefix = strtolower(get_class($this))."-".$form->getAttribute("id")."-";
+    if(!isset($_POST[$prefix.self::TIME_NAME], $_POST[$prefix.self::TOKEN_NAME])) return false;
+    if(time() - $_POST[$prefix.self::TIME_NAME] < 5) throw new Exception(_("Form has not been initialized"));
+    if(time() - $_POST[$prefix.self::TIME_NAME] > 60*20) throw new Exception(_("Form has expired"));
+    $hash = hash("sha1", $prefix.$_POST[$prefix.self::TIME_NAME].$this->formVars["secret"]);
+    if(strcmp($_POST[$prefix.self::TOKEN_NAME], $hash) !== 0) throw new Exception(_("Security verification failed"));
+    foreach($this->formItems as $i) {
+      $this->setPostValue($i[0], $prefix);
+    }
+    foreach($this->formItems as $i) {
+      try {
+        $this->verifyItem($i);
+      } catch(Exception $e) {
+        $this->errors[] = $e->getMessage();
+        $i[0]->addClass("warning");
+        foreach($this->formIds[$i[0]->getAttribute("id")] as $l) {
+          $l->addClass("warning");
+        }
+      }
+    }
+    if(!empty($this->errors)) throw new Exception();
+    foreach(array("clientaddr", "clientname", "copycond") as $name) {
+      $this->formVars[$name] = isset($this->formValues[$name]) ? $this->formValues[$name] : "";
+    }
+    if(!strlen($this->formVars["clientaddr"]))
+      new Logger(_("Attribute name clientaddr not sent or empty"), Logger::LOGGER_WARNING);
+    return true;
   }
 
   private function sendForm(DOMElementPlus $form, $msg) {
@@ -53,7 +102,7 @@ class ContactForm extends Plugin implements SplObserver {
     require LIB_FOLDER.'/PHPMailer/PHPMailerAutoload.php';
     $this->sendMail($this->formVars["adminaddr"], $this->formVars["adminname"], $this->formVars["clientaddr"],
       $this->formVars["clientname"], $msg);
-    if(strlen($this->formVars["copycond"])) {
+    if(is_array($this->formVars["copycond"])) {
       if(!strlen($this->formVars["clientaddr"]))
         throw new Exception(_("Unable to send copy to empty client address"));
       $this->sendMail($this->formVars["clientaddr"], $this->formVars["clientname"], $this->formVars["adminaddr"],
@@ -63,7 +112,7 @@ class ContactForm extends Plugin implements SplObserver {
     #print_r($_POST);
     #print_r($this->formVars);
     #echo $msg;
-    #print_r($this->formValues);
+    print_r($this->formValues);
     die("CONTACTFORM DEBUG DIE");
   }
 
@@ -91,7 +140,7 @@ class ContactForm extends Plugin implements SplObserver {
     new Logger(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }
 
-  private function createVars() {
+  private function createGlobalVars() {
     $this->rules = array();
     foreach($this->cfg->documentElement->childElements as $e) {
       try {
@@ -126,16 +175,7 @@ class ContactForm extends Plugin implements SplObserver {
     throw new Exception(sprintf(_("Missing attribute %s"), $aName));
   }
 
-  private function parseForm(DOMElementPlus $form) {
-    $doc = new DOMDocumentPlus();
-    $var = $doc->appendChild($doc->createElement("var"));
-    $form = $var->appendChild($doc->importNode($form, true));
-    $formId = $form->getAttribute("id");
-    $prefix = normalize(get_class($this));
-    $timeName = "$prefix-$formId-time";
-    $tokenName = "$prefix-$formId-token";
-    $time = time();
-    $formError = null;
+  private function createFormVars(DOMElementPlus $form) {
     $this->formVars = array();
     foreach($this->vars as $name => $value) {
       $this->formVars[$name] = $value;
@@ -143,141 +183,142 @@ class ContactForm extends Plugin implements SplObserver {
       $this->formVars[$name] = $form->getAttribute($name);
       $form->removeAttribute($name);
     }
-    try {
-      $this->checkPost($timeName, $tokenName, $formId);
-    } catch(Exception $e) {
-      $formError = $e->getMessage();
-    }
-    foreach(array("clientaddr", "clientname", "copycond") as $name) {
-      $this->formVars[$name] = '';
-      $aVal = $form->getAttribute($name);
-      $form->removeAttribute($name);
-      if(!$this->isPost) continue;
-      if(isset($_POST["$prefix-$formId-$aVal"])) {
-        $this->formVars[$name] = $_POST["$prefix-$formId-$aVal"];
-        continue;
-      }
-      if($name != "clientaddr") continue;
-      new Logger(sprintf(_("Client address not sent; attribute name '%s' not found"), $aVal), Logger::LOGGER_WARNING);
-    }
-    if($this->formVars["secret"] == "SECRET_PHRASE")
-      new Logger(_("Default secret phrase should be changed"), Logger::LOGGER_WARNING);
-    $form->setAttribute("method", "post");
-    $form->setAttribute("action", "/");
-    $form->setAttribute("var", "xhtml11-link@action");
-    $xpath = new DOMXPath($doc);
-    $form->setAttribute("id", "$prefix-".$formId);
-    $i = 1;
-    $e = null;
-    $formItems = array();
-    $this->formValues = array();
-    $rcValues = array();
-    foreach($xpath->query("//input | //textarea | //select") as $e) {
-      $name = "$prefix-$formId-item".$i++;
-      if($e->hasAttribute("name")) {
-        $aName = "$prefix-$formId-".$e->getAttribute("name");
-        if(in_array($aName, array($tokenName, $timeName))) {
-          new Logger(_("Forbidden element name time or token replaced"), Logger::LOGGER_WARNING);
-        } else $name = $aName;
-      }
-      $normName = normalize($name, null, false);
-      if(isset($_POST[$normName])) {
-        if($e->hasAttribute("id")) $this->formValues[$e->getAttribute("id")] = $_POST[$normName];
-        elseif($e->hasAttribute("name")) {
-          $this->formValues[normalize($e->getAttribute("name"), null, false)] = $_POST[$normName];
-        }
-      }
-      if($e->nodeName == "input" && in_array($e->getAttribute("type"), array("checkbox", "radio"))) {
-        if(!$e->hasAttribute("value")) {
-          $j = 1;
-          if(isset($rcValues[$name])) while(array_key_exists("i$j", $rcValues[$name])) $j++;
-          $e->setAttribute("value", "i$j");
-          $rcValues[$name]["i$j"] = null;
-        }
-        $rcValues[$name][$e->getAttribute("value")] = null;
-      }
-      $formItems[] = $e;
-      $e->setAttribute("name", $name);
-    }
-    $timeInput = $e->parentNode->appendChild($doc->createElement("input"));
-    $timeInput->setAttribute("name", $timeName);
+  }
+
+  private function registerFormItems(DOMElementPlus $form, $prefix) {
+    $time = time();
+    $timeInput = $form->ownerDocument->createElement("input");
+    $timeInput->setAttribute("name", $prefix.self::TIME_NAME);
     $timeInput->setAttribute("type", "hidden");
     $timeInput->setAttribute("value", $time);
-    $tokenInput = $e->parentNode->appendChild($doc->createElement("input"));
-    $tokenInput->setAttribute("name", $tokenName);
+    $tokenInput = $form->ownerDocument->createElement("input");
+    $tokenInput->setAttribute("name", $prefix.self::TOKEN_NAME);
     $tokenInput->setAttribute("type", "hidden");
-    $tokenInput->setAttribute("value", hash("sha1", $time.$this->formVars["secret"].$formId));
-    foreach($formItems as $item) {
-      if(is_null($item)) continue;
-      $passed = true;
-      $name = $item->getAttribute("name");
-      switch($item->nodeName) {
-        case "input":
-        if(!$item->hasAttribute("type")) {
-          new Logger(_("Element input missing attribute type skipped"), Logger::LOGGER_WARNING);
-          break;
-        }
-        switch($item->getAttribute("type")) {
-          case "text":
-          if($this->isPost) $passed = $this->verifyText($name, $item->getAttribute("rule"),
-            $item->hasAttribute("required"), $item->getAttribute("required"));
-          if(!isset($_POST[$name])) break;
-          $item->setAttribute("value", $_POST[$name]);
-          break;
-          case "checkbox":
-          $name = normalize($name, null, false);
-          case "radio":
-          if($this->isPost) $passed = $this->verifyChecked($name, $item->getAttribute("value"),
-            $item->hasAttribute("required"), $item->getAttribute("required"));
-          if(isset($_POST[$name]) && ($_POST[$name] == $item->getAttribute("value")
-            || (is_array($_POST[$name]) && in_array($item->getAttribute("value"), $_POST[$name])))) {
-            $item->setAttribute("checked", "checked");
-          } elseif($this->isPost) {
-            $item->removeAttribute("checked");
-          }
-        }
-        break;
-        case "textarea":
-        if($this->isPost) $passed = $this->verifyText($name, $item->getAttribute("rule"),
-          $item->hasAttribute("required"), $item->getAttribute("required"));
-        if(!$item->hasAttribute("cols")) $item->setAttribute("cols", 40);
-        if(!$item->hasAttribute("rows")) $item->setAttribute("rows", 20);
-        if(!isset($_POST[$name])) break;
-        $item->nodeValue = $_POST[$name];
-        #if($e->nodeValue == "") $e->nodeValue= " ";
-        break;
-        case "select":
-        if(!isset($_POST[$name])) break;
-        foreach($item->getElementsByTagName("option") as $o) {
-          $value = $o->nodeValue;
-          if($o->hasAttribute("value")) $value = $o->getAttribute("value");
-          if($_POST[$name] == $value) $o->setAttribute("selected", "selected");
-          else $o->removeAttribute("selected");
-        }
-        break;
+    $tokenInput->setAttribute("value", hash("sha1", $prefix.$time.$this->formVars["secret"]));
+    if($this->formVars["secret"] == "SECRET_PHRASE")
+      new Logger(_("Default secret phrase should be changed"), Logger::LOGGER_WARNING);
+    $i = 1;
+    $e = null;
+    $this->formItems = array();
+    $this->formValues = array();
+    $this->formNames = array(self::TIME_NAME, self::TOKEN_NAME);
+    $this->formIds = array();
+    $this->formGroupValues = array();
+    $xpath = new DOMXPath($form->ownerDocument);
+    foreach($xpath->query(self::FORM_ITEMS_QUERY) as $e) {
+      if($e->nodeName == "textarea") {
+        if(!$e->hasAttribute("cols")) $e->setAttribute("cols", 40);
+        if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 20);
       }
-      $item->removeAttribute("required");
-      $item->removeAttribute("rule");
-      if($passed) continue;
-      $item->addClass("warning");
-      if($item->parentNode->nodeName == "label") $item->parentNode->addClass("warning");
-      if(!$item->hasAttribute("id")) continue;
-      $id = $item->getAttribute("id");
-      foreach($xpath->query("//label[@for='$id']") as $e) $e->addClass("warning");
+      if($e->nodeName == "input" && !$e->hasAttribute("type")) {
+        new Logger(_("Element input missing attribute type skipped"), Logger::LOGGER_WARNING);
+        continue;
+      }
+      $this->formItems[] = array($e, $e->getAttribute("rule"), $e->hasAttribute("required"), $e->getAttribute("required"));
+      $e->removeAttribute("rule");
+      $e->removeAttribute("required");
+      $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
+      $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
+      $name = $this->processFormItem($this->formNames, $e, "name", $prefix, $id, true);
+      $this->completeFormItem($e, $name);
     }
-    foreach($xpath->query("form//*[@id or @for]") as $e) {
-      if($e->hasAttribute("id")) $e->setAttribute("id", "$prefix-$formId-".$e->getAttribute("id"));
-      if($e->hasAttribute("for")) $e->setAttribute("for", "$prefix-$formId-".$e->getAttribute("for"));
+    $e->parentNode->appendChild($timeInput);
+    $e->parentNode->appendChild($tokenInput);
+    foreach($xpath->query("//label") as $e) {
+      if($e->hasAttribute("for")) {
+        $for = $prefix.$e->getAttribute("for");
+        $e->setAttribute("for", $for);
+        $this->formIds[$for][] = $e;
+        continue;
+      }
+      foreach($xpath->query("input | textarea | select", $e) as $f) {
+        $this->formIds[$f->getAttribute("id")][] = $e;
+      }
     }
-    Cms::setVariable($formId, $doc);
-    $doc->processVariables($this->ruleTitles);
-    if(!is_null($formError)) throw new Exception($formError);
-    #echo $doc->saveXML();
+  }
+
+  private function completeFormItem(DOMElementPlus $e, $name) {
+    switch($e->nodeName) {
+      case "input":
+      if(!in_array($e->getAttribute("type"), array("checkbox", "radio"))) break;
+      $this->setUniqueGroupValue($e, $name, null);
+      break;
+      case "select":
+      foreach($e->childElements as $o) {
+        $this->setUniqueGroupValue($o, $name, $o->nodeValue);
+      }
+    }
+  }
+
+  private function setUniqueGroupValue(DOMElementPlus $e, $name, $default) {
+    $value = $e->getAttribute("value");
+    $j = "";
+    if(!strlen($value)) $value = $default;
+    if(!isset($this->formGroupValues[$name])) $this->formGroupValues[$name] = array();
+    if(is_null($value) || array_key_exists($value, $this->formGroupValues[$name])) {
+      $j = 1;
+      while(array_key_exists($value.$j, $this->formGroupValues[$name])) $j++;
+    }
+    $e->setAttribute("value", $value.$j);
+    $this->formGroupValues[$name][$value.$j] = null;
+  }
+
+  private function setPostValue(DOMElementPlus $e, $prefix) {
+    $post = null;
+    $name = str_replace("[]", "", $e->getAttribute("name"));
+    $name = substr($name, strlen($prefix));
+    if(isset($_POST[$prefix.$name])) $post = $_POST[$prefix.$name];
+    switch($e->nodeName) {
+      case "input":
+      switch($e->getAttribute("type")) {
+        case "text":
+        $e->setAttribute("value", $post);
+        break;
+        case "checkbox":
+        case "radio":
+        if($post == $e->getAttribute("value")
+          || (is_array($post) && in_array($e->getAttribute("value"), $post))) {
+          $e->setAttribute("checked", "checked");
+        } else {
+          $e->removeAttribute("checked");
+        }
+      }
+      break;
+      case "textarea":
+      $e->nodeValue = $post;
+      break;
+      case "select":
+      foreach($e->getElementsByTagName("option") as $o) {
+        if($post == $o->getAttribute("value")) $o->setAttribute("selected", "selected");
+        else $o->removeAttribute("selected");
+      }
+    }
+    if(is_null($post)) $post = $this->vars["nothing"];
+    $this->formValues[$name] = $post;
+  }
+
+  private function processFormItem(Array &$register, DOMElementPlus $e, $aName, $prefix, $default, $arraySupport) {
+    $value = normalize($e->getAttribute($aName), null, false); // remove "[]"" and stuff...
+    if(!strlen($value)) $value = $default;
+    $isCheckbox = $e->nodeName == "input" && $e->getAttribute("type") == "checkbox";
+    $isRadio = $e->nodeName == "input" && $e->getAttribute("type") == "radio";
+    if(array_key_exists($value, $register) && (!$arraySupport || !($isCheckbox || $isRadio))) {
+      $i = 1;
+      while(array_key_exists("$value$i", $register)) $i++;
+      $value = "$value$i";
+    }
+    if($arraySupport && $isCheckbox) {
+      $e->setAttribute($aName, $prefix.$value."[]");
+    } else {
+      $e->setAttribute($aName, $prefix.$value);
+    }
+    $register[$value] = array();
+    return $value;
   }
 
   private function createMessage(DOMDocumentPlus $cfg, $formId) {
     if(!array_key_exists($formId, $this->messages)) {
-      foreach($_POST as $k => $v) {
+      foreach($this->formValues as $k => $v) {
         if(is_array($v)) $v = implode(", ", $v);
         $msg[] = "$k: $v";
       }
@@ -287,43 +328,49 @@ class ContactForm extends Plugin implements SplObserver {
     return replaceVariables($this->messages[$formId], $variables);
   }
 
-  private function verifyChecked($name, $value, $required, $error) {
-    if(!$required || (isset($_POST[$name]) && $_POST[$name] == $value)) return true;
-    if(strlen($error)) $this->errors[$name] = $error;
-    else $this->errors[$name] = _("Item must be checked");
-    return false;
+  private function verifyItem(Array $item) {
+    $e = $item[0];
+    $rule = $item[1];
+    $req = $item[2];
+    $err = $item[3];
+    if($e->nodeName == "textarea") {
+      $this->verifyText($e->nodeValue, $rule, $req, $err);
+    } elseif($e->nodeName != "input") return;
+    switch($e->getAttribute("type")) {
+      case "text":
+      $this->verifyText($e->getAttribute("value"), $rule, $req, $err);
+      break;
+      case "checkbox":
+      case "radio":
+      $this->verifyChecked($e->hasAttribute("checked"), $req, $err);
+      break;
+    }
   }
 
-  private function verifyText($name, $ruleName, $required, $error) {
-    if(!isset($_POST[$name])) throw new Exception(sprintf(_("Missing post data %s"), $name));
-    if(!strlen(trim($_POST[$name]))) {
-      if(!$required) return true;
-      if(strlen($error)) $this->errors[$name] = $error;
-      else $this->errors[$name] = _("Item is required");
-      return false;
+  private function verifyText($value, $ruleName, $required, $error) {
+    if(!strlen(trim($value))) {
+      if(!$required) return;
+      if(!strlen($error)) $error = _("Item is required");
+      throw new Exception($error);
     }
-    if(!strlen($ruleName)) return true;
+    if(!strlen($ruleName)) return;
     if(!array_key_exists($ruleName, $this->rules))
       new Logger(sprintf(_("Form rule %s is not defined"), $ruleName), Logger::LOGGER_WARNING);
-    $res = @preg_match("/".$this->rules[$ruleName]."/", $_POST[$name]);
+    $res = @preg_match("/".$this->rules[$ruleName]."/", $value);
     if($res === false) {
       new Logger(sprintf(_("Form rule %s is invalid"), $ruleName), Logger::LOGGER_WARNING);
-      return true;
+      return;
     }
-    if($res === 1) return true;
-    if(strlen($error)) $this->errors[$name] = $error;
-    elseif(strlen($this->ruleTitles[$ruleName])) $this->errors[$name] = $this->ruleTitles[$ruleName];
-    else $this->errors[$name] = sprintf(_("Item value does not match required format: %s"), $this->rules[$ruleName]);
-    return false;
+    if($res === 1) return;
+    if(!strlen($error)) $error = $this->ruleTitles[$ruleName];
+    if(!strlen($error)) $error = sprintf(_("Item value does not match required format: %s"), $this->rules[$ruleName]);
+    throw new Exception($error);
   }
 
-  private function checkPost($timeName, $tokenName, $formId) {
-    if(!isset($_POST[$timeName], $_POST[$tokenName])) return;
-    $this->isPost = true;
-    if(time() - $_POST[$timeName] < 5) throw new Exception(_("Form has not been initialized"));
-    if(time() - $_POST[$timeName] > 60*20) throw new Exception(_("Form has expired"));
-    $hash = hash("sha1", $_POST[$timeName].$this->formVars["secret"].$formId);
-    if(strcmp($_POST[$tokenName], $hash) !== 0) throw new Exception(_("Security verification failed"));
+  private function verifyChecked($checked, $required, $error) {
+    if(!$required || $checked) return;
+    if(!strlen($error)) $error = _("Item must be checked");
+    throw new Exception($error);
   }
 
 }

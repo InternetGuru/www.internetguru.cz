@@ -11,6 +11,7 @@
   <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána</var>
   <var id="subject" modifyonly="modifyonly">Nová zpráva kontaktního formuláře</var>
   <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z webu</var>
+  <var id="nothing" modifyonly="modifyonly">n/a</var>
 
   <!--
     Pravidla kontrol textových prvků formuláře regulárním výrazem
@@ -31,9 +32,9 @@
     form.subject [text]
     form.copymsg [text]
 
-    form.clientaddr [input.name value]
-    form.clientname [input.name value]
-    form.copycond [input.name value] whether to send a copy
+    input.name == clientaddr to define client address (required)
+    input.name == clientname to define client name (optional)
+    input.name == copycond to define send a copy to client addr (optional)
 
     input[type='text'].rule [rule.name value]
     input.required [text or empty]
@@ -41,22 +42,20 @@
     textarea.rule [rule.name value]
     textarea.required [text or empty]
   -->
-  <form id="basic" clientaddr="email" clientname="fullname" copycond="copy">
+  <form id="basic">
     <dl>
       <dt><label for="fullname">Celé jméno</label></dt>
       <dd><input type="text" id="fullname" required="Jméno je povinné"/></dd>
       <dt><label for="email">E-mail</label></dt>
-      <dd><input type="text" rule="rule-email" id="email" required="Adresa musí být ve správném formátu"/></dd>
+      <dd><input type="text" rule="rule-email" id="email" name="clientaddr" required="Adresa musí být ve správném formátu"/></dd>
       <!-- <dd><label for="email" var="email">n/a</label></dd> -->
       <dt><label for="telephone">Telefon (nepovinné)</label></dt>
       <dd><input type="text" rule="rule-telephone" id="telephone"/></dd>
       <!-- <dd><label for="telephone" var="telephone">n/a</label></dd> -->
       <dt><label for="msg">Zpráva</label></dt>
       <dd><textarea id="msg" required="Zpráva je povinná"></textarea></dd>
-      <dt><label for="copy">Poslat kopii na mejl odesílatele</label></dt>
-      <dd><input type="checkbox" id="copy"/></dd>
-      <dt><label for="agree">Souhlas s podmínkami</label></dt>
-      <dd><input type="checkbox" id="agree" checked="checked" required="Musíte souhlasit s obchodními podmínkami"/></dd>
+      <dt><label for="copycond">Poslat kopii na mejl odesílatele</label></dt>
+      <dd><input type="checkbox" id="copycond"/></dd>
       <dt>Zájem o odebírání témat</dt>
       <dd><label><input type="checkbox" name="t[]"/> téma1</label></dd>
       <dd><label><input type="checkbox" name="t[]"/> téma2</label></dd>
@@ -71,6 +70,7 @@
         <option>Německo</option>
       </select></dd>
       <dt><label for="submit">Odeslání formuláře</label></dt>
+      <dd><label><input type="checkbox" checked="checked" required="Musíte souhlasit s obchodními podmínkami"/> Souhlas s podmínkami</label></dd>
       <dd><input type="submit" id="submit"/></dd>
     </dl>
   </form>

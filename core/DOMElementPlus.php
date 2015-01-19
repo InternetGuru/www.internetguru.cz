@@ -19,6 +19,17 @@ class DOMElementPlus extends DOMElement {
     return $newnode;
   }
 
+  public function removeAllAttributes(Array $except = array()) {
+    $toRemove = array();
+    foreach($this->attributes as $a) {
+      if(in_array($a->nodeName, $except)) continue;
+      $toRemove[] = $a;
+    }
+    foreach($toRemove as $a) {
+      $this->removeAttribute($a->nodeName);
+    }
+  }
+
   public function addClass($class) {
     if(!$this->hasAttribute("class")) $this->setAttribute("class", $class);
     else $this->setAttribute("class", $this->getAttribute("class")." $class");
@@ -176,6 +187,7 @@ class DOMElementPlus extends DOMElement {
     if(!is_null($aName)) {
       $this->insertVarString($element->nodeValue, $aName);
     }
+
     $var = $this->ownerDocument->importNode($element, true);
     $attributes = array();
     foreach($this->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;

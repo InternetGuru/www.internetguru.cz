@@ -100,6 +100,7 @@ class Cms {
     try {
       self::$content->validatePlus(true);
     } catch(Exception $e) {
+      #echo self::$content->saveXML();die();
       new Logger(sprintf(_("Some variables or functions causing HTML+ error: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
       self::$content = $oldContent;
     }
