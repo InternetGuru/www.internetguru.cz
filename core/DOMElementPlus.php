@@ -30,7 +30,12 @@ class DOMElementPlus extends DOMElement {
     }
   }
 
+  public function hasClass($class) {
+    return in_array($class, explode(" ", $this->getAttribute("class")));
+  }
+
   public function addClass($class) {
+    if($this->hasClass($class)) return;
     if(!$this->hasAttribute("class")) $this->setAttribute("class", $class);
     else $this->setAttribute("class", $this->getAttribute("class")." $class");
   }

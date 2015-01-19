@@ -187,35 +187,36 @@ function createSymlink($link, $target) {
 
 function replaceVariables($string, Array $variables, $varPrefix=null) {
   if(!strlen($string)) return $string;
-  $output = array();
-  foreach(explode('\$', $string) as $s) {
-    $r = array();
-    preg_match_all('/@?\$('.VARIABLE_PATTERN.')/i', $s, $match);
-    foreach($match[1] as $k => $varId) {
-      if(!array_key_exists($varId, $variables)) {
-        $varId = $varPrefix.$varId;
-        if(!array_key_exists($varId, $variables)) {
-          if(strpos($match[0][$k], "@") !== 0)
-            new Logger(sprintf(_("Variable '%s' does not exist"), $varId), Logger::LOGGER_WARNING);
-          continue;
-        }
-      }
-      $value = $variables[$varId];
-      if(is_array($value)) $value = implode(",", $value);
-      elseif(!is_string($value)) {
-        if(strpos($match[0][$k], "@") !== 0)
-          new Logger(sprintf(_("Variable '%s' is not string"), $varId), Logger::LOGGER_WARNING);
+  $pat = '/(@?\$'.VARIABLE_PATTERN.')/i';
+  $p = preg_split($pat, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+  if(count($p) < 2) return $string;
+  $newString = "";
+  foreach($p as $i => $v) {
+    if($i % 2 == 0) {
+      $newString .= $v;
+      continue;
+    }
+    $vName = substr($v, strpos($v, '$')+1);
+    if(!array_key_exists($vName, $variables)) {
+      $vName = $varPrefix.$vName;
+      if(!array_key_exists($vName, $variables)) {
+        if(strpos($v, "@") !== 0)
+          new Logger(sprintf(_("Variable '%s' does not exist"), $vName), Logger::LOGGER_WARNING);
+        $newString .= $v;
         continue;
       }
-      $r[$varId] = $value;
     }
-    $i = 0;
-    foreach($r as $var => $varVal) {
-      $s = str_replace($match[0][$i++], $varVal, $s);
+    $value = $variables[$vName];
+    if(is_array($value)) $value = implode(", ", $value);
+    elseif(!is_string($value)) {
+      if(strpos($v, "@") !== 0)
+        new Logger(sprintf(_("Variable '%s' is not string"), $vName), Logger::LOGGER_WARNING);
+      $newString .= $v;
+      continue;
     }
-    $output[] = $s;
+    $newString .= $value;
   }
-  return implode('$', $output);
+  return $newString;
 }
 
 ?>

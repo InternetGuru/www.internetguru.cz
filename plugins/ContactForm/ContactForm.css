@@ -1,0 +1,25 @@
+label.error {
+  display: none;
+}
+label.error.contactform-warning {
+  display: initial;
+}
+dd.contactform-warning:before,
+label.contactform-warning:not([for]):before {
+  content: "»";
+  display: inline-block;
+  color: rgb(152, 0, 0);
+  font-size: 1.5em;
+  line-height: 1em;
+  width: 0.8em;
+  margin-left: -0.8em;
+}
+label.contactform-warning.error,
+label.contactform-warning:not([for]) {
+  color: rgb(152, 0, 0);
+}
+input.contactform-warning[type='text'],
+textarea.contactform-warning {
+  border-color: #A13939;
+  background-color: #FFBBBB;
+}

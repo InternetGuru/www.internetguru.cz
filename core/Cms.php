@@ -24,6 +24,7 @@ class Cms {
     self::setVariable("messages", self::$flashList);
     self::setVariable("version", CMS_VERSION);
     self::setVariable("name", CMS_NAME);
+    self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("user_id", USER_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
     self::setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
@@ -48,9 +49,11 @@ class Cms {
 
   private static function addFlashItem($message, $type, $class) {
     if(!is_null(self::getVariable("auth-logged_user"))) $message = "$class: $message";
-    $li = self::$flashList->ownerDocument->createElement("li", $message);
-    $li->setAttribute("class", "$class $type");
+    $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
+    $li->setAttribute("class", "$class $type");
+    $li->setAttribute("var", "message");
+    $li->processVariables(array("message" => $message));
   }
 
   private static function getMessages() {

@@ -27,11 +27,16 @@ p code, li code, dt code, dd code {
   white-space: pre-wrap;
 }
 
-pre, textarea {
-  padding: 0.3em;
+input:not([type='submit']),
+pre, textarea, select {
+  border: 0.1em solid #aaa;
+  padding: 0.2em 0.4em;
   line-height: 1.5em;
-  margin-top: 1em;
-  margin-bottom: 1em;
+  vertical-align: top;
+}
+
+input:not([type="text"]) {
+  vertical-align: middle;
 }
 
 samp, p code, li code, dt code, dd code {
@@ -88,21 +93,29 @@ p object {
 #messages li {
   margin: 0.5em 0;
 }
+#messages > span,
+#messages a,
+#messages li.info {
+  color: #ccc;
+}
 #messages li.warning {
   /*background: rgb(255, 45, 45);*/
   background: rgb(187, 33, 33);
   color: #fff;
   padding: 0.5em;
 }
-#messages > span,
-#messages a,
-#messages li.info {
-  color: #ccc;
-}
 #messages li.success {
   background: rgb(53, 144, 61);
   color: #fff;
   padding: 0.5em;
+}
+#messages li.warning a,
+#messages li.success a,
+#messages li.warning label,
+#messages li.success label {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
 }
 #messages.hidden {
   float: left;
