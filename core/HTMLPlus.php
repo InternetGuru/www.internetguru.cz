@@ -322,13 +322,18 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function validateHid($repair) {
+    $hIds = array();
     foreach($this->headings as $h) {
       $id = $h->hasAttribute("id") ? $h->getAttribute("id") : null;
       if(!$this->isValidId($id)) {
         if(!$repair) throw new Exception(sprintf(_("Heading attribut id '%s' missing or invalid"), $id));
         $this->setUniqueId($h);
-        continue;
       }
+      if(array_key_exists($id, $hIds)) {
+        if(!$repair) throw new Exception(sprintf(_("Duplicit heading attribut id '%s'"), $id));
+        $this->setUniqueId($h);
+      }
+      $hIds[$h->getAttribute("id")] = null;
     }
   }
 
