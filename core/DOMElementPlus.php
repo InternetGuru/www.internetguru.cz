@@ -245,6 +245,7 @@ class DOMElementPlus extends DOMElement {
       $this->parentNode->insertBefore($cmt, $this);
     }
     if($keepContent) {
+      $children = array();
       foreach($this->childNodes as $n) $children[] = $n;
       foreach($children as $n) $this->parentNode->insertBefore($n, $this);
     }
