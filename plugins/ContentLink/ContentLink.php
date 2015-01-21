@@ -4,6 +4,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private $lang = null;
   private $isRoot;
   private $hPath;
+  private $vars;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -25,6 +26,11 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $h1 = $cf->getElementById($link, "link", "h");
       if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
+    foreach($this->getDOMPlus()->documentElement->childElements as $e) {
+      if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
+      $this->vars[$e->getAttribute("id")] = $e->nodeValue;
+    }
+
     $this->setPath($h1);
     $this->generateBc($c);
     if($this->isRoot) return $c;
@@ -91,9 +97,20 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $a->setAttribute("href", "#".$h->getAttribute("id"));
       if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
       if(empty($subtitles)) {
+        if(array_key_exists("logo", $this->vars)) {
+          if(!is_file(FILES_FOLDER."/".$this->vars["logo"])) {
+            new Logger(sprintf(_("Logo file %s not found"), $this->vars["logo"]), Logger::LOGGER_WARNING);
+          } else {
+            $o = $a->appendChild($bc->createElement("object", $a->nodeValue));
+            $o->setAttribute("data", $this->vars["logo"]);
+            $a->nodeValue = "";
+            $a->appendChild($o);
+          }
+        }
         $subtitles[] = $h->nodeValue;
         if(!$this->isRoot && !$h->hasAttribute("title") && $h->hasAttribute("short"))
           $a->setAttribute("title", $h->getAttribute("short"));
+
       } else {
         $subtitles[] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
       }
