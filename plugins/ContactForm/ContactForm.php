@@ -1,5 +1,10 @@
 <?php
 
+#todo: max one default secret phrase warning
+#todo: invalid admin e-mail address warning
+#todo: default servername = $cms-domain
+#todo: default subject = Nová zpráva z webu $cms-domain
+
 class ContactForm extends Plugin implements SplObserver {
 
   private $cfg;
@@ -41,8 +46,8 @@ class ContactForm extends Plugin implements SplObserver {
         redirTo(getRoot().getCurLink(), 302, true);
       } catch(Exception $e) {
         $this->finishForm($htmlForm, true);
-        $message = sprintf(_("<a href='#%s'>Unable to send form: %s</a>"),
-          $htmlForm->getAttribute("id"), $e->getMessage());
+        $message = "<a href='#".$htmlForm->getAttribute("id")."'>"
+          .sprintf(_("Unable to send form: %s"), $e->getMessage())."</a>";
         Cms::addMessage($message, Cms::MSG_WARNING);
         foreach($this->errors as $itemId => $message) {
           Cms::addMessage(sprintf("<label for='%s'>%s</label>", $itemId, $message), Cms::MSG_WARNING);
@@ -225,7 +230,7 @@ class ContactForm extends Plugin implements SplObserver {
     foreach($xpath->query(self::FORM_ITEMS_QUERY) as $e) {
       if($e->nodeName == "textarea") {
         if(!$e->hasAttribute("cols")) $e->setAttribute("cols", 40);
-        if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 20);
+        if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 7);
       }
       if($e->nodeName == "input" && !$e->hasAttribute("type")) {
         new Logger(_("Element input missing attribute type skipped"), Logger::LOGGER_WARNING);

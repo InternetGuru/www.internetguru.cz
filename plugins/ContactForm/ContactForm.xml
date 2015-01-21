@@ -8,8 +8,8 @@
   <!-- nepovinné proměnné rozšíření ContactForm -->
   <var id="adminname" modifyonly="modifyonly"></var> <!-- nepovinné jméno kontaktní osoby -->
   <var id="servername" modifyonly="modifyonly"></var> <!-- nepovinný název společnosti -->
-  <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána</var>
-  <var id="subject" modifyonly="modifyonly">Nová zpráva kontaktního formuláře</var>
+  <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána!</var>
+  <var id="subject" modifyonly="modifyonly">Nová zpráva z webu</var>
   <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z webu:</var>
   <var id="nothing" modifyonly="modifyonly">[nevyplněno]</var>
 
@@ -75,7 +75,7 @@ Ze systému $cms-name
       <dd><textarea id="msg" required="Zpráva je povinná"></textarea></dd>
       <dd><label class="error" for="msg">Nezapomeňte napsat zprávu</label></dd>
       <dt>Odeslání formuláře</dt>
-      <dd><label><input type="checkbox" id="sendcopy"/> Poslat kopii na uvedený e-mail</label></dd>
+      <dd><label><input type="checkbox" id="sendcopy"/> Poslat kopii této zprávy na uvedený e-mail</label></dd>
       <dd><input type="submit" id="submit"/></dd>
     </dl>
   </form>
