@@ -29,7 +29,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $cfg = $this->getDOMPlus();
     foreach($cfg->documentElement->childElements as $e) {
       if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
-      $this->vars[$e->getAttribute("id")] = $e->nodeValue;
+      $this->vars[$e->getAttribute("id")] = $e;
     }
 
     $this->setPath($h1);
@@ -100,11 +100,12 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
       if(empty($subtitles)) {
         if(array_key_exists("logo", $this->vars)) {
-          if(!is_file(FILES_FOLDER."/".$this->vars["logo"])) {
+          if(!is_file(FILES_FOLDER."/".$this->vars["logo"]->nodeValue)) {
             new Logger(sprintf(_("Logo file %s not found"), $this->vars["logo"]), Logger::LOGGER_WARNING);
           } else {
             $o = $a->appendChild($bc->createElement("object"));
-            $o->setAttribute("data", $this->vars["logo"]);
+            $o->setAttribute("data", $this->vars["logo"]->nodeValue);
+            $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
             $textContainer = $o;
             $a->appendChild($o);
           }
