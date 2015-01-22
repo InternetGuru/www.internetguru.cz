@@ -44,11 +44,12 @@ try {
   //set etag-header
   header("Etag: $etagFile");
   //check if page has changed. If not, send 304 and exit
-  if(!IS_LOCALHOST && $etagHeader == $etagFile) {
+  if(IS_LOCALHOST || CMS_DEBUG || $etagHeader != $etagFile
+    || preg_match("/^\D/", CMS_RELEASE)) {
+    echo $out;
+  } else {
     header("HTTP/1.1 304 Not Modified");
     new Logger(_("Page not modified"), Logger::LOGGER_INFO);
-  } else {
-    echo $out;
   }
 
   new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time);
