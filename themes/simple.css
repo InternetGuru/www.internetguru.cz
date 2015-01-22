@@ -47,16 +47,26 @@ div.paragraph > dl {
 ul ul, ul ol, ul dl,
 ol ul, ol ol, ol dl,
 dl ul, dl ol, dl dl {
-  margin-top: 0.5em;
-  margin-bottom: 0.5em;
+  margin: 0.5em 0;
+  padding-left: 0;
+  padding-right: 0;
 }
 
-div.list ul,
-div.list ol,
-div.list dl,
-div.contentbalancer ul {
+li li {
+  margin-left: 1rem;
+}
+
+div.list > ul,
+div.list > ol,
+div.list > dl {
   margin-top: 0;
   margin-bottom: 0;
+}
+
+div.list > ul > *:first-child,
+div.list > ol > *:first-child,
+div.list > dl > *:first-child {
+  margin-top: 0;
 }
 
 body {
@@ -196,7 +206,7 @@ li, dd {
 }
 
 dd {
-  font-style: italic;
+  /*font-style: italic;*/
 }
 
 dt {
