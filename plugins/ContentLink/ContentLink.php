@@ -4,7 +4,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   private $lang = null;
   private $isRoot;
   private $hPath;
-  private $vars;
+  private $vars = array();
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -26,7 +26,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $h1 = $cf->getElementById($link, "link", "h");
       if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
-    foreach($this->getDOMPlus()->documentElement->childElements as $e) {
+    $cfg = $this->getDOMPlus();
+    foreach($cfg->documentElement->childElements as $e) {
       if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
       $this->vars[$e->getAttribute("id")] = $e->nodeValue;
     }
@@ -93,7 +94,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     foreach(array_reverse($this->hPath) as $h) {
       #$h->processVariables(Cms::getAllVariables());
       $li = $ol->appendChild($bc->createElement("li"));
-      $a = $li->appendChild($bc->createElement("a", $h->nodeValue));
+      $a = $li->appendChild($bc->createElement("a"));
+      $textContainer = $a;
       $a->setAttribute("href", "#".$h->getAttribute("id"));
       if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
       if(empty($subtitles)) {
@@ -101,9 +103,9 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
           if(!is_file(FILES_FOLDER."/".$this->vars["logo"])) {
             new Logger(sprintf(_("Logo file %s not found"), $this->vars["logo"]), Logger::LOGGER_WARNING);
           } else {
-            $o = $a->appendChild($bc->createElement("object", $a->nodeValue));
+            $o = $a->appendChild($bc->createElement("object"));
             $o->setAttribute("data", $this->vars["logo"]);
-            $a->nodeValue = "";
+            $textContainer = $o;
             $a->appendChild($o);
           }
         }
@@ -115,7 +117,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
         $subtitles[] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
       }
     }
-    if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
+    if($h->hasAttribute("short")) $textContainer->nodeValue = $h->getAttribute("short");
+    else $textContainer->nodeValue = $h->nodeValue;
     Cms::setVariable("bc", $bc->documentElement);
     Cms::setVariable("title", implode(" - ", array_reverse($subtitles)));
   }
