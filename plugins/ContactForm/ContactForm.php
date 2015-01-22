@@ -111,8 +111,8 @@ class ContactForm extends Plugin implements SplObserver {
     foreach(array("email", "name", "sendcopy") as $name) {
       $this->formVars[$name] = isset($this->formValues[$name]) ? $this->formValues[$name] : "";
     }
-    if(!strlen($this->formVars["email"]))
-      new Logger(_("Attribute name email not sent or empty"), Logger::LOGGER_WARNING);
+    #if(!strlen($this->formVars["email"]))
+    #  new Logger(_("Attribute name email not sent or empty"), Logger::LOGGER_WARNING);
     return true;
   }
 
@@ -141,7 +141,7 @@ class ContactForm extends Plugin implements SplObserver {
   private function sendMail($mailto, $mailtoname, $replyto, $replytoname, $msg) {
     if(self::DEBUG) {
       echo $msg;
-      new Logger(sprintf(_("Sending e-mail to %s skipped"), $mailto));
+      new Logger(sprintf("Sending e-mail to %s skipped", $mailto));
       return;
     }
     $mail = new PHPMailer;
