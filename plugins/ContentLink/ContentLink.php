@@ -90,6 +90,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $ol->setAttribute("class", "contentlink-bc");
     $subtitles = array();
     $a = null;
+    $li = null;
     $h = null;
     foreach(array_reverse($this->hPath) as $h) {
       #$h->processVariables(Cms::getAllVariables());
@@ -118,8 +119,10 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
         $subtitles[] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
       }
     }
-    if($h->hasAttribute("short")) $textContainer->nodeValue = $h->getAttribute("short");
-    else $textContainer->nodeValue = $h->nodeValue;
+    if($h->hasAttribute("short")) {
+      if($textContainer->nodeName == "a") $a->nodeValue = $h->getAttribute("short");
+      else $li->appendChild($bc->createElement("span", $h->getAttribute("short")));
+    } else $textContainer->nodeValue = $h->nodeValue;
     Cms::setVariable("bc", $bc->documentElement);
     Cms::setVariable("title", implode(" - ", array_reverse($subtitles)));
   }
