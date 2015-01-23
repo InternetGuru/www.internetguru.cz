@@ -156,8 +156,8 @@ ol.contentlink-bc li:last-child a:not([href]) {
   padding-left: 0.2rem;
 }
 
-ol.contentlink-bc li:not(:first-child) a[href]:before,
-ol.contentlink-bc li a[href]:after {
+ol.contentlink-bc li:not(:first-child) a:not(.logo)[href]:before,
+ol.contentlink-bc li a:not(.logo)[href]:after {
   border-width: 1.2rem 0 1.2rem 1.25rem;
   content: '';
   position: absolute;

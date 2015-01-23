@@ -5,6 +5,8 @@
  */
 class SyntaxHighlightJs extends Plugin implements SplObserver, ContentStrategyInterface {
 
+  const HJS_DIR = "highlight.js/src";
+
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 100);
@@ -28,9 +30,9 @@ class SyntaxHighlightJs extends Plugin implements SplObserver, ContentStrategyIn
     }
     $os = Cms::getOutputStrategy();
 
-    $os->addCssFile(LIB_DIR."/highlight/styles/tomorrow.css");
+    $os->addCssFile(LIB_DIR."/".self::HJS_DIR."/styles/tomorrow.css");
     $os->addCssFile($this->getDir()."/SyntaxHighlightJs.css");
-    $os->addJsFile(LIB_DIR."/highlight/highlight.pack.js");
+    $os->addJsFile(LIB_DIR."/".self::HJS_DIR."/highlight.pack.js");
     $os->addJsFile($this->getDir().'/SyntaxHighlightJs.js', 10, "body");
 
     return $content;

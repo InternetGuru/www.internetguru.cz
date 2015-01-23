@@ -120,9 +120,10 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
         $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
         $o->nodeValue = $hFirst->nodeValue;
         $aFirst->nodeValue = null;
+        $aFirst->addClass("logo");
         $aFirst->appendChild($o);
-        if($hFirst->hasAttribute("short"))
-          $aFirst->appendChild($bc->createElement("span", $hFirst->getAttribute("short")));
+        if($this->isRoot && $hFirst->hasAttribute("short"))
+          $aFirst->parentNode->appendChild($bc->createElement("span", $hFirst->getAttribute("short")));
       }
     }
     Cms::setVariable("bc", $bc->documentElement);
