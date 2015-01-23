@@ -385,25 +385,26 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
     // plugins
     $current = $this->getSubdomVar("CMS_VER", $subdom);
-    if(is_null($current)) return;
-    $userSubdomFolder = SUBDOM_ROOT_FOLDER."/$subdom";
-    $d = new DOMDocumentPlus();
-    $set = $d->appendChild($d->createElement("var"));
-    foreach($this->cmsPlugins[$current] as $pName => $default) {
-      if(is_file("../$subdom/.PLUGIN.$pName")) continue; // silently skip forbidden plugins
-      $i = $d->createElement("input");
-      $i->setAttribute("type", "checkbox");
-      $i->setAttribute("name", "PLUGINS[]");
-      $i->setAttribute("value", $pName);
-      $changed = "";
-      if(is_file("../$subdom/PLUGIN.$pName") != is_file("$userSubdomFolder/PLUGIN.$pName"))
-        $changed = "*";
-      if(is_file("$userSubdomFolder/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
-      $l = $set->appendChild($d->createElement("label"));
-      $l->appendChild($i);
-      $l->appendChild(new DOMText(" $pName$changed"));
+    if(!is_null($current)) {
+      $userSubdomFolder = SUBDOM_ROOT_FOLDER."/$subdom";
+      $d = new DOMDocumentPlus();
+      $set = $d->appendChild($d->createElement("var"));
+      foreach($this->cmsPlugins[$current] as $pName => $default) {
+        if(is_file("../$subdom/.PLUGIN.$pName")) continue; // silently skip forbidden plugins
+        $i = $d->createElement("input");
+        $i->setAttribute("type", "checkbox");
+        $i->setAttribute("name", "PLUGINS[]");
+        $i->setAttribute("value", $pName);
+        $changed = "";
+        if(is_file("../$subdom/PLUGIN.$pName") != is_file("$userSubdomFolder/PLUGIN.$pName"))
+          $changed = "*";
+        if(is_file("$userSubdomFolder/PLUGIN.$pName")) $i->setAttribute("checked", "checked");
+        $l = $set->appendChild($d->createElement("label"));
+        $l->appendChild($i);
+        $l->appendChild(new DOMText(" $pName$changed"));
+      }
+      $vars["plugins"] = $set;
     }
-    $vars["plugins"] = $set;
 
     $doc->processVariables($vars);
   }
@@ -414,7 +415,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       if(is_null($filter) && strpos($f, ".") === 0) continue;
       if(!is_null($filter) && !preg_match($filter, $f)) continue;
       if(!is_dir("$dir/$f")) continue;
-      $subdirs[$f] = !file_exists("$dir/.$f");
+      $subdirs[$f] = !file_exists("$dir/.$f") && strpos($f, ".") !== 0;
     }
     return $subdirs;
   }
