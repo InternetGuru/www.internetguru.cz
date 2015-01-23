@@ -202,7 +202,10 @@ class DOMElementPlus extends DOMElement {
     foreach($nodes as $n) {
       $this->parentNode->insertBefore($n, $this);
       if($n->nodeType != XML_ELEMENT_NODE) continue;
-      foreach($attributes as $aName => $aValue) $n->setAttribute($aName, $aValue);
+      foreach($attributes as $aName => $aValue) {
+        if($n->hasAttribute($aName)) continue;
+        $n->setAttribute($aName, $aValue);
+      }
     }
     $this->parentNode->removeChild($this);
     # ??? $this->removeChildNodes();
