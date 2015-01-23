@@ -11,6 +11,8 @@
 
 class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
+  const CM_DIR = "CodeMirror";
+
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 100);
@@ -34,9 +36,9 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
     // supported syntax only
     $modes = array(
-      "xml" => LIB_DIR."/codemirror/mode/xml/xml.js",
-      "css" => LIB_DIR."/codemirror/mode/css/css.js",
-      "javascript" => LIB_DIR."/codemirror/mode/javascript/javascript.js",
+      "xml" => LIB_DIR."/".self::CM_DIR."/mode/xml/xml.js",
+      "css" => LIB_DIR."/".self::CM_DIR."/mode/css/css.js",
+      "javascript" => LIB_DIR."/".self::CM_DIR."/mode/javascript/javascript.js",
       );
     $libs = array();
     foreach($ta as $t) {
@@ -54,25 +56,25 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     }
     $os = Cms::getOutputStrategy();
 
-    $os->addCssFile(LIB_DIR."/codemirror/lib/codemirror.css");
-    $os->addCssFile(LIB_DIR."/codemirror/theme/tomorrow-night-eighties.css");
+    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.css");
+    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/theme/tomorrow-night-eighties.css");
     $os->addCssFile($this->getDir().'/SyntaxCodeMirror.css');
 
-    $os->addJsFile(LIB_DIR."/codemirror/lib/codemirror.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.js");
     foreach($libs as $l) $os->addJsFile($l);
-    $os->addJsFile(LIB_DIR."/codemirror/keymap/sublime.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/keymap/sublime.js");
 
-    $os->addJsFile(LIB_DIR."/codemirror/addon/search/searchcursor.js");
-    $os->addJsFile(LIB_DIR."/codemirror/addon/search/search.js");
-    $os->addJsFile(LIB_DIR."/codemirror/addon/dialog/dialog.js");
-    $os->addCssFile(LIB_DIR."/codemirror/addon/dialog/dialog.css");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/search.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
+    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
 
-    $os->addJsFile(LIB_DIR."/codemirror/addon/selection/active-line.js");
-    $os->addJsFile(LIB_DIR."/codemirror/addon/selection/mark-selection.js");
-    $os->addJsFile(LIB_DIR."/codemirror/addon/comment/comment.js");
-    $os->addJsFile(LIB_DIR."/codemirror/addon/edit/closetag.js");
-    $os->addJsFile(LIB_DIR."/codemirror/addon/wrap/hardwrap.js");
-    $os->addJsFile(LIB_DIR."/codemirror/addon/fold/foldcode.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/selection/active-line.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/selection/mark-selection.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/comment/comment.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
 
     $os->addJsFile($this->getDir().'/SyntaxCodeMirror.js', 10, "body");
 

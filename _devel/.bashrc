@@ -76,6 +76,7 @@ alias cms='cd "$CMS_FOLDER"'
 # GIT
 alias gaa='git add -A'
 alias gaas='gaa; gs'
+alias gclone='_(){ git clone --recursive ${1:"git@bitbucket.org:igwr/cms.git"}; }; _'
 alias gd='git diff'
 alias gdc='_(){ git log $1^..$1 -p; }; _' # git diff commit [param HASH]
 alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _'
@@ -84,9 +85,9 @@ alias gcv='TAG=$( git show-ref --tags | tail -1 ); echo "Version history until" 
 alias gl='git log --decorate --all --oneline --graph'
 alias gp='gpush'
 alias gpush='git push --all; git push --tags'
-alias gpull='git pull --all && git fetch -p'
+alias gpull='git pull --all && git fetch -p && git submodule update --init --recursive'
 alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _'
-alias gs='git status'
+alias gs='git status && git submodule status'
 
 # BASH
 alias sshcmsadmin='ssh -i ~/.ssh/id_rsa cmsadmin@46.28.109.142'
