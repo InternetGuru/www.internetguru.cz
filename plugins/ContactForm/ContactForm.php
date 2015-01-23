@@ -22,7 +22,7 @@ class ContactForm extends Plugin implements SplObserver {
   const TIME_NAME = "time";
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
-  const DEBUG = true;
+  const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
