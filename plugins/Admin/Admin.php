@@ -11,7 +11,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
   private $content = null;
-  private $contentValue = "n/a";
+  private $contentValue = null;
   private $schema = null;
   private $type = "n/a";
   private $redir = false;
@@ -104,7 +104,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["heading"] = $d->documentElement;
     $vars["link"] = getCurLink();
     $vars["linkadmin"] = $la;
-    $vars["content"] = $this->contentValue;
+    if($this->contentValue !== "" ) $vars["content"] = $this->contentValue;
     $vars["filename"] = $this->defaultFile;
     $vars["schema"] = $format;
     $vars["mode"] = $mode;
@@ -200,9 +200,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->dataFileDisabled = dirname($this->dataFile)."/.".basename($this->dataFile);
     // disabled if.file or both files exist, else new
     $this->dataFileStatus = self::STATUS_NEW;
-    if(file_exists($this->dataFile)) $this->dataFileStatus = self::STATUS_ENABLED;
     if(file_exists($this->dataFileDisabled)) $this->dataFileStatus = self::STATUS_DISABLED;
-    if(!file_exists($this->dataFile) && file_exists($this->dataFileDisabled)) $this->dataFile = $this->dataFileDisabled;
+    if(file_exists($this->dataFile)) $this->dataFileStatus = self::STATUS_ENABLED;
+    #if(!file_exists($this->dataFile) && file_exists($this->dataFileDisabled)) $this->dataFile = $this->dataFileDisabled;
   }
 
   private function isToDisable() {
@@ -276,8 +276,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function setContent() {
-    if(!file_exists($this->dataFile)) return;
-    if(!($this->contentValue = file_get_contents($this->dataFile)))
+    $f = $this->dataFile;
+    if(!file_exists($f)) $f = $this->dataFileDisabled;
+    if(!file_exists($f)) return;
+    if(($this->contentValue = file_get_contents($f)) === false)
       throw new Exception(sprintf(_("Unable to get contents from '%s'"), $this->dataFile));
   }
 
@@ -289,15 +291,16 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function enableDataFile() {
-    if(($this->dataFile == $this->dataFileDisabled
-      && !rename($this->dataFileDisabled, $this->dataFile))
-      || !unlink($this->dataFileDisabled))
+    #if(($this->dataFile == $this->dataFileDisabled
+    #  && !rename($this->dataFileDisabled, $this->dataFile))
+    #  || !unlink($this->dataFileDisabled))
+    if(!rename($this->dataFileDisabled, $this->dataFile))
       throw new Excepiton(_("Unable to enable file"));
     $this->statusChanged = true;
   }
 
   private function disableDataFile() {
-    if(!touch($this->dataFileDisabled))
+    if(!rename($this->dataFile, $this->dataFileDisabled))
       throw new Exception(_("Unable to disable file"));
     $this->statusChanged = true;
   }
