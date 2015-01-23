@@ -97,11 +97,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $type = $this->type;
     }
 
-    $d = new DOMDocumentPlus();
-    $v = $d->appendChild($d->createElement("var"));
-    $v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
-
-    $vars["heading"] = $d->documentElement;
+    #$d = new DOMDocumentPlus();
+    #$v = $d->appendChild($d->createElement("var"));
+    #$v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
+    #$vars["heading"] = $d->documentElement;
+    $vars["heading"] = $content->getElementsByTagName("h")->item(0)->nodeValue;
     $vars["link"] = getCurLink();
     $vars["linkadmin"] = $la;
     if($this->contentValue !== "" ) $vars["content"] = $this->contentValue;
