@@ -17,7 +17,7 @@ define("CACHE_DIR", "cache");
 define('EMAIL_PATTERN', "[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}");
 define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
-define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}");
+define('FILEPATH_PATTERN', "(?:[.a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}");
 define('FILE_HASH_ALGO', 'crc32b');
 define('STATUS_PREINIT', 'preinit');
 define('STATUS_INIT', 'init');
@@ -155,7 +155,7 @@ function getRes($res, $dest, $resFolder) {
   if(defined("ADMIN_FOLDER")) $folders[] = preg_quote(ADMIN_FOLDER, "/");
   if(defined("USER_FOLDER")) $folders[] = preg_quote(USER_FOLDER, "/");
   if(!preg_match("/^(?:".implode("|", $folders).")\/(".FILEPATH_PATTERN.")$/", $res, $m)) {
-    throw new Exception(sprintf(_("Forbidden file name '%s' format to copy to '%s' folder"), $m[1], $resFolder));
+    throw new Exception(sprintf(_("Forbidden file name '%s' format to copy to '%s' folder"), $res, $resFolder));
   }
   $mime = getFileMime($res);
   if(strpos($res, CMS_FOLDER) !== 0 && $mime != "text/plain" && strpos($mime, "image/") !== 0) {
