@@ -10,6 +10,7 @@ class ContactForm extends Plugin implements SplObserver {
 
   private $cfg;
   private $vars = array();
+  private $formIds;
   private $formVars;
   private $formValues;
   private $formItems = array();
@@ -21,7 +22,7 @@ class ContactForm extends Plugin implements SplObserver {
   const TIME_NAME = "time";
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
-  const DEBUG = false;
+  const DEBUG = true;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -240,7 +241,6 @@ class ContactForm extends Plugin implements SplObserver {
       $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
       $name = $this->processFormItem($this->formNames, $e, "name", $prefix, $id, true);
-      $this->completeFormItem($e, $name);
     }
     $e->parentNode->appendChild($timeInput);
     $e->parentNode->appendChild($tokenInput);
@@ -255,22 +255,30 @@ class ContactForm extends Plugin implements SplObserver {
         $this->formIds[$f->getAttribute("id")][] = $e;
       }
     }
+    foreach($this->formItems as $e) {
+      $this->completeFormItem($e);
+    }
   }
 
-  private function completeFormItem(DOMElementPlus $e, $name) {
+  private function completeFormItem(DOMElementPlus $e) {
     switch($e->nodeName) {
       case "input":
       if(!in_array($e->getAttribute("type"), array("checkbox", "radio"))) break;
-      $this->setUniqueGroupValue($e, $name, null);
+      $value = null;
+      if(!empty($this->formIds[$e->getAttribute("id")])) {
+        $value = trim($this->formIds[$e->getAttribute("id")][0]->nodeValue);
+      }
+      $this->setUniqueGroupValue($e, $value);
       break;
       case "select":
       foreach($e->childElements as $o) {
-        $this->setUniqueGroupValue($o, $name, $o->nodeValue);
+        $this->setUniqueGroupValue($o, $o->nodeValue);
       }
     }
   }
 
-  private function setUniqueGroupValue(DOMElementPlus $e, $name, $default) {
+  private function setUniqueGroupValue(DOMElementPlus $e, $default) {
+    $name = $e->getAttribute("name");
     $value = $e->getAttribute("value");
     $j = "";
     if(!strlen($value)) $value = $default;
