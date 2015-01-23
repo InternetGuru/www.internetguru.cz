@@ -32,7 +32,7 @@ class SyntaxHighlightJs extends Plugin implements SplObserver, ContentStrategyIn
 
     $os->addCssFile(LIB_DIR."/".self::HJS_DIR."/styles/tomorrow.css");
     $os->addCssFile($this->getDir()."/SyntaxHighlightJs.css");
-    $os->addJsFile(LIB_DIR."/".self::HJS_DIR."/highlight.pack.js");
+    $os->addJsFile(LIB_DIR."/highlight.pack.js");
     $os->addJsFile($this->getDir().'/SyntaxHighlightJs.js', 10, "body");
 
     return $content;
