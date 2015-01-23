@@ -4,6 +4,7 @@
 #todo: invalid admin e-mail address warning
 #todo: default servername = $cms-domain
 #todo: default subject = Nová zpráva z webu $cms-domain
+#todo: checkbox default value = trim first label
 
 class ContactForm extends Plugin implements SplObserver {
 
