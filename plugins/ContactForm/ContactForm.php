@@ -125,12 +125,12 @@ class ContactForm extends Plugin implements SplObserver {
       throw new Exception(sprintf(_("Invalid client email address: '%s'"), $this->formVars["email"]));
     require LIB_FOLDER.'/PHPMailer/PHPMailerAutoload.php';
     $this->sendMail($this->formVars["adminaddr"], $this->formVars["adminname"], $this->formVars["email"],
-      $this->formVars["name"], trim($msg));
+      $this->formVars["name"], trim($msg), $this->formVars["bcc"]);
     if(is_array($this->formVars["sendcopy"])) {
       if(!strlen($this->formVars["email"]))
         throw new Exception(_("Unable to send copy to empty client address"));
       $this->sendMail($this->formVars["email"], $this->formVars["name"], $this->formVars["adminaddr"],
-        $this->formVars["adminname"], $this->formVars["copymsg"]."\n\n".trim($msg));
+        $this->formVars["adminname"], $this->formVars["copymsg"]."\n\n".trim($msg), '');
     }
     if(!self::DEBUG) return;
     #print_r($_POST);
@@ -139,7 +139,7 @@ class ContactForm extends Plugin implements SplObserver {
     die("CONTACTFORM DEBUG DIE");
   }
 
-  private function sendMail($mailto, $mailtoname, $replyto, $replytoname, $msg) {
+  private function sendMail($mailto, $mailtoname, $replyto, $replytoname, $msg, $bcc) {
     if(self::DEBUG) {
       echo $msg;
       new Logger(sprintf("Sending e-mail to %s skipped", $mailto));
@@ -150,12 +150,11 @@ class ContactForm extends Plugin implements SplObserver {
     $mail->From = "no-reply@".getDomain();
     $mail->FromName = $this->formVars["servername"];
     $mail->addAddress($mailto, $mailtoname);
-    if(strlen($replyto)) {
-      $mail->addReplyTo($replyto, $replytoname);
-    }
     $mail->Subject = sprintf(_("New massage from %s"), getDomain());
-    if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     $mail->Body = $msg;
+    if(strlen($replyto)) $mail->addReplyTo($replyto, $replytoname);
+    if(strlen($bcc)) $mail->addBCC($bcc, '');
+    if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(!$mail->send()) {
       new Logger(sprintf(_("Failed to send e-mail: %s"), $mail->ErrorInfo));
       throw new Exception($mail->ErrorInfo);
