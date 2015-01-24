@@ -41,7 +41,3 @@ AuthName "restricted"
 
 #RewriteRule . - [E=R_USER:admin]
 #Require expr ( %{REMOTE_USER} == "%{ENV:R_USER}e" )
-
-<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
-  Header set Cache-Control "max-age=290304000, public"
-</FilesMatch>

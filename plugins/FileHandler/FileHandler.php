@@ -45,6 +45,14 @@ class FileHandler extends Plugin implements SplObserver {
     $start_time = microtime(true);
     header("Content-Type: ".$this->fileMime);
     header("Content-Length: $fileSize");
+    $etagFile = hash_file("md5", $filePath);
+    $etagHeader=(isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : false);
+    header("Etag: $etagFile");
+    if(!IS_LOCALHOST && !CMS_DEBUG && $etagHeader == $etagFile &&
+      !preg_match("/^\D/", CMS_RELEASE)) {
+      header("HTTP/1.1 304 Not Modified");
+      exit;
+    }
     set_time_limit(0);
     $handle = @fopen($filePath, "rb");
     if($handle === false)
