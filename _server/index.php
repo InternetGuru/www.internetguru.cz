@@ -1,2 +1,2 @@
 <?php
-header("Location: http://www.hotelpatriot.cz");
+header("Location: http://wzu.internetguru.cz");
