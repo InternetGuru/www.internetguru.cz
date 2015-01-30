@@ -23,3 +23,7 @@ textarea.contactform-warning {
   border-color: #A13939;
   background-color: #FFBBBB;
 }
+form dl ul li {
+  list-style-type: none;
+  margin-left: 0;
+}
