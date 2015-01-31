@@ -148,8 +148,9 @@ class ContactForm extends Plugin implements SplObserver {
     }
     $mail = new PHPMailer;
     $mail->CharSet = 'UTF-8';
-    $mail->From = "no-reply@".getDomain();
-    $mail->FromName = $this->formVars["servername"];
+    $mail->setFrom("no-reply@".getDomain(), $this->formVars["servername"]);
+    #$mail->From = "no-reply@".getDomain();
+    #$mail->FromName = $this->formVars["servername"];
     $mail->addAddress($mailto, $mailtoname);
     $mail->Subject = sprintf(_("New massage from %s"), getDomain());
     $mail->Body = $msg;
