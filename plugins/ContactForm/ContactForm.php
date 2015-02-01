@@ -82,8 +82,8 @@ class ContactForm extends Plugin implements SplObserver {
     $formId = $htmlForm->getAttribute("id");
     $htmlForm->removeAllAttributes(array("id", "class"));
     $htmlForm->setAttribute("method", "post");
-    $htmlForm->setAttribute("action", "/");
-    $htmlForm->setAttribute("var", "cms-link@action");
+    $htmlForm->setAttribute("action", getCurLink());
+    #$htmlForm->setAttribute("var", "cms-link@action");
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->createFormVars($form);
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
