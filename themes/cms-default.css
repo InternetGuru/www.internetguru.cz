@@ -32,7 +32,6 @@ pre, textarea, select {
   border: 0.1em solid #aaa;
   padding: 0.2em 0.4em;
   line-height: 1.5em;
-  vertical-align: top;
 }
 
 input {
@@ -58,6 +57,7 @@ fieldset > *:last-child {
 textarea {
   width: 100%;
   height: 60%;
+  vertical-align: top;
 }
 
 ol ol li {
