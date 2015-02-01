@@ -35,7 +35,7 @@ pre, textarea, select {
   vertical-align: top;
 }
 
-input:not([type="text"]) {
+input {
   vertical-align: middle;
 }
 
