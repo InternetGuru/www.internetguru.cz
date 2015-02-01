@@ -31,7 +31,7 @@ div.list.multiple div {
 div.list.multiple dl {
   margin: 1em;
   background: white;
-  padding: 0 1em;
+  padding: 0.5em 1em;
 }
 
 div.paragraph > p,

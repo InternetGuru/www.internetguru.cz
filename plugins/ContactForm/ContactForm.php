@@ -308,7 +308,7 @@ class ContactForm extends Plugin implements SplObserver {
         if($post == $e->getAttribute("value")
           || (is_array($post) && in_array($e->getAttribute("value"), $post))) {
           $e->setAttribute("checked", "checked");
-        } else {
+        } elseif(!empty($_POST)) {
           $e->removeAttribute("checked");
         }
       }
