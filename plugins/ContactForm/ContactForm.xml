@@ -10,8 +10,8 @@
   <var id="servername" modifyonly="modifyonly"></var> <!-- nepovinný název společnosti -->
   <var id="bcc" modifyonly="modifyonly"></var> <!-- nepovinná adresa skryté kopie zprávy -->
   <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána!</var>
-  <var id="subject" modifyonly="modifyonly">Nová zpráva z webu</var>
-  <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z webu:</var>
+  <var id="subject" modifyonly="modifyonly">Nová zpráva z webu $cms-domain od $email</var>
+  <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z $cms-domain:</var>
   <var id="nothing" modifyonly="modifyonly">[nevyplněno]</var>
 
   <!--

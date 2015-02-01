@@ -24,8 +24,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
       Cms::setOutputStrategy($this);
-      Cms::setVariable("url", getUrl());
-      Cms::setVariable("link", getCurLink());
     }
     if($subject->getStatus() == STATUS_PROCESS) {
       $cfg = $this->getDOMPlus();

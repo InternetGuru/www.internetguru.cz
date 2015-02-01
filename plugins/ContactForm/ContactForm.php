@@ -42,7 +42,13 @@ class ContactForm extends Plugin implements SplObserver {
           $this->finishForm($htmlForm, false);
           continue;
         }
-        $msg = $this->createMessage($this->cfg, $formId);
+        $vars = array_merge(Cms::getAllVariables(), $this->formValues);
+        foreach($this->formVars as $k => $v) {
+          $this->formVars[$k] = replaceVariables($v, $vars);
+        }
+        if(array_key_exists($formId, $this->messages)) {
+          $msg = replaceVariables($this->messages[$formId], $vars);
+        } else $msg = $this->createMessage($this->cfg, $formId);
         $this->sendForm($form, $msg);
         Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS, true);
         redirTo(getRoot().getCurLink(), 302, true);
@@ -76,7 +82,7 @@ class ContactForm extends Plugin implements SplObserver {
     $htmlForm->removeAllAttributes(array("id", "class"));
     $htmlForm->setAttribute("method", "post");
     $htmlForm->setAttribute("action", "/");
-    $htmlForm->setAttribute("var", "xhtml11-link@action");
+    $htmlForm->setAttribute("var", "cms-link@action");
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->createFormVars($form);
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
@@ -88,7 +94,7 @@ class ContactForm extends Plugin implements SplObserver {
 
   private function isValidPost(DOMElementPlus $form) {
     $prefix = strtolower(get_class($this))."-".$form->getAttribute("id")."-";
-    foreach($this->formItems as $i) {
+    if(!empty($_POST)) foreach($this->formItems as $i) {
       $this->setPostValue($i, $prefix);
     }
     if(!isset($_POST[$prefix.self::TIME_NAME], $_POST[$prefix.self::TOKEN_NAME])) return false;
@@ -149,14 +155,15 @@ class ContactForm extends Plugin implements SplObserver {
     $mail = new PHPMailer;
     $mail->CharSet = 'UTF-8';
     $mail->setFrom("no-reply@".getDomain(), $this->formVars["servername"]);
-    #$mail->From = "no-reply@".getDomain();
-    #$mail->FromName = $this->formVars["servername"];
     $mail->addAddress($mailto, $mailtoname);
-    $mail->Subject = sprintf(_("New massage from %s"), getDomain());
     $mail->Body = $msg;
-    if(strlen($replyto)) $mail->addReplyTo($replyto, $replytoname);
-    if(strlen($bcc)) $mail->addBCC($bcc, '');
+    $mail->Subject = sprintf(_("New massage from %s"), getDomain());
+    if(strlen($replyto)) {
+      $mail->addReplyTo($replyto, $replytoname);
+      $mail->Subject .= " [$replyto]";
+    }
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
+    if(strlen($bcc)) $mail->addBCC($bcc, '');
     if(!$mail->send()) {
       new Logger(sprintf(_("Failed to send e-mail: %s"), $mail->ErrorInfo));
       throw new Exception($mail->ErrorInfo);
@@ -308,7 +315,7 @@ class ContactForm extends Plugin implements SplObserver {
         if($post == $e->getAttribute("value")
           || (is_array($post) && in_array($e->getAttribute("value"), $post))) {
           $e->setAttribute("checked", "checked");
-        } elseif(!empty($_POST)) {
+        } else {
           $e->removeAttribute("checked");
         }
       }
@@ -347,15 +354,11 @@ class ContactForm extends Plugin implements SplObserver {
   }
 
   private function createMessage(DOMDocumentPlus $cfg, $formId) {
-    if(!array_key_exists($formId, $this->messages)) {
-      foreach($this->formValues as $k => $v) {
-        if(is_array($v)) $v = implode(", ", $v);
-        $msg[] = "$k: $v";
-      }
-      return implode("\n", $msg);
+    foreach($this->formValues as $k => $v) {
+      if(is_array($v)) $v = implode(", ", $v);
+      $msg[] = "$k: $v";
     }
-    $vars = array_merge(Cms::getAllVariables(), $this->formValues);
-    return replaceVariables($this->messages[$formId], $vars);
+    return implode("\n", $msg);
   }
 
   private function verifyItem(DOMElementPlus $e) {

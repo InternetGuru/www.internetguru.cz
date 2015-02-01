@@ -14,6 +14,11 @@
   <xsl:param name="cms-respid" select="''"/>
   <xsl:param name="cms-ctime" select="''"/>
   <xsl:param name="cms-mtime" select="''"/>
+  <xsl:param name="cms-version" select="''"/>
+  <xsl:param name="cms-desc" select="''"/>
+  <xsl:param name="cms-kw" select="''"/>
+  <xsl:param name="cms-url" select="''"/>
+  <xsl:param name="cms-link" select="''"/>
 
   <xsl:param name="contentlink-lang" select="''"/>
   <xsl:param name="contentlink-author" select="''"/>
@@ -23,11 +28,6 @@
   <xsl:param name="contentlink-ctime" select="''"/>
   <xsl:param name="contentlink-mtime" select="''"/>
 
-  <xsl:param name="cms-version" select="''"/>
-  <xsl:param name="cms-desc" select="''"/>
-  <xsl:param name="cms-kw" select="''"/>
-  <xsl:param name="xhtml11-url" select="''"/>
-  <xsl:param name="xhtml11-link" select="''"/>
   <xsl:param name="inputvar-myctime" select="''"/>
   <xsl:param name="inputvar-mymtime" select="''"/>
   <xsl:param name="inputvar-creation" select="''"/>
@@ -56,7 +56,7 @@
           <xsl:if test="not($cms-mtime = '')">
             <li>Upraveno: <xsl:value-of select="$inputvar-mymtime"/></li>
           </xsl:if>
-          <li class="link"><xsl:value-of disable-output-escaping="yes" select="$xhtml11-url"/>/<xsl:value-of disable-output-escaping="yes" select="$xhtml11-link"/></li>
+          <li class="link"><xsl:value-of disable-output-escaping="yes" select="$cms-url"/>/<xsl:value-of disable-output-escaping="yes" select="$cms-link"/></li>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
       </div>

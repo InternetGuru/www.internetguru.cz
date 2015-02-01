@@ -14,6 +14,12 @@
   <xsl:param name="cms-respid" select="''"/>
   <xsl:param name="cms-ctime" select="''"/>
   <xsl:param name="cms-mtime" select="''"/>
+  <xsl:param name="cms-version" select="''"/>
+  <xsl:param name="cms-desc" select="''"/>
+  <xsl:param name="cms-kw" select="''"/>
+  <xsl:param name="cms-url" select="''"/>
+  <xsl:param name="cms-link" select="''"/>
+  <xsl:param name="cms-domain" select="''"/>
 
   <xsl:param name="contentlink-lang" select="''"/>
   <xsl:param name="contentlink-author" select="''"/>
@@ -23,11 +29,6 @@
   <xsl:param name="contentlink-ctime" select="''"/>
   <xsl:param name="contentlink-mtime" select="''"/>
 
-  <xsl:param name="cms-version" select="''"/>
-  <xsl:param name="cms-desc" select="''"/>
-  <xsl:param name="cms-kw" select="''"/>
-  <xsl:param name="xhtml11-url" select="''"/>
-  <xsl:param name="xhtml11-link" select="''"/>
   <xsl:param name="inputvar-myctime" select="''"/>
   <xsl:param name="inputvar-mymtime" select="''"/>
   <xsl:param name="inputvar-creation" select="''"/>
