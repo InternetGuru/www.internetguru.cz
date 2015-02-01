@@ -43,6 +43,7 @@ class ContactForm extends Plugin implements SplObserver {
           continue;
         }
         $vars = array_merge(Cms::getAllVariables(), $this->formValues);
+        $vars["form_id"] = $formId;
         foreach($this->formVars as $k => $v) {
           $this->formVars[$k] = replaceVariables($v, $vars);
         }

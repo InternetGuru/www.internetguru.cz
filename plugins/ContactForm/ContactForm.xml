@@ -10,7 +10,7 @@
   <var id="servername" modifyonly="modifyonly"></var> <!-- nepovinný název společnosti -->
   <var id="bcc" modifyonly="modifyonly"></var> <!-- nepovinná adresa skryté kopie zprávy -->
   <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána!</var>
-  <var id="subject" modifyonly="modifyonly">Nová zpráva z webu $cms-domain od $email</var>
+  <var id="subject" modifyonly="modifyonly">Zpráva z $cms-domain od $email (formulář $form_id)</var>
   <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z $cms-domain:</var>
   <var id="nothing" modifyonly="modifyonly">[nevyplněno]</var>
 
@@ -27,7 +27,7 @@
   <!--
     Specifické proměnné konkrétního formuláře upravující výchozí hodnoty elementů var
     ^^^^
-    Atributy elementu form
+    Volitelné atributy elementu form
       secret
       adminaddr
       adminname
@@ -36,12 +36,16 @@
       subject
       copymsg
 
-    Proměnné z formuláře pro (1) odpovědět (reply-to), (2) poslání kopie zprávy uživateli
+
+    Použití proměnných
+      (1) pro odpověď na zprávu (reply-to),
+      (2) poslání kopie zprávy uživateli,
+      (3) použití kdekoli v textu zápisem $[globální_proměnná], $[atribut_name] nebo $form_id
     ^^^^
     Hodnoty atritubu name elementu input:
-      email    : e-mailová adresa uživatele (volitelné)
+      email    : e-mailová adresa uživatele (povinné pro (1) a (2), jinak volitelné)
       name     : jméno uživatele (volitelné)
-      sendcopy : možnost odeslání kopie na adresu uživatele (volitelné)
+      sendcopy : možnost odeslání kopie na adresu uživatele (povinné pro (2), jinak volitelné)
 
     Pravidla kontroly vstupů
     ^^^^
