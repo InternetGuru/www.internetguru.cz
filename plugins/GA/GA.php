@@ -16,7 +16,7 @@ class GA extends Plugin implements SplObserver {
 
   private function init() {
     $ga_id = $this->getDOMPlus()->getElementById("ga_id");
-    if(is_null($ga_id)) {
+    if(!strlen($ga_id->nodeValue)) {
       $ga_id = $this->getDOMPlus()->getElementById(getDomain());
     }
     if(is_null($ga_id)) {

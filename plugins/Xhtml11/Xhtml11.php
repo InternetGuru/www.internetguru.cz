@@ -439,7 +439,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function appendCdata(DOMElement $appendTo, $text) {
     if(!strlen($text)) return;
-    $cm = $appendTo->ownerDocument->createTextNode("\n//");
+    $cm = $appendTo->ownerDocument->createTextNode("//");
     if(strpos($text, "\n") !== 0) $text = "\n$text";
     $ct = $appendTo->ownerDocument->createCDATASection("$text\n//");
     $appendTo->appendChild($cm);
