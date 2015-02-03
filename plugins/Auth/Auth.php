@@ -11,10 +11,14 @@ class Auth extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
-    $this->handleRequest();
     if(IS_LOCALHOST) {
       Cms::setVariable("logged_user", "localhost");
       return;
+    } elseif(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER["REMOTE_ADDR"] == "46.28.109.142") {
+      Cms::setVariable("logged_user", "server");
+      return;
+    } else {
+      $this->handleRequest();
     }
     if(!is_null($this->loggedUser)) {
       if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
@@ -26,7 +30,6 @@ class Auth extends Plugin implements SplObserver {
   }
 
   private function handleRequest() {
-    if(IS_LOCALHOST) return;
     $cfg = $this->getDOMPlus();
     $url = getCurLink(true);
     $access = true;
