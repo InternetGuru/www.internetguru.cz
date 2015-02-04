@@ -80,9 +80,9 @@ class Agregator extends Plugin implements SplObserver {
         $li = $ol->appendChild($doc->createElement("li"));
         $a = $li->appendChild($doc->createElement("a"));
         $href = $subDir == "" ? $f : "$subDir/$f";
-        $a->setAttribute("href", $href);
+        $a->setAttribute("href", getRoot().$href);
         $o = $a->appendChild($doc->createElement("object"));
-        $o->setAttribute("data", "$href?thumb");
+        $o->setAttribute("data", getRoot()."$href?thumb");
         $o->setAttribute("type", $mime);
         $o->nodeValue = $href;
         $found = true;
@@ -102,7 +102,7 @@ class Agregator extends Plugin implements SplObserver {
         $li = $ol->appendChild($doc->createElement("li"));
         $a = $li->appendChild($doc->createElement("a"));
         $href = $subDir == "" ? $f : "$subDir/$f";
-        $a->setAttribute("href", $href);
+        $a->setAttribute("href", getRoot().$href);
         $a->nodeValue = $href;
       }
       Cms::setVariable("files".($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)), $root);
