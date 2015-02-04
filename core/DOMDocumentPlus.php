@@ -103,7 +103,10 @@ class DOMDocumentPlus extends DOMDocument {
     while(strpos($path, ".") === 0) $path = substr($path, 1);
     if(IS_LOCALHOST && strpos($path, substr(getRoot(), 0, -1)) === 0)
       $path = substr($path, strlen(getRoot())-1);
-    while(strpos($path, "/") === 0) $path = substr($path, 1);
+    if(strpos($path, "/") === 0) {
+      while(strpos($path, "/") === 0) $path = substr($path, 1);
+      $path = getRoot().$path;
+    }
     return $path.$query;
   }
 
