@@ -102,8 +102,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->validateLinks("a", "href", true);
     $contentPlus->validateLinks("form", "action", true);
     $contentPlus->validateLinks("object", "data", true);
-    $contentPlus->fragToLinks(Cms::getContentFull(), "a", "href");
-    $contentPlus->fragToLinks(Cms::getContentFull(), "form", "action");
+    $this->fragToLinks($contentPlus, Cms::getContentFull(), "a", "href");
+    $this->fragToLinks($contentPlus, Cms::getContentFull(), "form", "action");
+    $this->fragToLinks($contentPlus, Cms::getContentFull(), "object", "data");
 
     // check object.data mime/size
     $this->validateImages($contentPlus);
@@ -116,6 +117,52 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump($doc->schemaValidate(CMS_FOLDER."/".self::DTD_FILE));
     $this->validateEmptyContent($doc);
     return $doc->saveXML();
+  }
+
+  private function fragToLinks(DOMDocumentPlus $doc, HTMLPlus $src, $eName="a", $aName="href") {
+    $toStrip = array();
+    foreach($doc->getElementsByTagName($eName) as $a) {
+      if(!$a->hasAttribute($aName)) continue; // no link found
+      $pLink = parse_url($a->getAttribute($aName));
+      if(isset($pLink["scheme"])) continue; // link is absolute (suppose internal)
+      $query = isset($pLink["query"]) ? $pLink["query"] : "";
+      $queryUrl = strlen($query) ? "?$query" : "";
+      if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
+        $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
+        if($path == "/") $path = "";
+        if(strlen($path) && !DOMBuilder::isLink($path)) {
+          if(is_file(FILES_FOLDER.$path) || is_file(FILES_FOLDER."/".$path)) {
+            if(strpos($path, "/") === 0) $path = substr($path, 1);
+            $a->setAttribute($aName, getRoot().$path.$queryUrl); // add root
+            continue; // link to file
+          }
+          $toStrip[] = array($a, sprintf(_("Link '%s' not found within existing links or files"), $path));
+          continue; // link not exists
+        }
+        if($eName != "form" && getCurLink(true) == $path.$queryUrl) {
+          $toStrip[] = array($a, _("Cyclic link found"));
+          continue; // link is cyclic (except form@action)
+        }
+        $a->setAttribute($aName, getRoot().$path.$queryUrl);
+        continue; // localize link
+      }
+      $frag = $pLink["fragment"];
+      $linkedElement = $doc->getElementById($frag);
+      if(!is_null($linkedElement)) {
+        $h1id = $doc->getElementsByTagName("h1")->item(0)->getAttribute("id");
+        if(getCurLink(true) == getCurLink().$queryUrl && $h1id == $frag) {
+          $toStrip[] = array($a, _("Cyclic fragment found"));
+        }
+        continue; // ignore visible headings
+      }
+      $link = DOMBuilder::getLink($frag);
+      if(is_null($link)) {
+        $toStrip[] = array($a, sprintf(_("Identifier '%s' not found"), $frag));
+        continue; // id not exists
+      }
+      $a->setAttribute($aName, $link);
+    }
+    foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
 
   private function validateImages(DOMDocumentPlus $dom) {

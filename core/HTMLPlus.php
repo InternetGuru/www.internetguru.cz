@@ -186,6 +186,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHLink($repair);
     $this->validateLinks("a", "href", $repair);
     $this->validateLinks("form", "action", $repair);
+    $this->validateLinks("object", "data", $repair);
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->validateFirstHeadingAuthor($repair);

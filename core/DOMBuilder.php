@@ -38,6 +38,11 @@ class DOMBuilder {
     return getRoot().$link;
   }
 
+  public static function getRootHeadingId() {
+    reset(self::$idToLink);
+    return key(self::$idToLink);
+  }
+
   public static function getLinks() {
     return array_keys(self::$linkToId);
   }

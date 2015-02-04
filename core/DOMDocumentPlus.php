@@ -101,55 +101,9 @@ class DOMDocumentPlus extends DOMDocument {
     if(isset($pLink["fragment"])) return $query."#".$pLink["fragment"];
     $path = isset($pLink["path"]) ? $pLink["path"] : "";
     while(strpos($path, ".") === 0) $path = substr($path, 1);
-    if(IS_LOCALHOST && strpos($path, substr(getRoot(), 0, -1)) === 0)
+    if(IS_LOCALHOST && strpos($path, getRoot()) === 0)
       $path = substr($path, strlen(getRoot())-1);
-    if(strpos($path, "/") === 0) {
-      while(strpos($path, "/") === 0) $path = substr($path, 1);
-      $path = getRoot().$path;
-    }
     return $path.$query;
-  }
-
-  public function fragToLinks(HTMLPlus $src, $eName="a", $aName="href") {
-    $toStrip = array();
-    foreach($this->getElementsByTagName($eName) as $a) {
-      if(!$a->hasAttribute($aName)) continue; // no link found
-      if(is_file(FILES_FOLDER."/".$a->getAttribute($aName))) continue;
-      $pLink = parse_url($a->getAttribute($aName));
-      if(isset($pLink["scheme"])) continue; // link is absolute (suppose internal)
-      $query = isset($pLink["query"]) ? $pLink["query"] : "";
-      $queryUrl = strlen($query) ? "?$query" : "";
-      if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
-        $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
-        if($path == "/") $path = "";
-        if(strlen($path) && !DOMBuilder::isLink($path)) {
-          $toStrip[] = array($a, sprintf(_("Link '%s' not found"), $path));
-          continue; // link not exists
-        }
-        if($eName != "form" && getCurLink(true) == $path.$queryUrl) {
-          $toStrip[] = array($a, _("Cyclic link found"));
-          continue; // link is cyclic (except form@action)
-        }
-        $a->setAttribute($aName, getRoot().$path.$queryUrl);
-        continue; // localize link
-      }
-      $frag = $pLink["fragment"];
-      $linkedElement = $this->getElementById($frag);
-      if(!is_null($linkedElement)) {
-        $h1id = $this->getElementsByTagName("h1")->item(0)->getAttribute("id");
-        if(getCurLink(true) == getCurLink().$queryUrl && $h1id == $frag) {
-          $toStrip[] = array($a, _("Cyclic fragment found"));
-        }
-        continue; // ignore visible headings
-      }
-      $link = DOMBuilder::getLink($frag);
-      if(is_null($link)) {
-        $toStrip[] = array($a, sprintf(_("Identifier '%s' not found"), $frag));
-        continue; // id not exists
-      }
-      $a->setAttribute($aName, $link);
-    }
-    foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
 
   public function removeNodes($query) {
