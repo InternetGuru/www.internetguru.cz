@@ -1,4 +1,7 @@
-0.4.4 2015-01-22
+0.4.4 2015-02-05
+FileHandler: přidána podpora mezipaměti (cache) u souborů (80502d9)
+ContactForm: přidána možnost slepé kopie (BCC) (965aff7)
+Deaktivace mezipaměti prohlížeče (cache) u nestabilních verzí (6825f46)
 ContentLink: podpora loga v drobečkové navigaci (84d40db)
 ContactForm: nové rozšíření (fca6f8e)
 DomBuilder: nový atribut XML souborů modifyonly (005db62)
