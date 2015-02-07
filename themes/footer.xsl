@@ -49,7 +49,7 @@
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
           <li><xsl:value-of disable-output-escaping="yes" select="$copy"/> <xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
-          <li>Na službě: <a href='http://www.ezakladna.cz'>E-Základna</a></li>
+          <li>Na službě: <a href='https://www.ezakladna.cz'>E-Základna</a></li>
           <xsl:if test="not($cms-resp = '')">
             <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
           </xsl:if>
