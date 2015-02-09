@@ -1,3 +1,6 @@
+0.4.5 2015-02-09
+Auth: přidána možnost zaheslování celého webu pomocí znaku / (6ff6ca1)
+
 0.4.4 2015-02-05
 FileHandler: přidána podpora mezipaměti (cache) u souborů (80502d9)
 ContactForm: přidána možnost slepé kopie (BCC) (965aff7)

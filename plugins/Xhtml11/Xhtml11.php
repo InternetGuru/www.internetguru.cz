@@ -123,8 +123,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $toStrip = array();
     foreach($doc->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
-      $pLink = parse_url($a->getAttribute($aName));
-      if(isset($pLink["scheme"])) continue; // link is absolute (suppose internal)
+      $link = $a->getAttribute($aName);
+      $pLink = parse_url($link);
+      if(trimLink($link) == $link && isset($pLink["host"])) continue;
       $query = isset($pLink["query"]) ? $pLink["query"] : "";
       $queryUrl = strlen($query) ? "?$query" : "";
       if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
