@@ -139,13 +139,9 @@ class Agregator extends Plugin implements SplObserver {
           new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
           continue;
         }
-        if(!$html->hasAttribute("wrapper")) {
-          new Logger(_("Configuration element html missing attribute wrapper"), Logger::LOGGER_WARNING);
-          continue;
-        }
         try {
           $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-          $vValue = $this->getDOM($ctime, $html->childElements, $html->getAttribute("wrapper"), $subDir);
+          $vValue = $this->getDOM($ctime, $html->childElements, $subDir);
           Cms::setVariable($vName, $vValue);
         } catch(Exception $e) {
           new Logger($e->getMessage(), Logger::LOGGER_WARNING);
@@ -155,10 +151,9 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function getDOM(Array $htmlOrder, DOMNodeList $items, $wrapper, $subDir) {
+  private function getDOM(Array $htmlOrder, DOMNodeList $items, $subDir) {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
-    $list = $root->appendChild($doc->createElement($wrapper));
 
     $patterns = array();
     foreach($items as $item) {
@@ -180,7 +175,7 @@ class Agregator extends Plugin implements SplObserver {
         $vars = $this->getHTMLVariables($htmlPlus);
         $p = $this->replaceVariables($p, $vars);
         if(is_null($p)) continue;
-        $item = $list->appendChild($doc->importNode($p, true));
+        $item = $root->appendChild($doc->importNode($p, true));
       }
     }
     #$doc = Cms::processVariables($doc);
