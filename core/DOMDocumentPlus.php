@@ -74,7 +74,8 @@ class DOMDocumentPlus extends DOMDocument {
     foreach($this->getElementsByTagName($elName) as $e) {
       if(!$e->hasAttribute($attName)) continue;
       try {
-        $link = $this->repairLink($e->getAttribute($attName));
+        $link = trimLink($e->getAttribute($attName));
+        if($link == "") $link = "/";
         if($link === $e->getAttribute($attName)) continue;
         if(!$repair)
           throw new Exception(sprintf(_("Invalid repairable link '%s'"), $e->getAttribute($attName)));
@@ -86,24 +87,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
     foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
     return count($toStrip);
-  }
-
-  private function repairLink($link=null) {
-    if(is_null($link)) $link = getCurLink(); // null -> currentLink
-    if($link == "" || $link == "/") return "/";
-    $pLink = parse_url($link);
-    if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
-    if(isset($pLink["scheme"])) { // link is in absolute form
-      $curDomain = $_SERVER["REQUEST_SCHEME"]."://".$_SERVER["HTTP_HOST"].getRoot();
-      if(strpos(str_replace(array("?", "#"), array("/", "/"), $link), $curDomain) !== 0) return $link; // link is external
-    }
-    $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
-    if(isset($pLink["fragment"])) return $query."#".$pLink["fragment"];
-    $path = isset($pLink["path"]) ? $pLink["path"] : "";
-    while(strpos($path, ".") === 0) $path = substr($path, 1);
-    if(IS_LOCALHOST && strpos($path, getRoot()) === 0)
-      $path = substr($path, strlen(getRoot())-1);
-    return $path.$query;
   }
 
   public function removeNodes($query) {

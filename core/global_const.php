@@ -111,6 +111,19 @@ function getRoot() {
   return "/";
 }
 
+function trimLink($link) {
+  $pLink = parse_url($link);
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
+  if(!isset($pLink["scheme"]) && !isset($pLink["host"])) return $link; // link is relative
+  if(isset($pLink["scheme"]) && $pLink["scheme"] != $_SERVER["REQUEST_SCHEME"]) return $link; // different scheme
+  if($pLink["host"] != CURRENT_SUBDOM_DIR.".".getDomain()) return $link; // different host
+  $link = "";
+  if(isset($pLink["path"])) $link = $pLink["path"];
+  if(isset($pLink["query"])) $link .= "?".$pLink["query"];
+  if(isset($pLink["fragment"])) $link .= "#".$pLink["fragment"];
+  return $link;
+}
+
 function getUrl($schema=true) {
   $domain = $_SERVER["HTTP_HOST"];
   if($schema) $domain = $_SERVER["REQUEST_SCHEME"]."://".$domain;

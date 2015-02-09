@@ -335,7 +335,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     // versions
     $current = $this->getSubdomVar("CMS_VER", $subdom);
     if(!is_null($current)) {
-      $vars["linkHref"] = "http://$subdom.".getDomain();
+      if($subdom == CURRENT_SUBDOM_DIR) $vars["linkHref"] = "/";
+      else $vars["linkHref"] = "http://$subdom.".getDomain();
       $vars["version"] = "$current/".$this->cmsVersions[$current];
       $vars["CMS_VER"] = "CMS_VER.$current";
     } else $current = CMS_BEST_RELEASE;
