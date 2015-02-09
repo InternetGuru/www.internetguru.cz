@@ -159,8 +159,8 @@ class Agregator extends Plugin implements SplObserver {
     foreach($items as $item) {
       if($item->nodeName != "item") continue;
       if($item->hasAttribute("since"))
-        $patterns[$item->getAttribute("since")-1] = $item->childElements;
-      else $patterns[] = $item->childElements;
+        $patterns[$item->getAttribute("since")-1] = $item;
+      else $patterns[] = $item;
     }
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
@@ -170,15 +170,11 @@ class Agregator extends Plugin implements SplObserver {
       if(is_null($htmlPlus)) continue;
       $i++;
       if(isset($patterns[$i])) $pattern = $patterns[$i];
-      if(is_null($pattern) || !$pattern->length) continue;
-      foreach($pattern as $p) {
-        $vars = $this->getHTMLVariables($htmlPlus);
-        $p = $this->replaceVariables($p, $vars);
-        if(is_null($p)) continue;
-        $item = $root->appendChild($doc->importNode($p, true));
-      }
+      if(is_null($pattern) || !$pattern->childNodes->length) continue;
+      $item = $this->replaceVariables($pattern, $this->getHTMLVariables($htmlPlus));
+      $item = $root->appendChild($doc->importNode($item, true));
+      $item->stripTag();
     }
-    #$doc = Cms::processVariables($doc);
     return $doc->documentElement;
   }
 
