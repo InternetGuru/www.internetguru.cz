@@ -27,8 +27,8 @@ class Agregator extends Plugin implements SplObserver {
 
   private function insertContent() {
     if(!array_key_exists(getCurLink(), $this->links)) return;
-    $subDir = dirname(substr($this->links[getCurLink()]
-      , strlen(USER_FOLDER."/".$this->getDir()) + 1));
+    $subDir = dirname(substr($this->links[getCurLink()],
+      strlen(USER_FOLDER."/".$this->getDir()) + 1));
     if($subDir == ".") $subDir = "";
     $fName = basename($this->links[getCurLink()]);
     $doc = $this->html[$subDir][$fName];
@@ -117,7 +117,8 @@ class Agregator extends Plugin implements SplObserver {
       foreach($this->html[$subDir] as $f => $null) {
         if(pathinfo($f, PATHINFO_EXTENSION) != "html") continue;
         try {
-          $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir == "" ? null : $subDir);
+          $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f");
+          #$doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir == "" ? null : $subDir);
         } catch(Exception $e) {
           continue;
           #new Logger(sprintf(_("Agregator skipped file '%s'"), "$subDir/$f"), Logger::LOGGER_WARNING);
@@ -126,7 +127,7 @@ class Agregator extends Plugin implements SplObserver {
         $vars[$subDir][$f] = $this->getHTMLVariables($doc);
         foreach($doc->getElementsByTagName("h") as $h) {
           if(!$h->hasAttribute("link")) continue;
-          $this->links[$h->getAttribute("link")] = "$workingDir/$f";
+          $this->links[$h->getAttribute("link")] = $f; #"$workingDir/$f";
         }
       }
       if(!array_key_exists($subDir, $vars)) continue;
