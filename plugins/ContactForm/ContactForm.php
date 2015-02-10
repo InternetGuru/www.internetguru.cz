@@ -57,9 +57,9 @@ class ContactForm extends Plugin implements SplObserver {
         $this->finishForm($htmlForm, true);
         $message = "<a href='#".$htmlForm->getAttribute("id")."'>"
           .sprintf(_("Unable to send form: %s"), $e->getMessage())."</a>";
-        Cms::addMessage($message, Cms::MSG_WARNING);
+        Cms::addMessage($message, Cms::MSG_ERROR);
         foreach($this->errors as $itemId => $message) {
-          Cms::addMessage(sprintf("<label for='%s'>%s</label>", $itemId, $message), Cms::MSG_WARNING);
+          Cms::addMessage(sprintf("<label for='%s'>%s</label>", $itemId, $message), Cms::MSG_ERROR);
         }
       }
     }

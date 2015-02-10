@@ -10,9 +10,10 @@ class Cms {
   private static $forceFlash = false;
   private static $flashList = null;
   const DEBUG = false;
-  const MSG_WARNING = "warning";
-  const MSG_INFO = "info";
-  const MSG_SUCCESS = "success";
+  const MSG_ERROR = "Error";
+  const MSG_WARNING = "Warning";
+  const MSG_INFO = "Info";
+  const MSG_SUCCESS = "Success";
 
   public static function isForceFlash() {
     return self::$forceFlash;
@@ -50,11 +51,11 @@ class Cms {
     self::setVariable("messages", self::$flashList);
   }
 
-  private static function addFlashItem($message, $type, $class) {
-    if(!is_null(self::getVariable("auth-logged_user"))) $message = "$class: $message";
+  private static function addFlashItem($message, $type) {
+    if(!is_null(self::getVariable("auth-logged_user"))) $message = "$type: $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
-    $li->setAttribute("class", "$class $type");
+    $li->setAttribute("class", strtolower($type));
     $li->setAttribute("var", "message");
     $li->processVariables(array("message" => $message));
   }
@@ -62,8 +63,8 @@ class Cms {
   private static function getMessages() {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
     if(is_null(self::$flashList)) self::createFlashList();
-    foreach($_SESSION["cms"]["flash"] as $class => $item) {
-      foreach($item as $i) self::addFlashItem($i[0], $i[1], $class);
+    foreach($_SESSION["cms"]["flash"] as $type => $item) {
+      foreach($item as $i) self::addFlashItem($i, $type);
     }
     $_SESSION["cms"]["flash"] = array();
   }
@@ -131,24 +132,16 @@ class Cms {
   }
 
   public static function addMessage($message, $type, $flash = false) {
-    $caller = self::getCallerClass();
-    if(!in_array($type, array(self::MSG_WARNING, self::MSG_INFO, self::MSG_SUCCESS))) $type = self::MSG_INFO;
     if(!$flash && self::$forceFlash) {
       new Logger(_("Adding message after output - forcing flash"), Logger::LOGGER_WARNING);
       $flash = true;
     }
     if($flash) {
-      $_SESSION["cms"]["flash"][$caller][] = array($message, $type);
+      $_SESSION["cms"]["flash"][$type][] = $message;
       return;
     }
     if(is_null(self::$flashList)) self::createFlashList();
-    self::addFlashItem($message, $type, $caller);
-  }
-
-  private static function getCallerClass() {
-    $callers = debug_backtrace();
-    if(isset($callers[2]['class'])) return $callers[2]['class'];
-    return "unknown";
+    self::addFlashItem($message, $type);
   }
 
   public static function getVariable($name) {

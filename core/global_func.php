@@ -20,6 +20,7 @@ function redirTo($link, $code=null, $force=false) {
     if($curLink == $absLink)
       throw new LoggerException(sprintf(_("Cyclic redirection to '%s'"), $link));
   }
+  http_response_code(is_null($code) ? 302 : $code);
   if(class_exists("Logger"))
     new Logger(sprintf(_("Redirecting to '%s' with status code %s"), $link, (is_null($code) ? 302 : $code)));
   if(is_null($code) || !is_numeric($code)) {

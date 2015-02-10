@@ -49,10 +49,10 @@ try {
     echo $out;
   } else {
     header("HTTP/1.1 304 Not Modified");
-    new Logger(_("Page not modified"), Logger::LOGGER_INFO);
+    http_response_code(304);
   }
 
-  new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time);
+  new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time, false);
 
 } catch(Exception $e) {
 

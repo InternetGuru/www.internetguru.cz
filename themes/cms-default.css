@@ -92,6 +92,8 @@ p object {
 }
 #messages li {
   margin: 0.5em 0;
+  color: #fff;
+  padding: 0.5em;
 }
 #messages > span,
 #messages a,
@@ -99,20 +101,16 @@ p object {
   color: #ccc;
 }
 #messages li.warning {
-  /*background: rgb(255, 45, 45);*/
+  background: rgb(131, 114, 0);
+}
+#messages li.error {
   background: rgb(187, 33, 33);
-  color: #fff;
-  padding: 0.5em;
 }
 #messages li.success {
   background: rgb(53, 144, 61);
-  color: #fff;
-  padding: 0.5em;
 }
-#messages li.warning a,
-#messages li.success a,
-#messages li.warning label,
-#messages li.success label {
+#messages li a,
+#messages li label {
   color: white;
   text-decoration: underline;
   cursor: pointer;

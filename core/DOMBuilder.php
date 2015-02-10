@@ -181,7 +181,7 @@ class DOMBuilder {
       // register links/ids; repair if duplicit
       self::registerKeys($doc);
     } catch(Exception $e) {
-      new Logger(sprintf(_("HTML+ file %s duplicit keys renamed: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+      new Logger(sprintf(_("Duplicit id/link found in %s: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
     }
     // HTML+ include
     self::insertIncludes($doc, $filePath);

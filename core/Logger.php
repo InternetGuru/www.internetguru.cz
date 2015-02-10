@@ -4,12 +4,12 @@ class Logger {
   private $message;
   private $type;
   private $duration = null;
-  const LOGGER_FATAL = "fatal";
-  const LOGGER_ERROR = "error";
-  const LOGGER_WARNING = "warning";
-  const LOGGER_INFO = "info";
+  const LOGGER_FATAL = "Fatal";
+  const LOGGER_ERROR = "Error";
+  const LOGGER_WARNING = "Warning";
+  const LOGGER_INFO = "Info";
 
-  function __construct($message, $type=null, $start_time=null) {
+  function __construct($message, $type=null, $start_time=null, $cmsMsg = true) {
     if(!is_null($start_time))
       $this->duration = round((microtime(true) - $start_time)*1000)."ms";
     if(!is_dir(LOG_FOLDER) && !mkdir(LOG_FOLDER, 0755, true))
@@ -19,9 +19,8 @@ class Logger {
       self::LOGGER_ERROR,
       self::LOGGER_WARNING,
       self::LOGGER_INFO))) $type = self::LOGGER_INFO;
-    if(!is_null(Cms::getVariable("auth-logged_user")) && $type != self::LOGGER_INFO) {
-      Cms::addMessage("$message [".$this->getCaller().":$type]",
-        Cms::MSG_INFO, Cms::isForceFlash());
+    if(!is_null(Cms::getVariable("auth-logged_user")) && $cmsMsg) {
+      Cms::addMessage("$message [".$this->getCaller()."]", $type, Cms::isForceFlash());
     }
     $this->message = $message;
     $this->type = $type;

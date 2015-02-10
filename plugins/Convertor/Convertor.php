@@ -29,7 +29,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     }
     if(strlen($_GET[get_class($this)])) $this->processImport($_GET[get_class($this)]);
     elseif(substr(getCurLink(true), -1) == "=") {
-      Cms::addMessage(_("File URL cannot be empty"), Cms::MSG_WARNING);
+      Cms::addMessage(_("File URL cannot be empty"), Cms::MSG_ERROR);
     }
     $this->getImportedFiles();
   }
@@ -45,7 +45,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     try {
       $f = $this->getFile($fileUrl);
     } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
+      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
       $this->error = true;
       return;
     }
@@ -60,7 +60,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->file = $f;
       break;
       default:
-      Cms::addMessage(sprintf(_("Unsupported file MIME type '%s'"), $mime), Cms::MSG_WARNING);
+      Cms::addMessage(sprintf(_("Unsupported file MIME type '%s'"), $mime), Cms::MSG_ERROR);
       $this->error = true;
     }
   }
@@ -80,7 +80,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $doc->loadXML($xml);
     if(is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h") {
-      Cms::addMessage(_("Unable to import document; probably missing heading"), Cms::MSG_WARNING);
+      Cms::addMessage(_("Unable to import document; probably missing heading"), Cms::MSG_ERROR);
       return;
     }
     try {
@@ -92,7 +92,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     try {
       $doc->validatePlus(true);
     } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING);
+      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
       Cms::addMessage(_("Use @ to specify short/link attributes for heading"), Cms::MSG_INFO);
       Cms::addMessage(_("Eg. This Is Long Heading @ Short Heading"), Cms::MSG_INFO);
       Cms::addMessage(_("Use @ to specify kw attribute for description"), Cms::MSG_INFO);
@@ -173,9 +173,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       }
     } else $headers = @get_headers($url);
     if(strpos($headers[0], '302') !== false)
-      throw new Exception(sprintf(_("Destination URL '%s' is unaccessible; must be shared publically"), $url));
+      throw new Exception(_("Destination URL is unaccessible; must be shared publically"));
     elseif(strpos($headers[0], '200') === false)
-      throw new Exception(sprintf(_("Destination URL '%s' error: %s"), $url, $headers[0]));
+      throw new Exception(sprintf(_("Destination URL error: %s"), $headers[0]));
     $data = file_get_contents($url);
     $filename = $this->get_real_filename($http_response_header, $url);
     file_put_contents($this->tmpFolder."/$filename", $data);

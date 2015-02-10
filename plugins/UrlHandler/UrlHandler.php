@@ -79,7 +79,7 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function redirTo($link, $code) {
-    new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $link), "info");
+    #new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $link), "info");
     if(self::DEBUG) die("Redirecting to $link");
     redirTo(getRoot().$link, $code);
   }

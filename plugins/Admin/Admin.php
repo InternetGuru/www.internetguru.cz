@@ -49,7 +49,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if($this->contentChanged) {
         $this->savePost();
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
-        throw new Exception(_("No changes made"));
+        throw new Exception(_("No changes made"), 1);
       }
       if($this->isToEnable()) $this->enableDataFile();
       elseif($this->isToDisable()) $this->disableDataFile();
@@ -58,7 +58,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         Cms::addMessage(_("File status successfully changed"), Cms::MSG_SUCCESS, $this->redir);
       }
     } catch (Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_WARNING, $this->redir);
+      if($e->getCode() === 1) $type = Cms::MSG_INFO;
+      else $type = Cms::MSG_ERROR;
+      Cms::addMessage($e->getMessage(), $type, $this->redir);
       return;
     }
     if($this->redir) $this->redir($this->defaultFile);
