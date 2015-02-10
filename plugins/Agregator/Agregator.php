@@ -6,6 +6,7 @@ class Agregator extends Plugin implements SplObserver {
   private $html = array();  // filePath => HTMLPlus
   private $files = array();  // filePath => fileInfo(?)
   private $cfg;
+  private static $sortKey;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -110,9 +111,9 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function createHtmlVar($rootDir) {
+    $vars = array();
     foreach($this->html as $subDir => $null) {
       $workingDir = ($subDir == "" ? $rootDir : "$rootDir/$subDir");
-      $ctime = array();
       foreach($this->html[$subDir] as $f => $null) {
         if(pathinfo($f, PATHINFO_EXTENSION) != "html") continue;
         try {
@@ -122,26 +123,34 @@ class Agregator extends Plugin implements SplObserver {
           #new Logger(sprintf(_("Agregator skipped file '%s'"), "$subDir/$f"), Logger::LOGGER_WARNING);
         }
         $this->html[$subDir][$f] = $doc;
-        $ctime[$subDir][$f] = $doc->documentElement->firstElement->getAttribute("ctime");
+        $vars[$subDir][$f] = $this->getHTMLVariables($doc);
         foreach($doc->getElementsByTagName("h") as $h) {
           if(!$h->hasAttribute("link")) continue;
           $this->links[$h->getAttribute("link")] = "$workingDir/$f";
         }
       }
-      if(empty($ctime)) continue;
-      foreach($ctime as $s => $a) {
-        stableSort($a);
-        $ctime[$s] = array_reverse($a);
-      }
+      if(!array_key_exists($subDir, $vars)) continue;
       foreach($this->cfg->documentElement->childElements as $html) {
         if($html->nodeName != "html") continue;
         if(!$html->hasAttribute("id")) {
           new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
           continue;
         }
+        self::$sortKey = "ctime";
+        if($html->hasAttribute("sort") || $html->hasAttribute("rsort")) {
+          $reverse = $html->hasAttribute("rsort");
+          $userKey = $html->hasAttribute("sort") ? $html->getAttribute("sort") : $html->getAttribute("rsort");
+          if(!array_key_exists($userKey, current($vars[$subDir]))) {
+            new Logger(sprintf(_("Sort variable %s not found; using default ctime"), $userKey), Logger::LOGGER_WARNING);
+          } else {
+            self::$sortKey = $userKey;
+          }
+        } else $reverse = true;
+        uasort($vars[$subDir], array("Agregator", "cmp"));
+        if($reverse) $vars[$subDir] = array_reverse($vars[$subDir]);
         try {
           $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-          $vValue = $this->getDOM($ctime, $html->childElements, $subDir);
+          $vValue = $this->getDOM($vars[$subDir], $html->childElements, $subDir);
           Cms::setVariable($vName, $vValue);
         } catch(Exception $e) {
           new Logger($e->getMessage(), Logger::LOGGER_WARNING);
@@ -151,7 +160,12 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function getDOM(Array $htmlOrder, DOMNodeList $items, $subDir) {
+  private static function cmp($a, $b) {
+    if($a[self::$sortKey] == $b[self::$sortKey]) return 0;
+    return ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
+  }
+
+  private function getDOM(Array $vars, DOMNodeList $items, $subDir) {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
 
@@ -165,13 +179,13 @@ class Agregator extends Plugin implements SplObserver {
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
     $pattern = null;
-    foreach($htmlOrder[$subDir] as $k => $null) {
+    foreach($vars as $k => $v) {
       $htmlPlus = $this->html[$subDir][$k];
       if(is_null($htmlPlus)) continue;
       $i++;
       if(isset($patterns[$i])) $pattern = $patterns[$i];
       if(is_null($pattern) || !$pattern->childNodes->length) continue;
-      $item = $this->replaceVariables($pattern, $this->getHTMLVariables($htmlPlus));
+      $item = $this->replaceVariables($pattern, $v);
       $item = $root->appendChild($doc->importNode($item, true));
       $item->stripTag();
     }

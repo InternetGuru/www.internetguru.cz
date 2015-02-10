@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Agregator>
+  <!--
 
-  <!-- HTML: heading, link, ns, author, authorid, resp, respid, ctime, mtime, short, desc, kw -->
+    Dostupné proměnné:
+      heading, link, ns, author, authorid, resp, respid, ctime, mtime, short, desc, kw
+
+    Atributy elementu html:
+      id (povinné)
+      sort | rsort (reverzní) s hodnotou dostupné proměnné
+
+  -->
   <html id="html">
-    <item><li><a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</li></item>
+    <item><li><a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformatcs" var="ctime">n/a</em></li></item>
   </html>
   <html id="htmltop">
     <item>
