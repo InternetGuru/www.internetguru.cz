@@ -49,27 +49,26 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
     $doc = $imp->createDocument(null, null, $dtd);
     $doc->encoding="utf-8";
+    $h1 = $content->documentElement->firstElement;
+    $lang = $content->documentElement->getAttribute("xml:lang");
 
     // add root element
     $html = $doc->createElement("html");
     $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-    $html->setAttribute("xml:lang", Cms::getVariable("cms-lang"));
-    $html->setAttribute("lang", Cms::getVariable("cms-lang"));
+    $html->setAttribute("xml:lang", $lang);
+    $html->setAttribute("lang", $lang);
     $doc->appendChild($html);
 
     // add head element
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title", $this->getTitle($content)));
+    $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
     $this->appendMeta($head, "Content-Type", "text/html; charset=utf-8");
     $this->appendMeta($head, "viewport", "initial-scale=1");
-    $this->appendMeta($head, "Content-Language", Cms::getVariable("cms-lang"));
+    $this->appendMeta($head, "Content-Language", $lang);
     $this->appendMeta($head, "generator", Cms::getVariable("cms-name"));
-    $author = Cms::getVariable("cms-author");
-    if(strlen($author)) $this->appendMeta($head, "author", $author);
-    $desc = Cms::getVariable("cms-desc");
-    if(strlen($desc)) $this->appendMeta($head, "description", $desc);
-    $kw = Cms::getVariable("cms-kw");
-    if(strlen($kw)) $this->appendMeta($head, "keywords", $kw);
+    $this->appendMeta($head, "author", $h1->getAttribute("author"));
+    $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
+    $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
     $this->appendJsFiles($head);
@@ -235,8 +234,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
   */
 
-  private function getTitle(HTMLPlus $content) {
-    $h1 = $content->documentElement->firstElement;
+  private function getTitle(DOMElementPlus $h1) {
     $title = $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
     foreach($this->subject->getIsInterface("ContentStrategyInterface") as $clsName => $cls) {
       $tmp = Cms::getVariable(strtolower($clsName)."-title");
