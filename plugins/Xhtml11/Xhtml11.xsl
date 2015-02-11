@@ -19,6 +19,8 @@
         name() != 'public' and
         name() != 'author' and
         name() != 'authorid' and
+        name() != 'resp' and
+        name() != 'respid' and
         name() != 'ctime' and
         name() != 'mtime' ]"/>
       <xsl:apply-templates/>
