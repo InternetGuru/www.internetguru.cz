@@ -3,6 +3,7 @@
 class FileHandler extends Plugin implements SplObserver {
   private $maxFileSize;
   private $fileMime;
+  const DEBUG = true;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -45,11 +46,14 @@ class FileHandler extends Plugin implements SplObserver {
     $start_time = microtime(true);
     header("Content-Type: ".$this->fileMime);
     header("Content-Length: $fileSize");
-    $etagFile = hash_file("md5", $filePath);
+    header('Cache-Control: max-age=31104000'); // 1 year
+    $etagFile = hash("md5", filemtime($filePath));
     $etagHeader=(isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : false);
     header("Etag: $etagFile");
-    if(!IS_LOCALHOST && !CMS_DEBUG && $etagHeader == $etagFile &&
-      !preg_match("/^\D/", CMS_RELEASE)) {
+    $notModifiedEnabled = true;
+    if(IS_LOCALHOST || CMS_DEBUG || preg_match("/^\D/", CMS_RELEASE)) $notModifiedEnabled = false;
+    if(self::DEBUG) $notModifiedEnabled = true;
+    if($notModifiedEnabled && $etagHeader == $etagFile) {
       header("HTTP/1.1 304 Not Modified");
       exit;
     }
