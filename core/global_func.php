@@ -123,8 +123,8 @@ function incrementalRename($src, $dest) {
     throw new Exception(sprintf(_("Source file '%s' not found"), basename($src)));
   preg_match("/\d*$/", $dest, $m);
   $iLength = strlen($m[0]);
+  if($iLength > 0) $dest = substr($dest, 0, -$iLength);
   $i = (int) $m[0];
-  $dest = substr($dest, 0, -$iLength);
   while(file_exists($dest.$i)) $i++;
   if(!rename($src, $dest.$i))
     throw new Exception(sprintf(_("Unable to rename directory '%s'"), basename($src)));
