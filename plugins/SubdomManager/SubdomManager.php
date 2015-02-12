@@ -306,7 +306,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     foreach($this->userSubdoms as $subdom => $null) {
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($form, true));
-      $this->modifyDOM($doc, $subdom);
+      $doc->processVariables($this->createVars($subdom));
       $form->parentNode->insertBefore($newContent->importNode($doc->documentElement, true), $form);
     }
 
@@ -315,7 +315,8 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
     return $newContent;
   }
 
-  private function modifyDOM(DOMDocumentPlus $doc, $subdom) {
+  private function createVars($subdom) {
+    $vars = array();
     if(strpos($subdom, ".") === 0) {
       $vars["inactive"] = "";
       $subdom = substr($subdom, 1);
@@ -332,27 +333,40 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
 
     // versions
     $current = $this->getSubdomVar("CMS_VER", $subdom);
+    $changes = true;
     if(!is_null($current)) {
       if($subdom == CURRENT_SUBDOM_DIR) $vars["linkHref"] = "/";
       else $vars["linkHref"] = "http://$subdom.".getDomain();
       $vars["version"] = "$current/".$this->cmsVersions[$current];
       $vars["CMS_VER"] = "CMS_VER.$current";
-    } else $current = CMS_BEST_RELEASE;
+    } else {
+      $changes = false;
+    }
     $d = new DOMDocumentPlus();
     $set = $d->appendChild($d->createElement("var"));
-    $deprecated = false;
-    foreach($this->cmsVariants as $cmsVer => $active) {
+    $unsupported = false;
+    foreach($this->cmsVariants as $variant => $active) {
+      if(strtok($this->cmsVersions[$variant], ".") != strtok(CMS_VERSION, ".")) continue;
       if(!$active) {
-        if($current == $cmsVer) $deprecated = true;
+        if($current == $variant) $unsupported = true;
         continue; // silently skip disabled versions
       }
-      $o = $d->createElement("option", "$cmsVer/".$this->cmsVersions[$cmsVer]);
-      if($cmsVer == $current) $o->setAttribute("selected", "selected");
-      $o->setAttribute("value", $cmsVer);
+      $o = $d->createElement("option", "$variant/".$this->cmsVersions[$variant]);
+      if($variant == $current) $o->setAttribute("selected", "selected");
+      $o->setAttribute("value", $variant);
       $set->appendChild($o);
     }
-    if(!$deprecated) $vars["deprecated"] = "";
+    if(is_null($current) || strtok($this->cmsVersions[$current], ".") != strtok(CMS_VERSION, ".")) {
+      $changes = false;
+      $unsupported = true;
+    }
+    if(!$unsupported) $vars["unsupported"] = "";
     if($set->childNodes->length) $vars["cmsVers"] = $set;
+    if(!$changes) {
+      $vars["changesAvailable"] = "";
+      return $vars;
+    }
+    $vars["hideable"] = "hideable";
 
     // user directories
     $current = $this->getSubdomVar("USER_DIR", $subdom);
@@ -405,7 +419,7 @@ class SubdomManager extends Plugin implements SplObserver, ContentStrategyInterf
       $vars["plugins"] = $set;
     }
 
-    $doc->processVariables($vars);
+    return $vars;
   }
 
   private function getSubdirs($dir, $filter = null) {
