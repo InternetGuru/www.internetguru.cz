@@ -32,7 +32,7 @@ class ContactForm extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    Cms::getOutputStrategy()->addCssFile($this->getDir().'/'.get_class($this).'.css');
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.get_class($this).'.css');
     $this->cfg = $this->getDOMPlus();
     $this->createGlobalVars();
     foreach($this->forms as $formId => $form) {

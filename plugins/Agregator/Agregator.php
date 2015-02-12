@@ -17,8 +17,9 @@ class Agregator extends Plugin implements SplObserver {
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
     $this->cfg = $this->getDOMPlus();
-    $this->createList($this->html, USER_FOLDER."/".$this->getDir());
-    $this->createHtmlVar(USER_FOLDER."/".$this->getDir());
+    $htmlDir = USER_FOLDER."/".$this->pluginDir;
+    $this->createList($this->html, $htmlDir);
+    $this->createHtmlVar($htmlDir);
     $this->createList($this->files, FILES_FOLDER);
     $this->createFilesVar(FILES_FOLDER);
     $this->createImgVar(FILES_FOLDER);

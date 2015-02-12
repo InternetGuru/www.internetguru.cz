@@ -32,7 +32,7 @@ class GA extends Plugin implements SplObserver {
     Cms::getOutputStrategy()->addJs("var ga_id = '$ga_id';", 1, "body");
     foreach($this->getDOMPlus()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
-      $f = $this->getDir()."/".$jsFile->nodeValue;
+      $f = $this->pluginDir."/".$jsFile->nodeValue;
       Cms::getOutputStrategy()->addJsFile($f, 1, "body", $user);
     }
   }

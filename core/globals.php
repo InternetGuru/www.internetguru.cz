@@ -89,8 +89,9 @@ function createSymlink($link, $target) {
   elseif(is_link($link)) $restart = true;
   if(!symlink($target, "$link~") || !rename("$link~", $link))
     throw new Exception(sprintf(_("Unable to create symlink '%s'"), $link));
-  if($restart && !touch(APACHE_RESTART_FILEPATH))
-    new Logger(_("Unable to force symlink cache update: may take longer to apply"), "error");
+  #if($restart && !touch(APACHE_RESTART_FILEPATH))
+  if(!$restart) return;
+  new Logger(_("Symlink changed; may take time to apply"), Logger::LOGGER_WARNING);
 }
 
 function replaceVariables($string, Array $variables, $varPrefix=null) {
@@ -270,7 +271,8 @@ function duplicateDir($dir, $deep=true) {
 }
 
 function initStructure() {
-  $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER, LOG_FOLDER);
+  $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
+    LOG_FOLDER, FILES_FOLDER);
   foreach($dirs as $d) {
     if(is_dir($d)) continue;
     if(mkdir($d, 0755, true)) continue;

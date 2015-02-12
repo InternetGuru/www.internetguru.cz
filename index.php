@@ -18,9 +18,6 @@ try {
   define("USER_ROOT_DIR", "cmsuser");
   define("ADMIN_BACKUP_DIR", ADMIN_ROOT_DIR.".bak");
   define("USER_BACKUP_DIR", USER_ROOT_DIR.".bak");
-  #define("FILES_ROOT_DIR", "files");
-  #define("TEMP_DIR", "temp");
-  #define("CACHE_DIR", "cache");
   define('EMAIL_PATTERN', "[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}");
   define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
   define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
@@ -46,12 +43,9 @@ try {
     define('USER_ID', "Localhost");
     define('ADMIN_FOLDER', ADMIN_ROOT_DIR);
     define('USER_FOLDER', USER_ROOT_DIR);
-    #define('FILES_FOLDER', FILES_ROOT_DIR);
-    #define('TEMP_FOLDER', TEMP_DIR);
     define('ADMIN_BACKUP_FOLDER', ADMIN_BACKUP_DIR);
     define('USER_BACKUP_FOLDER', USER_BACKUP_DIR);
     define('LOG_FOLDER', LOG_DIR);
-    #define('CACHE_FOLDER', CACHE_DIR);
     #define("APACHE_RESTART_FILEPATH", null);
   } else {
     $cwdArray = explode("/", CURRENT_SUBDOM_FOLDER);
@@ -80,13 +74,13 @@ try {
     define('ADMIN_BACKUP_FOLDER', WWW_FOLDER."/".ADMIN_BACKUP_DIR."/".FULLDOMAIN);
     define('USER_BACKUP_FOLDER', WWW_FOLDER."/".USER_BACKUP_DIR."/".FULLDOMAIN);
     define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".FULLDOMAIN);
-    #define('CACHE_FOLDER', '../../'.CACHE_DIR.'/'.CURRENT_SUBDOM_DIR);
   }
   define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
   define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
   define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
   define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
   define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
+  define('FILES_FOLDER', USER_FOLDER."/".PLUGINS_DIR."/FileHandler");
   define('CMS_VERSION_FILENAME', "cms_version.txt");
   define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
   define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));

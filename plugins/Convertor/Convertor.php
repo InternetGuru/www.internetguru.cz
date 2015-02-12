@@ -16,7 +16,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
-    $this->tmpFolder = TEMP_FOLDER."/".PLUGINS_DIR."/".get_class($this);
+    $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
     if(is_dir($this->tmpFolder) || mkdir($this->tmpFolder, 0755, true)) return;
     throw new Exception(_("Unable to create convertor tmp folder"));
   }
@@ -128,10 +128,10 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function getContent(HTMLPlus $c) {
-    Cms::getOutputStrategy()->addCssFile($this->getDir().'/Convertor.css');
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $newContent = $this->getHTMLPlus();
     $vars["link"] = $_GET[get_class($this)];
-    $vars["path"] = TEMP_DIR."/".PLUGINS_DIR."/".get_class($this);
+    $vars["path"] = USER_FOLDER."/".PLUGINS_DIR."/".get_class($this);
     if(!empty($this->importedFiles)) $vars["importedhtml"] = $this->importedFiles;
     $vars["filename"] = $this->file;
     if(!is_null($this->html)) {
@@ -227,7 +227,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
-    $xsl = $this->getDOMPlus($this->getDir()."/$xslFile", false, false);
+    $xsl = $this->getDOMPlus($this->pluginDir."/$xslFile", false, false);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);

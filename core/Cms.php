@@ -28,7 +28,6 @@ class Cms {
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("user_id", USER_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    self::setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
     self::$contentFull = DOMBuilder::buildHTMLPlus(INDEX_HTML);
     $h1 = self::$contentFull->documentElement->firstElement;
     self::setVariable("lang", self::$contentFull->documentElement->getAttribute("xml:lang"));
