@@ -90,7 +90,7 @@ try {
   define('CMS_VERSION_FILENAME', "cms_version.txt");
   define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
   define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
-  print_r(get_defined_constants(true)); die();
+  #print_r(get_defined_constants(true)); die();
   #todo: date_default_timezone_set()
   #todo: localize lang
 
@@ -113,7 +113,6 @@ try {
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);
 
   $start_time = microtime(true);
-  if(!IS_LOCALHOST) new InitServer(CURRENT_SUBDOM_DIR, true);
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
@@ -133,7 +132,6 @@ try {
 
   duplicateDir(USER_FOLDER);
   duplicateDir(ADMIN_FOLDER);
-  if(defined("SUBDOM_FOLDER")) duplicateDir(SUBDOM_FOLDER, false);
 
   #header("Cache-Control: public, max-age=10800, must-revalidate");
   $out = Cms::getOutput();
