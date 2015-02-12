@@ -269,6 +269,15 @@ function duplicateDir($dir, $deep=true) {
   return $bakDir;
 }
 
+function initStructure() {
+  $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER, LOG_FOLDER);
+  foreach($dirs as $d) {
+    if(is_dir($d)) continue;
+    if(mkdir($d, 0755, true)) continue;
+    throw new Exception(sprintf(_("Unable to create folder %s"), $d));
+  }
+}
+
 function smartCopy($src, $dest, $delay=0) {
   if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"), basename($src)));
   if(file_exists($dest)) {

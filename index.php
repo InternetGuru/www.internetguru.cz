@@ -61,7 +61,7 @@ try {
     define("WWW_FOLDER", "/var/www");
     define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
     define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
-    define('CMS_DEBUG', is_file("CMS_DEBUG"));
+    define('CMS_DEBUG', is_file("DEBUG"));
     $userId = null;
     foreach(scandir(getcwd()) as $f) {
       $varName = strtok($f, ".");
@@ -111,6 +111,7 @@ try {
 
   require_once(CORE_FOLDER.'/globals.php');
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);
+  initStructure();
 
   $start_time = microtime(true);
   $plugins = new Plugins();
