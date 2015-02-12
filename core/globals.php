@@ -258,11 +258,27 @@ function duplicateDir($dir, $deep=true) {
 
 function initStructure() {
   $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
-    LOG_FOLDER, FILES_FOLDER);
+    LOG_FOLDER, FILES_FOLDER, RES_DIR);
   foreach($dirs as $d) {
     if(is_dir($d)) continue;
     if(mkdir($d, 0755, true)) continue;
     throw new Exception(sprintf(_("Unable to create folder %s"), $d));
+  }
+  $links = array(CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER);
+  foreach(scandir(CMS_ROOT_FOLDER) as $f) {
+    if(strpos($f, ".") === 0) continue;
+    if(!is_dir(CMS_ROOT_FOLDER."/$f")) continue;
+    if(file_exists(CMS_ROOT_FOLDER."/.$f")) continue;
+    $links["$f.php"] = CMS_ROOT_FOLDER."/$f/index.php";
+  }
+  foreach(scandir(getcwd()) as $f) {
+    if(!is_link($f)) continue;
+    if(array_key_exists($f, $links)) continue;
+    if($f == CMS_RELEASE) continue;
+    unlink($f);
+  }
+  foreach($links as $l => $t) {
+    createSymlink($l, $t);
   }
 }
 

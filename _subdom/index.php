@@ -13,11 +13,12 @@ try {
         break;
       }
       if(!preg_match("/^\d+\.\d+\.php$/", $f)) continue;
-      if(version_compare(substr($cmsIndex, -4), substr($f, -4)) > 0) continue;
+      if(version_compare(substr($cmsIndex, 0, -4), substr($f, 0, -4)) > 0) continue;
       $cmsIndex = $f;
     }
     // else throw
     if(!is_file($cmsIndex)) throw new Exception("Unable to find CMS version");
+    touch("VERSION.".substr($cmsIndex, 0, -4));
   }
 
   // include link given version
