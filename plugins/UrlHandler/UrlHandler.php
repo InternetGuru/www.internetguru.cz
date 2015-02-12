@@ -40,7 +40,7 @@ class UrlHandler extends Plugin implements SplObserver {
       }
       $query = parse_url($var->nodeValue, PHP_URL_QUERY);
       if(strlen($query)) $query = $this->alterQuery($query, $pNam);
-      redirTo(getRoot().$path.(strlen($query) ? "?$query" : ""), $code);
+      redirTo(ROOT_URL.$path.(strlen($query) ? "?$query" : ""), $code);
     }
   }
 
@@ -81,7 +81,7 @@ class UrlHandler extends Plugin implements SplObserver {
   private function redirTo($link, $code) {
     #new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $link), "info");
     if(self::DEBUG) die("Redirecting to $link");
-    redirTo(getRoot().$link, $code);
+    redirTo(ROOT_URL.$link, $code);
   }
 
   private function getBestId(Array $links, Array $found) {

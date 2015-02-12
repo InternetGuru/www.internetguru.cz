@@ -31,19 +31,20 @@ class Auth extends Plugin implements SplObserver {
 
   private function handleRequest() {
     $cfg = $this->getDOMPlus();
-    $url = getRoot().getCurLink(true);
+    $url = ROOT_URL.getCurLink(true);
     $access = true;
     foreach($cfg->getElementsByTagName('url') as $e) {
       if(strpos($url, $e->nodeValue) === false) continue;
-      if($e->hasAttribute("access") && $e->getAttribute("access") == "allow") $access = true;
+      if($e->getAttribute("access") == "allow") $access = true;
       else $access = false;
     }
-    if(isset($_SERVER['REMOTE_USER'])
-      && in_array($_SERVER['REMOTE_USER'], array(USER_ID, "admin"))) {
+    if(isset($_SERVER['REMOTE_USER'])) {
       $this->loggedUser = $_SERVER['REMOTE_USER'];
+    } elseif(isset($_SESSION[get_class($this)]["loggedUser"])) {
+      $this->loggedUser = $_SESSION[get_class($this)]["loggedUser"];
     }
-    if($access || !is_null($this->loggedUser)) return;
-    new ErrorPage(_("Authorization Required"), 401);
+    if($access || in_array($this->loggedUser, array(USER_ID, "admin"))) return;
+    redirTo("?login", 401, true);
   }
 
 }

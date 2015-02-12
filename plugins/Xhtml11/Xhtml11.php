@@ -133,7 +133,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         if(strlen($path) && !DOMBuilder::isLink($path)) {
           if(is_file(FILES_FOLDER.$path) || is_file(FILES_FOLDER."/".$path)) {
             if(strpos($path, "/") === 0) $path = substr($path, 1);
-            $a->setAttribute($aName, getRoot().$path.$queryUrl); // add root
+            $a->setAttribute($aName, ROOT_URL.$path.$queryUrl); // add root
             continue; // link to file
           }
           $toStrip[] = array($a, sprintf(_("Link '%s' not found within existing links or files"), $path));
@@ -143,7 +143,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $toStrip[] = array($a, _("Cyclic link found"));
           continue; // link is cyclic (except form@action)
         }
-        $a->setAttribute($aName, getRoot().$path.$queryUrl);
+        $a->setAttribute($aName, ROOT_URL.$path.$queryUrl);
         continue; // localize link
       }
       $frag = $pLink["fragment"];
@@ -213,7 +213,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   /*
   private function asynchronousExternalImageCheck($file) {
-    $headers = @get_headers(absoluteLink(getRoot().$filePath), 1);
+    $headers = @get_headers(absoluteLink(ROOT_URL.$filePath), 1);
     $invalid = !is_array($headers) || !array_key_exists("Content-Type", $headers)
       || !array_key_exists("Content-Length", $headers);
     if($invalid || strpos($headers[0], '200') === false) {
@@ -383,7 +383,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
     if($media) $e->setAttribute("media", $media);
-    $e->setAttribute("href", getRoot().$f);
+    $e->setAttribute("href", ROOT_URL.$f);
     $parent->appendChild($e);
   }
 
@@ -464,7 +464,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
-      if($f !== false) $e->setAttribute("src", getRoot().$f);
+      if($f !== false) $e->setAttribute("src", ROOT_URL.$f);
       $parent->appendChild($e);
     }
   }

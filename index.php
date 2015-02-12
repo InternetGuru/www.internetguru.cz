@@ -12,6 +12,7 @@ try {
   define("VER_DIR", "ver");
   define("LIB_DIR", "lib");
   define("CORE_DIR", "core");
+  define("FILES_DIR", "files");
   define("LOG_DIR", "cmslog");
   define('SUBDOM_ROOT_DIR', "subdom");
   define("ADMIN_ROOT_DIR", "cmsadmin");
@@ -36,6 +37,10 @@ try {
     || $_SERVER["REMOTE_ADDR"] == "::1"));
 
   if(IS_LOCALHOST) {
+    define('DOMAIN', "localhost");
+    $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
+    define('ROOT_URL', "/".$dir[1]."/");
+    define('HOST', DOMAIN."/".CURRENT_SUBDOM_DIR);
     define('CMS_RELEASE', "localhost");
     define("WWW_FOLDER", "..");
     define("CMS_FOLDER", WWW_FOLDER."/".CMS_DIR);
@@ -50,7 +55,8 @@ try {
   } else {
     $cwdArray = explode("/", CURRENT_SUBDOM_FOLDER);
     define('DOMAIN', $cwdArray[4]);
-    define('FULLDOMAIN', CURRENT_SUBDOM_DIR.".".DOMAIN);
+    define('ROOT_URL', "/");
+    define('HOST', CURRENT_SUBDOM_DIR.".".DOMAIN);
     define('CMS_RELEASE', basename(dirname(__FILE__)));
     define("WWW_FOLDER", "/var/www");
     define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
@@ -69,18 +75,18 @@ try {
     define('RES_DIR', "res");
     define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
     define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
-    define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".FULLDOMAIN);
-    define('USER_FOLDER', USER_ROOT_FOLDER."/".USER_ID."/".FULLDOMAIN);
-    define('ADMIN_BACKUP_FOLDER', WWW_FOLDER."/".ADMIN_BACKUP_DIR."/".FULLDOMAIN);
-    define('USER_BACKUP_FOLDER', WWW_FOLDER."/".USER_BACKUP_DIR."/".FULLDOMAIN);
-    define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".FULLDOMAIN);
+    define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);
+    define('USER_FOLDER', USER_ROOT_FOLDER."/".USER_ID."/".HOST);
+    define('ADMIN_BACKUP_FOLDER', WWW_FOLDER."/".ADMIN_BACKUP_DIR."/".HOST);
+    define('USER_BACKUP_FOLDER', WWW_FOLDER."/".USER_BACKUP_DIR."/".HOST);
+    define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HOST);
   }
   define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
   define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
   define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
   define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
   define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
-  define('FILES_FOLDER', USER_FOLDER."/".PLUGINS_DIR."/FileHandler");
+  define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
   define('CMS_VERSION_FILENAME', "cms_version.txt");
   define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
   define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));

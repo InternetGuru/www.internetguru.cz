@@ -9,20 +9,12 @@ function __autoload($className) {
   throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
-function getRoot() {
-  if(IS_LOCALHOST) {
-    $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
-    return "/".$dir[1]."/";
-  }
-  return "/";
-}
-
 function trimLink($link) {
   $pLink = parse_url($link);
   if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   if(!isset($pLink["scheme"]) && !isset($pLink["host"])) return $link; // link is relative
   if(isset($pLink["scheme"]) && $pLink["scheme"] != $_SERVER["REQUEST_SCHEME"]) return $link; // different scheme
-  if($pLink["host"] != CURRENT_SUBDOM_DIR.".".getDomain()) return $link; // different host
+  if($pLink["host"] != HOST) return $link; // different host
   $link = "";
   if(isset($pLink["path"])) $link = $pLink["path"];
   if(isset($pLink["query"])) $link .= "?".$pLink["query"];
@@ -33,7 +25,7 @@ function trimLink($link) {
 function getUrl($schema=true) {
   $domain = $_SERVER["HTTP_HOST"];
   if($schema) $domain = $_SERVER["REQUEST_SCHEME"]."://".$domain;
-  if(IS_LOCALHOST) return $domain . substr(getRoot(), 0, -1);
+  if(IS_LOCALHOST) return $domain . substr(ROOT_URL, 0, -1);
   return $domain;
 }
 
@@ -189,13 +181,7 @@ function stableSort(Array &$a) {
 function getCurLink($query=false) {
   if(!$query) return isset($_GET["page"]) ? $_GET["page"] : "";
   $query = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
-  return substr($query, strlen(getRoot()));
-}
-
-function getDomain() {
-  $d = explode(".", $_SERVER["HTTP_HOST"]);
-  while(count($d) > 2) array_shift($d);
-  return implode(".", $d);
+  return substr($query, strlen(ROOT_URL));
 }
 
 function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
@@ -395,7 +381,7 @@ function checkUrl($folder = null) {
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
     new ErrorPage(sprintf(_("The requested URL '%s' was not understood by this server."), $rUri), 400);
-  if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.*)?$/", $rUri, $m))
+  if(!preg_match("/^".preg_quote(ROOT_URL, "/")."(".FILEPATH_PATTERN.")(\?.*)?$/", $rUri, $m))
     return null;
 
   $fInfo["filepath"] = "$folder/".$m[1];

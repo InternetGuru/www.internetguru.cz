@@ -52,7 +52,7 @@ class ContactForm extends Plugin implements SplObserver {
         } else $msg = $this->createMessage($this->cfg, $formId);
         $this->sendForm($form, $msg);
         Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS, true);
-        redirTo(getRoot().getCurLink(), 302, true);
+        redirTo(ROOT_URL.getCurLink(), 302, true);
       } catch(Exception $e) {
         $this->finishForm($htmlForm, true);
         $message = "<a href='#".$htmlForm->getAttribute("id")."'>"
@@ -155,10 +155,10 @@ class ContactForm extends Plugin implements SplObserver {
     }
     $mail = new PHPMailer;
     $mail->CharSet = 'UTF-8';
-    $mail->setFrom("no-reply@".getDomain(), $this->formVars["servername"]);
+    $mail->setFrom("no-reply@".DOMAIN, $this->formVars["servername"]);
     $mail->addAddress($mailto, $mailtoname);
     $mail->Body = $msg;
-    $mail->Subject = sprintf(_("New massage from %s"), getDomain());
+    $mail->Subject = sprintf(_("New massage from %s"), HOST);
     if(strlen($replyto)) {
       $mail->addReplyTo($replyto, $replytoname);
       $mail->Subject .= " [$replyto]";

@@ -30,7 +30,7 @@ class ErrorPage {
       $tt["@TIPS@"] = implode("</dd>\n      <dd>", $whatnow);
       $images = $this->getImages($dir);
       $tt["@IMAGE@"] = $images[array_rand($images)];
-      $tt["@ROOT@"] = getRoot();
+      $tt["@ROOT@"] = ROOT_URL;
     }
     echo str_replace(array_keys($tt), $tt, $html);
     die();
@@ -43,7 +43,7 @@ class ErrorPage {
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
       $imgPath = LIB_FOLDER."/".$this->relDir."/$img";
       if(IS_LOCALHOST)
-        $i[] = getRoot().$imgPath;
+        $i[] = ROOT_URL.$imgPath;
       else
         $i[] = getRes("$dir/$img", $imgPath, CMSRES_ROOT_DIR."/".CMS_RELEASE);
     }
