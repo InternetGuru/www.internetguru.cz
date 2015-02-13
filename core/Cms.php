@@ -99,38 +99,26 @@ class Cms {
     }
   }
 
-  public static function setLoggedUser($user, $super=false) {
+  public static function setLoggedUser($user) {
     if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
     $_SESSION[get_called_class()]["loggedUser"] = $user;
-    if($super) $_SESSION[get_called_class()]["superUser"] = true;
-    else $_SESSION[get_called_class()]["superUser"] = false;
+    self::setVariable("logged_user", $user);
   }
 
   public static function isSuperUser() {
-    if(!isset($_SESSION[get_called_class()]["superUser"])) return false;
-    return $_SESSION[get_called_class()]["superUser"];
+    if(IS_LOCALHOST) return true;
+    if(self::getLoggedUser() == "admin") return true;
+    if(!isset($_SERVER["REMOTE_ADDR"])) return false;
+    if($_SERVER["REMOTE_ADDR"] == "46.28.109.142") return true;
+    return false;
   }
 
-  public static function getLoggedUser($save=false) {
-    $loggedUser = null;
-    $superUser = false;
-    if(IS_LOCALHOST) {
-      $loggedUser = "localhost";
-      $superUser = true;
-    } elseif(isset($_SERVER["REMOTE_ADDR"])
-      && $_SERVER["REMOTE_ADDR"] == "46.28.109.142") {
-      $loggedUser = "server";
-      $superUser = true;
-    } elseif(isset($_SERVER['REMOTE_USER'])) {
-      $loggedUser = $_SERVER['REMOTE_USER'];
-    } elseif(isset($_SESSION[get_called_class()]["loggedUser"])) {
-      $loggedUser = $_SESSION[get_called_class()]["loggedUser"];
-    }
-    if($loggedUser == "admin") $superUser = true;
-    if($save && !is_null($loggedUser)) {
-      self::setLoggedUser($loggedUser, $superUser);
-    }
-    return $loggedUser;
+  public static function getLoggedUser() {
+    if(isset($_SERVER['REMOTE_USER']))
+      return $_SERVER['REMOTE_USER'];
+    if(isset($_SESSION[get_called_class()]["loggedUser"]))
+      return $_SESSION[get_called_class()]["loggedUser"];
+    return null;
   }
 
   public static function contentProcessVariables() {
@@ -221,8 +209,9 @@ class Cms {
 
   public static function setVariable($name, $value) {
     $varId = self::getVarId($name);
+    if(!array_key_exists($varId, self::$variables))
+      self::addVariableItem("variables", $varId);
     self::$variables[$varId] = $value;
-    self::addVariableItem("variables", $varId);
     return $varId;
   }
 

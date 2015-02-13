@@ -477,7 +477,11 @@ function getShortString($str) {
 }
 
 function checkAuth() {
-  if(!is_null(Cms::getLoggedUser(true))) return;
+  $loggedUser = Cms::getLoggedUser();
+  if(!is_null($loggedUser)) {
+    Cms::setLoggedUser($loggedUser);
+    return;
+  }
   if(!file_exists(FORBIDDEN_FILE)) return;
   loginRedir();
 }
