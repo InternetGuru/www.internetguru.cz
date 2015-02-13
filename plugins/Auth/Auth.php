@@ -44,7 +44,7 @@ class Auth extends Plugin implements SplObserver {
       $this->loggedUser = $_SESSION[get_class($this)]["loggedUser"];
     }
     if($access || in_array($this->loggedUser, array(USER_ID, "admin"))) return;
-    redirTo("?login", 401, true);
+    redirTo("?login", 401, true, _("Authorization required"));
   }
 
 }

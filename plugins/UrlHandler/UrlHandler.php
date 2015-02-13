@@ -68,20 +68,19 @@ class UrlHandler extends Plugin implements SplObserver {
     $links = DOMBuilder::getLinks();
     if(DOMBuilder::isLink(getCurLink())) {
       if(getCurLink() != $links[0]) return;
-      $this->redirTo("", 301); // link to root heading permanent redir to root
+      $link = ROOT_URL; // link to root heading permanent redir to root
+      $code = 301;
+    } else {
+      $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
+      if(self::DEBUG) print_r($links);
+      $linkId = $this->findSimilarLinkId($links, $newLink);
+      if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
+      else $newLink = $links[$linkId];
+      $link = ROOT_URL.$newLink;
+      $code = 404;
     }
-    $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
-    if(self::DEBUG) print_r($links);
-    $linkId = $this->findSimilarLinkId($links, $newLink);
-    if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
-    else $newLink = $links[$linkId];
-    $this->redirTo($newLink, 404);
-  }
-
-  private function redirTo($link, $code) {
-    #new Logger(sprintf(_("Link '%s' not found, redir to '%s'"), getCurLink(), $link), "info");
     if(self::DEBUG) die("Redirecting to $link");
-    redirTo(ROOT_URL.$link, $code);
+    redirTo($link, $code);
   }
 
   private function getBestId(Array $links, Array $found) {

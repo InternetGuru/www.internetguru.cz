@@ -133,7 +133,7 @@ function absoluteLink($link=null) {
   return "$scheme://$host$path$query";
 }
 
-function redirTo($link, $code=null, $force=false) {
+function redirTo($link, $code=null, $force=false, $msg=null) {
   if(!$force) {
     $curLink = absoluteLink();
     $absLink = absoluteLink($link);
@@ -141,8 +141,9 @@ function redirTo($link, $code=null, $force=false) {
       throw new LoggerException(sprintf(_("Cyclic redirection to '%s'"), $link));
   }
   http_response_code(is_null($code) ? 302 : $code);
-  if(class_exists("Logger"))
-    new Logger(sprintf(_("Redirecting to '%s' with status code %s"), $link, (is_null($code) ? 302 : $code)));
+  if(class_exists("Logger")) {
+    new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
+  }
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
@@ -280,6 +281,12 @@ function initStructure() {
   foreach($links as $l => $t) {
     createSymlink($l, $t);
   }
+  if(basename($_SERVER["SCRIPT_NAME"]) != "index.php") return;
+  $srcIndex = CMS_FOLDER."/_subdom/index.php";
+  $destIndex = "index.php";
+  if(filemtime($srcIndex) <= filemtime($destIndex)) return;
+  safeRewriteFile($srcIndex, $destIndex);
+  redirTo(ROOT_URL.getCurLink(), null, true, _("File index.php updated"));
 }
 
 function smartCopy($src, $dest, $delay=0) {
