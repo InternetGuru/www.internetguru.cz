@@ -99,6 +99,23 @@ class Cms {
     }
   }
 
+  public static function setLoggedUser($user) {
+    if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
+    $_SESSION[get_called_class()]["loggedUser"] = $user;
+  }
+
+  public static function getLoggedUser() {
+    if(isset($_SERVER['REMOTE_USER'])) {
+      self::setLoggedUser($_SERVER['REMOTE_USER']);
+      return $_SERVER['REMOTE_USER'];
+    }
+    if(isset($_SESSION[get_called_class()]["loggedUser"])) {
+      self::setLoggedUser($_SESSION[get_called_class()]["loggedUser"]); // regenerate id
+      return $_SESSION[get_called_class()]["loggedUser"];
+    }
+    return null;
+  }
+
   public static function contentProcessVariables() {
     $oldContent = clone self::$content;
     self::$content->processVariables(self::$variables);

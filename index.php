@@ -114,11 +114,12 @@ try {
   require_once(CORE_FOLDER.'/globals.php');
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);
   initDirs();
-  initLinks();
+  if(!IS_LOCALHOST) initLinks();
   initFiles();
 
   $start_time = microtime(true);
   $plugins = new Plugins();
+  checkAuth();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 

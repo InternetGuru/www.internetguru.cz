@@ -259,7 +259,8 @@ function duplicateDir($dir, $deep=true) {
 
 function initDirs() {
   $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
-    LOG_FOLDER, FILES_FOLDER, RES_DIR);
+    LOG_FOLDER, FILES_FOLDER);
+  if(!IS_LOCALHOST) $dirs[] = RES_DIR;
   foreach($dirs as $d) {
     if(is_dir($d)) continue;
     if(mkdir($d, 0755, true)) continue;
@@ -473,6 +474,24 @@ function getShortString($str) {
   }
   if(strlen($str) - strlen($sStr) < $hLimit - $lLimit) return $str;
   return $sStr."…";
+}
+
+function checkAuth() {
+  if(!is_null(Cms::getLoggedUser())) return;
+  if(IS_LOCALHOST) {
+    Cms::setLoggedUser("localhost");
+    return;
+  }
+  if(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER["REMOTE_ADDR"] == "46.28.109.142") {
+    Cms::setLoggedUser("server");
+    return;
+  }
+  if(!file_exists(FORBIDDEN_FILE)) return;
+  loginRedir();
+}
+
+function loginRedir() {
+  redirTo("?login", 401, true, _("Authorization required"));
 }
 
 ?>
