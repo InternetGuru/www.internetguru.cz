@@ -10,7 +10,9 @@
   </xsl:template>
 
   <xsl:template match="div[contains(@id, 'footer')]/ul[last()]">
-    <xsl:if test="$cms-logged_user = $cms-admin_id or not($cms-super_user = '')">
+    <xsl:if test="$cms-logged_user = $cms-admin_id
+      or $cms-super_user = 'admin'
+      or $cms-super_user = 'localhost'">
       <ul>
         <li><a href="?admin">Administrace</a></li>
         <li><a href="?log">Logy</a></li>
