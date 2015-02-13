@@ -1,4 +1,11 @@
+0.5.0 2015-02-10
+SubdomManager: ignoruje rozdílné hlavní (major) verze (7697758)
+FileHandler: vylepšení mezipaměti (cache) u souborů (eeef403)
+GA: neaktivuje se pro přihlášené uživatele (bc45344)
+Konzolidace systémových hlášení (21f6b62)
+
 0.4.5 2015-02-09
+Agregator: přidána možnost řazení (4358afc)
 Auth: přidána možnost zaheslování celého webu pomocí znaku / (6ff6ca1)
 
 0.4.4 2015-02-05
