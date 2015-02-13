@@ -47,7 +47,7 @@ try {
     define("WWW_FOLDER", "..");
     define("CMS_FOLDER", WWW_FOLDER."/".CMS_DIR);
     define('CMS_DEBUG', true);
-    define('USER_ID', "Localhost");
+    define('ADMIN_ID', "Localhost");
     define('ADMIN_FOLDER', ADMIN_ROOT_DIR);
     define('USER_FOLDER', USER_ROOT_DIR);
     define('ADMIN_BACKUP_FOLDER', ADMIN_BACKUP_DIR);
@@ -67,10 +67,10 @@ try {
     $userId = null;
     foreach(scandir(getcwd()) as $f) {
       $varName = strtok($f, ".");
-      if($varName != "USER") continue; // eg. USER.ig1
+      if($varName != "ADMIN") continue; // eg. ADMIN.ig1
       $userId = substr($f, strlen($varName)+1);
     }
-    define('USER_ID', $userId);
+    define('ADMIN_ID', $userId);
     define('CMSRES_ROOT_DIR', "cmsres");
     define('CMSRES_ROOT_FOLDER', WWW_FOLDER."/".CMSRES_ROOT_DIR);
     #define("APACHE_RESTART_FILEPATH", CMSRES_ROOT_FOLDER."/APACHE_RESTART");
@@ -78,7 +78,7 @@ try {
     define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
     define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
     define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);
-    define('USER_FOLDER', USER_ROOT_FOLDER."/".USER_ID."/".HOST);
+    define('USER_FOLDER', USER_ROOT_FOLDER."/".ADMIN_ID."/".HOST);
     define('ADMIN_BACKUP_FOLDER', WWW_FOLDER."/".ADMIN_BACKUP_DIR."/".HOST);
     define('USER_BACKUP_FOLDER', WWW_FOLDER."/".USER_BACKUP_DIR."/".HOST);
     define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HOST);
@@ -109,7 +109,7 @@ try {
   }
 
   define('METHOD_NA', _("Method %s is no longer available"));
-  if(is_null(USER_ID)) die(_("Domain is ready to be acquired"));
+  if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 
   require_once(CORE_FOLDER.'/globals.php');
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);

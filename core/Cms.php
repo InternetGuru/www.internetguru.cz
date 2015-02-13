@@ -26,7 +26,7 @@ class Cms {
     self::setVariable("version", CMS_VERSION);
     self::setVariable("name", CMS_NAME);
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
-    self::setVariable("user_id", USER_ID);
+    self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
     self::$contentFull = DOMBuilder::buildHTMLPlus(INDEX_HTML);
     $h1 = self::$contentFull->documentElement->firstElement;
