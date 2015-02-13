@@ -19,7 +19,7 @@ class Logger {
       self::LOGGER_ERROR,
       self::LOGGER_WARNING,
       self::LOGGER_INFO))) $type = self::LOGGER_INFO;
-    if(!is_null(Cms::getVariable("auth-logged_user")) && $cmsMsg) {
+    if(!is_null(Cms::getLoggedUser()) && $cmsMsg) {
       Cms::addMessage("$message [".$this->getCaller()."]", $type, Cms::isForceFlash());
     }
     $this->message = $message;
@@ -42,7 +42,7 @@ class Logger {
       $msg[] = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
     else
       $msg[] = "0.0.0.0:0000";
-    $msg[] = is_null(Cms::getVariable("auth-logged_user")) ? "unknown" : Cms::getVariable("auth-logged_user"); // logged user
+    $msg[] = is_null(Cms::getLoggedUser()) ? "unknown" : Cms::getLoggedUser(); // logged user
     $msg[] = date(DATE_ATOM); // http://php.net/manual/en/class.datetime.php
     if(isset($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], $_SERVER["SERVER_PROTOCOL"]))
       $msg[] = '"'.$_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"]." ".$_SERVER["SERVER_PROTOCOL"].'"';

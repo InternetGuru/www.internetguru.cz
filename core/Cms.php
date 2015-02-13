@@ -51,7 +51,7 @@ class Cms {
   }
 
   private static function addFlashItem($message, $type) {
-    if(!is_null(self::getVariable("auth-logged_user"))) $message = "$type: $message";
+    if(!is_null(self::getLoggedUser())) $message = "$type: $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
     $li->setAttribute("class", strtolower($type));
@@ -104,13 +104,13 @@ class Cms {
     $_SESSION[get_called_class()]["loggedUser"] = $user;
   }
 
-  public static function getLoggedUser() {
+  public static function getLoggedUser($save=false) {
     if(isset($_SERVER['REMOTE_USER'])) {
-      self::setLoggedUser($_SERVER['REMOTE_USER']);
+      if($save) self::setLoggedUser($_SERVER['REMOTE_USER']);
       return $_SERVER['REMOTE_USER'];
     }
     if(isset($_SESSION[get_called_class()]["loggedUser"])) {
-      self::setLoggedUser($_SESSION[get_called_class()]["loggedUser"]); // regenerate id
+      if($save) self::setLoggedUser($_SESSION[get_called_class()]["loggedUser"]); // regenerate id
       return $_SESSION[get_called_class()]["loggedUser"];
     }
     return null;

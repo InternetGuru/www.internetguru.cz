@@ -7,7 +7,7 @@ class GA extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    if(!is_null(Cms::getVariable("auth-logged_user"))
+    if(!is_null(Cms::getLoggedUser())
       || preg_match("/^ig\d+/", CURRENT_SUBDOM_DIR)) {
       $subject->detach($this);
       return;

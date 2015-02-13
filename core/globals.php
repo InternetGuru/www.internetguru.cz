@@ -477,7 +477,7 @@ function getShortString($str) {
 }
 
 function checkAuth() {
-  if(!is_null(Cms::getLoggedUser())) return;
+  if(!is_null(Cms::getLoggedUser(true))) return;
   if(IS_LOCALHOST) {
     Cms::setLoggedUser("localhost");
     return;
