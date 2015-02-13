@@ -298,8 +298,8 @@ function initFiles() {
     $updated = true;
   }
   if($updated) redirTo(ROOT_URL.getCurLink(), null, true, _("Root file(s) updated"));
-  if(!file_exists(DEBUG) && !file_exists(".".DEBUG)) touch(".".DEBUG);
-  if(!file_exists(FORBIDDEN) && !file_exists(".".FORBIDDEN)) touch(FORBIDDEN);
+  if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
+  if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
 }
 
 function smartCopy($src, $dest, $delay=0) {

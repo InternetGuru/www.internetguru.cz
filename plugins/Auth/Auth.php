@@ -32,7 +32,7 @@ class Auth extends Plugin implements SplObserver {
   private function handleRequest() {
     $cfg = $this->getDOMPlus();
     $url = ROOT_URL.getCurLink(true);
-    $access = !file_exists(FORBIDDEN);
+    $access = !file_exists(FORBIDDEN_FILE);
     if($access) foreach($cfg->getElementsByTagName('url') as $e) {
       if(strpos($url, $e->nodeValue) === false) continue;
       if($e->getAttribute("access") == "allow") $access = true;
