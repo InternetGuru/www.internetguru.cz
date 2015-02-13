@@ -76,6 +76,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     } else {
       new Logger(sprintf(_("Favicon %s not found"), $this->favIcon), Logger::LOGGER_WARNING);
     }
+    $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
