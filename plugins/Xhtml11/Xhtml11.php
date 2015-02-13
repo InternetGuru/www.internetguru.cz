@@ -475,7 +475,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function validateEmptyContent(DOMDocument $doc) {
     $xpath = new DOMXPath($doc);
-    $emptyElOk = array("input", "br", "hr");
+    $emptyElOk = array("input", "br", "hr", "meta", "link");
     $emptyEl = array();
     foreach($xpath->query("//*[not(node()) or text()='']") as $e) {
       if(in_array($e->nodeName, $emptyElOk)) continue;

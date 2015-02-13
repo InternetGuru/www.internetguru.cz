@@ -15,7 +15,8 @@ class ErrorPage {
     $tt = array(
       "@CODE@" => $code,
       "@STATUS@" => $this->getStatusMessage($code),
-      "@ERROR@" => $message
+      "@ERROR@" => $message,
+      "@VERSION@" => CMS_NAME
     );
     if(!$extended) {
       $html = file_get_contents($dir."/".$this->errSimpleFile);
