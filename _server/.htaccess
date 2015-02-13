@@ -1,5 +1,10 @@
 RewriteEngine On
 
+#redirect to https only on www.internetguru.cz
+#RewriteCond %{HTTPS} off
+#RewriteCond %{HTTP_HOST} ^(www|dokumenty|partner|private)\.internetguru\.cz$ [NC]
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 #redir to www
 RewriteCond %{HTTP_HOST} ^([^\.]*)\.([^\.]*)$
 RewriteRule .* http://www.%0/$0 [R=301,L,QSA]
@@ -22,22 +27,22 @@ AuthType Basic
 AuthName "restricted"
 
 # CMS ?admin
-<If "%{QUERY_STRING} =~ /(SubdomManager|updateSubdom|Admin|LogViewer|Convertor)/">
+<If "%{QUERY_STRING} =~ /(SubdomManager|login|Admin|LogViewer|Convertor)/ && %{REMOTE_ADDR} != '46.28.109.142'">
   Require user admin
   Require group partner
 </If>
 
 # CRM & SML
-<If "%{REQUEST_FILENAME} =~ m#/subdom/(crm|doc)/#">
+<If "%{REQUEST_FILENAME} =~ m#/subdom/(crm|doc|private)/# && %{REMOTE_ADDR} != '46.28.109.142'">
   Require user admin
 </If>
 
-# PARTNER
-<If "%{REQUEST_FILENAME} =~ m#/subdom/partner/#">
-  Require user partner admin
+# dokumenty & ig##
+<If "%{REQUEST_FILENAME} =~ m#/subdom/(dokumenty|ig[0-9]+)/# && %{REMOTE_ADDR} != '46.28.109.142'">
+  Require user admin
   Require group partner
 </If>
 
-
-#RewriteRule . - [E=R_USER:admin]
-#Require expr ( %{REMOTE_USER} == "%{ENV:R_USER}e" )
+<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
+  Header set Cache-Control "max-age=290304000, public"
+</FilesMatch>

@@ -1,14 +1,11 @@
 <?php
 
-#TODO: detach if admin logged
-
 class GA extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    if(!is_null(Cms::getVariable("auth-logged_user"))
-      || preg_match("/^ig\d+/", CURRENT_SUBDOM_DIR)) {
+    if(Cms::isSuperUser()) {
       $subject->detach($this);
       return;
     }
@@ -18,7 +15,7 @@ class GA extends Plugin implements SplObserver {
   private function init() {
     $ga_id = $this->getDOMPlus()->getElementById("ga_id");
     if(!strlen($ga_id->nodeValue)) {
-      $ga_id = $this->getDOMPlus()->getElementById(getDomain());
+      $ga_id = $this->getDOMPlus()->getElementById(DOMAIN);
     }
     if(is_null($ga_id)) {
       $ga_id = $this->getDOMPlus()->getElementById("other");
@@ -32,7 +29,7 @@ class GA extends Plugin implements SplObserver {
     Cms::getOutputStrategy()->addJs("var ga_id = '$ga_id';", 1, "body");
     foreach($this->getDOMPlus()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
-      $f = $this->getDir()."/".$jsFile->nodeValue;
+      $f = $this->pluginDir."/".$jsFile->nodeValue;
       Cms::getOutputStrategy()->addJsFile($f, 1, "body", $user);
     }
   }

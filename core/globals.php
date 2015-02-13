@@ -1,5 +1,125 @@
 <?php
 
+function __autoload($className) {
+  $fp = PLUGINS_FOLDER."/$className/$className.php";
+  if(@include $fp) return;
+  $fc = CORE_FOLDER."/$className.php";
+  if(@include $fc) return;
+  #todo: log shortPath
+  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
+}
+
+function trimLink($link) {
+  $pLink = parse_url($link);
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
+  if(!isset($pLink["scheme"]) && !isset($pLink["host"])) return $link; // link is relative
+  if(isset($pLink["scheme"]) && $pLink["scheme"] != $_SERVER["REQUEST_SCHEME"]) return $link; // different scheme
+  if($pLink["host"] != HOST) return $link; // different host
+  $link = "";
+  if(isset($pLink["path"])) $link = $pLink["path"];
+  if(isset($pLink["query"])) $link .= "?".$pLink["query"];
+  if(isset($pLink["fragment"])) $link .= "#".$pLink["fragment"];
+  return $link;
+}
+
+function getUrl($schema=true) {
+  $domain = $_SERVER["HTTP_HOST"];
+  if($schema) $domain = $_SERVER["REQUEST_SCHEME"]."://".$domain;
+  if(IS_LOCALHOST) return $domain . substr(ROOT_URL, 0, -1);
+  return $domain;
+}
+
+function findFile($file, $user=true, $admin=true, $res=false) {
+  #while(strpos($file, "/") === 0) $file = substr($file, 1);
+  try {
+    $resFolder = $res && !IS_LOCALHOST ? $resFolder = RES_DIR : false;
+    $f = USER_FOLDER."/$file";
+    if($user && is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
+    $f = ADMIN_FOLDER."/$file";
+    if($admin && is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
+    $f = $file;
+    if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
+    if($res && !IS_LOCALHOST) $resFolder = CMSRES_ROOT_DIR."/".CMS_RELEASE;
+    $f = CMS_FOLDER."/$file";
+    if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
+  } catch(Exception $e) {
+    new Logger($e->getMessage(), "error");
+  }
+  return false;
+}
+
+function getRes($res, $dest, $resFolder) {
+  if($resFolder === false) return $res;
+  #TODO: check mime==ext, allowed types, max size
+  $folders = array(preg_quote(CMS_FOLDER, "/"));
+  if(defined("ADMIN_FOLDER")) $folders[] = preg_quote(ADMIN_FOLDER, "/");
+  if(defined("USER_FOLDER")) $folders[] = preg_quote(USER_FOLDER, "/");
+  if(!preg_match("/^(?:".implode("|", $folders).")\/(".FILEPATH_PATTERN.")$/", $res, $m)) {
+    throw new Exception(sprintf(_("Forbidden file name '%s' format to copy to '%s' folder"), $res, $resFolder));
+  }
+  $mime = getFileMime($res);
+  if(strpos($res, CMS_FOLDER) !== 0 && $mime != "text/plain" && strpos($mime, "image/") !== 0) {
+    throw new Exception(sprintf(_("Forbidden MIME type '%s' to copy '%s' to '%s' folder"), $mime, $m[1], $resFolder));
+  }
+  $newRes = $resFolder."/$dest";
+  $newDir = pathinfo($newRes, PATHINFO_DIRNAME);
+  if(!is_dir($newDir) && !mkdirGroup($newDir, 0775, true)) {
+    throw new Exception(sprintf(_("Unable to create directory structure '%s'"), $newDir));
+  }
+  if(is_link($newRes) && readlink($newRes) == $res) return $newRes;
+  if(!symlink($res, "$newRes~") || !rename("$newRes~", $newRes)) {
+    throw new Exception(sprintf(_("Unable to create symlink '%s' for '%s'"), $newRes, $m[1]));
+  }
+  #if(!chmodGroup($newRes, 0664))
+  #  throw new Exception(sprintf(_("Unable to chmod resource file '%x'"), $newRes);
+  return $newRes;
+}
+
+function createSymlink($link, $target) {
+  $restart = false;
+  if(is_link($link) && readlink($link) == $target) return;
+  elseif(is_link($link)) $restart = true;
+  if(!symlink($target, "$link~") || !rename("$link~", $link))
+    throw new Exception(sprintf(_("Unable to create symlink '%s'"), $link));
+  #if($restart && !touch(APACHE_RESTART_FILEPATH))
+  if(!$restart) return;
+  new Logger(_("Symlink changed; may take time to apply"), Logger::LOGGER_WARNING);
+}
+
+function replaceVariables($string, Array $variables, $varPrefix=null) {
+  if(!strlen($string)) return $string;
+  $pat = '/(@?\$'.VARIABLE_PATTERN.')/i';
+  $p = preg_split($pat, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+  if(count($p) < 2) return $string;
+  $newString = "";
+  foreach($p as $i => $v) {
+    if($i % 2 == 0) {
+      $newString .= $v;
+      continue;
+    }
+    $vName = substr($v, strpos($v, '$')+1);
+    if(!array_key_exists($vName, $variables)) {
+      $vName = $varPrefix.$vName;
+      if(!array_key_exists($vName, $variables)) {
+        if(strpos($v, "@") !== 0)
+          new Logger(sprintf(_("Variable '%s' does not exist"), $vName), Logger::LOGGER_WARNING);
+        $newString .= $v;
+        continue;
+      }
+    }
+    $value = $variables[$vName];
+    if(is_array($value)) $value = implode(", ", $value);
+    elseif(!is_string($value)) {
+      if(strpos($v, "@") !== 0)
+        new Logger(sprintf(_("Variable '%s' is not string"), $vName), Logger::LOGGER_WARNING);
+      $newString .= $v;
+      continue;
+    }
+    $newString .= $value;
+  }
+  return $newString;
+}
+
 function absoluteLink($link=null) {
   if(is_null($link)) $link = $_SERVER["REQUEST_URI"];
   if(substr($link, 0, 1) == "/") $link = substr($link, 1);
@@ -13,7 +133,7 @@ function absoluteLink($link=null) {
   return "$scheme://$host$path$query";
 }
 
-function redirTo($link, $code=null, $force=false) {
+function redirTo($link, $code=null, $force=false, $msg=null) {
   if(!$force) {
     $curLink = absoluteLink();
     $absLink = absoluteLink($link);
@@ -21,8 +141,9 @@ function redirTo($link, $code=null, $force=false) {
       throw new LoggerException(sprintf(_("Cyclic redirection to '%s'"), $link));
   }
   http_response_code(is_null($code) ? 302 : $code);
-  if(class_exists("Logger"))
-    new Logger(sprintf(_("Redirecting to '%s' with status code %s"), $link, (is_null($code) ? 302 : $code)));
+  if(class_exists("Logger")) {
+    new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
+  }
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
@@ -61,13 +182,7 @@ function stableSort(Array &$a) {
 function getCurLink($query=false) {
   if(!$query) return isset($_GET["page"]) ? $_GET["page"] : "";
   $query = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
-  return substr($query, strlen(getRoot()));
-}
-
-function getDomain() {
-  $d = explode(".", $_SERVER["HTTP_HOST"]);
-  while(count($d) > 2) array_shift($d);
-  return implode(".", $d);
+  return substr($query, strlen(ROOT_URL));
 }
 
 function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
@@ -142,15 +257,59 @@ function duplicateDir($dir, $deep=true) {
   return $bakDir;
 }
 
-function smartCopy($src, $dest, $delay=0) {
+function initDirs() {
+  $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
+    LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER);
+  if(!IS_LOCALHOST) $dirs[] = RES_DIR;
+  foreach($dirs as $d) {
+    if(is_dir($d)) continue;
+    if(mkdir($d, 0755, true)) continue;
+    throw new Exception(sprintf(_("Unable to create folder %s"), $d));
+  }
+}
+
+function initLinks() {
+  $links = array(CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER);
+  foreach(scandir(CMS_ROOT_FOLDER) as $f) {
+    if(strpos($f, ".") === 0) continue;
+    if(!is_dir(CMS_ROOT_FOLDER."/$f")) continue;
+    if(file_exists(CMS_ROOT_FOLDER."/.$f")) continue;
+    if(!is_file(CMS_ROOT_FOLDER."/$f/index.php")) continue;
+    $links["$f.php"] = CMS_ROOT_FOLDER."/$f/index.php";
+  }
+  foreach(scandir(getcwd()) as $f) {
+    if(!is_link($f)) continue;
+    if(array_key_exists($f, $links)) continue;
+    if($f == CMS_RELEASE) continue;
+    unlink($f);
+  }
+  foreach($links as $l => $t) {
+    createSymlink($l, $t);
+  }
+}
+
+function initFiles() {
+  if(basename($_SERVER["SCRIPT_NAME"]) != "index.php") return;
+  $coreFiles = array(".htaccess", "index.php");
+  $updated = false;
+  foreach($coreFiles as $f) {
+    $src = CMS_FOLDER."/_subdom/$f";
+    if(filemtime($src) <= filemtime($f)) continue;
+    safeRewriteFile($src, $f);
+    $updated = true;
+  }
+  if($updated) redirTo(ROOT_URL.getCurLink(), null, true, _("Root file(s) updated"));
+  if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
+  if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
+}
+
+function smartCopy($src, $dest, $force=false) {
   if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"), basename($src)));
   if(file_exists($dest)) {
+    if(!$force) return;
     // both are links with same target
     if(is_link($dest) && is_link($src)
       && readlink($dest) == readlink($src)) return;
-    // both are files within given age gap (delay)
-    elseif(!is_link($dest) && !is_link($src)
-      && $delay && filectime($dest) > time()-$delay) return;
   }
   $destDir = dirname($dest);
   if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
@@ -257,7 +416,7 @@ function checkUrl($folder = null) {
   $pUrl = parse_url($rUri);
   if($pUrl === false || strpos($pUrl["path"], "//") !== false)
     new ErrorPage(sprintf(_("The requested URL '%s' was not understood by this server."), $rUri), 400);
-  if(!preg_match("/^".preg_quote(getRoot(), "/")."(".FILEPATH_PATTERN.")(\?.*)?$/", $rUri, $m))
+  if(!preg_match("/^".preg_quote(ROOT_URL, "/")."(".FILEPATH_PATTERN.")(\?.*)?$/", $rUri, $m))
     return null;
 
   $fInfo["filepath"] = "$folder/".$m[1];
@@ -313,6 +472,20 @@ function getShortString($str) {
   }
   if(strlen($str) - strlen($sStr) < $hLimit - $lLimit) return $str;
   return $sStr."…";
+}
+
+function checkAuth() {
+  $loggedUser = Cms::getLoggedUser();
+  if(!is_null($loggedUser)) {
+    Cms::setLoggedUser($loggedUser);
+    return;
+  }
+  if(!file_exists(FORBIDDEN_FILE)) return;
+  loginRedir();
+}
+
+function loginRedir() {
+  redirTo("?login", 401, true, _("Authorization required"));
 }
 
 ?>

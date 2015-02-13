@@ -4,7 +4,6 @@ class Plugins implements SplSubject {
   private $status = null;
   private $observers = array(); // list of enabled observer (names => Observer)
   private $observerPriority = array();
-  private $availableObservers = array(); // list of available observer (names => null)
 
   public function __construct() {
     $this->attachPlugins();
@@ -12,10 +11,6 @@ class Plugins implements SplSubject {
 
   public function getObservers() {
     return $this->observers;
-  }
-
-  public function getAvailableObservers() {
-    return $this->availableObservers;
   }
 
   public function isAttachedPlugin($pluginName) {
@@ -28,21 +23,12 @@ class Plugins implements SplSubject {
   }
 
   private function attachPlugins() {
-    $dir = PLUGINS_FOLDER;
-    if(!is_dir($dir))
-      throw new Exception(sprintf(_("Missing plugin folder '%s'"), $dir));
-    foreach(scandir($dir) as $p) {
-      if(strpos($p, ".") === 0 || file_exists("$dir/.$p")) continue; // skip.plugin
-      if(IS_LOCALHOST && file_exists(PLUGINS_FOLDER."/.$p")) {
-        $this->availableObservers[$p] = null;
-        continue;
-      }
-      if(!IS_LOCALHOST && (file_exists(".PLUGIN.$p") || !file_exists("PLUGIN.$p"))) {
-        if(!file_exists(".PLUGIN.$p")) $this->availableObservers[$p] = null;
-        continue;
-      }
+    if(!is_dir(PLUGINS_FOLDER))
+      throw new Exception(sprintf(_("Missing plugin folder '%s'"), PLUGINS_FOLDER));
+    foreach(scandir(PLUGINS_FOLDER) as $p) {
+      if(strpos($p, ".") === 0) continue;
+      if(file_exists(PLUGINS_FOLDER."/.$p")) continue;
       $this->attach(new $p($this));
-      $this->availableObservers[$p] = null;
     }
   }
 

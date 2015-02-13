@@ -2,10 +2,12 @@
 
 class Plugin {
   private $doms = array();
-  protected $subject = null;
+  protected $subject;
+  protected $pluginDir;
 
   public function __construct(SplSubject $s) {
     $this->subject = $s;
+    $this->pluginDir = PLUGINS_DIR."/".get_class($this);
   }
 
   protected function detachIfNotAttached($pluginName) {
@@ -20,10 +22,6 @@ class Plugin {
     return false;
   }
 
-  protected function getDir() {
-    return PLUGINS_DIR."/".get_class($this);
-  }
-
   protected function getHTMLPlus($filePath=null, $user=true) {
     if(is_null($filePath)) return $this->getDOMExt("html", true, $user);
     return $this->getDOMPlus($filePath, true, $user);
@@ -31,7 +29,7 @@ class Plugin {
 
   protected function getDOMExt($ext=null, $htmlPlus=false, $user=true) {
     if(is_null($ext)) $ext = "xml";
-    return $this->getDOMPlus($this->getDir()."/".get_class($this).".$ext", $htmlPlus, $user);
+    return $this->getDOMPlus($this->pluginDir."/".get_class($this).".$ext", $htmlPlus, $user);
   }
 
   protected function getDOMPlus($filePath=null, $htmlPlus=false, $user=true) {

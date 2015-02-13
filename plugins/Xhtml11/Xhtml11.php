@@ -69,7 +69,14 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon");
+    $icoPath = findFile($this->favIcon);
+    if(is_file($icoPath)) {
+      $this->copyToRoot($icoPath, "favicon.ico");
+      $this->appendLinkElement($head, "favicon.ico", "shortcut icon");
+    } else {
+      new Logger(sprintf(_("Favicon %s not found"), $this->favIcon), Logger::LOGGER_WARNING);
+    }
+    $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
@@ -133,7 +140,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         if(strlen($path) && !DOMBuilder::isLink($path)) {
           if(is_file(FILES_FOLDER.$path) || is_file(FILES_FOLDER."/".$path)) {
             if(strpos($path, "/") === 0) $path = substr($path, 1);
-            $a->setAttribute($aName, getRoot().$path.$queryUrl); // add root
+            $a->setAttribute($aName, ROOT_URL.$path.$queryUrl); // add root
             continue; // link to file
           }
           $toStrip[] = array($a, sprintf(_("Link '%s' not found within existing links or files"), $path));
@@ -143,7 +150,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $toStrip[] = array($a, _("Cyclic link found"));
           continue; // link is cyclic (except form@action)
         }
-        $a->setAttribute($aName, getRoot().$path.$queryUrl);
+        $a->setAttribute($aName, ROOT_URL.$path.$queryUrl);
         continue; // localize link
       }
       $frag = $pLink["fragment"];
@@ -213,7 +220,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   /*
   private function asynchronousExternalImageCheck($file) {
-    $headers = @get_headers(absoluteLink(getRoot().$filePath), 1);
+    $headers = @get_headers(absoluteLink(ROOT_URL.$filePath), 1);
     $invalid = !is_array($headers) || !array_key_exists("Content-Type", $headers)
       || !array_key_exists("Content-Length", $headers);
     if($invalid || strpos($headers[0], '200') === false) {
@@ -282,8 +289,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->getDir()."/Xhtml11.xsl", 0, false);
-    $this->addTransformation($this->getDir()."/Xhtml11final.xsl", 100, false);
+    $this->addTransformation($this->pluginDir."/Xhtml11.xsl", 0, false);
+    $this->addTransformation($this->pluginDir."/Xhtml11final.xsl", 100, false);
 
     // add template files
     $theme = $cfg->getElementById("theme");
@@ -298,12 +305,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->addThemeFiles($cfg->documentElement);
   }
 
-  private function createRootFavicon($target) {
-    if(IS_LOCALHOST) return;
-    $link = "favicon.ico";
-    if(is_link($link) && readlink($link) == $target) return;
-    if(symlink($target, "$link~") && rename("$link~", $link)) return;
-    new Logger(sprintf(_("Unable to create root '%s' link"), $link), Logger::LOGGER_ERROR);
+  private function copyToRoot($src, $dest) {
+    if(is_file($dest) && getFileHash($src) == getFileHash($dest)) return;
+    smartCopy($src, $dest, true);
   }
 
   private function addThemeFiles(DOMElement $e) {
@@ -368,7 +372,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function appendLinkElement(DOMElement $parent, $file, $rel, $type=false, $media=false, $user=true) {
     try {
-      $f = findFile($file, $user, true, true);
+      $f = $file;
+      if(!is_file($f)) $f = findFile($file, $user, true, true);
     } catch (Exception $e) {
       $f = false;
     }
@@ -378,12 +383,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       new Logger($comment, Logger::LOGGER_ERROR);
       return;
     }
-    if($rel == "shortcut icon") $this->createRootFavicon($f);
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
     if($media) $e->setAttribute("media", $media);
-    $e->setAttribute("href", getRoot().$f);
+    $e->setAttribute("href", ROOT_URL.$f);
     $parent->appendChild($e);
   }
 
@@ -464,7 +468,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
-      if($f !== false) $e->setAttribute("src", getRoot().$f);
+      if($f !== false) $e->setAttribute("src", ROOT_URL.$f);
       $parent->appendChild($e);
     }
   }

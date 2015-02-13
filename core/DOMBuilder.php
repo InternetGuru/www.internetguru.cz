@@ -31,11 +31,11 @@ class DOMBuilder {
   public static function getLink($frag) {
     if(!array_key_exists($frag, self::$idToLink)) return null;
     reset(self::$idToLink);
-    if($frag == key(self::$idToLink)) return getRoot();
+    if($frag == key(self::$idToLink)) return ROOT_URL;
     $link = self::$idToLink[$frag];
-    if($link == current(self::$idToLink)) return getRoot()."#$frag";
+    if($link == current(self::$idToLink)) return ROOT_URL."#$frag";
     if(self::$linkToId[$link] != $frag) $link .= "#$frag";
-    return getRoot().$link;
+    return ROOT_URL.$link;
   }
 
   public static function getRootHeadingId() {

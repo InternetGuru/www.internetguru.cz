@@ -26,9 +26,8 @@ class Cms {
     self::setVariable("version", CMS_VERSION);
     self::setVariable("name", CMS_NAME);
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
-    self::setVariable("user_id", USER_ID);
+    self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    self::setVariable("plugins_available", array_keys($plugins->getAvailableObservers()));
     self::$contentFull = DOMBuilder::buildHTMLPlus(INDEX_HTML);
     $h1 = self::$contentFull->documentElement->firstElement;
     self::setVariable("lang", self::$contentFull->documentElement->getAttribute("xml:lang"));
@@ -52,7 +51,7 @@ class Cms {
   }
 
   private static function addFlashItem($message, $type) {
-    if(!is_null(self::getVariable("auth-logged_user"))) $message = "$type: $message";
+    if(!is_null(self::getLoggedUser())) $message = "$type: $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
     $li->setAttribute("class", strtolower($type));
@@ -98,6 +97,34 @@ class Cms {
       if(self::DEBUG) echo $c->saveXML();
       throw new Exception($e->getMessage()." (".get_class($cs).")");
     }
+  }
+
+  public static function setLoggedUser($user) {
+    if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
+    $_SESSION[get_called_class()]["loggedUser"] = $user;
+    self::setVariable("logged_user", $user);
+    if(self::isSuperUser())
+      self::setVariable("super_user", $user);
+  }
+
+  public static function isSuperUser() {
+    if(IS_LOCALHOST) return true;
+    if(self::getLoggedUser() == "admin") return true;
+    if(self::getLoggedUser() == ADMIN_ID) return true;
+    if(isset($_SERVER["REMOTE_ADDR"])
+      && $_SERVER["REMOTE_ADDR"] == SERVER_IP) return true;
+    return false;
+  }
+
+  public static function getLoggedUser() {
+    if(IS_LOCALHOST) return "localhost";
+    if(isset($_SERVER["REMOTE_ADDR"])
+      && $_SERVER["REMOTE_ADDR"] == SERVER_IP) return "server";
+    if(isset($_SERVER['REMOTE_USER']))
+      return $_SERVER['REMOTE_USER'];
+    if(isset($_SESSION[get_called_class()]["loggedUser"]))
+      return $_SESSION[get_called_class()]["loggedUser"];
+    return null;
   }
 
   public static function contentProcessVariables() {
@@ -188,8 +215,9 @@ class Cms {
 
   public static function setVariable($name, $value) {
     $varId = self::getVarId($name);
+    if(!array_key_exists($varId, self::$variables))
+      self::addVariableItem("variables", $varId);
     self::$variables[$varId] = $value;
-    self::addVariableItem("variables", $varId);
     return $varId;
   }
 

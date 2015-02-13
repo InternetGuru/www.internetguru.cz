@@ -33,7 +33,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PROCESS) {
-      $os = Cms::getOutputStrategy()->addTransformation($this->getDir()."/Admin.xsl");
+      $os = Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Admin.xsl");
     }
     if($subject->getStatus() != STATUS_INIT) return;
     if(!isset($_GET[get_class($this)])) {
@@ -71,7 +71,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function getContent(HTMLPlus $content) {
-    Cms::getOutputStrategy()->addJsFile($this->getDir().'/Admin.js', 100, "body");
+    Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
 
     $format = $this->type;
     if($this->type == "html") $format = "html+";
@@ -332,7 +332,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function redir($f="") {
-    $redir = getRoot().getCurLink();
+    $redir = ROOT_URL.getCurLink();
     if(!isset($_POST["saveandgo"]))
       $redir .= "?".get_class($this).(strlen($f) ? "=$f" : "");
     redirTo($redir, null, true);

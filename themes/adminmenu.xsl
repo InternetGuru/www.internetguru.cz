@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <xsl:param name="auth-logged_user" select="''"/>
+  <xsl:param name="cms-admin_id" select="''"/>
+  <xsl:param name="cms-logged_user" select="''"/>
+  <xsl:param name="cms-super_user" select="''"/>
 
   <xsl:template match="/">
     <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template match="div[contains(@id, 'footer')]/ul[last()]">
-    <xsl:if test="not($auth-logged_user = '') and not($auth-logged_user = 'server')">
+    <xsl:if test="$cms-logged_user = $cms-admin_id
+      or $cms-super_user = 'admin'
+      or $cms-super_user = 'localhost'">
       <ul>
         <li><a href="?admin">Administrace</a></li>
         <li><a href="?log">Logy</a></li>

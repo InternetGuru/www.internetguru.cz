@@ -67,7 +67,7 @@ class FileHandler extends Plugin implements SplObserver {
       flush();
     }
     fclose($handle);
-    if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time);
+    if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time, false);
     die();
   }
 
@@ -88,7 +88,7 @@ class FileHandler extends Plugin implements SplObserver {
     if(!$v[0] && !$v[1]) $this->downloadFile($filePath, $v[2]);
     $i = $this->getImageSize($filePath);
     if($i[0] < $v[0] && $i[1] < $v[1]) $this->downloadFile($filePath, $v[2]);
-    $tmpDir = TEMP_FOLDER."/".PLUGINS_DIR."/".get_class($this)."/$vName";
+    $tmpDir = USER_FOLDER."/".$this->pluginDir."/$vName";
     if(!is_dir($tmpDir) && !mkdir($tmpDir, 0775, true))
       throw new Exception(_("Unable to create temporary folder"));
     $tmpPath = $tmpDir."/".basename($filePath);

@@ -17,7 +17,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
     }
-    if($subject->getStatus() != STATUS_PREINIT) return;
+    if($subject->getStatus() != STATUS_INIT) return;
     $this->logFiles = $this->getFiles(LOG_FOLDER, 15);
     $this->verFiles = $this->getFiles(VER_FOLDER);
   }

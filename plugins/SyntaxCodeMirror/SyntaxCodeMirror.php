@@ -58,7 +58,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.css");
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/theme/tomorrow-night-eighties.css");
-    $os->addCssFile($this->getDir().'/SyntaxCodeMirror.css');
+    $os->addCssFile($this->pluginDir.'/SyntaxCodeMirror.css');
 
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.js");
     foreach($libs as $l) $os->addJsFile($l);
@@ -76,7 +76,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
 
-    $os->addJsFile($this->getDir().'/SyntaxCodeMirror.js', 10, "body");
+    $os->addJsFile($this->pluginDir.'/SyntaxCodeMirror.js', 10, "body");
 
     return $content;
   }
