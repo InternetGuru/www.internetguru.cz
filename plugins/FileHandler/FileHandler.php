@@ -67,7 +67,7 @@ class FileHandler extends Plugin implements SplObserver {
       flush();
     }
     fclose($handle);
-    if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time);
+    if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time, false);
     die();
   }
 

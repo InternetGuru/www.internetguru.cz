@@ -112,7 +112,7 @@ try {
   if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 
   require_once(CORE_FOLDER.'/globals.php');
-  new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);
+  new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
   initDirs();
   if(!IS_LOCALHOST) initLinks();
   initFiles();
@@ -161,8 +161,9 @@ try {
 } catch(Exception $e) {
 
   $m = $e->getMessage();
-  if(CMS_DEBUG) $m = sprintf(_("Exception: %s in %s on line %s"), $m, $e->getFile(), $e->getLine());
-  new Logger(sprintf(_("IGCMS failed to finish"), CMS_RELEASE), Logger::LOGGER_FATAL, $start_time);
+  if(CMS_DEBUG) $m = sprintf(_("%s in %s on line %s"), $m, $e->getFile(), $e->getLine());
+  $m = sprintf(_("IGCMS failed to finish: %s"), $m);
+  new Logger($m, Logger::LOGGER_FATAL, $start_time, false);
   if(class_exists("ErrorPage")) new ErrorPage($m, 500, true);
 
   http_response_code(500);
