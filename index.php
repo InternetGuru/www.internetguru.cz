@@ -124,7 +124,6 @@ try {
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 
-  checkUrl();
   Cms::init(); // because of dombuilder to set variable into cms
   $plugins->setStatus(STATUS_INIT);
   $plugins->notify();

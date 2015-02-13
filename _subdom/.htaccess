@@ -16,4 +16,4 @@ RewriteRule   ^(.+)\/$               %{ENV:RB}$1  [R=301,L]
 # create _GET parameters
 #RewriteCond   %{REQUEST_URI}         !\.[a-z0-9]{2,4}$ [NC]
 RewriteCond   %{REQUEST_FILENAME}    !-f
-RewriteRule   .*                     %{ENV:RB}index.php?page=$0 [QSA]
+RewriteRule   .*                     %{ENV:RB}index.php?q=$0 [QSA]

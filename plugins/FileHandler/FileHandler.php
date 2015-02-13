@@ -17,8 +17,9 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function handleRequest() {
-    $fInfo = checkUrl(FILES_FOLDER);
-    if(is_null($fInfo["filepath"])) return;
+    $link = getCurLink();
+    if(!preg_match("/^".FILEPATH_PATTERN."$/", $link)) return;
+    $fInfo = $this->checkLink($link);
     $filePath = realpath($fInfo["filepath"]);
     $this->fileMime = $fInfo["filemime"];
     if($filePath === false) return;
@@ -30,6 +31,36 @@ class FileHandler extends Plugin implements SplObserver {
       new ErrorPage(sprintf(_("Unable to handle image: %s")
         , CMS_DEBUG ? $e->getMessage() : $fInfo["filepath"]), 500);
     }
+  }
+
+  private function checkLink($link) {
+    $fInfo["filepath"] = FILES_FOLDER."/$link";
+    if(!is_file($fInfo["filepath"]))
+      new ErrorPage(sprintf(_("The requested URL '%s' was not found on this server."), $link), 404);
+    $disallowedMime = array(
+      "application/x-msdownload" => null,
+      "application/x-msdos-program" => null,
+      "application/x-msdos-windows" => null,
+      "application/x-download" => null,
+      "application/bat" => null,
+      "application/x-bat" => null,
+      "application/com" => null,
+      "application/x-com" => null,
+      "application/exe" => null,
+      "application/x-exe" => null,
+      "application/x-winexe" => null,
+      "application/x-winhlp" => null,
+      "application/x-winhelp" => null,
+      "application/x-javascript" => null,
+      "application/hta" => null,
+      "application/x-ms-shortcut" => null,
+      "application/octet-stream" => null,
+      "vms/exe" => null,
+    );
+    $fInfo["filemime"] = getFileMime($fInfo["filepath"]);
+    if(array_key_exists($fInfo["filemime"], $disallowedMime))
+      new ErrorPage(sprintf(_("Unsupported mime type '%s'"), $fInfo["filemime"]), 415);
+    return $fInfo;
   }
 
   private function downloadFile($filePath, $maxSize = 0, $log = true) {

@@ -180,7 +180,7 @@ function stableSort(Array &$a) {
 }
 
 function getCurLink($query=false) {
-  if(!$query) return isset($_GET["page"]) ? $_GET["page"] : "";
+  if(!$query) return isset($_GET["q"]) ? $_GET["q"] : "";
   $query = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
   return substr($query, strlen(ROOT_URL));
 }
@@ -409,44 +409,6 @@ function fileSizeConvert($b) {
         $i++;
     }
     return round($b, 1)." ".$iec[$i];
-}
-
-function checkUrl($folder = null) {
-  $rUri = $_SERVER["REQUEST_URI"];
-  $pUrl = parse_url($rUri);
-  if($pUrl === false || strpos($pUrl["path"], "//") !== false)
-    new ErrorPage(sprintf(_("The requested URL '%s' was not understood by this server."), $rUri), 400);
-  if(!preg_match("/^".preg_quote(ROOT_URL, "/")."(".FILEPATH_PATTERN.")(\?.*)?$/", $rUri, $m))
-    return null;
-
-  $fInfo["filepath"] = "$folder/".$m[1];
-  if(!is_file($fInfo["filepath"]))
-    new ErrorPage(sprintf(_("The requested URL '%s' was not found on this server."), $rUri), 404);
-
-  $disallowedMime = array(
-    "application/x-msdownload" => null,
-    "application/x-msdos-program" => null,
-    "application/x-msdos-windows" => null,
-    "application/x-download" => null,
-    "application/bat" => null,
-    "application/x-bat" => null,
-    "application/com" => null,
-    "application/x-com" => null,
-    "application/exe" => null,
-    "application/x-exe" => null,
-    "application/x-winexe" => null,
-    "application/x-winhlp" => null,
-    "application/x-winhelp" => null,
-    "application/x-javascript" => null,
-    "application/hta" => null,
-    "application/x-ms-shortcut" => null,
-    "application/octet-stream" => null,
-    "vms/exe" => null,
-  );
-  $fInfo["filemime"] = getFileMime($fInfo["filepath"]);
-  if(array_key_exists($fInfo["filemime"], $disallowedMime))
-    new ErrorPage(sprintf(_("Unsupported mime type '%s'"), $fInfo["filemime"]), 415);
-  return $fInfo;
 }
 
 function getFileHash($filePath) {
