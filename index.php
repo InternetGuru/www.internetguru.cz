@@ -14,6 +14,8 @@ try {
   define("CORE_DIR", "core");
   define("FILES_DIR", "files");
   define("LOG_DIR", "cmslog");
+  define("DEBUG_FILE", "DEBUG");
+  define("FORBIDDEN_FILE", "FORBIDDEN");
   define('SUBDOM_ROOT_DIR', "subdom");
   define("ADMIN_ROOT_DIR", "cmsadmin");
   define("USER_ROOT_DIR", "cmsuser");
@@ -61,7 +63,7 @@ try {
     define("WWW_FOLDER", "/var/www");
     define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
     define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
-    define('CMS_DEBUG', is_file("DEBUG"));
+    define('CMS_DEBUG', is_file(DEBUG_FILE));
     $userId = null;
     foreach(scandir(getcwd()) as $f) {
       $varName = strtok($f, ".");
@@ -111,7 +113,9 @@ try {
 
   require_once(CORE_FOLDER.'/globals.php');
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time);
-  initStructure();
+  initDirs();
+  initLinks();
+  initFiles();
 
   $start_time = microtime(true);
   $plugins = new Plugins();

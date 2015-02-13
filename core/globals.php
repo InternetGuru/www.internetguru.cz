@@ -257,7 +257,7 @@ function duplicateDir($dir, $deep=true) {
   return $bakDir;
 }
 
-function initStructure() {
+function initDirs() {
   $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
     LOG_FOLDER, FILES_FOLDER, RES_DIR);
   foreach($dirs as $d) {
@@ -265,11 +265,15 @@ function initStructure() {
     if(mkdir($d, 0755, true)) continue;
     throw new Exception(sprintf(_("Unable to create folder %s"), $d));
   }
+}
+
+function initLinks() {
   $links = array(CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER);
   foreach(scandir(CMS_ROOT_FOLDER) as $f) {
     if(strpos($f, ".") === 0) continue;
     if(!is_dir(CMS_ROOT_FOLDER."/$f")) continue;
     if(file_exists(CMS_ROOT_FOLDER."/.$f")) continue;
+    if(!is_file(CMS_ROOT_FOLDER."/$f/index.php")) continue;
     $links["$f.php"] = CMS_ROOT_FOLDER."/$f/index.php";
   }
   foreach(scandir(getcwd()) as $f) {
@@ -281,12 +285,21 @@ function initStructure() {
   foreach($links as $l => $t) {
     createSymlink($l, $t);
   }
+}
+
+function initFiles() {
   if(basename($_SERVER["SCRIPT_NAME"]) != "index.php") return;
-  $srcIndex = CMS_FOLDER."/_subdom/index.php";
-  $destIndex = "index.php";
-  if(filemtime($srcIndex) <= filemtime($destIndex)) return;
-  safeRewriteFile($srcIndex, $destIndex);
-  redirTo(ROOT_URL.getCurLink(), null, true, _("File index.php updated"));
+  $coreFiles = array(".htaccess", "index.php");
+  $updated = false;
+  foreach($coreFiles as $f) {
+    $src = CMS_FOLDER."/_subdom/$f";
+    if(filemtime($src) <= filemtime($f)) continue;
+    safeRewriteFile($src, $f);
+    $updated = true;
+  }
+  if($updated) redirTo(ROOT_URL.getCurLink(), null, true, _("Root file(s) updated"));
+  if(!file_exists(DEBUG) && !file_exists(".".DEBUG)) touch(".".DEBUG);
+  if(!file_exists(FORBIDDEN) && !file_exists(".".FORBIDDEN)) touch(FORBIDDEN);
 }
 
 function smartCopy($src, $dest, $delay=0) {
