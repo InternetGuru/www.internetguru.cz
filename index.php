@@ -5,6 +5,7 @@ try {
   session_cache_limiter("");
   session_start();
 
+  define("SERVER_IP", "46.28.109.142");
   define("INDEX_HTML", "index.html");
   define("PLUGINS_DIR", "plugins");
   define("THEMES_DIR", "themes");

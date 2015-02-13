@@ -108,12 +108,16 @@ class Cms {
   public static function isSuperUser() {
     if(IS_LOCALHOST) return true;
     if(self::getLoggedUser() == "admin") return true;
-    if(!isset($_SERVER["REMOTE_ADDR"])) return false;
-    if($_SERVER["REMOTE_ADDR"] == "46.28.109.142") return true;
+    if(self::getLoggedUser() == ADMIN_ID) return true;
+    if(isset($_SERVER["REMOTE_ADDR"])
+      && $_SERVER["REMOTE_ADDR"] == SERVER_IP) return true;
     return false;
   }
 
   public static function getLoggedUser() {
+    if(IS_LOCALHOST) return "localhost";
+    if(isset($_SERVER["REMOTE_ADDR"])
+      && $_SERVER["REMOTE_ADDR"] == SERVER_IP) return "server";
     if(isset($_SERVER['REMOTE_USER']))
       return $_SERVER['REMOTE_USER'];
     if(isset($_SESSION[get_called_class()]["loggedUser"]))

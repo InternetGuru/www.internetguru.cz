@@ -1,14 +1,11 @@
 <?php
 
-#TODO: detach if admin logged
-
 class GA extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    if(!is_null(Cms::getLoggedUser())
-      || preg_match("/^ig\d+/", CURRENT_SUBDOM_DIR)) {
+    if(Cms::isSuperUser()) {
       $subject->detach($this);
       return;
     }
