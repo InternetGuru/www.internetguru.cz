@@ -478,14 +478,6 @@ function getShortString($str) {
 
 function checkAuth() {
   if(!is_null(Cms::getLoggedUser(true))) return;
-  if(IS_LOCALHOST) {
-    Cms::setLoggedUser("localhost");
-    return;
-  }
-  if(isset($_SERVER["REMOTE_ADDR"]) && $_SERVER["REMOTE_ADDR"] == "46.28.109.142") {
-    Cms::setLoggedUser("server");
-    return;
-  }
   if(!file_exists(FORBIDDEN_FILE)) return;
   loginRedir();
 }

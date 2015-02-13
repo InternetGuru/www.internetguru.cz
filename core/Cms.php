@@ -99,21 +99,38 @@ class Cms {
     }
   }
 
-  public static function setLoggedUser($user) {
+  public static function setLoggedUser($user, $super=false) {
     if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
     $_SESSION[get_called_class()]["loggedUser"] = $user;
+    if($super) $_SESSION[get_called_class()]["superUser"] = true;
+    else $_SESSION[get_called_class()]["superUser"] = false;
+  }
+
+  public static function isSuperUser() {
+    if(!isset($_SESSION[get_called_class()]["superUser"])) return false;
+    return $_SESSION[get_called_class()]["superUser"];
   }
 
   public static function getLoggedUser($save=false) {
-    if(isset($_SERVER['REMOTE_USER'])) {
-      if($save) self::setLoggedUser($_SERVER['REMOTE_USER']);
-      return $_SERVER['REMOTE_USER'];
+    $loggedUser = null;
+    $superUser = false;
+    if(IS_LOCALHOST) {
+      $loggedUser = "localhost";
+      $superUser = true;
+    } elseif(isset($_SERVER["REMOTE_ADDR"])
+      && $_SERVER["REMOTE_ADDR"] == "46.28.109.142") {
+      $loggedUser = "server";
+      $superUser = true;
+    } elseif(isset($_SERVER['REMOTE_USER'])) {
+      $loggedUser = $_SERVER['REMOTE_USER'];
+    } elseif(isset($_SESSION[get_called_class()]["loggedUser"])) {
+      $loggedUser = $_SESSION[get_called_class()]["loggedUser"];
     }
-    if(isset($_SESSION[get_called_class()]["loggedUser"])) {
-      if($save) self::setLoggedUser($_SESSION[get_called_class()]["loggedUser"]); // regenerate id
-      return $_SESSION[get_called_class()]["loggedUser"];
+    if($loggedUser == "admin") $superUser = true;
+    if($save && !is_null($loggedUser)) {
+      self::setLoggedUser($loggedUser, $superUser);
     }
-    return null;
+    return $loggedUser;
   }
 
   public static function contentProcessVariables() {

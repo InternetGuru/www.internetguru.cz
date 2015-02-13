@@ -19,7 +19,7 @@ class Auth extends Plugin implements SplObserver {
       return;
     }
     // url is restricted
-    if(in_array(Cms::getLoggedUser(true), array(ADMIN_ID, "admin"))) return;
+    if(Cms::getLoggedUser(true) == ADMIN_ID || Cms::isSuperUser()) return;
     loginRedir();
   }
 
