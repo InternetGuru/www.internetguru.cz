@@ -103,6 +103,8 @@ class Cms {
     if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
     $_SESSION[get_called_class()]["loggedUser"] = $user;
     self::setVariable("logged_user", $user);
+    if(self::isSuperUser())
+      self::setVariable("super_user", $user);
   }
 
   public static function isSuperUser() {

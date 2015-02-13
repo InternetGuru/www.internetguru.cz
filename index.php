@@ -86,9 +86,9 @@ try {
   }
   define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
   define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
-  define('THEMES_FOLDER', CMS_FOLDER."/".THEMES_DIR);
   define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
   define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
+  define('THEMES_FOLDER', USER_FOLDER."/".THEMES_DIR);
   define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
   define('CMS_VERSION_FILENAME', "cms_version.txt");
   define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));

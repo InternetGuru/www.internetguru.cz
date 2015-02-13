@@ -259,7 +259,7 @@ function duplicateDir($dir, $deep=true) {
 
 function initDirs() {
   $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
-    LOG_FOLDER, FILES_FOLDER);
+    LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER);
   if(!IS_LOCALHOST) $dirs[] = RES_DIR;
   foreach($dirs as $d) {
     if(is_dir($d)) continue;
@@ -303,15 +303,13 @@ function initFiles() {
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
 }
 
-function smartCopy($src, $dest, $delay=0) {
+function smartCopy($src, $dest, $force=false) {
   if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"), basename($src)));
   if(file_exists($dest)) {
+    if(!$force) return;
     // both are links with same target
     if(is_link($dest) && is_link($src)
       && readlink($dest) == readlink($src)) return;
-    // both are files within given age gap (delay)
-    elseif(!is_link($dest) && !is_link($src)
-      && $delay && filectime($dest) > time()-$delay) return;
   }
   $destDir = dirname($dest);
   if(!is_dir($destDir) && !mkdir($destDir, 0755, true))

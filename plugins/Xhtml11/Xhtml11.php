@@ -69,7 +69,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon");
+    $icoPath = findFile($this->favIcon);
+    if(is_file($icoPath)) {
+      $this->copyToRoot($icoPath, "favicon.ico");
+      $this->appendLinkElement($head, "favicon.ico", "shortcut icon");
+    } else {
+      new Logger(sprintf(_("Favicon %s not found"), $this->favIcon), Logger::LOGGER_WARNING);
+    }
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
     $this->appendJsFiles($head);
     $this->appendCssFiles($head);
@@ -298,12 +304,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->addThemeFiles($cfg->documentElement);
   }
 
-  private function createRootFavicon($target) {
-    if(IS_LOCALHOST) return;
-    $link = "favicon.ico";
-    if(is_link($link) && readlink($link) == $target) return;
-    if(symlink($target, "$link~") && rename("$link~", $link)) return;
-    new Logger(sprintf(_("Unable to create root '%s' link"), $link), Logger::LOGGER_ERROR);
+  private function copyToRoot($src, $dest) {
+    if(is_file($dest) && getFileHash($src) == getFileHash($dest)) return;
+    smartCopy($src, $dest, true);
   }
 
   private function addThemeFiles(DOMElement $e) {
@@ -378,7 +381,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       new Logger($comment, Logger::LOGGER_ERROR);
       return;
     }
-    if($rel == "shortcut icon") $this->createRootFavicon($f);
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
