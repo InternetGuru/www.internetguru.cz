@@ -275,7 +275,7 @@ class DOMBuilder {
     foreach($toStripTag as $include) $include->stripTag();
     foreach($toStripElement as $include) $include->stripElement();
     new Logger(sprintf(_("Inserted %s of %s HTML+ file(s)"),
-      count($toStripElement), count($includes)), null, $start_time);
+      count($toStripElement), count($includes)), null, $start_time, false);
   }
 
   private static function insertHtmlPlus(DOMElement $include, $homeDir) {

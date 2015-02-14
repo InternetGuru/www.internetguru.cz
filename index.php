@@ -67,9 +67,9 @@ try {
     define('CMS_DEBUG', is_file(DEBUG_FILE));
     $userId = null;
     foreach(scandir(getcwd()) as $f) {
-      $varName = strtok($f, ".");
-      if($varName != "ADMIN") continue; // eg. ADMIN.ig1
-      $userId = substr($f, strlen($varName)+1);
+      $varName = substr($f, 0, 6);
+      if($varName != "ADMIN.") continue; // eg. ADMIN.ig1
+      $userId = substr($f, 6);
     }
     define('ADMIN_ID', $userId);
     define('CMSRES_ROOT_DIR', "cmsres");

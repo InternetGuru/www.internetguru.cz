@@ -28,6 +28,7 @@ class Plugins implements SplSubject {
     foreach(scandir(PLUGINS_FOLDER) as $p) {
       if(strpos($p, ".") === 0) continue;
       if(file_exists(PLUGINS_FOLDER."/.$p")) continue;
+      if(file_exists(".PLUGIN.$p")) continue;
       $this->attach(new $p($this));
     }
   }

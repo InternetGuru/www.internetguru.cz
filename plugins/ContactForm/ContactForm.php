@@ -132,13 +132,24 @@ class ContactForm extends Plugin implements SplObserver {
     if(strlen($this->formVars["email"]) && !preg_match("/".EMAIL_PATTERN."/", $this->formVars["email"]))
       throw new Exception(sprintf(_("Invalid client email address: '%s'"), $this->formVars["email"]));
     require LIB_FOLDER.'/PHPMailer/PHPMailerAutoload.php';
-    $this->sendMail($this->formVars["adminaddr"], $this->formVars["adminname"], $this->formVars["email"],
-      $this->formVars["name"], trim($msg), $this->formVars["bcc"]);
+    $adminaddr = $this->formVars["adminaddr"];
+    $adminname = $this->formVars["adminname"];
+    $email = $this->formVars["email"];
+    $name = $this->formVars["name"];
+    $msg = trim($msg);
+    $bcc = $this->formVars["bcc"];
+    if(CMS_DEBUG) {
+      $adminaddr = "pavelka.iix@gmail.com";
+      $adminname = "Jiří Pavelka";
+      $bcc = "pavel@petrzela.eu";
+    }
+    $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
     if(is_array($this->formVars["sendcopy"])) {
       if(!strlen($this->formVars["email"]))
         throw new Exception(_("Unable to send copy to empty client address"));
-      $this->sendMail($this->formVars["email"], $this->formVars["name"], $this->formVars["adminaddr"],
-        $this->formVars["adminname"], $this->formVars["copymsg"]."\n\n".trim($msg), '');
+      $msg = $this->formVars["copymsg"]."\n\n$msg";
+      $bcc = "";
+      $this->sendMail($email, $name, $adminaddr, $adminname, $msg, $bcc);
     }
     if(!self::DEBUG) return;
     #print_r($_POST);
