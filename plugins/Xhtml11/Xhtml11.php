@@ -145,7 +145,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $toStrip[] = array($a, sprintf(_("Link '%s' not found within existing links or files"), $path));
           continue; // link not exists
         }
-        if($eName != "form" && getCurLink(true) == $path.$queryUrl) {
+        #var_dump(getCurLink(true));
+        #var_dump($this->buildLink($path, $query));
+        if($eName != "form" && ROOT_URL.getCurLink(true) == $this->buildLink($path, $query)) {
           $toStrip[] = array($a, _("Cyclic link found"));
           continue; // link is cyclic (except form@action)
         }
@@ -156,7 +158,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $linkedElement = $doc->getElementById($frag);
       if(!is_null($linkedElement)) {
         $h1id = $doc->getElementsByTagName("h1")->item(0)->getAttribute("id");
-        if(getCurLink(true) == getCurLink().$queryUrl && $h1id == $frag) {
+        #var_dump(getCurLink(true));
+        #var_dump($this->buildLink($path, $query));
+        #var_dump($h1id.":".$frag);
+        if(ROOT_URL.getCurLink(true) == $this->buildLink(getCurLink(), $query) && $h1id == $frag) {
           $toStrip[] = array($a, _("Cyclic fragment found"));
         }
         continue; // ignore visible headings
