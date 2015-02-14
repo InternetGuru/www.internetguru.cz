@@ -28,13 +28,23 @@ class DOMBuilder {
     return $doc;
   }
 
-  public static function getLink($frag) {
-    if(!array_key_exists($frag, self::$idToLink)) return null;
+  public static function getId($link) {
+    if($link == "") {
+      reset(self::$linkToId);
+      return current(self::$linkToId);
+    }
+    if(!array_key_exists($link, self::$linkToId))
+      throw new Exception(sprintf(_("Link %s not found"), $link));
+    return self::$linkToId[$link];
+  }
+
+  public static function getLink($id) {
+    if(!array_key_exists($id, self::$idToLink))
+      throw new Exception(sprintf(_("Id %s not found"), $id));
     reset(self::$idToLink);
-    if($frag == key(self::$idToLink)) return "";
-    $link = self::$idToLink[$frag];
-    if($link == current(self::$idToLink)) return "#$frag";
-    if(self::$linkToId[$link] != $frag) $link .= "#$frag";
+    if($id == key(self::$idToLink)) return ""; // link to first HP heading
+    $link = self::$idToLink[$id];
+    if($link == current(self::$idToLink)) return ""; // link to 2nd+ HP heading
     return $link;
   }
 

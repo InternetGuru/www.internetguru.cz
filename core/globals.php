@@ -13,7 +13,7 @@ function trimLink($link) {
   $pLink = parse_url($link);
   if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   if(!isset($pLink["scheme"]) && !isset($pLink["host"])) return $link; // link is relative
-  if(isset($pLink["scheme"]) && $pLink["scheme"] != $_SERVER["REQUEST_SCHEME"]) return $link; // different scheme
+  if(isset($pLink["scheme"]) && $pLink["scheme"] != $_SERVER["REQUEST_SCHEME"]) return null; // different scheme
   if($pLink["host"] != HOST) return null; // different host
   $link = "";
   if(isset($pLink["path"])) $link = $pLink["path"];
@@ -299,6 +299,8 @@ function initLinks() {
 }
 
 function initFiles() {
+  if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
+  if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
   if(basename($_SERVER["SCRIPT_NAME"]) != "index.php") return;
   $coreFiles = array(".htaccess", "index.php");
   $updated = false;
@@ -308,9 +310,7 @@ function initFiles() {
     safeRewriteFile($src, $f);
     $updated = true;
   }
-  if($updated) redirTo(getCurLink(), $_SERVER["QUERY_STRING"], null, true, _("Root file(s) updated"));
-  if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
-  if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
+  if($updated) redirTo(getCurLink(), "", null, true, _("Root file(s) updated"));
 }
 
 function smartCopy($src, $dest, $force=false) {

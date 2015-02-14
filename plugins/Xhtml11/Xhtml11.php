@@ -161,12 +161,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         }
         continue; // ignore visible headings
       }
-      $link = DOMBuilder::getLink($frag);
-      if(is_null($link)) {
-        $toStrip[] = array($a, sprintf(_("Identifier '%s' not found"), $frag));
-        continue; // id not exists
+      try {
+        $link = DOMBuilder::getLink($frag);
+        $a->setAttribute($aName, buildLink($link).(DOMBuilder::getId($link) != $frag ? "#$frag" : ""));
+      } catch(Exception $e) {
+        $toStrip[] = array($a, $e->getMessage());
       }
-      $a->setAttribute($aName, buildLink($link));
     }
     foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
