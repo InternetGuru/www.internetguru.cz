@@ -1,81 +1,64 @@
-# ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
-
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
-
 # don't put duplicate lines in the history. See bash(1) for more options
 # don't overwrite GNU Midnight Commander's setting of `ignorespace'.
 HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
 # ... or force ignoredups and ignorespace
 HISTCONTROL=ignoreboth
-
 # append to the history file, don't overwrite it
 shopt -s histappend
 
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# make less more friendly for non-text input files, see lesspipe(1)
-#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# set variable identifying the chroot you work in (used in the prompt below)
-#if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
-#debian_chroot=$(cat /etc/debian_chroot)
-#fi
-
-# set a fancy prompt (non-color, unless we know we "want" color)
-#case "$TERM" in
-#xterm-color) color_prompt=yes;;
-#esac
-
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
-force_color_prompt=yes
-
-if [ -n "$force_color_prompt" ]; then
-if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-# We have color support; assume it's compliant with Ecma-48
-# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-# a case would tend to support setf rather than setaf.)
-color_prompt=yes
-else
-color_prompt=
-fi
-fi
-
-# enable color support of ls and also add handy aliases
+# Color settings
 if [ -x /usr/bin/dircolors ]; then
 test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
 alias ls='ls --color=auto'
 fi
-
-# alias ls='ls $LS_OPTIONS'
- alias ll='ls $LS_OPTIONS -lah'
-# alias l='ls $LS_OPTIONS -lA'
-#
-# Some more alias to avoid making mistakes:
-# alias rm='rm -i'
-# alias cp='cp -i'
-# alias mv='mv -i'
-
 export TERM=xterm-256color
 
-# FOLDERS
-CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
-CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
-CMS_FOLDER_3='/cygdrive/e/Instal/wamp/www/cms/'
-CMS_FOLDER="$( if [ -d "$CMS_FOLDER_1" ]; then echo "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then echo "$CMS_FOLDER_2"; elif [ -d "$CMS_FOLDER_3" ]; then echo "$CMS_FOLDER_3"; else echo "dir not found"; fi )"
-alias cms='cd "$CMS_FOLDER"'
+# Normal Colors
+Black='\e[0;30m'        # Black
+Red='\e[0;31m'          # Red
+Green='\e[0;32m'        # Green
+Yellow='\e[0;33m'       # Yellow
+Blue='\e[0;34m'         # Blue
+Purple='\e[0;35m'       # Purple
+Cyan='\e[0;36m'         # Cyan
+White='\e[0;37m'        # White
+# Bold
+BBlack='\e[1;30m'       # Black
+BRed='\e[1;31m'         # Red
+BGreen='\e[1;32m'       # Green
+BYellow='\e[1;33m'      # Yellow
+BBlue='\e[1;34m'        # Blue
+BPurple='\e[1;35m'      # Purple
+BCyan='\e[1;36m'        # Cyan
+BWhite='\e[1;37m'       # White
+# Background
+On_Black='\e[40m'       # Black
+On_Red='\e[41m'         # Red
+On_Green='\e[42m'       # Green
+On_Yellow='\e[43m'      # Yellow
+On_Blue='\e[44m'        # Blue
+On_Purple='\e[45m'      # Purple
+On_Cyan='\e[46m'        # Cyan
+On_White='\e[47m'       # White
+# Color reset
+NC="\e[m"
+# Color2user
+if [[ $USER == "root" ]]; then
+  SU=$BRed
+  elif [[ $USER == "cmsadmin" ]]; then
+    SU=$BGreen
+  elif [[ $USER == "webcmsadmin" ]]; then
+    SU=$BGreen
+  else
+    SU=$BCyan
+fi
+PS1="\[$SU\]\u\[$NC\]@\h:\w\#\[$NC\] "
 
 # GIT
 alias gaas='git add -A; gs'
-alias gclone='_(){ git clone --recursive ${1:"git@bitbucket.org:igwr/cms.git"}; }; _'
+alias gclone='_(){ git clone --recursive ${1:git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
 alias gdc='_(){ git log $1^..$1 -p; }; _' # git diff commit [param HASH]
 alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _'
@@ -84,6 +67,7 @@ alias gl='git log --decorate --all --oneline --graph'
 alias glc='git log --decorate --oneline'
 alias gpush='git push --all; git push --tags'
 alias gpull='git pull --all --tags && git fetch -p && git submodule update --init --recursive'
+alias gpullhard='git reset --hard && gpull'
 alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _'
 alias gs='git status && git submodule status'
 
@@ -92,3 +76,10 @@ alias sshcmsadmin='ssh -i ~/.ssh/id_rsa cmsadmin@46.28.109.142'
 alias less='less -rSX'
 alias ll='ls -lah'
 alias phplint='find . -name "*.php" -type f -exec php -l "{}" \;'
+
+# LOCAL
+CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
+CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
+CMS_FOLDER_3='/cygdrive/e/Instal/wamp/www/cms/'
+CMS_FOLDER="$( if [ -d "$CMS_FOLDER_1" ]; then echo "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then echo "$CMS_FOLDER_2"; elif [ -d "$CMS_FOLDER_3" ]; then echo "$CMS_FOLDER_3"; else echo "dir not found"; fi )"
+alias cms='cd "$CMS_FOLDER"'
