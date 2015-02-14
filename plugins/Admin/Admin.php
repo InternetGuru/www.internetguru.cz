@@ -331,11 +331,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     return $schema;
   }
 
-  private function redir($f="") {
-    $redir = ROOT_URL.getCurLink();
-    if(!isset($_POST["saveandgo"]))
-      $redir .= "?".get_class($this).(strlen($f) ? "=$f" : "");
-    redirTo($redir, null, true);
+  private function redir($f) {
+    $q = "";
+    if(!isset($_POST["saveandgo"])) $q = get_class($this)."=$f";
+    redirTo(getCurLink(), $q, null, true);
   }
 
 }

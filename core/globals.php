@@ -14,7 +14,7 @@ function trimLink($link) {
   if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   if(!isset($pLink["scheme"]) && !isset($pLink["host"])) return $link; // link is relative
   if(isset($pLink["scheme"]) && $pLink["scheme"] != $_SERVER["REQUEST_SCHEME"]) return $link; // different scheme
-  if($pLink["host"] != HOST) return $link; // different host
+  if($pLink["host"] != HOST) return null; // different host
   $link = "";
   if(isset($pLink["path"])) $link = $pLink["path"];
   if(isset($pLink["query"])) $link .= "?".$pLink["query"];
@@ -133,11 +133,11 @@ function absoluteLink($link=null) {
   return "$scheme://$host$path$query";
 }
 
-function redirTo($link, $code=null, $force=false, $msg=null) {
-  if(!$force) {
-    $curLink = absoluteLink();
-    $absLink = absoluteLink($link);
-    if($curLink == $absLink)
+function redirTo($link, $query="", $code=null, $force=false, $msg=null) {
+  $l = trimLink(strtok($link, "?"));
+  if(!is_null($l)) {
+    $link = buildLink($l, $query);
+    if(!$force && getCurLink(true) == $link)
       throw new LoggerException(sprintf(_("Cyclic redirection to '%s'"), $link));
   }
   http_response_code(is_null($code) ? 302 : $code);
@@ -151,6 +151,16 @@ function redirTo($link, $code=null, $force=false, $msg=null) {
   header("Location: $link", true, $code);
   header("Refresh: 0; url=$link");
   exit();
+}
+
+function buildLink($path, $query="") {
+  if(strpos($path, ROOT_URL) === 0) $path = substr($path, strlen(ROOT_URL));
+  $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
+  if($scriptFile == "index.php") return ROOT_URL.$path.(strlen($query) ? "?$query" : "");
+  $q = array();
+  if(strlen($path)) $q[] ="q=$path";
+  if(strlen($query)) $q[] = $query;
+  return ROOT_URL.$scriptFile.(!empty($q) ? "?".implode("&", $q) : "");
 }
 
 function chmodGroup($file, $mode) {
@@ -298,7 +308,7 @@ function initFiles() {
     safeRewriteFile($src, $f);
     $updated = true;
   }
-  if($updated) redirTo(ROOT_URL.getCurLink(), null, true, _("Root file(s) updated"));
+  if($updated) redirTo(getCurLink(), $_SERVER["QUERY_STRING"], null, true, _("Root file(s) updated"));
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
 }
@@ -437,7 +447,7 @@ function getShortString($str) {
 }
 
 function loginRedir() {
-  redirTo("?login", 401, true, _("Authorization required"));
+  redirTo(getCurLink(), "login", 401, true, _("Authorization required"));
 }
 
 ?>

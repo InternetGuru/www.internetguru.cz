@@ -75,6 +75,7 @@ class DOMDocumentPlus extends DOMDocument {
       if(!$e->hasAttribute($attName)) continue;
       try {
         $link = trimLink($e->getAttribute($attName));
+        if(is_null($link)) $link = $e->getAttribute($attName);
         if($link == "") $link = "/";
         if($link === $e->getAttribute($attName)) continue;
         if(!$repair)

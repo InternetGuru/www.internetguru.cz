@@ -130,8 +130,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     foreach($doc->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
       $link = $a->getAttribute($aName);
+      if(is_null(trimLink($link))) continue;
       $pLink = parse_url($link);
-      if(trimLink($link) == $link && isset($pLink["host"])) continue;
       $query = isset($pLink["query"]) ? $pLink["query"] : "";
       $queryUrl = strlen($query) ? "?$query" : "";
       if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
@@ -139,29 +139,24 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         while(strpos($path, "/") === 0) $path = substr($path, 1);
         if(strlen($path) && !DOMBuilder::isLink($path)) {
           if(is_file(FILES_FOLDER.$path) || is_file(FILES_FOLDER."/".$path)) {
-            $a->setAttribute($aName, $this->buildLink($path, $query));
+            $a->setAttribute($aName, buildLink($path, $query));
             continue; // link to file
           }
           $toStrip[] = array($a, sprintf(_("Link '%s' not found within existing links or files"), $path));
           continue; // link not exists
         }
-        #var_dump(getCurLink(true));
-        #var_dump($this->buildLink($path, $query));
-        if($eName != "form" && ROOT_URL.getCurLink(true) == $this->buildLink($path, $query)) {
+        if($eName != "form" && ROOT_URL.getCurLink(true) == buildLink($path, $query)) {
           $toStrip[] = array($a, _("Cyclic link found"));
           continue; // link is cyclic (except form@action)
         }
-        $a->setAttribute($aName, $this->buildLink($path, $query));
+        $a->setAttribute($aName, buildLink($path, $query));
         continue; // localize link
       }
       $frag = $pLink["fragment"];
       $linkedElement = $doc->getElementById($frag);
       if(!is_null($linkedElement)) {
         $h1id = $doc->getElementsByTagName("h1")->item(0)->getAttribute("id");
-        #var_dump(getCurLink(true));
-        #var_dump($this->buildLink($path, $query));
-        #var_dump($h1id.":".$frag);
-        if(ROOT_URL.getCurLink(true) == $this->buildLink(getCurLink(), $query) && $h1id == $frag) {
+        if(ROOT_URL.getCurLink(true) == buildLink(getCurLink(), $query) && $h1id == $frag) {
           $toStrip[] = array($a, _("Cyclic fragment found"));
         }
         continue; // ignore visible headings
@@ -171,15 +166,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $toStrip[] = array($a, sprintf(_("Identifier '%s' not found"), $frag));
         continue; // id not exists
       }
-      $a->setAttribute($aName, $this->buildLink($link, ""));
+      $a->setAttribute($aName, buildLink($link));
     }
     foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
-  }
-
-  private function buildLink($path, $query) {
-    $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
-    if($scriptFile == "index.php") return ROOT_URL.$path.(strlen($query) ? "?$query" : "");
-    return ROOT_URL.$scriptFile."?q=$path".(strlen($query) ? "&$query" : "");
   }
 
   private function validateImages(DOMDocumentPlus $dom) {

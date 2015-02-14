@@ -40,7 +40,7 @@ class UrlHandler extends Plugin implements SplObserver {
       }
       $query = parse_url($var->nodeValue, PHP_URL_QUERY);
       if(strlen($query)) $query = $this->alterQuery($query, $pNam);
-      redirTo(ROOT_URL.$path.(strlen($query) ? "?$query" : ""), $code);
+      redirTo($path, $query, $code);
     }
   }
 
@@ -68,7 +68,7 @@ class UrlHandler extends Plugin implements SplObserver {
     $links = DOMBuilder::getLinks();
     if(DOMBuilder::isLink(getCurLink())) {
       if(getCurLink() != $links[0]) return;
-      $link = ROOT_URL; // link to root heading permanent redir to root
+      $link = ""; // link to root heading permanent redir to root
       $code = 301;
     } else {
       $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
@@ -76,11 +76,11 @@ class UrlHandler extends Plugin implements SplObserver {
       $linkId = $this->findSimilarLinkId($links, $newLink);
       if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
       else $newLink = $links[$linkId];
-      $link = ROOT_URL.$newLink;
+      $link = $newLink;
       $code = 404;
     }
     if(self::DEBUG) die("Redirecting to $link");
-    redirTo($link, $code);
+    redirTo($link, "", $code);
   }
 
   private function getBestId(Array $links, Array $found) {
