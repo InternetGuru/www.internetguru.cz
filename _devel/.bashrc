@@ -54,11 +54,11 @@ if [[ $USER == "root" ]]; then
   else
     SU=$BCyan
 fi
-PS1="\[$SU\]\u\[$NC\]@\h:\w\#\[$NC\] "
+PS1="\[$SU\]\u\[$NC\]@\h:\w# "
 
 # GIT
 alias gaas='git add -A; gs'
-alias gclone='_(){ git clone --recursive ${1:git@bitbucket.org:igwr/cms.git}; }; _'
+alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
 alias gdc='_(){ git log $1^..$1 -p; }; _' # git diff commit [param HASH]
 alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _'
