@@ -185,7 +185,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         #todo: $this->asynchronousExternalImageCheck($dataFile);
         continue;
       }
-      $filePath = FILES_FOLDER."/".$pUrl["path"];
+      $query = array();
+      if(isset($pUrl["query"])) parse_str($pUrl["query"], $query);
+      $filePath = FILES_FOLDER."/".(array_key_exists("q", $query) ? $query["q"] : $pUrl["path"]);
       if(!is_file($filePath)) {
         $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $pUrl["path"]));
         continue;
@@ -198,15 +200,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $o->setAttribute("type", $mime);
           new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime), Logger::LOGGER_WARNING);
         }
-        $query = isset($pUrl["query"]) ? explode("&", $pUrl["query"]) : array();
-        $fullRemoved = false;
-        foreach($query as $k => $q) {
-          if($q != "full" && strpos($q, "full=") !== 0) continue;
-          unset($query[$k]);
-          $fullRemoved = true;
-        }
-        if($fullRemoved) {
-          $o->setAttribute("data", $pUrl["path"].(count($query) ? "?".implode("&", $query) : ""));
+        if(array_key_exists("full", $query)) {
+          unset($query["full"]);
+          $o->setAttribute("data", $pUrl["path"].(count($query) ? "?".http_build_query($data) : ""));
           new Logger(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile), Logger::LOGGER_WARNING);
         }
       } catch(Exception $e) {
@@ -215,6 +211,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       }
     }
     foreach($toStrip as $o) $o[0]->stripTag($o[1]);
+  }
+
+  private function getLink($path, $query) {
+    $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
+    if($scriptFile == "index.php") return $path;
+
   }
 
   /*
