@@ -99,6 +99,17 @@ class Cms {
     }
   }
 
+  public static function checkAuth() {
+    $loggedUser = self::getLoggedUser();
+    if(!is_null($loggedUser)) {
+      self::setLoggedUser($loggedUser);
+      return;
+    }
+    if(!file_exists(FORBIDDEN_FILE)) return;
+    if(basename($_SERVER["SCRIPT_NAME"]) == "index.php") return;
+    loginRedir();
+  }
+
   public static function setLoggedUser($user) {
     if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
     $_SESSION[get_called_class()]["loggedUser"] = $user;

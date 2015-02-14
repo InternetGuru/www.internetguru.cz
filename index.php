@@ -118,9 +118,9 @@ try {
   if(!IS_LOCALHOST) initLinks();
   initFiles();
 
+  Cms::checkAuth();
   $start_time = microtime(true);
   $plugins = new Plugins();
-  checkAuth();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 

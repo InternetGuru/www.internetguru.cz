@@ -436,16 +436,6 @@ function getShortString($str) {
   return $sStr."…";
 }
 
-function checkAuth() {
-  $loggedUser = Cms::getLoggedUser();
-  if(!is_null($loggedUser)) {
-    Cms::setLoggedUser($loggedUser);
-    return;
-  }
-  if(!file_exists(FORBIDDEN_FILE)) return;
-  loginRedir();
-}
-
 function loginRedir() {
   redirTo("?login", 401, true, _("Authorization required"));
 }

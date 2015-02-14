@@ -14,7 +14,7 @@ class Auth extends Plugin implements SplObserver {
       else $access = false;
     }
     if(is_null($access)) return;
-    if($access && !file_exists(FORBIDDEN_FILE)) {
+    if($access) {
       Cms::setLoggedUser("anonymous");
       return;
     }
