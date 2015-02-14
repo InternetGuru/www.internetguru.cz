@@ -85,7 +85,7 @@ Ze systému $cms-name
     </dl>
   </form>
 
-  <!-- prázdný element message vygeneruje seznam všech polí -->
+  <!-- prázdný element message vygeneruje seznam všech polí
   <form id="demo">
     <dl>
       <dt><label for="name">Celé jméno</label></dt>
@@ -118,5 +118,6 @@ Ze systému $cms-name
       <dd><input type="submit" id="submit"/></dd>
     </dl>
   </form>
+  -->
 
 </ContactForm>

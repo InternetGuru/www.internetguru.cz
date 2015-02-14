@@ -28,7 +28,6 @@
   <stylesheet media="print">themes/cms-print.css</stylesheet>
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
-  <jsFile readonly="readonly" />
   <jsFile append="body">themes/fragments.js</jsFile>
   <jsFile append="body" priority="5">themes/selectable.js</jsFile>
   <jsFile append="body">themes/hideable.js</jsFile>
