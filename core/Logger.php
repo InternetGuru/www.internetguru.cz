@@ -19,7 +19,7 @@ class Logger {
       self::LOGGER_ERROR,
       self::LOGGER_WARNING,
       self::LOGGER_INFO))) $type = self::LOGGER_INFO;
-    if($cmsMsg && !is_null(Cms::getLoggedUser())) {
+    if($cmsMsg && Cms::isSuperUser()) {
       Cms::addMessage("$message [".$this->getCaller()."]", $type, Cms::isForceFlash());
     }
     $this->message = $message;
