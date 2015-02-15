@@ -243,7 +243,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if($this->type != "html") {
         $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
         $root = $doc->appendChild($doc->createElement($rootName));
-        $root->appendChild($doc->createComment(_(" user content ")));
+        $root->appendChild($doc->createComment(" "._("user content")." "));
       } else {
         $doc->appendChild($doc->createElement("body"));
         $doc->defaultHeading = _("My Heading");
