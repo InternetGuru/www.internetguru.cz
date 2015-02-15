@@ -81,7 +81,7 @@ p object {
 
 #messages {
   background: rgb(37,37,37);
-  font-family: "Emilbus Mono","Lucida Console",monospace;
+  /*font-family: "Emilbus Mono","Lucida Console",monospace;*/
   /*font-size: 1.15em;*/
 }
 #messages ul {
@@ -96,12 +96,14 @@ p object {
   padding: 0.5em;
 }
 #messages > span,
-#messages a,
-#messages li.info {
+#messages a {
   color: #ccc;
 }
+#messages li.info {
+  background: rgb(0, 66, 131);
+}
 #messages li.warning {
-  background: rgb(131, 114, 0);
+  background: rgb(166, 120, 0);
 }
 #messages li.error {
   background: rgb(187, 33, 33);
