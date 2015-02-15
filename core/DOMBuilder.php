@@ -12,7 +12,8 @@ class DOMBuilder {
   #const USE_CACHE = true;
   private static $included = array();
   private static $idToLink = array(); // id => closest or self link
-  private static $idToTitle = array(); // id => self h1
+  private static $idToDesc = array(); // id => shorted description
+  private static $idToTitle = array(); // id => self title or shorted content
   private static $linkToId = array(); // link => self id
 
   public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
@@ -47,6 +48,15 @@ class DOMBuilder {
     $link = self::$idToLink[$id];
     if($link == current(self::$idToLink)) return ""; // link to 2nd+ HP heading
     return $link;
+  }
+
+  public static function getDesc($id) {
+    if(array_key_exists($id, self::$idToDesc)) return self::$idToDesc[$id];
+    try {
+      return self::getDesc(self::getId($id));
+    } catch(Exception $e) {
+      return null;
+    }
   }
 
   public static function getTitle($id) {
@@ -220,7 +230,14 @@ class DOMBuilder {
     $duplicit = array();
     foreach(self::getIdentifiers($doc) as $e) {
       $id = $e->getAttribute("id");
-      self::$idToTitle[$id] = getShortString($e->nodeValue);
+      if($e->nodeName == "h") {
+        $desc = getShortString($e->nextElement->nodeValue);
+        if(strlen($desc)) self::$idToDesc[$id] = $desc;
+      }
+      if(strlen($e->getAttribute("title")))
+        self::$idToTitle[$id] = $e->getAttribute("title");
+      else
+        self::$idToTitle[$id] = getShortString($e->nodeValue);
       // element with id
       if(array_key_exists($id, self::$idToLink)) {
         $duplicit[] = $id;

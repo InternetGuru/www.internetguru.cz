@@ -150,7 +150,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           continue; // link is cyclic (except form@action)
         }
         $a->setAttribute($aName, buildLink($path, $query));
-        $this->generateTitle($a, $path);
+        if(!strlen($query)) $this->generateTitle($a, $path);
         continue; // localize link
       }
       $frag = $pLink["fragment"];
@@ -177,10 +177,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function generateTitle(DOMElementPlus $a, $id) {
+    if($a->nodeName != "a") return;
     if(strlen($a->getAttribute("title"))) return;
     $title = DOMBuilder::getTitle($id);
-    #var_dump($title);
+    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($id);
     if(is_null($title)) return;
+    if($title == $a->nodeValue) return;
     $a->setAttribute("title", $title);
   }
 
@@ -229,7 +231,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function getLink($path, $query) {
     $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
     if($scriptFile == "index.php") return $path;
-
   }
 
   /*
