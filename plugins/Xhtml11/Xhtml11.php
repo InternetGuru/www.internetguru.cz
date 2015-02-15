@@ -130,7 +130,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     foreach($doc->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
       $link = $a->getAttribute($aName);
-      if(is_null(trimLink($link))) continue;
+      if(is_null(trimLink($link))) continue; // link is external
       $pLink = parse_url($link);
       $query = isset($pLink["query"]) ? $pLink["query"] : "";
       $queryUrl = strlen($query) ? "?$query" : "";
@@ -150,6 +150,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           continue; // link is cyclic (except form@action)
         }
         $a->setAttribute($aName, buildLink($path, $query));
+        $this->generateTitle($a, $path);
         continue; // localize link
       }
       $frag = $pLink["fragment"];
@@ -158,17 +159,29 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $h1id = $doc->getElementsByTagName("h1")->item(0)->getAttribute("id");
         if(ROOT_URL.getCurLink(true) == buildLink(getCurLink(), $query) && $h1id == $frag) {
           $toStrip[] = array($a, _("Cyclic fragment found"));
+          continue; // link is to current h1
         }
+        $this->generateTitle($a, $frag);
+        #var_dump("generating title for ".$a->nodeValue);
         continue; // ignore visible headings
       }
       try {
         $link = DOMBuilder::getLink($frag);
         $a->setAttribute($aName, buildLink($link).(DOMBuilder::getId($link) != $frag ? "#$frag" : ""));
+        $this->generateTitle($a, $frag);
       } catch(Exception $e) {
         $toStrip[] = array($a, $e->getMessage());
       }
     }
     foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
+  }
+
+  private function generateTitle(DOMElementPlus $a, $id) {
+    if(strlen($a->getAttribute("title"))) return;
+    $title = DOMBuilder::getTitle($id);
+    #var_dump($title);
+    if(is_null($title)) return;
+    $a->setAttribute("title", $title);
   }
 
   private function validateImages(DOMDocumentPlus $dom) {

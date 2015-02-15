@@ -12,6 +12,7 @@ class DOMBuilder {
   #const USE_CACHE = true;
   private static $included = array();
   private static $idToLink = array(); // id => closest or self link
+  private static $idToTitle = array(); // id => self h1
   private static $linkToId = array(); // link => self id
 
   public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
@@ -46,6 +47,15 @@ class DOMBuilder {
     $link = self::$idToLink[$id];
     if($link == current(self::$idToLink)) return ""; // link to 2nd+ HP heading
     return $link;
+  }
+
+  public static function getTitle($id) {
+    if(array_key_exists($id, self::$idToTitle)) return self::$idToTitle[$id];
+    try {
+      return self::getTitle(self::getId($id));
+    } catch(Exception $e) {
+      return null;
+    }
   }
 
   public static function getRootHeadingId() {
@@ -210,11 +220,14 @@ class DOMBuilder {
     $duplicit = array();
     foreach(self::getIdentifiers($doc) as $e) {
       $id = $e->getAttribute("id");
+      self::$idToTitle[$id] = getShortString($e->nodeValue);
+      // element with id
       if(array_key_exists($id, self::$idToLink)) {
         $duplicit[] = $id;
         $id = self::generateUniqueVal($id, self::$idToLink);
         $e->setAttribute("id", $id);
       }
+      // heading
       if($e->hasAttribute("link")) {
         $link = $e->getAttribute("link");
         if(array_key_exists($link, self::$linkToId)) {

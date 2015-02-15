@@ -432,8 +432,8 @@ function getDirHash($dirPath) {
 }
 
 function getShortString($str) {
-  $lLimit = 9;
-  $hLimit = 16;
+  $lLimit = 60;
+  $hLimit = 80;
   if(strlen($str) < $hLimit) return $str;
   $w = explode(" ", $str);
   $sStr = $w[0];
