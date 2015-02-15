@@ -22,13 +22,6 @@ function trimLink($link) {
   return $link;
 }
 
-function getUrl($schema=true) {
-  $domain = $_SERVER["HTTP_HOST"];
-  if($schema) $domain = $_SERVER["REQUEST_SCHEME"]."://".$domain;
-  if(IS_LOCALHOST) return $domain . substr(ROOT_URL, 0, -1);
-  return $domain;
-}
-
 function findFile($file, $user=true, $admin=true, $res=false) {
   #while(strpos($file, "/") === 0) $file = substr($file, 1);
   try {

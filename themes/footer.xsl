@@ -18,6 +18,7 @@
   <xsl:param name="cms-desc" select="''"/>
   <xsl:param name="cms-kw" select="''"/>
   <xsl:param name="cms-url" select="''"/>
+  <xsl:param name="cms-uri" select="''"/>
   <xsl:param name="cms-link" select="''"/>
 
   <xsl:param name="contentlink-lang" select="''"/>
@@ -56,7 +57,7 @@
           <xsl:if test="not($cms-mtime = '')">
             <li>Upraveno: <xsl:value-of select="$inputvar-mymtime"/></li>
           </xsl:if>
-          <li class="link"><xsl:value-of disable-output-escaping="yes" select="$cms-url"/>/<xsl:value-of disable-output-escaping="yes" select="$cms-link"/></li>
+          <li class="link"><xsl:value-of disable-output-escaping="yes" select="$cms-uri"/></li>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
       </div>

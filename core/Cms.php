@@ -37,8 +37,9 @@ class Cms {
     self::setVariable("authorid", $h1->hasAttribute("authorid") ? $h1->getAttribute("authorid") : null);
     self::setVariable("resp", $h1->getAttribute("resp"));
     self::setVariable("respid", $h1->hasAttribute("respid") ? $h1->getAttribute("respid") : null);
-    self::setVariable("domain", getUrl(false));
-    self::setVariable("url", getUrl());
+    self::setVariable("host", HOST);
+    self::setVariable("url", URL);
+    self::setVariable("uri", URI);
     self::setVariable("link", getCurLink());
   }
 

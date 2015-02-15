@@ -15,10 +15,7 @@ class HTMLPlus extends DOMDocumentPlus {
     parent::__construct($version, $encoding);
     $c = new DateTime("now");
     $this->defaultCtime = $c->format(DateTime::W3C);
-    $this->defaultHeading = _("Some Required Heading");
-    $this->defaultNs = getUrl(false);
-    $this->defaultDesc = _("Some required description content");
-    $this->defaultKw = _("some, required, comma, separated, keywords");
+    $this->defaultNs = HOST;
   }
 
   public function __set($vName, $vValue) {
