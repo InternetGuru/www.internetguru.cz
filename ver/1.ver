@@ -1,4 +1,10 @@
+1.0.1 2015-02-15
+Přidáno automatické generování titulků k odkazům (3c2087d)
+
 1.0.0 2015-02-13
+cms-default.css: barvy a výchozí font systémových hlášení (64a3a5e)
+Explicitně zobrazená verze vyžaduje přihlášení (ca44b40)
+Podpora zobrazení webu na všech dostupných verzí přímo z URL (5215c13)
 Xhtml11: možnost vlastního souboru robots.txt (889e30e)
 Každá nová poddoména vyžaduje přihlášení (a712c74)
 Změna adresářové struktury (1c38432)
