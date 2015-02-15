@@ -69,6 +69,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
+    $this->appendMeta($head, "robots", "all");
     $icoPath = findFile($this->favIcon);
     if(is_file($icoPath)) {
       $this->copyToRoot($icoPath, "favicon.ico");
