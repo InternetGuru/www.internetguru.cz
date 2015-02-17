@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
-  xmlns:php="http://php.net/xsl">
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:param name="cms-title" select="''"/>
   <xsl:param name="contentlink-bc" select="''"/>
