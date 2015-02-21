@@ -146,10 +146,10 @@ function buildUrl(Array $p) {
 
 function parseLocalLink($link, $host=null) {
   $pLink = parse_url($link);
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
   if(isset($pLink["path"]))
     while(strpos($pLink["path"], "/") === 0) $pLink["path"] = substr($pLink["path"], 1);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   if(isset($pLink["scheme"])) {
     if($pLink["scheme"] != SCHEME) return null; // different scheme
     unset($pLink["scheme"]);
