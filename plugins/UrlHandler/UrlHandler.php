@@ -30,20 +30,24 @@ class UrlHandler extends Plugin implements SplObserver {
       $pNam = $var->hasAttribute("parName") ? $var->getAttribute("parName") : null;
       $pVal = $var->hasAttribute("parValue") ? $var->getAttribute("parValue") : null;
       if(!$this->queryMatch($pNam, $pVal)) continue;
-      $code = $var->hasAttribute("code") && $var->getAttribute("code") == "permanent" ? 301 : 302;
-      $path = parse_url($var->nodeValue, PHP_URL_PATH);
-      if(!strlen($path)) $path = getCurLink(); // current link if empty string
-      while(strpos($path, "/") === 0) $path = substr($path, 1); // empty string if root
-      if($path != getCurLink() && strlen($path) && !DOMBuilder::isLink($path)) {
-        new Logger(sprintf(_("Redirection link '%s' not found"), $path), "warning");
-        continue;
+      try {
+        $pLink = parseLocalLink($var->nodeValue);
+        if(is_null($pLink)) redirTo($var->nodeValue);
+        if(array_key_exists("fragment", $pLink)) redirTo(DOMBuilder::getLink($pLink["fragment"]));
+        if(array_key_exists("path", $pLink)) DOMBuilder::getId($pLink["path"]); // check
+        else $pLink["path"] = getCurLink();
+        if(array_key_exists("query", $pLink))
+          $pLink["query"] = $this->alterQuery($pLink["query"], $pNam);
+        $link = buildUrl($pLink);
+        if($link == getCurLink(true)) throw new Exception(sprintf(_("Link %s is cyclic"), $link));
+        redirTo($link);
+      } catch(Exception $e) {
+        new Logger($e->getMessage(), "warning");
       }
-      $query = parse_url($var->nodeValue, PHP_URL_QUERY);
-      if(strlen($query)) $query = $this->alterQuery($query, $pNam);
-      redirTo($path, $query, $code);
     }
   }
 
+  #todo: simplify parse_str()
   private function alterQuery($query, $pNam) {
     $param = array();
     foreach(explode("&", $query) as $p) {
@@ -56,6 +60,7 @@ class UrlHandler extends Plugin implements SplObserver {
     return implode("&", $query);
   }
 
+  #todo: simplify $_GET
   private function queryMatch($pNam, $pVal) {
     foreach(explode("&", parse_url(getCurLink(true), PHP_URL_QUERY)) as $q) {
       if(is_null($pVal) && strpos("$q=", "$pNam=$pVal") === 0) return true;
@@ -80,7 +85,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $code = 404;
     }
     if(self::DEBUG) die("Redirecting to $link");
-    redirTo($link, "", $code);
+    redirTo($link, $code);
   }
 
   private function getBestId(Array $links, Array $found) {

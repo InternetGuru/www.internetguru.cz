@@ -9,19 +9,6 @@ function __autoload($className) {
   throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
-function trimLink($link) {
-  $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
-  if(!isset($pLink["scheme"]) && !isset($pLink["host"])) return $link; // link is relative
-  if(isset($pLink["scheme"]) && $pLink["scheme"] != $_SERVER["REQUEST_SCHEME"]) return null; // different scheme
-  if($pLink["host"] != HOST) return null; // different host
-  $link = "";
-  if(isset($pLink["path"])) $link = $pLink["path"];
-  if(isset($pLink["query"])) $link .= "?".$pLink["query"];
-  if(isset($pLink["fragment"])) $link .= "#".$pLink["fragment"];
-  return $link;
-}
-
 function findFile($file, $user=true, $admin=true, $res=false) {
   #while(strpos($file, "/") === 0) $file = substr($file, 1);
   try {
@@ -126,13 +113,9 @@ function absoluteLink($link=null) {
   return "$scheme://$host$path$query";
 }
 
-function redirTo($link, $query="", $code=null, $force=false, $msg=null) {
-  $l = trimLink(strtok($link, "?"));
-  if(!is_null($l)) {
-    $link = buildLink($l, $query);
-    if(!$force && getCurLink(true) == $link)
-      throw new LoggerException(sprintf(_("Cyclic redirection to '%s'"), $link));
-  }
+function redirTo($link, $code=null, $msg=null) {
+  $pLink = parseLocalLink($link);
+  if(!is_null($pLink)) $link = buildLink(buildUrl($pLink)); // /[link]?[query] || beta.php?q=[link]&[query]
   http_response_code(is_null($code) ? 302 : $code);
   if(class_exists("Logger")) {
     new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
@@ -146,10 +129,44 @@ function redirTo($link, $query="", $code=null, $force=false, $msg=null) {
   exit();
 }
 
-function buildLink($path, $query="") {
-  if(strpos($path, ROOT_URL) === 0) $path = substr($path, strlen(ROOT_URL));
+function buildUrl(Array $p) {
+  $url = "";
+  if(array_key_exists("scheme", $p)) {
+    $url .= $p["scheme"].":";
+    if(!array_key_exists("host", $p)) throw new Exception(_("URL with scheme missing host"));
+  }
+  if(array_key_exists("user", $p) || array_key_exists("pass", $p))
+    throw new Exception(_("URL with username or password not supported"));
+  if(array_key_exists("host", $p)) $url .= "//".$p["host"];
+  if(array_key_exists("path", $p)) $url .= "/".$p["path"];
+  if(array_key_exists("query", $p)) $url .= "?".$p["query"];
+  if(array_key_exists("fragment", $p)) $url .= "#".$p["fragment"];
+  return $url;
+}
+
+function parseLocalLink($link, $host=null) {
+  $pLink = parse_url($link);
+  foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
+  if(isset($pLink["path"]))
+    while(strpos($pLink["path"], "/") === 0) $pLink["path"] = substr($pLink["path"], 1);
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
+  if(isset($pLink["scheme"])) {
+    if($pLink["scheme"] != SCHEME) return null; // different scheme
+    unset($pLink["scheme"]);
+  }
+  if(isset($pLink["host"])) {
+    if($pLink["host"] != (is_null($host) ? HOST : $host)) return null; // different ns
+    unset($pLink["host"]);
+  }
+  return $pLink;
+}
+
+function buildLink($link) {
+  if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
-  if($scriptFile == "index.php") return ROOT_URL.$path.(strlen($query) ? "?$query" : "");
+  if($scriptFile == "index.php") return ROOT_URL.$link;
+  $path = parse_url($link, PHP_URL_PATH);
+  $query = parse_url($link, PHP_URL_QUERY);
   $q = array();
   if(strlen($path)) $q[] ="q=$path";
   if(strlen($query)) $q[] = $query;
@@ -183,9 +200,17 @@ function stableSort(Array &$a) {
 }
 
 function getCurLink($query=false) {
-  if(!$query) return isset($_GET["q"]) ? $_GET["q"] : "";
-  $query = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : "";
-  return substr($query, strlen(ROOT_URL));
+  if(!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) return "";
+  parse_str($_SERVER['QUERY_STRING'], $pQuery);
+  $link = $pQuery["q"];
+  if(!$query) return $link;
+  unset($pQuery["q"]);
+  return $link.buildQuery($pQuery);
+}
+
+function buildQuery($pQuery) {
+  if(empty($pQuery)) return "";
+  return "?".urldecode(http_build_query($pQuery));
 }
 
 function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
@@ -303,7 +328,7 @@ function initFiles() {
     safeRewriteFile($src, $f);
     $updated = true;
   }
-  if($updated) redirTo(getCurLink(), "", null, true, _("Root file(s) updated"));
+  if($updated) redirTo(getCurLink(), "", null, _("Root file(s) updated"));
 }
 
 function smartCopy($src, $dest, $force=false) {
@@ -440,7 +465,7 @@ function getShortString($str) {
 }
 
 function loginRedir() {
-  redirTo(getCurLink(), "login", 401, true, _("Authorization required"));
+  redirTo(getCurLink()."?login", 401, _("Authorization required"));
 }
 
 ?>

@@ -189,7 +189,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateFirstHeadingAuthor($repair);
     $this->validateFirstHeadingLink($repair);
     $this->validateFirstHeadingCtime($repair);
-    $this->validateFirstHeadingNs($repair);
+    $this->validateBodyNs($repair);
     $this->validateMeta($repair);
     $this->relaxNGValidatePlus();
   }
@@ -210,12 +210,17 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  private function validateFirstHeadingNs($repair) {
+  private function validateBodyNs($repair) {
+    $b = $this->documentElement;
+    if($b->hasAttribute("ns")) return;
     $h = $this->headings->item(0);
-    if($h->hasAttribute("ns")) return;
+    if($h->hasAttribute("ns")) {
+      $this->defaultNs = $h->getAttribute("ns");
+      $h->removeAttribute("ns");
+    }
     if(!$repair || is_null($this->defaultNs))
-      throw new Exception(_("First heading attribude 'ns' missing"));
-    $h->setAttribute("ns", $this->defaultNs);
+      throw new Exception(_("Body attribude 'ns' missing"));
+    $b->setAttribute("ns", $this->defaultNs);
   }
 
   private function validateFirstHeadingLink($repair) {
@@ -382,6 +387,29 @@ class HTMLPlus extends DOMDocumentPlus {
         $h->setAttribute("link", $link);
       }
     }
+  }
+
+  public function validateLinks($elName, $attName, $repair) {
+    $toStrip = array();
+    foreach($this->getElementsByTagName($elName) as $e) {
+      if(!$e->hasAttribute($attName)) continue;
+      try {
+        $pLink = parseLocalLink($e->getAttribute($attName), $this->documentElement->getAttribute("ns"));
+        if(is_null($pLink)) continue;
+        if(array_key_exists("host", $pLink)) continue;
+        $link = buildUrl($pLink);
+        if($link == "") $link = "#".$this->headings->item(0)->getAttribute("id");
+        if($link === $e->getAttribute($attName)) continue; // link has not changed
+        if(!$repair)
+          throw new Exception(sprintf(_("Invalid repairable link '%s'"), $e->getAttribute($attName)));
+        $e->setAttribute($attName, $link);
+      } catch(Exception $ex) {
+        if(!$repair) throw $ex;
+        $toStrip[] = array($e, $ex->getMessage());
+      }
+    }
+    foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
+    return count($toStrip);
   }
 
   private function validateAuthor($repair) {

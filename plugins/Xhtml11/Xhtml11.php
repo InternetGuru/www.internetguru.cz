@@ -106,9 +106,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // correct links
     $contentPlus = new DOMDocumentPlus();
     $contentPlus->loadXML($content->saveXML());
-    $contentPlus->validateLinks("a", "href", true);
-    $contentPlus->validateLinks("form", "action", true);
-    $contentPlus->validateLinks("object", "data", true);
+    #$contentPlus->validateLinks("a", "href", true);
+    #$contentPlus->validateLinks("form", "action", true);
+    #$contentPlus->validateLinks("object", "data", true);
     $this->fragToLinks($contentPlus, Cms::getContentFull(), "a", "href");
     $this->fragToLinks($contentPlus, Cms::getContentFull(), "form", "action");
     $this->fragToLinks($contentPlus, Cms::getContentFull(), "object", "data");
@@ -126,62 +126,49 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     return $doc->saveXML();
   }
 
-  private function fragToLinks(DOMDocumentPlus $doc, HTMLPlus $src, $eName="a", $aName="href") {
+  private function fragToLinks(DOMDocumentPlus $doc, HTMLPlus $src, $eName, $aName) {
     $toStrip = array();
     foreach($doc->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
-      $link = $a->getAttribute($aName);
-      if(is_null(trimLink($link))) continue; // link is external
-      $pLink = parse_url($link);
-      $query = isset($pLink["query"]) ? $pLink["query"] : "";
-      $queryUrl = strlen($query) ? "?$query" : "";
-      if(isset($pLink["path"]) || isset($pLink["query"])) { // link is by path/query
-        $path = isset($pLink["path"]) ? $pLink["path"] : getCurLink();
-        while(strpos($path, "/") === 0) $path = substr($path, 1);
-        if(strlen($path) && !DOMBuilder::isLink($path)) {
-          if(is_file(FILES_FOLDER.$path) || is_file(FILES_FOLDER."/".$path)) {
-            $a->setAttribute($aName, buildLink($path, $query));
+      $pLink = parseLocalLink($a->getAttribute($aName));
+      if(is_null($pLink)) continue; // link is external
+      $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
+      try {
+        if(array_key_exists("fragment", $pLink)) {
+          $linkId = $pLink["fragment"];
+          if(array_key_exists("path", $pLink)) $linkId = trim($pLink["path"], "/")."-$linkId";
+        } elseif(strpos($a->getAttribute($aName), "?") === 0) {
+          $linkId = DOMBuilder::getId(getCurLink());
+        } elseif(isset($pLink["path"])) {
+          if(is_file(FILES_FOLDER."/".$pLink["path"])) {
+            $a->setAttribute($aName, buildLink($path.$query));
             continue; // link to file
           }
-          $toStrip[] = array($a, sprintf(_("Link '%s' not found within existing links or files"), $path));
-          continue; // link not exists
+          $linkId = DOMBuilder::getId($pLink["path"]);
+        } else {
+          $linkId = DOMBuilder::getId();
         }
-        if($eName != "form" && ROOT_URL.getCurLink(true) == buildLink($path, $query)) {
-          $toStrip[] = array($a, _("Cyclic link found"));
-          continue; // link is cyclic (except form@action)
-        }
-        $a->setAttribute($aName, buildLink($path, $query));
-        if(!strlen($query)) $this->generateTitle($a, $path);
-        continue; // localize link
-      }
-      $frag = $pLink["fragment"];
-      $linkedElement = $doc->getElementById($frag);
-      if(!is_null($linkedElement)) {
-        $h1id = $doc->getElementsByTagName("h1")->item(0)->getAttribute("id");
-        if(ROOT_URL.getCurLink(true) == buildLink(getCurLink(), $query) && $h1id == $frag) {
-          $toStrip[] = array($a, _("Cyclic fragment found"));
-          continue; // link is to current h1
-        }
-        $this->generateTitle($a, $frag);
-        #var_dump("generating title for ".$a->nodeValue);
-        continue; // ignore visible headings
-      }
-      try {
-        $link = DOMBuilder::getLink($frag);
-        $a->setAttribute($aName, buildLink($link).(DOMBuilder::getId($link) != $frag ? "#$frag" : ""));
-        $this->generateTitle($a, $frag);
+        $this->setupLink($a, $aName, $linkId, $query);
       } catch(Exception $e) {
         $toStrip[] = array($a, $e->getMessage());
       }
+
     }
     foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
 
-  private function generateTitle(DOMElementPlus $a, $id) {
-    if($a->nodeName != "a") return;
+  private function setupLink(DOMElementPlus $a, $aName, $linkId, $query) {
+    $link = DOMBuilder::getLink($linkId);
+    $frag = DOMBuilder::getId($link) != $linkId ? "#$linkId" : "";
+    #var_dump($link.$frag.$query);
+    #var_dump(getCurLink(true));
+    if($a->nodeName != "form" && $link.$frag.$query == getCurLink(true))
+      throw new Exception(_("Cyclic link found"));
+    $a->setAttribute($aName, buildLink($link).$query.$frag);
+    if($a->nodeName != "a" || strlen($query)) return;
     if(strlen($a->getAttribute("title"))) return;
-    $title = DOMBuilder::getTitle($id);
-    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($id);
+    $title = DOMBuilder::getTitle($linkId);
+    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($linkId);
     if(is_null($title)) return;
     if($title == $a->nodeValue) return;
     $a->setAttribute("title", $title);
@@ -218,7 +205,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         }
         if(array_key_exists("full", $query)) {
           unset($query["full"]);
-          $o->setAttribute("data", $pUrl["path"].(count($query) ? "?".http_build_query($data) : ""));
+          $o->setAttribute("data", $pUrl["path"].buildQuery($query));
           new Logger(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile), Logger::LOGGER_WARNING);
         }
       } catch(Exception $e) {

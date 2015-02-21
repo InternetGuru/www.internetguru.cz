@@ -69,27 +69,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function validateLinks($elName, $attName, $repair) {
-    $toStrip = array();
-    foreach($this->getElementsByTagName($elName) as $e) {
-      if(!$e->hasAttribute($attName)) continue;
-      try {
-        $link = trimLink($e->getAttribute($attName));
-        if(is_null($link)) $link = $e->getAttribute($attName);
-        if($link == "") $link = "/";
-        if($link === $e->getAttribute($attName)) continue;
-        if(!$repair)
-          throw new Exception(sprintf(_("Invalid repairable link '%s'"), $e->getAttribute($attName)));
-        $e->setAttribute($attName, $link);
-      } catch(Exception $ex) {
-        if(!$repair) throw $ex;
-        $toStrip[] = array($e, $ex->getMessage());
-      }
-    }
-    foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
-    return count($toStrip);
-  }
-
   public function removeNodes($query) {
     $xpath = new DOMXPath($this);
     $toRemove = array();
@@ -135,7 +114,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   protected function isValidId($id) {
-    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/", $id);
+    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
   }
 
   private function removeVar($e, $attr) {

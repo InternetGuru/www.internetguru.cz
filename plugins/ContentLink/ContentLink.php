@@ -37,7 +37,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     if($this->isRoot) return $c;
 
     $desc = $h1->nextElement;
-    if(!$h1->hasAttribute("ns")) $h1->setAttribute("ns", $h1->getAncestorValue("ns"));
     if(!strlen($desc->nodeValue)) $desc->nodeValue = $desc->getAncestorValue();
     if(!$desc->hasAttribute("kw")) $desc->setAttribute("kw", $desc->getAncestorValue("kw"));
 
@@ -52,6 +51,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $content = new HTMLPlus();
     $content->formatOutput = true;
     $body = $content->appendChild($content->createElement("body"));
+    $body->setAttribute("ns", $cf->documentElement->getAttribute("ns"));
     foreach($h1->parentNode->attributes as $attName => $attNode) {
       $body->setAttributeNode($content->importNode($attNode));
     }

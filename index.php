@@ -84,9 +84,8 @@ try {
     define('USER_BACKUP_FOLDER', WWW_FOLDER."/".USER_BACKUP_DIR."/".HOST);
     define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HOST);
   }
-  $protocol = "http";
-  if(isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] == "on") $protocol = "https";
-  define("URL", "$protocol://".HOST);
+  define("SCHEME", (@$_SERVER["HTTPS"] == "on" ? "https" : "http"));
+  define("URL", SCHEME."://".HOST);
   define("URI", URL.(isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : ""));
   define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
   define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
