@@ -255,9 +255,10 @@ class DOMBuilder {
     }
     if(!empty($duplicit)) new Logger(sprintf(_("Duplicit prefix found in %s: %s"),
       $fShort, implode(", ", $duplicit)), Logger::LOGGER_WARNING);
-    if(!strlen($prefixLink)) return;
-    self::addLocalPrefix($doc, $prefixLink, "a", "href", $ids);
-    self::addLocalPrefix($doc, $prefixLink, "form", "action", $ids);
+    if(strlen($prefixLink)) {
+      self::addLocalPrefix($doc, $prefixLink, "a", "href", $ids);
+      self::addLocalPrefix($doc, $prefixLink, "form", "action", $ids);
+    }
     $doc->loadXML($doc->saveXML()); // refresh id/for attributes
   }
 
