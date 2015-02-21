@@ -249,11 +249,16 @@ class DOMBuilder {
       if($e->isSameNode($h1)) self::registerKeys($e, "", $prefixId);
       else self::registerKeys($e, $prefixLink, $prefixId);
     }
+    foreach($doc->getElementsByTagName("label") as $e) {
+      if(!$e->hasAttribute("for")) continue;
+      $e->setAttribute("for", $prefixId.$e->getAttribute("for"));
+    }
     if(!empty($duplicit)) new Logger(sprintf(_("Duplicit prefix found in %s: %s"),
       $fShort, implode(", ", $duplicit)), Logger::LOGGER_WARNING);
     if(!strlen($prefix)) return;
     self::addLocalPrefix($doc, $prefix, "a", "href", $ids);
-    #self::addLocalPrefix($doc, $prefix, "form", "action");
+    self::addLocalPrefix($doc, $prefix, "form", "action", $ids);
+    $doc->loadXML($doc->saveXML()); // refresh id/for attributes
   }
 
   private static function addLocalPrefix(HTMLPlus $doc, $prefix, $eName, $aName, Array $ids) {

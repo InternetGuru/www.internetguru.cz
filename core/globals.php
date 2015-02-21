@@ -10,7 +10,6 @@ function __autoload($className) {
 }
 
 function findFile($file, $user=true, $admin=true, $res=false) {
-  #while(strpos($file, "/") === 0) $file = substr($file, 1);
   try {
     $resFolder = $res && !IS_LOCALHOST ? $resFolder = RES_DIR : false;
     $f = USER_FOLDER."/$file";
@@ -147,8 +146,7 @@ function buildUrl(Array $p) {
 function parseLocalLink($link, $host=null) {
   $pLink = parse_url($link);
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
-  if(isset($pLink["path"]))
-    while(strpos($pLink["path"], "/") === 0) $pLink["path"] = substr($pLink["path"], 1);
+  if(isset($pLink["path"])) ltrim($pLink["path"], "/");
   if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   if(isset($pLink["scheme"])) {
     if($pLink["scheme"] != SCHEME) return null; // different scheme
@@ -163,6 +161,7 @@ function parseLocalLink($link, $host=null) {
 
 function buildLink($link) {
   if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
+  $link = ltrim($link, "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   if($scriptFile == "index.php") return ROOT_URL.$link;
   $path = parse_url($link, PHP_URL_PATH);
@@ -210,7 +209,7 @@ function getCurLink($query=false) {
 
 function buildQuery($pQuery) {
   if(empty($pQuery)) return "";
-  return "?".urldecode(http_build_query($pQuery));
+  return "?".rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
 function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {

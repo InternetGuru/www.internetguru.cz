@@ -159,8 +159,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    */
   private function setDefaultFile() {
 
-    $f = $_GET[get_class($this)];
-    if(strpos($f, "/") === 0) $f = substr($f, 1); // remove trailing slash
+    $f = ltrim($_GET[get_class($this)], "/");
     if(!strlen($f)) {
       $l = getCurLink().".html";
       if(findFile($l)) $f = $l;
