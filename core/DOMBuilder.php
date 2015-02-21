@@ -295,6 +295,7 @@ class DOMBuilder {
       $e->setAttribute("link", $prefixLink.$link);
     } else {
       $link = $e->getAncestorValue("link", "h");
+      $prefixLink = "";
     }
     self::$idToLink[$prefixId.$id] = $prefixLink.$link;
     if($e->nodeName == "h") {
