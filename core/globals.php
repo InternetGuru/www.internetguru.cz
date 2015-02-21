@@ -331,14 +331,11 @@ function initFiles() {
   if($updated) redirTo(getCurLink(), "", null, _("Root file(s) updated"));
 }
 
-function smartCopy($src, $dest, $force=false) {
+function smartCopy($src, $dest) {
   if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"), basename($src)));
-  if(file_exists($dest)) {
-    if(!$force) return;
-    // both are links with same target
-    if(is_link($dest) && is_link($src)
-      && readlink($dest) == readlink($src)) return;
-  }
+  // both are links with same target
+  if(file_exists($dest) && is_link($dest) && is_link($src)
+    && readlink($dest) == readlink($src)) return;
   $destDir = dirname($dest);
   if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
     throw new Exception(sprintf(_("Unable to create directory '%s'"), $destDir));
@@ -373,6 +370,7 @@ function copyFiles($src, $dest, $deep=false) {
       if($deep) copyFiles("$src/$f", "$dest/$f", $deep);
       continue;
     }
+    if(is_file("$dest/$f") && filemtime("$dest/$f") == filemtime("$src/$f")) continue;
     smartCopy("$src/$f", "$dest/$f");
   }
 }

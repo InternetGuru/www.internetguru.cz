@@ -310,7 +310,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function copyToRoot($src, $dest) {
     if(is_file($dest) && getFileHash($src) == getFileHash($dest)) return;
-    smartCopy($src, $dest, true);
+    smartCopy($src, $dest);
   }
 
   private function addThemeFiles(DOMElement $e) {
