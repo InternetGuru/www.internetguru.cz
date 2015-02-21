@@ -163,6 +163,7 @@ function parseLocalLink($link, $host=null) {
 
 function buildLink($link) {
   if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
+  $link = ltrim($link, "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   if($scriptFile == "index.php") return ROOT_URL.$link;
   $path = parse_url($link, PHP_URL_PATH);
@@ -210,7 +211,7 @@ function getCurLink($query=false) {
 
 function buildQuery($pQuery) {
   if(empty($pQuery)) return "";
-  return "?".urldecode(http_build_query($pQuery));
+  return "?".rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
 function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
