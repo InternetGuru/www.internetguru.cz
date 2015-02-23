@@ -17,6 +17,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   private function filter(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     $nodes = array();
+    $prefix = $content->documentElement->firstElement->getAttribute("link");
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
     foreach($nodes as $section) {
       $hs = array();
@@ -32,7 +33,8 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
           #$a->setAttribute("title", $h->nodeValue);
           $a->nodeValue = $h->getAttribute("short");
         }
-        $a->setAttribute("href", "#".$h->getAttribute("id"));
+        $a->setAttribute("href", "$prefix#".$h->getAttribute("id"));
+        #var_dump("$prefix#".$h->getAttribute("id"));
         $li->appendChild($a);
         $ul->appendChild($li);
       }

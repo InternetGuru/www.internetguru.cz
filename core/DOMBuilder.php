@@ -14,7 +14,7 @@ class DOMBuilder {
   private static $idToLink = array(); // id => closest or self link
   private static $idToDesc = array(); // id => shorted description
   private static $idToTitle = array(); // id => self title or shorted content
-  private static $linkToId = array(); // link => self id
+  private static $linkToNull = array(); // link => null
 
   public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
     $doc = new HTMLPlus();
@@ -31,31 +31,28 @@ class DOMBuilder {
   }
 
   public static function getId($link="") {
-    if($link == "") {
-      reset(self::$linkToId);
-      return current(self::$linkToId);
-    }
-    if(array_key_exists($link, self::$linkToId)) return self::$linkToId[$link];
-    $prefix = self::getId();
-    if(!array_key_exists("$prefix/$link", self::$linkToId))
-      throw new Exception(sprintf(_("Link %s not found"), $link));
-    return self::$linkToId["$prefix/$link"];
+    throw new Exception(METHOD_NA);
   }
 
-  public static function getLink($id) {
-    if(!array_key_exists($id, self::$idToLink)) {
-      #$prefix = self::getId();
-      #if(!array_key_exists("$prefix-$id", self::$idToLink)) {
-        #print_r(self::$idToLink);
-        throw new Exception(sprintf(_("Id %s not found"), $id));
-      #}
-      #$id = "$prefix-$id";
-    }
+  public static function getLink(Array $pUrl) {
     reset(self::$idToLink);
-    if($id == key(self::$idToLink)) return ""; // link to first HP heading
-    $link = self::$idToLink[$id];
-    if($link == current(self::$idToLink)) return ""; // link to 2nd+ HP heading
-    return $link;
+    if(array_key_exists("fragment", $pUrl)) {
+      $ids = current(self::$idToLink);
+      if(array_key_exists("path", $pUrl) && array_key_exists($pUrl["path"], self::$idToLink))
+        $ids = self::$idToLink[$pUrl["path"]];
+      if(array_key_exists($pUrl["fragment"], $ids)) {
+        $pUrl = array_merge($pUrl, $ids[$pUrl["fragment"]]);
+        if(!isset($ids[$pUrl["fragment"]]["fragment"])) unset($pUrl["fragment"]);
+        if($pUrl["path"] == key(self::$idToLink)) unset($pUrl["path"]);
+        return $pUrl;
+      }
+    }
+    if(array_key_exists("path", $pUrl) && array_key_exists($pUrl["path"], self::$linkToNull)) {
+      if($pUrl["path"] == key(self::$idToLink)) unset($pUrl["path"]);
+      return $pUrl;
+    }
+    if(!array_key_exists("path", $pUrl) && !array_key_exists("fragment", $pUrl)) return $pUrl;
+    throw new Exception(sprintf(_("Link %s not found"), buildUrl($pUrl)));
   }
 
   public static function getDesc($id) {
@@ -82,11 +79,11 @@ class DOMBuilder {
   }
 
   public static function getLinks() {
-    return array_keys(self::$linkToId);
+    return array_keys(self::$linkToNull);
   }
 
   public static function isLink($link) {
-    return array_key_exists($link, self::$linkToId);
+    return array_key_exists($link, self::$linkToNull);
   }
 
   private static function globalReadonly(DOMDocumentPlus $doc) {
@@ -218,9 +215,9 @@ class DOMBuilder {
     // HTML+ include
     self::insertIncludes($doc, $filePath);
     // register links/ids; repair if duplicit
-    self::setIdentifiers($doc);
-    #print_r(self::$idToLink);
-    #print_r(self::$linkToId);
+    self::setIdentifiers($doc, $fShort);
+    #var_dump(self::$idToLink);
+    #print_r(self::$linkToNull);
   }
 
   private static function prefixLinks($prefix, HTMLPlus $doc) {
@@ -230,82 +227,91 @@ class DOMBuilder {
     }
   }
 
-  private static function setIdentifiers(HTMLPlus $doc) {
+  private static function setIdentifiers(HTMLPlus $doc, $fShort) {
     $duplicit = array();
     $h1 = $doc->documentElement->firstElement;
-    $prefix = $h1->getAttribute("link");
+    $prefix = trim($h1->getAttribute("link"), "/");
+    #if(empty(self::$idToLink)) $prefix = "";
     if(array_key_exists($prefix, self::$idToLink)) {
-      $duplicit[] = $prefix;
       $prefix = self::generateUniqueVal($prefix, self::$idToLink);
+      new Logger(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
+        $fShort, $prefix), Logger::LOGGER_WARNING);
       $h1->setAttribute("link", $prefix);
     }
-    $prefixLink = "$prefix/";
-    $prefixId = str_replace("/", "-", $prefixLink);
-    if(empty(self::$linkToId)) $prefixLink = "";
-    $ids = array();
-    $xpath = new DOMXPath($doc);
-    foreach($xpath->query("//*[@id]") as $e) {
-      $ids[$e->getAttribute("id")] = $e;
-      if($e->isSameNode($h1)) self::registerKeys($e, "", $prefixId);
-      else self::registerKeys($e, $prefixLink, $prefixId);
-    }
-    foreach($doc->getElementsByTagName("label") as $e) {
-      if(!$e->hasAttribute("for")) continue;
-      $e->setAttribute("for", $prefixId.$e->getAttribute("for"));
-    }
-    if(!empty($duplicit)) new Logger(sprintf(_("Duplicit prefix found in %s: %s"),
-      $fShort, implode(", ", $duplicit)), Logger::LOGGER_WARNING);
-    if(strlen($prefixLink)) {
-      self::addLocalPrefix($doc, $prefixLink, "a", "href", $ids);
-      self::addLocalPrefix($doc, $prefixLink, "form", "action", $ids);
-    }
-    $doc->loadXML($doc->saveXML()); // refresh id/for attributes
+    self::$idToLink[$prefix] = array();
+    self::registerKeys($doc, $prefix);
+    self::addLocalPrefix($doc, $prefix, "a", "href");
+    self::addLocalPrefix($doc, $prefix, "form", "action");
+    #print_r(self::$idToLink);
+    #var_dump(self::$linkToNull);
   }
 
-  private static function addLocalPrefix(HTMLPlus $doc, $prefix, $eName, $aName, Array $ids) {
-    $prefixed = array();
-    #var_dump(self::$idToLink);
+  private static function addLocalPrefix(HTMLPlus $doc, $prefix, $eName, $aName) {
     foreach($doc->getElementsByTagName($eName) as $e) {
       if(!$e->hasAttribute($aName)) continue;
       $pLink = parseLocalLink($e->getAttribute($aName));
       if(is_null($pLink)) continue; // link is external
-      if(array_key_exists("fragment", $pLink)) {
-        if(array_key_exists($pLink["fragment"], $ids)) {
-          $e->setAttribute($aName, "#$prefix-".$pLink["fragment"]);
-        } elseif(!array_key_exists("path", $pLink)) {
-          $m = sprintf(_("Fragment %s without prefix not found"), $pLink["fragment"]);
-          new Logger($m, Logger::LOGGER_WARNING);
-          $e->stripAttr($aName, $m);
+
+      if(array_key_exists("path", $pLink)) {
+        if(!array_key_exists($pLink["path"], self::$idToLink[$prefix])) {
+          foreach(self::$idToLink[$prefix] as $link) {
+            if("$prefix/".$link["path"] != $pLink["path"]) continue;
+            new Logger(sprintf(_("Found local link with prefix %s"), $e->getAttribute($aName)),
+              Logger::LOGGER_WARNING);
+            break;
+          }
+          continue;
         }
-      } elseif(array_key_exists("path", $pLink)) {
-        try {
-          $linkId = DOMBuilder::getId("$prefix/".$pLink["path"]);
-          $e->setAttribute($aName, "#$linkId");
-        } catch(Exception $e) {}
+        $pLink["path"] = "$prefix/".$pLink["path"];
       }
+      if(array_key_exists("fragment", $pLink)) {
+        if(array_key_exists("path", $pLink)) {
+          if($pLink["path"] == $prefix) new Logger(sprintf(_("Found local fragment with prefix %s"),
+            $e->getAttribute($aName)), Logger::LOGGER_WARNING);
+          continue;
+        }
+        $pLink["path"] = $prefix;
+      }
+      $e->setAttribute($aName, buildUrl($pLink));
     }
   }
 
-  private static function registerKeys(DOMElementPlus $e, $prefixLink, $prefixId) {
-    $id = $e->getAttribute("id");
-    $e->setAttribute("id", $prefixId.$id);
-    if($e->hasAttribute("link")) {
-      $link = $e->getAttribute("link");
-      self::$linkToId[$prefixLink.$link] = $prefixId.$id;
-      $e->setAttribute("link", $prefixLink.$link);
-    } else {
-      $link = $e->getAncestorValue("link", "h");
-      $prefixLink = "";
+  private static function registerKeys(HTMLPlus $doc, $prefix) {
+    $newLinks = array();
+    $prefixLink = "$prefix/";
+    if(empty(self::$linkToNull)) $prefixLink = "";
+    $xpath = new DOMXPath($doc);
+    foreach($xpath->query("//*[@id]") as $e) {
+      $id = $e->getAttribute("id");
+      if($e->hasAttribute("link")) {
+        $link = $e->getAttribute("link");
+        if($link != $prefix) $link = $prefixLink.$link;
+        #if(!strlen($prefixLink) && $link == $prefix) $link = "";
+        if(array_key_exists($link, self::$linkToNull)) {
+          new Logger(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
+          continue;
+        }
+        self::$linkToNull[$link] = null;
+        $newLinks[$link] = $e;
+        $pLink = array("path" => $link);
+      } else {
+        $link = $e->getAncestorValue("link", "h");
+        if($link != $prefix) $link = $prefixLink.$link;
+        #if(!strlen($prefixLink) && $link == $prefix) $link = "";
+        $pLink = array("path" => $link, "fragment" => $id);
+        $link = buildUrl($pLink);
+      }
+      self::$idToLink[$prefix][$id] = $pLink;
+      if($e->nodeName == "h") {
+        $desc = getShortString($e->nextElement->nodeValue);
+        if(strlen($desc)) self::$idToDesc[$link] = $desc;
+      }
+      if(strlen($e->getAttribute("title")))
+        self::$idToTitle[$link] = $e->getAttribute("title");
+      else
+        self::$idToTitle[$link] = getShortString($e->nodeValue);
     }
-    self::$idToLink[$prefixId.$id] = $prefixLink.$link;
-    if($e->nodeName == "h") {
-      $desc = getShortString($e->nextElement->nodeValue);
-      if(strlen($desc)) self::$idToDesc[$prefixId.$id] = $desc;
-    }
-    if(strlen($e->getAttribute("title")))
-      self::$idToTitle[$prefixId.$id] = $e->getAttribute("title");
-    else
-      self::$idToTitle[$prefixId.$id] = getShortString($e->nodeValue);
+    foreach($newLinks as $link => $e) $e->setAttribute("link", $link);
   }
 
   private static function generateUniqueVal($val, Array $reg) {

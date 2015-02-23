@@ -78,7 +78,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function setPath(DOMElement $h) {
     while(!is_null($h)) {
-      if($h->hasAttribute("link")) $this->hPath[$h->getAttribute("id")] = $h;
+      if($h->hasAttribute("link")) $this->hPath[$h->getAttribute("link")] = $h;
       $h = $h->parentNode->getPreviousElement("h");
     }
   }
@@ -94,11 +94,11 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $h = null;
     $aFirst = null;
     $hFirst = null;
-    foreach(array_reverse($this->hPath) as $h) {
+    foreach(array_reverse($this->hPath) as $link => $h) {
       #$h->processVariables(Cms::getAllVariables());
       $li = $ol->appendChild($bc->createElement("li"));
       $a = $li->appendChild($bc->createElement("a", $h->nodeValue));
-      $a->setAttribute("href", "#".$h->getAttribute("id"));
+      $a->setAttribute("href", $link);
       #if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
       if(empty($subtitles)) {
         $aFirst = $a;

@@ -130,25 +130,17 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $toStrip = array();
     foreach($doc->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
-      $pLink = parseLocalLink($a->getAttribute($aName));
-      if(is_null($pLink)) continue; // link is external
-      $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
       try {
-        if(array_key_exists("fragment", $pLink)) {
-          $linkId = $pLink["fragment"];
-          if(array_key_exists("path", $pLink)) $linkId = trim($pLink["path"], "/")."-$linkId";
-        } elseif(strpos($a->getAttribute($aName), "?") === 0) {
-          $linkId = DOMBuilder::getId(getCurLink());
-        } elseif(isset($pLink["path"])) {
-          if(is_file(FILES_FOLDER."/".$pLink["path"])) {
-            $a->setAttribute($aName, buildLink($path.$query));
-            continue; // link to file
-          }
-          $linkId = DOMBuilder::getId($pLink["path"]);
-        } else {
-          $linkId = DOMBuilder::getId();
+        #var_dump($a->getAttribute($aName));
+        $pUrl = parseLocalLink($a->getAttribute($aName));
+        if(is_null($pUrl)) continue; // link is external
+        if(array_key_exists("path", $pUrl) && is_file(FILES_FOLDER."/".$pUrl["path"])) { // link is file
+          $a->setAttribute($aName, buildLink($path.$query));
+          continue;
         }
-        $this->setupLink($a, $aName, $linkId, $query);
+        $pLink = DOMBuilder::getLink($pUrl);
+        #var_dump($pLink);
+        $this->setupLink($a, $aName, $pLink);
       } catch(Exception $e) {
         $toStrip[] = array($a, $e->getMessage());
       }
@@ -157,18 +149,24 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
 
-  private function setupLink(DOMElementPlus $a, $aName, $linkId, $query) {
-    $link = DOMBuilder::getLink($linkId);
-    $frag = DOMBuilder::getId($link) != $linkId ? "#$linkId" : "";
-    #var_dump($link.$frag.$query);
+  private function setupLink(DOMElementPlus $a, $aName, $pLink) {
+    #var_dump(buildUrl($pLink));
     #var_dump(getCurLink(true));
-    if($a->nodeName != "form" && $link.$frag.$query == getCurLink(true))
-      throw new Exception(_("Cyclic link found"));
-    $a->setAttribute($aName, buildLink($link).$query.$frag);
-    if($a->nodeName != "a" || strlen($query)) return;
+    if($a->nodeName != "form" && buildUrl($pLink) == getCurLink(true))
+      throw new Exception(_("Cyclic link removed"));
+    if(isset($pLink["path"]) && !isset($pLink["query"]) && $pLink["path"] == getCurLink())
+      throw new Exception(_("Local fragment to undefined id removed"));
+    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $pLink);
+    #if(isset($pLink["path"])) $pLink["path"] = buildLink($pLink["path"]);
+    $a->setAttribute($aName, buildLink(buildUrl($pLink)));
+  }
+
+  private function insertTitle(DOMElementPlus $a, Array $pLink) {
+    #todo
+    return;
     if(strlen($a->getAttribute("title"))) return;
-    $title = DOMBuilder::getTitle($linkId);
-    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($linkId);
+    $title = DOMBuilder::getTitle($pLink);
+    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($pLink);
     if(is_null($title)) return;
     if($title == $a->nodeValue) return;
     $a->setAttribute("title", $title);

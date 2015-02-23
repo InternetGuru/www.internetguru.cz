@@ -174,4 +174,6 @@ try {
 
 }
 
+session_write_close();
+
 ?>
