@@ -12,8 +12,8 @@ class DOMBuilder {
   #const USE_CACHE = true;
   private static $included = array();
   private static $idToLink = array(); // id => closest or self link
-  private static $idToDesc = array(); // id => shorted description
-  private static $idToTitle = array(); // id => self title or shorted content
+  private static $linkToDesc = array(); // id => shorted description
+  private static $linkToTitle = array(); // id => self title or shorted content
   private static $linkToNull = array(); // link => null
 
   public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
@@ -55,22 +55,14 @@ class DOMBuilder {
     throw new Exception(sprintf(_("Link %s not found"), buildUrl($pUrl)));
   }
 
-  public static function getDesc($id) {
-    if(array_key_exists($id, self::$idToDesc)) return self::$idToDesc[$id];
-    try {
-      return self::getDesc(self::getId($id));
-    } catch(Exception $e) {
-      return null;
-    }
+  public static function getDesc($link) {
+    if(array_key_exists($link, self::$linkToDesc)) return self::$linkToDesc[$link];
+    return null;
   }
 
-  public static function getTitle($id) {
-    if(array_key_exists($id, self::$idToTitle)) return self::$idToTitle[$id];
-    try {
-      return self::getTitle(self::getId($id));
-    } catch(Exception $e) {
-      return null;
-    }
+  public static function getTitle($link) {
+    if(array_key_exists($link, self::$linkToTitle)) return self::$linkToTitle[$link];
+    return null;
   }
 
   public static function getRootHeadingId() {
@@ -304,12 +296,12 @@ class DOMBuilder {
       self::$idToLink[$prefix][$id] = $pLink;
       if($e->nodeName == "h") {
         $desc = getShortString($e->nextElement->nodeValue);
-        if(strlen($desc)) self::$idToDesc[$link] = $desc;
+        if(strlen($desc)) self::$linkToDesc[$link] = $desc;
       }
       if(strlen($e->getAttribute("title")))
-        self::$idToTitle[$link] = $e->getAttribute("title");
+        self::$linkToTitle[$link] = $e->getAttribute("title");
       else
-        self::$idToTitle[$link] = getShortString($e->nodeValue);
+        self::$linkToTitle[$link] = getShortString($e->nodeValue);
     }
     foreach($newLinks as $link => $e) $e->setAttribute("link", $link);
   }

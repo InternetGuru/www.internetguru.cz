@@ -156,17 +156,15 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       throw new Exception(_("Cyclic link removed"));
     if(isset($pLink["path"]) && !isset($pLink["query"]) && $pLink["path"] == getCurLink())
       throw new Exception(_("Local fragment to undefined id removed"));
-    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $pLink);
-    #if(isset($pLink["path"])) $pLink["path"] = buildLink($pLink["path"]);
-    $a->setAttribute($aName, buildLink(buildUrl($pLink)));
+    $link = buildUrl($pLink);
+    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $link);
+    $a->setAttribute($aName, buildLink($link));
   }
 
-  private function insertTitle(DOMElementPlus $a, Array $pLink) {
-    #todo
-    return;
+  private function insertTitle(DOMElementPlus $a, $link) {
     if(strlen($a->getAttribute("title"))) return;
-    $title = DOMBuilder::getTitle($pLink);
-    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($pLink);
+    $title = DOMBuilder::getTitle($link);
+    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($link);
     if(is_null($title)) return;
     if($title == $a->nodeValue) return;
     $a->setAttribute("title", $title);

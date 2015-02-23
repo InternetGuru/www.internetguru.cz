@@ -168,10 +168,11 @@ function buildLink($link) {
   if($scriptFile == "index.php") return ROOT_URL.$link;
   $path = parse_url($link, PHP_URL_PATH);
   $query = parse_url($link, PHP_URL_QUERY);
+  $frag = parse_url($link, PHP_URL_FRAGMENT);
   $q = array();
   if(strlen($path)) $q[] ="q=$path";
   if(strlen($query)) $q[] = $query;
-  return ROOT_URL.$scriptFile.(!empty($q) ? "?".implode("&", $q) : "");
+  return ROOT_URL.$scriptFile.(!empty($q) ? "?".implode("&", $q) : "").(strlen($frag) ? "#$frag" : "");
 }
 
 function chmodGroup($file, $mode) {
@@ -203,7 +204,8 @@ function stableSort(Array &$a) {
 function getCurLink($query=false) {
   if(!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) return "";
   parse_str($_SERVER['QUERY_STRING'], $pQuery);
-  $link = $pQuery["q"];
+  $link = "";
+  if(isset($pQuery["q"])) $link = $pQuery["q"];
   if(!$query) return $link;
   unset($pQuery["q"]);
   return $link.buildQuery($pQuery);
