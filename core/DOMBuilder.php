@@ -57,10 +57,16 @@ class DOMBuilder {
 
   public static function getDesc($link) {
     if(array_key_exists($link, self::$linkToDesc)) return self::$linkToDesc[$link];
+    reset(self::$linkToDesc);
+    $link = key(self::$linkToDesc).$link;
+    if(array_key_exists($link, self::$linkToDesc)) return self::$linkToDesc[$link];
     return null;
   }
 
   public static function getTitle($link) {
+    if(array_key_exists($link, self::$linkToTitle)) return self::$linkToTitle[$link];
+    reset(self::$linkToTitle);
+    $link = key(self::$linkToTitle).$link;
     if(array_key_exists($link, self::$linkToTitle)) return self::$linkToTitle[$link];
     return null;
   }
