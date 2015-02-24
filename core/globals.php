@@ -311,7 +311,7 @@ function initLinks() {
   foreach(scandir(getcwd()) as $f) {
     if(!is_link($f)) continue;
     if(array_key_exists($f, $links)) continue;
-    if($f == CMS_RELEASE) continue;
+    if($f == CMS_RELEASE.".php") continue;
     unlink($f);
   }
   foreach($links as $l => $t) {

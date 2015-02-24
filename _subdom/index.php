@@ -4,21 +4,24 @@ try {
 
   // localhost
   $cmsIndex = "../cms/index.php";
+
   if(!is_file($cmsIndex)) {
     // find version file and best release
+    $cmsIndex = null;
+    $cmsVersion = null;
     foreach(scandir(getcwd()) as $f) {
-      $varName = strtok($f, ".");
-      if($varName == "VERSION") { // eg. VERSION.1.0
-        $cmsIndex = substr($f, strlen($varName)+1).".php";
-        break;
+      if(is_dir($f)) continue;
+      if(strtok($f, ".") == "VERSION") { // eg. VERSION.1.0
+        $cmsVersion = substr($f, 8).".php";
       }
       if(!preg_match("/^\d+\.\d+\.php$/", $f)) continue;
       if(version_compare(substr($cmsIndex, 0, -4), substr($f, 0, -4)) > 0) continue;
       $cmsIndex = $f;
     }
+    if(!is_null($cmsVersion) && is_file($cmsVersion)) $cmsIndex = $cmsVersion;
     // else throw
-    if(!is_file($cmsIndex)) throw new Exception("Unable to find CMS version");
-    touch("VERSION.".substr($cmsIndex, 0, -4));
+    if(!is_file($cmsIndex)) throw new Exception("Unable to find stable CMS version");
+    if(is_null($cmsVersion)) touch("VERSION.".substr($cmsIndex, 0, -4));
   }
 
   // include link given version
