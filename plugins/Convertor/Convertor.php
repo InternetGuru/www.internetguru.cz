@@ -28,7 +28,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       return;
     }
     if(strlen($_GET[get_class($this)])) $this->processImport($_GET[get_class($this)]);
-    elseif(substr(getCurLink(true), -1) == "=") {
+    elseif(substr($_SERVER['QUERY_STRING'], -1) == "=") {
       Cms::addMessage(_("File URL cannot be empty"), Cms::MSG_ERROR);
     }
     $this->getImportedFiles();
@@ -130,6 +130,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   public function getContent(HTMLPlus $c) {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $newContent = $this->getHTMLPlus();
+    $vars["action"] = "?".get_class($this);
     $vars["link"] = $_GET[get_class($this)];
     $vars["path"] = $this->pluginDir;
     if(!empty($this->importedFiles)) $vars["importedhtml"] = $this->importedFiles;
