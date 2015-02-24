@@ -399,9 +399,9 @@ class HTMLPlus extends DOMDocumentPlus {
         if(array_key_exists("host", $pLink)) continue;
         $link = buildUrl($pLink);
         if($link == "") $link = "#".$this->headings->item(0)->getAttribute("id");
-        if($link === $e->getAttribute($attName)) continue; // link has not changed
+        if($link === ltrim($e->getAttribute($attName), "/")) continue; // link has not changed
         if(!$repair)
-          throw new Exception(sprintf(_("Invalid repairable link '%s'"), $e->getAttribute($attName)));
+          throw new Exception(sprintf(_("Invalid link %s repairable to %s"), $e->getAttribute($attName), $link));
         $e->setAttribute($attName, $link);
       } catch(Exception $ex) {
         if(!$repair) throw $ex;

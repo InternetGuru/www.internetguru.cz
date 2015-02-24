@@ -135,7 +135,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $pUrl = parseLocalLink($a->getAttribute($aName));
         if(is_null($pUrl)) continue; // link is external
         if(array_key_exists("path", $pUrl) && is_file(FILES_FOLDER."/".$pUrl["path"])) { // link is file
-          $a->setAttribute($aName, buildLink($path.$query));
+          $a->setAttribute($aName, buildLink(buildUrl($pUrl)));
           continue;
         }
         $pLink = DOMBuilder::getLink($pUrl);
@@ -154,7 +154,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump(getCurLink(true));
     if($a->nodeName != "form" && buildUrl($pLink) == getCurLink(true))
       throw new Exception(_("Cyclic link removed"));
-    if(isset($pLink["path"]) && !isset($pLink["query"]) && $pLink["path"] == getCurLink())
+    if(isset($pLink["path"]) && isset($pLink["fragment"]) && !isset($pLink["query"]) && $pLink["path"] == getCurLink())
       throw new Exception(_("Local fragment to undefined id removed"));
     $link = buildUrl($pLink);
     if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $link);
@@ -175,15 +175,14 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     foreach($dom->getElementsByTagName("object") as $o) {
       if(!$o->hasAttribute("data")) continue;
       $dataFile = $o->getAttribute("data");
-      $pUrl = parse_url($dataFile);
-      if(!is_array($pUrl)) {
-        $toStrip[] = array($o, sprintf(_("Invalid object data '%s' format"), $dataFile));
+      try {
+        $pUrl = parseLocalLink($dataFile);
+      } catch(Exception $e) {
+        $toStrip[] = array($o, $e->getMessage());
         continue;
       }
-      if(array_key_exists("scheme", $pUrl)) {
-        #todo: $this->asynchronousExternalImageCheck($dataFile);
-        continue;
-      }
+      if(is_null($pUrl)) continue; // external
+
       $query = array();
       if(isset($pUrl["query"])) parse_str($pUrl["query"], $query);
       $filePath = FILES_FOLDER."/".(array_key_exists("q", $query) ? $query["q"] : $pUrl["path"]);
