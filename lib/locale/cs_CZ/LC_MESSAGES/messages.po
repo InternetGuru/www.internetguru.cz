@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-25 00:35+0100\n"
-"PO-Revision-Date: 2015-02-25 00:35+0100\n"
+"POT-Creation-Date: 2015-02-25 13:53+0100\n"
+"PO-Revision-Date: 2015-02-25 13:54+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -230,11 +230,6 @@ msgstr "Do '%s' nelze vložit proměnnou typu pole"
 #, php-format
 msgid "Cannot modify attribute %s in element %s"
 msgstr "Nepodařilo se změnit atribut %s v elementu %s"
-
-#: D:\wamp\www\cms/core/DOMElementPlus.php:262
-#, php-format
-msgid "Attribute '%s' stripped"
-msgstr "Atribut '%s' byl odstraněn"
 
 #: D:\wamp\www\cms/core/HTMLPlus.php:23
 msgid "Variable value must be non-empty string or null"
@@ -505,7 +500,12 @@ msgstr "Nepodařilo se otevřít soubor"
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: D:\wamp\www\cms/core/globals.php:469
+#: D:\wamp\www\cms/core/globals.php:436
+#, php-format
+msgid "Attribute '%s' stripped"
+msgstr "Atribut '%s' byl odstraněn"
+
+#: D:\wamp\www\cms/core/globals.php:478
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
@@ -963,63 +963,72 @@ msgstr "Nepodařilo se nalézt ikonu (favicon) %s"
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:156
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:143
+#, php-format
+msgid "Removed duplicit id %s"
+msgstr "Odstraněn duplicitní identifikátor %s"
+
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:177
 msgid "Cyclic link removed"
 msgstr "Odstraněn cyklický odkaz"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:158
-msgid "Local fragment to undefined id removed"
-msgstr "Odstraněn lokální fragmen s nedefinovaným identifikátorem"
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:180
+#, php-format
+msgid "Removed local fragment to undefined id %s"
+msgstr "Odstraněn lokální fragment na neexistující identifikátor %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:190
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:213
 #, php-format
 msgid "Object data '%s' not found"
 msgstr "Cílový soubor elementu object '%s' nebyl nenalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:196
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:219
 #, php-format
 msgid "Invalid object '%s' MIME type '%s'"
 msgstr "Element object '%s' má chybný MIME typ '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:199
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:222
 #, php-format
 msgid "Object '%s' attribute type set to '%s'"
 msgstr "Atribut elementu '%s' byl nastaven na '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:204
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:227
 #, php-format
 msgid "Parameter 'full' removed from data attribute '%s'"
 msgstr "Odstraněn parametr 'full' z atributu data '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:265
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:288
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:298
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:321
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:343
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:366
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:345
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:368
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:379
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:402
 #, php-format
 msgid "Link [%s] file '%s' not found"
 msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:460
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:483
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "Local fragment to undefined id removed"
+#~ msgstr "Odstraněn lokální fragmen s nedefinovaným identifikátorem"
 
 #~ msgid "Invalid repairable link '%s'"
 #~ msgstr "Nalezen chybný leč opravitelný odkaz '%s'"
