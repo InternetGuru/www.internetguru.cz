@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-24 23:24+0100\n"
-"PO-Revision-Date: 2015-02-24 23:30+0100\n"
+"POT-Creation-Date: 2015-02-25 00:35+0100\n"
+"PO-Revision-Date: 2015-02-25 00:35+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -344,8 +344,8 @@ msgstr "Normalizace odkazu '%s' způsobuje duplicitu"
 
 #: D:\wamp\www\cms/core/HTMLPlus.php:404
 #, php-format
-msgid "Invalid repairable link '%s'"
-msgstr "Nalezen chybný leč opravitelný odkaz '%s'"
+msgid "Invalid link %s repairable to %s"
+msgstr "Neplatný odkaz %s opravitelný na %s"
 
 #: D:\wamp\www\cms/core/Logger.php:16
 #, php-format
@@ -971,60 +971,61 @@ msgstr "Odstraněn cyklický odkaz"
 msgid "Local fragment to undefined id removed"
 msgstr "Odstraněn lokální fragmen s nedefinovaným identifikátorem"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:180
-#, php-format
-msgid "Invalid object data '%s' format"
-msgstr "Chybná cesta zdrojového souboru '%s' v elementu object"
-
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:191
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:190
 #, php-format
 msgid "Object data '%s' not found"
 msgstr "Cílový soubor elementu object '%s' nebyl nenalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:197
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:196
 #, php-format
 msgid "Invalid object '%s' MIME type '%s'"
 msgstr "Element object '%s' má chybný MIME typ '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:200
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:199
 #, php-format
 msgid "Object '%s' attribute type set to '%s'"
 msgstr "Atribut elementu '%s' byl nastaven na '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:205
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:204
 #, php-format
 msgid "Parameter 'full' removed from data attribute '%s'"
 msgstr "Odstraněn parametr 'full' z atributu data '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:266
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:265
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:299
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:298
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:344
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:343
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:346
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:345
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:380
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:379
 #, php-format
 msgid "Link [%s] file '%s' not found"
 msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:461
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:460
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "Invalid repairable link '%s'"
+#~ msgstr "Nalezen chybný leč opravitelný odkaz '%s'"
+
+#~ msgid "Invalid object data '%s' format"
+#~ msgstr "Chybná cesta zdrojového souboru '%s' v elementu object"
 
 #~ msgid "Id %s not found"
 #~ msgstr "Identifikátor %s nebyl nalezen"

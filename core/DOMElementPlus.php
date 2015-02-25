@@ -255,15 +255,6 @@ class DOMElementPlus extends DOMElement {
     $this->parentNode->removeChild($this);
   }
 
-  public function stripAttr($attr, $comment = null) {
-    if(!$this->hasAttribute($attr)) return;
-    $this->removeAttribute($attr);
-    if(!Cms::isSuperUser()) return;
-    if(is_null($comment)) $comment = sprintf(_("Attribute '%s' stripped"), $attr);
-    $cmt = $this->ownerDocument->createComment(" $comment ");
-    $this->parentNode->insertBefore($cmt, $this);
-  }
-
   public function getPreviousElement($eName=null) {
     if(is_null($eName)) $eName = $this->nodeName;
     $e = $this->previousElement;

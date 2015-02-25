@@ -104,20 +104,21 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     }
 
     // correct links
-    $contentPlus = new DOMDocumentPlus();
-    $contentPlus->loadXML($content->saveXML());
+    #$contentPlus = new DOMDocumentPlus();
+    #$contentPlus->loadXML($content->saveXML());
     #$contentPlus->validateLinks("a", "href", true);
     #$contentPlus->validateLinks("form", "action", true);
     #$contentPlus->validateLinks("object", "data", true);
-    $this->fragToLinks($contentPlus, Cms::getContentFull(), "a", "href");
-    $this->fragToLinks($contentPlus, Cms::getContentFull(), "form", "action");
-    $this->fragToLinks($contentPlus, Cms::getContentFull(), "object", "data");
+    $ids = $this->getIds($content);
+    $this->fragToLinks($content, $ids, "a", "href");
+    $this->fragToLinks($content, $ids, "form", "action");
+    $this->fragToLinks($content, $ids, "object", "data");
 
     // check object.data mime/size
-    $this->validateImages($contentPlus);
+    $this->validateImages($content);
 
     // import into html and save
-    $content = $doc->importNode($contentPlus->documentElement, true);
+    $content = $doc->importNode($content->documentElement, true);
     $html->appendChild($content);
     $this->appendJsFiles($content, self::APPEND_BODY);
 
@@ -126,7 +127,27 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     return $doc->saveXML();
   }
 
-  private function fragToLinks(DOMDocumentPlus $doc, HTMLPlus $src, $eName, $aName) {
+  private function getIds(DOMDocument $doc) {
+    $ids = array();
+    $toStrip = array();
+    $xPath = new DOMXPath($doc);
+    foreach($xPath->query("//*[@id]") as $e) {
+      $id = $e->getAttribute("id");
+      if(isset($ids[$id])) {
+        $toStrip[] = $e;
+        continue;
+      }
+      $ids[$id] = $e;
+    }
+    foreach($toStrip as $e) {
+      $m = sprintf(_("Removed duplicit id %s"), $e->getAttribute("id"));
+      stripAttr($e, "id", $m);
+      new Logger($m, Logger::LOGGER_WARNING);
+    }
+    return $ids;
+  }
+
+  private function fragToLinks(DOMDocument $doc, Array $ids, $eName, $aName) {
     $toStrip = array();
     foreach($doc->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
@@ -140,28 +161,30 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         }
         $pLink = DOMBuilder::getLink($pUrl);
         #var_dump($pLink);
-        $this->setupLink($a, $aName, $pLink);
+        $this->setupLink($a, $aName, $pLink, $ids);
       } catch(Exception $e) {
         $toStrip[] = array($a, $e->getMessage());
       }
 
     }
-    foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
+    foreach($toStrip as $a) stripAttr($a[0], $aName, $a[1]);
   }
 
-  private function setupLink(DOMElementPlus $a, $aName, $pLink) {
+  private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
     #var_dump(buildUrl($pLink));
     #var_dump(getCurLink(true));
     if($a->nodeName != "form" && buildUrl($pLink) == getCurLink(true))
       throw new Exception(_("Cyclic link removed"));
-    if(isset($pLink["path"]) && isset($pLink["fragment"]) && !isset($pLink["query"]) && $pLink["path"] == getCurLink())
-      throw new Exception(_("Local fragment to undefined id removed"));
+    if(isset($pLink["path"]) && isset($pLink["fragment"]) && !isset($pLink["query"]) && $pLink["path"] == getCurLink()) {
+      if(array_key_exists($pLink["fragment"], $ids)) continue;
+      throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));
+    }
     $link = buildUrl($pLink);
     if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $link);
     $a->setAttribute($aName, buildLink($link));
   }
 
-  private function insertTitle(DOMElementPlus $a, $link) {
+  private function insertTitle(DOMElement $a, $link) {
     if(strlen($a->getAttribute("title"))) return;
     $title = DOMBuilder::getTitle($link);
     if($title == $a->nodeValue) $title = DOMBuilder::getDesc($link);
@@ -170,7 +193,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $a->setAttribute("title", $title);
   }
 
-  private function validateImages(DOMDocumentPlus $dom) {
+  private function validateImages(DOMDocument $dom) {
     $toStrip = array();
     foreach($dom->getElementsByTagName("object") as $o) {
       if(!$o->hasAttribute("data")) continue;
