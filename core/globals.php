@@ -429,15 +429,6 @@ function getFileMime($file) {
   #return $mime[0];
 }
 
-function stripAttr(DOMElement $e, $attr, $comment = null) {
-  if(!$e->hasAttribute($attr)) return;
-  $e->removeAttribute($attr);
-  if(!Cms::isSuperUser()) return;
-  if(is_null($comment)) $comment = sprintf(_("Attribute '%s' stripped"), $attr);
-  $cmt = $e->ownerDocument->createComment(" $comment ");
-  $e->parentNode->insertBefore($cmt, $e);
-}
-
 function fileSizeConvert($b) {
     if(!is_numeric($b)) return $b;
     $i = 0;

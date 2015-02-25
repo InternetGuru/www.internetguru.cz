@@ -408,7 +408,7 @@ class HTMLPlus extends DOMDocumentPlus {
         $toStrip[] = array($e, $ex->getMessage());
       }
     }
-    foreach($toStrip as $a) stripAttr($a[0], $attName, $a[1]);
+    foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
     return count($toStrip);
   }
 

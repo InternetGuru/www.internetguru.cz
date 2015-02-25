@@ -41,6 +41,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   public function getOutput(HTMLPlus $content) {
     stableSort($this->cssFilesPriority);
     stableSort($this->jsFilesPriority);
+    $h1 = $content->documentElement->firstElement;
+    $lang = $content->documentElement->getAttribute("xml:lang");
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
@@ -49,8 +51,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
     $doc = $imp->createDocument(null, null, $dtd);
     $doc->encoding="utf-8";
-    $h1 = $content->documentElement->firstElement;
-    $lang = $content->documentElement->getAttribute("xml:lang");
 
     // add root element
     $html = $doc->createElement("html");
@@ -103,22 +103,17 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       }
     }
 
-    // correct links
-    #$contentPlus = new DOMDocumentPlus();
-    #$contentPlus->loadXML($content->saveXML());
-    #$contentPlus->validateLinks("a", "href", true);
-    #$contentPlus->validateLinks("form", "action", true);
-    #$contentPlus->validateLinks("object", "data", true);
-    $ids = $this->getIds($content);
-    $this->fragToLinks($content, $ids, "a", "href");
-    $this->fragToLinks($content, $ids, "form", "action");
-    $this->fragToLinks($content, $ids, "object", "data");
-
-    // check object.data mime/size
-    $this->validateImages($content);
+    // final validation
+    $contentPlus = new DOMDocumentPlus();
+    $contentPlus->loadXML($content->saveXML());
+    $ids = $this->getIds($contentPlus);
+    $this->fragToLinks($contentPlus, $ids, "a", "href");
+    $this->fragToLinks($contentPlus, $ids, "form", "action");
+    $this->fragToLinks($contentPlus, $ids, "object", "data");
+    $this->validateImages($contentPlus);
 
     // import into html and save
-    $content = $doc->importNode($content->documentElement, true);
+    $content = $doc->importNode($contentPlus->documentElement, true);
     $html->appendChild($content);
     $this->appendJsFiles($content, self::APPEND_BODY);
 
@@ -141,13 +136,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     }
     foreach($toStrip as $e) {
       $m = sprintf(_("Removed duplicit id %s"), $e->getAttribute("id"));
-      stripAttr($e, "id", $m);
+      $e->stripAttr("id", $m);
       new Logger($m, Logger::LOGGER_WARNING);
     }
     return $ids;
   }
 
-  private function fragToLinks(DOMDocument $doc, Array $ids, $eName, $aName) {
+  private function fragToLinks(DOMDocumentPlus $doc, Array $ids, $eName, $aName) {
     $toStrip = array();
     foreach($doc->getElementsByTagName($eName) as $a) {
       if(!$a->hasAttribute($aName)) continue; // no link found
@@ -167,7 +162,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       }
 
     }
-    foreach($toStrip as $a) stripAttr($a[0], $aName, $a[1]);
+    foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
   }
 
   private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
@@ -175,8 +170,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump(getCurLink(true));
     if($a->nodeName != "form" && buildUrl($pLink) == getCurLink(true))
       throw new Exception(_("Cyclic link removed"));
-    if(isset($pLink["path"]) && isset($pLink["fragment"]) && !isset($pLink["query"]) && $pLink["path"] == getCurLink()) {
-      if(array_key_exists($pLink["fragment"], $ids)) continue;
+    if(isset($pLink["path"]) && isset($pLink["fragment"]) && !isset($pLink["query"])
+      && $pLink["path"] == getCurLink() && !array_key_exists($pLink["fragment"], $ids)) {
       throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));
     }
     $link = buildUrl($pLink);
@@ -193,11 +188,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $a->setAttribute("title", $title);
   }
 
-  private function validateImages(DOMDocument $dom) {
+  private function validateImages(DOMDocumentPlus $dom) {
     $toStrip = array();
     foreach($dom->getElementsByTagName("object") as $o) {
       if(!$o->hasAttribute("data")) continue;
-      $dataFile = $o->getAttribute("data");
+      $dataFile = substr($o->getAttribute("data"), strlen(ROOT_URL));
       try {
         $pUrl = parseLocalLink($dataFile);
       } catch(Exception $e) {
