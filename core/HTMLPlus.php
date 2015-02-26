@@ -181,9 +181,9 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHempty($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
-    $this->validateLinks("a", "href", $repair);
-    $this->validateLinks("form", "action", $repair);
-    $this->validateLinks("object", "data", $repair);
+    #$this->validateLinks("a", "href", $repair);
+    #$this->validateLinks("form", "action", $repair);
+    #$this->validateLinks("object", "data", $repair);
     $this->validateDates($repair);
     $this->validateAuthor($repair);
     $this->validateFirstHeadingAuthor($repair);
@@ -389,7 +389,10 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  public function validateLinks($elName, $attName, $repair) {
+  private function validateLinks($elName, $attName, $repair) {
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    return;
+    /*
     $toStrip = array();
     foreach($this->getElementsByTagName($elName) as $e) {
       if(!$e->hasAttribute($attName)) continue;
@@ -399,7 +402,7 @@ class HTMLPlus extends DOMDocumentPlus {
         if(array_key_exists("host", $pLink)) continue;
         $link = buildUrl($pLink);
         if($link == "") $link = "#".$this->headings->item(0)->getAttribute("id");
-        if($link === ltrim($e->getAttribute($attName), "/")) continue; // link has not changed
+        if($link === $e->getAttribute($attName)) continue; // link has not changed
         if(!$repair)
           throw new Exception(sprintf(_("Invalid link %s repairable to %s"), $e->getAttribute($attName), $link));
         $e->setAttribute($attName, $link);
@@ -410,6 +413,7 @@ class HTMLPlus extends DOMDocumentPlus {
     }
     foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
     return count($toStrip);
+    */
   }
 
   private function validateAuthor($repair) {

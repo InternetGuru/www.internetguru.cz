@@ -45,7 +45,7 @@ class DOMBuilder {
       if(array_key_exists($pUrl["fragment"], $ids)) {
         $pUrl = array_merge($pUrl, $ids[$pUrl["fragment"]]);
         if(!isset($ids[$pUrl["fragment"]]["fragment"])) unset($pUrl["fragment"]);
-        if($pUrl["path"] == key(self::$idToLink)) unset($pUrl["path"]);
+        if($pUrl["path"] == key(self::$idToLink)) $pUrl["path"] = "";
         return $pUrl;
       }
     }

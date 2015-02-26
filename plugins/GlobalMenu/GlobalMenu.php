@@ -50,6 +50,7 @@ class GlobalMenu extends Plugin implements SplObserver {
   private function getMenu(DOMDocumentPlus $doc, DOMElement $section) {
     $ul = $doc->createElement("ul");
     $li = null;
+    $prefix = Cms::getContentFull()->documentElement->firstElement->getAttribute("link");
     foreach($section->childElements as $n) {
       if($n->nodeName == "section") {
         $menu = $this->getMenu($doc, $n);
@@ -69,7 +70,7 @@ class GlobalMenu extends Plugin implements SplObserver {
       }
       if(getCurLink() === $link) $a->setAttribute("class", "current");
       if(!is_null($link)) $a->setAttribute("href", $link);
-      else $a->setAttribute("href", "#".$n->getAttribute("id"));
+      else $a->setAttribute("href", "$prefix#".$n->getAttribute("id"));
       if(is_null($link)) $a->setAttribute("class", "fragment");
       $li->appendChild($a);
       $ul->appendChild($li);

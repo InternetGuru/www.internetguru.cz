@@ -135,8 +135,8 @@ function buildUrl(Array $p) {
   if(array_key_exists("user", $p) || array_key_exists("pass", $p))
     throw new Exception(_("URL with username or password not supported"));
   if(array_key_exists("host", $p)) $url .= "//".$p["host"];
-  if(array_key_exists("host", $p) && array_key_exists("path", $p)) $url .= "/";
-  if(array_key_exists("path", $p)) $url .= trim($p["path"], "/");
+  #if(array_key_exists("host", $p) && array_key_exists("path", $p)) $url .= "/";
+  if(array_key_exists("path", $p)) $url .= "/".trim($p["path"], "/");
   if(array_key_exists("query", $p)) $url .= "?".$p["query"];
   if(array_key_exists("fragment", $p)) $url .= "#".$p["fragment"];
   return $url;
