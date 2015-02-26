@@ -227,13 +227,13 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function insertVar($varName, $varValue) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
     $this->ownerDocument->insertVar($varName, $varValue, $this);
   }
 
   public function insertFn($varName, $varValue) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
     $this->ownerDocument->insertFn($varName, $varValue, $this);
   }

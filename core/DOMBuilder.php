@@ -31,7 +31,7 @@ class DOMBuilder {
   }
 
   public static function getId($link="") {
-    throw new Exception(METHOD_NA);
+    throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
   }
 
   public static function getLink(Array $pUrl) {

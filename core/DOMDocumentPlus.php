@@ -38,12 +38,12 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function insertVar($varName, $varValue, $element=null) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 
   public function insertFn($varName, $varValue, $element=null) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 
@@ -80,7 +80,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function validatePlus($repair = false) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 

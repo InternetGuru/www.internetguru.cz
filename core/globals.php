@@ -163,6 +163,7 @@ function parseLocalLink($link, $host=null) {
 
 function buildLink($link) {
   if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
+  if(strpos($link, "#") === 0) return $link;
   $link = ltrim($link, "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   if($scriptFile == "index.php") return ROOT_URL.$link;

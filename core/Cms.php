@@ -153,12 +153,12 @@ class Cms {
   }
 
   public static function processVariables(DOMDocumentPlus $doc) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return $doc;
   }
 
   private static function insertVar(HTMLPlus $newContent, $varName, $varValue) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
     $tmpContent = clone $newContent;
     $tmpContent->insertVar($varName, $varValue);
