@@ -154,9 +154,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $a->setAttribute($aName, buildLink(buildUrl($pUrl)));
           continue;
         }
-        $pLink = DOMBuilder::getLink($pUrl);
-        #var_dump($pLink);
-        $this->setupLink($a, $aName, $pLink, $ids);
+        if(!array_key_exists("fragment", $pUrl) || array_key_exists("path", $pUrl)) {
+          $pUrl = DOMBuilder::getLink($pUrl);
+        }
+        #var_dump($pUrl);
+        $this->setupLink($a, $aName, $pUrl, $ids);
       } catch(Exception $e) {
         $toStrip[] = array($a, $e->getMessage());
       }

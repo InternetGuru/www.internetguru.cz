@@ -113,8 +113,6 @@ function absoluteLink($link=null) {
 }
 
 function redirTo($link, $code=null, $msg=null) {
-  $pLink = parseLocalLink($link);
-  if(!is_null($pLink)) $link = buildLink(buildUrl($pLink)); // /[link]?[query] || beta.php?q=[link]&[query]
   http_response_code(is_null($code) ? 302 : $code);
   if(class_exists("Logger")) {
     new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
@@ -332,7 +330,7 @@ function initFiles() {
     safeRewriteFile($src, $f);
     $updated = true;
   }
-  if($updated) redirTo(getCurLink(), "", null, _("Root file(s) updated"));
+  if($updated) redirTo(buildLink(getCurLink()), "", null, _("Root file(s) updated"));
 }
 
 function smartCopy($src, $dest) {
@@ -467,7 +465,7 @@ function getShortString($str) {
 }
 
 function loginRedir() {
-  redirTo(getCurLink()."?login", 401, _("Authorization required"));
+  redirTo(buildLink(getCurLink()."?login"), 401, _("Authorization required"));
 }
 
 ?>
