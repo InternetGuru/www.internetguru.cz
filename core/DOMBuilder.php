@@ -37,15 +37,16 @@ class DOMBuilder {
   public static function getLink(Array $pUrl) {
     reset(self::$idToLink);
     if(array_key_exists("fragment", $pUrl)) {
-      $ids = current(self::$idToLink);
-      if(array_key_exists("path", $pUrl) && array_key_exists($pUrl["path"], self::$idToLink))
-        $ids = self::$idToLink[$pUrl["path"]];
-      if(array_key_exists($pUrl["fragment"], $ids) && !array_key_exists($pUrl["path"], $ids)) {
+      if(!array_key_exists("path", $pUrl))
         throw new Exception(sprintf("Fragment %s missing prefix", $pUrl["fragment"]));
-        #$pUrl = array_merge($pUrl, $ids[$pUrl["fragment"]]);
-        #if(!isset($ids[$pUrl["fragment"]]["fragment"])) unset($pUrl["fragment"]);
-        #if($pUrl["path"] == key(self::$idToLink)) unset($pUrl["path"]);
-        #return $pUrl;
+      $ids = current(self::$idToLink);
+      if(array_key_exists($pUrl["path"], self::$idToLink))
+        $ids = self::$idToLink[$pUrl["path"]];
+      if(array_key_exists($pUrl["fragment"], $ids)) {
+        $pUrl = array_merge($pUrl, $ids[$pUrl["fragment"]]);
+        if(!isset($ids[$pUrl["fragment"]]["fragment"])) unset($pUrl["fragment"]);
+        if($pUrl["path"] == key(self::$idToLink)) unset($pUrl["path"]);
+        return $pUrl;
       }
     }
     if(array_key_exists("path", $pUrl) && array_key_exists($pUrl["path"], self::$linkToNull)) {
