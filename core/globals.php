@@ -127,18 +127,14 @@ function redirTo($link, $code=null, $msg=null) {
 }
 
 function buildUrl(Array $p) {
+  return implodeLink($p);
+}
+
+function implodeLink(Array $p) {
   $url = "";
-  if(array_key_exists("scheme", $p)) {
-    $url .= $p["scheme"].":";
-    if(!array_key_exists("host", $p)) throw new Exception(_("URL with scheme missing host"));
-  }
-  if(array_key_exists("user", $p) || array_key_exists("pass", $p))
-    throw new Exception(_("URL with username or password not supported"));
-  if(array_key_exists("host", $p)) $url .= "//".$p["host"];
-  #if(array_key_exists("host", $p) && array_key_exists("path", $p)) $url .= "/";
-  if(array_key_exists("path", $p)) $url .= "/".trim($p["path"], "/");
-  if(array_key_exists("query", $p)) $url .= "?".$p["query"];
-  if(array_key_exists("fragment", $p)) $url .= "#".$p["fragment"];
+  if(isset($p["path"])) $url .= trim($p["path"], "/");
+  if(isset($p["query"])) $url .= "?".$p["query"];
+  if(isset($p["fragment"])) $url .= "#".$p["fragment"];
   return $url;
 }
 
@@ -147,7 +143,6 @@ function parseLocalLink($link, $host=null) {
   if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
   if(isset($pLink["path"])) $pLink["path"] = trim($pLink["path"], "/");
-    #while(strpos($pLink["path"], "/") === 0) $pLink["path"] = substr($pLink["path"], 1);
   if(isset($pLink["scheme"])) {
     if($pLink["scheme"] != SCHEME) return null; // different scheme
     unset($pLink["scheme"]);
@@ -160,9 +155,15 @@ function parseLocalLink($link, $host=null) {
 }
 
 function buildLink($link) {
+  return buildLocalUrl($link);
+}
+
+function buildLocalUrl($link) {
+  #if(strpos($link, "#") === 0) return $link;
   if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
-  if(strpos($link, "#") === 0) return $link;
   $link = ltrim($link, "/");
+  #$defPref = DOMBuilder::getDefaultPrefix();
+  #if(strpos($link, $defPref) === 0) $link = substr($link, strlen($defPref));
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   if($scriptFile == "index.php") return ROOT_URL.$link;
   $path = parse_url($link, PHP_URL_PATH);

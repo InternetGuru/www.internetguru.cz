@@ -14,7 +14,8 @@ class DOMBuilder {
   private static $idToLink = array(); // id => closest or self link
   private static $linkToDesc = array(); // id => shorted description
   private static $linkToTitle = array(); // id => self title or shorted content
-  private static $linkToNull = array(); // link => null
+  private static $linkToId = array(); // link => null
+  private static $defaultPrefix = null;
 
   public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
     $doc = new HTMLPlus();
@@ -35,26 +36,21 @@ class DOMBuilder {
   }
 
   public static function getLink(Array $pUrl) {
-    reset(self::$idToLink);
-    if(array_key_exists("fragment", $pUrl)) {
-      if(!array_key_exists("path", $pUrl))
-        throw new Exception(sprintf("Fragment %s missing prefix", $pUrl["fragment"]));
-      $ids = current(self::$idToLink);
-      if(array_key_exists($pUrl["path"], self::$idToLink))
-        $ids = self::$idToLink[$pUrl["path"]];
-      if(array_key_exists($pUrl["fragment"], $ids)) {
-        $pUrl = array_merge($pUrl, $ids[$pUrl["fragment"]]);
-        if(!isset($ids[$pUrl["fragment"]]["fragment"])) unset($pUrl["fragment"]);
-        if($pUrl["path"] == key(self::$idToLink)) $pUrl["path"] = "";
-        return $pUrl;
-      }
+    if(!isset($pUrl["path"])) return implodeLink($pUrl); // no prefix
+    #var_dump(self::$linkToId);
+    #var_dump(self::$idToLink);
+    #if(!isset($pUrl["fragment"])) $pUrl["fragment"] = $pUrl["path"];
+    if(isset($pUrl["fragment"]) && isset(self::$idToLink[$pUrl["path"]][$pUrl["fragment"]])) {
+      if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
+      else $pUrl["path"] = $pUrl["path"]."/".self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
+      if(!isset(self::$linkToId[implodeLink($pUrl)])) unset($pUrl["fragment"]);
+      return implodeLink($pUrl);
     }
-    if(array_key_exists("path", $pUrl) && array_key_exists($pUrl["path"], self::$linkToNull)) {
-      if($pUrl["path"] == key(self::$idToLink)) unset($pUrl["path"]);
-      return $pUrl;
+    if(isset(self::$linkToId[$pUrl["path"]])) {
+      if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
+      return implodeLink($pUrl);
     }
-    if(!array_key_exists("path", $pUrl) && !array_key_exists("fragment", $pUrl)) return $pUrl;
-    throw new Exception(sprintf(_("Link %s not found"), buildUrl($pUrl)));
+    throw new Exception(sprintf(_("Link %s not found"), implodeLink($pUrl)));
   }
 
   public static function getDesc($link) {
@@ -66,6 +62,7 @@ class DOMBuilder {
   }
 
   public static function getTitle($link) {
+    #var_dump(self::$linkToTitle); die();
     if(array_key_exists($link, self::$linkToTitle)) return self::$linkToTitle[$link];
     reset(self::$linkToTitle);
     $link = key(self::$linkToTitle).$link;
@@ -79,11 +76,11 @@ class DOMBuilder {
   }
 
   public static function getLinks() {
-    return array_keys(self::$linkToNull);
+    return array_keys(self::$linkToId);
   }
 
   public static function isLink($link) {
-    return array_key_exists($link, self::$linkToNull);
+    return array_key_exists($link, self::$linkToId);
   }
 
   private static function globalReadonly(DOMDocumentPlus $doc) {
@@ -217,7 +214,7 @@ class DOMBuilder {
     // register links/ids; repair if duplicit
     self::setIdentifiers($doc, $fShort);
     #var_dump(self::$idToLink);
-    #print_r(self::$linkToNull);
+    #print_r(self::$linkToId);
   }
 
   private static function prefixLinks($prefix, HTMLPlus $doc) {
@@ -239,11 +236,11 @@ class DOMBuilder {
       $h1->setAttribute("link", $prefix);
     }
     self::$idToLink[$prefix] = array();
+    #self::$linkToId[$prefix] = array();
     self::registerKeys($doc, $prefix);
     self::addLocalPrefix($doc, $prefix, "a", "href");
     self::addLocalPrefix($doc, $prefix, "form", "action");
-    #print_r(self::$idToLink);
-    #var_dump(self::$linkToNull);
+    #var_dump(self::$idToLink); var_dump(self::$linkToId);
   }
 
   private static function addLocalPrefix(HTMLPlus $doc, $prefix, $eName, $aName) {
@@ -251,67 +248,60 @@ class DOMBuilder {
       if(!$e->hasAttribute($aName)) continue;
       $pLink = parseLocalLink($e->getAttribute($aName));
       if(is_null($pLink)) continue; // link is external
-
-      if(array_key_exists("path", $pLink)) {
-        if(!array_key_exists($pLink["path"], self::$idToLink[$prefix])) {
-          foreach(self::$idToLink[$prefix] as $link) {
-            if("$prefix/".$link["path"] != $pLink["path"]) continue;
-            new Logger(sprintf(_("Found local link with prefix %s"), $e->getAttribute($aName)),
-              Logger::LOGGER_WARNING);
-            break;
-          }
-          continue;
-        }
-        $pLink["path"] = "$prefix/".$pLink["path"];
-      }
-      if(array_key_exists("fragment", $pLink)) {
-        if(array_key_exists("path", $pLink)) {
-          if($pLink["path"] == $prefix) new Logger(sprintf(_("Found local fragment with prefix %s"),
-            $e->getAttribute($aName)), Logger::LOGGER_WARNING);
-          continue;
-        }
-        $pLink["path"] = $prefix;
-      }
-      $e->setAttribute($aName, buildUrl($pLink));
+      if(isset($pLink["path"])) {
+        $pLink["path"] = $prefix."/".$pLink["path"];
+      } else $pLink["path"] = $prefix;
+      $e->setAttribute($aName, implodeLink($pLink));
     }
   }
 
   private static function registerKeys(HTMLPlus $doc, $prefix) {
     $newLinks = array();
-    $prefixLink = "$prefix/";
-    if(empty(self::$linkToNull)) $prefixLink = "";
+    if(empty(self::$linkToId)) self::$defaultPrefix = $prefix;
     $xpath = new DOMXPath($doc);
     foreach($xpath->query("//*[@id]") as $e) {
       $id = $e->getAttribute("id");
       if($e->hasAttribute("link")) {
-        $link = $e->getAttribute("link");
-        if($link != $prefix) $link = $prefixLink.$link;
-        #if(!strlen($prefixLink) && $link == $prefix) $link = "";
-        if(array_key_exists($link, self::$linkToNull)) {
-          new Logger(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
-          continue;
-        }
-        self::$linkToNull[$link] = null;
-        $newLinks[$link] = $e;
-        $pLink = array("path" => $link);
+        $link = ($e->getAttribute("link") != $prefix ? $e->getAttribute("link") : "");
+        #if($link != $prefix) $link = .$link;
+        #if(!strlen($prefix."/") && $link == $prefix) $link = "";
+        #$pLink = array("path" => $link);
+        $linkId = self::getLinkFull($prefix, $e->getAttribute("link"), null);
+        $newLinks[$linkId] = $e;
       } else {
         $link = $e->getAncestorValue("link", "h");
-        if($link != $prefix) $link = $prefixLink.$link;
-        #if(!strlen($prefixLink) && $link == $prefix) $link = "";
-        $pLink = array("path" => $link, "fragment" => $id);
-        $link = buildUrl($pLink);
+        if($link == $prefix) $link = "";
+        $linkId = self::getLinkFull($prefix, $link, $id);
       }
-      self::$idToLink[$prefix][$id] = $pLink;
+      if(array_key_exists($linkId, self::$linkToId)) {
+        new Logger(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
+        continue;
+      }
+      self::$idToLink[$prefix][$id] = $link;
+      self::$linkToId[$linkId] = $id;
+      #self::$idToLink[$prefix][$id] = $pLink;
       if($e->nodeName == "h") {
         $desc = getShortString($e->nextElement->nodeValue);
-        if(strlen($desc)) self::$linkToDesc[$link] = $desc;
+        if(strlen($desc)) self::$linkToDesc[$linkId] = $desc;
       }
       if(strlen($e->getAttribute("title")))
-        self::$linkToTitle[$link] = $e->getAttribute("title");
+        self::$linkToTitle[$linkId] = $e->getAttribute("title");
       else
-        self::$linkToTitle[$link] = getShortString($e->nodeValue);
+        self::$linkToTitle[$linkId] = getShortString($e->nodeValue);
     }
-    foreach($newLinks as $link => $e) $e->setAttribute("link", $link);
+    foreach($newLinks as $link => $e) {
+      #if(!strlen($link)) $link = self::$defaultPrefix;
+      $e->setAttribute("link", $link);
+    }
+    #var_dump($link);
+  }
+
+  private static function getLinkFull($prefix, $link, $frag) {
+    $linkId = array();
+    if($prefix != self::$defaultPrefix) $linkId[] = $prefix;
+    if($link != $prefix) $linkId[] = $link.(strlen($frag) ? "#$frag" : "");
+    if(empty($linkId)) $linkId[] = self::$defaultPrefix;
+    return implode("/", $linkId);
   }
 
   private static function generateUniqueVal($val, Array $reg) {

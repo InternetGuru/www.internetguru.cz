@@ -151,12 +151,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $pUrl = parseLocalLink($a->getAttribute($aName));
         if(is_null($pUrl)) continue; // link is external
         if(array_key_exists("path", $pUrl) && is_file(FILES_FOLDER."/".$pUrl["path"])) { // link is file
-          $a->setAttribute($aName, buildLink(buildUrl($pUrl)));
+          $a->setAttribute($aName, buildLocalUrl(implodeLink($pUrl)));
+          #$a->setAttribute($aName, buildLink(buildUrl($pUrl)));
           continue;
         }
-        if(!array_key_exists("fragment", $pUrl) || array_key_exists("path", $pUrl)) {
-          $pUrl = DOMBuilder::getLink($pUrl);
-        }
+        #if(!array_key_exists("fragment", $pUrl) || array_key_exists("path", $pUrl)) {
+        #  $pUrl = DOMBuilder::getLink($pUrl);
+        #}
         #var_dump($pUrl);
         $this->setupLink($a, $aName, $pUrl, $ids);
       } catch(Exception $e) {
@@ -170,19 +171,23 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
     #var_dump(buildUrl($pLink));
     #var_dump(getCurLink(true));
-    if($a->nodeName != "form" && buildUrl($pLink) == "/".getCurLink(true))
-      throw new Exception(_("Cyclic link removed"));
-    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, buildUrl($pLink));
-    if(isset($pLink["path"]) && isset($pLink["fragment"]) && !isset($pLink["query"])
-      && $pLink["path"] == getCurLink()) {
-      if(!array_key_exists($pLink["fragment"], $ids))
-        throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));
-      unset($pLink["path"]);
-    }
-    $a->setAttribute($aName, buildLink(buildUrl($pLink)));
+    #var_dump($pLink);
+    $link = DOMBuilder::getLink($pLink);
+    #var_dump($link);
+    if($a->nodeName != "form" && $link == getCurLink(true))
+      throw new Exception(sprintf(_("Cyclic link %s removed"), $a->getAttribute($aName)));
+    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $link);
+    #if(isset($pLink["path"]) && isset($pLink["fragment"]) && !isset($pLink["query"])
+    #  && $pLink["path"] == getCurLink()) {
+    #  if(!array_key_exists($pLink["fragment"], $ids))
+    #    throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));
+      #unset($pLink["path"]);
+    #}
+    $a->setAttribute($aName, buildLocalUrl($link));
   }
 
   private function insertTitle(DOMElement $a, $link) {
+    #var_dump($link);
     if(strlen($a->getAttribute("title"))) return;
     $title = DOMBuilder::getTitle($link);
     if($title == $a->nodeValue) $title = DOMBuilder::getDesc($link);
@@ -230,11 +235,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       }
     }
     foreach($toStrip as $o) $o[0]->stripTag($o[1]);
-  }
-
-  private function getLink($path, $query) {
-    $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
-    if($scriptFile == "index.php") return $path;
   }
 
   /*
