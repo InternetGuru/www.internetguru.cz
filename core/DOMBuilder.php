@@ -17,9 +17,9 @@ class DOMBuilder {
   private static $linkToId = array(); // link => null
   private static $defaultPrefix = null;
 
-  public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
+  public static function buildHTMLPlus($filePath, $user=true) {
     $doc = new HTMLPlus();
-    self::build($doc, $filePath, true, $user, $linkPrefix);
+    self::build($doc, $filePath, true, $user);
     return $doc;
   }
 
@@ -96,7 +96,7 @@ class DOMBuilder {
     }
   }
 
-  private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user, $linkPrefix) {
+  private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user) {
     /*
     $dc = new DOMCache(hash(FILE_HASH_ALGO, "$fileName, $replace, $user"));
     if($dc->isValid()) return $dc->getCache();
@@ -107,7 +107,7 @@ class DOMBuilder {
     if(self::DEBUG) $doc->formatOutput = true;
 
     if($replace) {
-      self::safeLoadDOM($fileName, $doc, $user, true, $linkPrefix);
+      self::safeLoadDOM($fileName, $doc, $user, true);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
       return;
     }
@@ -145,7 +145,7 @@ class DOMBuilder {
     return $f;
   }
 
-  private static function safeLoadDOM($filePath, DOMDocumentPlus $doc, $user, $admin, $linkPrefix) {
+  private static function safeLoadDOM($filePath, DOMDocumentPlus $doc, $user, $admin) {
     $files = array();
     try {
       $files[self::findFile($filePath, $user, $admin)] = null;
@@ -159,7 +159,7 @@ class DOMBuilder {
     foreach($files as $f => $void) {
       if(file_exists(dirname($f)."/.".basename($f))) continue;
       try {
-        self::loadDOM($f, $doc, null, $linkPrefix);
+        self::loadDOM($f, $doc, null);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
@@ -173,7 +173,7 @@ class DOMBuilder {
       throw new Exception(sprintf(_("Failed to load user/admin/default file %s"), basename($filePath)));
   }
 
-  private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $linkPrefix=null) {
+  private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $included=false) {
     $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
     $fShort = str_replace($remove, array(), "?$filePath");
     if($doc instanceof HTMLPlus) {
@@ -196,7 +196,7 @@ class DOMBuilder {
     $doc->defaultCtime = $c->format(DateTime::W3C);
     $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
     $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
-    if(!is_null($linkPrefix)) self::prefixLinks($linkPrefix, $doc);
+    #if(!is_null($linkPrefix)) self::prefixLinks($linkPrefix, $doc);
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
@@ -212,17 +212,18 @@ class DOMBuilder {
     // HTML+ include
     self::insertIncludes($doc, $filePath);
     // register links/ids; repair if duplicit
+    if($included) return;
     self::setIdentifiers($doc, $fShort);
     #var_dump(self::$idToLink);
     #print_r(self::$linkToId);
   }
 
-  private static function prefixLinks($prefix, HTMLPlus $doc) {
-    foreach($doc->getElementsByTagName("h") as $h) {
-      if(!$h->hasAttribute("link")) continue;
-      $h->setAttribute("link", "$prefix/".$h->getAttribute("link"));
-    }
-  }
+  #private static function prefixLinks($prefix, HTMLPlus $doc) {
+  #  foreach($doc->getElementsByTagName("h") as $h) {
+  #    if(!$h->hasAttribute("link")) continue;
+  #    $h->setAttribute("link", "$prefix/".$h->getAttribute("link"));
+  #  }
+  #}
 
   private static function setIdentifiers(HTMLPlus $doc, $fShort) {
     $duplicit = array();
@@ -360,7 +361,7 @@ class DOMBuilder {
     try {
       $doc = new HTMLPlus();
       $author = $include->getAncestorValue("author", "h");
-      self::loadDOM("$homeDir/$val", $doc, $author);
+      self::loadDOM("$homeDir/$val", $doc, $author, true);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
