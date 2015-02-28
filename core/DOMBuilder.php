@@ -46,7 +46,7 @@ class DOMBuilder {
       if(!isset(self::$linkToId[implodeLink($pUrl)])) unset($pUrl["fragment"]);
       return implodeLink($pUrl);
     }
-    if(isset(self::$linkToId[$pUrl["path"]])) {
+    if(isset(self::$linkToId[$pUrl["path"]]) && !isset($pUrl["fragment"])) {
       if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
       return implodeLink($pUrl);
     }
