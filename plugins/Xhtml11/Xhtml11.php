@@ -175,7 +175,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $link = DOMBuilder::getLink($pLink);
     #var_dump($link);
     if($a->nodeName != "form" && $link == getCurLink(true))
-      throw new Exception(sprintf(_("Cyclic link %s removed"), $a->getAttribute($aName)));
+      throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
     if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $link);
     if(strpos($link, getCurLink(true)."#") === 0 && !array_key_exists($pLink["fragment"], $ids))
       throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));
