@@ -339,7 +339,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function redir($f) {
     $link = getCurLink();
     if(!isset($_POST["saveandgo"])) $link .= "?".get_class($this)."=$f";
-    redirTo(buildLink($link));
+    redirTo(buildLocalUrl($link));
   }
 
 }

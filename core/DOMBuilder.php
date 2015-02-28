@@ -249,9 +249,12 @@ class DOMBuilder {
       $pLink = parseLocalLink($e->getAttribute($aName));
       if(is_null($pLink)) continue; // link is external
       if(isset($pLink["path"])) {
-        $pLink["path"] = $prefix."/".$pLink["path"];
+        if(isset(self::$linkToId[$prefix."/".$pLink["path"]])) {
+          $pLink["path"] = $prefix."/".$pLink["path"];
+        }
       } else $pLink["path"] = $prefix;
       $e->setAttribute($aName, implodeLink($pLink));
+      #var_dump(implodeLink($pLink));
     }
   }
 

@@ -126,10 +126,6 @@ function redirTo($link, $code=null, $msg=null) {
   exit();
 }
 
-function buildUrl(Array $p) {
-  return implodeLink($p);
-}
-
 function implodeLink(Array $p) {
   $url = "";
   if(isset($p["path"])) $url .= trim($p["path"], "/");
@@ -152,10 +148,6 @@ function parseLocalLink($link, $host=null) {
     unset($pLink["host"]);
   }
   return $pLink;
-}
-
-function buildLink($link) {
-  return buildLocalUrl($link);
 }
 
 function buildLocalUrl($link) {
@@ -331,7 +323,7 @@ function initFiles() {
     safeRewriteFile($src, $f);
     $updated = true;
   }
-  if($updated) redirTo(buildLink(getCurLink()), "", null, _("Root file(s) updated"));
+  if($updated) redirTo(buildLocalUrl(getCurLink()), "", null, _("Root file(s) updated"));
 }
 
 function smartCopy($src, $dest) {
@@ -466,7 +458,7 @@ function getShortString($str) {
 }
 
 function loginRedir() {
-  redirTo(buildLink(getCurLink()."?login"), 401, _("Authorization required"));
+  redirTo(buildLocalUrl(getCurLink()."?login"), 401, _("Authorization required"));
 }
 
 ?>

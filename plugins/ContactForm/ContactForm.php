@@ -52,7 +52,7 @@ class ContactForm extends Plugin implements SplObserver {
         } else $msg = $this->createMessage($this->cfg, $formId);
         $this->sendForm($form, $msg);
         Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS, true);
-        redirTo(buildLink(getCurLink()));
+        redirTo(buildLocalUrl(getCurLink()));
       } catch(Exception $e) {
         $this->finishForm($htmlForm, true);
         $message = "<a href='#".$htmlForm->getAttribute("id")."'>"

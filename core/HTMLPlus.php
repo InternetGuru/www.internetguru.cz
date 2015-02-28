@@ -391,29 +391,6 @@ class HTMLPlus extends DOMDocumentPlus {
 
   private function validateLinks($elName, $attName, $repair) {
     new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
-    return;
-    /*
-    $toStrip = array();
-    foreach($this->getElementsByTagName($elName) as $e) {
-      if(!$e->hasAttribute($attName)) continue;
-      try {
-        $pLink = parseLocalLink($e->getAttribute($attName), $this->documentElement->getAttribute("ns"));
-        if(is_null($pLink)) continue;
-        if(array_key_exists("host", $pLink)) continue;
-        $link = buildUrl($pLink);
-        if($link == "") $link = "#".$this->headings->item(0)->getAttribute("id");
-        if($link === $e->getAttribute($attName)) continue; // link has not changed
-        if(!$repair)
-          throw new Exception(sprintf(_("Invalid link %s repairable to %s"), $e->getAttribute($attName), $link));
-        $e->setAttribute($attName, $link);
-      } catch(Exception $ex) {
-        if(!$repair) throw $ex;
-        $toStrip[] = array($e, $ex->getMessage());
-      }
-    }
-    foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
-    return count($toStrip);
-    */
   }
 
   private function validateAuthor($repair) {
