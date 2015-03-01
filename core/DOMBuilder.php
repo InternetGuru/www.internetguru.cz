@@ -250,10 +250,12 @@ class DOMBuilder {
       $pLink = parseLocalLink($e->getAttribute($aName));
       if(is_null($pLink)) continue; // link is external
       if(isset($pLink["path"])) {
-        if(isset(self::$linkToId[$prefix."/".$pLink["path"]])) {
-          $pLink["path"] = $prefix."/".$pLink["path"];
-        }
-      } else $pLink["path"] = $prefix;
+        if(!isset(self::$linkToId[$prefix."/".$pLink["path"]])) continue;
+        $pLink["path"] = $prefix."/".$pLink["path"];
+      } elseif(isset($pLink["fragment"])) {
+        if(!isset(self::$linkToId[$prefix."#".$pLink["fragment"]])) continue;
+        $pLink["path"] = $prefix;
+      }
       $e->setAttribute($aName, implodeLink($pLink));
       #var_dump(implodeLink($pLink));
     }

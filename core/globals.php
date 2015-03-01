@@ -317,11 +317,12 @@ function initFiles() {
   $updated = false;
   foreach($coreFiles as $f) {
     $src = CMS_FOLDER."/_subdom/$f";
-    if(filemtime($src) <= filemtime($f)) continue;
+    if(filemtime($src) == filemtime($f)) continue;
     safeRewriteFile($src, $f);
+    touch($f, filemtime($src));
     $updated = true;
   }
-  if($updated) redirTo(buildLocalUrl(getCurLink()), "", null, _("Root file(s) updated"));
+  if($updated) redirTo(buildLocalUrl(getCurLink()), null, _("Root file(s) updated"));
 }
 
 function smartCopy($src, $dest) {
