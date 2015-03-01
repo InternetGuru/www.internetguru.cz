@@ -12,11 +12,11 @@ try {
     $redir = null;
     foreach(scandir(getcwd()) as $f) {
       if(is_dir($f)) continue;
-      if(strtok($f, ".") == "REDIR") { // eg. REDIR.www.internetguru.cz
+      if(strpos($f, "REDIR.") === 0) { // eg. REDIR.www.internetguru.cz
         header("Location: http://".substr($f, 6));
         exit;
       }
-      if(strtok($f, ".") == "VERSION") { // eg. VERSION.1.0
+      if(strpos($f, "VERSION.") === 0) { // eg. VERSION.1.0
         $cmsVersion = substr($f, 8).".php";
       }
       if(!preg_match("/^\d+\.\d+\.php$/", $f)) continue;

@@ -168,12 +168,14 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
     $linkId = DOMBuilder::getLinkId($pLink);
     if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
+    #var_dump("---------");
     #var_dump(implodeLink($pLink));
     #var_dump(getCurLink());
     #var_dump(getCurLink(true));
     #var_dump($pLink);
     #var_dump($linkId);
     #var_dump($link);
+    #var_dump(buildLocalUrl($link, !is_null($linkId)));
     if($a->nodeName != "form" && (is_null($linkId) ? getCurLink() : "").$link == getCurLink(true))
       throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
     if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $linkId);

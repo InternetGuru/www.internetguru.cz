@@ -155,7 +155,7 @@ function buildLocalUrl($link, $root=true) {
   $link = ltrim($link, "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   $path = parse_url($link, PHP_URL_PATH);
-  if($scriptFile == "index.php") return ($root && $path != getCurLink() ? ROOT_URL : "").$link;
+  if($scriptFile == "index.php") return ($root && $path != getCurLink(true) ? ROOT_URL : "").$link;
   $query = parse_url($link, PHP_URL_QUERY);
   $frag = parse_url($link, PHP_URL_FRAGMENT);
   $q = array();
