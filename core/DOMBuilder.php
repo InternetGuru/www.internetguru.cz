@@ -36,6 +36,7 @@ class DOMBuilder {
   }
 
   public static function getLinkId(Array $pUrl) {
+    if(empty($pUrl)) $pUrl["path"] = self::$defaultPrefix;
     if(!isset($pUrl["path"])) return null; // no prefix
     #var_dump(self::$linkToId);
     #var_dump(self::$idToLink);

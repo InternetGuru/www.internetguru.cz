@@ -154,14 +154,18 @@ function buildLocalUrl($link, $root=true) {
   #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
   $link = ltrim($link, "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
-  $path = parse_url($link, PHP_URL_PATH);
-  if($scriptFile == "index.php") return ($root && $path != getCurLink(true) ? ROOT_URL : "").$link;
+  if($scriptFile == "index.php") {
+    if($root && !strlen($link)) return ROOT_URL;
+    $path = parse_url($link, PHP_URL_PATH);
+    return ($root && $path != getCurLink(true) ? ROOT_URL : "").$link;
+  }
   $query = parse_url($link, PHP_URL_QUERY);
   $frag = parse_url($link, PHP_URL_FRAGMENT);
   $q = array();
   if(strlen($path)) $q[] ="q=$path";
   if(strlen($query)) $q[] = $query;
-  return ($root && $path != getCurLink() ? ROOT_URL.$scriptFile : "")
+  if($root && !strlen($link)) return ROOT_URL.$scriptFile;
+  return ($root && $path != getCurLink(true) ? ROOT_URL.$scriptFile : "")
     .(!empty($q) ? "?".implode("&", $q) : "").(strlen($frag) ? "#$frag" : "");
 }
 
