@@ -114,9 +114,13 @@ function absoluteLink($link=null) {
 
 function redirTo($link, $code=null, $msg=null) {
   http_response_code(is_null($code) ? 302 : $code);
-  if(class_exists("Logger")) {
-    new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
+  if(!strlen($link)) {
+    $link = ROOT_URL;
+    if(class_exists("Logger"))
+      new Logger(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING);
   }
+  if(class_exists("Logger"))
+    new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
@@ -154,9 +158,9 @@ function buildLocalUrl($link, $root=true) {
   #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
   $link = ltrim($link, "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
+  $path = parse_url($link, PHP_URL_PATH);
   if($scriptFile == "index.php") {
     if($root && !strlen($link)) return ROOT_URL;
-    $path = parse_url($link, PHP_URL_PATH);
     return ($root && $path != getCurLink(true) ? ROOT_URL : "").$link;
   }
   $query = parse_url($link, PHP_URL_QUERY);
@@ -326,7 +330,7 @@ function initFiles() {
     touch($f, filemtime($src));
     $updated = true;
   }
-  if($updated) redirTo(ROOT_URL, null, _("Root file(s) updated"));
+  if($updated) redirTo(buildLocalUrl(getCurLink()), null, _("Root file(s) updated"));
 }
 
 function smartCopy($src, $dest) {
