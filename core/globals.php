@@ -150,21 +150,19 @@ function parseLocalLink($link, $host=null) {
   return $pLink;
 }
 
-function buildLocalUrl($link) {
-  #if(strpos($link, "#") === 0) return $link;
-  if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
+function buildLocalUrl($link, $root=true) {
+  #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
   $link = ltrim($link, "/");
-  #$defPref = DOMBuilder::getDefaultPrefix();
-  #if(strpos($link, $defPref) === 0) $link = substr($link, strlen($defPref));
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
-  if($scriptFile == "index.php") return ROOT_URL.$link;
   $path = parse_url($link, PHP_URL_PATH);
+  if($scriptFile == "index.php") return ($root && $path != getCurLink() ? ROOT_URL : "").$link;
   $query = parse_url($link, PHP_URL_QUERY);
   $frag = parse_url($link, PHP_URL_FRAGMENT);
   $q = array();
   if(strlen($path)) $q[] ="q=$path";
   if(strlen($query)) $q[] = $query;
-  return ROOT_URL.$scriptFile.(!empty($q) ? "?".implode("&", $q) : "").(strlen($frag) ? "#$frag" : "");
+  return ($root && $path != getCurLink() ? ROOT_URL.$scriptFile : "")
+    .(!empty($q) ? "?".implode("&", $q) : "").(strlen($frag) ? "#$frag" : "");
 }
 
 function chmodGroup($file, $mode) {

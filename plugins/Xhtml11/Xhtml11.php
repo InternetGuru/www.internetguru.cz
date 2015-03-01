@@ -145,6 +145,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function fragToLinks(DOMDocumentPlus $doc, Array $ids, $eName, $aName) {
     $toStrip = array();
     foreach($doc->getElementsByTagName($eName) as $a) {
+      #var_dump($a->nodeValue);
       if(!$a->hasAttribute($aName)) continue; // no link found
       try {
         #var_dump($a->getAttribute($aName));
@@ -155,10 +156,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           #$a->setAttribute($aName, buildLink(implodeLink($pUrl)));
           continue;
         }
-        #if(!array_key_exists("fragment", $pUrl) || array_key_exists("path", $pUrl)) {
-        #  $pUrl = DOMBuilder::getLink($pUrl);
-        #}
-        #var_dump($pUrl);
         $this->setupLink($a, $aName, $pUrl, $ids);
       } catch(Exception $e) {
         $toStrip[] = array($a, $e->getMessage());
@@ -169,17 +166,20 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
+    $linkId = DOMBuilder::getLinkId($pLink);
+    if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
     #var_dump(implodeLink($pLink));
+    #var_dump(getCurLink());
     #var_dump(getCurLink(true));
     #var_dump($pLink);
-    $link = DOMBuilder::getLink($pLink);
+    #var_dump($linkId);
     #var_dump($link);
-    if($a->nodeName != "form" && $link == getCurLink(true))
+    if($a->nodeName != "form" && (is_null($linkId) ? getCurLink() : "").$link == getCurLink(true))
       throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
-    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $link);
+    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $linkId);
     if(strpos($link, getCurLink(true)."#") === 0 && !array_key_exists($pLink["fragment"], $ids))
       throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));
-    $a->setAttribute($aName, buildLocalUrl($link));
+    $a->setAttribute($aName, buildLocalUrl($link, !is_null($linkId)));
   }
 
   private function insertTitle(DOMElement $a, $link) {

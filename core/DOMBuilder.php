@@ -35,8 +35,8 @@ class DOMBuilder {
     throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
   }
 
-  public static function getLink(Array $pUrl) {
-    if(!isset($pUrl["path"])) return implodeLink($pUrl); // no prefix
+  public static function getLinkId(Array $pUrl) {
+    if(!isset($pUrl["path"])) return null; // no prefix
     #var_dump(self::$linkToId);
     #var_dump(self::$idToLink);
     #if(!isset($pUrl["fragment"])) $pUrl["fragment"] = $pUrl["path"];

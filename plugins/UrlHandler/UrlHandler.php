@@ -33,9 +33,10 @@ class UrlHandler extends Plugin implements SplObserver {
       try {
         $pLink = parseLocalLink($var->nodeValue);
         if(is_null($pLink)) redirTo(buildLocalUrl($var->nodeValue));
-        $link = DOMBuilder::getLink($pLink);
+        $linkId = DOMBuilder::getLinkId($pLink);
+        if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
         if($link == getCurLink(true)) throw new Exception(sprintf(_("Ignored cyclic redirection to %s"), $link));
-        redirTo(buildLocalUrl(implodeLink($pLink)));
+        redirTo(buildLocalUrl(implodeLink($pLink), !is_null($linkId)));
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
       }
