@@ -256,7 +256,7 @@ class DOMBuilder {
       } elseif(isset($pLink["fragment"])) {
         if(!isset(self::$linkToId[$prefix."#".$pLink["fragment"]])) continue;
         $pLink["path"] = $prefix;
-      }
+      } else continue;
       $e->setAttribute($aName, implodeLink($pLink));
       #var_dump(implodeLink($pLink));
     }
