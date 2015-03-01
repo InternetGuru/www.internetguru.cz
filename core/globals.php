@@ -322,7 +322,7 @@ function initFiles() {
     touch($f, filemtime($src));
     $updated = true;
   }
-  if($updated) redirTo(buildLocalUrl(getCurLink()), null, _("Root file(s) updated"));
+  if($updated) redirTo(ROOT_URL, null, _("Root file(s) updated"));
 }
 
 function smartCopy($src, $dest) {
