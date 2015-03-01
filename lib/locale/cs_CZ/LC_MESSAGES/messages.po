@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-01 19:54+0100\n"
-"PO-Revision-Date: 2015-03-01 19:55+0100\n"
+"POT-Creation-Date: 2015-03-01 20:49+0100\n"
+"PO-Revision-Date: 2015-03-01 20:49+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -631,94 +631,82 @@ msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
 msgid "Unable to send form: %s"
 msgstr "Nepodařilo se odeslat formulář: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:102
-msgid "Form has not been initialized"
-msgstr "Formulář nebyl inicializován"
-
 #: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:103
-msgid "Form has expired"
-msgstr "Platnost formuláře vypršela"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:105
 msgid "Security verification failed"
 msgstr "Selhalo bezpečnostní ověření"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:119
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:117
 #, php-format
 msgid "%s error(s) occured"
 msgstr "počet neplatných položek je %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:129
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:127
 msgid "Missing admin address"
 msgstr "Chybí adresa administrátora"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:131
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:129
 #, php-format
 msgid "Invalid admin email address: '%s'"
 msgstr "Neplatná adresa administrátora: '%s'"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:133
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:131
 #, php-format
 msgid "Invalid client email address: '%s'"
 msgstr "Neplatná adresa odesílatele: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:149
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:147
 msgid "Unable to send copy to empty client address"
 msgstr "Není možné odeslat kopii zprávy na prázdnou adresu"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:172
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:170
 #, php-format
 msgid "New massage from %s"
 msgstr "Nová zpráva z %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:180
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:178
 #, php-format
 msgid "Failed to send e-mail: %s"
 msgstr "Nepodařilo se odeslat zprávu: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:183
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:181
 #, php-format
 msgid "E-mail successfully sent to %s"
 msgstr "Zpráva byla úspěšně odeslána na adresu %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:210
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:208
 #, php-format
 msgid "Skipped element %s: %s"
 msgstr "Element %s byl vynechán: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:218
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:216
 #, php-format
 msgid "Missing attribute %s"
 msgstr "Chybí atribut %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:242
-msgid "Default secret phrase should be changed"
-msgstr "Výchozí bezpečnostní fráze by měla být změněná"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:257
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:253
 msgid "Element input missing attribute type skipped"
 msgstr "Byl vynechán element input, neboť postrádá atribut type"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:397
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:392
 msgid "Item is required"
 msgstr "Pložka je povinná"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:402
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:397
 #, php-format
 msgid "Form rule %s is not defined"
 msgstr "Formulářové pravidlo %s není definované"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:405
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:400
 #, php-format
 msgid "Form rule %s is invalid"
 msgstr "Formulářové pravidlo %s je neplatné"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:410
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:405
 #, php-format
 msgid "Item value does not match required format: %s"
 msgstr "Hodnota položky neodpovídá požadovanému formátu: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:416
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:411
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
 
@@ -1008,6 +996,15 @@ msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "Form has not been initialized"
+#~ msgstr "Formulář nebyl inicializován"
+
+#~ msgid "Form has expired"
+#~ msgstr "Platnost formuláře vypršela"
+
+#~ msgid "Default secret phrase should be changed"
+#~ msgstr "Výchozí bezpečnostní fráze by měla být změněná"
 
 #~ msgid "Found local link with prefix %s"
 #~ msgstr "Nelezen lokální link s prefixem %s"

@@ -1,4 +1,8 @@
+1.1.0 2015-02-21
+Agregátor: přidána podpora prefixů odkazů (1400bdf)
+
 1.0.1 2015-02-15
+Admin: vedle XML zobrazuje i HTML soubory rozšíření (7ddf982)
 Přidáno automatické generování titulků k odkazům (3c2087d)
 
 1.0.0 2015-02-13

@@ -18,8 +18,8 @@ class ContactForm extends Plugin implements SplObserver {
   private $rules = array();
   private $ruleTitles = array();
   private $errors = array();
+  private $storedToken = null;
   const TOKEN_NAME = "token";
-  const TIME_NAME = "time";
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -98,11 +98,9 @@ class ContactForm extends Plugin implements SplObserver {
     if(!empty($_POST)) foreach($this->formItems as $i) {
       $this->setPostValue($i, $prefix);
     }
-    if(!isset($_POST[$prefix.self::TIME_NAME], $_POST[$prefix.self::TOKEN_NAME])) return false;
-    if(time() - $_POST[$prefix.self::TIME_NAME] < 5) throw new Exception(_("Form has not been initialized"));
-    if(time() - $_POST[$prefix.self::TIME_NAME] > 60*20) throw new Exception(_("Form has expired"));
-    $hash = hash("sha1", $prefix.$_POST[$prefix.self::TIME_NAME].$this->formVars["secret"]);
-    if(strcmp($_POST[$prefix.self::TOKEN_NAME], $hash) !== 0) throw new Exception(_("Security verification failed"));
+    if(!isset($_POST[$prefix.self::TOKEN_NAME])) return false;
+    if(strcmp($_POST[$prefix.self::TOKEN_NAME], $this->storedToken) !== 0)
+      throw new Exception(_("Security verification failed"));
     foreach($this->formItems as $i) {
       try {
         $this->verifyItem($i);
@@ -230,21 +228,19 @@ class ContactForm extends Plugin implements SplObserver {
 
   private function registerFormItems(DOMElementPlus $form, $prefix) {
     $time = time();
-    $timeInput = $form->ownerDocument->createElement("input");
-    $timeInput->setAttribute("name", $prefix.self::TIME_NAME);
-    $timeInput->setAttribute("type", "hidden");
-    $timeInput->setAttribute("value", $time);
+    $tokenValue = md5(uniqid(rand(), true));
+    if(isset($_SESSION[$prefix.self::TOKEN_NAME]))
+      $this->storedToken = $_SESSION[$prefix.self::TOKEN_NAME];
+    $_SESSION[$prefix.self::TOKEN_NAME] = $tokenValue;
     $tokenInput = $form->ownerDocument->createElement("input");
     $tokenInput->setAttribute("name", $prefix.self::TOKEN_NAME);
     $tokenInput->setAttribute("type", "hidden");
-    $tokenInput->setAttribute("value", hash("sha1", $prefix.$time.$this->formVars["secret"]));
-    if($this->formVars["secret"] == "SECRET_PHRASE")
-      new Logger(_("Default secret phrase should be changed"), Logger::LOGGER_WARNING);
+    $tokenInput->setAttribute("value", $tokenValue);
     $i = 1;
     $e = null;
     $this->formItems = array();
     $this->formValues = array();
-    $this->formNames = array(self::TIME_NAME, self::TOKEN_NAME);
+    $this->formNames = array(self::TOKEN_NAME);
     $this->formIds = array();
     $this->formGroupValues = array();
     $xpath = new DOMXPath($form->ownerDocument);
@@ -262,7 +258,6 @@ class ContactForm extends Plugin implements SplObserver {
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
       $name = $this->processFormItem($this->formNames, $e, "name", $prefix, $id, true);
     }
-    $e->parentNode->appendChild($timeInput);
     $e->parentNode->appendChild($tokenInput);
     foreach($xpath->query("//label") as $e) {
       if($e->hasAttribute("for")) {

@@ -2,7 +2,6 @@
 <ContactForm>
 
   <!-- povinné proměnné rozšíření ContactForm -->
-  <var id="secret" modifyonly="modifyonly">SECRET_PHRASE</var> <!-- zabezpečení formulářů -->
   <var id="adminaddr" modifyonly="modifyonly">[e-mail kontaktní osoby]</var> <!-- povinný údaj -->
 
   <!-- nepovinné proměnné rozšíření ContactForm -->
@@ -28,7 +27,6 @@
     Specifické proměnné konkrétního formuláře upravující výchozí hodnoty elementů var
     ^^^^
     Volitelné atributy elementu form
-      secret
       adminaddr
       adminname
       servername
