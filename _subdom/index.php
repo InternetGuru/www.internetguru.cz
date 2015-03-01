@@ -9,8 +9,13 @@ try {
     // find version file and best release
     $cmsIndex = null;
     $cmsVersion = null;
+    $redir = null;
     foreach(scandir(getcwd()) as $f) {
       if(is_dir($f)) continue;
+      if(strtok($f, ".") == "REDIR") { // eg. REDIR.www.internetguru.cz
+        header("Location: http://".substr($f, 6));
+        exit;
+      }
       if(strtok($f, ".") == "VERSION") { // eg. VERSION.1.0
         $cmsVersion = substr($f, 8).".php";
       }
