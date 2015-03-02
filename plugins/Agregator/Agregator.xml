@@ -3,7 +3,7 @@
   <!--
 
     Dostupné proměnné:
-      heading, link, ns, author, authorid, resp, respid, ctime, mtime, short, desc, kw
+      heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
 
     Atributy elementu html:
       id (povinné)
