@@ -73,10 +73,12 @@ class UrlHandler extends Plugin implements SplObserver {
       $code = 301;
     } else {
       $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
-      if(self::DEBUG) print_r($links);
-      $linkId = $this->findSimilarLinkId($links, $newLink);
-      if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
-      else $newLink = $links[$linkId];
+      if(!DOMBuilder::isLink($newLink)) {
+        if(self::DEBUG) print_r($links);
+        $linkId = $this->findSimilarLinkId($links, $newLink);
+        if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
+        else $newLink = $links[$linkId];
+      }
       $link = $newLink;
       $code = 404;
     }
