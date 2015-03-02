@@ -64,8 +64,15 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
         if(strpos($c, "$className-") !== 0) continue;
         $setId = substr($c, strlen("$className-"));
       }
+      if($setId == "none") {
+        $section->parentNode->removeChild($section);
+        continue;
+      }
       $set = $this->sets[$this->defaultSet];
-      if(!is_null($setId) && isset($this->sets[$setId])) $set = $this->sets[$setId];
+      if(!is_null($setId)) {
+        if(isset($this->sets[$setId])) $set = $this->sets[$setId];
+        else new Logger(sprintf(_("Item id %s not found, using default"), $setId), Logger::LOGGER_WARNING);
+      }
       $hs = array();
       foreach($section->childElements as $e) if($e->nodeName == "h") $hs[] = $e;
       $force = $section->getPreviousElement("h")->hasAttribute("link");
