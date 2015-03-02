@@ -58,13 +58,18 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $prefix = $content->documentElement->firstElement->getAttribute("link");
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
     foreach($nodes as $section) {
-      #todo: pick set from class
+      $className = strtolower(get_class($this));
+      $setId = null;
+      foreach(explode(" ", $section->getAttribute("class")) as $c) {
+        if(strpos($c, "$className-") !== 0) continue;
+        $setId = substr($c, strlen("$className-"));
+      }
       $set = $this->sets[$this->defaultSet];
+      if(!is_null($setId) && isset($this->sets[$setId])) $set = $this->sets[$setId];
       $hs = array();
       foreach($section->childElements as $e) if($e->nodeName == "h") $hs[] = $e;
       $force = $section->getPreviousElement("h")->hasAttribute("link");
       $wrapper = $content->createElement($set->getAttribute("wrapper"));
-      $className = strtolower(get_class($this));
       if($set->getAttribute("id") != $this->defaultSet) $className .= "-".$set->getAttribute("id");
       $wrapper->setAttribute("class", $className);
       foreach($hs as $h) {
