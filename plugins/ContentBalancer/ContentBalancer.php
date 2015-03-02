@@ -2,6 +2,8 @@
 
 class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
+  private $sets = array();
+  private $defaultSet = null;
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
@@ -10,9 +12,45 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   }
 
   public function getContent(HTMLPlus $content) {
+    // set vars
+    $this->createVars();
+    // check sets
+    if(empty($this->sets)) {
+      new Logger(_("No sets found"), Logger::LOGGER_ERROR);
+      return $content;
+    }
+    // check default set
+    if(is_null($this->defaultSet) || !isset($this->sets[$this->defaultSet])) {
+      reset($this->sets);
+      $this->defaultSet = key($this->sets);
+    }
+    // proceed
     $this->filter($content);
     return $content;
   }
+
+  private function createVars() {
+    $cfg = $this->getDOMPlus();
+    foreach($cfg->documentElement->childElements as $e) {
+      try {
+        $id = $e->getAttribute("id");
+        switch($e->nodeName) {
+          case "var":
+          if($id == "default") $this->defaultSet = $e->nodeValue;
+          break;
+          case "item":
+          if($id == "") throw new Exception(_("Element item missing id"));
+          if(!strlen($e->getAttribute("wrapper")))
+            throw new Exception(sprintf(_("Element item %s missing attribute wrapper"), $id));
+          $this->sets[$id] = $e;
+          break;
+        }
+      } catch(Exception $ex) {
+        new Logger(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
+      }
+    }
+  }
+
 
   private function filter(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
@@ -20,26 +58,45 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $prefix = $content->documentElement->firstElement->getAttribute("link");
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
     foreach($nodes as $section) {
+      #todo: pick set from class
+      $set = $this->sets[$this->defaultSet];
       $hs = array();
       foreach($section->childElements as $e) if($e->nodeName == "h") $hs[] = $e;
       $force = $section->getPreviousElement("h")->hasAttribute("link");
-      $ul = $content->createElement("ul");
-      $ul->setAttribute("class", "contentbalancer");
+      $wrapper = $content->createElement($set->getAttribute("wrapper"));
+      $className = strtolower(get_class($this));
+      if($set->getAttribute("id") != $this->defaultSet) $className .= "-".$set->getAttribute("id");
+      $wrapper->setAttribute("class", $className);
       foreach($hs as $h) {
         if(!$force && !$h->hasAttribute("link")) continue 2;
-        $li = $content->createElement("li");
-        $a = $content->createElement("a", $h->nodeValue);
-        if($h->hasAttribute("short")) {
-          #$a->setAttribute("title", $h->nodeValue);
-          $a->nodeValue = $h->getAttribute("short");
+        $vars = $this->getVariables($h, $prefix);
+        $root = $this->createDOMElement($vars, $set);
+        foreach($root->childElements as $e) {
+          $wrapper->appendChild($content->importNode($e, true));
         }
-        $a->setAttribute("href", "$prefix#".$h->getAttribute("id"));
-        #var_dump("$prefix#".$h->getAttribute("id"));
-        $li->appendChild($a);
-        $ul->appendChild($li);
       }
-      $section->parentNode->replaceChild($ul, $section);
+      $section->parentNode->replaceChild($wrapper, $section);
     }
+    return $content;
+  }
+
+  private function createDOMElement(Array $vars, DOMElementPlus $set) {
+    $doc = new DOMDocumentPlus();
+    $doc->appendChild($doc->importNode($set, true));
+    $doc->processVariables($vars);
+    return $doc->documentElement;
+  }
+
+  private function getVariables(DOMElementPlus $h, $prefix) {
+    $vars = array();
+    $desc = $h->nextElement;
+    $vars['heading'] = $h->nodeValue;
+    $vars['link'] = "$prefix#".$h->getAttribute("id");
+    $vars['headingplus'] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
+    $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
+    $vars['desc'] = strlen($desc->nodeValue) ? $desc->nodeValue : null;
+    $vars['kw'] = $desc->hasAttribute("kw") ? $desc->getAttribute("kw") : null;
+    return $vars;
   }
 
   private function getParentHeading(DOMElement $e) {
