@@ -124,14 +124,14 @@ class Cms {
     if(self::getLoggedUser() == "admin") return true;
     if(self::getLoggedUser() == ADMIN_ID) return true;
     if(isset($_SERVER["REMOTE_ADDR"])
-      && $_SERVER["REMOTE_ADDR"] == SERVER_IP) return true;
+      && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return true;
     return false;
   }
 
   public static function getLoggedUser() {
     if(IS_LOCALHOST) return "localhost";
     if(isset($_SERVER["REMOTE_ADDR"])
-      && $_SERVER["REMOTE_ADDR"] == SERVER_IP) return "server";
+      && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return "server";
     if(isset($_SERVER['REMOTE_USER']))
       return $_SERVER['REMOTE_USER'];
     if(isset($_SESSION[get_called_class()]["loggedUser"]))

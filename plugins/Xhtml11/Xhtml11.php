@@ -392,7 +392,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function appendLinkElement(DOMElement $parent, $file, $rel, $type=false, $media=false, $user=true) {
     try {
       $f = $file;
-      if(!is_file($f)) $f = findFile($file, $user, true, true);
+      if(!is_null(parseLocalLink($f)) && !is_file($f))
+        $f = findFile($file, $user, true, true);
     } catch (Exception $e) {
       $f = false;
     }

@@ -5,7 +5,6 @@ try {
   session_cache_limiter("");
   session_start();
 
-  define("SERVER_IP", "46.28.109.142");
   define("INDEX_HTML", "index.html");
   define("PLUGINS_DIR", "plugins");
   define("THEMES_DIR", "themes");
@@ -17,7 +16,6 @@ try {
   define("LOG_DIR", "cmslog");
   define("DEBUG_FILE", "DEBUG");
   define("FORBIDDEN_FILE", "FORBIDDEN");
-  define('SUBDOM_ROOT_DIR', "subdom");
   define("ADMIN_ROOT_DIR", "cmsadmin");
   define("USER_ROOT_DIR", "cmsuser");
   define("ADMIN_BACKUP_DIR", ADMIN_ROOT_DIR.".bak");
@@ -31,8 +29,7 @@ try {
   define('STATUS_INIT', 'init');
   define('STATUS_PROCESS', 'process');
   define('STATUS_POSTPROCESS', 'postprocess');
-  define('CURRENT_SUBDOM_FOLDER', getcwd());
-  define('CURRENT_SUBDOM_DIR', basename(CURRENT_SUBDOM_FOLDER));
+  define('CURRENT_SUBDOM', basename(getcwd()));
   define("IS_LOCALHOST", (!isset($_SERVER["REMOTE_ADDR"])
     || $_SERVER["REMOTE_ADDR"] == "127.0.0.1"
     || strpos($_SERVER["REMOTE_ADDR"], "192.168.") === 0
@@ -43,7 +40,7 @@ try {
     define('DOMAIN', "localhost");
     $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
     define('ROOT_URL', "/".$dir[1]."/");
-    define('HOST', DOMAIN."/".CURRENT_SUBDOM_DIR);
+    define('HOST', DOMAIN."/".CURRENT_SUBDOM);
     define('CMS_RELEASE', "localhost");
     define("WWW_FOLDER", "..");
     define("CMS_FOLDER", WWW_FOLDER."/".CMS_DIR);
@@ -56,10 +53,10 @@ try {
     define('LOG_FOLDER', LOG_DIR);
     #define("APACHE_RESTART_FILEPATH", null);
   } else {
-    $cwdArray = explode("/", CURRENT_SUBDOM_FOLDER);
+    $cwdArray = explode("/", getcwd());
     define('DOMAIN', $cwdArray[4]);
     define('ROOT_URL', "/");
-    define('HOST', CURRENT_SUBDOM_DIR.".".DOMAIN);
+    define('HOST', CURRENT_SUBDOM.".".DOMAIN);
     define('CMS_RELEASE', basename(dirname(__FILE__)));
     define("WWW_FOLDER", "/var/www");
     define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
