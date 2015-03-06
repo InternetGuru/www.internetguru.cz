@@ -89,6 +89,7 @@ class FileHandler extends Plugin implements SplObserver {
       exit;
     }
     set_time_limit(0);
+    /*
     $handle = @fopen($filePath, "rb");
     if($handle === false)
       new ErrorPage(sprintf(_("Unable to read file '%s'"), $shortPath), 500);
@@ -98,6 +99,8 @@ class FileHandler extends Plugin implements SplObserver {
       flush();
     }
     fclose($handle);
+    */
+    passthru("cat $filePath");
     if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time, false);
     die();
   }
