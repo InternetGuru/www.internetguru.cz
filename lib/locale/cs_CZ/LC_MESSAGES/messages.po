@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-01 20:49+0100\n"
-"PO-Revision-Date: 2015-03-01 20:49+0100\n"
+"POT-Creation-Date: 2015-03-06 13:24+0100\n"
+"PO-Revision-Date: 2015-03-06 13:28+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -86,7 +86,7 @@ msgid "Unable to user-update XML: %s"
 msgstr "Nepodařilo se aplikovat uživatelské XML: %s"
 
 #: D:\wamp\www\cms/core/DOMBuilder.php:145
-#: D:\wamp\www\cms/core/globals.php:337
+#: D:\wamp\www\cms/core/globals.php:333
 #, php-format
 msgid "File '%s' not found"
 msgstr "Soubor '%s' nebyl nalezen"
@@ -96,10 +96,10 @@ msgstr "Soubor '%s' nebyl nalezen"
 msgid "Unable to load '%s': %s"
 msgstr "Nepodařilo se načíst soubor '%s': %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:174
+#: D:\wamp\www\cms/core/DOMBuilder.php:173
 #, php-format
-msgid "Failed to load user/admin/default file %s"
-msgstr "Nepodařilo se načíst uživatelský/administrátorský/výchozí soubor %s"
+msgid "Failed to load user/admin/default file %s: %s"
+msgstr "Nepodařilo se načíst uživatelský/admin/výchozí soubor %s: %s"
 
 #: D:\wamp\www\cms/core/DOMBuilder.php:182
 #, php-format
@@ -459,57 +459,58 @@ msgstr "Složka '%s' nebyla nalezena"
 msgid "Unable to create folder %s"
 msgstr "Nepodařilo se vytvořit složku %s"
 
-#: D:\wamp\www\cms/core/globals.php:333
-msgid "Root file(s) updated"
-msgstr "Došlo k aktualizaci kořenových souborů"
+#: D:\wamp\www\cms/core/globals.php:329
+#, php-format
+msgid "Subdom file %s updated"
+msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: D:\wamp\www\cms/core/globals.php:343
+#: D:\wamp\www\cms/core/globals.php:339
 #, php-format
 msgid "Unable to create directory '%s'"
 msgstr "Nelze vytvořit složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:349
+#: D:\wamp\www\cms/core/globals.php:345
 #, php-format
 msgid "Unable to copy '%s' to '%s'"
 msgstr "Nepodařilo se zkopírovat '%s' na '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:368
+#: D:\wamp\www\cms/core/globals.php:364
 #, php-format
 msgid "Unable to create '%s' folder"
 msgstr "Nepodařilo se vytvořit složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:403
+#: D:\wamp\www\cms/core/globals.php:399
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: D:\wamp\www\cms/core/globals.php:418
+#: D:\wamp\www\cms/core/globals.php:414
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: D:\wamp\www\cms/core/globals.php:468
+#: D:\wamp\www\cms/core/globals.php:464
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: D:\wamp\www\cms/index.php:115
+#: D:\wamp\www\cms/index.php:113
 #, php-format
 msgid "Method %s is no longer available"
 msgstr "Metoda %s již není k dispozici"
 
-#: D:\wamp\www\cms/index.php:116
+#: D:\wamp\www\cms/index.php:114
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: D:\wamp\www\cms/index.php:162
+#: D:\wamp\www\cms/index.php:160
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: D:\wamp\www\cms/index.php:167
+#: D:\wamp\www\cms/index.php:165
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: D:\wamp\www\cms/index.php:168
+#: D:\wamp\www\cms/index.php:166
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -674,6 +675,7 @@ msgid "E-mail successfully sent to %s"
 msgstr "Zpráva byla úspěšně odeslána na adresu %s"
 
 #: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:208
+#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:49
 #, php-format
 msgid "Skipped element %s: %s"
 msgstr "Element %s byl vynechán: %s"
@@ -710,7 +712,25 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu: %s"
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
 
-#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:50
+#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:19
+msgid "No sets found"
+msgstr "Nebyly nalezeny žádné sestavy"
+
+#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:42
+msgid "Element item missing id"
+msgstr "Element item postrádá atribut id"
+
+#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:44
+#, php-format
+msgid "Element item %s missing attribute wrapper"
+msgstr "Element item %s postrádá atribut wrapper"
+
+#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:74
+#, php-format
+msgid "Item id %s not found, using default"
+msgstr "Nebyl nalezen element item s id %s, zvolen výchozí"
+
+#: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:119
 #, php-format
 msgid "Unable to find parent heading for %s"
 msgstr "Nepodařilo se nelézt nadřazený nadpis pro '%s'"
@@ -827,36 +847,41 @@ msgstr "Soubor %s o velikosti %s přesahuje limitní velikost %s"
 msgid "File %s size %s is exceeding global limit %s"
 msgstr "Soubor %s o velikosti %s přesahuje globální limit %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:94
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:93
 #, php-format
-msgid "Unable to read file '%s'"
-msgstr "Nepodařilo se přečíst soubor '%s'"
+msgid "Unable to pass file %s"
+msgstr "Nepodařilo se poslat soubor %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:124
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:117
 msgid "Unable to create temporary folder"
 msgstr "Nepodařilo se vytvořit dočasnou složku"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:129
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:122
 msgid "Image dimensions are over limit"
 msgstr "Rozměry obrázku přesahují limit"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:137
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:130
 #, php-format
 msgid "Unable to resize image %s"
 msgstr "Nepodařilo se zmenšit obrázek %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:141
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:134
 msgid "Unable to create temporary image"
 msgstr "Nepodařilo se vytvořit dočasný soubor s obrázkem"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:149
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:142
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
-#: D:\wamp\www\cms/plugins/GA/GA.php:25
+#: D:\wamp\www\cms/plugins/GA/GA.php:23
 #, php-format
 msgid "Invalid ga_id format '%s'"
 msgstr "Chybný formát ga_id '%s'"
+
+#: D:\wamp\www\cms/plugins/GA/GA.php:28
+#, php-format
+msgid "GA (%s) disabled if administrator logged"
+msgstr "GA (%s) je neaktivní v administračním režimu"
 
 #: D:\wamp\www\cms/plugins/InputVar/InputVar.php:18
 #, php-format
@@ -987,15 +1012,24 @@ msgstr "Neúspěšná kompilace transformace '%s'"
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:400
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:401
 #, php-format
 msgid "Link [%s] file '%s' not found"
 msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:481
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:482
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
+
+#~ msgid "Failed to load user/admin/default file %s"
+#~ msgstr "Nepodařilo se načíst uživatelský/administrátorský/výchozí soubor %s"
+
+#~ msgid "Root file(s) updated"
+#~ msgstr "Došlo k aktualizaci kořenových souborů"
+
+#~ msgid "Unable to read file '%s'"
+#~ msgstr "Nepodařilo se přečíst soubor '%s'"
 
 #~ msgid "Form has not been initialized"
 #~ msgstr "Formulář nebyl inicializován"

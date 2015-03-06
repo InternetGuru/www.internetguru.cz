@@ -320,17 +320,13 @@ function initLinks() {
 function initFiles() {
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
-  if(basename($_SERVER["SCRIPT_NAME"]) != "index.php") return;
-  $coreFiles = array(".htaccess", "index.php");
-  $updated = false;
-  foreach($coreFiles as $f) {
-    $src = CMS_FOLDER."/_subdom/$f";
-    if(filemtime($src) == filemtime($f)) continue;
-    safeRewriteFile($src, $f);
-    touch($f, filemtime($src));
-    $updated = true;
-  }
-  if($updated) redirTo(buildLocalUrl(getCurLink()), null, _("Root file(s) updated"));
+  $f = "index.php";
+  if(basename($_SERVER["SCRIPT_NAME"]) != $f) return;
+  $src = CMS_FOLDER."/".SERVER_FILES_DIR."/$f";
+  if(filemtime($src) == filemtime($f)) return;
+  safeRewriteFile($src, $f);
+  touch($f, filemtime($src));
+  redirTo(buildLocalUrl(getCurLink()), null, sprintf(_("Subdom file %s updated"), $f));
 }
 
 function smartCopy($src, $dest) {

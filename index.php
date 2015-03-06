@@ -13,6 +13,7 @@ try {
   define("LIB_DIR", "lib");
   define("CORE_DIR", "core");
   define("FILES_DIR", "files");
+  define("SERVER_FILES_DIR", "_server");
   define("LOG_DIR", "cmslog");
   define("DEBUG_FILE", "DEBUG");
   define("FORBIDDEN_FILE", "FORBIDDEN");
