@@ -132,7 +132,7 @@ class Cms {
     if(IS_LOCALHOST) return "localhost";
     if(isset($_SERVER["REMOTE_ADDR"])
       && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return "server";
-    if(isset($_SERVER['REMOTE_USER']))
+    if(isset($_SERVER['REMOTE_USER']) && strlen($_SERVER['REMOTE_USER']))
       return $_SERVER['REMOTE_USER'];
     if(isset($_SESSION[get_called_class()]["loggedUser"]))
       return $_SESSION[get_called_class()]["loggedUser"];
