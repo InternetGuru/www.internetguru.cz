@@ -42,7 +42,7 @@ class ErrorPage {
     // http://xkcd.com/1350/#p:10e7f9b6-b9b8-11e3-8003-002590d77bdd
     foreach(scandir($dir) as $img) {
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
-      $imgPath = LIB_FOLDER."/".$this->relDir."/$img";
+      $imgPath = LIB_DIR."/".$this->relDir."/$img";
       if(IS_LOCALHOST)
         $i[] = ROOT_URL.$imgPath;
       else
