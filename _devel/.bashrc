@@ -47,7 +47,7 @@ NC="\e[m"
 # Color2user
 if [[ $USER == "root" ]]; then
   SU=$BRed
-  elif [[ $USER == "cmsadmin" ]]; then
+  elif [[ $USER == "cmsadmin" || $USER == "cms" ]]; then
     SU=$BGreen
   elif [[ $USER == "webcmsadmin" ]]; then
     SU=$BGreen
@@ -73,6 +73,7 @@ alias gs='git status && git submodule status'
 
 # BASH
 alias sshcmsadmin='ssh -i ~/.ssh/id_rsa cmsadmin@46.28.109.142'
+alias sshcms='ssh -i ~/.ssh/id_rsa cms@31.31.75.247'
 alias less='less -rSX'
 alias ll='ls -lah'
 alias phplint='find . -name "*.php" -type f -exec php -l "{}" \;'
