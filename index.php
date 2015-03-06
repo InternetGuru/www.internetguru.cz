@@ -30,7 +30,6 @@ try {
   define('STATUS_INIT', 'init');
   define('STATUS_PROCESS', 'process');
   define('STATUS_POSTPROCESS', 'postprocess');
-  define('CURRENT_SUBDOM', basename(getcwd()));
   define("IS_LOCALHOST", (!isset($_SERVER["REMOTE_ADDR"])
     || $_SERVER["REMOTE_ADDR"] == "127.0.0.1"
     || strpos($_SERVER["REMOTE_ADDR"], "192.168.") === 0
@@ -38,6 +37,7 @@ try {
     || $_SERVER["REMOTE_ADDR"] == "::1"));
 
   if(IS_LOCALHOST) {
+    define('CURRENT_SUBDOM', basename(getcwd()));
     define('DOMAIN', "localhost");
     $dir = explode("/", $_SERVER["SCRIPT_NAME"]);
     define('ROOT_URL', "/".$dir[1]."/");
@@ -54,10 +54,11 @@ try {
     define('LOG_FOLDER', LOG_DIR);
     #define("APACHE_RESTART_FILEPATH", null);
   } else {
-    $cwdArray = explode("/", getcwd());
-    define('DOMAIN', $cwdArray[4]);
+    define('HOST', basename(getcwd()));
+    $hostArr = explode(".", HOST);
+    define('DOMAIN', $hostArr[count($hostArr)-2].".".$hostArr[count($hostArr)-1]);
+    define('CURRENT_SUBDOM', substr(HOST, 0, -(strlen(DOMAIN)+1)));
     define('ROOT_URL', "/");
-    define('HOST', CURRENT_SUBDOM.".".DOMAIN);
     define('CMS_RELEASE', basename(dirname(__FILE__)));
     define("WWW_FOLDER", "/var/www");
     define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
