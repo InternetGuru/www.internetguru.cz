@@ -89,18 +89,8 @@ class FileHandler extends Plugin implements SplObserver {
       exit;
     }
     set_time_limit(0);
-    /*
-    $handle = @fopen($filePath, "rb");
-    if($handle === false)
-      new ErrorPage(sprintf(_("Unable to read file '%s'"), $shortPath), 500);
-    while(!feof($handle)) {
-      print(fread($handle, 1024*8));
-      ob_flush();
-      flush();
-    }
-    fclose($handle);
-    */
-    passthru("cat $filePath");
+    passthru("cat $filePath", $err);
+    if($err != 0) new ErrorPage(sprintf(_("Unable to pass file %s"), $shortPath), 500);
     if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time, false);
     die();
   }
