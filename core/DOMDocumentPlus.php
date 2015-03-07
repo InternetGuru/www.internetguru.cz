@@ -58,14 +58,14 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function processFunctions(Array $functions, $ignore = array()) {
+  public function processFunctions(Array $functions, Array $variables = Array(), $ignore = array(), $delStrlen=false) {
     $xpath = new DOMXPath($this);
     $elements = array();
     foreach($xpath->query("//*[@fn]") as $e) $elements[] = $e;
     foreach(array_reverse($elements) as $e) {
-      if(array_key_exists($e->nodeName, $ignore))
-        $e->processFunctions($functions, $ignore[$e->nodeName]);
-      else $e->processFunctions($functions);
+      if(isset($ignore[$e->nodeName]))
+        $e->processFunctions($functions, $variables, $ignore[$e->nodeName], $delStrlen);
+      else $e->processFunctions($functions, $variables, array(), $delStrlen);
     }
   }
 

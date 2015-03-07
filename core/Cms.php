@@ -129,7 +129,7 @@ class Cms {
   }
 
   public static function getLoggedUser() {
-    if(IS_LOCALHOST) return "localhost";
+    if(IS_LOCALHOST) return ADMIN_ID;
     if(isset($_SERVER["REMOTE_ADDR"])
       && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return "server";
     if(isset($_SERVER['REMOTE_USER']) && strlen($_SERVER['REMOTE_USER']))
@@ -142,7 +142,7 @@ class Cms {
   public static function contentProcessVariables() {
     $oldContent = clone self::$content;
     self::$content->processVariables(self::$variables);
-    self::$content->processFunctions(self::$functions);
+    self::$content->processFunctions(self::$functions, self::$variables);
     try {
       self::$content->validatePlus(true);
     } catch(Exception $e) {

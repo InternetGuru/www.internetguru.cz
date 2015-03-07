@@ -52,12 +52,20 @@ class DOMElementPlus extends DOMElement {
     }
   }
 
-  public function processFunctions(Array $functions, $ignore = array()) {
+  public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array(), $delStrlen=false) {
     foreach($this->getVariables("fn", $ignore) as list($vName, $aName)) {
-      $f = array_key_exists($vName, $functions) ? $functions[$vName] : null;
-      if(is_null($f)) continue;
-      $v = call_user_func($f, is_null($aName) ? $this->nodeValue : $this->getAttribute($aName));
       try {
+        if(strpos($vName, "strlen-") === 0) {
+          if(isset($variables[substr($vName, 7)]) && strlen($variables[substr($vName, 7)])) {
+            $this->removeAttrVal("fn", $vName.(strlen($aName) ? "@$aName" : ""));
+          } elseif($delStrlen) {
+            $this->insertVariable("", $aName);
+          }
+          continue;
+        }
+        $f = array_key_exists($vName, $functions) ? $functions[$vName] : null;
+        if(is_null($f)) continue;
+        $v = call_user_func($f, is_null($aName) ? $this->nodeValue : $this->getAttribute($aName));
         $this->insertVariable($v, $aName);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
@@ -240,6 +248,16 @@ class DOMElementPlus extends DOMElement {
 
   public function stripElement($comment = null) {
     $this->stripTag($comment, false);
+  }
+
+  public function removeAttrVal($aName, $aValue) {
+    if(!strlen($this->getAttribute($aName))) return;
+    $attrs = explode(" ", $this->getAttribute($aName));
+    foreach($attrs as $k=>$v) {
+      if($v == $aValue) unset($attrs[$k]);
+    }
+    if(empty($attrs)) $this->removeAttribute($aName);
+    else $this->setAttribute($aName, implode(" ", $attrs));
   }
 
   public function stripAttr($attr, $comment = null) {

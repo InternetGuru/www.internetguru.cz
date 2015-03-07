@@ -46,7 +46,7 @@ try {
     define("WWW_FOLDER", "..");
     define("CMS_FOLDER", WWW_FOLDER."/".CMS_DIR);
     define('CMS_DEBUG', true);
-    define('ADMIN_ID', "Localhost");
+    define('ADMIN_ID', "localhost");
     define('ADMIN_FOLDER', ADMIN_ROOT_DIR);
     define('USER_FOLDER', USER_ROOT_DIR);
     define('ADMIN_BACKUP_FOLDER', ADMIN_BACKUP_DIR);

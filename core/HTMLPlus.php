@@ -43,8 +43,8 @@ class HTMLPlus extends DOMDocumentPlus {
     parent::processVariables($variables, array("h" => array("id", "link")));
   }
 
-  public function processFunctions(Array $functions) {
-    parent::processFunctions($functions, array("h" => array("id", "link")));
+  public function processFunctions(Array $functions, Array $variables = array()) {
+    parent::processFunctions($functions, $variables, array("h" => array("id", "link")), true);
   }
 
   public function applySyntax() {

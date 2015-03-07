@@ -494,17 +494,21 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function validateEmptyContent(DOMDocument $doc) {
+    $emptyShort = array("input", "br", "hr", "meta", "link"); // allowed empty in short format
+    $emptyLong = array("script"); // allowed empty in long format only
     $xpath = new DOMXPath($doc);
-    $emptyElOk = array("input", "br", "hr", "meta", "link");
-    $emptyEl = array();
+    $toExpand = array();
+    $toDelete = array();
     foreach($xpath->query("//*[not(node()) or text()='']") as $e) {
-      if(in_array($e->nodeName, $emptyElOk)) continue;
-      $emptyEl[] = $e;
+      if(in_array($e->nodeName, $emptyShort)) continue;
+      if(in_array($e->nodeName, $emptyLong)) {
+        $toExpand[] = $e;
+        continue;
+      }
+      $toDelete[] = $e;
     }
-    if(!count($emptyEl)) return;
-    foreach($emptyEl as $e) {
-      $e->appendChild($doc->createTextNode(""));
-    }
+    foreach($toExpand as $e) $e->appendChild($doc->createTextNode(""));
+    foreach($toDelete as $e) $e->parentNode->removeChild($e);
   }
 
   private function appendCdata(DOMElement $appendTo, $text) {
