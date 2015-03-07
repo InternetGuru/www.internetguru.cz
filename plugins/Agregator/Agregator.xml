@@ -3,7 +3,7 @@
   <!--
 
     Dostupné proměnné:
-      heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
+      filepath, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
 
     Atributy elementu html:
       id (povinné)
@@ -24,7 +24,7 @@
   </html>
   <html id="htmldetail">
     <item>
-      <dt><a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
+      <dt><a title="Autor: %s" var="link@href author@title heading">n/a</a> <em fn="strlen-cms-logged_user">[<a href="?Admin=%s" var="filepath@href">Editovat</a>]</em></dt>
       <dd>Poslední změna: <strong fn="inputvar-dateformatcs" var="mtime">n/a</strong></dd>
       <dd>Klíčová slova: <em var="kw">n/a</em></dd>
       <dd var="desc">n/a</dd>

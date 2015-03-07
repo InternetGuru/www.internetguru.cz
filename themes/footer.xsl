@@ -5,6 +5,7 @@
   <xsl:param name="cms-title" select="''"/>
   <xsl:param name="contentlink-bc" select="''"/>
   <xsl:param name="globalmenu" select="''"/>
+  <xsl:param name="agregator-filepath" select="''"/>
 
   <xsl:param name="cms-lang" select="''"/>
   <xsl:param name="cms-author" select="''"/>
@@ -19,6 +20,8 @@
   <xsl:param name="cms-url" select="''"/>
   <xsl:param name="cms-uri" select="''"/>
   <xsl:param name="cms-link" select="''"/>
+  <xsl:param name="cms-logged_user" select="''"/>
+  <xsl:param name="cms-super_user" select="''"/>
 
   <xsl:param name="contentlink-lang" select="''"/>
   <xsl:param name="contentlink-author" select="''"/>
@@ -63,20 +66,21 @@
     </body>
   </xsl:template>
 
-  <xsl:template match="/div[id='content']">
+  <xsl:template match="div[@id='content']">
     <div>
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates select="*"/>
-      <xsl:if test="not($contentlink-resp = '') or not($contentlink-mtime = $contentlink-ctime)">
-        <ul class="docinfo">
-          <xsl:if test="not($contentlink-resp = '')">
-            <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
-          </xsl:if>
-          <xsl:if test="not($contentlink-mtime = $contentlink-ctime)">
-            <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
-          </xsl:if>
-        </ul>
-      </xsl:if>
+      <ul class="docinfo">
+        <xsl:if test="not($contentlink-resp = '')">
+          <li class="resp"><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
+        </xsl:if>
+        <xsl:if test="not($contentlink-mtime = $contentlink-ctime)">
+          <li class="mtime"><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
+        </xsl:if>
+        <xsl:if test="not($cms-super_user = '') and not($cms-super_user = 'server') and not($agregator-filepath = '')">
+          <li class="edit"><xsl:value-of disable-output-escaping="yes" select="$inputvar-edit"/></li>
+        </xsl:if>
+      </ul>
     </div>
   </xsl:template>
 

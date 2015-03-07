@@ -5,6 +5,7 @@
   <xsl:param name="cms-title" select="''"/>
   <xsl:param name="contentlink-bc" select="''"/>
   <xsl:param name="globalmenu" select="''"/>
+  <xsl:param name="agregator-filepath" select="''"/>
 
   <xsl:param name="cms-lang" select="''"/>
   <xsl:param name="cms-author" select="''"/>
@@ -17,7 +18,10 @@
   <xsl:param name="cms-desc" select="''"/>
   <xsl:param name="cms-kw" select="''"/>
   <xsl:param name="cms-url" select="''"/>
+  <xsl:param name="cms-uri" select="''"/>
   <xsl:param name="cms-link" select="''"/>
+  <xsl:param name="cms-logged_user" select="''"/>
+  <xsl:param name="cms-super_user" select="''"/>
 
   <xsl:param name="contentlink-lang" select="''"/>
   <xsl:param name="contentlink-author" select="''"/>
@@ -45,6 +49,9 @@
   <xsl:template match="/body/h1">
     <div>
       <div>
+        <xsl:if test="not($cms-super_user = '') and not($cms-super_user = 'server') and not($agregator-filepath = '')">
+          <p class="edit"><xsl:value-of disable-output-escaping="yes" select="$inputvar-edit"/></p>
+        </xsl:if>
         <xsl:if test="not($contentlink-author = '')">
           <p class="creation"><xsl:value-of disable-output-escaping="yes" select="$inputvar-creation"/></p>
         </xsl:if>

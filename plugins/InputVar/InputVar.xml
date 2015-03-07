@@ -32,6 +32,8 @@
   <var id="linkmtime" fn="dateformatcs" data="@$contentlink-mtime"/>
   <var id="linkauthor" fn="link" href="#@$contentlink-authorid" data="@$contentlink-author"/>
   <var id="creation" data="Autorem následujícího obsahu je $linkauthor ze dne $linkctime"/>
+  <var id="linkedit" fn="link" href="?Admin=@$agregator-filepath" data="Upravit obsah"/>
+  <var id="edit" data="[$linkedit]"/>
 
   <var id="linkresp" fn="link" href="#@$contentlink-respid" data="@$contentlink-resp"/>
   <var id="resp" data="Za obsah této stránky zodpovídá $linkresp."/>

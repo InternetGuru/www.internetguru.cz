@@ -106,7 +106,7 @@ ul.docinfo {
   font-style: italic;
 }
 
-p.creation {
+p.creation, p.edit {
   margin-top: 0;
   margin-bottom: -1rem;
   position: relative;
@@ -114,8 +114,13 @@ p.creation {
   font-weight: 100;
 }
 
-p.creation a {
+p.creation a, p.edit a {
   color: white;
+}
+
+p.edit {
+  float: right;
+  z-index: 1;
 }
 
 /* breadcrumb navigation */

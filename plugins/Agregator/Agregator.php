@@ -23,7 +23,7 @@ class Agregator extends Plugin implements SplObserver {
     $this->createList($this->files, FILES_FOLDER);
     $this->createFilesVar(FILES_FOLDER);
     $this->createImgVar(FILES_FOLDER);
-    $this->insertContent();
+    $this->insertContent($htmlDir);
   }
 
   private function insertContent() {
@@ -47,6 +47,7 @@ class Agregator extends Plugin implements SplObserver {
     foreach($doc->documentElement->childElements as $e) {
       $dest->appendChild($dest->ownerDocument->importNode($e, true));
     }
+    Cms::setVariable("filepath", $this->pluginDir.(strlen($subDir) ? "/$subDir" : "")."/$fName");
   }
 
   private function createList(&$list, $rootDir, $subDir=null) {
@@ -123,7 +124,7 @@ class Agregator extends Plugin implements SplObserver {
           #new Logger(sprintf(_("Agregator skipped file '%s'"), "$subDir/$f"), Logger::LOGGER_WARNING);
         }
         $this->html[$subDir][$f] = $doc;
-        $vars[$subDir][$f] = $this->getHTMLVariables($doc);
+        $vars[$subDir][$f] = $this->getHTMLVariables($doc, "$workingDir/$f");
         foreach($doc->getElementsByTagName("h") as $h) {
           if(!$h->hasAttribute("link")) continue;
           $this->links[$h->getAttribute("link")] = array($subDir, $f);
@@ -196,13 +197,15 @@ class Agregator extends Plugin implements SplObserver {
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($element, true));
     $doc->processVariables($vars);
+    $doc->processFunctions(array(), $vars);
     return $doc->documentElement;
   }
 
-  private function getHTMLVariables(HTMLPlus $doc) {
+  private function getHTMLVariables(HTMLPlus $doc, $filePath) {
     $vars = array();
     $h = $doc->documentElement->firstElement;
     $desc = $h->nextElement;
+    $vars['filepath'] = $filePath;
     $vars['heading'] = $h->nodeValue;
     $vars['link'] = $h->getAttribute("link");
     $vars['author'] = $h->getAttribute("author");
