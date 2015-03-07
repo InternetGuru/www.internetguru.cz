@@ -18,7 +18,6 @@
   <xsl:param name="cms-kw" select="''"/>
   <xsl:param name="cms-url" select="''"/>
   <xsl:param name="cms-link" select="''"/>
-  <xsl:param name="cms-domain" select="''"/>
 
   <xsl:param name="contentlink-lang" select="''"/>
   <xsl:param name="contentlink-author" select="''"/>
