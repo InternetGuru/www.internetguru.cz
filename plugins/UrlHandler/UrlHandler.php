@@ -82,6 +82,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $link = $newLink;
       $code = 404;
     }
+    $link = buildLocalUrl($link);
     if(self::DEBUG) die("Redirecting to $link");
     redirTo($link, $code);
   }
