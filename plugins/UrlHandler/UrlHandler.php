@@ -31,8 +31,12 @@ class UrlHandler extends Plugin implements SplObserver {
       $pVal = $var->hasAttribute("parValue") ? $var->getAttribute("parValue") : null;
       if(!$this->queryMatch($pNam, $pVal)) continue;
       try {
+        if($var->nodeValue == "/" || $var->nodeValue == "") redirTo(buildLocalUrl(""));
         $pLink = parseLocalLink($var->nodeValue);
-        if(is_null($pLink)) redirTo(buildLocalUrl($var->nodeValue));
+        if(is_null($pLink)) redirTo(buildLocalUrl($var->nodeValue)); // external redir
+        if(!isset($pLink["path"])) $pLink["path"] = getCurLink(); // no path = keep current path
+        if(strpos($var->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no path = keep current path
+        #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
         $linkId = DOMBuilder::getLinkId($pLink);
         if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
         if($link == getCurLink(true)) throw new Exception(sprintf(_("Ignored cyclic redirection to %s"), $link));
@@ -58,7 +62,7 @@ class UrlHandler extends Plugin implements SplObserver {
 
   #todo: simplify $_GET
   private function queryMatch($pNam, $pVal) {
-    foreach(explode("&", parse_url(getCurLink(true), PHP_URL_QUERY)) as $q) {
+    foreach(explode("&", getCurQuery()) as $q) {
       if(is_null($pVal) && strpos("$q=", "$pNam=$pVal") === 0) return true;
       if(!is_null($pVal) && "$q=" == "$pNam=$pVal") return true;
     }

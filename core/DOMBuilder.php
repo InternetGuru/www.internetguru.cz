@@ -38,6 +38,7 @@ class DOMBuilder {
   public static function getLinkId(Array $pUrl) {
     if(empty($pUrl)) $pUrl["path"] = self::$defaultPrefix;
     if(!isset($pUrl["path"])) return null; // no prefix
+    #var_dump($pUrl);
     #var_dump(self::$linkToId);
     #var_dump(self::$idToLink);
     #if(!isset($pUrl["fragment"])) $pUrl["fragment"] = $pUrl["path"];
@@ -47,6 +48,7 @@ class DOMBuilder {
       if(!isset(self::$linkToId[implodeLink($pUrl)])) unset($pUrl["fragment"]);
       return implodeLink($pUrl);
     }
+    if($pUrl["path"] == "") $pUrl["path"] = self::$defaultPrefix;
     if(isset(self::$linkToId[$pUrl["path"]]) && !isset($pUrl["fragment"])) {
       if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
       return implodeLink($pUrl);

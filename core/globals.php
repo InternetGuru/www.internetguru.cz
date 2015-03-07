@@ -200,18 +200,20 @@ function stableSort(Array &$a) {
 }
 
 function getCurLink($query=false) {
-  if(!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) return "";
-  parse_str($_SERVER['QUERY_STRING'], $pQuery);
-  $link = "";
-  if(isset($pQuery["q"])) $link = $pQuery["q"];
-  if(!$query) return $link;
-  unset($pQuery["q"]);
-  return $link.buildQuery($pQuery);
+  $link = isset($_GET["q"]) ? $_GET["q"] : "";
+  return $link.($query ? getCurQuery(true) : "");
 }
 
-function buildQuery($pQuery) {
+function getCurQuery($qm=false) {
+  if(!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) return "";
+  parse_str($_SERVER['QUERY_STRING'], $pQuery);
+  if(isset($pQuery["q"])) unset($pQuery["q"]);
+  return buildQuery($pQuery, $qm);
+}
+
+function buildQuery($pQuery, $qm=true) {
   if(empty($pQuery)) return "";
-  return "?".rtrim(urldecode(http_build_query($pQuery)), "=");
+  return ($qm ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
 function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
