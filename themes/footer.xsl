@@ -47,7 +47,7 @@
   <xsl:template match="/body">
     <body>
       <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="*"/>
+      <xsl:apply-templates/>
       <div id="footer">
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
@@ -67,9 +67,9 @@
   </xsl:template>
 
   <xsl:template match="div[@id='content']">
-    <div>
+    <xsl:element name="div">
       <xsl:copy-of select="@*"/>
-      <xsl:apply-templates select="*"/>
+      <xsl:apply-templates/>
       <ul class="docinfo">
         <xsl:if test="not($contentlink-resp = '')">
           <li class="resp"><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
@@ -77,11 +77,11 @@
         <xsl:if test="not($contentlink-mtime = $contentlink-ctime)">
           <li class="mtime"><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
         </xsl:if>
-        <xsl:if test="not($cms-super_user = '') and not($cms-super_user = 'server') and not($agregator-filepath = '')">
+        <xsl:if test="not($cms-super_user = '') and not($agregator-filepath = '')">
           <li class="edit"><xsl:value-of disable-output-escaping="yes" select="$inputvar-edit"/></li>
         </xsl:if>
       </ul>
-    </div>
+    </xsl:element>
   </xsl:template>
 
   <xsl:template match="node()|@*">

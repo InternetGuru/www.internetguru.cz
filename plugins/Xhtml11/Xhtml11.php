@@ -495,7 +495,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function validateEmptyContent(DOMDocument $doc) {
     $emptyShort = array("input", "br", "hr", "meta", "link"); // allowed empty in short format
-    $emptyLong = array("script"); // allowed empty in long format only
+    $emptyLong = array("script", "textarea"); // allowed empty in long format only
     $xpath = new DOMXPath($doc);
     $toExpand = array();
     $toDelete = array();

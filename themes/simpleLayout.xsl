@@ -49,7 +49,7 @@
   <xsl:template match="/body/h1">
     <div>
       <div>
-        <xsl:if test="not($cms-super_user = '') and not($cms-super_user = 'server') and not($agregator-filepath = '')">
+        <xsl:if test="not($cms-super_user = '') and not($agregator-filepath = '')">
           <p class="edit"><xsl:value-of disable-output-escaping="yes" select="$inputvar-edit"/></p>
         </xsl:if>
         <xsl:if test="not($contentlink-author = '')">

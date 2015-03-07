@@ -23,7 +23,7 @@ class Agregator extends Plugin implements SplObserver {
     $this->createList($this->files, FILES_FOLDER);
     $this->createFilesVar(FILES_FOLDER);
     $this->createImgVar(FILES_FOLDER);
-    $this->insertContent($htmlDir);
+    $this->insertContent();
   }
 
   private function insertContent() {
