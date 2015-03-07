@@ -124,7 +124,7 @@ class Agregator extends Plugin implements SplObserver {
           #new Logger(sprintf(_("Agregator skipped file '%s'"), "$subDir/$f"), Logger::LOGGER_WARNING);
         }
         $this->html[$subDir][$f] = $doc;
-        $vars[$subDir][$f] = $this->getHTMLVariables($doc, "$workingDir/$f");
+        $vars[$subDir][$f] = $this->getHTMLVariables($doc,  $this->pluginDir.(strlen($subDir) ? "/$subDir" : "")."/$f");
         foreach($doc->getElementsByTagName("h") as $h) {
           if(!$h->hasAttribute("link")) continue;
           $this->links[$h->getAttribute("link")] = array($subDir, $f);

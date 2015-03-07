@@ -1,3 +1,10 @@
 User-agent: *
 Disallow: /*?Admin
+Disallow: /*?admin
+Disallow: /*?ver
+Disallow: /*?log
 Disallow: /*?LogViewer
+Disallow: /*?import
+Disallow: /*?Convertor
+Disallow: /*?subdom
+Disallow: /*?SubdomManager
