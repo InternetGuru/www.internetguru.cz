@@ -200,7 +200,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $toStrip = array();
     foreach($dom->getElementsByTagName("object") as $o) {
       if(!$o->hasAttribute("data")) continue;
-      $dataFile = substr($o->getAttribute("data"), strlen(ROOT_URL));
+      $dataFile = $o->getAttribute("data");
+      if(strpos($dataFile, ROOT_URL) === 0) $dataFile = substr($o->getAttribute("data"), strlen(ROOT_URL));
       try {
         $pUrl = parseLocalLink($dataFile);
       } catch(Exception $e) {
@@ -208,7 +209,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         continue;
       }
       if(is_null($pUrl)) continue; // external
-
       $query = array();
       if(isset($pUrl["query"])) parse_str($pUrl["query"], $query);
       $filePath = FILES_FOLDER."/".(array_key_exists("q", $query) ? $query["q"] : $pUrl["path"]);
@@ -495,7 +495,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function validateEmptyContent(DOMDocument $doc) {
     $emptyShort = array("input", "br", "hr", "meta", "link"); // allowed empty in short format
-    $emptyLong = array("script", "textarea"); // allowed empty in long format only
+    $emptyLong = array("script", "textarea", "object"); // allowed empty in long format only
     $xpath = new DOMXPath($doc);
     $toExpand = array();
     $toDelete = array();
@@ -508,7 +508,20 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $toDelete[] = $e;
     }
     foreach($toExpand as $e) $e->appendChild($doc->createTextNode(""));
-    foreach($toDelete as $e) $e->parentNode->removeChild($e);
+    foreach($toDelete as $e) {
+      $this->removeEmptyElement($e, _("Empty element(s) removed"));
+    }
+  }
+
+  private function removeEmptyElement(DOMElement $e, $comment) {
+    $parent = $e->parentNode;
+    if(strlen($parent->nodeValue)) {
+      $cmt = $e->ownerDocument->createComment(" $comment ");
+      $parent->insertBefore($cmt, $e);
+      $parent->removeChild($e);
+      return;
+    }
+    $this->removeEmptyElement($parent, $comment);
   }
 
   private function appendCdata(DOMElement $appendTo, $text) {

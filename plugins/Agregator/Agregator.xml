@@ -11,20 +11,20 @@
 
   -->
   <html id="html">
-    <item><li><a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformatcs" var="ctime">n/a</em></li></item>
+    <item><li><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah"><object type="image/png" data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAbwAAAG8B8aLcQwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACuSURBVDiNnZIxCsJAEEXfQsDWAwhu4SEsPVK8gcdIZSvkFMEmpVcI2OQGYvVtZpMNIs5mYBh22Pd+M0jC20AEWmAEGmDnhk3QAcq6KUmubQ6ZYKz4UyGEaMl7YAucsvfdk5wSXzYvtu+A6IWvwCGT1NM/J1zZlO3jT0EJ/CUohReCNfAkWAsbyyaDbyVwEhyZL2swiQtOgjPL+3bDSdCuhSURgB542uyBh6Q3zvoAbkCnrUxn49oAAAAASUVORK5CYII1315173770dfd28e164bcf3e30bfb1d9">Edit</object></a> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformatcs" var="ctime">n/a</em></li></item>
   </html>
   <html id="htmltop">
     <item>
-      <dt><a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt>
+      <dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah"><object type="image/png" data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAbwAAAG8B8aLcQwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACuSURBVDiNnZIxCsJAEEXfQsDWAwhu4SEsPVK8gcdIZSvkFMEmpVcI2OQGYvVtZpMNIs5mYBh22Pd+M0jC20AEWmAEGmDnhk3QAcq6KUmubQ6ZYKz4UyGEaMl7YAucsvfdk5wSXzYvtu+A6IWvwCGT1NM/J1zZlO3jT0EJ/CUohReCNfAkWAsbyyaDbyVwEhyZL2swiQtOgjPL+3bDSdCuhSURgB542uyBh6Q3zvoAbkCnrUxn49oAAAAASUVORK5CYII1315173770dfd28e164bcf3e30bfb1d9">Edit</object></a> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt>
       <dd var="kw">n/a</dd>
       <dd var="desc">n/a</dd>
     </item>
-    <item><dt><a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt></item>
+    <item><dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah"><object type="image/png" data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAbwAAAG8B8aLcQwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACuSURBVDiNnZIxCsJAEEXfQsDWAwhu4SEsPVK8gcdIZSvkFMEmpVcI2OQGYvVtZpMNIs5mYBh22Pd+M0jC20AEWmAEGmDnhk3QAcq6KUmubQ6ZYKz4UyGEaMl7YAucsvfdk5wSXzYvtu+A6IWvwCGT1NM/J1zZlO3jT0EJ/CUohReCNfAkWAsbyyaDbyVwEhyZL2swiQtOgjPL+3bDSdCuhSURgB542uyBh6Q3zvoAbkCnrUxn49oAAAAASUVORK5CYII1315173770dfd28e164bcf3e30bfb1d9">Edit</object></a> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt></item>
     <item since="4"/>
   </html>
   <html id="htmldetail">
     <item>
-      <dt><a title="Autor: %s" var="link@href author@title heading">n/a</a> <em fn="strlen-cms-logged_user">[<a href="?Admin=%s" var="filepath@href">Editovat</a>]</em></dt>
+      <dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah"><object type="image/png" data="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAbwAAAG8B8aLcQwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACuSURBVDiNnZIxCsJAEEXfQsDWAwhu4SEsPVK8gcdIZSvkFMEmpVcI2OQGYvVtZpMNIs5mYBh22Pd+M0jC20AEWmAEGmDnhk3QAcq6KUmubQ6ZYKz4UyGEaMl7YAucsvfdk5wSXzYvtu+A6IWvwCGT1NM/J1zZlO3jT0EJ/CUohReCNfAkWAsbyyaDbyVwEhyZL2swiQtOgjPL+3bDSdCuhSURgB542uyBh6Q3zvoAbkCnrUxn49oAAAAASUVORK5CYII1315173770dfd28e164bcf3e30bfb1d9">Edit</object></a> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
       <dd>Poslední změna: <strong fn="inputvar-dateformatcs" var="mtime">n/a</strong></dd>
       <dd>Klíčová slova: <em var="kw">n/a</em></dd>
       <dd var="desc">n/a</dd>
