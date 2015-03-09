@@ -130,10 +130,10 @@ function redirTo($link, $code=null, $msg=null) {
   exit();
 }
 
-function implodeLink(Array $p) {
+function implodeLink(Array $p, $query=true) {
   $url = "";
   if(isset($p["path"])) $url .= trim($p["path"], "/");
-  if(isset($p["query"])) $url .= "?".$p["query"];
+  if($query && isset($p["query"])) $url .= "?".$p["query"];
   if(isset($p["fragment"])) $url .= "#".$p["fragment"];
   return $url;
 }

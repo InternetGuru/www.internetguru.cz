@@ -36,7 +36,8 @@ class DOMBuilder {
   }
 
   public static function getLinkId(Array $pUrl) {
-    if(empty($pUrl)) $pUrl["path"] = self::$defaultPrefix;
+    if(empty($pUrl)) return "";
+    if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return "";
     if(!isset($pUrl["path"])) return null; // no prefix
     #var_dump($pUrl);
     #var_dump(self::$linkToId);
@@ -48,11 +49,12 @@ class DOMBuilder {
       if(!isset(self::$linkToId[implodeLink($pUrl)])) unset($pUrl["fragment"]);
       return implodeLink($pUrl);
     }
-    if($pUrl["path"] == "") $pUrl["path"] = self::$defaultPrefix;
-    if(isset(self::$linkToId[$pUrl["path"]]) && !isset($pUrl["fragment"])) {
-      if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
-      return implodeLink($pUrl);
-    }
+    #if($pUrl["path"] == "") $pUrl["path"] = self::$defaultPrefix;
+    if(isset(self::$linkToId[implodeLink($pUrl, false)])) return implodeLink($pUrl);
+    #if(isset(self::$linkToId[$pUrl["path"]]) && !isset($pUrl["fragment"])) {
+      #if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
+      #return implodeLink($pUrl);
+    #}
     throw new Exception(sprintf(_("Link %s not found"), implodeLink($pUrl)));
   }
 
@@ -218,7 +220,7 @@ class DOMBuilder {
     if($included) return;
     self::setIdentifiers($doc, $fShort);
     #var_dump(self::$idToLink);
-    #print_r(self::$linkToId);
+    #var_dump(self::$linkToId);
   }
 
   #private static function prefixLinks($prefix, HTMLPlus $doc) {
@@ -282,6 +284,7 @@ class DOMBuilder {
         if($link == $prefix) $link = "";
         $linkId = self::getLinkFull($prefix, $link, $id);
       }
+      if(empty(self::$linkToId)) $linkId = "";
       if(array_key_exists($linkId, self::$linkToId)) {
         new Logger(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
         continue;
