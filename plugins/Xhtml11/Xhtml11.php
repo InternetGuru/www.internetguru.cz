@@ -151,7 +151,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         #var_dump($a->getAttribute($aName));
         $pUrl = parseLocalLink($a->getAttribute($aName));
         if(is_null($pUrl)) continue; // link is external
-        if(array_key_exists("path", $pUrl) && is_file(FILES_FOLDER."/".$pUrl["path"])) { // link is file
+        #var_dump(buildLocalUrl(implodeLink($pUrl)));
+        if(isset($pUrl["path"]) && strpos($pUrl["path"], FILES_DIR."/") === 0) { // link to file
+          if(!is_file(USER_FOLDER."/".$pUrl["path"]))
+            throw new Exception(sprintf(_("File %s not found"), $pUrl["path"]));
+          #var_dump($aName, buildLocalUrl(implodeLink($pUrl)));
           $a->setAttribute($aName, buildLocalUrl(implodeLink($pUrl)));
           #$a->setAttribute($aName, buildLink(implodeLink($pUrl)));
           continue;
@@ -211,7 +215,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       if(is_null($pUrl)) continue; // external
       $query = array();
       if(isset($pUrl["query"])) parse_str($pUrl["query"], $query);
-      $filePath = FILES_FOLDER."/".(array_key_exists("q", $query) ? $query["q"] : $pUrl["path"]);
+      $filePath = USER_FOLDER."/".(array_key_exists("q", $query) ? $query["q"] : $pUrl["path"]);
       if(!is_file($filePath)) {
         $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $pUrl["path"]));
         continue;

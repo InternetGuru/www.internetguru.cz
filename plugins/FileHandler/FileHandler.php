@@ -18,7 +18,8 @@ class FileHandler extends Plugin implements SplObserver {
 
   private function handleRequest() {
     $link = getCurLink();
-    if(!preg_match("/^".FILEPATH_PATTERN."$/", $link)) return;
+    if(strpos($link, FILES_DIR."/") !== 0) return;
+    #if(!preg_match("/^".FILEPATH_PATTERN."$/", $link)) return;
     $fInfo = $this->checkLink($link);
     $filePath = realpath($fInfo["filepath"]);
     $this->fileMime = $fInfo["filemime"];
@@ -34,7 +35,7 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function checkLink($link) {
-    $fInfo["filepath"] = FILES_FOLDER."/$link";
+    $fInfo["filepath"] = USER_FOLDER."/$link";
     if(!is_file($fInfo["filepath"]))
       new ErrorPage(sprintf(_("The requested URL '%s' was not found on this server."), $link), 404);
     $disallowedMime = array(
@@ -89,7 +90,8 @@ class FileHandler extends Plugin implements SplObserver {
       exit;
     }
     set_time_limit(0);
-    passthru("cat $filePath", $err);
+    if(IS_LOCALHOST) echo file_get_contents($filePath);
+    else passthru("cat $filePath", $err);
     if($err != 0) new ErrorPage(sprintf(_("Unable to pass file %s"), $shortPath), 500);
     if($log) new Logger("File download '$shortPath' ".fileSizeConvert($fileSize), Logger::LOGGER_INFO, $start_time, false);
     die();
@@ -109,9 +111,9 @@ class FileHandler extends Plugin implements SplObserver {
       break;
     }
     $v = $var[$vName];
-    if(!$v[0] && !$v[1]) $this->downloadFile($filePath, $v[2]);
+    if(!$v[0] && !$v[1]) $this->downloadFile($filePath, $v[2]); // log only full size images
     $i = $this->getImageSize($filePath);
-    if($i[0] < $v[0] && $i[1] < $v[1]) $this->downloadFile($filePath, $v[2]);
+    if($i[0] < $v[0] && $i[1] < $v[1]) $this->downloadFile($filePath, $v[2], false);
     $tmpDir = USER_FOLDER."/".$this->pluginDir."/$vName";
     if(!is_dir($tmpDir) && !mkdir($tmpDir, 0775, true))
       throw new Exception(_("Unable to create temporary folder"));
@@ -129,6 +131,8 @@ class FileHandler extends Plugin implements SplObserver {
     if(!$result)
       throw new Exception(sprintf(_("Unable to resize image %s"), basename($filePath)));
     $imBin = $im->__toString();
+    if($im->getImageLength() > $v[2])
+      throw new Exception(_("Generated image is too big"));
     if(!strlen($imBin) || !file_put_contents($tmpPath, $imBin)) {
       if(is_file($tmpPath)) @unlink($tmpPath);
       throw new Exception(_("Unable to create temporary image"));
