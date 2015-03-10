@@ -18,24 +18,19 @@ class InputVar extends Plugin implements SplObserver {
         new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName), Logger::LOGGER_WARNING);
         continue;
       }
-      $data = null;
       switch($e->nodeName) {
         case "var":
         if($subject->getStatus() != STATUS_PROCESS) continue;
-        if(!$e->hasAttribute("data")) {
-          new Logger(sprintf(_("Element var id=%s missing attribute data"), $e->getAttribute("id")), Logger::LOGGER_WARNING);
-          continue;
-        }
-        $data = $e->getAttribute("data");
-        $this->processRule($e, $data);
+        $this->processRule($e);
         case "fn":
         if($subject->getStatus() != STATUS_INIT) continue;
-        $this->processRule($e, null);
+        $this->processRule($e);
         break;
         default:
         new Logger(sprintf(_("Unknown element name %s"), $e->nodeName), Logger::LOGGER_WARNING);
       }
     }
+    #var_dump(Cms::getAllVariables());
   }
 
   private function setVar($var, $name, $value) {
@@ -43,18 +38,18 @@ class InputVar extends Plugin implements SplObserver {
     else Cms::setVariable($name, $value);
   }
 
-  private function processRule(DOMElement $e, $data) {
-    $data = $this->parse($data);
+  private function processRule(DOMElement $e) {
+    $e->processVariables(Cms::getAllVariables(), array(), true, $e);
     if(!$e->hasAttribute("fn")) {
-      $this->setVar($e->nodeName, $e->getAttribute("id"), $data);
+      $this->setVar($e->nodeName, $e->getAttribute("id"), $e);
       return;
     }
     $f = $e->getAttribute("fn");
     if(strpos($f, "-") === false) $f = get_class($this)."-$f";
     $result = Cms::getFunction($f);
-    if(!is_null($data) && !is_null($result)) {
+    if($e->hasAttribute("fn") && !is_null($result)) {
       try {
-        $result = Cms::applyUserFn($f, $data);
+        $result = Cms::applyUserFn($f, $e->nodeValue);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to apply function: %s"), $e->getMessage()), Logger::LOGGER_WARNING);
         return;
@@ -109,8 +104,8 @@ class InputVar extends Plugin implements SplObserver {
       new Logger(sprintf(_("Unknown function name %s"), $e->getAttribute("fn")), Logger::LOGGER_WARNING);
       return;
     }
-    if(is_null($data)) Cms::setFunction($id, $fn);
-    else Cms::setVariable($id, $fn($data));
+    if($e->nodeName == "fn") Cms::setFunction($id, $fn);
+    else Cms::setVariable($id, $fn($e->nodeValue));
   }
 
   private function parse($value) {
