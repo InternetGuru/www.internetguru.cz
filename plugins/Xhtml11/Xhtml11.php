@@ -513,15 +513,19 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     }
     foreach($toExpand as $e) $e->appendChild($doc->createTextNode(""));
     foreach($toDelete as $e) {
-      $this->removeEmptyElement($e, _("Empty element(s) removed"));
+      $eInfo = $e->nodeName;
+      foreach($e->attributes as $a) $eInfo .= ".".$a->nodeName."=".$a->nodeValue;
+      $this->removeEmptyElement($e, sprintf(_("Removed empty element %s"), $eInfo));
     }
   }
 
   private function removeEmptyElement(DOMElement $e, $comment) {
     $parent = $e->parentNode;
     if(strlen($parent->nodeValue)) {
-      $cmt = $e->ownerDocument->createComment(" $comment ");
-      $parent->insertBefore($cmt, $e);
+      if(Cms::isSuperUser() || CMS_DEBUG) {
+        $cmt = $e->ownerDocument->createComment(" $comment ");
+        $parent->insertBefore($cmt, $e);
+      }
       $parent->removeChild($e);
       return;
     }
