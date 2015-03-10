@@ -84,7 +84,7 @@ class GlobalMenu extends Plugin implements SplObserver {
   private function setCurrentClass(DOMElementPlus $a) {
     $a->setAttribute("class", $a->getAttribute("class")." current");
     $parentLi = $a->parentNode->parentNode->parentNode;
-    if(is_null($parentLi)) return;
+    if(is_null($parentLi) || $parentLi->nodeName != "li") return;
     $this->setCurrentClass($parentLi->firstElement);
   }
 
