@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-10 23:04+0100\n"
-"PO-Revision-Date: 2015-03-10 23:06+0100\n"
+"POT-Creation-Date: 2015-03-10 23:47+0100\n"
+"PO-Revision-Date: 2015-03-10 23:47+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -1021,9 +1021,13 @@ msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:516
-msgid "Empty element(s) removed"
-msgstr "Odstraněn prázdný element"
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:518
+#, php-format
+msgid "Removed empty element %s"
+msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "Empty element(s) removed"
+#~ msgstr "Odstraněn prázdný element"
 
 #~ msgid "Logo file %s not found"
 #~ msgstr "Nepodařilo se najít soubor s logem %s"
