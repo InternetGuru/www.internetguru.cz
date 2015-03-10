@@ -2,7 +2,7 @@ h2 {
   color: #086CA2;
 }
 
-div.contentbalancer a,
+div.contentbalancer-simple:not(.section) a,
 #content > div:first-child {
   background: #3C9DD1;
 }

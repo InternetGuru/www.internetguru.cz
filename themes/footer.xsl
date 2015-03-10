@@ -71,10 +71,13 @@
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates/>
       <ul class="docinfo">
+        <xsl:if test="not($contentlink-author = '')">
+          <li class="creation"><xsl:value-of disable-output-escaping="yes" select="$inputvar-creation"/></li>
+        </xsl:if>
         <xsl:if test="not($contentlink-resp = '')">
           <li class="resp"><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
         </xsl:if>
-        <xsl:if test="not($contentlink-mtime = $contentlink-ctime)">
+        <xsl:if test="not($inputvar-linkmtime = $inputvar-linkctime)">
           <li class="mtime"><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
         </xsl:if>
         <xsl:if test="not($cms-super_user = '') and not($agregator-filepath = '')">

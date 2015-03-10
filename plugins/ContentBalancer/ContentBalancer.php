@@ -55,7 +55,6 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   private function filter(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     $nodes = array();
-    $prefix = $content->documentElement->firstElement->getAttribute("link");
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
     foreach($nodes as $section) {
       $className = strtolower(get_class($this));
@@ -77,11 +76,12 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       foreach($section->childElements as $e) if($e->nodeName == "h") $hs[] = $e;
       $force = $section->getPreviousElement("h")->hasAttribute("link");
       $wrapper = $content->createElement($set->getAttribute("wrapper"));
-      if($set->getAttribute("id") != $this->defaultSet) $className .= "-".$set->getAttribute("id");
+      #if($set->getAttribute("id") != $this->defaultSet)
+      $className .= "-".$set->getAttribute("id");
       $wrapper->setAttribute("class", $className);
       foreach($hs as $h) {
         if(!$force && !$h->hasAttribute("link")) continue 2;
-        $vars = $this->getVariables($h, $prefix);
+        $vars = $this->getVariables($h);
         $root = $this->createDOMElement($vars, $set);
         foreach($root->childElements as $e) {
           $wrapper->appendChild($content->importNode($e, true));
@@ -99,11 +99,11 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     return $doc->documentElement;
   }
 
-  private function getVariables(DOMElementPlus $h, $prefix) {
+  private function getVariables(DOMElementPlus $h) {
     $vars = array();
     $desc = $h->nextElement;
     $vars['heading'] = $h->nodeValue;
-    $vars['link'] = $h->hasAttribute("link") ? $h->getAttribute("link") : "$prefix#".$h->getAttribute("id");
+    $vars['link'] = $h->hasAttribute("link") ? $h->getAttribute("link") : $h->getAncestorValue("link")."#".$h->getAttribute("id");
     $vars['headingplus'] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
     $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
     $vars['desc'] = strlen($desc->nodeValue) ? $desc->nodeValue : null;

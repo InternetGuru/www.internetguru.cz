@@ -184,7 +184,7 @@ ol.contentlink-bc li:not(:first-child) a[href]:before {
 }
 
 #content > div:first-child + div,
-div.list, div.contentbalancer,
+div.list, div.contentbalancer-simple:not(.section),
 fieldset > dl {
   background: #EAF2F5;
   padding-top: 1.5em;
@@ -219,17 +219,17 @@ dt {
   font-weight: normal;
 }
 
-div.contentbalancer ul {
+div.contentbalancer-simple:not(.section) ul {
   list-style: none;
   text-align: center;
 }
 
-div.contentbalancer li {
+div.contentbalancer-simple:not(.section) li {
   display: inline-block;
   margin: 0;
 }
 
-div.contentbalancer a {
+div.contentbalancer-simple:not(.section) a {
   text-transform: uppercase;
   padding: 1em;
   font-weight: 100;
