@@ -40,8 +40,9 @@ class DOMElementPlus extends DOMElement {
     else $this->setAttribute("class", $this->getAttribute("class")." $class");
   }
 
-  public function processVariables(Array $variables, $ignore = array()) {
-    foreach($this->getVariables("var", $ignore) as list($vName, $aName)) {
+  public function processVariables(Array $variables, $ignore = array(), $deep = false) {
+    $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
+    foreach($this->getVariables("var", $ignoreAttr) as list($vName, $aName)) {
       $v = array_key_exists($vName, $variables) ? $variables[$vName] : null;
       try {
         $this->insertVariable($v, $aName);
@@ -50,6 +51,8 @@ class DOMElementPlus extends DOMElement {
       }
       if(is_null($aName)) return;
     }
+    if(!$deep) return;
+    foreach($this->childElements as $e) $e->processVariables($variables, $ignore, $deep);
   }
 
   public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array(), $delStrlen=false) {
@@ -193,7 +196,15 @@ class DOMElementPlus extends DOMElement {
         $e->nodeValue = htmlspecialchars($html[$k]);
       }
     }
-    $this->insertVarDOMElement($dom->documentElement, null);
+    if(count($html) > 1) {
+      $this->insertVarDOMElement($dom->documentElement, null);
+      return;
+    }
+    while($this->hasChildNodes()) $this->removeChild($this->firstChild);
+    foreach($dom->documentElement->firstChild->childNodes as $n) {
+      $this->appendChild($this->ownerDocument->importNode($n, true));
+    }
+    #var_dump($this->nodeValue);
   }
 
   private function insertVarDOMElement(DOMElement $element, $aName) {

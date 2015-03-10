@@ -48,14 +48,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function processVariables(Array $variables, $ignore = array()) {
-    $xpath = new DOMXPath($this);
-    $elements = array();
-    foreach($xpath->query("//*[@var]") as $e) $elements[] = $e;
-    foreach(array_reverse($elements) as $e) {
-      if(array_key_exists($e->nodeName, $ignore))
-        $e->processVariables($variables, $ignore[$e->nodeName]);
-      else $e->processVariables($variables);
-    }
+    $this->documentElement->processVariables($variables, $ignore, true);
   }
 
   public function processFunctions(Array $functions, Array $variables = Array(), $ignore = array(), $delStrlen=false) {

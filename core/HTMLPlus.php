@@ -40,7 +40,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function processVariables(Array $variables) {
-    parent::processVariables($variables, array("h" => array("id", "link")));
+    $this->documentElement->processVariables($variables, array("h" => array("id", "link")), true);
   }
 
   public function processFunctions(Array $functions, Array $variables = array()) {
