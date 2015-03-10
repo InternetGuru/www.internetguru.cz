@@ -1,6 +1,7 @@
 <?php
 
 class GlobalMenu extends Plugin implements SplObserver {
+  private $current = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -23,6 +24,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     $root->appendChild($menu);
     $menu->setAttribute("class", "globalmenu");
     $this->trimList($menu);
+    if(!is_null($this->current)) $this->setCurrentClass($this->current);
     Cms::setVariable("globalmenu", $root);
   }
 
@@ -68,7 +70,7 @@ class GlobalMenu extends Plugin implements SplObserver {
         $a->nodeValue = htmlspecialchars($n->getAttribute("short"));
         #$a->setAttribute("title", $n->nodeValue);
       }
-      if(getCurLink() === $link) $a->setAttribute("class", "current");
+      if(getCurLink() === $link) $this->current = $a;
       if(!is_null($link)) $a->setAttribute("href", $link);
       else $a->setAttribute("href", "$prefix#".$n->getAttribute("id"));
       if(is_null($link)) $a->setAttribute("class", "fragment");
@@ -77,6 +79,13 @@ class GlobalMenu extends Plugin implements SplObserver {
     }
     if(is_null($li)) return null;
     return $ul;
+  }
+
+  private function setCurrentClass(DOMElementPlus $a) {
+    $a->setAttribute("class", $a->getAttribute("class")." current");
+    $parentLi = $a->parentNode->parentNode->parentNode;
+    if(is_null($parentLi)) return;
+    $this->setCurrentClass($parentLi->firstElement);
   }
 
 }
