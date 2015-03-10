@@ -112,19 +112,15 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
     if(array_key_exists("logo", $this->vars)) {
-      if(!is_file(FILES_FOLDER."/".$this->vars["logo"]->nodeValue)) {
-        new Logger(sprintf(_("Logo file %s not found"), $this->vars["logo"]->nodeValue), Logger::LOGGER_WARNING);
-      } else {
-        $o = $bc->createElement("object");
-        $o->setAttribute("data", $this->vars["logo"]->nodeValue);
-        $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
-        $o->nodeValue = $hFirst->nodeValue;
-        $aFirst->nodeValue = null;
-        $aFirst->addClass("logo");
-        $aFirst->appendChild($o);
-        if($this->isRoot && $hFirst->hasAttribute("short"))
-          $aFirst->parentNode->appendChild($bc->createElement("span", $hFirst->getAttribute("short")));
-      }
+      $o = $bc->createElement("object");
+      $o->setAttribute("data", $this->vars["logo"]->nodeValue);
+      $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
+      $o->nodeValue = $hFirst->nodeValue;
+      $aFirst->nodeValue = null;
+      $aFirst->addClass("logo");
+      $aFirst->appendChild($o);
+      if($this->isRoot && $hFirst->hasAttribute("short"))
+        $aFirst->parentNode->appendChild($bc->createElement("span", $hFirst->getAttribute("short")));
     }
     Cms::setVariable("bc", $bc->documentElement);
     Cms::setVariable("title", implode(" - ", array_reverse($subtitles)));
