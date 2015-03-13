@@ -25,6 +25,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     $menu->setAttribute("class", "globalmenu");
     $this->trimList($menu);
     if(!is_null($this->current)) $this->setCurrentClass($this->current);
+    #var_dump($doc->saveXML());
     Cms::setVariable("globalmenu", $root);
   }
 

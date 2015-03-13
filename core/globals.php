@@ -133,7 +133,7 @@ function redirTo($link, $code=null, $msg=null) {
 function implodeLink(Array $p, $query=true) {
   $url = "";
   if(isset($p["path"])) $url .= trim($p["path"], "/");
-  if($query && isset($p["query"])) $url .= "?".$p["query"];
+  if($query && isset($p["query"]) && strlen($p["query"])) $url .= "?".$p["query"];
   if(isset($p["fragment"])) $url .= "#".$p["fragment"];
   return $url;
 }
@@ -156,7 +156,6 @@ function parseLocalLink($link, $host=null) {
 
 function buildLocalUrl(Array $pLink) {
   #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
-  #var_dump($pLink);
   if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   if(PAGESPEED_OFF) {
@@ -164,9 +163,12 @@ function buildLocalUrl(Array $pLink) {
   }
   if(!isset($pLink["path"]) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
   if($scriptFile == "index.php") return ROOT_URL.implodeLink($pLink);
-  if(strlen($pLink["path"])) $q[] ="q=".$pLink["path"];
-  if(strlen($pLink["query"])) $q[] = $pLink["query"];
-  return ROOT_URL.$scriptFile.implodeLink($pLink);
+  $q = array();
+  if(isset($pLink["path"]) && strlen($pLink["path"])) $q[] = "q=".$pLink["path"];
+  $pLink["path"] = $scriptFile;
+  if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
+  if(count($q)) $pLink["query"] = implode("&", $q);
+  return ROOT_URL.implodeLink($pLink);
 }
 
 function chmodGroup($file, $mode) {

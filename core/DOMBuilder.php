@@ -317,7 +317,7 @@ class DOMBuilder {
     $linkId = array();
     if($prefix != self::$defaultPrefix) $linkId[] = $prefix;
     if($link != $prefix && strlen($link)) $linkId[] = $link;
-    if(empty($linkId)) $linkId[] = self::$defaultPrefix;
+    if(empty($linkId) && !strlen($frag)) $linkId[] = self::$defaultPrefix;
     return implode("/", $linkId).(strlen($frag) ? "#$frag" : "");
   }
 

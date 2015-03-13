@@ -182,7 +182,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #  throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
     if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, implodeLink($link));
     $localUrl = buildLocalUrl($link);
-    if($a->nodeName != "form" && $localUrl == ROOT_URL.getCurLink(true))
+    $curUrl = buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()));
+    #var_dump("-------------");
+    #var_dump($localUrl);
+    #var_dump($curUrl);
+    #var_dump($_SERVER["REQUEST_URI"]);
+    if($a->nodeName != "form" && $localUrl == $curUrl)
       throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
 
     #var_dump($localUrl);
