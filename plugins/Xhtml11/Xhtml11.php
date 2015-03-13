@@ -183,20 +183,24 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump(implodeLink($link));
     #if($a->nodeName != "form" && (!isset($link["path"]) ? getCurLink() : "").implodeLink($link) == getCurLink(true))
     #  throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
-    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, implodeLink($link));
-    $localUrl = buildLocalUrl($link);
-    $curUrl = buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()));
-    #var_dump("-------------");
-    #var_dump($localUrl);
-    #var_dump($curUrl);
-    #var_dump($_SERVER["REQUEST_URI"]);
-    if($a->nodeName != "form" && $localUrl == $curUrl)
+    $cyclic = $this->isCyclicLink($link);
+    if($a->nodeName != "form" && $cyclic && !isset($pLink["fragment"]))
       throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
+    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, implodeLink($link));
 
+    if(isset($link["path"]) && $cyclic) unset($link["path"]);
+    $localUrl = buildLocalUrl($link);
     #var_dump($localUrl);
     if(strpos($localUrl, "#") === 0 && !array_key_exists($pLink["fragment"], $ids))
       throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));
     $a->setAttribute($aName, $localUrl);
+  }
+
+  private function isCyclicLink(Array $pLink) {
+    if(isset($pLink["path"]) && $pLink["path"] != getCurLink()) return false;
+    $query = getCurQuery();
+    if(!isset($pLink["query"])) return strlen($query) ? false : true;
+    return $pLink["query"] == $query;
   }
 
   private function insertTitle(DOMElement $a, $link) {
