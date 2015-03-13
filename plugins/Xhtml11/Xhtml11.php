@@ -95,7 +95,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $newContent = $this->transform($content, $xslt, $this->transformations[$xslt]['user'], $proc);
         $newContent->encoding="utf-8";
         $xml = $newContent->saveXML();
-        if(!@$newContent->loadXML($xml))
+        if(!$newContent->loadXML($xml))
           throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
         $content = $newContent;
       } catch(Exception $e) {
@@ -165,7 +165,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       }
 
     }
-    foreach($toStrip as $a) $a[0]->stripAttr($aName, $a[1]);
+    foreach($toStrip as $a) {
+      $a[0]->stripAttr($aName, $a[1]);
+      $a[0]->stripAttr("title", "");
+    }
   }
 
   private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
@@ -176,7 +179,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump($pLink);
     $link = DOMBuilder::normalizeLink($pLink);
     #if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
-    #var_dump($linkId);
+    #var_dump($link);
     #var_dump(implodeLink($link));
     #if($a->nodeName != "form" && (!isset($link["path"]) ? getCurLink() : "").implodeLink($link) == getCurLink(true))
     #  throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));

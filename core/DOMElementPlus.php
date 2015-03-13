@@ -274,6 +274,7 @@ class DOMElementPlus extends DOMElement {
   public function stripAttr($attr, $comment = null) {
     if(!$this->hasAttribute($attr)) return;
     $this->removeAttribute($attr);
+    if($comment === "") return;
     if(!Cms::isSuperUser() && !CMS_DEBUG) return;
     if(is_null($comment)) $comment = sprintf(_("Attribute '%s' stripped"), $attr);
     $cmt = $this->ownerDocument->createComment(" $comment ");

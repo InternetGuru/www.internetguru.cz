@@ -36,12 +36,17 @@ class DOMBuilder {
   }
 
   public static function normalizeLink(Array $pUrl) {
+    #var_dump($pUrl);
     #if(empty($pUrl)) return "";
     if(empty($pUrl)) return array("path" => "");
     #if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return "";
     if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return array("path" => "");
     #if(!isset($pUrl["path"])) return null; // no prefix
-    if(!isset($pUrl["path"])) return $pUrl; // no prefix
+    if(!isset($pUrl["path"])) {
+      if(isset($pUrl["fragment"]) && isset(self::$idToLink[self::$defaultPrefix][$pUrl["fragment"]]))
+        $pUrl["path"] = self::$defaultPrefix;
+      else return $pUrl; // no prefix
+    }
     #var_dump($pUrl);
     #var_dump(self::$linkToId);
     #var_dump(self::$idToLink);

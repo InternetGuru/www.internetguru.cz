@@ -61,7 +61,7 @@
           <xsl:if test="not($cms-mtime = '')">
             <li>Upraveno: <xsl:value-of select="$inputvar-mymtime"/></li>
           </xsl:if>
-          <li class="link"><xsl:value-of disable-output-escaping="yes" select="$cms-uri"/></li>
+          <li class="link"><xsl:value-of select="$cms-uri"/></li>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
       </div>
