@@ -31,16 +31,17 @@ class UrlHandler extends Plugin implements SplObserver {
       $pVal = $var->hasAttribute("parValue") ? $var->getAttribute("parValue") : null;
       if(!$this->queryMatch($pNam, $pVal)) continue;
       try {
-        if($var->nodeValue == "/" || $var->nodeValue == "") redirTo(buildLocalUrl(""));
+        if($var->nodeValue == "/" || $var->nodeValue == "") redirTo(array("path" => ""));
         $pLink = parseLocalLink($var->nodeValue);
-        if(is_null($pLink)) redirTo(buildLocalUrl($var->nodeValue)); // external redir
+        if(is_null($pLink)) redirTo($var->nodeValue); // external redir
         if(!isset($pLink["path"])) $pLink["path"] = getCurLink(); // no path = keep current path
-        if(strpos($var->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no path = keep current path
+        if(strpos($var->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
         #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
-        $linkId = DOMBuilder::getLinkId($pLink);
-        if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
-        if($link == getCurLink(true)) throw new Exception(sprintf(_("Ignored cyclic redirection to %s"), $link));
-        redirTo(buildLocalUrl(implodeLink($pLink), !is_null($linkId)));
+        #var_dump($pLink);
+        $pLink = DOMBuilder::normalizeLink($pLink);
+        if(implodeLink($pLink) == getCurLink(true))
+          throw new Exception(sprintf(_("Ignored cyclic redirection to %s"), $var->nodeValue));
+        redirTo(buildLocalUrl($pLink));
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
       }
@@ -73,15 +74,15 @@ class UrlHandler extends Plugin implements SplObserver {
     $links = DOMBuilder::getLinks();
     if(DOMBuilder::isLink(getCurLink())) {
       if(getCurLink() != $links[0]) return;
-      $link = ""; // link to root heading permanent redir to root
+      $link = array("path" => ""); // link to root heading permanent redir to root
       $code = 301;
     } else {
-      $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
-      if(!DOMBuilder::isLink($newLink)) {
+      $newLink = array("path" => normalize(getCurLink(), "a-zA-Z0-9/_-"));
+      if(!DOMBuilder::isLink($newLink["path"])) {
         if(self::DEBUG) print_r($links);
-        $linkId = $this->findSimilarLinkId($links, $newLink);
-        if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
-        else $newLink = $links[$linkId];
+        $linkId = $this->findSimilarLinkId($links, $newLink["path"]);
+        $newLink["path"] = ""; // nothing found, redir to root
+        if(!is_null($linkId) && !$linkId == $links[0]) $newLink["fragment"] = $links[$linkId];
       }
       $link = $newLink;
       $code = 404;

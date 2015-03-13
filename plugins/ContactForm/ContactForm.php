@@ -18,8 +18,6 @@ class ContactForm extends Plugin implements SplObserver {
   private $rules = array();
   private $ruleTitles = array();
   private $errors = array();
-  private $storedToken = null;
-  const TOKEN_NAME = "token";
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -38,6 +36,9 @@ class ContactForm extends Plugin implements SplObserver {
     foreach($this->forms as $formId => $form) {
       try {
         $htmlForm = $this->parseForm($form);
+        if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
+          Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS);
+        }
         if(!$this->isValidPost($form)) {
           $this->finishForm($htmlForm, false);
           continue;
@@ -51,8 +52,7 @@ class ContactForm extends Plugin implements SplObserver {
           $msg = replaceVariables($this->messages[$formId], $vars);
         } else $msg = $this->createMessage($this->cfg, $formId);
         $this->sendForm($form, $msg);
-        Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS, true);
-        redirTo(buildLocalUrl(getCurLink()));
+        redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=$formId")));
       } catch(Exception $e) {
         $this->finishForm($htmlForm, true);
         $message = "<a href='#".$htmlForm->getAttribute("id")."'>"
@@ -95,12 +95,9 @@ class ContactForm extends Plugin implements SplObserver {
 
   private function isValidPost(DOMElementPlus $form) {
     $prefix = strtolower(get_class($this))."-".$form->getAttribute("id")."-";
-    if(!empty($_POST)) foreach($this->formItems as $i) {
-      $this->setPostValue($i, $prefix);
-    }
-    if(!isset($_POST[$prefix.self::TOKEN_NAME])) return false;
-    if(strcmp($_POST[$prefix.self::TOKEN_NAME], $this->storedToken) !== 0)
-      throw new Exception(_("Security verification failed"));
+    if(!empty($_POST)) foreach($this->formItems as $i) $this->setPostValue($i, $prefix);
+    if(!isset($_POST[get_class($this)])
+      || $_POST[get_class($this)] != normalize(get_class($this))."-".$form->getAttribute("id")) return false;
     foreach($this->formItems as $i) {
       try {
         $this->verifyItem($i);
@@ -174,10 +171,7 @@ class ContactForm extends Plugin implements SplObserver {
     }
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(strlen($bcc)) $mail->addBCC($bcc, '');
-    if(!$mail->send()) {
-      new Logger(sprintf(_("Failed to send e-mail: %s"), $mail->ErrorInfo));
-      throw new Exception($mail->ErrorInfo);
-    }
+    if(!$mail->send()) throw new Exception($mail->ErrorInfo);
     new Logger(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }
 
@@ -228,19 +222,15 @@ class ContactForm extends Plugin implements SplObserver {
 
   private function registerFormItems(DOMElementPlus $form, $prefix) {
     $time = time();
-    $tokenValue = md5(uniqid(rand(), true));
-    if(isset($_SESSION[$prefix.self::TOKEN_NAME]))
-      $this->storedToken = $_SESSION[$prefix.self::TOKEN_NAME];
-    $_SESSION[$prefix.self::TOKEN_NAME] = $tokenValue;
-    $tokenInput = $form->ownerDocument->createElement("input");
-    $tokenInput->setAttribute("name", $prefix.self::TOKEN_NAME);
-    $tokenInput->setAttribute("type", "hidden");
-    $tokenInput->setAttribute("value", $tokenValue);
+    $idInput = $form->ownerDocument->createElement("input");
+    $idInput->setAttribute("name", get_class($this));
+    $idInput->setAttribute("type", "hidden");
+    $idInput->setAttribute("value", $form->getAttribute("id"));
     $i = 1;
     $e = null;
     $this->formItems = array();
     $this->formValues = array();
-    $this->formNames = array(self::TOKEN_NAME);
+    $this->formNames = array(get_class($this));
     $this->formIds = array();
     $this->formGroupValues = array();
     $xpath = new DOMXPath($form->ownerDocument);
@@ -258,7 +248,7 @@ class ContactForm extends Plugin implements SplObserver {
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
       $name = $this->processFormItem($this->formNames, $e, "name", $prefix, $id, true);
     }
-    $e->parentNode->appendChild($tokenInput);
+    $e->parentNode->appendChild($idInput);
     foreach($xpath->query("//label") as $e) {
       if($e->hasAttribute("for")) {
         $for = $prefix.$e->getAttribute("for");

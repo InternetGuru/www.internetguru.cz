@@ -63,7 +63,7 @@ $msg
 Posláno $inputvar-today z IP adresy $cms-ip
 Ze systému $cms-name
   </message>
-  <form id="basic">
+  <form id="basic" success="oook">
     <dl>
       <dt><label for="name">Celé jméno</label></dt>
       <dd><input type="text" id="name" required="Jméno je povinné"/></dd>

@@ -33,6 +33,8 @@
 
   <xsl:param name="inputvar-myctime" select="''"/>
   <xsl:param name="inputvar-mymtime" select="''"/>
+  <xsl:param name="inputvar-linkmtime" select="''"/>
+  <xsl:param name="inputvar-linkctime" select="''"/>
   <xsl:param name="inputvar-creation" select="''"/>
   <xsl:param name="inputvar-cyear" select="''"/>
   <xsl:param name="inputvar-year" select="''"/>

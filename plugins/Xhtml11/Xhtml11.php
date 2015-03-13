@@ -151,13 +151,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         #var_dump($a->getAttribute($aName));
         $pUrl = parseLocalLink($a->getAttribute($aName));
         if(is_null($pUrl)) continue; // link is external
-        #var_dump(buildLocalUrl(implodeLink($pUrl)));
+        #var_dump(buildLocalUrl($pUrl));
         if(isset($pUrl["path"]) && strpos($pUrl["path"], FILES_DIR."/") === 0) { // link to file
           if(!is_file(USER_FOLDER."/".$pUrl["path"]))
             throw new Exception(sprintf(_("File %s not found"), $pUrl["path"]));
-          #var_dump($aName, buildLocalUrl(implodeLink($pUrl)));
-          $a->setAttribute($aName, buildLocalUrl(implodeLink($pUrl)));
-          #$a->setAttribute($aName, buildLink(implodeLink($pUrl)));
+          #var_dump($aName, buildLocalUrl($pUrl));
+          $a->setAttribute($aName, buildLocalUrl($pUrl));
           continue;
         }
         $this->setupLink($a, $aName, $pUrl, $ids);
@@ -175,15 +174,17 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump(getCurLink());
     #var_dump(getCurLink(true));
     #var_dump($pLink);
-    $linkId = DOMBuilder::getLinkId($pLink);
-    if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
+    $link = DOMBuilder::normalizeLink($pLink);
+    #if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
     #var_dump($linkId);
-    #var_dump($link);
-    #var_dump(buildLocalUrl($link, !is_null($linkId)));
-    if($a->nodeName != "form" && (is_null($linkId) ? getCurLink() : "").$link == getCurLink(true))
+    #var_dump(implodeLink($link));
+    #if($a->nodeName != "form" && (!isset($link["path"]) ? getCurLink() : "").implodeLink($link) == getCurLink(true))
+    #  throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
+    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, implodeLink($link));
+    $localUrl = buildLocalUrl($link);
+    if($a->nodeName != "form" && $localUrl == ROOT_URL.getCurLink(true))
       throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
-    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, $linkId);
-    $localUrl = buildLocalUrl($link, !is_null($linkId));
+
     #var_dump($localUrl);
     if(strpos($localUrl, "#") === 0 && !array_key_exists($pLink["fragment"], $ids))
       throw new Exception(sprintf(_("Removed local fragment to undefined id %s"), $pLink["fragment"]));

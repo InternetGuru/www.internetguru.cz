@@ -154,23 +154,19 @@ function parseLocalLink($link, $host=null) {
   return $pLink;
 }
 
-function buildLocalUrl($link, $root=true) {
+function buildLocalUrl(Array $pLink) {
   #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
-  $link = ltrim($link, "/");
+  #var_dump($pLink);
+  if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
-  $path = parse_url($link, PHP_URL_PATH);
-  if($scriptFile == "index.php") {
-    if($root && !strlen($link)) return ROOT_URL;
-    return ($root && $path != getCurLink(true) ? ROOT_URL : "").$link;
+  if(PAGESPEED_OFF) {
+    $pLink["query"] = (isset($pLink["query"]) ? $pLink["query"]."&" : "")."PageSpeed=off";
   }
-  $query = parse_url($link, PHP_URL_QUERY);
-  $frag = parse_url($link, PHP_URL_FRAGMENT);
-  $q = array();
-  if(strlen($path)) $q[] ="q=$path";
-  if(strlen($query)) $q[] = $query;
-  if($root && !strlen($link)) return ROOT_URL.$scriptFile;
-  return ($root && $path != getCurLink(true) ? ROOT_URL.$scriptFile : "")
-    .(!empty($q) ? "?".implode("&", $q) : "").(strlen($frag) ? "#$frag" : "");
+  if(!isset($pLink["path"]) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
+  if($scriptFile == "index.php") return ROOT_URL.implodeLink($pLink);
+  if(strlen($pLink["path"])) $q[] ="q=".$pLink["path"];
+  if(strlen($pLink["query"])) $q[] = $pLink["query"];
+  return ROOT_URL.$scriptFile.implodeLink($pLink);
 }
 
 function chmodGroup($file, $mode) {
@@ -328,7 +324,7 @@ function initFiles() {
   if(filemtime($src) == filemtime($f)) return;
   safeRewriteFile($src, $f);
   touch($f, filemtime($src));
-  redirTo(buildLocalUrl(getCurLink()), null, sprintf(_("Subdom file %s updated"), $f));
+  redirTo(buildLocalUrl(array("path" => getCurLink())), null, sprintf(_("Subdom file %s updated"), $f));
 }
 
 function smartCopy($src, $dest) {
@@ -463,7 +459,7 @@ function getShortString($str) {
 }
 
 function loginRedir() {
-  redirTo(buildLocalUrl(getCurLink()."?login"), 401, _("Authorization required"));
+  redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "login"), 401, _("Authorization required")));
 }
 
 ?>

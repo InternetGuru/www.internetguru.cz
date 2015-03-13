@@ -112,11 +112,12 @@ class Cms {
   }
 
   public static function setLoggedUser($user) {
-    if(!session_regenerate_id()) throw new Exception(_("Unable to regenerate session ID"));
-    $_SESSION[get_called_class()]["loggedUser"] = $user;
     self::setVariable("logged_user", $user);
-    if(self::isSuperUser())
-      self::setVariable("super_user", $user);
+    if(!self::isSuperUser()) return;
+    self::setVariable("super_user", $user);
+    session_cache_limiter("");
+    if(!session_start() || !session_regenerate_id()) throw new Exception(_("Unable to re/generate session ID"));
+    $_SESSION[get_called_class()]["loggedUser"] = $user;
   }
 
   public static function isSuperUser() {
@@ -172,11 +173,12 @@ class Cms {
 
   public static function addMessage($message, $type, $flash = false) {
     if(!$flash && self::$forceFlash) {
-      new Logger(_("Adding message after output - forcing flash"), Logger::LOGGER_WARNING);
+      new Logger(_("Adding message after output - forcing flash"));
       $flash = true;
     }
     if($flash) {
-      $_SESSION["cms"]["flash"][$type][] = $message;
+      if(!Cms::isSuperUser()) new Logger(_("Unable to set flash message if super user not logged"));
+      else $_SESSION["cms"]["flash"][$type][] = $message;
       return;
     }
     if(is_null(self::$flashList)) self::createFlashList();

@@ -35,10 +35,13 @@ class DOMBuilder {
     throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
   }
 
-  public static function getLinkId(Array $pUrl) {
-    if(empty($pUrl)) return "";
-    if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return "";
-    if(!isset($pUrl["path"])) return null; // no prefix
+  public static function normalizeLink(Array $pUrl) {
+    #if(empty($pUrl)) return "";
+    if(empty($pUrl)) return array("path" => "");
+    #if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return "";
+    if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return array("path" => "");
+    #if(!isset($pUrl["path"])) return null; // no prefix
+    if(!isset($pUrl["path"])) return $pUrl; // no prefix
     #var_dump($pUrl);
     #var_dump(self::$linkToId);
     #var_dump(self::$idToLink);
@@ -47,10 +50,12 @@ class DOMBuilder {
       if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
       else $pUrl["path"] = $pUrl["path"]."/".self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
       if(!isset(self::$linkToId[implodeLink($pUrl)])) unset($pUrl["fragment"]);
-      return implodeLink($pUrl);
+      #return implodeLink($pUrl);
+      return $pUrl;
     }
     #if($pUrl["path"] == "") $pUrl["path"] = self::$defaultPrefix;
-    if(isset(self::$linkToId[implodeLink($pUrl, false)])) return implodeLink($pUrl);
+    #if(isset(self::$linkToId[implodeLink($pUrl, false)])) return implodeLink($pUrl);
+    if(isset(self::$linkToId[implodeLink($pUrl, false)])) return $pUrl;
     #if(isset(self::$linkToId[$pUrl["path"]]) && !isset($pUrl["fragment"])) {
       #if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
       #return implodeLink($pUrl);
@@ -254,7 +259,7 @@ class DOMBuilder {
       if(!$e->hasAttribute($aName)) continue;
       $pLink = parseLocalLink($e->getAttribute($aName));
       if(is_null($pLink)) continue; // link is external
-      if(isset($pLink["path"])) {
+      if(isset($pLink["path"]) && strlen($pLink["path"])) {
         if(!isset(self::$linkToId[$prefix."/".$pLink["path"]])) continue;
         $pLink["path"] = $prefix."/".$pLink["path"];
       } elseif(isset($pLink["fragment"])) {
@@ -311,9 +316,9 @@ class DOMBuilder {
   private static function getLinkFull($prefix, $link, $frag) {
     $linkId = array();
     if($prefix != self::$defaultPrefix) $linkId[] = $prefix;
-    if($link != $prefix) $linkId[] = $link.(strlen($frag) ? "#$frag" : "");
+    if($link != $prefix && strlen($link)) $linkId[] = $link;
     if(empty($linkId)) $linkId[] = self::$defaultPrefix;
-    return implode("/", $linkId);
+    return implode("/", $linkId).(strlen($frag) ? "#$frag" : "");
   }
 
   private static function generateUniqueVal($val, Array $reg) {

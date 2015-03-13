@@ -2,9 +2,6 @@
 try {
 
   $start_time = microtime(true);
-  session_cache_limiter("");
-  session_start();
-
   define("INDEX_HTML", "index.html");
   define("PLUGINS_DIR", "plugins");
   define("THEMES_DIR", "themes");
@@ -30,6 +27,7 @@ try {
   define('STATUS_INIT', 'init');
   define('STATUS_PROCESS', 'process');
   define('STATUS_POSTPROCESS', 'postprocess');
+  define('PAGESPEED_OFF', isset($_GET["PageSpeed"]) && $_GET["PageSpeed"] == "off");
   define("IS_LOCALHOST", (!isset($_SERVER["REMOTE_ADDR"])
     || $_SERVER["REMOTE_ADDR"] == "127.0.0.1"
     || strpos($_SERVER["REMOTE_ADDR"], "192.168.") === 0
@@ -138,26 +136,9 @@ try {
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
-  duplicateDir(USER_FOLDER);
-  duplicateDir(ADMIN_FOLDER);
-
-  #header("Cache-Control: public, max-age=10800, must-revalidate");
-  $out = Cms::getOutput();
-  //get a unique hash of this file (etag)
-  $etagFile = hash("md5", $out);
-  //get the HTTP_IF_NONE_MATCH header if set (etag: unique file hash)
-  $etagHeader=(isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH']) : false);
-  //set etag-header
-  header("Etag: $etagFile");
-  //check if page has changed. If not, send 304 and exit
-  if(IS_LOCALHOST || CMS_DEBUG || $etagHeader != $etagFile
-    || preg_match("/^\D/", CMS_RELEASE)) {
-    echo $out;
-  } else {
-    header("HTTP/1.1 304 Not Modified");
-    http_response_code(304);
-  }
-
+  if(Cms::isSuperUser()) duplicateDir(USER_FOLDER);
+  if(Cms::isSuperUser()) duplicateDir(ADMIN_FOLDER);
+  echo Cms::getOutput();
   new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time, false);
 
 } catch(Exception $e) {
