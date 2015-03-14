@@ -185,7 +185,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
     if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, implodeLink($link));
 
-    if(isset($link["path"]) && $cyclic) unset($link["path"]);
+    if(count($link) > 1 && isset($link["path"]) && $cyclic) unset($link["path"]);
     $localUrl = buildLocalUrl($link);
     #var_dump($localUrl);
     if(strpos($localUrl, "#") === 0 && !array_key_exists($pLink["fragment"], $ids))
