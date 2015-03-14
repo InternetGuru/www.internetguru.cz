@@ -79,10 +79,10 @@ class UrlHandler extends Plugin implements SplObserver {
     } else {
       $newLink = array("path" => normalize(getCurLink(), "a-zA-Z0-9/_-"));
       if(!DOMBuilder::isLink($newLink["path"])) {
-        if(self::DEBUG) print_r($links);
+        if(self::DEBUG) var_dump($links);
         $linkId = $this->findSimilarLinkId($links, $newLink["path"]);
-        $newLink["path"] = ""; // nothing found, redir to root
-        if(!is_null($linkId) && !$linkId == $links[0]) $newLink["fragment"] = $links[$linkId];
+        if(!is_null($linkId) && !$linkId == $links[0]) $newLink = parseLocalLink($links[$linkId]);
+        if(!isset($newLink["path"])) $newLink["path"] = "";
       }
       $link = $newLink;
       $code = 404;
@@ -94,21 +94,24 @@ class UrlHandler extends Plugin implements SplObserver {
 
   private function getBestId(Array $links, Array $found) {
     if(count($found) == 1) return key($found);
+    $minVal = PHP_INT_MAX;
     $minLvl = PHP_INT_MAX;
-    foreach($found as $id => $null) {
+    $foundLvl = array();
+    foreach($found as $id => $val) {
       $lvl = substr_count($links[$id], "/");
+      if($val < $minVal) $minVal = $val;
       if($lvl < $minLvl) $minLvl = $lvl;
-      $found[$id] = $lvl;
+      $foundLvl[$id] = $lvl;
     }
-    $keys = array_keys($found, $minLvl);
-    if(count($keys) == 1) return $keys[0];
     $minLen = PHP_INT_MAX;
-    foreach($keys as $id) {
+    foreach($found as $id => $val) {
+      if($foundLvl[$id] != $minLvl) continue;
+      if($val != $minVal) continue;
       $len = strlen($links[$id]);
       if($len < $minLen) $minLen = $len;
       $short[$id] = $len;
     }
-    $keys = array_keys($short, $minLen);
+    $keys = array_keys($short, $minLen); // filter result to minlength
     return $keys[0];
   }
 
@@ -131,14 +134,13 @@ class UrlHandler extends Plugin implements SplObserver {
    */
   private function findSimilarLinkId(Array $links, $link) {
     if(!strlen($link)) return null;
-    if(self::DEBUG) echo "findSimilarLinkId(links, $link)";
     // zero pos substring
     $found = $this->minPos($links, $link);
-    if(self::DEBUG) print_r($found);
+    if(self::DEBUG) var_dump($found);
     if(count($found)) return $this->getBestId($links, $found);
     // low levenstein first
     $found = $this->minLev($links, $link, 2);
-    if(self::DEBUG) print_r($found);
+    if(self::DEBUG) var_dump($found);
     if(count($found)) return $this->getBestId($links, $found);
     // first "directory" search
     $parts = explode("/", $link);
@@ -158,7 +160,7 @@ class UrlHandler extends Plugin implements SplObserver {
     foreach ($links as $k => $l) {
       $pos = strpos($l, $link);
       if($pos === false || (!is_null($max) && $pos > $max)) continue;
-      $linkpos[$k] = $pos;
+      $linkpos[$k] = strpos($l, "#") === 0 ? $pos-1 : $pos;
     }
     asort($linkpos);
     if(count($linkpos)) return $linkpos;
