@@ -194,10 +194,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function isCyclicLink(Array $pLink) {
-    if(isset($pLink["path"]) && $pLink["path"] != getCurLink()) return false;
-    $query = getCurQuery();
-    if(!isset($pLink["query"])) return strlen($query) ? false : true;
-    return $pLink["query"] == $query;
+    #if(isset($pLink["path"]) && $pLink["path"] != getCurLink()) return false;
+    #if(!isset($pLink["query"])) return strlen(getCurQuery()) ? false : true;
+    if(!isset($pLink["path"])) $pLink["path"] = getCurLink();
+    $destLink = (buildLocalUrl($pLink));
+    $curLink = (buildLocalUrl(array("path"=>getCurLink(), "query"=>getCurQuery())));
+    return $destLink === $curLink;
   }
 
   private function insertTitle(DOMElement $a, $link) {

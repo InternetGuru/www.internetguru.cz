@@ -156,12 +156,12 @@ function parseLocalLink($link, $host=null) {
 
 function buildLocalUrl(Array $pLink) {
   #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
-  if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
-  else return implodeLink($pLink);
-  $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   if(PAGESPEED_OFF && (!isset($pLink["query"]) || strpos($pLink["query"], "PageSpeed=off") === false)) {
     $pLink["query"] = (isset($pLink["query"]) ? $pLink["query"]."&" : "")."PageSpeed=off";
   }
+  if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
+  else return implodeLink($pLink);
+  $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
   if(!isset($pLink["path"]) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
   if($scriptFile == "index.php") return ROOT_URL.implodeLink($pLink);
   $q = array();
