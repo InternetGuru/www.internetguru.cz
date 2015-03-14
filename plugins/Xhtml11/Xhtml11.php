@@ -14,10 +14,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
+  const FAVICON = "favicon.ico";
   const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
+    $this->favIcon = $this->pluginDir."/".self::FAVICON;
     if(self::DEBUG) new Logger("DEBUG");
   }
 
@@ -70,13 +72,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $this->appendMeta($head, "robots", "all");
-    $icoPath = findFile($this->favIcon);
-    if(is_file($icoPath)) {
-      $this->copyToRoot($icoPath, "favicon.ico");
-      $this->appendLinkElement($head, "favicon.ico", "shortcut icon");
-    } else {
-      new Logger(sprintf(_("Favicon %s not found"), $this->favIcon), Logger::LOGGER_WARNING);
-    }
+    $this->copyToRoot(findFile($this->favIcon), self::FAVICON);
+    $this->appendLinkElement($head, self::FAVICON, "shortcut icon");
     $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
     $this->appendJsFiles($head);
@@ -368,6 +365,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $this->addCssFile($n->nodeValue, $media);
         break;
         case "favicon":
+        if(findFile($n->nodeValue) === false) {
+          new Logger(sprintf(_("Favicon %s not found"), $n->nodeValue), Logger::LOGGER_WARNING);
+          break;
+        }
         $this->favIcon = $n->nodeValue;
         break;
       }
