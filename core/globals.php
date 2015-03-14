@@ -290,12 +290,22 @@ function duplicateDir($dir, $deep=true) {
 function initDirs() {
   $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
     LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER);
-  if(!IS_LOCALHOST) $dirs[] = RES_DIR;
+  if(!IS_LOCALHOST) {
+    $dirs[] = RES_DIR;
+    $dirs[] = CMSRES_ROOT_FOLDER."/".CMS_RELEASE;
+  }
   foreach($dirs as $d) {
     if(is_dir($d)) continue;
     if(mkdir($d, 0755, true)) continue;
     throw new Exception(sprintf(_("Unable to create folder %s"), $d));
   }
+}
+
+function initCmsres() {
+  $resDir = CMSRES_ROOT_FOLDER."/".CMS_RELEASE;
+  if(count(scandir($resDir)) != 2) return;
+  $allowedExt = array("css", "js", "png", "jpeg", "jpg", "gif", "svg", "eot", "ttf", "woff");
+  copyFiles(LIB_FOLDER, $resDir."/".LIB_DIR, true, true, $allowedExt);
 }
 
 function initLinks() {
@@ -330,7 +340,7 @@ function initFiles() {
   redirTo(buildLocalUrl(array("path" => getCurLink())), null, sprintf(_("Subdom file %s updated"), $f));
 }
 
-function smartCopy($src, $dest) {
+function smartCopy($src, $dest, $symlink=false) {
   if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"), basename($src)));
   // both are links with same target
   if(file_exists($dest) && is_link($dest) && is_link($src)
@@ -340,6 +350,10 @@ function smartCopy($src, $dest) {
     throw new Exception(sprintf(_("Unable to create directory '%s'"), $destDir));
   if(is_link($src)) {
     createSymlink($dest, readlink($src));
+    return;
+  }
+  if($symlink) {
+    createSymlink($dest, $src);
     return;
   }
   if(!copy($src, $dest)) {
@@ -360,17 +374,18 @@ function deleteRedundantFiles($in, $according) {
   }
 }
 
-function copyFiles($src, $dest, $deep=false) {
+function copyFiles($src, $dest, $deep=false, $symlink=false, Array $allowedExt=array()) {
   if(!is_dir($dest) && !mkdir($dest))
     throw new LoggerException(sprintf(_("Unable to create '%s' folder"), $dest));
   foreach(scandir($src) as $f) {
     if(in_array($f, array(".", ".."))) continue;
     if(is_dir("$src/$f") && !is_link("$src/$f")) {
-      if($deep) copyFiles("$src/$f", "$dest/$f", $deep);
+      if($deep) copyFiles("$src/$f", "$dest/$f", $deep, $symlink, $allowedExt);
       continue;
     }
+    if(!empty($allowedExt) && !in_array(pathinfo($f, PATHINFO_EXTENSION), $allowedExt)) continue;
     if(is_file("$dest/$f") && filemtime("$dest/$f") == filemtime("$src/$f")) continue;
-    smartCopy("$src/$f", "$dest/$f");
+    smartCopy("$src/$f", "$dest/$f", $symlink);
   }
 }
 

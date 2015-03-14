@@ -115,6 +115,7 @@ try {
   require_once(CORE_FOLDER.'/globals.php');
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
   initDirs();
+  if(!IS_LOCALHOST) initCmsres();
   if(!IS_LOCALHOST) initLinks();
   initFiles();
 

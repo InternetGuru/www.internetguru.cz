@@ -13,12 +13,12 @@ class FileHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
-    $this->handleRequest();
-  }
-
-  private function handleRequest() {
     $link = getCurLink();
     if(strpos($link, FILES_DIR."/") !== 0) return;
+    $this->handleFileRequest();
+  }
+
+  private function handleFileRequest() {
     #if(!preg_match("/^".FILEPATH_PATTERN."$/", $link)) return;
     $fInfo = $this->checkLink($link);
     $filePath = realpath($fInfo["filepath"]);
