@@ -1,0 +1,28 @@
+@font-face {
+  font-family: "Flaticon";
+  src: url("flaticon.eot");
+  src: url("flaticon.eot#iefix") format("embedded-opentype"),
+  url("flaticon.woff") format("woff"),
+  url("flaticon.ttf") format("truetype"),
+  url("flaticon.svg") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="flaticon-"],
+[class*=" flaticon-"] {
+  font-family: Flaticon;
+  font-style: normal;
+  width: 1em;
+  display: inline-block;
+  overflow: hidden;
+  word-wrap: normal;
+  vertical-align: sub;
+  visibility: hidden;
+  width: 1em;
+}
+
+.flaticon-drawing3:before {
+  visibility: visible;
+  content: "\e000";
+}
