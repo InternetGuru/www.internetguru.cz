@@ -107,7 +107,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $this->fragToLinks($contentPlus, $ids, "a", "href");
     $this->fragToLinks($contentPlus, $ids, "form", "action");
     $this->fragToLinks($contentPlus, $ids, "object", "data");
-    $this->validateImages($contentPlus);
+    #$this->validateImages($contentPlus);
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement, true);
@@ -148,12 +148,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         #var_dump($a->getAttribute($aName));
         $pUrl = parseLocalLink($a->getAttribute($aName));
         if(is_null($pUrl)) continue; // link is external
-        #var_dump(buildLocalUrl($pUrl));
-        if(isset($pUrl["path"]) && strpos($pUrl["path"], FILES_DIR."/") === 0) { // link to file
-          if(!is_file(USER_FOLDER."/".$pUrl["path"]))
-            throw new Exception(sprintf(_("File %s not found"), $pUrl["path"]));
-          #var_dump($aName, buildLocalUrl($pUrl));
-          $a->setAttribute($aName, buildLocalUrl($pUrl));
+        if(isset($pUrl["path"]) && preg_match("/".FILEPATH_PATTERN."/", $pUrl["path"])) { // link to file
+          if(Cms::isSuperUser() && $eName == "object" && is_file($pUrl["path"])) {
+            $mimeType = getFileMime($pUrl["path"]);
+            if($a->getAttribute("type") != $mimeType)
+              new Logger(sprintf(_("Object %s attribute type invalid or missing: %s"), $pUrl["path"], $mimeType), Logger::LOGGER_ERROR);
+          }
+          $a->setAttribute($aName, ROOT_URL.$pUrl["path"]);
           continue;
         }
         $this->setupLink($a, $aName, $pUrl, $ids);
@@ -216,8 +217,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $toStrip = array();
     foreach($dom->getElementsByTagName("object") as $o) {
       if(!$o->hasAttribute("data")) continue;
-      $dataFile = $o->getAttribute("data");
       if(strpos($dataFile, ROOT_URL) === 0) $dataFile = substr($o->getAttribute("data"), strlen(ROOT_URL));
+      $dataFile = findFile($o->getAttribute("data"));
+      if($dataFile === false) continue;
       try {
         $pUrl = parseLocalLink($dataFile);
       } catch(Exception $e) {
@@ -410,6 +412,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function appendLinkElement(DOMElement $parent, $file, $rel, $type=false, $media=false, $user=true) {
+    /*
     try {
       $f = $file;
       if(!is_null(parseLocalLink($f)) && !is_file($f))
@@ -423,11 +426,12 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       new Logger($comment, Logger::LOGGER_ERROR);
       return;
     }
+    */
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
     if($media) $e->setAttribute("media", $media);
-    $e->setAttribute("href", ROOT_URL.$f);
+    $e->setAttribute("href", ROOT_URL.$file);
     $parent->appendChild($e);
   }
 
@@ -493,6 +497,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function appendJsFiles(DOMElement $parent, $append = self::APPEND_HEAD) {
     foreach($this->jsFilesPriority as $k => $v) {
       if($append != $this->jsFiles[$k]["append"]) continue;
+      /*
       $f = false;
       if(!is_null($this->jsFiles[$k]["file"])) {
         try {
@@ -505,10 +510,11 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           continue;
         }
       }
+      */
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
-      if($f !== false) $e->setAttribute("src", ROOT_URL.$f);
+      if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", ROOT_URL.$this->jsFiles[$k]["file"]);
       $parent->appendChild($e);
     }
   }

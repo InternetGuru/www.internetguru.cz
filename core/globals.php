@@ -9,49 +9,13 @@ function __autoload($className) {
   throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
-function findFile($file, $user=true, $admin=true, $res=false) {
-  try {
-    $resFolder = $res && !IS_LOCALHOST ? $resFolder = RES_DIR : false;
-    $f = USER_FOLDER."/$file";
-    if($user && is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
-    $f = ADMIN_FOLDER."/$file";
-    if($admin && is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
-    $f = $file;
-    if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
-    if($res && !IS_LOCALHOST) $resFolder = CMSRES_ROOT_DIR."/".CMS_RELEASE;
-    $f = CMS_FOLDER."/$file";
-    if(is_file($f)) return $resFolder ? getRes($f, $file, $resFolder) : $f;
-  } catch(Exception $e) {
-    new Logger($e->getMessage(), "error");
-  }
+function findFile($filePath, $user=true, $admin=true) {
+  if($user && is_file(USER_FOLDER."/$filePath")) return USER_FOLDER."/$filePath";
+  if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
+  if(is_file($filePath)) return $filePath;
+  if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
+  #todo: return null (keep type)
   return false;
-}
-
-function getRes($res, $dest, $resFolder) {
-  if($resFolder === false) return $res;
-  #TODO: check mime==ext, allowed types, max size
-  $folders = array(preg_quote(CMS_FOLDER, "/"));
-  if(defined("ADMIN_FOLDER")) $folders[] = preg_quote(ADMIN_FOLDER, "/");
-  if(defined("USER_FOLDER")) $folders[] = preg_quote(USER_FOLDER, "/");
-  if(!preg_match("/^(?:".implode("|", $folders).")\/(".FILEPATH_PATTERN.")$/", $res, $m)) {
-    throw new Exception(sprintf(_("Forbidden file name '%s' format to copy to '%s' folder"), $res, $resFolder));
-  }
-  $mime = getFileMime($res);
-  if(strpos($res, CMS_FOLDER) !== 0 && $mime != "text/plain" && strpos($mime, "image/") !== 0) {
-    throw new Exception(sprintf(_("Forbidden MIME type '%s' to copy '%s' to '%s' folder"), $mime, $m[1], $resFolder));
-  }
-  $newRes = $resFolder."/$dest";
-  $newDir = pathinfo($newRes, PATHINFO_DIRNAME);
-  if(!is_dir($newDir) && !mkdirGroup($newDir, 0775, true)) {
-    throw new Exception(sprintf(_("Unable to create directory structure '%s'"), $newDir));
-  }
-  if(is_link($newRes) && readlink($newRes) == $res) return $newRes;
-  if(!symlink($res, "$newRes~") || !rename("$newRes~", $newRes)) {
-    throw new Exception(sprintf(_("Unable to create symlink '%s' for '%s'"), $newRes, $m[1]));
-  }
-  #if(!chmodGroup($newRes, 0664))
-  #  throw new Exception(sprintf(_("Unable to chmod resource file '%x'"), $newRes);
-  return $newRes;
 }
 
 function createSymlink($link, $target) {
@@ -245,13 +209,37 @@ function safeRewriteFile($src, $dest, $keepOld=true) {
 }
 
 function safeRewrite($content, $dest) {
-  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true)) return false;
-  if(!file_exists($dest)) return file_put_contents($dest, $content);
-  $b = file_put_contents("$dest.new", $content);
-  if($b === false) return false;
-  if(!copy($dest, "$dest.old")) return false;
-  if(!rename("$dest.new", $dest)) return false;
-  return $b;
+  $lock = null;
+  $lockNew = null;
+  try {
+    $lock = lockFile(dirname($dest));
+    if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true)) throw new Exception("x");
+    unlockFile($lock);
+
+    $lock = lockFile($dest);
+    if(!file_exists($dest)) {
+      if(!file_put_contents($dest, $content)) throw new Exception("x");
+      unlockFile($lock);
+      return true;
+    }
+
+    $lockNew = lockFile("$dest.new");
+    $b = file_put_contents("$dest.new", $content);
+    if($b === false) throw new Exception("x");
+
+    $lock = lockFile("$dest.old");
+    if(!copy($dest, "$dest.old")) throw new Exception("x");
+    unlockFile($lock);
+
+    $lock = lockFile($dest);
+    if(!rename("$dest.new", $dest)) throw new Exception("x");
+    unlockFile($lock);
+    unlockFile($lockNew);
+    return $b;
+  } catch(Exception $e) {}
+  unlockFile($lock);
+  unlockFile($lockNew);
+  return false;
 }
 
 function safeRemoveDir($dir) {
@@ -290,10 +278,6 @@ function duplicateDir($dir, $deep=true) {
 function initDirs() {
   $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
     LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER);
-  if(!IS_LOCALHOST) {
-    $dirs[] = RES_DIR;
-    $dirs[] = CMSRES_ROOT_FOLDER."/".CMS_RELEASE;
-  }
   foreach($dirs as $d) {
     if(is_dir($d)) continue;
     if(mkdir($d, 0755, true)) continue;
@@ -301,15 +285,8 @@ function initDirs() {
   }
 }
 
-function initCmsres() {
-  $resDir = CMSRES_ROOT_FOLDER."/".CMS_RELEASE;
-  if(count(scandir($resDir)) != 2) return;
-  $allowedExt = array("css", "js", "png", "jpeg", "jpg", "gif", "svg", "eot", "ttf", "woff");
-  copyFiles(LIB_FOLDER, $resDir."/".LIB_DIR, true, true, $allowedExt);
-}
-
 function initLinks() {
-  $links = array(CMSRES_ROOT_DIR => CMSRES_ROOT_FOLDER);
+  $links = array();
   foreach(scandir(CMS_ROOT_FOLDER) as $f) {
     if(strpos($f, ".") === 0) continue;
     if(!is_dir(CMS_ROOT_FOLDER."/$f")) continue;
@@ -345,20 +322,55 @@ function smartCopy($src, $dest, $symlink=false) {
   // both are links with same target
   if(file_exists($dest) && is_link($dest) && is_link($src)
     && readlink($dest) == readlink($src)) return;
-  $destDir = dirname($dest);
-  if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
-    throw new Exception(sprintf(_("Unable to create directory '%s'"), $destDir));
-  if(is_link($src)) {
-    createSymlink($dest, readlink($src));
-    return;
+  $e = null;
+  $lock = null;
+  try {
+    $destDir = dirname($dest);
+    $lock = lockFile($destDir);
+    if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
+      throw new Exception(sprintf(_("Unable to create directory '%s'"), $destDir));
+    unlockFile($lock);
+    if(is_link($src)) {
+      $lock = lockFile($dest);
+      createSymlink($dest, readlink($src));
+      unlockFile($lock);
+      return;
+    }
+    if($symlink) {
+      $lock = lockFile($dest);
+      createSymlink($dest, $src);
+      unlockFile($lock);
+      return;
+    }
+    $lock = lockFile($dest);
+    if(!copy($src, $dest) || !touch($dest, filemtime($src))) {
+      throw new Exception(sprintf(_("Unable to copy '%s' to '%s'"), $src, $dest));
+    }
+    unlockFile($lock);
+  } catch(Exception $e) {}
+  if(is_null($e)) return;
+  unlockFile($lock);
+  throw $e;
+}
+
+function lockFile($filePath) {
+  $fp = fopen("$filePath.lock", "c");
+  $i = 0;
+  while(!flock($fp, LOCK_EX)) {
+    touch("DIED.txt");
+    die();
+    usleep(rand(10, 200));
+    if($i++ <= 10) continue;
+    fclose($fp);
+    throw new Exception(_("Unable to acquire file lock").(CMS_DEBUG ? " $filePath.lock" : ""));
   }
-  if($symlink) {
-    createSymlink($dest, $src);
-    return;
-  }
-  if(!copy($src, $dest)) {
-    throw new Exception(sprintf(_("Unable to copy '%s' to '%s'"), $src, $dest));
-  }
+  return $fp;
+}
+
+function unlockFile($fp) {
+  if(is_null($fp)) return;
+  flock($fp, LOCK_UN);
+  fclose($fp);
 }
 
 function deleteRedundantFiles($in, $according) {

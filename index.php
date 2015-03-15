@@ -69,10 +69,6 @@ try {
       $userId = substr($f, 6);
     }
     define('ADMIN_ID', $userId);
-    define('CMSRES_ROOT_DIR', "cmsres");
-    define('CMSRES_ROOT_FOLDER', WWW_FOLDER."/".CMSRES_ROOT_DIR);
-    #define("APACHE_RESTART_FILEPATH", CMSRES_ROOT_FOLDER."/APACHE_RESTART");
-    define('RES_DIR', "res");
     define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
     define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
     define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);
@@ -115,7 +111,6 @@ try {
   require_once(CORE_FOLDER.'/globals.php');
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
   initDirs();
-  if(!IS_LOCALHOST) initCmsres();
   if(!IS_LOCALHOST) initLinks();
   initFiles();
 
