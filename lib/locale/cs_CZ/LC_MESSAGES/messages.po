@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-13 10:45+0100\n"
-"PO-Revision-Date: 2015-03-13 10:46+0100\n"
+"POT-Creation-Date: 2015-03-15 01:04+0100\n"
+"PO-Revision-Date: 2015-03-15 01:04+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.4\n"
+"X-Generator: Poedit 1.7.5\n"
 "X-Poedit-Basepath: .\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -74,93 +74,93 @@ msgstr "Obsah není nastaven"
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:63
+#: D:\wamp\www\cms/core/DOMBuilder.php:68
 #, php-format
 msgid "Link %s not found"
 msgstr "Odkaz %s nebyl nalezen"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:136
+#: D:\wamp\www\cms/core/DOMBuilder.php:141
 #, php-format
 msgid "Unable to admin-update XML: %s"
 msgstr "Nepodařilo se aplikovat administrátorské XML: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:147
+#: D:\wamp\www\cms/core/DOMBuilder.php:152
 #, php-format
 msgid "Unable to user-update XML: %s"
 msgstr "Nepodařilo se aplikovat uživatelské XML: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:154
-#: D:\wamp\www\cms/core/globals.php:331
+#: D:\wamp\www\cms/core/DOMBuilder.php:159
+#: D:\wamp\www\cms/core/globals.php:344
 #, php-format
 msgid "File '%s' not found"
 msgstr "Soubor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:174
+#: D:\wamp\www\cms/core/DOMBuilder.php:179
 #, php-format
 msgid "Unable to load '%s': %s"
 msgstr "Nepodařilo se načíst soubor '%s': %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:182
+#: D:\wamp\www\cms/core/DOMBuilder.php:187
 #, php-format
 msgid "Failed to load user/admin/default file %s: %s"
 msgstr "Nepodařilo se načíst uživatelský/admin/výchozí soubor %s: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:191
+#: D:\wamp\www\cms/core/DOMBuilder.php:196
 #, php-format
 msgid "File '%s' already included"
 msgstr "Soubor '%s' byl již vložen"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:196
+#: D:\wamp\www\cms/core/DOMBuilder.php:201
 #, php-format
 msgid "File disabled"
 msgstr "Soubor je neaktivní"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:200
+#: D:\wamp\www\cms/core/DOMBuilder.php:205
 #, php-format
 msgid "Invalid XML file %s"
 msgstr "Chybný XML soubor %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:217
+#: D:\wamp\www\cms/core/DOMBuilder.php:222
 #, php-format
 msgid "HTML+ file %s autocorrected: %s"
 msgstr "HTML+ soubor %s byl automaticky opraven: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:245
+#: D:\wamp\www\cms/core/DOMBuilder.php:250
 #, php-format
 msgid "Duplicit prefix %s in %s renamed to %s"
 msgstr "Duplicitní prefix %s v %s přejmenován na %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:294
+#: D:\wamp\www\cms/core/DOMBuilder.php:299
 #, php-format
 msgid "Duplicit link %s skipped"
 msgstr "Byl vynechán duplicitní link %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:359
+#: D:\wamp\www\cms/core/DOMBuilder.php:364
 #, php-format
 msgid "Inserted %s of %s HTML+ file(s)"
 msgstr "Vloženo %s z %s HTML+ souborů"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:368
+#: D:\wamp\www\cms/core/DOMBuilder.php:373
 #, php-format
 msgid "Included file '%s' not found"
 msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:371
+#: D:\wamp\www\cms/core/DOMBuilder.php:376
 #, php-format
 msgid "Included file extension '%s' must be .html"
 msgstr "Přípona vkládaného souboru '%s' musí být .html"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:373
+#: D:\wamp\www\cms/core/DOMBuilder.php:378
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:379
+#: D:\wamp\www\cms/core/DOMBuilder.php:384
 #, php-format
 msgid "Unable to import '%s': %s"
 msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:387
+#: D:\wamp\www\cms/core/DOMBuilder.php:392
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -168,12 +168,12 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:399
+#: D:\wamp\www\cms/core/DOMBuilder.php:404
 #, php-format
 msgid "HTML+ autocorrected after inserting '%s': %s"
 msgstr "HTML+ automaticky opraven po vložení souboru '%s': %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:450
+#: D:\wamp\www\cms/core/DOMBuilder.php:455
 #, php-format
 msgid "ID '%s' conflicts with element '%s'"
 msgstr "Atribut ID '%s' koliduje s elementem '%s'"
@@ -225,7 +225,7 @@ msgstr "Do '%s' nelze vložit proměnnou typu pole"
 msgid "Cannot modify attribute %s in element %s"
 msgstr "Nepodařilo se změnit atribut %s v elementu %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:278
+#: D:\wamp\www\cms/core/DOMElementPlus.php:279
 #, php-format
 msgid "Attribute '%s' stripped"
 msgstr "Atribut '%s' byl odstraněn"
@@ -419,79 +419,79 @@ msgstr "Přesměrování na '%s'"
 msgid "Unable to parse href '%s'"
 msgstr "Nelze zpracovat atribut href '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:224
+#: D:\wamp\www\cms/core/globals.php:227
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: D:\wamp\www\cms/core/globals.php:230 D:\wamp\www\cms/core/globals.php:265
+#: D:\wamp\www\cms/core/globals.php:233 D:\wamp\www\cms/core/globals.php:268
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/globals.php:232
+#: D:\wamp\www\cms/core/globals.php:235
 msgid "Unable to create directory structure"
 msgstr "Nelze vytvořit adresářovou strukturu"
 
-#: D:\wamp\www\cms/core/globals.php:234
+#: D:\wamp\www\cms/core/globals.php:237
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:236
+#: D:\wamp\www\cms/core/globals.php:239
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:238
+#: D:\wamp\www\cms/core/globals.php:241
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: D:\wamp\www\cms/core/globals.php:240
+#: D:\wamp\www\cms/core/globals.php:243
 msgid "Unable to delete.old file"
 msgstr "Nepodařilo se smazat soubor .old"
 
-#: D:\wamp\www\cms/core/globals.php:272
+#: D:\wamp\www\cms/core/globals.php:275
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:278
+#: D:\wamp\www\cms/core/globals.php:281
 #, php-format
 msgid "Directory '%s' not found"
 msgstr "Složka '%s' nebyla nalezena"
 
-#: D:\wamp\www\cms/core/globals.php:294
+#: D:\wamp\www\cms/core/globals.php:300
 #, php-format
 msgid "Unable to create folder %s"
 msgstr "Nepodařilo se vytvořit složku %s"
 
-#: D:\wamp\www\cms/core/globals.php:327
+#: D:\wamp\www\cms/core/globals.php:340
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: D:\wamp\www\cms/core/globals.php:337
+#: D:\wamp\www\cms/core/globals.php:350
 #, php-format
 msgid "Unable to create directory '%s'"
 msgstr "Nelze vytvořit složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:343
+#: D:\wamp\www\cms/core/globals.php:360
 #, php-format
 msgid "Unable to copy '%s' to '%s'"
 msgstr "Nepodařilo se zkopírovat '%s' na '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:362
+#: D:\wamp\www\cms/core/globals.php:379
 #, php-format
 msgid "Unable to create '%s' folder"
 msgstr "Nepodařilo se vytvořit složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:397
+#: D:\wamp\www\cms/core/globals.php:415
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: D:\wamp\www\cms/core/globals.php:412
+#: D:\wamp\www\cms/core/globals.php:430
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: D:\wamp\www\cms/core/globals.php:462
+#: D:\wamp\www\cms/core/globals.php:480
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
@@ -504,17 +504,17 @@ msgstr "Metoda %s již není k dispozici"
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: D:\wamp\www\cms/index.php:142
+#: D:\wamp\www\cms/index.php:143
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: D:\wamp\www\cms/index.php:147
+#: D:\wamp\www\cms/index.php:148
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: D:\wamp\www\cms/index.php:148
+#: D:\wamp\www\cms/index.php:149
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -809,61 +809,61 @@ msgstr "Nepodařilo se aplikovat transformaci '%s'"
 
 #: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:32
 #, php-format
-msgid "Unable to handle image: %s"
-msgstr "Nepodařilo se zpracovat obrázek: %s"
+msgid "Unable to handle image %s: %s"
+msgstr "Nepodařilo se zpracovat obrázek %s: %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:40
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:39
 #, php-format
 msgid "The requested URL '%s' was not found on this server."
 msgstr "Požadovaná URL adresa '%s' nebyla na serveru nalezena"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:63
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:62
 #, php-format
 msgid "Unsupported mime type '%s'"
 msgstr "Nepodporovaný MIME typ '%s'"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:71
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:70
 #, php-format
 msgid "File %s is empty"
 msgstr "Soubor %s je prázdný"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:73
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:72
 #, php-format
 msgid "File %s size %s is exceeding variable limit %s"
 msgstr "Soubor %s o velikosti %s přesahuje limitní velikost %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:76
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:75
 #, php-format
 msgid "File %s size %s is exceeding global limit %s"
 msgstr "Soubor %s o velikosti %s přesahuje globální limit %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:95
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:94
 #, php-format
 msgid "Unable to pass file %s"
 msgstr "Nepodařilo se poslat soubor %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:119
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:118
 msgid "Unable to create temporary folder"
 msgstr "Nepodařilo se vytvořit dočasnou složku"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:124
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:123
 msgid "Image dimensions are over limit"
 msgstr "Rozměry obrázku přesahují limit"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:132
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:131
 #, php-format
 msgid "Unable to resize image %s"
 msgstr "Nepodařilo se zmenšit obrázek %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:135
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:134
 msgid "Generated image is too big"
 msgstr "Vygenerovaný obrázek je příliš veliký"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:138
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:137
 msgid "Unable to create temporary image"
 msgstr "Nepodařilo se vytvořit dočasný soubor s obrázkem"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:146
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:145
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
@@ -932,94 +932,97 @@ msgstr "Obsah"
 msgid "Ignored cyclic redirection to %s"
 msgstr "Ignorováno cyklické přesměrování na %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:32
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:34
 msgid "Select all"
 msgstr "Vybrat vše"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:78
-#, php-format
-msgid "Favicon %s not found"
-msgstr "Nepodařilo se nalézt ikonu (favicon) %s"
-
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:99
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:96
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:138
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:135
 #, php-format
 msgid "Removed duplicit id %s"
 msgstr "Odstraněn duplicitní identifikátor %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:157
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:154
 #, php-format
 msgid "File %s not found"
 msgstr "Nebyl nalezen soubor %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:186
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:185
 #, php-format
 msgid "Removed cyclic link %s"
 msgstr "Odstraněn cyklický odkaz %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:190
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:192
 #, php-format
 msgid "Removed local fragment to undefined id %s"
 msgstr "Odstraněn lokální fragment na neexistující identifikátor %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:221
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:232
 #, php-format
 msgid "Object data '%s' not found"
 msgstr "Cílový soubor elementu object '%s' nebyl nenalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:227
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:238
 #, php-format
 msgid "Invalid object '%s' MIME type '%s'"
 msgstr "Element object '%s' má chybný MIME typ '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:230
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:241
 #, php-format
 msgid "Object '%s' attribute type set to '%s'"
 msgstr "Atribut elementu '%s' byl nastaven na '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:235
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:246
 #, php-format
 msgid "Parameter 'full' removed from data attribute '%s'"
 msgstr "Odstraněn parametr 'full' z atributu data '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:291
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:302
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:324
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:335
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:369
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:371
+#, php-format
+msgid "Favicon %s not found"
+msgstr "Nepodařilo se nalézt ikonu (favicon) %s"
+
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:384
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:371
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:386
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:406
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:421
 #, php-format
 msgid "Link [%s] file '%s' not found"
 msgstr "Zdroj elementu link [%s] '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:487
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:502
 #, php-format
 msgid "Javascript file '%s' not found"
 msgstr "Soubor s javascriptem '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:519
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:534
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "Unable to handle image: %s"
+#~ msgstr "Nepodařilo se zpracovat obrázek: %s"
 
 #~ msgid "Unable to regenerate session ID"
 #~ msgstr "Nepodařilo se obnovit identifikátor relace"

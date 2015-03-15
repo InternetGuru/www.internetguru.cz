@@ -29,8 +29,7 @@ class FileHandler extends Plugin implements SplObserver {
     try {
       $this->handleImage($filePath);
     } catch(Exception $e) {
-      new ErrorPage(sprintf(_("Unable to handle image: %s")
-        , CMS_DEBUG ? $e->getMessage() : $fInfo["filepath"]), 500);
+      new ErrorPage(sprintf(_("Unable to handle image %s: %s"), $link, $e->getMessage()), 500);
     }
   }
 
