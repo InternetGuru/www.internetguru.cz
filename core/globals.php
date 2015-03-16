@@ -282,7 +282,7 @@ function smartCopy($src, $dest) {
 
 function lockFile($filePath) {
   if(!is_file($filePath)) throw new Exception(_("File does not exist"));
-  $fp = @fopen($fileName, "r+");
+  $fp = @fopen($filePath, "r+");
   if(!$fp) throw new Exception(_("Unable to open file"));
   $start_time = microtime(true);
   do {
