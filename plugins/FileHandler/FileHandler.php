@@ -2,18 +2,12 @@
 
 class FileHandler extends Plugin implements SplObserver {
   private $maxFileSize;
-  private $modes;
   const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1);
     $this->maxFileSize = 50*1024*1024;
-    $this->modes = array(
-      "normal" => array(1000, 1000, 225*1024, 85),
-      "thumb" => array(200, 200, 50*1024, 85),
-      "big" => array(1500, 1500, 350*1024, 75),
-      "full" => array(0, 0, 0, 0));
   }
 
   public function update(SplSubject $subject) {
@@ -23,22 +17,8 @@ class FileHandler extends Plugin implements SplObserver {
       && strpos(getCurLink(), THEMES_DIR."/") !== 0 && strpos(getCurLink(), PLUGINS_DIR."/") !== 0)
       throw new Exception(_("File illegal path"));
     try {
-      $dest = getCurLink();
-      $mode = null;
-      $src = findFile($dest);
-      if(!$src) {
-        $pLink = explode("/", $dest);
-        if(count($pLink) > 2 && isset($this->modes[$pLink[1]])) {
-          $mode = $pLink[1];
-          unset($pLink[1]);
-          $src = findFile(implode("/", $pLink));
-        }
-        if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
-      }
-      $fp = lockFile($src);
-      if(!is_file($dest)) $this->handleFile($src, $dest, $mode);
-      unlockFile($fp);
-      redirTo(ROOT_URL.$dest);
+      $this->handleFile();
+      redirTo(ROOT_URL.getCurLink());
     } catch(Exception $e) {
       $errno = 500;
       if($e->getCode() != 0) $errno = $e->getCode();
@@ -46,10 +26,35 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
-  private function handleFile($src, $dest, $mode) {
+  private function handleFile() {
+    $mode = "";
+    $dest = getCurLink();
+    $src = findFile($dest);
+    $pLink = explode("/", $dest);
+    if(count($pLink) > 2) {
+      $mode = $pLink[1];
+      if($src === false) {
+        unset($pLink[1]);
+        $src = findFile(implode("/", $pLink));
+      }
+    }
+    if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
+    $fp = lockFile($src);
+    if(is_file($dest)) {
+      unlockFile($fp);
+      return;
+    }
     $mimeType = getFileMime($src);
     if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
-      $this->handleImage(realpath($src), $dest, $mimeType, $mode);
+      $modes = array(
+        "" => array(1000, 1000, 225*1024, 85), // default, eg. resources like icons
+        "images" => array(1000, 1000, 225*1024, 85),
+        "thumbs" => array(200, 200, 50*1024, 85),
+        "bigimages" => array(1500, 1500, 350*1024, 75),
+        "fullimages" => array(0, 0, 0, 0));
+      if(!isset($modes[$mode])) throw new Exception(_("Unknown image mode"));
+      $this->handleImage(realpath($src), $dest, $modes[$mode]);
+      unlockFile($fp);
       return;
     }
     $registeredMime = array(
@@ -62,28 +67,27 @@ class FileHandler extends Plugin implements SplObserver {
     if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
       throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
     copy_plus($src, $dest);
+    unlockFile($fp);
   }
 
-  private function handleImage($src, $dest, $mimeType, $mode) {
-    reset($this->modes);
-    $v = is_null($mode) ? current($this->modes) : $this->modes[$mode];
+  private function handleImage($src, $dest, $mode) {
     $i = $this->getImageSize($src);
-    if($i[0] < $v[0] && $i[1] < $v[1]) {
+    if($i[0] < $mode[0] && $i[1] < $mode[1]) {
       $fileSize = filesize($src);
-      if($fileSize > $v[2])
-        throw new Exception(sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($v[2])));
+      if($fileSize > $mode[2])
+        throw new Exception(sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($mode[2])));
       copy_plus($src, $dest);
       return;
     }
     $im = new Imagick($src);
-    $im->setImageCompressionQuality($v[3]);
-    if($i[0] > $i[1]) $result = $im->thumbnailImage($v[0], 0);
-    else $result = $im->thumbnailImage(0, $v[1]);
+    $im->setImageCompressionQuality($mode[3]);
+    if($i[0] > $i[1]) $result = $im->thumbnailImage($mode[0], 0);
+    else $result = $im->thumbnailImage(0, $mode[1]);
     #var_dump($im->getImageLength());
     $imBin = $im->__toString();
     if(!$result || !strlen($imBin))
       throw new Exception(_("Unable to resize image"));
-    if(strlen($imBin) > $v[2])
+    if(strlen($imBin) > $mode[2])
       throw new Exception(_("Generated image is too big"));
     mkdir_plus(dirname($dest));
     $b = file_put_contents($dest, $imBin);
