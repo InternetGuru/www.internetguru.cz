@@ -133,8 +133,8 @@ try {
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
-  if(Cms::isSuperUser()) duplicateDir(USER_FOLDER);
-  if(Cms::isSuperUser()) duplicateDir(ADMIN_FOLDER);
+  #if(Cms::isSuperUser()) duplicateDir(USER_FOLDER);
+  #if(Cms::isSuperUser()) duplicateDir(ADMIN_FOLDER);
   echo Cms::getOutput();
   new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time, false);
 
