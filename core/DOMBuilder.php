@@ -217,8 +217,6 @@ class DOMBuilder {
     } catch(Exception $e) {
       $doc->validatePlus(true);
       if(strpos($filePath, CMS_FOLDER) !== 0) {
-        #if(!safeRewrite($doc->saveXML(), $filePath))
-        #  throw new Exception(sprintf(_("Unable to save autocorrected file: %s"), $e->getMessage()));
         new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
       }
     }

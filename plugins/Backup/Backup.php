@@ -29,9 +29,14 @@ class Backup extends Plugin implements SplObserver {
       $src = "$dir/$file";
       $dest = $backupDir."/".$this->getBackupFileName("$dir/$file");
       // both are files within given age gap
-      if(is_file($dest) && !is_link($dest) && !is_link($src)
-        && filemtime($dest) > time()-60*60) continue;
-      smartCopy($src, $dest);
+      if(is_file($dest) && !is_link($dest) && !is_link($src) && filemtime($dest) > time()-60*60) continue;
+      $fp = lockFile($src);
+      if(is_file($dest) && !is_link($dest) && !is_link($src) && filemtime($dest) > time()-60*60) {
+        unlockFile($fp);
+        continue;
+      }
+      copy_plus($src, $dest);
+      unlockFile($fp);
     }
   }
 

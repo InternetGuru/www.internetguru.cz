@@ -12,8 +12,6 @@ class Logger {
   function __construct($message, $type=null, $start_time=null, $cmsMsg = true) {
     if(!is_null($start_time))
       $this->duration = round((microtime(true) - $start_time)*1000)."ms";
-    if(!is_dir(LOG_FOLDER) && !mkdir(LOG_FOLDER, 0755, true))
-      throw new Exception(sprintf(_("Unable to create log dir '%s'"), LOG_FOLDER));
     if(!in_array($type, array(
       self::LOGGER_FATAL,
       self::LOGGER_ERROR,

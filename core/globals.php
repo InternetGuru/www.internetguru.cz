@@ -104,7 +104,7 @@ function implodeLink(Array $p, $query=true) {
 
 function parseLocalLink($link, $host=null) {
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
+  if($pLink === false) throw new LoggerExceptoin(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
   if(isset($pLink["path"])) $pLink["path"] = trim($pLink["path"], "/");
   if(isset($pLink["scheme"])) {
@@ -134,20 +134,6 @@ function buildLocalUrl(Array $pLink) {
   if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
   if(count($q)) $pLink["query"] = implode("&", $q);
   return ROOT_URL.implodeLink($pLink);
-}
-
-function chmodGroup($file, $mode) {
-  $oldMask = umask(002);
-  $chmod = chmod($file, $mode);
-  umask($oldMask);
-  return $chmod;
-}
-
-function mkdirGroup($dir, $mode=0777, $rec=false) {
-  $oldMask = umask(002);
-  $dirMade = mkdir($dir, $mode, $rec);
-  umask($oldMask);
-  return $dirMade;
 }
 
 function __toString($o) {
@@ -192,11 +178,10 @@ function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
   return $s;
 }
 
-function safeRewriteFile($src, $dest, $keepOld=true) {
-  if(!file_exists($src))
+function copy_plus($src, $dest, $keepOld=true) {
+  if(!is_file($src))
     throw new LoggerException(sprinft(_("Source file '%s' not found"), $src));
-  if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true))
-    throw new LoggerException(_("Unable to create directory structure"));
+  mkdir_plus(dirname($dest));
   if(!is_link($dest) && is_file($dest) && !copy($dest, "$dest.old"))
     throw new LoggerException(_("Unable to backup destination file"));
   if(!copy($src, "$dest.new"))
@@ -208,38 +193,10 @@ function safeRewriteFile($src, $dest, $keepOld=true) {
   return true;
 }
 
-function safeRewrite($content, $dest) {
-  $lock = null;
-  $lockNew = null;
-  try {
-    $lock = lockFile(dirname($dest));
-    if(!file_exists(dirname($dest)) && !@mkdir(dirname($dest), 0775, true)) throw new Exception("x");
-    unlockFile($lock);
-
-    $lock = lockFile($dest);
-    if(!file_exists($dest)) {
-      if(!file_put_contents($dest, $content)) throw new Exception("x");
-      unlockFile($lock);
-      return true;
-    }
-
-    $lockNew = lockFile("$dest.new");
-    $b = file_put_contents("$dest.new", $content);
-    if($b === false) throw new Exception("x");
-
-    $lock = lockFile("$dest.old");
-    if(!copy($dest, "$dest.old")) throw new Exception("x");
-    unlockFile($lock);
-
-    $lock = lockFile($dest);
-    if(!rename("$dest.new", $dest)) throw new Exception("x");
-    unlockFile($lock);
-    unlockFile($lockNew);
-    return $b;
-  } catch(Exception $e) {}
-  unlockFile($lock);
-  unlockFile($lockNew);
-  return false;
+function mkdir_plus($dir, $mode=0775, $recursive=true) {
+  if(is_dir($dir)) return;
+  @mkdir($dir, $mode, $recursive); // race condition
+  if(!is_dir($dir)) throw new Exception(_("Unable to create directory"));
 }
 
 function safeRemoveDir($dir) {
@@ -277,12 +234,8 @@ function duplicateDir($dir, $deep=true) {
 
 function initDirs() {
   $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
-    LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER);
-  foreach($dirs as $d) {
-    if(is_dir($d)) continue;
-    if(mkdir($d, 0755, true)) continue;
-    throw new Exception(sprintf(_("Unable to create folder %s"), $d));
-  }
+    LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER, LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR);
+  foreach($dirs as $d) mkdir_plus($d);
 }
 
 function initLinks() {
@@ -312,59 +265,31 @@ function initFiles() {
   if(basename($_SERVER["SCRIPT_NAME"]) != $f) return;
   $src = CMS_FOLDER."/".SERVER_FILES_DIR."/$f";
   if(filemtime($src) == filemtime($f)) return;
-  safeRewriteFile($src, $f);
+  $fp = lockFile($src);
+  if(filemtime($src) == filemtime($f)) {
+    unlockFile($fp);
+    return;
+  }
+  copy_plus($src, $f);
   touch($f, filemtime($src));
+  unlockFile($fp);
   redirTo(buildLocalUrl(array("path" => getCurLink())), null, sprintf(_("Subdom file %s updated"), $f));
 }
 
-function smartCopy($src, $dest, $symlink=false) {
-  if(!file_exists($src)) throw new Exception(sprintf(_("File '%s' not found"), basename($src)));
-  // both are links with same target
-  if(file_exists($dest) && is_link($dest) && is_link($src)
-    && readlink($dest) == readlink($src)) return;
-  $e = null;
-  $lock = null;
-  try {
-    $destDir = dirname($dest);
-    $lock = lockFile($destDir);
-    if(!is_dir($destDir) && !mkdir($destDir, 0755, true))
-      throw new Exception(sprintf(_("Unable to create directory '%s'"), $destDir));
-    unlockFile($lock);
-    if(is_link($src)) {
-      $lock = lockFile($dest);
-      createSymlink($dest, readlink($src));
-      unlockFile($lock);
-      return;
-    }
-    if($symlink) {
-      $lock = lockFile($dest);
-      createSymlink($dest, $src);
-      unlockFile($lock);
-      return;
-    }
-    $lock = lockFile($dest);
-    if(!copy($src, $dest) || !touch($dest, filemtime($src))) {
-      throw new Exception(sprintf(_("Unable to copy '%s' to '%s'"), $src, $dest));
-    }
-    unlockFile($lock);
-  } catch(Exception $e) {}
-  if(is_null($e)) return;
-  unlockFile($lock);
-  throw $e;
+function smartCopy($src, $dest) {
+  throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
 }
 
 function lockFile($filePath) {
-  $fp = fopen("$filePath.lock", "c");
-  $i = 0;
-  while(!flock($fp, LOCK_EX)) {
-    touch("DIED.txt");
-    die();
-    usleep(rand(10, 200));
-    if($i++ <= 10) continue;
-    fclose($fp);
-    throw new Exception(_("Unable to acquire file lock").(CMS_DEBUG ? " $filePath.lock" : ""));
-  }
-  return $fp;
+  if(!is_file($filePath)) throw new Exception(_("File does not exist"));
+  $fp = @fopen($fileName, "r+");
+  if(!$fp) throw new Exception(_("Unable to open file"));
+  $start_time = microtime(true);
+  do {
+    if(flock($fp, LOCK_EX|LOCK_NB)) return $fp;
+    usleep(rand(10, 500));
+  } while(microtime(true) < $start_time+FILE_LOCK_WAIT_SEC);
+  throw new Exception(_("Unable to acquire file lock"));
 }
 
 function unlockFile($fp) {
@@ -386,18 +311,23 @@ function deleteRedundantFiles($in, $according) {
   }
 }
 
-function copyFiles($src, $dest, $deep=false, $symlink=false, Array $allowedExt=array()) {
-  if(!is_dir($dest) && !mkdir($dest))
-    throw new LoggerException(sprintf(_("Unable to create '%s' folder"), $dest));
+function copyFiles($src, $dest, $deep=false) {
+  mkdir_plus($dest);
   foreach(scandir($src) as $f) {
     if(in_array($f, array(".", ".."))) continue;
     if(is_dir("$src/$f") && !is_link("$src/$f")) {
-      if($deep) copyFiles("$src/$f", "$dest/$f", $deep, $symlink, $allowedExt);
+      if($deep) copyFiles("$src/$f", "$dest/$f", $deep);
       continue;
     }
-    if(!empty($allowedExt) && !in_array(pathinfo($f, PATHINFO_EXTENSION), $allowedExt)) continue;
+    #if(!empty($allowedExt) && !in_array(pathinfo($f, PATHINFO_EXTENSION), $allowedExt)) continue;
     if(is_file("$dest/$f") && filemtime("$dest/$f") == filemtime("$src/$f")) continue;
-    smartCopy("$src/$f", "$dest/$f", $symlink);
+    $fp = lockFile("$src/$f");
+    if(is_file("$dest/$f") && filemtime("$dest/$f") == filemtime("$src/$f")) {
+      unlockFile($fp);
+      continue;
+    }
+    copy_plus("$src/$f", "$dest/$f");
+    unlockFile($fp);
   }
 }
 

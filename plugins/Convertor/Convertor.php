@@ -17,8 +17,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     parent::__construct($s);
     $s->setPriority($this, 5);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
-    if(is_dir($this->tmpFolder) || mkdir($this->tmpFolder, 0755, true)) return;
-    throw new Exception(_("Unable to create convertor tmp folder"));
+    mkdir_plus($this->tmpFolder);
   }
 
   public function update(SplSubject $subject) {

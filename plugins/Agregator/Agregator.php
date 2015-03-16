@@ -51,9 +51,10 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function createList(&$list, $rootDir, $subDir=null) {
-    if(!is_dir($rootDir)) {
-      if(!mkdir($rootDir, 0775, true))
-        new Logger(_("Unable to create Agregator temporary folder"), Logger::LOGGER_WARNING);
+    try {
+      mkdir_plus($rootDir);
+    } catch(Exception $e) {
+      new Logger(_("Unable to create Agregator temporary folder"), Logger::LOGGER_WARNING);
       return;
     }
     $workingDir = is_null($subDir) ? $rootDir : "$rootDir/$subDir";

@@ -297,8 +297,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function savePost() {
-    if(safeRewrite($this->contentValue, $this->dataFile) === false)
+    try {
+      file_put_contents_plus($this->contentValue, $this->dataFile);
+    } catch(Exception $e) {
+      if(CMS_DEBUG) throw $e;
       throw new Exception(_("Unable to save changes, administration may be locked"));
+    }
     $this->redir = true;
     Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $this->redir);
   }

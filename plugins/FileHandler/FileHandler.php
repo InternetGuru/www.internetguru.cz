@@ -23,10 +23,11 @@ class FileHandler extends Plugin implements SplObserver {
       && strpos(getCurLink(), THEMES_DIR."/") !== 0 && strpos(getCurLink(), PLUGINS_DIR."/") !== 0)
       throw new Exception(_("File illegal path"));
     try {
+      $dest = getCurLink();
       $mode = null;
-      $src = findFile(getCurLink());
+      $src = findFile($dest);
       if(!$src) {
-        $pLink = explode("/", getCurLink());
+        $pLink = explode("/", $dest);
         if(count($pLink) > 2 && isset($this->modes[$pLink[1]])) {
           $mode = $pLink[1];
           unset($pLink[1]);
@@ -34,10 +35,10 @@ class FileHandler extends Plugin implements SplObserver {
         }
         if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
       }
-      $this->handleUrl($src, getCurLink(), $mode);
-      $this->handleDir(dirname($src), dirname(getCurLink()), pathinfo(getCurLink(), PATHINFO_EXTENSION), $mode);
-      if(self::DEBUG) new ErrorPage("REFRESH to ".ROOT_URL.getCurLink(), 404);
-      redirTo(ROOT_URL.getCurLink());
+      $fp = lockFile($src);
+      if(!is_file($dest)) $this->handleFile($src, $dest, $mode);
+      unlockFile($fp);
+      redirTo(ROOT_URL.$dest);
     } catch(Exception $e) {
       $errno = 500;
       if($e->getCode() != 0) $errno = $e->getCode();
@@ -45,23 +46,7 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
-  private function handleDir($srcDir, $destDir, $ext, $mode) {
-    foreach(scandir($srcDir) as $f) {
-      if(strpos($f, ".") === 0) continue;
-      if(is_dir("$srcDir/$f")) $this->handleDir("$srcDir/$f", $destDir, $ext, $mode);
-      if($ext != pathinfo($f, PATHINFO_EXTENSION)) continue;
-      try {
-        $handleSrc = "$srcDir/$f";
-        if(!is_null($mode) && is_file("$srcDir/$mode/$f")) $handleSrc = "$srcDir/$mode/$f";
-        if(is_file("$destDir/$f") && filemtime($handleSrc) == filemtime("$destDir/$f")) continue;
-        $this->handleUrl($handleSrc, "$destDir/$f", $mode);
-      } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to handle file %s: %s"), "$srcDir/$f", $e->getMessage()), Logger::LOGGER_WARNING);
-      }
-    }
-  }
-
-  private function handleUrl($src, $dest, $mode) {
+  private function handleFile($src, $dest, $mode) {
     $mimeType = getFileMime($src);
     if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
       $this->handleImage(realpath($src), $dest, $mimeType, $mode);
@@ -76,7 +61,7 @@ class FileHandler extends Plugin implements SplObserver {
     $ext = pathinfo($src, PATHINFO_EXTENSION);
     if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
       throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
-    smartCopy($src, $dest);
+    copy_plus($src, $dest);
   }
 
   private function handleImage($src, $dest, $mimeType, $mode) {
@@ -87,20 +72,21 @@ class FileHandler extends Plugin implements SplObserver {
       $fileSize = filesize($src);
       if($fileSize > $v[2])
         throw new Exception(sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($v[2])));
-      smartCopy($src, $dest);
+      copy_plus($src, $dest);
       return;
     }
     $im = new Imagick($src);
     $im->setImageCompressionQuality($v[3]);
     if($i[0] > $i[1]) $result = $im->thumbnailImage($v[0], 0);
     else $result = $im->thumbnailImage(0, $v[1]);
-    if(!$result)
-      throw new Exception(_("Unable to resize image"));
+    #var_dump($im->getImageLength());
     $imBin = $im->__toString();
-    if($im->getImageLength() > $v[2])
+    if(!$result || !strlen($imBin))
+      throw new Exception(_("Unable to resize image"));
+    if(strlen($imBin) > $v[2])
       throw new Exception(_("Generated image is too big"));
-    if(!strlen($imBin) || !safeRewrite($imBin, $dest) || !touch($dest, filemtime($src)))
-      throw new Exception(_("Unable to save image"));
+    $b = file_put_contents($imBin, $dest);
+    if($b === false || !touch($dest, filemtime($src))) throw new Exception(_("Unable to create file"));
   }
 
   private function getImageSize($imagePath) {

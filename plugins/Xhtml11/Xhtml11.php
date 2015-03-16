@@ -344,7 +344,13 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function copyToRoot($src, $dest) {
     if(is_file($dest) && getFileHash($src) == getFileHash($dest)) return;
-    smartCopy($src, $dest);
+    $fp = lockFile($src);
+    if(is_file($dest) && getFileHash($src) == getFileHash($dest)) {
+      unlockFile($fp);
+      return;
+    }
+    copy_plus($src, $dest);
+    unlockFile($fp);
   }
 
   private function addThemeFiles(DOMElement $e) {

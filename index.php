@@ -16,6 +16,7 @@ try {
   define("FORBIDDEN_FILE", "FORBIDDEN");
   define("ADMIN_ROOT_DIR", "cmsadmin");
   define("USER_ROOT_DIR", "cmsuser");
+  define("FILE_LOCK_WAIT_SEC", 2);
   define("ADMIN_BACKUP_DIR", ADMIN_ROOT_DIR.".bak");
   define("USER_BACKUP_DIR", USER_ROOT_DIR.".bak");
   define('EMAIL_PATTERN', "[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}");
