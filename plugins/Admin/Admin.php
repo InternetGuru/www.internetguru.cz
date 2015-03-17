@@ -32,10 +32,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_PREINIT) {
-      if(!Cms::isSuperUser()) $subject->detach($this);
-      return;
-    }
     if($subject->getStatus() == STATUS_PROCESS) {
       $os = Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Admin.xsl");
       return;
@@ -51,6 +47,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if($this->isPost()) $this->processPost();
       else $this->setContent();
       $this->processXml();
+      if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->contentChanged) {
         $this->savePost();
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
