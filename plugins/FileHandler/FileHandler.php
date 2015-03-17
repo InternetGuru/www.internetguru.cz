@@ -60,6 +60,7 @@ class FileHandler extends Plugin implements SplObserver {
     $registeredMime = array(
       "inode/x-empty" => array(), // empty file with any ext
       "text/plain" => array("css", "js"),
+      "text/x-c" => array("js"),
       "application/x-elc" => array("js"),
       "application/x-empty" => array("css", "js"),
       "application/octet-stream" => array("woff", "js"),
