@@ -46,7 +46,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->setDataFiles();
       if($this->isPost()) $this->processPost();
       else $this->setContent();
-      $this->processXml();
+      if(!$this->isResource($this->type)) $this->processXml();
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->contentChanged) {
         $this->savePost();
@@ -65,7 +65,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       Cms::addMessage($e->getMessage(), $type, $this->redir);
       return;
     }
-    if($this->redir) $this->redir($this->defaultFile);
+    if(!$this->redir) return;
+    if($this->isResource($this->type)) {
+      if(is_file($this->defaultFile)) unlink($this->defaultFile);
+    } else {
+      #todo: clear php cache
+    }
+    $this->redir($this->defaultFile);
   }
 
   private function isPost() {
@@ -223,8 +229,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     return false;
   }
 
+  private function isResource($type) {
+    return !in_array($type, array("xml", "xsl", "html"));
+  }
+
   private function processXml() {
-    if(!in_array($this->type, array("xml", "xsl", "html"))) return;
     // get default schema
     if($df = findFile($this->defaultFile, false)) {
       $this->schema = $this->getSchema($df);
