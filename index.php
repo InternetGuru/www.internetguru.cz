@@ -3,6 +3,7 @@ try {
 
   $start_time = microtime(true);
   define("INDEX_HTML", "index.html");
+  define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
   define("PLUGINS_DIR", "plugins");
   define("THEMES_DIR", "themes");
   define("CMS_DIR", "cms");

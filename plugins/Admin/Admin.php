@@ -69,9 +69,22 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->isResource($this->type)) {
       if(is_file($this->defaultFile)) unlink($this->defaultFile);
     } else {
-      #todo: clear php cache
+      if(!IS_LOCALHOST) $this->purgeNginxCache(NGINX_CACHE_FOLDER);
     }
     $this->redir($this->defaultFile);
+  }
+
+  private function purgeNginxCache($folder) {
+    foreach(scandir($folder) as $f) {
+      if(strpos($f, ".") === 0) continue;
+      if(is_dir("$folder/$f")) {
+        $this->purgeNginxCache("$folder/$f");
+        continue;
+      }
+      if(!empty(preg_grep("/KEY: ".SCHEME.HOST."/", file("$folder/$f")))) {
+        unlink("$folder/$f");
+      }
+    }
   }
 
   private function isPost() {
