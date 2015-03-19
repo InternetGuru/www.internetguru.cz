@@ -64,6 +64,8 @@ class FileHandler extends Plugin implements SplObserver {
       "application/x-elc" => array("js"),
       "application/x-empty" => array("css", "js"),
       "application/octet-stream" => array("woff", "js"),
+      "image/svg+xml" => array("svg"),
+      "application/pdf" => array("pdf"),
     );
     $ext = pathinfo($src, PATHINFO_EXTENSION);
     if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))

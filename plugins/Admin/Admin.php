@@ -316,6 +316,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function savePost() {
+    mkdir_plus(dirname($this->dataFile));
     $b = file_put_contents($this->dataFile, $this->contentValue);
     if($b === false) throw new Exception(_("Unable to save changes, administration may be locked"));
     $this->redir = true;

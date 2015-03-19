@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-16 22:19+0100\n"
-"PO-Revision-Date: 2015-03-16 22:19+0100\n"
+"POT-Creation-Date: 2015-03-19 01:54+0100\n"
+"PO-Revision-Date: 2015-03-19 01:58+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -233,6 +233,14 @@ msgstr "Atribut '%s' byl odstraněn"
 msgid "Variable value must be non-empty string or null"
 msgstr "Hodnota proměnné musí být neprázdný řetězec nebo null"
 
+#: D:\wamp\www\cms/core/HTMLPlus.php:202
+msgid "Empty element desc following heading with attribute link found"
+msgstr "Nalezen prázdný element desc následující nadpis s atributem link"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:207
+msgid "Attribute kw following heading with link not found or empty"
+msgstr "Nebyl nalezen platný atribut kw následující nadpis s atributem link"
+
 #: D:\wamp\www\cms/core/HTMLPlus.php:222
 msgid "Body attribude 'ns' missing"
 msgstr "V elementu body chybí atribut 'ns'"
@@ -334,6 +342,26 @@ msgstr "Odkaz '%s' má chybnoý formát"
 #, php-format
 msgid "Normalize link leads to duplicit value '%s'"
 msgstr "Normalizace odkazu '%s' způsobuje duplicitu"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:400
+msgid "Attr 'author' cannot be empty"
+msgstr "Atribut 'author' nemůže být prázdný"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:414
+msgid "Attribute 'mtime' requires 'ctime'"
+msgstr "Atribut 'mtime' vyžaduje 'ctime'"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:420
+msgid "Invalid 'ctime' attribute format"
+msgstr "Neplatný formát atributu 'ctime'"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:427
+msgid "Invalid 'mtime' attribute format"
+msgstr "Neplatný formát atributu 'mtime'"
+
+#: D:\wamp\www\cms/core/HTMLPlus.php:432
+msgid "'mtime' cannot be lower than 'ctime'"
+msgstr "Atribut 'mtime' nemůže být menší než 'ctime'"
 
 #: D:\wamp\www\cms/core/Plugin.php:19
 #, php-format
@@ -457,26 +485,26 @@ msgstr "Funkce finfo_file() není podporovaná"
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: D:\wamp\www\cms/index.php:109
+#: D:\wamp\www\cms/index.php:110
 #, php-format
 msgid "Method %s is no longer available"
 msgstr "Metoda %s již není k dispozici"
 
-#: D:\wamp\www\cms/index.php:110
+#: D:\wamp\www\cms/index.php:111
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: D:\wamp\www\cms/index.php:139
+#: D:\wamp\www\cms/index.php:140
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: D:\wamp\www\cms/index.php:144
+#: D:\wamp\www\cms/index.php:145
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: D:\wamp\www\cms/index.php:145
+#: D:\wamp\www\cms/index.php:146
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -493,83 +521,87 @@ msgstr "aktivní soubor"
 msgid "inactive file"
 msgstr "neaktivní soubor"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:57
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:50
+msgid "Insufficient right to save changes"
+msgstr "Nedostatečná práva pro uložení změn"
+
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:54
 msgid "No changes made"
 msgstr "Nebyly provedeny žádné změny"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:63
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:60
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:94
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:110
 msgid "replace"
 msgstr "nahrazení"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:94
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:110
 msgid "modify"
 msgstr "modifikace"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:111
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:127
 msgid "administration"
 msgstr "administrace"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:191
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:207
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:250
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:269
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:253
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:272
 msgid "My Heading"
 msgstr "Můj nadpis"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:254
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:273
 msgid "My Content Description"
 msgstr "Můj popis obsahu"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:255
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:274
 msgid "my, comma, separated, keywords"
 msgstr "moje, klíčová, slova, oddělená, čárkou"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:259
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:278
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:280
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:299
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:296
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:315
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:304
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:321
 msgid "Unable to save changes, administration may be locked"
 msgstr "Nepodařilo se uložit změny, administrace je pravděpodobně uzamčená"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:307
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:323
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:315
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:331
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:321
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:337
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:332
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:348
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:344
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:360
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -765,42 +797,46 @@ msgstr "Nepodařilo se nalézt soubor '%s' v archivu '%s'"
 msgid "Failed to apply transformation '%s'"
 msgstr "Nepodařilo se aplikovat transformaci '%s'"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:24
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:18
 msgid "File illegal path"
 msgstr "Neplatná cesta souboru"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:36
-msgid "Requested URL not found on this server"
-msgstr "Požadovaná URL nebyla nalezena"
-
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:45
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:25
 #, php-format
 msgid "Unable to handle file request: %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:63
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:41
+msgid "Requested URL not found on this server"
+msgstr "Požadovaná URL nebyla nalezena"
+
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:55
+msgid "Unknown image mode"
+msgstr "Neznámý mód obrázku"
+
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:72
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:74
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:82
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:85
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:93
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:87
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:95
 msgid "Generated image is too big"
 msgstr "Vygenerovaný obrázek je příliš veliký"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:90
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:98
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:96
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:104
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
