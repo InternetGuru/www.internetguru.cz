@@ -1,26 +1,50 @@
 div.section.doc {
-  counter-reset: section;
+  counter-reset: par section;
 }
 div.section.doc h2 {
-  counter-reset: par;
+  counter-reset: par subsection;
+}
+div.section.doc h3 {
+  counter-reset: par subsubsection;
 }
 div.section.doc h2:before {
   counter-increment: section;
-  content: "§ " counter(section) ": ";
+  content: counter(section) ") ";
+}
+div.section.doc.par h2:before {
+  counter-increment: section;
+  content: "§ " counter(section) ", ";
 }
 div.section.doc.kap h2:before {
   counter-increment: section;
-  content: "Kap. " counter(section) ": ";
+  content: "Kapitola " counter(section) ": ";
 }
 div.section.doc.chapter h2:before {
   counter-increment: section;
   content: "Chapter " counter(section) ": ";
+}
+div.section.doc h3:before {
+  counter-increment: subsection;
+  content: counter(section) "." counter(subsection) " ";
+}
+div.section.doc h4:before {
+  counter-increment: subsubsection;
+  content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
 }
 div.section.doc p:before {
   counter-increment: par;
   content: counter(par) ") ";
   font-size: 1.1em;
 }
-div.section.doc div.paragraph ol {
-  list-style-type: lower-alpha;
+div.section div.paragraph > ol,
+div.section div.list > ol {
+  list-style-type: lower-roman;
+}
+div.section div.paragraph ol > li:before,
+div.section div.list ol > li:before {
+  content: "";
+}
+div.section div.paragraph ol > li,
+div.section div.list ol > li {
+  margin-left: 2em;
 }

@@ -60,8 +60,21 @@ textarea {
   vertical-align: top;
 }
 
-ol ol li {
-  list-style-type: lower-latin;
+div.paragraph ol,
+div.list ol {
+  counter-reset: item;
+  list-style: none;
+}
+
+div.paragraph ol > li,
+div.list ol > li {
+  margin-left: 1em;
+}
+
+div.paragraph ol > li:before,
+div.list ol > li:before {
+  content: counters(item, ".") " ";
+  counter-increment: item;
 }
 
 ol.img li, ul.img li {

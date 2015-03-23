@@ -50,8 +50,8 @@ class FileHandler extends Plugin implements SplObserver {
         "" => array(1000, 1000, 225*1024, 85), // default, eg. resources like icons
         "images" => array(1000, 1000, 225*1024, 85),
         "thumbs" => array(200, 200, 50*1024, 85),
-        "bigimages" => array(1500, 1500, 350*1024, 75),
-        "fullimages" => array(0, 0, 0, 0));
+        "big" => array(1500, 1500, 350*1024, 75),
+        "full" => array(0, 0, 0, 0));
       if(!isset($modes[$mode])) throw new Exception(_("Unknown image mode"));
       $this->handleImage(realpath($src), $dest, $modes[$mode]);
       unlockFile($fp);
@@ -80,6 +80,10 @@ class FileHandler extends Plugin implements SplObserver {
       $fileSize = filesize($src);
       if($fileSize > $mode[2])
         throw new Exception(sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($mode[2])));
+      copy_plus($src, $dest);
+      return;
+    }
+    if($mode[0] == 0 && $mode[1] == 0) {
       copy_plus($src, $dest);
       return;
     }
