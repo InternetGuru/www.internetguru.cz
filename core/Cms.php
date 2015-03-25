@@ -41,6 +41,7 @@ class Cms {
     self::setVariable("url", URL);
     self::setVariable("uri", URI);
     self::setVariable("link", getCurLink());
+    self::setVariable("pagespeed_off", PAGESPEED_OFF);
   }
 
   private static function createFlashList() {

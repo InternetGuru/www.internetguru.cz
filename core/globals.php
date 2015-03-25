@@ -120,8 +120,12 @@ function parseLocalLink($link, $host=null) {
 
 function buildLocalUrl(Array $pLink) {
   #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
-  if(PAGESPEED_OFF && (!isset($pLink["query"]) || strpos($pLink["query"], "PageSpeed=off") === false)) {
-    $pLink["query"] = (isset($pLink["query"]) ? $pLink["query"]."&" : "")."PageSpeed=off";
+  $psoff = "PageSpeed=off";
+  $pson = "PageSpeed=on";
+  if(PAGESPEED_OFF) {
+    if(!isset($pLink["query"])
+      || (strpos($pLink["query"], $psoff) === false && strpos($pLink["query"], $pson) != false))
+      $pLink["query"] = (isset($pLink["query"]) ? $pLink["query"]."&" : "").$psoff;
   }
   if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
   else return implodeLink($pLink);
