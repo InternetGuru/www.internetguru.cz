@@ -48,13 +48,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       else $this->setContent();
       if(!$this->isResource($this->type)) $this->processXml();
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
+      if($this->isToEnable()) $this->enableDataFile();
       if($this->contentChanged) {
         $this->savePost();
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
         throw new Exception(_("No changes made"), 1);
       }
-      if($this->isToEnable()) $this->enableDataFile();
-      elseif($this->isToDisable()) $this->disableDataFile();
+      if($this->isToDisable()) $this->disableDataFile();
       if(!$this->contentChanged && $this->statusChanged) {
         $this->redir = true;
         Cms::addMessage(_("File status successfully changed"), Cms::MSG_SUCCESS, $this->redir);
