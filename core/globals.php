@@ -233,8 +233,8 @@ function duplicateDir($dir, $deep=true) {
 }
 
 function initDirs() {
-  $dirs = array(ADMIN_FOLDER, USER_FOLDER, ADMIN_BACKUP_FOLDER, USER_BACKUP_FOLDER,
-    LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER, LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR);
+  $dirs = array(USER_FOLDER, LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER,
+    LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR);
   foreach($dirs as $d) mkdir_plus($d);
 }
 

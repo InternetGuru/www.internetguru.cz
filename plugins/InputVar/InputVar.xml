@@ -24,7 +24,7 @@
   <var id="cyear" fn="strftime" format="%Y" var="cms-ctime"/>
   <var id="year" fn="strftime" format="%Y">now</var>
   <var id="today" fn="dateformatcs">now</var>
-  <var id="myctime" fn="dateformatcs" var="cms-ctime">xxx</var>
+  <var id="myctime" fn="dateformatcs" var="cms-ctime"/>
   <var id="mymtime" fn="dateformatcs" var="cms-mtime"/>
   <var id="linkctime" fn="dateformatcs" var="contentlink-ctime"/>
   <var id="linkmtime" fn="dateformatcs" var="contentlink-mtime"/>

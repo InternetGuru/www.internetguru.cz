@@ -18,8 +18,6 @@ try {
   define("ADMIN_ROOT_DIR", "cmsadmin");
   define("USER_ROOT_DIR", "cmsuser");
   define("FILE_LOCK_WAIT_SEC", 2);
-  define("ADMIN_BACKUP_DIR", ADMIN_ROOT_DIR.".bak");
-  define("USER_BACKUP_DIR", USER_ROOT_DIR.".bak");
   define('EMAIL_PATTERN', "[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}");
   define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
   define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
@@ -49,8 +47,6 @@ try {
     define('ADMIN_ID', "localhost");
     define('ADMIN_FOLDER', ADMIN_ROOT_DIR);
     define('USER_FOLDER', USER_ROOT_DIR);
-    define('ADMIN_BACKUP_FOLDER', ADMIN_BACKUP_DIR);
-    define('USER_BACKUP_FOLDER', USER_BACKUP_DIR);
     define('LOG_FOLDER', LOG_DIR);
     #define("APACHE_RESTART_FILEPATH", null);
   } else {
@@ -75,8 +71,6 @@ try {
     define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
     define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);
     define('USER_FOLDER', USER_ROOT_FOLDER."/".ADMIN_ID."/".HOST);
-    define('ADMIN_BACKUP_FOLDER', WWW_FOLDER."/".ADMIN_BACKUP_DIR."/".HOST);
-    define('USER_BACKUP_FOLDER', WWW_FOLDER."/".USER_BACKUP_DIR."/".HOST);
     define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HOST);
   }
   define("SCHEME", (@$_SERVER["HTTPS"] == "on" ? "https" : "http"));
