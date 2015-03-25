@@ -487,6 +487,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
 
   public function addTransformation($filePath, $priority = 10, $user = true) {
+    if(!$user && is_file(USER_FOLDER."/".$filePath))
+      new Logger(sprintf(_("File %s modification is disabled"), $filePath), Logger::LOGGER_WARNING);
     Cms::addVariableItem("transformations", $filePath);
     $this->transformations[$filePath] = array(
       "priority" => $priority,
