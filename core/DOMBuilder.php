@@ -53,7 +53,7 @@ class DOMBuilder {
     #if(!isset($pUrl["fragment"])) $pUrl["fragment"] = $pUrl["path"];
     if(isset($pUrl["fragment"]) && isset(self::$idToLink[$pUrl["path"]][$pUrl["fragment"]])) {
       if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
-      else $pUrl["path"] = $pUrl["path"]."/".self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
+      elseif(strlen(self::$idToLink[$pUrl["path"]][$pUrl["fragment"]])) $pUrl["path"] = $pUrl["path"]."/".self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
       if(!isset(self::$linkToId[implodeLink($pUrl)])) unset($pUrl["fragment"]);
       #return implodeLink($pUrl);
       return $pUrl;
