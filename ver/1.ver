@@ -1,4 +1,17 @@
+1.4.0 2015-03-15
+Auth: přidána možnost zakázat všem kromě admina (d4f4c3e)
+
+1.3.0 2015-03-10
+Komentáře v kódu se zobrazí pouze vlastníkovi webu (68d915a)
+InputVar: nová struktura uživatelských proměnných (5625bcc)
+GlobalMenu: přidává třídu current do všech položek v cestě (e8f29e0)
+
+1.2.0 2015-03-06
+Agregátor: přidány odkazy pro editaci (11f6094)
+
 1.1.0 2015-02-21
+ContentBalancer: přidána možnost nezobrazovat (1afbd2a)
+ContentBalancer: vlastní sestavy s odkazy (260343e)
 Agregátor: přidána podpora prefixů odkazů (1400bdf)
 
 1.0.1 2015-02-15
