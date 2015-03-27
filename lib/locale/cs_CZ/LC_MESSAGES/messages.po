@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-27 11:50+0100\n"
-"PO-Revision-Date: 2015-03-27 11:51+0100\n"
+"POT-Creation-Date: 2015-03-27 12:55+0100\n"
+"PO-Revision-Date: 2015-03-27 12:55+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -416,77 +416,76 @@ msgstr "Přesměrování na prázdný řetězec změněno na kořenový adresá�
 msgid "Redirecting to '%s'"
 msgstr "Přesměrování na '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:108
+#: D:\wamp\www\cms/core/globals.php:109
 #, php-format
 msgid "Unable to parse href '%s'"
 msgstr "Nelze zpracovat atribut href '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:126
-#, php-format
-msgid "Link %s is cyclic"
-msgstr "Odstraněn cyklický odkaz %s"
+#: D:\wamp\www\cms/core/globals.php:127
+msgid "Link is cyclic"
+msgstr "Odkaz je cycklický"
 
-#: D:\wamp\www\cms/core/globals.php:198
+#: D:\wamp\www\cms/core/globals.php:202
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: D:\wamp\www\cms/core/globals.php:204 D:\wamp\www\cms/core/globals.php:234
+#: D:\wamp\www\cms/core/globals.php:208 D:\wamp\www\cms/core/globals.php:238
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/globals.php:207
+#: D:\wamp\www\cms/core/globals.php:211
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:209
+#: D:\wamp\www\cms/core/globals.php:213
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:211
+#: D:\wamp\www\cms/core/globals.php:215
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: D:\wamp\www\cms/core/globals.php:213
+#: D:\wamp\www\cms/core/globals.php:217
 msgid "Unable to delete.old file"
 msgstr "Nepodařilo se smazat soubor .old"
 
-#: D:\wamp\www\cms/core/globals.php:220
+#: D:\wamp\www\cms/core/globals.php:224
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: D:\wamp\www\cms/core/globals.php:241
+#: D:\wamp\www\cms/core/globals.php:245
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:247
+#: D:\wamp\www\cms/core/globals.php:251
 #, php-format
 msgid "Directory '%s' not found"
 msgstr "Složka '%s' nebyla nalezena"
 
-#: D:\wamp\www\cms/core/globals.php:297
+#: D:\wamp\www\cms/core/globals.php:301
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: D:\wamp\www\cms/core/globals.php:305
+#: D:\wamp\www\cms/core/globals.php:309
 msgid "File does not exist"
 msgstr "Soubor neexistuje"
 
-#: D:\wamp\www\cms/core/globals.php:307 D:\wamp\www\cms/core/globals.php:378
+#: D:\wamp\www\cms/core/globals.php:311 D:\wamp\www\cms/core/globals.php:382
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: D:\wamp\www\cms/core/globals.php:313
+#: D:\wamp\www\cms/core/globals.php:317
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: D:\wamp\www\cms/core/globals.php:393
+#: D:\wamp\www\cms/core/globals.php:397
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: D:\wamp\www\cms/core/globals.php:443
+#: D:\wamp\www\cms/core/globals.php:447
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
@@ -924,10 +923,14 @@ msgstr "Odstraněn duplicitní identifikátor %s"
 msgid "Object %s attribute type invalid or missing: %s"
 msgstr "Atribut type elementu object %s je neplatný nebo chybí: %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:188
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:162
 #, php-format
-msgid "Local fragment to undefined id %s"
-msgstr "Lokální fragment na neexistující id %s"
+msgid "Link %s removed: %s"
+msgstr "Odkaz %s odstraněn: %s"
+
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:188
+msgid "Local fragment to undefined id"
+msgstr "Lokální fragment na neexistující id"
 
 #: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:220
 #, php-format
@@ -983,6 +986,12 @@ msgstr "Modifikace souboru %s je vypnuta"
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "Link %s is cyclic"
+#~ msgstr "Odkaz %s je cyklický"
+
+#~ msgid "Local fragment to undefined id %s"
+#~ msgstr "Lokální fragment na neexistující id %s"
 
 #~ msgid "Ignored cyclic redirection to %s"
 #~ msgstr "Ignorováno cyklické přesměrování na %s"

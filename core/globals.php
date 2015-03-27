@@ -97,7 +97,8 @@ function redirTo($link, $code=null, $msg=null) {
 
 function implodeLink(Array $p, $query=true) {
   $url = "";
-  if(isset($p["path"])) $url .= trim($p["path"], "/");
+  #if(isset($p["path"])) $url .= trim($p["path"], "/");
+  if(isset($p["path"])) $url .= $p["path"];
   if($query && isset($p["query"]) && strlen($p["query"])) $url .= "?".$p["query"];
   if(isset($p["fragment"])) $url .= "#".$p["fragment"];
   return $url;
@@ -123,20 +124,23 @@ function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
   addPageSpeedOff($pLink);
   $cyclic = isCyclicLink($pLink);
   if(!$ignoreCyclic && $cyclic && !isset($pLink["fragment"]))
-    throw new Exception(sprintf(_("Link %s is cyclic"), implodeLink($pLink)));
-  if(count($pLink) > 1 && isset($pLink["path"]) && $cyclic) unset($pLink["path"]);
-  #if(strpos($pLink, ROOT_URL) === 0) $pLink = substr($pLink, strlen(ROOT_URL));
-  if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
-  else return implodeLink($pLink);
+    throw new Exception(_("Link is cyclic"));
+  $path = null;
+  if(isset($pLink["path"])) {
+    $path = ltrim($pLink["path"], "/");
+    if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
+    else $pLink["path"] = ROOT_URL.$pLink["path"];
+  } else return implodeLink($pLink);
+  if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
-  if(!isset($pLink["path"]) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  if($scriptFile == "index.php") return ROOT_URL.implodeLink($pLink);
+  if($scriptFile == "index.php") return implodeLink($pLink);
+  $pLink["path"] = ROOT_URL.$scriptFile;
+  if($cyclic) $pLink["path"] = "";
   $q = array();
-  if(isset($pLink["path"]) && strlen($pLink["path"])) $q[] = "q=".$pLink["path"];
-  $pLink["path"] = $scriptFile;
+  if(strlen($path)) $q[] = "q=".$path;
   if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
   if(count($q)) $pLink["query"] = implode("&", $q);
-  return ROOT_URL.implodeLink($pLink);
+  return implodeLink($pLink);
 }
 
 function isCyclicLink(Array $pLink) {

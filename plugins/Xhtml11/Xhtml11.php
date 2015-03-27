@@ -159,7 +159,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         }
         $this->setupLink($a, $aName, $pUrl, $ids);
       } catch(Exception $e) {
-        $toStrip[] = array($a, $e->getMessage());
+        $toStrip[] = array($a, sprintf(_("Link %s removed: %s"), $a->getAttribute($aName), $e->getMessage()));
       }
 
     }
@@ -185,7 +185,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $localUrl = buildLocalUrl($link, $a->nodeName == "form");
     #var_dump($localUrl);
     if(strpos($localUrl, "#") === 0 && !array_key_exists($pLink["fragment"], $ids))
-      throw new Exception(sprintf(_("Local fragment to undefined id %s"), $pLink["fragment"]));
+      throw new Exception(_("Local fragment to undefined id"));
     $a->setAttribute($aName, $localUrl);
   }
 
