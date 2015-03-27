@@ -4,7 +4,7 @@
   <xsl:param name="cms-admin_id" select="''"/>
   <xsl:param name="cms-logged_user" select="''"/>
   <xsl:param name="cms-super_user" select="''"/>
-  <xsl:param name="cms-pagespeed_off" select="''"/>
+  <xsl:param name="cms-pagespeed" select="''"/>
 
   <xsl:template match="/">
     <xsl:apply-templates/>
@@ -20,7 +20,7 @@
         <li><a href="?subdom">Poddomény</a></li>
         <li>
           <xsl:choose>
-            <xsl:when test="$cms-pagespeed_off = 1">
+            <xsl:when test="$cms-pagespeed = 'off'">
               <a href="?PageSpeed=on">Zapnout PageSpeed</a>
             </xsl:when>
             <xsl:otherwise>

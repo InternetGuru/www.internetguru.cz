@@ -27,7 +27,6 @@ try {
   define('STATUS_INIT', 'init');
   define('STATUS_PROCESS', 'process');
   define('STATUS_POSTPROCESS', 'postprocess');
-  define('PAGESPEED_OFF', isset($_GET["PageSpeed"]) && $_GET["PageSpeed"] == "off");
   define("IS_LOCALHOST", (!isset($_SERVER["REMOTE_ADDR"])
     || $_SERVER["REMOTE_ADDR"] == "127.0.0.1"
     || strpos($_SERVER["REMOTE_ADDR"], "192.168.") === 0

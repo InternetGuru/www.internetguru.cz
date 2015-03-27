@@ -99,6 +99,7 @@ function implodeLink(Array $p, $query=true) {
   if(isset($p["path"])) $url .= trim($p["path"], "/");
   if($query && isset($p["query"]) && strlen($p["query"])) $url .= "?".$p["query"];
   if(isset($p["fragment"])) $url .= "#".$p["fragment"];
+  if($url == "") return ROOT_URL;
   return $url;
 }
 
@@ -120,13 +121,7 @@ function parseLocalLink($link, $host=null) {
 
 function buildLocalUrl(Array $pLink) {
   #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
-  $psoff = "PageSpeed=off";
-  $pson = "PageSpeed=on";
-  if(PAGESPEED_OFF) {
-    if(!isset($pLink["query"])
-      || (strpos($pLink["query"], $psoff) === false && strpos($pLink["query"], $pson) != false))
-      $pLink["query"] = (isset($pLink["query"]) ? $pLink["query"]."&" : "").$psoff;
-  }
+  addPageSpeedOff($pLink);
   if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
   else return implodeLink($pLink);
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
@@ -138,6 +133,22 @@ function buildLocalUrl(Array $pLink) {
   if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
   if(count($q)) $pLink["query"] = implode("&", $q);
   return ROOT_URL.implodeLink($pLink);
+}
+
+function addPageSpeedOff(Array &$pLink) {
+  $psoff = "PageSpeed=off";
+  $pson = "PageSpeed=on";
+  if(!isset($_GET["PageSpeed"]) || $_GET["PageSpeed"] != "off") return;
+  if(isset($pLink["query"])) {
+    $pQuery = explode("&", $pLink["query"]);
+    foreach($pQuery as $k => $p) {
+      if($p != $pson) continue;
+      unset($pQuery[$k]);
+      $pLink["query"] = implode("&", $pQuery);
+      return;
+    }
+    $pLink["query"] = $pLink["query"]."&".$psoff;
+  } else $pLink["query"] = $psoff;
 }
 
 function __toString($o) {
