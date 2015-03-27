@@ -64,8 +64,8 @@ class UrlHandler extends Plugin implements SplObserver {
   #todo: simplify $_GET
   private function queryMatch($pNam, $pVal) {
     foreach(explode("&", getCurQuery()) as $q) {
-      if(is_null($pVal) && strpos("$q=", "$pNam=$pVal") === 0) return true;
-      if(!is_null($pVal) && "$q=" == "$pNam=$pVal") return true;
+      if(is_null($pVal) && strpos("$q=", "$pNam=") === 0) return true;
+      if(!is_null($pVal) && "$q" == "$pNam=$pVal") return true;
     }
     return false;
   }

@@ -175,6 +175,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump(getCurLink());
     #var_dump(getCurLink(true));
     #var_dump($pLink);
+    addPageSpeedOff($pLink);
     $link = DOMBuilder::normalizeLink($pLink);
     #if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
     #var_dump($link);

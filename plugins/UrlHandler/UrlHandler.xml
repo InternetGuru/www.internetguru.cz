@@ -26,6 +26,8 @@
   <var parName="ver" parValue="">?LogViewer=ver</var>
   <var parName="log" parValue="">?LogViewer=log</var>
 
+  <var parName="PageSpeed" parValue="on">?</var>
+
   <var parName="login">?</var>
   <var parName="admin">?Admin</var>
   <var parName="log">?LogViewer</var>
