@@ -37,11 +37,8 @@ class UrlHandler extends Plugin implements SplObserver {
         if(!isset($pLink["path"])) $pLink["path"] = getCurLink(); // no path = keep current path
         if(strpos($var->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
         #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
-        #var_dump($pLink);
         $pLink = DOMBuilder::normalizeLink($pLink);
-        if(implodeLink($pLink) == getCurLink(true))
-          throw new Exception(sprintf(_("Ignored cyclic redirection to %s"), $var->nodeValue));
-        redirTo(buildLocalUrl($pLink));
+        redirTo(buildLocalUrl($pLink, false));
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
       }

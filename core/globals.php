@@ -119,8 +119,13 @@ function parseLocalLink($link, $host=null) {
   return $pLink;
 }
 
-function buildLocalUrl(Array $pLink) {
-  #if(strpos($link, ROOT_URL) === 0) $link = substr($link, strlen(ROOT_URL));
+function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
+  addPageSpeedOff($pLink);
+  $cyclic = isCyclicLink($pLink);
+  if(!$ignoreCyclic && $cyclic && !isset($pLink["fragment"]))
+    throw new Exception(sprintf(_("Link %s is cyclic"), implodeLink($pLink)));
+  if(count($pLink) > 1 && isset($pLink["path"]) && $cyclic) unset($pLink["path"]);
+  #if(strpos($pLink, ROOT_URL) === 0) $pLink = substr($pLink, strlen(ROOT_URL));
   if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
   else return implodeLink($pLink);
   $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
@@ -132,6 +137,14 @@ function buildLocalUrl(Array $pLink) {
   if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
   if(count($q)) $pLink["query"] = implode("&", $q);
   return ROOT_URL.implodeLink($pLink);
+}
+
+function isCyclicLink(Array $pLink) {
+  if(isset($pLink["fragment"])) return false;
+  if(isset($pLink["path"]) && $pLink["path"] != getCurLink()) return false;
+  if(!isset($pLink["query"]) && getCurQuery() != "") return false;
+  if(isset($pLink["query"]) && $pLink["query"] != getCurQuery()) return false;
+  return true;
 }
 
 function addPageSpeedOff(Array &$pLink) {
