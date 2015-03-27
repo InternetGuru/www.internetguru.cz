@@ -85,6 +85,7 @@ function redirTo($link, $code=null, $msg=null) {
   }
   if(class_exists("Logger"))
     new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
+  #var_dump($link); die();
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
     exit();
@@ -135,7 +136,7 @@ function buildLocalUrl(Array $pLink) {
 
 function addPageSpeedOff(Array &$pLink) {
   $psoff = "PageSpeed=off";
-  $pson = "PageSpeed=on";
+  $pson = "PageSpeed=start";
   if(!isset($_GET["PageSpeed"]) || $_GET["PageSpeed"] != "off") return;
   if(isset($pLink["query"])) {
     if(strpos($pLink["query"], $pson) !== false) return;

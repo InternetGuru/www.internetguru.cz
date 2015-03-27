@@ -21,7 +21,7 @@
         <li>
           <xsl:choose>
             <xsl:when test="$cms-pagespeed = 'off'">
-              <a href="?PageSpeed=on">Zapnout PageSpeed</a>
+              <a href="?PageSpeed=start">Zapnout PageSpeed</a>
             </xsl:when>
             <xsl:otherwise>
               <a href="?PageSpeed=off">Vypnout PageSpeed</a>
