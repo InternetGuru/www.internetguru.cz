@@ -22,6 +22,7 @@
   <xsl:param name="cms-link" select="''"/>
   <xsl:param name="cms-logged_user" select="''"/>
   <xsl:param name="cms-super_user" select="''"/>
+  <xsl:param name="cms-admin_id" select="''"/>
 
   <xsl:param name="contentlink-lang" select="''"/>
   <xsl:param name="contentlink-author" select="''"/>
@@ -38,7 +39,6 @@
   <xsl:param name="inputvar-creation" select="''"/>
   <xsl:param name="inputvar-cyear" select="''"/>
   <xsl:param name="inputvar-year" select="''"/>
-  <xsl:param name="inputvar-webmaster" select="''"/>
 
   <xsl:variable name="copy">
     <xsl:choose>
@@ -64,7 +64,7 @@
           </xsl:if>
           <li class="link"><xsl:value-of select="$cms-uri"/></li>
           <xsl:if test="not($cms-logged_user = '')">
-            <li>Admin: <xsl:value-of select="$cms-user_id"/></li>
+            <li>Admin: <xsl:value-of select="$cms-admin_id"/></li>
           </xsl:if>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
