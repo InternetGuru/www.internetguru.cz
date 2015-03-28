@@ -13,10 +13,10 @@ class FileHandler extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
     if(!preg_match("/".FILEPATH_PATTERN."/", getCurLink())) return;
-    if(strpos(getCurLink(), FILES_DIR."/") !== 0 && strpos(getCurLink(), LIB_DIR."/") !== 0
-      && strpos(getCurLink(), THEMES_DIR."/") !== 0 && strpos(getCurLink(), PLUGINS_DIR."/") !== 0)
-      throw new Exception(_("File illegal path"));
     try {
+      if(strpos(getCurLink(), FILES_DIR."/") !== 0 && strpos(getCurLink(), LIB_DIR."/") !== 0
+        && strpos(getCurLink(), THEMES_DIR."/") !== 0 && strpos(getCurLink(), PLUGINS_DIR."/") !== 0)
+      throw new Exception(_("File illegal path"), 404);
       $this->handleFile();
       redirTo(ROOT_URL.getCurLink());
     } catch(Exception $e) {
@@ -47,12 +47,12 @@ class FileHandler extends Plugin implements SplObserver {
     $mimeType = getFileMime($src);
     if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
       $modes = array(
-        "" => array(1000, 1000, 225*1024, 85), // default, eg. resources like icons
+        "" => array(1000, 1000, 225*1024, 85), // default, e.g. resources like icons
         "images" => array(1000, 1000, 225*1024, 85),
         "thumbs" => array(200, 200, 50*1024, 85),
         "big" => array(1500, 1500, 350*1024, 75),
         "full" => array(0, 0, 0, 0));
-      if(!isset($modes[$mode])) throw new Exception(_("Unknown image mode"));
+      if(!isset($modes[$mode])) $mode = "";
       $this->handleImage(realpath($src), $dest, $modes[$mode]);
       unlockFile($fp);
       return;
