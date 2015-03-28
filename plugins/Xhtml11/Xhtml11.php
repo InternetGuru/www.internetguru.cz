@@ -193,9 +193,9 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     #var_dump($link);
     if(strlen($a->getAttribute("title"))) return;
     $title = DOMBuilder::getTitle($link);
-    if($title == $a->nodeValue) $title = DOMBuilder::getDesc($link);
+    if(normalize($title) == normalize($a->nodeValue)) $title = DOMBuilder::getDesc($link);
     if(is_null($title)) return;
-    if($title == $a->nodeValue) return;
+    if(normalize($title) == normalize($a->nodeValue)) return;
     $a->setAttribute("title", $title);
   }
 
