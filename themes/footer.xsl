@@ -38,11 +38,12 @@
   <xsl:param name="inputvar-creation" select="''"/>
   <xsl:param name="inputvar-cyear" select="''"/>
   <xsl:param name="inputvar-year" select="''"/>
+  <xsl:param name="inputvar-webmaster" select="''"/>
 
   <xsl:variable name="copy">
     <xsl:choose>
-      <xsl:when test="$inputvar-cyear = $inputvar-year">© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/></xsl:when>
-      <xsl:otherwise>© <xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/>–<xsl:value-of disable-output-escaping="yes" select="$inputvar-year"/></xsl:otherwise>
+      <xsl:when test="$inputvar-cyear = $inputvar-year">©&#160;<xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/></xsl:when>
+      <xsl:otherwise>©&#160;<xsl:value-of disable-output-escaping="yes" select="$inputvar-cyear"/>–<xsl:value-of disable-output-escaping="yes" select="$inputvar-year"/></xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
 
@@ -53,7 +54,7 @@
       <div id="footer">
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
-          <li><xsl:value-of disable-output-escaping="yes" select="$copy"/> <xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
+          <li><xsl:value-of disable-output-escaping="yes" select="$copy"/>&#160;<xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
           <li>Na službě: <a href='https://www.e-zakladna.cz'>E-Základna</a></li>
           <xsl:if test="not($cms-resp = '')">
             <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
@@ -62,6 +63,9 @@
             <li>Upraveno: <xsl:value-of select="$inputvar-mymtime"/></li>
           </xsl:if>
           <li class="link"><xsl:value-of select="$cms-uri"/></li>
+          <xsl:if test="not($cms-logged_user = '')">
+            <li>Admin: <xsl:value-of select="$cms-user_id"/></li>
+          </xsl:if>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
       </div>
