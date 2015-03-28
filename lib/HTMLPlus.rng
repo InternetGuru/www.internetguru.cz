@@ -252,7 +252,7 @@
     <element name="dt">
       <ref name="dt.attlist"/>
       <ref name="Inline.model"/>
-      <ref name="htmlplus.list"/>
+      <!-- <ref name="htmlplus.list"/> -->
     </element>
   </define>
 
@@ -260,7 +260,7 @@
     <element name="dd">
       <ref name="dd.attlist"/>
       <ref name="Inline.model"/>
-      <!-- <ref name="htmlplus.list"/> really? -->
+      <ref name="htmlplus.list"/>
     </element>
   </define>
 
