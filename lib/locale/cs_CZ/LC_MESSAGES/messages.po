@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-27 12:55+0100\n"
-"PO-Revision-Date: 2015-03-27 12:55+0100\n"
+"POT-Creation-Date: 2015-03-29 01:06+0100\n"
+"PO-Revision-Date: 2015-03-29 01:06+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -801,7 +801,7 @@ msgstr "Nepodařilo se nalézt soubor '%s' v archivu '%s'"
 msgid "Failed to apply transformation '%s'"
 msgstr "Nepodařilo se aplikovat transformaci '%s'"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:18
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:19
 msgid "File illegal path"
 msgstr "Neplatná cesta souboru"
 
@@ -813,10 +813,6 @@ msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 #: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:41
 msgid "Requested URL not found on this server"
 msgstr "Požadovaná URL nebyla nalezena"
-
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:55
-msgid "Unknown image mode"
-msgstr "Neznámý mód obrázku"
 
 #: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:72
 #, php-format
@@ -833,8 +829,9 @@ msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
 #: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:99
-msgid "Generated image is too big"
-msgstr "Vygenerovaný obrázek je příliš veliký"
+#, php-format
+msgid "Generated image size %s is over limit %s"
+msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
 #: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:102
 msgid "Unable to create file"
@@ -986,6 +983,12 @@ msgstr "Modifikace souboru %s je vypnuta"
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "Unknown image mode"
+#~ msgstr "Neznámý mód obrázku"
+
+#~ msgid "Generated image is too big"
+#~ msgstr "Vygenerovaný obrázek je příliš veliký"
 
 #~ msgid "Link %s is cyclic"
 #~ msgstr "Odkaz %s je cyklický"

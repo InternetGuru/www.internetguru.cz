@@ -76,7 +76,7 @@ class FileHandler extends Plugin implements SplObserver {
 
   private function handleImage($src, $dest, $mode) {
     $i = $this->getImageSize($src);
-    if($i[0] < $mode[0] && $i[1] < $mode[1]) {
+    if($i[0] <= $mode[0] && $i[1] <= $mode[1]) {
       $fileSize = filesize($src);
       if($fileSize > $mode[2])
         throw new Exception(sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($mode[2])));
@@ -96,7 +96,7 @@ class FileHandler extends Plugin implements SplObserver {
     if(!$result || !strlen($imBin))
       throw new Exception(_("Unable to resize image"));
     if(strlen($imBin) > $mode[2])
-      throw new Exception(_("Generated image is too big"));
+      throw new Exception(_("Generated image size %s is over limit %s"), fileSizeConvert(strlen($imBin)), fileSizeConvert($mode[2]));
     mkdir_plus(dirname($dest));
     $b = file_put_contents($dest, $imBin);
     if($b === false || !touch($dest, filemtime($src))) throw new Exception(_("Unable to create file"));
