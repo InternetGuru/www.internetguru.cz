@@ -57,10 +57,13 @@
   </xsl:template>
 
   <xsl:template match="//blockcode">
-    <pre><code>
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates/>
-    </code></pre>
+    <pre>
+      <xsl:copy-of select="@class"/>
+      <code>
+        <xsl:copy-of select="@*"/>
+        <xsl:apply-templates/>
+      </code>
+    </pre>
   </xsl:template>
 
   <xsl:template match="//p[count(ul|ol|dl)>0]">

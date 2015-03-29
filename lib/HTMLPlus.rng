@@ -186,7 +186,7 @@
     </element>
   </define>
 
-  <define name="htmlplus.list">
+  <define name="xhtmlplus.list">
     <zeroOrMore>
       <choice>
         <ref name="htmlplus.ul"/>
@@ -196,7 +196,7 @@
     </zeroOrMore>
   </define>
 
-  <define name="xhtmlplus.list">
+  <define name="htmlplus.list">
     <choice>
       <zeroOrMore>
         <ref name="htmlplus.ul"/>
