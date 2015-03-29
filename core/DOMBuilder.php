@@ -112,13 +112,6 @@ class DOMBuilder {
   }
 
   private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user) {
-    /*
-    $dc = new DOMCache(hash(FILE_HASH_ALGO, "$fileName, $replace, $user"));
-    if($dc->isValid()) return $dc->getCache();
-    $dc->addSurceFile($fileName);
-    $dc->addSurceFile(ADMIN_FOLDER."/$fileName");
-    $dc->addSurceFile(USER_FOLDER."/$fileName");
-    */
     if(self::DEBUG) $doc->formatOutput = true;
 
     if($replace) {
@@ -205,21 +198,27 @@ class DOMBuilder {
       throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
     if(!($doc instanceof HTMLPlus)) return;
 
-    // validate, save if repaired
-    $c = new DateTime();
-    $c->setTimeStamp(filectime($filePath));
-    $doc->defaultCtime = $c->format(DateTime::W3C);
-    $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
-    $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
-    #if(!is_null($linkPrefix)) self::prefixLinks($linkPrefix, $doc);
-    try {
-      $doc->validatePlus();
-    } catch(Exception $e) {
-      $doc->validatePlus(true);
-      if(strpos($filePath, CMS_FOLDER) !== 0) {
-        new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+    if(!self::isValid($filePath)) {
+      // validate, save if repaired
+      $c = new DateTime();
+      $c->setTimeStamp(filectime($filePath));
+      $doc->defaultCtime = $c->format(DateTime::W3C);
+      $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
+      $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
+      try {
+        $doc->validatePlus();
+        if(!IS_LOCALHOST) {
+          $stored = apc_store($filePath, filemtime($filePath), rand(3600*24*30*3, 3600*24*30*6));
+          if(!$stored) new Logger(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
+        }
+      } catch(Exception $e) {
+        $doc->validatePlus(true);
+        if(strpos($filePath, CMS_FOLDER) !== 0) {
+          new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+        }
       }
     }
+
     // generate ctime/mtime from file if not set
     self::setMtime($doc, $filePath);
     // HTML+ include
@@ -231,12 +230,11 @@ class DOMBuilder {
     #var_dump(self::$linkToId);
   }
 
-  #private static function prefixLinks($prefix, HTMLPlus $doc) {
-  #  foreach($doc->getElementsByTagName("h") as $h) {
-  #    if(!$h->hasAttribute("link")) continue;
-  #    $h->setAttribute("link", "$prefix/".$h->getAttribute("link"));
-  #  }
-  #}
+  private static function isValid($filePath) {
+    if(IS_LOCALHOST) return false;
+    if(!apc_exists($filePath)) return false;
+    return apc_fetch($filePath) == filemtime($filePath);
+  }
 
   private static function setIdentifiers(HTMLPlus $doc, $fShort) {
     $duplicit = array();
