@@ -82,6 +82,7 @@ class DOMDocumentPlus extends DOMDocument {
       throw new Exception(sprintf(_("Unable to find HTML+ RNG schema '%s'"), $f));
     try {
       libxml_use_internal_errors(true);
+      libxml_clear_errors();
       if(!$this->relaxNGValidate($f))
         throw new Exception(_("relaxNGValidate() internal error occured"));
     } catch (Exception $e) {
@@ -89,13 +90,13 @@ class DOMDocumentPlus extends DOMDocument {
       if(count($internal_errors)) {
         $note = " ["._("Caution: this message may be misleading")."]";
         if(self::DEBUG) die($this->saveXML());
-        $e = new Exception(current($internal_errors)->message.$note);
+        throw new Exception(current($internal_errors)->message.$note);
       }
+      throw $e;
+    } finally {
+      libxml_clear_errors();
+      libxml_use_internal_errors(false);
     }
-    // finally
-    libxml_clear_errors();
-    libxml_use_internal_errors(false);
-    if(isset($e)) throw $e;
     return true;
   }
 
