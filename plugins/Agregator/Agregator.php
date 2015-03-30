@@ -152,7 +152,7 @@ class Agregator extends Plugin implements SplObserver {
         if($reverse) $vars[$subDir] = array_reverse($vars[$subDir]);
         try {
           $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-          $vValue = $this->getDOM($vars[$subDir], $html->childElements, $subDir);
+          $vValue = $this->getDOM($vars[$subDir], $html->childElements, $subDir, $html->getAttribute("id"));
           Cms::setVariable($vName, $vValue);
         } catch(Exception $e) {
           new Logger($e->getMessage(), Logger::LOGGER_WARNING);
@@ -167,17 +167,21 @@ class Agregator extends Plugin implements SplObserver {
     return ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
   }
 
-  private function getDOM(Array $vars, DOMNodeList $items, $subDir) {
+  private function getDOM(Array $vars, DOMNodeList $items, $subDir, $id) {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
-
+    $nonItemElement = false;
     $patterns = array();
     foreach($items as $item) {
-      if($item->nodeName != "item") continue;
+      if($item->nodeName != "item") {
+        $nonItemElement = true;
+        continue;
+      }
       if($item->hasAttribute("since"))
         $patterns[$item->getAttribute("since")-1] = $item;
       else $patterns[] = $item;
     }
+    if($nonItemElement) new Logger(sprintf(_("Redundant element(s) found in %s"), $id), Logger::LOGGER_WARNING);
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
     $pattern = null;
