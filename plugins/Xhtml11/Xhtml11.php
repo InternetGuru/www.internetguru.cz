@@ -191,7 +191,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function insertTitle(DOMElement $a, $link) {
     #var_dump($link);
-    if(strlen($a->getAttribute("title"))) return;
+    if($a->hasAttribute("title")) {
+      if(!strlen($a->getAttribute("title"))) $a->stripAttr("title");
+      return;
+    }
     $title = DOMBuilder::getTitle($link);
     if(normalize($title) == normalize($a->nodeValue)) $title = DOMBuilder::getDesc($link);
     if(is_null($title)) return;
