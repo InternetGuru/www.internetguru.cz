@@ -1,17 +1,16 @@
-.hideable dd {
+dl.toc dd {
   margin-left: 0em;
   font-style: normal;
 }
-.xcontenttoc-hide {
-  display: none;
+dl.toc ol {
+  counter-reset: item;
+  list-style: none;
 }
-.xcontenttoc-switch {
-  text-decoration: none;
-  /*font-family: "Lucida Console",monospace;*/
-  font-family: inherit;
-  color: inherit;
-  background: transparent;
-  padding: 0;
-  border: none;
-  font-weight: bold;
+dl.toc ol > li {
+  margin-left: 1em;
 }
+dl.toc ol > li:before {
+  content: counters(item, ".") " ";
+  counter-increment: item;
+}
+

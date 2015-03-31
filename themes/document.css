@@ -36,15 +36,22 @@ div.section.doc p:before {
   content: counter(par) ") ";
   font-size: 1.1em;
 }
-div.section div.paragraph > ol,
-div.section div.list > ol {
+div.section.doc div.paragraph > ol,
+div.section.doc div.list > ol {
   list-style-type: lower-roman;
 }
-div.section div.paragraph ol > li:before,
-div.section div.list ol > li:before {
+div.section.doc div.paragraph ol > li:before,
+div.section.doc div.list ol > li:before {
   content: "";
 }
-div.section div.paragraph ol > li,
-div.section div.list ol > li {
+div.section.doc div.paragraph ol > li,
+div.section.doc div.list ol > li {
   margin-left: 2em;
+}
+div.section.doc form input[type="text"] {
+  border: none;
+  background: #EAF2F5;
+}
+div.section.doc h2 {
+  text-align: left;
 }

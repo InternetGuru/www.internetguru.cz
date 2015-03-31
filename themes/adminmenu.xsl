@@ -12,7 +12,7 @@
 
   <xsl:template match="div[contains(@id, 'footer')]/ul[last()]">
     <xsl:if test="not($cms-logged_user = '')">
-      <ul>
+      <ul class="adminmenu">
         <li><a href="?admin">Administrace</a></li>
         <li><a href="?log">Logy</a></li>
         <li><a href="?ver">Verze</a></li>

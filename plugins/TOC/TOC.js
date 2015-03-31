@@ -33,7 +33,7 @@
         var div = document.createElement("div");
         div.className = "list";
         tocWrapper = document.createElement("dl");
-        tocWrapper.className = "hideable nohide";
+        tocWrapper.className = "hideable nohide toc";
         div.appendChild(tocWrapper);
         tocRoot.parentNode.insertBefore(div,tocRoot);
       },

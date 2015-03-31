@@ -64,7 +64,7 @@
           </xsl:if>
           <li class="link"><xsl:value-of select="$cms-uri"/></li>
           <xsl:if test="not($cms-logged_user = '')">
-            <li>Admin: <xsl:value-of select="$cms-admin_id"/></li>
+            <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
           </xsl:if>
           <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
