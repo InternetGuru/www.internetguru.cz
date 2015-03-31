@@ -447,4 +447,24 @@ function loginRedir() {
   redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "login"), 401, _("Authorization required")));
 }
 
+if(!function_exists("apc_exists")) {
+  function apc_exists($key) {
+    return file_exists(getcwd()."/../tmp_apc/$key");
+  }
+}
+
+if(!function_exists("apc_fetch")) {
+  function apc_fetch($key) {
+    return json_decode(file_get_contents(getcwd()."/../tmp_apc/$key"), true);
+  }
+}
+
+if(!function_exists("apc_store")) {
+  function apc_store($key, $value) {
+    $path = getcwd()."/../tmp_apc/$key";
+    mkdir_plus(dirname($path));
+    return file_put_contents($path, json_encode($value)) !== false;
+  }
+}
+
 ?>

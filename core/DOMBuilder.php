@@ -185,59 +185,97 @@ class DOMBuilder {
     $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
     $fShort = str_replace($remove, array(), "?$filePath");
     if($doc instanceof HTMLPlus) {
-      if(array_key_exists(realpath($filePath), self::$included))
+      if(array_key_exists($filePath, self::$included))
         throw new Exception(sprintf(_("File '%s' already included"), $fShort));
-      self::$included[realpath($filePath)] = null;
+      self::$included[$filePath] = null;
       Cms::addVariableItem("html", $fShort);
     }
     if(is_file(dirname($filePath)."/.".basename($filePath)))
       throw new Exception(sprintf(_("File disabled")));
 
+    $fInfo = self::getCache($filePath);
+    if(!is_null($fInfo)) {
+      if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
+      foreach($fInfo["includes"] as $f) {
+        self::$included[$f] = null;
+        Cms::addVariableItem("html", $f);
+      }
+      $doc->loadXML($fInfo["xml"]);
+      self::$idToLink[$fInfo["prefix"]] = $fInfo["idtolink"];
+      self::$linkToId = array_merge(self::$linkToId, $fInfo["linktoid"]);
+      self::$linkToDesc = array_merge(self::$linkToDesc, $fInfo["linktodesc"]);
+      self::$linkToTitle = array_merge(self::$linkToTitle, $fInfo["linktotitle"]);
+      return;
+    }
+
     // load
     if(!@$doc->load($filePath))
       throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
     if(!($doc instanceof HTMLPlus)) return;
-
-    if(!self::isValid($filePath)) {
-      // validate, save if repaired
-      $c = new DateTime();
-      $c->setTimeStamp(filectime($filePath));
-      $doc->defaultCtime = $c->format(DateTime::W3C);
-      $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
-      $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
-      try {
-        $doc->validatePlus();
-        if(!IS_LOCALHOST) {
-          $stored = apc_store($filePath, filemtime($filePath), rand(3600*24*30*3, 3600*24*30*6));
-          if(!$stored) new Logger(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
-        }
-      } catch(Exception $e) {
-        $doc->validatePlus(true);
-        if(strpos($filePath, CMS_FOLDER) !== 0) {
-          new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
-        }
+    // validate, save if repaired
+    $c = new DateTime();
+    $c->setTimeStamp(filectime($filePath));
+    $doc->defaultCtime = $c->format(DateTime::W3C);
+    $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
+    $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
+    $storeCache = true;
+    try {
+      $doc->validatePlus();
+    } catch(Exception $e) {
+      $doc->validatePlus(true);
+      $storeCache = false;
+      if(strpos($filePath, CMS_FOLDER) !== 0) {
+        new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
       }
     }
-
     // generate ctime/mtime from file if not set
     self::setMtime($doc, $filePath);
     // HTML+ include
-    self::insertIncludes($doc, $filePath);
+    $inclDom = array();
+    $inclSrc = array();
+    foreach($doc->getElementsByTagName("include") as $include) {
+      $inclDom[] = $include;
+      $inclSrc[] = dirname($filePath)."/".$include->getAttribute("src");
+    }
+    $offId = count(self::$linkToId);
+    $offDesc = count(self::$linkToDesc);
+    $offTitle = count(self::$linkToTitle);
+    if(!self::insertIncludes($inclDom, dirname($filePath))) $storeCache = false;
     // register links/ids; repair if duplicit
     if($included) return;
-    self::setIdentifiers($doc, $fShort);
+    if(!self::setIdentifiers($doc, $fShort)) $storeCache = false;
     #var_dump(self::$idToLink);
     #var_dump(self::$linkToId);
+    #var_dump(self::$linkToDesc);
+    #var_dump(self::$linkToTitle);
+    if(!$storeCache) return;
+    $fInfo = array(
+      "mtime" => filemtime($filePath),
+      "includes" => $inclSrc,
+      "idtolink" => end(self::$idToLink),
+      "prefix" => key(self::$idToLink),
+      "linktoid" => array_slice(self::$linkToId, $offId, null, true),
+      "linktodesc" => array_slice(self::$linkToDesc, $offDesc, null, true),
+      "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
+      "xml" => $doc->saveXML()
+    );
+    $stored = apc_store($filePath, $fInfo, rand(3600*24*30*3, 3600*24*30*6));
+    if(!$stored) new Logger(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
   }
 
-  private static function isValid($filePath) {
-    if(IS_LOCALHOST) return false;
-    if(!apc_exists($filePath)) return false;
-    return apc_fetch($filePath) == filemtime($filePath);
+  private static function getCache($filePath) {
+    if(!apc_exists($filePath)) return null;
+    $fInfo = apc_fetch($filePath);
+    if($fInfo["mtime"] != filemtime($filePath)) return null;
+    foreach($fInfo["includes"] as $f) {
+      if(!self::getCache($f)) return null;
+      if(isset(self::$included[$f])) return null;
+    }
+    return $fInfo;
   }
 
   private static function setIdentifiers(HTMLPlus $doc, $fShort) {
-    $duplicit = array();
+    $storeCache = true;
     $h1 = $doc->documentElement->firstElement;
     $prefix = trim($h1->getAttribute("link"), "/");
     #if(empty(self::$idToLink)) $prefix = "";
@@ -246,13 +284,15 @@ class DOMBuilder {
       new Logger(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
         $fShort, $prefix), Logger::LOGGER_WARNING);
       $h1->setAttribute("link", $prefix);
+      $storeCache = false;
     }
     self::$idToLink[$prefix] = array();
     #self::$linkToId[$prefix] = array();
-    self::registerKeys($doc, $prefix);
+    if(!self::registerKeys($doc, $prefix)) $storeCache = false;
     self::addLocalPrefix($doc, $prefix, "a", "href");
     self::addLocalPrefix($doc, $prefix, "form", "action");
     #var_dump(self::$idToLink); var_dump(self::$linkToId);
+    return $storeCache;
   }
 
   private static function addLocalPrefix(HTMLPlus $doc, $prefix, $eName, $aName) {
@@ -274,6 +314,7 @@ class DOMBuilder {
 
   private static function registerKeys(HTMLPlus $doc, $prefix) {
     $newLinks = array();
+    $storeCache = true;
     if(empty(self::$linkToId)) self::$defaultPrefix = $prefix;
     $xpath = new DOMXPath($doc);
     foreach($xpath->query("//*[@id]") as $e) {
@@ -293,6 +334,7 @@ class DOMBuilder {
       if(empty(self::$linkToId)) $linkId = "";
       if(array_key_exists($linkId, self::$linkToId)) {
         new Logger(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
+        $storeCache = false;
         continue;
       }
       self::$idToLink[$prefix][$id] = $link;
@@ -311,6 +353,7 @@ class DOMBuilder {
       #if(!strlen($link)) $link = self::$defaultPrefix;
       $e->setAttribute("link", $link);
     }
+    return $storeCache;
     #var_dump($link);
   }
 
@@ -339,16 +382,12 @@ class DOMBuilder {
     $h->setAttribute("mtime", $m->format(DateTime::W3C));
   }
 
-  private static function insertIncludes(HTMLPlus $doc, $filePath) {
-    $includes = array();
-    foreach($doc->getElementsByTagName("include") as $include) $includes[] = $include;
-    if(!count($includes)) return;
-    $start_time = microtime(true);
+  private static function insertIncludes(Array $includes, $homeDir) {
     $toStripElement = array();
     $toStripTag = array();
     foreach($includes as $include) {
       try {
-        self::insertHtmlPlus($include, dirname($filePath));
+        self::insertHtmlPlus($include, $homeDir);
         $toStripElement[] = $include;
       } catch(Exception $e) {
         $toStripTag[] = $include;
@@ -357,15 +396,14 @@ class DOMBuilder {
     }
     foreach($toStripTag as $include) $include->stripTag();
     foreach($toStripElement as $include) $include->stripElement();
-    new Logger(sprintf(_("Inserted %s of %s HTML+ file(s)"),
-      count($toStripElement), count($includes)), null, $start_time, false);
+    return empty($toStripTag);
   }
 
   private static function insertHtmlPlus(DOMElement $include, $homeDir) {
     $val = $include->getAttribute("src");
     $file = realpath("$homeDir/$val");
+    Cms::addVariableItem("html", $val);
     if($file === false) {
-      Cms::addVariableItem("html", $val);
       throw new Exception(sprintf(_("Included file '%s' not found"), $val));
     }
     if(pathinfo($val, PATHINFO_EXTENSION) != "html")
