@@ -132,7 +132,7 @@ function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
     else $pLink["path"] = ROOT_URL.$pLink["path"];
   } else return implodeLink($pLink);
   if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  $scriptFile = basename($_SERVER["SCRIPT_NAME"]);
+  $scriptFile = SCRIPT_NAME;
   if($scriptFile == "index.php") return implodeLink($pLink);
   $pLink["path"] = ROOT_URL.$scriptFile;
   if($cyclic) $pLink["path"] = "";
@@ -287,7 +287,7 @@ function initFiles() {
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
   $f = "index.php";
-  if(basename($_SERVER["SCRIPT_NAME"]) != $f) return;
+  if(SCRIPT_NAME != $f) return;
   $src = CMS_FOLDER."/".SERVER_FILES_DIR."/$f";
   if(filemtime($src) == filemtime($f)) return;
   $fp = lockFile($src);

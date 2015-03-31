@@ -23,6 +23,7 @@ try {
   define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
   define('FILEPATH_PATTERN', "(?:[.a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}");
   define('FILE_HASH_ALGO', 'crc32b');
+  define('SCRIPT_NAME', basename($_SERVER["SCRIPT_NAME"]));
   define('STATUS_PREINIT', 'preinit');
   define('STATUS_INIT', 'init');
   define('STATUS_PROCESS', 'process');
