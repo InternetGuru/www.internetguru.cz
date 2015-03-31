@@ -139,15 +139,16 @@ class Agregator extends Plugin implements SplObserver {
           continue;
         }
         self::$sortKey = "ctime";
+        $reverse = true;
         if($html->hasAttribute("sort") || $html->hasAttribute("rsort")) {
           $reverse = $html->hasAttribute("rsort");
           $userKey = $html->hasAttribute("sort") ? $html->getAttribute("sort") : $html->getAttribute("rsort");
           if(!array_key_exists($userKey, current($vars[$subDir]))) {
-            new Logger(sprintf(_("Sort variable %s not found; using default ctime"), $userKey), Logger::LOGGER_WARNING);
+            new Logger(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
           } else {
             self::$sortKey = $userKey;
           }
-        } else $reverse = true;
+        }
         uasort($vars[$subDir], array("Agregator", "cmp"));
         if($reverse) $vars[$subDir] = array_reverse($vars[$subDir]);
         try {

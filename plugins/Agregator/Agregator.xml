@@ -7,13 +7,13 @@
 
     Atributy elementu html:
       id (povinné)
-      sort | rsort (reverzní) s hodnotou dostupné proměnné
+      sort | rsort (reverzní) s hodnotou dostupné proměnné (výchozí rsort="ctime")
 
   -->
-  <html id="html">
+  <html id="li">
     <item><li><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformatcs" var="ctime">n/a</em></li></item>
   </html>
-  <html id="htmltop">
+  <html id="topdt">
     <item>
       <dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt>
       <dd var="kw">n/a</dd>
@@ -22,7 +22,7 @@
     <item><dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt></item>
     <item since="4"/>
   </html>
-  <html id="htmldetail">
+  <html id="dt">
     <item>
       <dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
       <dd>Poslední změna: <strong fn="inputvar-dateformatcs" var="mtime">n/a</strong></dd>
