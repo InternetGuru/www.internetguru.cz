@@ -2,9 +2,9 @@
 
 
 class Agregator extends Plugin implements SplObserver {
-  private $links = array();  // link => filePath
-  private $html = array();  // filePath => HTMLPlus
   private $files = array();  // filePath => fileInfo(?)
+  private $currentDoc = null;
+  private $currentSubdir = null;
   private $cfg;
   private static $sortKey;
 
@@ -18,19 +18,17 @@ class Agregator extends Plugin implements SplObserver {
     if($this->detachIfNotAttached("Xhtml11")) return;
     $this->cfg = $this->getDOMPlus();
     $htmlDir = USER_FOLDER."/".$this->pluginDir;
-    $this->createList($this->html, $htmlDir);
-    $this->createHtmlVar($htmlDir);
-    $this->createList($this->files, FILES_FOLDER);
-    $this->createFilesVar(FILES_FOLDER);
-    $this->createImgVar(FILES_FOLDER);
-    $this->insertContent();
+    $curLink = getCurLink();
+    foreach($this->createList($htmlDir) as $subDir => $files) {
+      $this->createHtmlVar($subDir, $files);
+    }
+    #$filesList = $this->createList(FILES_FOLDER);
+    #$this->createFilesVar(FILES_FOLDER);
+    #$this->createImgVar(FILES_FOLDER);
+    if(!is_null($this->currentDoc)) $this->insertContent($this->currentDoc, $this->currentSubdir);
   }
 
-  private function insertContent() {
-    if(!array_key_exists(getCurLink(), $this->links)) return;
-    $subDir = $this->links[getCurLink()][0];
-    $fName = $this->links[getCurLink()][1];
-    $doc = $this->html[$subDir][$fName];
+  private function insertContent(HTMLPlus $doc, $subDir) {
     $dest = Cms::getContentFull()->getElementById($subDir, "link");
     if(is_null($dest)) $dest = Cms::getContentFull()->documentElement->firstElement->nextElement;
     while($dest->nodeName != "section") {
@@ -47,26 +45,27 @@ class Agregator extends Plugin implements SplObserver {
     foreach($doc->documentElement->childElements as $e) {
       $dest->appendChild($dest->ownerDocument->importNode($e, true));
     }
-    Cms::setVariable("filepath", $this->pluginDir.(strlen($subDir) ? "/$subDir" : "")."/$fName");
   }
 
-  private function createList(&$list, $rootDir, $subDir=null) {
+  private function createList($rootDir, $subDir=null) {
     try {
       mkdir_plus($rootDir);
     } catch(Exception $e) {
       new Logger(_("Unable to create Agregator temporary folder"), Logger::LOGGER_WARNING);
       return;
     }
+    $list = array();
     $workingDir = is_null($subDir) ? $rootDir : "$rootDir/$subDir";
     foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
       if(is_dir("$workingDir/$f")) {
-        $this->createList($list, $rootDir, is_null($subDir) ? $f : "$subDir/$f");
+        $list = array_merge($list, $this->createList($rootDir, is_null($subDir) ? $f : "$subDir/$f"));
         continue;
       }
       if(is_file("$workingDir/.$f")) continue;
-      $list[$subDir][$f] = null;
+      $list[$subDir][] = "$workingDir/$f";
     }
+    return $list;
   }
 
   private function createImgVar($rootDir) {
@@ -111,54 +110,56 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function createHtmlVar($rootDir) {
+  private function createHtmlVar($subDir, Array $files) {
     $vars = array();
-    foreach($this->html as $subDir => $null) {
-      $workingDir = ($subDir == "" ? $rootDir : "$rootDir/$subDir");
-      foreach($this->html[$subDir] as $f => $null) {
-        if(pathinfo($f, PATHINFO_EXTENSION) != "html") continue;
-        try {
-          $doc = DOMBuilder::buildHTMLPlus("$workingDir/$f");
-          #$doc = DOMBuilder::buildHTMLPlus("$workingDir/$f", true, $subDir == "" ? null : $subDir);
-        } catch(Exception $e) {
-          continue;
-          #new Logger(sprintf(_("Agregator skipped file '%s'"), "$subDir/$f"), Logger::LOGGER_WARNING);
-        }
-        $this->html[$subDir][$f] = $doc;
-        $vars[$subDir][$f] = $this->getHTMLVariables($doc,  $this->pluginDir.(strlen($subDir) ? "/$subDir" : "")."/$f");
-        foreach($doc->getElementsByTagName("h") as $h) {
-          if(!$h->hasAttribute("link")) continue;
-          $this->links[$h->getAttribute("link")] = array($subDir, $f);
+    foreach($files as $file) {
+      if(pathinfo($file, PATHINFO_EXTENSION) != "html") continue;
+      try {
+        $doc = DOMBuilder::buildHTMLPlus($file);
+      } catch(Exception $e) {
+        continue;
+      }
+      $vars[$file] = $this->getHTMLVariables($doc, $file);
+      foreach($doc->getElementsByTagName("h") as $h) {
+        if(!$h->hasAttribute("link")) continue;
+        if($h->getAttribute("link") != getCurLink()) continue;
+        $this->currentDoc = $doc;
+        $this->currentSubdir = $subDir;
+        Cms::setVariable("filepath", $file);
+      }
+    }
+    if(empty($vars)) continue;
+
+    // use cache
+    #todo
+
+    // no cache
+    foreach($this->cfg->documentElement->childElements as $html) {
+      if($html->nodeName != "html") continue;
+      if(!$html->hasAttribute("id")) {
+        new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
+        continue;
+      }
+      self::$sortKey = "ctime";
+      $reverse = true;
+      if($html->hasAttribute("sort") || $html->hasAttribute("rsort")) {
+        $reverse = $html->hasAttribute("rsort");
+        $userKey = $html->hasAttribute("sort") ? $html->getAttribute("sort") : $html->getAttribute("rsort");
+        if(!array_key_exists($userKey, current($vars))) {
+          new Logger(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
+        } else {
+          self::$sortKey = $userKey;
         }
       }
-      if(!array_key_exists($subDir, $vars)) continue;
-      foreach($this->cfg->documentElement->childElements as $html) {
-        if($html->nodeName != "html") continue;
-        if(!$html->hasAttribute("id")) {
-          new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
-          continue;
-        }
-        self::$sortKey = "ctime";
-        $reverse = true;
-        if($html->hasAttribute("sort") || $html->hasAttribute("rsort")) {
-          $reverse = $html->hasAttribute("rsort");
-          $userKey = $html->hasAttribute("sort") ? $html->getAttribute("sort") : $html->getAttribute("rsort");
-          if(!array_key_exists($userKey, current($vars[$subDir]))) {
-            new Logger(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
-          } else {
-            self::$sortKey = $userKey;
-          }
-        }
-        uasort($vars[$subDir], array("Agregator", "cmp"));
-        if($reverse) $vars[$subDir] = array_reverse($vars[$subDir]);
-        try {
-          $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-          $vValue = $this->getDOM($vars[$subDir], $html->childElements, $subDir, $html->getAttribute("id"));
-          Cms::setVariable($vName, $vValue);
-        } catch(Exception $e) {
-          new Logger($e->getMessage(), Logger::LOGGER_WARNING);
-          continue;
-        }
+      uasort($vars, array("Agregator", "cmp"));
+      if($reverse) $vars = array_reverse($vars);
+      try {
+        $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+        $vValue = $this->getDOM($vars, $html->childElements, $html->getAttribute("id"));
+        Cms::setVariable($vName, $vValue);
+      } catch(Exception $e) {
+        new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+        continue;
       }
     }
   }
@@ -168,7 +169,7 @@ class Agregator extends Plugin implements SplObserver {
     return ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
   }
 
-  private function getDOM(Array $vars, DOMNodeList $items, $subDir, $id) {
+  private function getDOM(Array $vars, DOMNodeList $items, $id) {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
     $nonItemElement = false;
@@ -187,8 +188,6 @@ class Agregator extends Plugin implements SplObserver {
     $i = -1;
     $pattern = null;
     foreach($vars as $k => $v) {
-      $htmlPlus = $this->html[$subDir][$k];
-      if(is_null($htmlPlus)) continue;
       $i++;
       if(isset($patterns[$i])) $pattern = $patterns[$i];
       if(is_null($pattern) || !$pattern->childNodes->length) continue;
