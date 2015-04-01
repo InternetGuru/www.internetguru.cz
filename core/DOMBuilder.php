@@ -235,7 +235,8 @@ class DOMBuilder {
     $inclSrc = array();
     foreach($doc->getElementsByTagName("include") as $include) {
       $inclDom[] = $include;
-      $inclSrc[] = dirname($filePath)."/".$include->getAttribute("src");
+      $inclPath = dirname($filePath)."/".$include->getAttribute("src");
+      $inclSrc[$inclPath] = filemtime($inclPath);
     }
     $offId = count(self::$linkToId);
     $offDesc = count(self::$linkToDesc);
@@ -267,9 +268,9 @@ class DOMBuilder {
     if(!apc_exists($filePath)) return null;
     $fInfo = apc_fetch($filePath);
     if($fInfo["mtime"] != filemtime($filePath)) return null;
-    foreach($fInfo["includes"] as $f) {
-      if(!self::getCache($f)) return null;
-      if(isset(self::$included[$f])) return null;
+    foreach($fInfo["includes"] as $file => $mtime) {
+      if($mtime != filemtime($file)) return null;
+      if(isset(self::$included[$file])) return null;
     }
     return $fInfo;
   }
@@ -402,8 +403,8 @@ class DOMBuilder {
   private static function insertHtmlPlus(DOMElement $include, $homeDir) {
     $val = $include->getAttribute("src");
     $file = realpath("$homeDir/$val");
-    Cms::addVariableItem("html", $val);
     if($file === false) {
+      Cms::addVariableItem("html", $val);
       throw new Exception(sprintf(_("Included file '%s' not found"), $val));
     }
     if(pathinfo($val, PATHINFO_EXTENSION) != "html")
