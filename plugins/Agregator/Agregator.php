@@ -112,6 +112,7 @@ class Agregator extends Plugin implements SplObserver {
 
   private function createHtmlVar($subDir, Array $files) {
     $vars = array();
+    $useCache = true;
     foreach($files as $file) {
       if(pathinfo($file, PATHINFO_EXTENSION) != "html") continue;
       try {
@@ -127,18 +128,31 @@ class Agregator extends Plugin implements SplObserver {
         $this->currentSubdir = $subDir;
         Cms::setVariable("filepath", $file);
       }
+      if(!$this->isValidInCache($file)) {
+        $stored = apc_store(get_class($this)."_$file", filemtime($file), rand(3600*24*30*3, 3600*24*30*6));
+        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $vName), Logger::LOGGER_WARNING);
+        $useCache = false;
+      }
     }
-    if(empty($vars)) continue;
+    if(empty($vars)) return;
 
-    // use cache
-    #todo
 
-    // no cache
     foreach($this->cfg->documentElement->childElements as $html) {
       if($html->nodeName != "html") continue;
       if(!$html->hasAttribute("id")) {
         new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
         continue;
+      }
+      $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+      // use cache
+      if($useCache) {
+        $sCache = $this->getSubDirCache($vName);
+        if(!is_null($sCache)) {
+          $doc = new DOMDocumentPlus();
+          $doc->loadXML($sCache["value"]);
+          Cms::setVariable($sCache["name"], $doc->documentElement);
+          continue;
+        }
       }
       self::$sortKey = "ctime";
       $reverse = true;
@@ -154,15 +168,34 @@ class Agregator extends Plugin implements SplObserver {
       uasort($vars, array("Agregator", "cmp"));
       if($reverse) $vars = array_reverse($vars);
       try {
-        $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
         $vValue = $this->getDOM($vars, $html->childElements, $html->getAttribute("id"));
-        Cms::setVariable($vName, $vValue);
+        Cms::setVariable($vName, $vValue->documentElement);
+        $var = array(
+          "name" => $vName,
+          "value" => $vValue->saveXML(),
+        );
+        $stored = apc_store(get_class($this)."_subdir_$vName", $var, rand(3600*24*30*3, 3600*24*30*6));
+        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $vName), Logger::LOGGER_WARNING);
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
         continue;
       }
     }
   }
+
+  private function isValidInCache($filePath) {
+    $cacheKey = get_class($this)."_$filePath";
+    if(!apc_exists($cacheKey)) return false;
+    if(apc_fetch($cacheKey) != filemtime($filePath)) return false;
+    return true;
+  }
+
+  private function getSubDirCache($vName) {
+    $cacheKey = get_class($this)."_subdir_$vName";
+    if(!apc_exists($cacheKey)) return null;
+    return apc_fetch($cacheKey);
+  }
+
 
   private static function cmp($a, $b) {
     if($a[self::$sortKey] == $b[self::$sortKey]) return 0;
@@ -195,7 +228,7 @@ class Agregator extends Plugin implements SplObserver {
       $item = $root->appendChild($doc->importNode($item, true));
       $item->stripTag();
     }
-    return $doc->documentElement;
+    return $doc;
   }
 
   private function replaceVariables(DOMElementPlus $element, Array $vars) {
