@@ -174,7 +174,7 @@ class Agregator extends Plugin implements SplObserver {
           "name" => $vName,
           "value" => $vValue->saveXML(),
         );
-        $stored = apc_store(get_class($this)."_subdir_$vName", $var, rand(3600*24*30*3, 3600*24*30*6));
+        $stored = apc_store(HOST.get_class($this)."_subdir_$vName", $var, rand(3600*24*30*3, 3600*24*30*6));
         if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $vName), Logger::LOGGER_WARNING);
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
@@ -191,7 +191,7 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function getSubDirCache($vName) {
-    $cacheKey = get_class($this)."_subdir_$vName";
+    $cacheKey = HOST.get_class($this)."_subdir_$vName";
     if(!apc_exists($cacheKey)) return null;
     return apc_fetch($cacheKey);
   }
