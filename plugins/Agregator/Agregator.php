@@ -133,7 +133,7 @@ class Agregator extends Plugin implements SplObserver {
         Cms::setVariable("filepath", $file);
       }
       $cacheKey = get_class($this).$filePath;
-      if(!$this->isValidCached($cacheKey)) {
+      if(!$this->isValidCached($cacheKey, $filePath)) {
         $stored = apc_store($cacheKey, filemtime($filePath), rand(3600*24*30*3, 3600*24*30*6));
         if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $file), Logger::LOGGER_WARNING);
         $useCache = false;
@@ -186,7 +186,7 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function isValidCached($key) {
+  private function isValidCached($key, $filePath) {
     if(!apc_exists($key)) return false;
     if(apc_fetch($key) != filemtime($filePath)) return false;
     return true;
