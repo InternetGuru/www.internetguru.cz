@@ -109,6 +109,7 @@ try {
   require_once(CORE_FOLDER.'/globals.php');
 
   // check if session is valid
+  /*
   if(isset($_COOKIE[session_name()])) {
     session_start();
     if(!isset($_SESSION["expire"]) || strtotime($_SESSION["expire"]) <= time()) {
@@ -122,6 +123,7 @@ try {
       redirTo("/");
     }
   }
+  */
 
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 
