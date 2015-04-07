@@ -42,6 +42,10 @@ class Agregator extends Plugin implements SplObserver {
       }
       $dest = $dest->nextElement;
     }
+    foreach($doc->documentElement->attributes as $a) {
+      if($a->nodeName == "ns") continue;
+      $dest->setAttribute($a->nodeName, $a->nodeValue);
+    }
     foreach($doc->documentElement->childElements as $e) {
       $dest->appendChild($dest->ownerDocument->importNode($e, true));
     }
