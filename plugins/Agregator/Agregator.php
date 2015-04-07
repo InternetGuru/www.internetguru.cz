@@ -115,11 +115,13 @@ class Agregator extends Plugin implements SplObserver {
     $useCache = true;
     foreach($files as $fileName) {
       if(pathinfo($fileName, PATHINFO_EXTENSION) != "html") continue;
+      if(strlen($subDir)) $fileName = "$subDir/$fileName";
       $file = $this->pluginDir."/$fileName";
       $filePath = USER_FOLDER."/".$file;
       try {
         $doc = DOMBuilder::buildHTMLPlus($filePath);
       } catch(Exception $e) {
+        new Logger($e->getMessage(), Logger::LOGGER_WARNING);
         continue;
       }
       $vars[$filePath] = $this->getHTMLVariables($doc, $file);
@@ -133,13 +135,11 @@ class Agregator extends Plugin implements SplObserver {
       $cacheKey = get_class($this).$filePath;
       if(!$this->isValidCached($cacheKey)) {
         $stored = apc_store($cacheKey, filemtime($filePath), rand(3600*24*30*3, 3600*24*30*6));
-        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $this->pluginDir."/$file"), Logger::LOGGER_WARNING);
+        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $file), Logger::LOGGER_WARNING);
         $useCache = false;
       }
     }
     if(empty($vars)) return;
-
-
     foreach($this->cfg->documentElement->childElements as $html) {
       if($html->nodeName != "html") continue;
       if(!$html->hasAttribute("id")) {
