@@ -97,7 +97,10 @@ function redirTo($link, $code=null, $msg=null) {
 
 function implodeLink(Array $p, $query=true) {
   $url = "";
-  #if(isset($p["path"])) $url .= trim($p["path"], "/");
+  if(isset($p["scheme"])) {
+    $url .= $p["scheme"]."://".HOST."/";
+    if(isset($p["path"])) $p["path"] = ltrim($p["path"], "/");
+  }
   if(isset($p["path"])) $url .= $p["path"];
   if($query && isset($p["query"]) && strlen($p["query"])) $url .= "?".$p["query"];
   if(isset($p["fragment"])) $url .= "#".$p["fragment"];
@@ -452,7 +455,8 @@ function loginRedir() {
   $aQuery = array();
   parse_str(getCurQuery(), $aQuery);
   $q = buildQuery(array_merge($aQuery, array("login" => "")), false);
-  redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => $q), 401, _("Authorization required")));
+  $pLink = array("scheme" => "https", "path" => getCurLink(), "query" => $q);
+  redirTo(buildLocalUrl($pLink, 401, _("Authorization required")));
 }
 
 if(!function_exists("apc_exists")) {
