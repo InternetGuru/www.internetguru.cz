@@ -1,57 +1,55 @@
-div.section.doc {
+body.doc {
   counter-reset: par section;
 }
-div.section.doc h2 {
+body.doc h2 {
   counter-reset: par subsection;
+  text-align: left;
 }
-div.section.doc h3 {
+body.doc h3 {
   counter-reset: par subsubsection;
 }
-div.section.doc h2:before {
+body.doc h2:before {
   counter-increment: section;
   content: counter(section) ") ";
 }
-div.section.doc.par h2:before {
+body.doc.par h2:before {
   counter-increment: section;
   content: "§ " counter(section) ", ";
 }
-div.section.doc.kap h2:before {
+body.doc.kap h2:before {
   counter-increment: section;
   content: "Kapitola " counter(section) ": ";
 }
-div.section.doc.chapter h2:before {
+body.doc.chapter h2:before {
   counter-increment: section;
   content: "Chapter " counter(section) ": ";
 }
-div.section.doc h3:before {
+body.doc h3:before {
   counter-increment: subsection;
   content: counter(section) "." counter(subsection) " ";
 }
-div.section.doc h4:before {
+body.doc h4:before {
   counter-increment: subsubsection;
   content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
 }
-div.section.doc p:before {
+body.doc div.section p:before {
   counter-increment: par;
   content: counter(par) ") ";
   font-size: 1.1em;
 }
-div.section.doc div.paragraph > ol,
-div.section.doc div.list > ol {
+body.doc div.paragraph > ol,
+body.doc div.list > ol {
   list-style-type: lower-roman;
 }
-div.section.doc div.paragraph ol > li:before,
-div.section.doc div.list ol > li:before {
+body.doc div.paragraph ol > li:before,
+body.doc div.list ol > li:before {
   content: "";
 }
-div.section.doc div.paragraph ol > li,
-div.section.doc div.list ol > li {
+body.doc div.paragraph ol > li,
+body.doc div.list ol > li {
   margin-left: 2em;
 }
-div.section.doc form input[type="text"] {
+body.doc form input[type="text"] {
   border: none;
   background: #EAF2F5;
-}
-div.section.doc h2 {
-  text-align: left;
 }
