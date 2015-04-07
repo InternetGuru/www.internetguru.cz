@@ -182,8 +182,7 @@ class DOMBuilder {
   }
 
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $included=false) {
-    $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
-    $fShort = str_replace($remove, array(), "?$filePath");
+    $fShort = stripDataFolder($filePath);
     if($doc instanceof HTMLPlus) {
       if(array_key_exists($filePath, self::$included))
         throw new Exception(sprintf(_("File '%s' already included"), $fShort));
@@ -196,9 +195,9 @@ class DOMBuilder {
     $fInfo = self::getCache($filePath);
     if(!is_null($fInfo)) {
       if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
-      foreach($fInfo["includes"] as $f) {
-        self::$included[$f] = null;
-        Cms::addVariableItem("html", $f);
+      foreach($fInfo["includes"] as $file => $mtime) {
+        self::$included[$file] = null;
+        Cms::addVariableItem("html", stripDataFolder($file));
       }
       $doc->loadXML($fInfo["xml"]);
       self::$idToLink[$fInfo["prefix"]] = $fInfo["idtolink"];

@@ -428,6 +428,11 @@ function getDirHash($dirPath) {
   return hash(FILE_HASH_ALGO, implode("", scandir($dirPath)));
 }
 
+function stripDataFolder($filePath) {
+  $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
+  return str_replace($remove, array(), "?$filePath");
+}
+
 function getShortString($str) {
   $lLimit = 60;
   $hLimit = 80;
