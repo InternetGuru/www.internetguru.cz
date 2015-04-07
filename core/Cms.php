@@ -115,9 +115,12 @@ class Cms {
     self::setVariable("logged_user", $user);
     if(!self::isSuperUser()) return;
     self::setVariable("super_user", $user);
-    session_cache_limiter("");
-    if(!session_start() || !session_regenerate_id()) throw new Exception(_("Unable to re/generate session ID"));
+    if((session_status() == PHP_SESSION_NONE && !session_start()) {
+      || !session_regenerate_id())
+      throw new Exception(_("Unable to re/generate session ID"));
+    }
     $_SESSION[get_called_class()]["loggedUser"] = $user;
+    $_SESSION["expire"] = time(); #todo + xxx sec;
   }
 
   public static function isSuperUser() {

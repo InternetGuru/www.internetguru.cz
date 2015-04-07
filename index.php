@@ -1,6 +1,8 @@
 <?php
 try {
 
+  session_cache_limiter("");
+
   $start_time = microtime(true);
   define("INDEX_HTML", "index.html");
   define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
@@ -105,7 +107,24 @@ try {
   if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 
   require_once(CORE_FOLDER.'/globals.php');
+
+  // check if session is valid
+  if(isset($_COOKIE[session_name()])) {
+    session_start();
+    if(!isset($_SESSION["expire"]) || strtotime($_SESSION["expire"]) <= time()) {
+      $params = session_get_cookie_params();
+      setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+      );
+      $_SESSION = array();
+      session_destroy();
+      redirTo("/");
+    }
+  }
+
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
+
   initDirs();
   if(!IS_LOCALHOST) initLinks();
   initFiles();
