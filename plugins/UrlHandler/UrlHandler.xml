@@ -15,7 +15,8 @@
       prázdný param ... smaže aktuální parametry, např. "/?"
   -->
 
-  <var link="login">/</var>
+  <var link="login">?login</var>
+  <var link="Login">?login</var>
   <var link="Admin">/?Admin</var>
   <var link="admin">/?Admin</var>
   <var link="log">/?LogViewer=log</var>
@@ -28,7 +29,7 @@
 
   <var parName="PageSpeed" parValue="start">?</var>
 
-  <var parName="login">?</var>
+  <var parName="Login">?login</var>
   <var parName="admin">?Admin</var>
   <var parName="log">?LogViewer</var>
   <var parName="ver">?LogViewer</var>

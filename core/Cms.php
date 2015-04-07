@@ -119,8 +119,8 @@ class Cms {
       || !session_regenerate_id()) {
       throw new Exception(_("Unable to re/generate session ID"));
     }
-    $_SESSION[get_called_class()]["loggedUser"] = $user;
-    #$_SESSION["expire"] = time(); #todo + xxx sec;
+    #$_SESSION[get_called_class()]["loggedUser"] = $user;
+    $_SESSION["expire"] = time()+3600;
   }
 
   public static function isSuperUser() {
@@ -138,8 +138,8 @@ class Cms {
       && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return "server";
     if(isset($_SERVER['REMOTE_USER']) && strlen($_SERVER['REMOTE_USER']))
       return $_SERVER['REMOTE_USER'];
-    if(isset($_SESSION[get_called_class()]["loggedUser"]))
-      return $_SESSION[get_called_class()]["loggedUser"];
+    #if(isset($_SESSION[get_called_class()]["loggedUser"]))
+    #  return $_SESSION[get_called_class()]["loggedUser"];
     return null;
   }
 

@@ -449,7 +449,9 @@ function getShortString($str) {
 }
 
 function loginRedir() {
-  redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "login"), 401, _("Authorization required")));
+  $aQuery = explode("&", getCurQuery());
+  $q = buildQuery(array_merge($aQuery, array("login")));
+  redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => $q), 401, _("Authorization required")));
 }
 
 if(!function_exists("apc_exists")) {

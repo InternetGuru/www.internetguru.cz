@@ -1,9 +1,8 @@
 <?php
 try {
 
-  session_cache_limiter("");
-
   $start_time = microtime(true);
+  session_cache_limiter("");
   define("INDEX_HTML", "index.html");
   define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
   define("PLUGINS_DIR", "plugins");
@@ -109,10 +108,9 @@ try {
   require_once(CORE_FOLDER.'/globals.php');
 
   // check if session is valid
-  /*
   if(isset($_COOKIE[session_name()])) {
     session_start();
-    if(!isset($_SESSION["expire"]) || strtotime($_SESSION["expire"]) <= time()) {
+    if(!isset($_SESSION["expire"]) || $_SESSION["expire"] <= time()) {
       $params = session_get_cookie_params();
       setcookie(session_name(), '', time() - 42000,
         $params["path"], $params["domain"],
@@ -120,10 +118,9 @@ try {
       );
       $_SESSION = array();
       session_destroy();
-      redirTo("/");
+      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()), true));
     }
   }
-  */
 
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 

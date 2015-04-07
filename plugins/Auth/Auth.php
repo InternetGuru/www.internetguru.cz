@@ -15,7 +15,9 @@ class Auth extends Plugin implements SplObserver {
       elseif($e->getAttribute("access") == "denyall") $access = false;
       else $access = !is_null(Cms::getLoggedUser()); // default = deny for anonymous users
     }
-    if($access === false) loginRedir();
+    if($access !== false) return;
+    if(is_null(Cms::getLoggedUser())) loginRedir();
+    new ErrorPage(_("Insufficient rights to view this content"), 403);
   }
 
   public function update(SplSubject $subject) {}
