@@ -178,16 +178,16 @@ function getCurLink($query=false) {
   return $link.($query ? getCurQuery(true) : "");
 }
 
-function getCurQuery($qm=false) {
+function getCurQuery($questionMark=false) {
   if(!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) return "";
   parse_str($_SERVER['QUERY_STRING'], $pQuery);
   if(isset($pQuery["q"])) unset($pQuery["q"]);
-  return buildQuery($pQuery, $qm);
+  return buildQuery($pQuery, $questionMark);
 }
 
-function buildQuery($pQuery, $qm=true) {
+function buildQuery($pQuery, $questionMark=true) {
   if(empty($pQuery)) return "";
-  return ($qm ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
+  return ($questionMark ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
 function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
@@ -449,8 +449,9 @@ function getShortString($str) {
 }
 
 function loginRedir() {
-  $aQuery = explode("&", getCurQuery());
-  $q = buildQuery(array_merge($aQuery, array("login")));
+  $aQuery = array();
+  parse_str(getCurQuery(), $aQuery);
+  $q = buildQuery(array_merge($aQuery, array("login" => "")), false);
   redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => $q), 401, _("Authorization required")));
 }
 
