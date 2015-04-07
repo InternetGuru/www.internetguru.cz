@@ -63,7 +63,7 @@ class Agregator extends Plugin implements SplObserver {
         continue;
       }
       if(is_file("$workingDir/.$f")) continue;
-      $list[$subDir][] = "$workingDir/$f";
+      $list[$subDir][] = $f;
     }
     return $list;
   }
@@ -113,14 +113,16 @@ class Agregator extends Plugin implements SplObserver {
   private function createHtmlVar($subDir, Array $files) {
     $vars = array();
     $useCache = true;
-    foreach($files as $file) {
-      if(pathinfo($file, PATHINFO_EXTENSION) != "html") continue;
+    foreach($files as $fileName) {
+      if(pathinfo($fileName, PATHINFO_EXTENSION) != "html") continue;
+      $file = $this->pluginDir."/$fileName";
+      $filePath = USER_FOLDER."/".$file;
       try {
-        $doc = DOMBuilder::buildHTMLPlus($file);
+        $doc = DOMBuilder::buildHTMLPlus($filePath);
       } catch(Exception $e) {
         continue;
       }
-      $vars[$file] = $this->getHTMLVariables($doc, $file);
+      $vars[$filePath] = $this->getHTMLVariables($doc, $file);
       foreach($doc->getElementsByTagName("h") as $h) {
         if(!$h->hasAttribute("link")) continue;
         if($h->getAttribute("link") != getCurLink()) continue;
@@ -128,9 +130,10 @@ class Agregator extends Plugin implements SplObserver {
         $this->currentSubdir = $subDir;
         Cms::setVariable("filepath", $file);
       }
-      if(!$this->isValidInCache($file)) {
-        $stored = apc_store(get_class($this)."_$file", filemtime($file), rand(3600*24*30*3, 3600*24*30*6));
-        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $vName), Logger::LOGGER_WARNING);
+      $cacheKey = get_class($this).$filePath;
+      if(!$this->isValidCached($cacheKey)) {
+        $stored = apc_store($cacheKey, filemtime($filePath), rand(3600*24*30*3, 3600*24*30*6));
+        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $this->pluginDir."/$file"), Logger::LOGGER_WARNING);
         $useCache = false;
       }
     }
@@ -183,10 +186,9 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function isValidInCache($filePath) {
-    $cacheKey = get_class($this)."_$filePath";
-    if(!apc_exists($cacheKey)) return false;
-    if(apc_fetch($cacheKey) != filemtime($filePath)) return false;
+  private function isValidCached($key) {
+    if(!apc_exists($key)) return false;
+    if(apc_fetch($key) != filemtime($filePath)) return false;
     return true;
   }
 
