@@ -41,33 +41,22 @@ body.doc div.paragraph > ol,
 body.doc div.list > ol {
   list-style-type: lower-roman;
 }
-/*
-body.doc div.paragraph ol > li:before,
-body.doc div.list ol > li:before {
-  content: "";
-}
-body.doc div.paragraph ol > li,
-body.doc div.list ol > li {
-  margin-left: 2em;
-}
-*/
-body.doc li input[type="text"],
-body.doc dd input[type="text"] {
+body.doc label > input[type="text"] {
   border: none;
   background: #EAF2F5;
   width: 55%;
   min-width: 25em;
   border-bottom: 0.1em solid rgb(165, 165, 165);
 }
-body.doc li span,
-body.doc dd span {
+body.doc label > span {
   width: 27%;
   display: inline-block;
   min-width: 13em;
 }
 @media print {
-  p.creation, ul.docinfo,
-  .hidden, #footer {
+  body.doc.sml p.creation,
+  body.doc.sml ul.docinfo,
+  body.doc.sml #footer {
     display: none;
   }
 }
