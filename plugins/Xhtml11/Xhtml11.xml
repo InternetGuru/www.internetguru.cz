@@ -22,8 +22,9 @@
   <!-- available themes: basic or simple -->
   <var id="theme">simple</var>
 
-  <stylesheet>themes/cms-default.css</stylesheet>
+  <stylesheet>lib/opensans/opensans.css</stylesheet>
   <stylesheet>lib/flaticon/flaticon.css</stylesheet>
+  <stylesheet>themes/cms-default.css</stylesheet>
   <stylesheet media="print">themes/cms-print.css</stylesheet>
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
