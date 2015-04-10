@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-31 00:51+0100\n"
-"PO-Revision-Date: 2015-03-31 00:53+0100\n"
+"POT-Creation-Date: 2015-04-10 17:27+0100\n"
+"PO-Revision-Date: 2015-04-10 17:29+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -43,33 +43,33 @@ msgstr "HTML+ generované rozšířením %s bylo automaticky opraveno: %s"
 msgid "Unable to re/generate session ID"
 msgstr "Nepodařilo se vygenerovat session ID"
 
-#: D:\wamp\www\cms/core/Cms.php:152
+#: D:\wamp\www\cms/core/Cms.php:154
 #, php-format
 msgid "Some variables or functions causing HTML+ error: %s"
 msgstr "Některé proměnné nebo funkce způsobují chybu syntaxe HTML+: %s"
 
-#: D:\wamp\www\cms/core/Cms.php:177
+#: D:\wamp\www\cms/core/Cms.php:179
 msgid "Adding message after output - forcing flash"
 msgstr "Vynucený 'flash' pro systémouvou zprávu přidanou po výpise"
 
-#: D:\wamp\www\cms/core/Cms.php:181
+#: D:\wamp\www\cms/core/Cms.php:183
 msgid "Unable to set flash message if super user not logged"
 msgstr "Není možné nastavit flash zprávu bez přihlášeného administrátora"
 
-#: D:\wamp\www\cms/core/Cms.php:215
+#: D:\wamp\www\cms/core/Cms.php:217
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: D:\wamp\www\cms/core/Cms.php:223
+#: D:\wamp\www\cms/core/Cms.php:225
 #, php-format
 msgid "Unable to set function %s: not a function"
 msgstr "Není možné vytvořit funkci %s: nejedná se o funkci"
 
-#: D:\wamp\www\cms/core/Cms.php:252
+#: D:\wamp\www\cms/core/Cms.php:254
 msgid "Content is not set"
 msgstr "Obsah není nastaven"
 
-#: D:\wamp\www\cms/core/Cms.php:264
+#: D:\wamp\www\cms/core/Cms.php:266
 #, php-format
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
@@ -104,67 +104,62 @@ msgstr "Nepodařilo se načíst soubor '%s': %s"
 msgid "Failed to load user/admin/default file %s: %s"
 msgstr "Nepodařilo se načíst uživatelský/admin/výchozí soubor %s: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:189
+#: D:\wamp\www\cms/core/DOMBuilder.php:188
 #, php-format
 msgid "File '%s' already included"
 msgstr "Soubor '%s' byl již vložen"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:194
+#: D:\wamp\www\cms/core/DOMBuilder.php:193
 #, php-format
 msgid "File disabled"
 msgstr "Soubor je neaktivní"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:198
+#: D:\wamp\www\cms/core/DOMBuilder.php:212
 #, php-format
 msgid "Invalid XML file %s"
 msgstr "Chybný XML soubor %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:212
-#, php-format
-msgid "Unable to cache file %s"
-msgstr "Nepodařilo se uložit soubor %s do mezipaměti"
-
-#: D:\wamp\www\cms/core/DOMBuilder.php:217
+#: D:\wamp\www\cms/core/DOMBuilder.php:227
 #, php-format
 msgid "HTML+ file %s autocorrected: %s"
 msgstr "HTML+ soubor %s byl automaticky opraven: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:246
+#: D:\wamp\www\cms/core/DOMBuilder.php:263
+#, php-format
+msgid "Unable to cache file %s"
+msgstr "Nepodařilo se uložit soubor %s do mezipaměti"
+
+#: D:\wamp\www\cms/core/DOMBuilder.php:284
 #, php-format
 msgid "Duplicit prefix %s in %s renamed to %s"
 msgstr "Duplicitní prefix %s v %s přejmenován na %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:295
+#: D:\wamp\www\cms/core/DOMBuilder.php:336
 #, php-format
 msgid "Duplicit link %s skipped"
 msgstr "Byl vynechán duplicitní link %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:360
-#, php-format
-msgid "Inserted %s of %s HTML+ file(s)"
-msgstr "Vloženo %s z %s HTML+ souborů"
-
-#: D:\wamp\www\cms/core/DOMBuilder.php:369
+#: D:\wamp\www\cms/core/DOMBuilder.php:407
 #, php-format
 msgid "Included file '%s' not found"
 msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:372
+#: D:\wamp\www\cms/core/DOMBuilder.php:410
 #, php-format
 msgid "Included file extension '%s' must be .html"
 msgstr "Přípona vkládaného souboru '%s' musí být .html"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:374
+#: D:\wamp\www\cms/core/DOMBuilder.php:412
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:380
+#: D:\wamp\www\cms/core/DOMBuilder.php:418
 #, php-format
 msgid "Unable to import '%s': %s"
 msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:388
+#: D:\wamp\www\cms/core/DOMBuilder.php:426
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -172,12 +167,12 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:400
+#: D:\wamp\www\cms/core/DOMBuilder.php:438
 #, php-format
 msgid "HTML+ autocorrected after inserting '%s': %s"
 msgstr "HTML+ automaticky opraven po vložení souboru '%s': %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:451
+#: D:\wamp\www\cms/core/DOMBuilder.php:489
 #, php-format
 msgid "ID '%s' conflicts with element '%s'"
 msgstr "Atribut ID '%s' koliduje s elementem '%s'"
@@ -239,12 +234,14 @@ msgid "Variable value must be non-empty string or null"
 msgstr "Hodnota proměnné musí být neprázdný řetězec nebo null"
 
 #: D:\wamp\www\cms/core/HTMLPlus.php:202
-msgid "Empty element desc following heading with attribute link found"
-msgstr "Nalezen prázdný element desc následující nadpis s atributem link"
+#, php-format
+msgid "Empty element desc following heading with attribute link %s found"
+msgstr "Nalezen prázdný element desc následující nadpis s atributem link %s"
 
 #: D:\wamp\www\cms/core/HTMLPlus.php:207
-msgid "Attribute kw following heading with link not found or empty"
-msgstr "Nebyl nalezen platný atribut kw následující nadpis s atributem link"
+#, php-format
+msgid "Attribute kw following heading with link %s not found or empty"
+msgstr "Nebyl nalezen platný atribut kw následující nadpis s atributem link %s"
 
 #: D:\wamp\www\cms/core/HTMLPlus.php:222
 msgid "Body attribude 'ns' missing"
@@ -421,99 +418,99 @@ msgstr "Přesměrování na prázdný řetězec změněno na kořenový adresá�
 msgid "Redirecting to '%s'"
 msgstr "Přesměrování na '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:109
+#: D:\wamp\www\cms/core/globals.php:112
 #, php-format
 msgid "Unable to parse href '%s'"
 msgstr "Nelze zpracovat atribut href '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:127
+#: D:\wamp\www\cms/core/globals.php:130
 msgid "Link is cyclic"
 msgstr "Odkaz je cycklický"
 
-#: D:\wamp\www\cms/core/globals.php:202
+#: D:\wamp\www\cms/core/globals.php:205
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: D:\wamp\www\cms/core/globals.php:208 D:\wamp\www\cms/core/globals.php:238
+#: D:\wamp\www\cms/core/globals.php:211 D:\wamp\www\cms/core/globals.php:241
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/globals.php:211
+#: D:\wamp\www\cms/core/globals.php:214
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:213
+#: D:\wamp\www\cms/core/globals.php:216
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:215
+#: D:\wamp\www\cms/core/globals.php:218
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: D:\wamp\www\cms/core/globals.php:217
+#: D:\wamp\www\cms/core/globals.php:220
 msgid "Unable to delete.old file"
 msgstr "Nepodařilo se smazat soubor .old"
 
-#: D:\wamp\www\cms/core/globals.php:224
+#: D:\wamp\www\cms/core/globals.php:227
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: D:\wamp\www\cms/core/globals.php:245
+#: D:\wamp\www\cms/core/globals.php:248
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:251
+#: D:\wamp\www\cms/core/globals.php:254
 #, php-format
 msgid "Directory '%s' not found"
 msgstr "Složka '%s' nebyla nalezena"
 
-#: D:\wamp\www\cms/core/globals.php:301
+#: D:\wamp\www\cms/core/globals.php:304
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: D:\wamp\www\cms/core/globals.php:309
+#: D:\wamp\www\cms/core/globals.php:312
 msgid "File does not exist"
 msgstr "Soubor neexistuje"
 
-#: D:\wamp\www\cms/core/globals.php:311 D:\wamp\www\cms/core/globals.php:382
+#: D:\wamp\www\cms/core/globals.php:314 D:\wamp\www\cms/core/globals.php:385
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: D:\wamp\www\cms/core/globals.php:317
+#: D:\wamp\www\cms/core/globals.php:320
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: D:\wamp\www\cms/core/globals.php:397
+#: D:\wamp\www\cms/core/globals.php:400
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: D:\wamp\www\cms/core/globals.php:447
+#: D:\wamp\www\cms/core/globals.php:459
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: D:\wamp\www\cms/index.php:103
+#: D:\wamp\www\cms/index.php:105
 #, php-format
 msgid "Method %s is no longer available"
 msgstr "Metoda %s již není k dispozici"
 
-#: D:\wamp\www\cms/index.php:104
+#: D:\wamp\www\cms/index.php:106
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: D:\wamp\www\cms/index.php:133
+#: D:\wamp\www\cms/index.php:152
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: D:\wamp\www\cms/index.php:138
+#: D:\wamp\www\cms/index.php:157
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: D:\wamp\www\cms/index.php:139
+#: D:\wamp\www\cms/index.php:158
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -615,29 +612,37 @@ msgstr "Nepodporované schéma '%s'"
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:57
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:58
 msgid "Unable to create Agregator temporary folder"
 msgstr "Nepodařilo se vytvořit dočasný adresář pro rozšíření Agregator"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:138
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:142
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:185
+#, php-format
+msgid "Unable to cache variable %s"
+msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
+
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:150
 msgid "Configuration element html missing attribute id"
 msgstr "Konfiguračnímu elementu html chybí atribut id"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:146
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:170
 #, php-format
-msgid "Sort variable %s not found; using default ctime"
-msgstr ""
-"Proměnná atributu sort %s nebyla nazelena; použita výchozí hodnota řazení "
-"ctime"
+msgid "Sort variable %s not found; using default"
+msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:184
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:225
 #, php-format
 msgid "Redundant element(s) found in %s"
 msgstr "Nalezen nadbytečný element v %s"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:185
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:226
 msgid "No item element found"
 msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
+
+#: D:\wamp\www\cms/plugins/Auth/Auth.php:20
+msgid "Insufficient rights to view this content"
+msgstr "Nedostatečná práva pro zobrazení obsahu"
 
 #: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:59
 #, php-format
@@ -993,6 +998,20 @@ msgstr "Modifikace souboru %s je vypnuta"
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "Inserted %s of %s HTML+ file(s)"
+#~ msgstr "Vloženo %s z %s HTML+ souborů"
+
+#~ msgid "Empty element desc following heading with attribute link found"
+#~ msgstr "Nalezen prázdný element desc následující nadpis s atributem link"
+
+#~ msgid "Attribute kw following heading with link not found or empty"
+#~ msgstr "Nebyl nalezen platný atribut kw následující nadpis s atributem link"
+
+#~ msgid "Sort variable %s not found; using default ctime"
+#~ msgstr ""
+#~ "Proměnná atributu sort %s nebyla nazelena; použita výchozí hodnota řazení "
+#~ "ctime"
 
 #~ msgid "Unknown image mode"
 #~ msgstr "Neznámý mód obrázku"

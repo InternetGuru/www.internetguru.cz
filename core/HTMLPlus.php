@@ -199,12 +199,12 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$h->hasAttribute("link")) continue;
       if(!strlen(trim($h->nextElement->nodeValue))) {
         if(!$repair || is_null($this->defaultDesc))
-          throw new Exception(_("Empty element desc following heading with attribute link found"));
+          throw new Exception(sprintf(_("Empty element desc following heading with attribute link %s found"), $h->getAttribute("link")));
         $h->nextElement->nodeValue = $this->defaultDesc;
       }
       if(!$h->nextElement->hasAttribute("kw") || !strlen(trim($h->nextElement->getAttribute("kw")))) {
         if(!$repair || is_null($this->defaultKw))
-          throw new Exception(_("Attribute kw following heading with link not found or empty"));
+          throw new Exception(sprintf(_("Attribute kw following heading with link %s not found or empty"), $h->getAttribute("link")));
         $h->nextElement->setAttribute("kw", $this->defaultKw);
       }
     }
