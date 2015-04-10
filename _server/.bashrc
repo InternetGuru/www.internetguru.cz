@@ -53,7 +53,7 @@ elif [[ $USER == "cms" ]]; then
 else
     SU=$BCyan
 fi
-PS1="\[$SU\]\u\[$NC\]@\h:\w\\$ \e]0;\u@\h:\w\a"
+PS1="\[$SU\]\u\[$NC\]@\h:\[$BWhite\]\w\[$NC\]\\$ \e]0;\u@\h:\w\a"
 
 # GIT
 alias gaas='git add -A; gs'
