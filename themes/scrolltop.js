@@ -1,11 +1,10 @@
 (function(win) {
 
   var Config = {};
-  Config.wrapperId = "scrolltop";
-  Config.speed = 10;
-  Config.text = "^";
-  Config.scrollBy = 50;
-  Config.hidePosition = 200;
+  Config.wrapperId = "scrolltop"; // wrapper element (a) id value
+  Config.time = 250; // int ms to scroll
+  Config.text = "^"; // text content
+  Config.hidePosition = 200; // display / hide button int px from top
 
    var ScrollTop = function() {
 
@@ -14,6 +13,8 @@
       button = null,
       h1 = document.getElementsByTagName("h1")[0],
       displayed = false,
+      step = null,
+      wait = 10,
       initCfg = function(cfg) {
         if(typeof cfg === 'undefined') return;
         for(var attr in cfg) {
@@ -39,8 +40,8 @@
       },
       doScroll = function() {
         if (getScrollTop() != 0) {
-          window.scrollBy(0, -1 * Config.scrollBy);
-          scrollTimeOut = setTimeout(function(){ doScroll(); }, Config.speed);
+          window.scrollBy(0, -1 * step);
+          scrollTimeOut = setTimeout(function(){ doScroll(); }, wait);
         } else {
           clearTimeout(scrollTimeOut);
           window.history.replaceState("", "", "#"+h1.id);
@@ -72,7 +73,9 @@
         button.appendChild(span);
         document.body.appendChild(button);
         button.onclick = function() {
-          doScroll();
+          step = Math.round(getScrollTop() / Config.time * wait);
+          if(Config.time == 0) window.scrollTo(0, 0);
+          else doScroll();
           return false;
         }
       };
