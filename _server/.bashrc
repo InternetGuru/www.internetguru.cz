@@ -48,14 +48,12 @@ NC="\e[m"
 # Color2user
 if [[ $USER == "root" ]]; then
   SU=$BRed
-  elif [[ $USER == "cmsadmin" || $USER == "cms" ]]; then
+elif [[ $USER == "cms" ]]; then
     SU=$BGreen
-  elif [[ $USER == "webcmsadmin" ]]; then
-    SU=$BGreen
-  else
+else
     SU=$BCyan
 fi
-PS1="\[$SU\]\u\[$NC\]@\h:\w# "
+PS1="\[$SU\]\u\[$NC\]@\h:\w\\$ \e]0;\u@\h:\w\a"
 
 # GIT
 alias gaas='git add -A; gs'
