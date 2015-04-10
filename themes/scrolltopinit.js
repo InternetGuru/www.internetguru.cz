@@ -1,0 +1,3 @@
+ScrollTop.init({
+  /* text: "nahoru" */
+});

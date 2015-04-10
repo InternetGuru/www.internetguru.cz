@@ -31,6 +31,8 @@
   <jsFile append="body">themes/fragments.js</jsFile>
   <jsFile append="body" priority="5">themes/selectable.js</jsFile>
   <jsFile append="body">themes/hideable.js</jsFile>
+  <jsFile append="body">themes/scrolltop.js</jsFile>
+  <jsFile append="body">themes/scrolltopinit.js</jsFile>
 
   <!-- <xslt readonly="readonly"/> -->
   <xslt>themes/cms-messages.xsl</xslt>

@@ -1,7 +1,7 @@
 (function(win) {
 
   var Config = {};
-  Config.wrapperClass = "scrolltop";
+  Config.wrapperId = "scrolltop";
   Config.speed = 10;
   Config.text = "^";
   Config.scrollBy = 50;
@@ -23,8 +23,8 @@
       },
       appendStyle = function() {
         var css = '/* scrolltop.js */'
-          + 'div.scrolltop { position: fixed; bottom: 0; right: 0; }'
-          + 'div.scrolltop a { text-decoration: none; background: rgba(0, 0, 0, 0.6); padding: 0.3rem 0.75rem; font-size: 1.15rem; vertical-align: 0.5rem; margin: 0.75rem; display: block; color: white; }';
+          + 'a#scrolltop { position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.6); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; }'
+          + 'a#scrolltop span { position: relative; top: -0.1em; }';
           var style = document.getElementsByTagName('style')[0];
         if(style == undefined) {
           var head = document.head || document.getElementsByTagName('head')[0];
@@ -64,14 +64,14 @@
         win.onscroll = fn;
       },
       createButton = function() {
-        button = document.createElement("div");
-        button.className = Config.wrapperClass;
-        var a = document.createElement("a");
-        a.href = "#" + h1.id;
-        a.innerHTML = Config.text;
-        button.appendChild(a);
+        button = document.createElement("a");
+        button.href = "#" + h1.id;
+        button.id = Config.wrapperId;
+        var span = document.createElement("span");
+        span.innerHTML = Config.text;
+        button.appendChild(span);
         document.body.appendChild(button);
-        a.onclick = function() {
+        button.onclick = function() {
           doScroll();
           return false;
         }
