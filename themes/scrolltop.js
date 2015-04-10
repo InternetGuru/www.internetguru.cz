@@ -24,7 +24,7 @@
       },
       appendStyle = function() {
         var css = '/* scrolltop.js */'
-          + 'a#scrolltop { position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.6); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; }'
+          + 'a#scrolltop { position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; }'
           + 'a#scrolltop span { position: relative; top: -0.1em; }';
           var style = document.getElementsByTagName('style')[0];
         if(style == undefined) {
