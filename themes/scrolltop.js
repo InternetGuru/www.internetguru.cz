@@ -25,7 +25,8 @@
       appendStyle = function() {
         var css = '/* scrolltop.js */'
           + 'a#scrolltop { position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; }'
-          + 'a#scrolltop span { position: relative; top: -0.1em; }';
+          + 'a#scrolltop span { position: relative; top: -0.1em; }'
+          + 'a#scrolltop.scrollhide { display: none; }';
           var style = document.getElementsByTagName('style')[0];
         if(style == undefined) {
           var head = document.head || document.getElementsByTagName('head')[0];
@@ -54,11 +55,11 @@
             if(getScrollTop() <= Config.hidePosition) {
               if(button === null) return;
               displayed = false;
-              button.style.display = "none";
+              button.className = "scrollhide";
             } else if(displayed == false) {
               displayed = true;
               if(button === null) createButton();
-              button.style.display = "block";
+              button.className = "";
             }
           }, 50);
         };
