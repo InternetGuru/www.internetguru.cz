@@ -3,9 +3,9 @@
   var Config = {};
   Config.wrapperClass = "scrolltop";
   Config.speed = 10;
-  Config.text = "Top";
+  Config.text = "^";
   Config.scrollBy = 50;
-  Config.hidePosition = 0;
+  Config.hidePosition = 200;
 
    var ScrollTop = function() {
 
@@ -24,7 +24,7 @@
       appendStyle = function() {
         var css = '/* scrolltop.js */'
           + 'div.scrolltop { position: fixed; bottom: 0; right: 0; }'
-          + 'div.scrolltop a { text-decoration: none; background: rgba(0, 0, 0, 0.6); padding: 1rem 0.75rem; font-size: 1.15rem; vertical-align: 0.5rem; border-radius: 2rem; margin: 0.75rem; display: block; color: white; }';
+          + 'div.scrolltop a { text-decoration: none; background: rgba(0, 0, 0, 0.6); padding: 0.3rem 0.75rem; font-size: 1.15rem; vertical-align: 0.5rem; margin: 0.75rem; display: block; color: white; }';
           var style = document.getElementsByTagName('style')[0];
         if(style == undefined) {
           var head = document.head || document.getElementsByTagName('head')[0];
