@@ -218,12 +218,17 @@ class Agregator extends Plugin implements SplObserver {
       }
       $cacheKey = get_class($this).$filePath;
       if(!$this->isValidCached($cacheKey, $filePath)) {
-        $stored = apc_store($cacheKey, filemtime($filePath), rand(3600*24*30*3, 3600*24*30*6));
-        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $file), Logger::LOGGER_WARNING);
+        $this->storeCache($cacheKey, filemtime($filePath), $file);
         $useCache = false;
       }
     }
     if(empty($vars)) return;
+    $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
+    $cacheKey = HOST.get_class($this).$filePath;
+    if(!$this->isValidCached($cacheKey, $filePath)) {
+      $this->storeCache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
+      $useCache = false;
+    }
     foreach($this->cfg->documentElement->childElements as $html) {
       if($html->nodeName != "html") continue;
       if(!$html->hasAttribute("id")) {
@@ -261,13 +266,17 @@ class Agregator extends Plugin implements SplObserver {
           "name" => $vName,
           "value" => $vValue->saveXML(),
         );
-        $stored = apc_store(HOST.get_class($this)."_subdir_$vName", $var, rand(3600*24*30*3, 3600*24*30*6));
-        if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $vName), Logger::LOGGER_WARNING);
+        $this->storeCache(HOST.get_class($this)."_subdir_$vName", $var, $vName);
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
         continue;
       }
     }
+  }
+
+  private function storeCache($key, $value, $name) {
+    $stored = apc_store($key, $value, rand(3600*24*30*3, 3600*24*30*6));
+    if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
   }
 
   private function isValidCached($key, $filePath) {
@@ -281,7 +290,6 @@ class Agregator extends Plugin implements SplObserver {
     if(!apc_exists($cacheKey)) return null;
     return apc_fetch($cacheKey);
   }
-
 
   private static function cmp($a, $b) {
     if($a[self::$sortKey] == $b[self::$sortKey]) return 0;

@@ -461,22 +461,24 @@ function loginRedir() {
 
 if(!function_exists("apc_exists")) {
   function apc_exists($key) {
-    return file_exists(getcwd()."/../tmp_apc/$key");
+    return file_exists(apc_get_path($key));
   }
 }
 
 if(!function_exists("apc_fetch")) {
   function apc_fetch($key) {
-    return json_decode(file_get_contents(getcwd()."/../tmp_apc/$key"), true);
+    return json_decode(file_get_contents(apc_get_path($key)), true);
   }
 }
 
 if(!function_exists("apc_store")) {
   function apc_store($key, $value) {
-    $path = getcwd()."/../tmp_apc/$key";
-    mkdir_plus(dirname($path));
-    return file_put_contents($path, json_encode($value)) !== false;
+    return file_put_contents(apc_get_path($key), json_encode($value)) !== false;
   }
+}
+
+function apc_get_path($key) {
+  return getcwd()."/../tmp_apc/".normalize($key);
 }
 
 ?>
