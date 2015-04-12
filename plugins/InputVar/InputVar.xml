@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
 
+  <!--
+
+    Element var:
+      - identifikátor (atribut id="neco")
+      - funkce (nepovinný atribut fn="název funkce")
+      - proměnná (nepovinný atribut var="název proměnné")
+
+    Element fn:
+      - identifikátor (atribut id="neco")
+      - funkce (atribut fn="název funkce")
+
+    Dostupné funkce:
+      - hash ... vrací otisk textu dle (nepovinného) atributu algo
+        Formát podle http://php.net/manual/en/function.hash-algos.php
+        Výchozím algoritmem je crc32b
+      - strftime ... formátuje datum podle (nepovinného) atributu format
+        Formát podle http://php.net/manual/en/function.strftime.php
+        Výchozím formátem je %m/%d/%Y
+      - sprintf ... formátuje obsah resp. elementy podle obsahu
+        Formát podle http://php.net/manual/en/function.sprintf.php
+      - replace ... nahrazuje obsah elementu podle obsažených elementů data
+        Např. <data name="a">b</data> nahradí všechny "a" v textu za "b"
+      - sequence ... řetězí volání funkcí uvedených v elementech call
+
+  -->
+
   <fn id="monthcs" fn="replace">
     <data name="leden">ledna</data>
     <data name="únor">února</data>
@@ -15,23 +41,15 @@
     <data name="listopad">listopadu</data>
     <data name="prosinec">prosince</data>
   </fn>
-  <fn id="dateformat" fn="strftime" format="%e. %B %Y"/>
-  <fn id="dateformatcs" fn="sequence">
-    <call fn="dateformat"/>
-    <call fn="monthcs"/>
+  <fn id="yearformat" fn="strftime" format="%Y"/>
+  <fn id="tmpdateformat" fn="strftime" format="%e. %B %Y"/>
+  <fn id="dateformat" fn="sequence">
+    <call>tmpdateformat</call>
+    <call>monthcs</call>
   </fn>
 
-  <var id="cyear" fn="strftime" format="%Y" var="cms-ctime"/>
-  <var id="year" fn="strftime" format="%Y">now</var>
-  <var id="today" fn="dateformatcs">now</var>
-  <var id="myctime" fn="dateformatcs" var="cms-ctime"/>
-  <var id="mymtime" fn="dateformatcs" var="cms-mtime"/>
-  <var id="linkctime" fn="dateformatcs" var="contentlink-ctime"/>
-  <var id="linkmtime" fn="dateformatcs" var="contentlink-mtime"/>
-
-  <var id="creation">Autorem obsahu je <a var="contentlink-author contentlink-authorid@href">n/a</a> ze dne <em var="inputvar-linkctime">n/a</em></var>
-  <var id="edit">[<a href="?Admin=%s" var="agregator-filepath@href">Upravit obsah</a>]</var>
-  <var id="resp">Za obsah této stránky zodpovídá <a var="contentlink-resp contentlink-respid@href">n/a</a>.</var>
-  <var id="modified">Obsah této stránky byl naposledy upraven dne <em var="inputvar-linkmtime">n/a</em>.</var>
+  <var id="cyear" fn="yearformat" var="cms-ctime"/>
+  <var id="year" fn="yearformat">now</var>
+  <var id="today" fn="dateformat">now</var>
 
 </InputVar>

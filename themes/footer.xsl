@@ -59,8 +59,8 @@
           <xsl:if test="not($cms-resp = '')">
             <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
           </xsl:if>
-          <xsl:if test="not($cms-mtime = '')">
-            <li>Upraveno: <xsl:value-of select="$inputvar-mymtime"/></li>
+          <xsl:if test="$cms-mtime">
+            <li>Upraveno: <em fn="inputvar-dateformat"><xsl:value-of select="$cms-mtime"/></em></li>
           </xsl:if>
           <li class="link"><xsl:value-of select="$cms-uri"/></li>
           <xsl:if test="not($cms-logged_user = '')">
@@ -72,6 +72,7 @@
     </body>
   </xsl:template>
 
+  <!--
   <xsl:template match="div[@id='content']">
     <xsl:element name="div">
       <xsl:copy-of select="@*"/>
@@ -81,10 +82,10 @@
           <li class="creation"><xsl:value-of disable-output-escaping="yes" select="$inputvar-creation"/></li>
         </xsl:if>
         <xsl:if test="not($inputvar-linkmtime = $inputvar-linkctime)">
-          <li class="mtime"><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
+          <li class="modification"><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
         </xsl:if>
         <xsl:if test="not($contentlink-resp = '')">
-          <li class="resp"><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
+          <li class="responsible"><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
         </xsl:if>
         <xsl:if test="not($cms-super_user = '') and not($agregator-filepath = '')">
           <li class="edit"><xsl:value-of disable-output-escaping="yes" select="$inputvar-edit"/></li>
@@ -92,6 +93,7 @@
       </ul>
     </xsl:element>
   </xsl:template>
+  -->
 
   <xsl:template match="node()|@*">
     <xsl:copy>

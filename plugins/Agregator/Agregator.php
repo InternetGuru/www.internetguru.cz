@@ -1,16 +1,20 @@
 <?php
 
-
 class Agregator extends Plugin implements SplObserver {
   private $files = array();  // filePath => fileInfo(?)
   private $currentDoc = null;
   private $currentSubdir = null;
+  private $currentFilepath = null;
+  private $currentMTime = null;
+  private $currentCTime = null;
+  private $edit;
   private $cfg;
   private static $sortKey;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 2);
+    $this->edit = _("Edit");
   }
 
   public function update(SplSubject $subject) {
@@ -25,7 +29,81 @@ class Agregator extends Plugin implements SplObserver {
     #$filesList = $this->createList(FILES_FOLDER);
     #$this->createFilesVar(FILES_FOLDER);
     #$this->createImgVar(FILES_FOLDER);
-    if(!is_null($this->currentDoc)) $this->insertContent($this->currentDoc, $this->currentSubdir);
+    if(is_null($this->currentDoc)) return;
+    $this->insertDocInfo($this->currentDoc);
+    $this->insertContent($this->currentDoc, $this->currentSubdir);
+  }
+
+  private function insertDocInfo(HTMLPlus $doc) {
+    foreach($doc->getElementsByTagName("h") as $h) {
+      $ul = $this->createDocInfo($h);
+      if(!$ul->childNodes->length) continue;
+      $e = $h->nextElement;
+      while(!is_null($e)) {
+        if($e->nodeName == "h") break;
+        $e = $e->nextElement;
+      }
+      if(is_null($e)) $h->parentNode->appendChild($ul);
+      else $h->parentNode->insertBefore($ul, $e);
+    }
+  }
+
+  private function createDocInfo(DOMElementPlus $h) {
+    $ul = $h->ownerDocument->createElement("ul");
+    if($h->parentNode->nodeName == "body") {
+      $ul->setAttribute("class", "docinfo nomultiple global");
+      // global author & creation
+      $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+      $li->setAttribute("class", "created");
+      $authorLink = $h->getAttribute("author");
+      if($h->hasAttribute("authorid")) {
+        $authorLink = "<a href='".$h->getAttribute("authorid")."'>$authorLink</a>";
+      }
+      $cDate = "<em fn='inputvar-dateformat'>".$this->currentCTime."</em>";
+      $li->insertVariable(sprintf(_("Created by %s on %s"), $authorLink, $cDate));
+      // global modification
+      if(substr($this->currentCTime, 0, 10) != substr($this->currentMTime, 0, 10)) {
+        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+        $li->setAttribute("class", "modified");
+        $mDate = "<em fn='inputvar-dateformat'>".$this->currentMTime."</em>";
+        $li->insertVariable(sprintf(_("Document content last modified on %s"), $mDate));
+      }
+      // global responsibility
+      if($h->hasAttribute("resp")) {
+        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+        $li->setAttribute("class", "responsible");
+        $respLink = $h->getAttribute("resp");
+        if($h->hasAttribute("respid")) {
+          $respLink = "<a href='".$h->getAttribute("respid")."'>$respLink</a>";
+        }
+        $li->insertVariable(sprintf(_("Person responsible for this content is %s"), $respLink));
+      }
+      // edit link
+      if(Cms::isSuperUser()) {
+        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+        $li->setAttribute("class", "edit");
+        $a = $li->appendChild($h->ownerDocument->createElement("a", $this->edit));
+        $a->setAttribute("href", "?Admin=".$this->currentFilepath);
+        $a->setAttribute("title", $this->currentFilepath);
+      }
+    } else {
+      $ul->setAttribute("class", "docinfo nomultiple partial");
+      // local author (?)
+      // local responsibility (?)
+      // local creation
+      if($h->hasAttribute("ctime") && substr($this->currentCTime, 0, 10) != substr($h->getAttribute("ctime"), 0, 10)) {
+        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+        $cDate = "<em fn='inputvar-dateformat'>".$h->getAttribute("ctime")."</em>";
+        $li->insertVariable(sprintf(_("This section has been created on %s"), $cDate));
+      }
+      // local modification
+      if($h->hasAttribute("mtime") && substr($this->currentMTime, 0, 10) != substr($h->getAttribute("mtime"), 0, 10)) {
+        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+        $mDate = "<em fn='inputvar-dateformat'>".$h->getAttribute("mtime")."</em>";
+        $li->insertVariable(sprintf(_("This section has been modified on %s"), $mDate));
+      }
+    }
+    return $ul;
   }
 
   private function insertContent(HTMLPlus $doc, $subDir) {
@@ -134,7 +212,9 @@ class Agregator extends Plugin implements SplObserver {
         if($h->getAttribute("link") != getCurLink()) continue;
         $this->currentDoc = $doc;
         $this->currentSubdir = $subDir;
-        Cms::setVariable("filepath", $file);
+        $this->currentFilepath = $file;
+        $this->currentCTime = $h->getAttribute("ctime");
+        $this->currentMTime = $h->getAttribute("mtime");
       }
       $cacheKey = get_class($this).$filePath;
       if(!$this->isValidCached($cacheKey, $filePath)) {
@@ -241,7 +321,7 @@ class Agregator extends Plugin implements SplObserver {
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($element, true));
     $doc->processVariables($vars);
-    $doc->processFunctions(array(), $vars);
+    #$doc->processFunctions(array(), $vars);
     return $doc->documentElement;
   }
 
@@ -249,7 +329,10 @@ class Agregator extends Plugin implements SplObserver {
     $vars = array();
     $h = $doc->documentElement->firstElement;
     $desc = $h->nextElement;
-    $vars['filepath'] = $filePath;
+    $vars['editlink'] = "";
+    if(Cms::isSuperUser()) {
+      $vars['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";
+    }
     $vars['heading'] = $h->nodeValue;
     $vars['link'] = $h->getAttribute("link");
     $vars['author'] = $h->getAttribute("author");

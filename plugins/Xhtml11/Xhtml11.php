@@ -19,21 +19,19 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
+    $s->setPriority($this, 1000);
     $this->favIcon = $this->pluginDir."/".self::FAVICON;
+    Cms::setOutputStrategy($this);
     if(self::DEBUG) new Logger("DEBUG");
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_INIT) {
-      Cms::setOutputStrategy($this);
-    }
-    if($subject->getStatus() == STATUS_PROCESS) {
-      $cfg = $this->getDOMPlus();
-      $this->registerThemes($cfg);
-      if(!$this->selectable) return;
-      $selectTitle = _("Select all");
-      $this->addJs("Selectable.init({selectTitle: \"$selectTitle\"});", 6);
-    }
+    if($subject->getStatus() != STATUS_PROCESS) return;
+    $cfg = $this->getDOMPlus();
+    $this->registerThemes($cfg);
+    if(!$this->selectable) return;
+    $selectTitle = _("Select all");
+    $this->addJs("Selectable.init({selectTitle: \"$selectTitle\"});", 6);
   }
 
   /**
@@ -84,26 +82,17 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     Cms::setForceFlash();
 
     // apply transformations
-    $proc = new XSLTProcessor();
-    $proc->setParameter('', $this->getProcParams());
-    stableSort($this->transformationsPriority);
-    foreach($this->transformationsPriority as $xslt => $priority) {
-      try {
-        $newContent = $this->transform($content, $xslt, $this->transformations[$xslt]['user'], $proc);
-        $newContent->encoding="utf-8";
-        $xml = $newContent->saveXML();
-        if(!$newContent->loadXML($xml))
-          throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
-        $content = $newContent;
-      } catch(Exception $e) {
-        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
-      }
-    }
+    $content = $this->applyTransformations($content);
 
     // final validation
     $contentPlus = new DOMDocumentPlus();
     $contentPlus->loadXML($content->saveXML());
-    $ids = $this->getIds($contentPlus);
+    $contentPlus->processVariables(Cms::getAllVariables());
+    $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
+    $xPath = new DOMXPath($contentPlus);
+    foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var", "");
+    foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn", "");
+    $ids = $this->getIds($xPath);
     $this->fragToLinks($contentPlus, $ids, "a", "href");
     $this->fragToLinks($contentPlus, $ids, "form", "action");
     $this->fragToLinks($contentPlus, $ids, "object", "data");
@@ -119,10 +108,31 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     return $doc->saveXML();
   }
 
-  private function getIds(DOMDocument $doc) {
+  private function applyTransformations(DOMDocumentPlus $content) {
+    $proc = new XSLTProcessor();
+    $proc->setParameter('', $this->getProcParams());
+    stableSort($this->transformationsPriority);
+    foreach($this->transformationsPriority as $xslt => $priority) {
+      try {
+        $newContent = $this->transform($content, $xslt, $this->transformations[$xslt]['user'], $proc);
+        $newContent->encoding="utf-8";
+        $xml = $newContent->saveXML();
+        if(!$newContent->loadXML($xml))
+          throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
+        $content = $newContent;
+      } catch(Exception $e) {
+        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+      } finally {
+        #unset($this->transformations[$xslt]);
+        #unset($this->transformationsPriority[$xslt]);
+      }
+    }
+    return $content;
+  }
+
+  private function getIds(DOMXPath $xPath) {
     $ids = array();
     $toStrip = array();
-    $xPath = new DOMXPath($doc);
     foreach($xPath->query("//*[@id]") as $e) {
       $id = $e->getAttribute("id");
       if(isset($ids[$id])) {
@@ -315,8 +325,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->pluginDir."/Xhtml11.xsl", 0, false);
-    $this->addTransformation($this->pluginDir."/Xhtml11final.xsl", 100, false);
+    $this->addTransformation($this->pluginDir."/Xhtml11.xsl", 1, false);
 
     // add template files
     $theme = $cfg->getElementById("theme");
@@ -379,10 +388,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $xsl = DOMBuilder::buildDOMPlus($fileName, true, $user);
     if(!@$proc->importStylesheet($xsl))
       throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
-    if(($x = @$proc->transformToDoc($content) ) === false)
+    if(($doc = @$proc->transformToDoc($content) ) === false)
       throw new Exception(sprintf(_("XSLT '%s' transformation fail"), $fileName));
     #echo $x->saveXML();
-    return $x;
+    return $doc;
   }
 
   /**

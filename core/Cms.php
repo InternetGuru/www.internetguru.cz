@@ -113,7 +113,10 @@ class Cms {
 
   public static function setLoggedUser($user) {
     self::setVariable("logged_user", $user);
-    if(!self::isSuperUser()) return;
+    if(!self::isSuperUser()) {
+      self::setVariable("super_user", "");
+      return;
+    }
     self::setVariable("super_user", $user);
     if((session_status() == PHP_SESSION_NONE && !session_start())
       || !session_regenerate_id()) {
@@ -260,11 +263,11 @@ class Cms {
     return self::$outputStrategy;
   }
 
-  public static function applyUserFn($fName, $value) {
+  public static function applyUserFn($fName, DOMNode $node) {
     $fn = self::getFunction($fName);
     if(is_null($fn))
       throw new Exception(sprintf(_("Function %s does not exist"), $fName));
-    return $fn($value);
+    return $fn($node);
   }
 
 }

@@ -35,6 +35,9 @@
         </oneOrMore>
       </element>
     </optional>
+    <optional>
+      <ref name="contentElements"/>
+    </optional>
   </define>
 
   <define name="htmlplus.include">

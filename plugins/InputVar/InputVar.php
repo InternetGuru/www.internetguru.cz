@@ -38,43 +38,59 @@ class InputVar extends Plugin implements SplObserver {
     else Cms::setVariable($name, $value);
   }
 
-  private function processRule(DOMElement $e) {
-    $e->processVariables(Cms::getAllVariables(), array(), true, $e);
-    if(!$e->hasAttribute("fn")) {
-      $this->setVar($e->nodeName, $e->getAttribute("id"), $e);
+  private function processRule(DOMElement $el) {
+    $el->processVariables(Cms::getAllVariables(), array(), true, $el);
+    if(!$el->hasAttribute("fn")) {
+      $this->setVar($el->nodeName, $el->getAttribute("id"), $el);
       return;
     }
-    $f = $e->getAttribute("fn");
+    $f = $el->getAttribute("fn");
     if(strpos($f, "-") === false) $f = get_class($this)."-$f";
     $result = Cms::getFunction($f);
-    if($e->hasAttribute("fn") && !is_null($result)) {
+    if($el->hasAttribute("fn") && !is_null($result)) {
       try {
-        $result = Cms::applyUserFn($f, $e->nodeValue);
+        $result = Cms::applyUserFn($f, $el);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to apply function: %s"), $e->getMessage()), Logger::LOGGER_WARNING);
         return;
       }
     }
     if(!is_null($result)) {
-      $this->setVar($e->nodeName, $e->getAttribute("id"), $result);
+      $this->setVar($el->nodeName, $el->getAttribute("id"), $result);
       return;
     }
-    $id = $e->getAttribute("id");
-    switch($e->getAttribute("fn")) {
+    try {
+      $fn = $this->register($el);
+    } catch(Exception $e) {
+      new Logger(sprintf(_("Unable to register function %s: %s"), $el->getAttribute("fn"), $e->getMessage()), Logger::LOGGER_WARNING);
+      return;
+    }
+    $id = $el->getAttribute("id");
+    if($el->nodeName == "fn") Cms::setFunction($id, $fn);
+    else Cms::setVariable($id, $fn($el));
+  }
+
+  private function register(DOMElement $el) {
+    $id = $el->getAttribute("id");
+    $fn = null;
+    switch($el->getAttribute("fn")) {
       case "hash":
-      $algo = $e->hasAttribute("algo") ? $e->getAttribute("algo") : null;
+      $algo = $el->hasAttribute("algo") ? $el->getAttribute("algo") : null;
       $fn = $this->createFnHash($id, $this->parse($algo));
       break;
       case "strftime":
-      $format = $e->hasAttribute("format") ? $e->getAttribute("format") : null;
+      $format = $el->hasAttribute("format") ? $el->getAttribute("format") : null;
       $fn = $this->createFnStrftime($id, $format);
+      break;
+      case "sprintf":
+      $fn = $this->createFnSprintf($id, $el->nodeValue);
       break;
       case "replace":
       $tr = array();
-      foreach($e->childElements as $d) {
+      foreach($el->childElements as $d) {
         if($d->nodeName != "data") continue;
         if(!$d->hasAttribute("name")) {
-          new Logger(_("Function replace missing attribute name"), Logger::LOGGER_WARNING);
+          new Logger(_("Element data missing attribute name"), Logger::LOGGER_WARNING);
           continue;
         }
         $tr[$d->getAttribute("name")] = $this->parse($d->nodeValue);
@@ -83,29 +99,20 @@ class InputVar extends Plugin implements SplObserver {
       break;
       case "sequence":
       $seq = array();
-      foreach($e->childElements as $call) {
+      foreach($el->childElements as $call) {
         if($call->nodeName != "call") continue;
-        if(!$call->hasAttribute("fn")) {
-          new Logger(_("Function sequence missing attribute fn"), Logger::LOGGER_WARNING);
+        if(!strlen($call->nodeValue)) {
+          new Logger(_("Element call missing content"), Logger::LOGGER_WARNING);
           continue;
         }
-        $seq[] = $call->getAttribute("fn");
+        $seq[] = $call->nodeValue;
       }
       $fn = $this->createFnSequence($id, $seq);
       break;
-      case "link":
-      $href = "";
-      $title = null;
-      if($e->hasAttribute("href")) $href = $e->getAttribute("href");
-      if($e->hasAttribute("title")) $title = $e->getAttribute("title");
-      $fn = $this->createFnLink($id, $this->parse($href), $this->parse($title));
-      break;
       default:
-      new Logger(sprintf(_("Unknown function name %s"), $e->getAttribute("fn")), Logger::LOGGER_WARNING);
-      return;
+      throw new Exception(_("Unknown function name"));
     }
-    if($e->nodeName == "fn") Cms::setFunction($id, $fn);
-    else Cms::setVariable($id, $fn($e->nodeValue));
+    return $fn;
   }
 
   private function parse($value) {
@@ -114,51 +121,55 @@ class InputVar extends Plugin implements SplObserver {
 
   private function createFnHash($id, $algo=null) {
     if(!in_array($algo, hash_algos())) $algo = "crc32b";
-    return function($value) use ($algo) {
-      return hash($algo, $value);
+    return function(DOMNode $node) use ($algo) {
+      return hash($algo, $node->nodeValue);
     };
   }
 
   private function createFnStrftime($id, $format=null) {
     if(is_null($format)) $format = "%m/%d/%Y";
     $format = $this->crossPlatformCompatibleFormat($format);
-    return function($value) use ($format) {
+    return function(DOMNode $node) use ($format) {
+      $value = $node->nodeValue;
       $date = trim(strftime($format, strtotime($value)));
       return $date ? $date : $value;
     };
   }
 
   private function createFnReplace($id, Array $replace) {
-    if(empty($replace)) {
-      new Logger(_("No data found for function replace"), Logger::LOGGER_WARNING);
-      return;
-    }
-    return function($value) use ($replace) {
-      return str_replace(array_keys($replace), $replace, $value);
+    if(empty($replace)) throw new Exception(_("No data found"));
+    return function(DOMNode $node) use ($replace) {
+      return str_replace(array_keys($replace), $replace, $node->nodeValue);
+    };
+  }
+
+  private function createFnSprintf($id, $format) {
+    if(!strlen($format)) throw new Exception(_("No content found"));
+    return function(DOMNode $node) use ($format) {
+      $elements = array();
+      foreach($node->childNodes as $child) {
+        if($child->nodeType != XML_ELEMENT_NODE) break;
+        $elements[] = $child->nodeValue;
+      }
+      if(empty($elements)) $elements[] = $node->nodeValue;
+      $temp = @vsprintf($format, $elements);
+      if($temp === false) return $format;
+      return $temp;
     };
   }
 
   private function createFnSequence($id, Array $call) {
-    if(empty($call)) {
-      new Logger(_("No data found for function sequence"), Logger::LOGGER_WARNING);
-      return;
-    }
-    return function($value) use ($call) {
+    if(empty($call)) throw new Exception(_("No data found"));
+    return function(DOMNode $node) use ($call) {
       foreach($call as $f) {
         if(strpos($f, "-") === false) $f = get_class($this)."-$f";
         try {
-          $value = Cms::applyUserFn($f, $value);
+          $node = new DOMElement("any", Cms::applyUserFn($f, $node));
         } catch(Exception $e) {
           new Logger(sprintf(_("Sequence call skipped: %s"), $e->getMessage()), Logger::LOGGER_WARNING);
         }
       }
-      return $value;
-    };
-  }
-
-  private function createFnLink($id, $href="", $title=null) {
-    return function($value) use ($href, $title) {
-      return "<a href='$href'".(is_null($title) ? "" : " title='$title'").">".$value."</a>";
+      return $node->nodeValue;
     };
   }
 

@@ -44,7 +44,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function processFunctions(Array $functions, Array $variables = array()) {
-    parent::processFunctions($functions, $variables, array("h" => array("id", "link")), true);
+    parent::processFunctions($functions, $variables, array("h" => array("id", "link")));
   }
 
   public function applySyntax() {
@@ -410,6 +410,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if($h->hasAttribute("ctime")) $ctime = $h->getAttribute("ctime");
       if($h->hasAttribute("mtime")) $mtime = $h->getAttribute("mtime");
       if(is_null($ctime) && is_null($mtime)) continue;
+      if(is_null($ctime)) $ctime = $h->getAncestorValue("ctime");
       if(is_null($ctime)) {
         if(!$repair) throw new Exception(_("Attribute 'mtime' requires 'ctime'"));
         $ctime = $mtime;

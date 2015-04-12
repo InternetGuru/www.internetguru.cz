@@ -3,7 +3,7 @@
   <!--
 
     Dostupné proměnné:
-      filepath, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
+      editlink, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
 
     Atributy elementu html:
       id (povinné)
@@ -11,27 +11,27 @@
 
   -->
   <html id="li">
-    <item><li><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformatcs" var="ctime">n/a</em></li></item>
+    <item><li><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li></item>
   </html>
   <html id="topdt">
     <item>
-      <dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt>
+      <dt><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformat" var="ctime">n/a</em>)</dt>
       <dd var="kw">n/a</dd>
       <dd var="desc">n/a</dd>
     </item>
-    <item><dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt></item>
+    <item><dt><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformat" var="ctime">n/a</em>)</dt></item>
     <item since="4"/>
   </html>
   <html id="dt">
     <item>
-      <dt><a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
-      <dd>Poslední změna: <strong fn="inputvar-dateformatcs" var="mtime">n/a</strong></dd>
+      <dt><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
+      <dd>Poslední změna: <strong fn="inputvar-dateformat" var="mtime">n/a</strong></dd>
       <dd>Klíčová slova: <em var="kw">n/a</em></dd>
       <dd var="desc">n/a</dd>
     </item>
   </html>
   <html id="dd" sort="mtime">
-    <item><dd><a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformatcs" var="mtime">n/a</span> <a href="?Admin=%s" var="filepath@href" fn="strlen-cms-super_user" title="Editovat obsah" class="flaticon-drawing3">Edit</a></dd></item>
+    <item><dd><em var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd></item>
   </html>
 
   <!-- XSLT (todo)

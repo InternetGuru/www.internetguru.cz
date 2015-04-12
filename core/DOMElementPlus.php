@@ -42,33 +42,27 @@ class DOMElementPlus extends DOMElement {
 
   public function processVariables(Array $variables, $ignore = array(), $deep = false) {
     $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
-    foreach($this->getVariables("var", $ignoreAttr) as list($vName, $aName)) {
-      $v = array_key_exists($vName, $variables) ? $variables[$vName] : null;
+    foreach($this->getVariables("var", $ignoreAttr) as list($vName, $aName, $var)) {
+      if(!isset($variables[$vName])) continue;
       try {
-        $this->insertVariable($v, $aName);
+        $this->removeAttrVal("var", $var);
+        $this->insertVariable($variables[$vName], $aName);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
       }
-      if(is_null($aName)) return;
+      #if(is_null($aName)) return;
     }
     if(!$deep) return;
     foreach($this->childElements as $e) $e->processVariables($variables, $ignore, $deep);
   }
 
-  public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array(), $delStrlen=false) {
-    foreach($this->getVariables("fn", $ignore) as list($vName, $aName)) {
+  public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array()) {
+    foreach($this->getVariables("fn", $ignore) as list($vName, $aName, $fn)) {
       try {
-        if(strpos($vName, "strlen-") === 0) {
-          if(isset($variables[substr($vName, 7)]) && strlen($variables[substr($vName, 7)])) {
-            $this->removeAttrVal("fn", $vName.(strlen($aName) ? "@$aName" : ""));
-          } elseif($delStrlen) {
-            $this->insertVariable("", $aName);
-          }
-          continue;
-        }
+        $this->removeAttrVal("fn", $fn);
         $f = array_key_exists($vName, $functions) ? $functions[$vName] : null;
         if(is_null($f)) continue;
-        $v = call_user_func($f, is_null($aName) ? $this->nodeValue : $this->getAttribute($aName));
+        $v = call_user_func($f, is_null($aName) ? $this : $this->getAttributeNode($aName));
         $this->insertVariable($v, $aName);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
@@ -77,7 +71,7 @@ class DOMElementPlus extends DOMElement {
     }
   }
 
-  private function insertVariable($value, $aName) {
+  public function insertVariable($value, $aName=null) {
     if(is_null($this->parentNode)) return;
     switch(gettype($value)) {
       case "NULL":
@@ -86,7 +80,10 @@ class DOMElementPlus extends DOMElement {
       case "boolean":
       $value = (string) $value;
       case "string":
-      if(!strlen($value)) $this->removeSelf($aName);
+      if(!strlen($value)) {
+        $this->removeSelf($aName);
+        break;
+      }
       $this->insertVarString($value, $aName);
       break;
       case "array":
@@ -239,8 +236,8 @@ class DOMElementPlus extends DOMElement {
         new Logger(sprintf(_("Cannot modify attribute %s in element %s"), $aName, $this->nodeName), Logger::LOGGER_WARNING);
         continue;
       }
-      if(is_null($aName)) $variables[] = array($vName, $aName);
-      else array_unshift($variables, array($vName, $aName));
+      if(is_null($aName)) $variables[] = array($vName, $aName, $var);
+      else array_unshift($variables, array($vName, $aName, $var));
     }
     return $variables;
   }
