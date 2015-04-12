@@ -45,7 +45,7 @@
           scrollTimeOut = setTimeout(function(){ doScroll(); }, wait);
         } else {
           clearTimeout(scrollTimeOut);
-          window.history.replaceState("", "", "#"+h1.id);
+          window.history.replaceState("", "", window.location.pathname + window.location.search);
         }
       },
       setScrollEvent = function() {
