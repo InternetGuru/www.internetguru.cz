@@ -1,0 +1,3 @@
+TOC.init({
+  tocTitle: "Obsah"
+});

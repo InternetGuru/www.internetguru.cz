@@ -93,7 +93,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
-
     $format = $this->type;
     if($this->type == "html") $format = "html+";
     if(!is_null($this->schema)) $format .= " (".pathinfo($this->schema, PATHINFO_BASENAME).")";

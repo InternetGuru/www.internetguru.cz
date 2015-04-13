@@ -28,9 +28,15 @@
   <stylesheet media="print">themes/cms-print.css</stylesheet>
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
+  <jsFile append="body">themes/syntaxhighlightjs.js</jsFile>
   <jsFile append="body">themes/fragments.js</jsFile>
+  <jsFile append="body" priority="5">themes/toc.js</jsFile>
+  <jsFile append="body" priority="5">themes/tocinit.js</jsFile>
   <jsFile append="body" priority="5">themes/selectable.js</jsFile>
+  <jsFile append="body" priority="5">themes/selectableinit.js</jsFile>
   <jsFile append="body">themes/hideable.js</jsFile>
+  <jsFile append="body">themes/editable.js</jsFile>
+  <jsFile append="body">themes/editableinit.js</jsFile>
   <jsFile append="body">themes/scrolltop.js</jsFile>
   <jsFile append="body">themes/scrolltopinit.js</jsFile>
 

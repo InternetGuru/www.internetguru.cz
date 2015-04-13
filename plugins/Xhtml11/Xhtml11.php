@@ -10,7 +10,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $transformationsPriority = array();
   private $transformations = array();
   private $favIcon = null;
-  private $selectable = false;
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
   const DTD_FILE = 'lib/xhtml11-flat.dtd';
@@ -29,9 +28,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     if($subject->getStatus() != STATUS_PROCESS) return;
     $cfg = $this->getDOMPlus();
     $this->registerThemes($cfg);
-    if(!$this->selectable) return;
-    $selectTitle = _("Select all");
-    $this->addJs("Selectable.init({selectTitle: \"$selectTitle\"});", 6);
   }
 
   /**
@@ -365,7 +361,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $priority = 10;
         if($n->hasAttribute("append")) $append = $n->getAttribute("append");
         if($n->hasAttribute("priority")) $priority = $n->getAttribute("priority");
-        if($n->nodeValue == "themes/selectable.js") $this->selectable = true;
         $this->addJsFile($n->nodeValue, $priority, $append, $user);
         break;
         case "stylesheet":

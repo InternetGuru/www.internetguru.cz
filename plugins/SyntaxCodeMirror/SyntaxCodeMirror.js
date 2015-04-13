@@ -28,7 +28,9 @@
   });
 
   cm.on("change",function(cm,change) {
-    if(typeof setModified != "function") return;
+    if(!Editable) return;
+    var form = Editable.getParentForm(TextArea);
+    if(!form || !form.classList.contains(Editable.getEditableClass())) return;
     setModified();
   });
 

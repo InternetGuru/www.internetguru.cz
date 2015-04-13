@@ -21,6 +21,21 @@
           Config[attr] = cfg[attr];
         }
       },
+      appendStyle = function() {
+        var css = '/* toc.js */'
+          + 'dl.toc dd {margin-left: 0em; font-style: normal; }'
+          + 'dl.toc ol {counter-reset: item; list-style: none; }'
+          + 'dl.toc ol > li {margin-left: 1em; }'
+          + 'dl.toc ol > li:before {content: counters(item, ".") " "; counter-increment: item; }';
+          var style = document.getElementsByTagName('style')[0];
+        if(style == undefined) {
+          var head = document.head || document.getElementsByTagName('head')[0];
+          style = document.createElement('style');
+          style.type = 'text/css';
+          head.appendChild(style);
+        }
+        style.appendChild(document.createTextNode(css));
+      },
       createTocWrapper = function() {
         var d = document.getElementsByTagName("div");
         var i = 0;
@@ -29,13 +44,14 @@
           tocRoot = d[i];
           break;
         }
-        if(tocRoot == null) throw "Unable to find div." + Config.tocNS;
+        if(tocRoot == null) return false
         var div = document.createElement("div");
         div.className = "list";
         tocWrapper = document.createElement("dl");
         tocWrapper.className = "hideable nohide toc";
         div.appendChild(tocWrapper);
         tocRoot.parentNode.insertBefore(div,tocRoot);
+        return true;
       },
       getHeadings = function(e) {
         var l = e.nodeName.toLowerCase().match(headingsPatt);
@@ -74,7 +90,8 @@
       return {
         init : function(cfg) {
           // create toc
-          createTocWrapper();
+          var wrapper = createTocWrapper();
+          if(!wrapper) return;
           initCfg(cfg);
           headingsPatt = new RegExp("h([1-6])");
           getHeadings(tocRoot);
