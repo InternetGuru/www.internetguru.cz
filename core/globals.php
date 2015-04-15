@@ -125,8 +125,8 @@ function parseLocalLink($link, $host=null) {
 
 function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
   addPageSpeedOff($pLink);
-  $cyclic = isCyclicLink($pLink);
-  if(!$ignoreCyclic && $cyclic && !isset($pLink["fragment"]))
+  $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
+  if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
   $path = null;
   if(isset($pLink["path"])) {

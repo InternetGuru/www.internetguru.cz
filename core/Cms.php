@@ -122,8 +122,6 @@ class Cms {
       || !session_regenerate_id()) {
       throw new Exception(_("Unable to re/generate session ID"));
     }
-    #$_SESSION[get_called_class()]["loggedUser"] = $user;
-    $_SESSION["expire"] = time()+3600;
   }
 
   public static function isSuperUser() {

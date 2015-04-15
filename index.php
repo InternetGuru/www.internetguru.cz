@@ -107,20 +107,16 @@ try {
 
   require_once(CORE_FOLDER.'/globals.php');
 
-  // check if session is valid
-  if(isset($_COOKIE[session_name()])) {
-    session_start();
-    if(!isset($_SESSION["expire"]) || $_SESSION["expire"] <= time()) {
-      $params = session_get_cookie_params();
-      setcookie(session_name(), '', time() - 42000,
-        $params["path"], $params["domain"],
-        $params["secure"], $params["httponly"]
-      );
-      $_SESSION = array();
-      session_destroy();
-      $location = buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()), true);
-      redirTo($location, null, _("Session expired"));
-    }
+  // prevent unauthorized no-cached requests
+  if(is_null(Cms::getLoggedUser()) && isset($_COOKIE[session_name()])) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+      $params["path"], $params["domain"],
+      $params["secure"], $params["httponly"]
+    );
+    new ErrorPage(_("Unexpected session cookies removed"), 403);
+    #$location = buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()), true);
+    #redirTo($location, null, _("Unauthorized session cookies removed"));
   }
 
   new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
