@@ -29,6 +29,7 @@ class Agregator extends Plugin implements SplObserver {
     #$this->createFilesVar(FILES_FOLDER);
     #$this->createImgVar(FILES_FOLDER);
     if(is_null($this->currentDoc)) return;
+    Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
     $this->insertDocInfo($this->currentDoc);
     $this->insertContent($this->currentDoc, $this->currentSubdir);
   }
@@ -42,6 +43,12 @@ class Agregator extends Plugin implements SplObserver {
       $ul = $this->createDocInfo($h, $vars);
       if(!$ul->childNodes->length) continue;
       $ul->processVariables($this->docinfo, array(), true);
+      if($h->parentNode->nodeName == "body") {
+        $wrapper = $doc->createElement("var");
+        $wrapper->appendChild($ul);
+        Cms::setVariable("docinfo", $wrapper);
+        continue;
+      }
       $e = $h->nextElement;
       while(!is_null($e)) {
         if($e->nodeName == "h") break;
