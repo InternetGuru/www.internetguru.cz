@@ -2,11 +2,10 @@
 
 class Agregator extends Plugin implements SplObserver {
   private $files = array();  // filePath => fileInfo(?)
+  private $docinfo = array();
   private $currentDoc = null;
   private $currentSubdir = null;
   private $currentFilepath = null;
-  private $currentMTime = null;
-  private $currentCTime = null;
   private $edit;
   private $cfg;
   private static $sortKey;
@@ -35,9 +34,14 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function insertDocInfo(HTMLPlus $doc) {
+    $vars = array();
+    foreach($this->cfg->getElementsByTagName("var") as $var) {
+      $vars[$var->getAttribute("id")] = $var;
+    }
     foreach($doc->getElementsByTagName("h") as $h) {
-      $ul = $this->createDocInfo($h);
+      $ul = $this->createDocInfo($h, $vars);
       if(!$ul->childNodes->length) continue;
+      $ul->processVariables($this->docinfo, array(), true);
       $e = $h->nextElement;
       while(!is_null($e)) {
         if($e->nodeName == "h") break;
@@ -48,60 +52,63 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function createDocInfo(DOMElementPlus $h) {
-    $ul = $h->ownerDocument->createElement("ul");
+  private function createDocInfo(DOMElementPlus $h, Array $vars) {
+    $doc = $h->ownerDocument;
+    $ul = $doc->createElement("ul");
     if($h->parentNode->nodeName == "body") {
       $ul->setAttribute("class", "docinfo nomultiple global");
+      $li = $ul->appendChild($doc->createElement("li"));
       // global author & creation
-      $li = $ul->appendChild($h->ownerDocument->createElement("li"));
-      $li->setAttribute("class", "created");
-      $authorLink = $h->getAttribute("author");
-      if($h->hasAttribute("authorid")) {
-        $authorLink = "<a href='".$h->getAttribute("authorid")."'>$authorLink</a>";
+      $li->setAttribute("class", "creation");
+      foreach($vars["creation"]->childNodes as $n) {
+        $li->appendChild($doc->importNode($n, true));
       }
-      $cDate = "<em fn='inputvar-dateformat'>".$this->currentCTime."</em>";
-      $li->insertVariable(sprintf(_("Created by %s on %s"), $authorLink, $cDate));
       // global modification
-      if(substr($this->currentCTime, 0, 10) != substr($this->currentMTime, 0, 10)) {
-        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+      if(substr($this->docinfo["ctime"], 0, 10) != substr($this->docinfo["mtime"], 0, 10)) {
+        $li = $ul->appendChild($doc->createElement("li"));
         $li->setAttribute("class", "modified");
-        $mDate = "<em fn='inputvar-dateformat'>".$this->currentMTime."</em>";
-        $li->insertVariable(sprintf(_("Document content last modified on %s"), $mDate));
+        foreach($vars["modified"]->childNodes as $n) {
+          $li->appendChild($doc->importNode($n, true));
+        }
       }
       // global responsibility
       if($h->hasAttribute("resp")) {
-        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+        $li = $ul->appendChild($doc->createElement("li"));
         $li->setAttribute("class", "responsible");
-        $respLink = $h->getAttribute("resp");
-        if($h->hasAttribute("respid")) {
-          $respLink = "<a href='".$h->getAttribute("respid")."'>$respLink</a>";
+        foreach($vars["responsible"]->childNodes as $n) {
+          $li->appendChild($doc->importNode($n, true));
         }
-        $li->insertVariable(sprintf(_("Person responsible for this content is %s"), $respLink));
       }
       // edit link
       if(Cms::isSuperUser()) {
-        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
+        $li = $ul->appendChild($doc->createElement("li"));
         $li->setAttribute("class", "edit");
-        $a = $li->appendChild($h->ownerDocument->createElement("a", $this->edit));
+        $a = $li->appendChild($doc->createElement("a", $this->edit));
         $a->setAttribute("href", "?Admin=".$this->currentFilepath);
         $a->setAttribute("title", $this->currentFilepath);
       }
     } else {
       $ul->setAttribute("class", "docinfo nomultiple partial");
+      $partinfo = array();
       // local author (?)
       // local responsibility (?)
       // local creation
-      if($h->hasAttribute("ctime") && substr($this->currentCTime, 0, 10) != substr($h->getAttribute("ctime"), 0, 10)) {
-        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
-        $cDate = "<em fn='inputvar-dateformat'>".$h->getAttribute("ctime")."</em>";
-        $li->insertVariable(sprintf(_("This section has been created on %s"), $cDate));
+      if($h->hasAttribute("ctime") && substr($this->docinfo["ctime"], 0, 10) != substr($h->getAttribute("ctime"), 0, 10)) {
+        $partinfo["ctime"] = $h->getAttribute("ctime");
+        $li = $ul->appendChild($doc->createElement("li"));
+        foreach($vars["part_created"]->childNodes as $n) {
+          $li->appendChild($doc->importNode($n, true));
+        }
       }
       // local modification
-      if($h->hasAttribute("mtime") && substr($this->currentMTime, 0, 10) != substr($h->getAttribute("mtime"), 0, 10)) {
-        $li = $ul->appendChild($h->ownerDocument->createElement("li"));
-        $mDate = "<em fn='inputvar-dateformat'>".$h->getAttribute("mtime")."</em>";
-        $li->insertVariable(sprintf(_("This section has been modified on %s"), $mDate));
+      if($h->hasAttribute("mtime") && substr($this->docinfo["mtime"], 0, 10) != substr($h->getAttribute("mtime"), 0, 10)) {
+        $partinfo["mtime"] = $h->getAttribute("mtime");
+        $li = $ul->appendChild($doc->createElement("li"));
+        foreach($vars["part_modified"]->childNodes as $n) {
+          $li->appendChild($doc->importNode($n, true));
+        }
       }
+      $ul->processVariables($partinfo, array(), true);
     }
     return $ul;
   }
@@ -210,11 +217,10 @@ class Agregator extends Plugin implements SplObserver {
       foreach($doc->getElementsByTagName("h") as $h) {
         if(!$h->hasAttribute("link")) continue;
         if($h->getAttribute("link") != getCurLink()) continue;
+        $this->docinfo = $vars[$filePath];
         $this->currentDoc = $doc;
         $this->currentSubdir = $subDir;
         $this->currentFilepath = $file;
-        $this->currentCTime = $h->getAttribute("ctime");
-        $this->currentMTime = $h->getAttribute("mtime");
       }
       $cacheKey = get_class($this).$filePath;
       if(!$this->isValidCached($cacheKey, $filePath)) {
@@ -344,9 +350,9 @@ class Agregator extends Plugin implements SplObserver {
     $vars['heading'] = $h->nodeValue;
     $vars['link'] = $h->getAttribute("link");
     $vars['author'] = $h->getAttribute("author");
-    $vars['authorid'] = $h->hasAttribute("authorid") ? $h->getAttribute("authorid") : null;
+    $vars['authorid'] = $h->hasAttribute("authorid") ? $h->getAttribute("authorid") : "";
     $vars['resp'] = $h->hasAttribute("resp") ? $h->getAttribute("resp") : null;
-    $vars['respid'] = $h->hasAttribute("respid") ? $h->getAttribute("respid") : null;
+    $vars['respid'] = $h->hasAttribute("respid") ? $h->getAttribute("respid") : "";
     $vars['ctime'] = $h->getAttribute("ctime");
     $vars['mtime'] = $h->getAttribute("mtime");
     $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;

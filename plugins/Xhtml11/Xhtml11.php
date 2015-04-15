@@ -86,8 +86,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $contentPlus->processVariables(Cms::getAllVariables());
     $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
     $xPath = new DOMXPath($contentPlus);
-    foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var", "");
-    foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn", "");
+    foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
+    foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
     $ids = $this->getIds($xPath);
     $this->fragToLinks($contentPlus, $ids, "a", "href");
     $this->fragToLinks($contentPlus, $ids, "form", "action");

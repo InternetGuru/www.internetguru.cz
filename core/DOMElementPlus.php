@@ -53,15 +53,18 @@ class DOMElementPlus extends DOMElement {
       #if(is_null($aName)) return;
     }
     if(!$deep) return;
-    foreach($this->childElements as $e) $e->processVariables($variables, $ignore, $deep);
+    foreach($this->childNodes as $e) {
+      if($e->nodeType != XML_ELEMENT_NODE) continue;
+      $e->processVariables($variables, $ignore, $deep);
+    }
   }
 
   public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array()) {
     foreach($this->getVariables("fn", $ignore) as list($vName, $aName, $fn)) {
       try {
-        $this->removeAttrVal("fn", $fn);
         $f = array_key_exists($vName, $functions) ? $functions[$vName] : null;
         if(is_null($f)) continue;
+        $this->removeAttrVal("fn", $fn);
         $v = call_user_func($f, is_null($aName) ? $this : $this->getAttributeNode($aName));
         $this->insertVariable($v, $aName);
       } catch(Exception $e) {
@@ -270,10 +273,11 @@ class DOMElementPlus extends DOMElement {
 
   public function stripAttr($attr, $comment = null) {
     if(!$this->hasAttribute($attr)) return;
+    $aVal = $this->getAttribute($attr);
     $this->removeAttribute($attr);
     if($comment === "") return;
     if(!Cms::isSuperUser() && !CMS_DEBUG) return;
-    if(is_null($comment)) $comment = sprintf(_("Attribute '%s' stripped"), $attr);
+    if(is_null($comment)) $comment = sprintf(_("Attribute %s stripped"), "$attr='$aVal'");
     $cmt = $this->ownerDocument->createComment(" $comment ");
     $this->parentNode->insertBefore($cmt, $this);
   }
