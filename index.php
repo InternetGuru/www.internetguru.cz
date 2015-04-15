@@ -118,7 +118,8 @@ try {
       );
       $_SESSION = array();
       session_destroy();
-      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()), true));
+      $location = buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()), true);
+      redirTo($location, null, _("Session expired"));
     }
   }
 
