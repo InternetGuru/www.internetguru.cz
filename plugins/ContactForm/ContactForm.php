@@ -177,7 +177,7 @@ class ContactForm extends Plugin implements SplObserver {
 
   private function createGlobalVars() {
     $this->rules = array();
-    foreach($this->cfg->documentElement->childElements as $e) {
+    foreach($this->cfg->documentElement->childElementsArray as $e) {
       try {
         switch($e->nodeName) {
           case "var":
@@ -276,7 +276,7 @@ class ContactForm extends Plugin implements SplObserver {
       $this->setUniqueGroupValue($e, $value);
       break;
       case "select":
-      foreach($e->childElements as $o) {
+      foreach($e->childElementsArray as $o) {
         $this->setUniqueGroupValue($o, $o->nodeValue);
       }
     }

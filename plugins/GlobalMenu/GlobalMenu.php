@@ -32,8 +32,8 @@ class GlobalMenu extends Plugin implements SplObserver {
   private function trimList(DOMElement $ul) {
     $currentLink = false;
     $deepLink = false;
-    foreach($ul->childElements as $li) {
-      foreach($li->childElements as $n) {
+    foreach($ul->childElementsArray as $li) {
+      foreach($li->childElementsArray as $n) {
         if($this->isProperLink($n)) $currentLink = true;
         if($n->nodeName == "ul") $deepLink = $this->trimList($n);
       }
@@ -54,7 +54,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     $ul = $doc->createElement("ul");
     $li = null;
     $prefix = Cms::getContentFull()->documentElement->firstElement->getAttribute("link");
-    foreach($section->childElements as $n) {
+    foreach($section->childElementsArray as $n) {
       if($n->nodeName == "section") {
         $menu = $this->getMenu($doc, $n);
         if(!is_null($menu)) {

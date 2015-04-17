@@ -263,10 +263,10 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$repair) throw new Exception(_("Attribute 'xml:lang' is missing in element body"));
       $this->documentElement->setAttribute("xml:lang", _("en"));
     }
-    if($this->documentElement->childElements->length == 1
-      && $this->documentElement->childElements->item(0)->nodeName == "section") {
+    $fe = $this->documentElement->firstElement;
+    if(!is_null($fe) && $fe->nodeName == "section") {
       if(!$repair) throw new Exception(_("Element section cannot be empty"));
-      $this->addTitleElements();
+      $this->addTitleElements($this->documentElement);
       return;
     }
     $hRoot = 0;
@@ -293,19 +293,19 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->addTitleElements($s);
   }
 
-  private function addTitleElements() {
-    $b = $this->documentElement->firstElement;
-    $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
-    $b->parentNode->insertBefore($this->createElement("h", _("Web title")), $b);
-    $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
-    $b->parentNode->insertBefore($this->createElement("desc", _("Web description")), $b);
-    $b->parentNode->insertBefore($this->createTextNode("\n  "), $b);
+  private function addTitleElements(DOMElementPlus $el) {
+    $first = $el->firstElement;
+    $el->insertBefore($this->createTextNode("\n  "), $first);
+    $el->insertBefore($this->createElement("h", _("Web title")), $first);
+    $el->insertBefore($this->createTextNode("\n  "), $first);
+    $el->insertBefore($this->createElement("desc", _("Web description")), $first);
+    $el->insertBefore($this->createTextNode("\n  "), $first);
   }
 
   private function validateSections($repair) {
     $emptySect = array();
     foreach($this->getElementsByTagName("section") as $s) {
-      if($s->childElements->length === 0) $emptySect[] = $s;
+      if(!count($s->childElementsArray)) $emptySect[] = $s;
     }
     if(!$repair && count($emptySect)) throw new Exception(_("Empty section(s) found"));
     if(!count($emptySect)) return;

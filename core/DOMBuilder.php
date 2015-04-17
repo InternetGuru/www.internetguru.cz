@@ -100,7 +100,7 @@ class DOMBuilder {
 
   private static function globalReadonly(DOMDocumentPlus $doc) {
     $nodes = array();
-    foreach($doc->documentElement->childElements as $n) {
+    foreach($doc->documentElement->childElementsArray as $n) {
       if($n->nodeValue == "" && $n->hasAttribute("readonly")) $nodes[] = $n;
     }
     foreach($nodes as $n) {
@@ -428,7 +428,7 @@ class DOMBuilder {
     $impAuthor = $doc->documentElement->firstElement->getAttribute("author");
     if($impAuthor == $author)
       $doc->documentElement->firstElement->removeAttribute("author"); // prevent "creation" info
-    foreach($doc->documentElement->childElements as $n) {
+    foreach($doc->documentElement->childElementsArray as $n) {
       $include->parentNode->insertBefore($include->ownerDocument->importNode($n, true), $include);
     }
     try {
@@ -461,7 +461,7 @@ class DOMBuilder {
     if(is_null($doc->documentElement)) {
       $doc->appendChild($doc->importNode($newDoc->documentElement));
     }
-    foreach($newDoc->documentElement->childElements as $n) {
+    foreach($newDoc->documentElement->childElementsArray as $n) {
       // if empty && readonly => user cannot modify
       foreach($doc->getElementsByTagName($n->nodeName) as $d) {
         if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
@@ -469,7 +469,7 @@ class DOMBuilder {
       if(!$n instanceof DOMElement) continue;
       if(self::doRemove($n)) {
         $remove = array();
-        foreach($doc->documentElement->childElements as $d) {
+        foreach($doc->documentElement->childElementsArray as $d) {
           if($d->nodeName != $n->nodeName) continue;
           if($d->hasAttribute("modifyonly")) continue;
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;

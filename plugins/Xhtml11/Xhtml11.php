@@ -113,7 +113,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         $newContent = $this->transform($content, $xslt, $this->transformations[$xslt]['user'], $proc);
         $newContent->encoding="utf-8";
         $xml = $newContent->saveXML();
-        if(!$newContent->loadXML($xml))
+        if(!@$newContent->loadXML($xml))
           throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
         $content = $newContent;
       } catch(Exception $e) {
@@ -288,18 +288,17 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       $valid = true;
       if($v instanceof Closure) continue;
       elseif($v instanceof DOMDocumentPlus) {
-        $v = $d->saveHTML();
+        $s = $v->saveXML($v->documentElement);
       } elseif($v instanceof DOMElement) {
-        $d = new DOMDocumentPlus();
-        foreach($v->childNodes as $n) $d->appendChild($d->importNode($n, true));
-        $v = $d->saveHTML();
+        $s = "";
+        foreach($v->childNodes as $n) $s .= $v->ownerDocument->saveXML($n);
       } elseif(is_array($v)) {
-        $v = implode(", ", $v);
+        $s = implode(", ", $v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
         new Logger(sprintf(_("Unable to convert variable '%s' to string"), $k), Logger::LOGGER_ERROR);
         continue;
       } else {
-        $v = (string) $v;
+        $s = (string) $v;
       }
       if(false) {
         if($k != "globalmenu") continue;
@@ -313,7 +312,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
         echo translateUtf8Entities($v)."\n";
         die();
       }
-      $o[$k] = str_replace("'", '"', translateUtf8Entities($v));
+      $o[$k] = str_replace("'", '"', translateUtf8Entities($s));
     }
     return $o;
   }
@@ -348,7 +347,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   }
 
   private function addThemeFiles(DOMElement $e) {
-    foreach($e->childElements as $n) {
+    foreach($e->childElementsArray as $n) {
       if($n->nodeValue == "") continue;
       switch ($n->nodeName) {
         case "xslt":

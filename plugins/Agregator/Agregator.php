@@ -20,10 +20,19 @@ class Agregator extends Plugin implements SplObserver {
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
     $this->cfg = $this->getDOMPlus();
-    $htmlDir = USER_FOLDER."/".$this->pluginDir;
     $curLink = getCurLink();
-    foreach($this->createList($htmlDir) as $subDir => $files) {
-      $this->createHtmlVar($subDir, $files);
+    try {
+      mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
+      mkdir_plus(USER_FOLDER."/".$this->pluginDir);
+      $list = array();
+      $this->createList(USER_FOLDER."/".$this->pluginDir, $list);
+      $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list);
+      foreach($list as $subDir => $files) {
+        $this->createHtmlVar($subDir, $files);
+      }
+    } catch(Exception $e) {
+      new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+      return;
     }
     #$filesList = $this->createList(FILES_FOLDER);
     #$this->createFilesVar(FILES_FOLDER);
@@ -138,30 +147,24 @@ class Agregator extends Plugin implements SplObserver {
       if($a->nodeName == "ns") continue;
       $dest->setAttribute($a->nodeName, $a->nodeValue);
     }
-    foreach($doc->documentElement->childElements as $e) {
+    foreach($doc->documentElement->childElementsArray as $e) {
       $dest->appendChild($dest->ownerDocument->importNode($e, true));
     }
   }
 
-  private function createList($rootDir, $subDir=null) {
-    try {
-      mkdir_plus($rootDir);
-    } catch(Exception $e) {
-      new Logger(_("Unable to create Agregator temporary folder"), Logger::LOGGER_WARNING);
-      return;
-    }
-    $list = array();
+  private function createList($rootDir, Array &$list, $subDir=null) {
+    if(!is_dir($rootDir)) return;
+    if(!is_null($subDir) && isset($list[$subDir])) return;
     $workingDir = is_null($subDir) ? $rootDir : "$rootDir/$subDir";
     foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
       if(is_dir("$workingDir/$f")) {
-        $list = array_merge($list, $this->createList($rootDir, is_null($subDir) ? $f : "$subDir/$f"));
+        $this->createList($rootDir, $list, is_null($subDir) ? $f : "$subDir/$f");
         continue;
       }
       if(is_file("$workingDir/.$f")) continue;
       $list[$subDir][] = $f;
     }
-    return $list;
   }
 
   private function createImgVar($rootDir) {
@@ -214,6 +217,7 @@ class Agregator extends Plugin implements SplObserver {
       if(strlen($subDir)) $fileName = "$subDir/$fileName";
       $file = $this->pluginDir."/$fileName";
       $filePath = USER_FOLDER."/".$file;
+      if(!is_file($filePath)) $filePath = ADMIN_FOLDER."/".$file;
       try {
         $doc = DOMBuilder::buildHTMLPlus($filePath);
       } catch(Exception $e) {
@@ -242,7 +246,7 @@ class Agregator extends Plugin implements SplObserver {
       $this->storeCache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
       $useCache = false;
     }
-    foreach($this->cfg->documentElement->childElements as $html) {
+    foreach($this->cfg->documentElement->childElementsArray as $html) {
       if($html->nodeName != "html") continue;
       if(!$html->hasAttribute("id")) {
         new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
@@ -273,7 +277,7 @@ class Agregator extends Plugin implements SplObserver {
       uasort($vars, array("Agregator", "cmp"));
       if($reverse) $vars = array_reverse($vars);
       try {
-        $vValue = $this->getDOM($vars, $html->childElements, $html->getAttribute("id"));
+        $vValue = $this->getDOM($vars, $html->childElementsArray, $html->getAttribute("id"));
         Cms::setVariable($vName, $vValue->documentElement);
         $var = array(
           "name" => $vName,
@@ -309,7 +313,7 @@ class Agregator extends Plugin implements SplObserver {
     return ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
   }
 
-  private function getDOM(Array $vars, DOMNodeList $items, $id) {
+  private function getDOM(Array $vars, Array $items, $id) {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
     $nonItemElement = false;

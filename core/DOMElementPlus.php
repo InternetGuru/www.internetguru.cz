@@ -5,7 +5,7 @@ class DOMElementPlus extends DOMElement {
   public function rename($name) {
     $newnode = $this->ownerDocument->createElement($name);
     $children = array();
-    foreach ($this->childElements as $child) {
+    foreach ($this->childElementsArray as $child) {
       $children[] = $child;
     }
     foreach ($children as $child) {
@@ -119,7 +119,7 @@ class DOMElementPlus extends DOMElement {
     $p = $this->parentNode;
     $p->removeChild($this);
     if($p->nodeType != XML_ELEMENT_NODE) return;
-    if($p->childElements->length != 0) return;
+    if(!empty($p->childElementsArray)) return;
     $p->emptyRecursive();
   }
 
@@ -336,8 +336,8 @@ class DOMElementPlus extends DOMElement {
       case "previousElement":
       return $this->getPreviousSiblingElement();
       break;
-      case "childElements":
-      return $this->getChildElements();
+      case "childElementsArray":
+      return $this->getChildElementsArray();
       break;
       case "firstElement":
       return $this->getFirstElement();
@@ -359,14 +359,19 @@ class DOMElementPlus extends DOMElement {
     return $e;
   }
 
-  private function getFirstElement() {
-    if(!$this->childElements->length) return null;
-    return $this->childElements->item(0);
+  private function getChildElementsArray() {
+    $elements = array();
+    foreach($this->childNodes as $n) {
+      if($n->nodeType != XML_ELEMENT_NODE) continue;
+      $elements[] = $n;
+    }
+    return $elements;
   }
 
-  private function getChildElements() {
-    $xpath = new DOMXPath($this->ownerDocument);
-    return $xpath->query($this->getNodePath()."/node()[not(self::text() or self::comment() or self::processing-instruction())]");
+  private function getFirstElement() {
+    $childElements = $this->childElementsArray;
+    if(empty($childElements)) return null;
+    return $childElements[0];
   }
 
 }

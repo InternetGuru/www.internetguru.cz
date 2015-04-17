@@ -31,7 +31,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
 
   private function createVars() {
     $cfg = $this->getDOMPlus();
-    foreach($cfg->documentElement->childElements as $e) {
+    foreach($cfg->documentElement->childElementsArray as $e) {
       try {
         $id = $e->getAttribute("id");
         switch($e->nodeName) {
@@ -73,7 +73,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
         else new Logger(sprintf(_("Item id %s not found, using default"), $setId), Logger::LOGGER_WARNING);
       }
       $hs = array();
-      foreach($section->childElements as $e) if($e->nodeName == "h") $hs[] = $e;
+      foreach($section->childElementsArray as $e) if($e->nodeName == "h") $hs[] = $e;
       $force = $section->getPreviousElement("h")->hasAttribute("link");
       $wrapper = $content->createElement($set->getAttribute("wrapper"));
       #if($set->getAttribute("id") != $this->defaultSet)
@@ -83,7 +83,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
         if(!$force && !$h->hasAttribute("link")) continue 2;
         $vars = $this->getVariables($h);
         $root = $this->createDOMElement($vars, $set);
-        foreach($root->childElements as $e) {
+        foreach($root->childElementsArray as $e) {
           $wrapper->appendChild($content->importNode($e, true));
         }
       }

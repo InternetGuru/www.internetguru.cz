@@ -13,7 +13,7 @@ class InputVar extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
     $dom = $this->getDOMPlus();
-    foreach($dom->documentElement->childElements as $e) {
+    foreach($dom->documentElement->childElementsArray as $e) {
       if(!$e->hasAttribute("id")) {
         new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName), Logger::LOGGER_WARNING);
         continue;
@@ -87,7 +87,7 @@ class InputVar extends Plugin implements SplObserver {
       break;
       case "replace":
       $tr = array();
-      foreach($el->childElements as $d) {
+      foreach($el->childElementsArray as $d) {
         if($d->nodeName != "data") continue;
         if(!$d->hasAttribute("name")) {
           new Logger(_("Element data missing attribute name"), Logger::LOGGER_WARNING);
@@ -99,7 +99,7 @@ class InputVar extends Plugin implements SplObserver {
       break;
       case "sequence":
       $seq = array();
-      foreach($el->childElements as $call) {
+      foreach($el->childElementsArray as $call) {
         if($call->nodeName != "call") continue;
         if(!strlen($call->nodeValue)) {
           new Logger(_("Element call missing content"), Logger::LOGGER_WARNING);
