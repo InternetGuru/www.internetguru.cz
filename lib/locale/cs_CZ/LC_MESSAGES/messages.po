@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-12 19:25+0100\n"
-"PO-Revision-Date: 2015-04-12 19:55+0100\n"
+"POT-Creation-Date: 2015-04-17 12:14+0100\n"
+"PO-Revision-Date: 2015-04-17 12:16+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -43,33 +43,33 @@ msgstr "HTML+ generované rozšířením %s bylo automaticky opraveno: %s"
 msgid "Unable to re/generate session ID"
 msgstr "Nepodařilo se vygenerovat session ID"
 
-#: D:\wamp\www\cms/core/Cms.php:157
+#: D:\wamp\www\cms/core/Cms.php:155
 #, php-format
 msgid "Some variables or functions causing HTML+ error: %s"
 msgstr "Některé proměnné nebo funkce způsobují chybu syntaxe HTML+: %s"
 
-#: D:\wamp\www\cms/core/Cms.php:182
+#: D:\wamp\www\cms/core/Cms.php:180
 msgid "Adding message after output - forcing flash"
 msgstr "Vynucený 'flash' pro systémouvou zprávu přidanou po výpise"
 
-#: D:\wamp\www\cms/core/Cms.php:186
+#: D:\wamp\www\cms/core/Cms.php:184
 msgid "Unable to set flash message if super user not logged"
 msgstr "Není možné nastavit flash zprávu bez přihlášeného administrátora"
 
-#: D:\wamp\www\cms/core/Cms.php:220
+#: D:\wamp\www\cms/core/Cms.php:218
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: D:\wamp\www\cms/core/Cms.php:228
+#: D:\wamp\www\cms/core/Cms.php:226
 #, php-format
 msgid "Unable to set function %s: not a function"
 msgstr "Není možné vytvořit funkci %s: nejedná se o funkci"
 
-#: D:\wamp\www\cms/core/Cms.php:257
+#: D:\wamp\www\cms/core/Cms.php:255
 msgid "Content is not set"
 msgstr "Obsah není nastaven"
 
-#: D:\wamp\www\cms/core/Cms.php:269
+#: D:\wamp\www\cms/core/Cms.php:267
 #, php-format
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
@@ -204,30 +204,30 @@ msgstr "Upozornění: tato informace může být zavádějící"
 msgid "Unable to insert variable %s: %s"
 msgstr "Nepodařilo se vložit proměnnou %s: %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:68
+#: D:\wamp\www\cms/core/DOMElementPlus.php:71
 #, php-format
 msgid "Unable to insert function %s: %s"
 msgstr "Nepodařilo se aplikovat funkci %s: %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:103
+#: D:\wamp\www\cms/core/DOMElementPlus.php:106
 #, php-format
 msgid "Unsupported variable type %s"
 msgstr "Nepodporovaný formát proměnné %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:178
+#: D:\wamp\www\cms/core/DOMElementPlus.php:181
 #, php-format
 msgid "Unable to insert array into '%s'"
 msgstr "Do '%s' nelze vložit proměnnou typu pole"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:236
+#: D:\wamp\www\cms/core/DOMElementPlus.php:239
 #, php-format
 msgid "Cannot modify attribute %s in element %s"
 msgstr "Nepodařilo se změnit atribut %s v elementu %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:276
+#: D:\wamp\www\cms/core/DOMElementPlus.php:280
 #, php-format
-msgid "Attribute '%s' stripped"
-msgstr "Atribut '%s' byl odstraněn"
+msgid "Attribute %s stripped"
+msgstr "Odstraněn atribut %s"
 
 #: D:\wamp\www\cms/core/HTMLPlus.php:23
 msgid "Variable value must be non-empty string or null"
@@ -491,26 +491,30 @@ msgstr "Funkce finfo_file() není podporovaná"
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: D:\wamp\www\cms/index.php:105
+#: D:\wamp\www\cms/index.php:104
 #, php-format
 msgid "Method %s is no longer available"
 msgstr "Metoda %s již není k dispozici"
 
-#: D:\wamp\www\cms/index.php:106
+#: D:\wamp\www\cms/index.php:105
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: D:\wamp\www\cms/index.php:152
+#: D:\wamp\www\cms/index.php:116
+msgid "Unexpected session cookies removed"
+msgstr "Odstraněna neočekávaná proměnná sessionid v cookies"
+
+#: D:\wamp\www\cms/index.php:148
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: D:\wamp\www\cms/index.php:157
+#: D:\wamp\www\cms/index.php:153
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: D:\wamp\www\cms/index.php:158
+#: D:\wamp\www\cms/index.php:154
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -539,133 +543,103 @@ msgstr "Nebyly provedeny žádné změny"
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:110
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:109
 msgid "replace"
 msgstr "nahrazení"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:110
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:109
 msgid "modify"
 msgstr "modifikace"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:127
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:126
 msgid "administration"
 msgstr "administrace"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:207
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:206
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:269
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:268
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:272
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:271
 msgid "My Heading"
 msgstr "Můj nadpis"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:273
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:272
 msgid "My Content Description"
 msgstr "Můj popis obsahu"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:274
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:273
 msgid "my, comma, separated, keywords"
 msgstr "moje, klíčová, slova, oddělená, čárkou"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:278
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:277
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:299
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:298
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:315
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:314
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:321
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:320
 msgid "Unable to save changes, administration may be locked"
 msgstr "Nepodařilo se uložit změny, administrace je pravděpodobně uzamčená"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:323
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:322
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:331
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:330
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:337
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:336
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:348
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:347
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:360
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:359
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:17
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:16
 msgid "Edit"
 msgstr "Editovat"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:63
-#, php-format
-msgid "Created by %s on %s"
-msgstr "Autorem obsahu je %s ze dne %s"
-
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:69
-#, php-format
-msgid "Document content last modified on %s"
-msgstr "Obsah této stránky byl naposledy upraven %s"
-
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:79
-#, php-format
-msgid "Person responsible for this content is %s"
-msgstr "Zodpovědná osoba za tento obsah je %s"
-
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:97
-#, php-format
-msgid "This section has been created on %s"
-msgstr "Tato sekce byla vytvořena %s"
-
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:103
-#, php-format
-msgid "This section has been modified on %s"
-msgstr "Tato sekce byla upravena %s"
-
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:136
-msgid "Unable to create Agregator temporary folder"
-msgstr "Nepodařilo se vytvořit dočasný adresář pro rozšíření Agregator"
-
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:222
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:265
-#, php-format
-msgid "Unable to cache variable %s"
-msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
-
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:230
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:252
 msgid "Configuration element html missing attribute id"
 msgstr "Konfiguračnímu elementu html chybí atribut id"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:250
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:272
 #, php-format
 msgid "Sort variable %s not found; using default"
 msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:305
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:296
+#, php-format
+msgid "Unable to cache variable %s"
+msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
+
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:330
 #, php-format
 msgid "Redundant element(s) found in %s"
 msgstr "Nalezen nadbytečný element v %s"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:306
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:331
 msgid "No item element found"
 msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
 
@@ -927,16 +901,16 @@ msgstr "Element call postrádá obsah"
 msgid "Unknown function name"
 msgstr "Neznámá funkce"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:141
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:169
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:140
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:162
 msgid "No data found"
 msgstr "Nebyla nalezena data"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:151
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:147
 msgid "No content found"
 msgstr "Nebyl nalezen obsah"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:178
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:169
 #, php-format
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"
@@ -946,92 +920,111 @@ msgstr "Funkce sequence přeskočila volání funkce: %s"
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/plugins/TOC/TOC.php:23
-msgid "Table of Contents"
-msgstr "Obsah"
-
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:33
-msgid "Select all"
-msgstr "Vybrat vše"
-
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:121
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:117
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:145
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:141
 #, php-format
 msgid "Removed duplicit id %s"
 msgstr "Odstraněn duplicitní identifikátor %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:165
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:161
 #, php-format
 msgid "Object %s attribute type invalid or missing: %s"
 msgstr "Atribut type elementu object %s je neplatný nebo chybí: %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:172
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:168
 #, php-format
 msgid "Link %s removed: %s"
 msgstr "Odkaz %s odstraněn: %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:198
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:194
 msgid "Local fragment to undefined id"
 msgstr "Lokální fragment na neexistující id"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:233
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:229
 #, php-format
 msgid "Object data '%s' not found"
 msgstr "Cílový soubor elementu object '%s' nebyl nenalezen"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:239
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:235
 #, php-format
 msgid "Invalid object '%s' MIME type '%s'"
 msgstr "Element object '%s' má chybný MIME typ '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:242
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:238
 #, php-format
 msgid "Object '%s' attribute type set to '%s'"
 msgstr "Atribut elementu '%s' byl nastaven na '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:247
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:243
 #, php-format
 msgid "Parameter 'full' removed from data attribute '%s'"
 msgstr "Odstraněn parametr 'full' z atributu data '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:303
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:298
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:335
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:330
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:377
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:371
 #, php-format
 msgid "Favicon %s not found"
 msgstr "Nepodařilo se nalézt ikonu (favicon) %s"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:390
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:384
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:392
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:386
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:489
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:483
 #, php-format
 msgid "File %s modification is disabled"
 msgstr "Modifikace souboru %s je vypnuta"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:546
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:540
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "Attribute '%s' stripped"
+#~ msgstr "Atribut '%s' byl odstraněn"
+
+#~ msgid "Created by %s on %s"
+#~ msgstr "Autorem obsahu je %s ze dne %s"
+
+#~ msgid "Document content last modified on %s"
+#~ msgstr "Obsah této stránky byl naposledy upraven %s"
+
+#~ msgid "Person responsible for this content is %s"
+#~ msgstr "Zodpovědná osoba za tento obsah je %s"
+
+#~ msgid "This section has been created on %s"
+#~ msgstr "Tato sekce byla vytvořena %s"
+
+#~ msgid "This section has been modified on %s"
+#~ msgstr "Tato sekce byla upravena %s"
+
+#~ msgid "Unable to create Agregator temporary folder"
+#~ msgstr "Nepodařilo se vytvořit dočasný adresář pro rozšíření Agregator"
+
+#~ msgid "Table of Contents"
+#~ msgstr "Obsah"
+
+#~ msgid "Select all"
+#~ msgstr "Vybrat vše"
 
 #~ msgid "Function replace missing attribute name"
 #~ msgstr "Funkce replace postrádá atribut name"

@@ -44,7 +44,6 @@ try {
     define('CMS_RELEASE', "localhost");
     define("WWW_FOLDER", "..");
     define("CMS_FOLDER", WWW_FOLDER."/".CMS_DIR);
-    define('CMS_DEBUG', true);
     define('ADMIN_ID', "localhost");
     define('ADMIN_FOLDER', ADMIN_ROOT_DIR);
     define('USER_FOLDER', USER_ROOT_DIR);
@@ -60,7 +59,6 @@ try {
     define("WWW_FOLDER", "/var/www");
     define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
     define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
-    define('CMS_DEBUG', is_file(DEBUG_FILE));
     $userId = null;
     foreach(scandir(getcwd()) as $f) {
       $varName = substr($f, 0, 6);
@@ -74,6 +72,7 @@ try {
     define('USER_FOLDER', USER_ROOT_FOLDER."/".ADMIN_ID."/".HOST);
     define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HOST);
   }
+  define('CMS_DEBUG', is_file(DEBUG_FILE));
   define("SCHEME", (@$_SERVER["HTTPS"] == "on" ? "https" : "http"));
   define("URL", SCHEME."://".HOST);
   define("URI", URL.(isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : ""));
