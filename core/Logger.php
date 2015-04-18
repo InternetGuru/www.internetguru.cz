@@ -20,6 +20,7 @@ class Logger {
     if($cmsMsg && Cms::isSuperUser()) {
       Cms::addMessage("$message [".$this->getCaller()."]", $type, Cms::isForceFlash());
     }
+    if(Cms::getLoggedUser() == "server") return;
     $this->message = $message;
     $this->type = $type;
     $this->log();
