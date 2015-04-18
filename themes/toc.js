@@ -3,6 +3,7 @@
   var Config = {}
 
   Config.tocTitle = "Table of contents";
+  Config.maxDepth = 2; // 0 for no limit
   Config.tocNS = "contenttoc";
 
    var TOC = function() {
@@ -80,6 +81,7 @@
 
           // call itself if next level is 1 higher
           if(hLevels[i+1] != (currentLevel+1)) continue;
+          if(Config.maxDepth > 0 && currentLevel > Config.maxDepth) continue;
           var subOl = win.document.createElement('ol');
           createTOC(i+1, subOl);
           li.appendChild(subOl);
