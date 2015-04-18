@@ -117,9 +117,10 @@ class DOMElementPlus extends DOMElement {
 
   private function emptyRecursive() {
     $p = $this->parentNode;
+    if(is_null($p)) return;
     $p->removeChild($this);
     if($p->nodeType != XML_ELEMENT_NODE) return;
-    if(!empty($p->childElementsArray)) return;
+    if(count($p->childElementsArray)) return;
     $p->emptyRecursive();
   }
 
@@ -370,7 +371,7 @@ class DOMElementPlus extends DOMElement {
 
   private function getFirstElement() {
     $childElements = $this->childElementsArray;
-    if(empty($childElements)) return null;
+    if(!count($childElements)) return null;
     return $childElements[0];
   }
 

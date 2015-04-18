@@ -332,7 +332,7 @@ class ContactForm extends Plugin implements SplObserver {
   }
 
   private function processFormItem(Array &$register, DOMElementPlus $e, $aName, $prefix, $default, $arraySupport) {
-    $value = normalize($e->getAttribute($aName), null, false); // remove "[]"" and stuff...
+    $value = normalize($e->getAttribute($aName), null, null, false); // remove "[]"" and stuff...
     if(!strlen($value)) $value = $default;
     $isCheckbox = $e->nodeName == "input" && $e->getAttribute("type") == "checkbox";
     $isRadio = $e->nodeName == "input" && $e->getAttribute("type") == "radio";

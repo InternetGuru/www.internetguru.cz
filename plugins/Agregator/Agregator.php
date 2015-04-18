@@ -233,7 +233,7 @@ class Agregator extends Plugin implements SplObserver {
         $this->currentSubdir = $subDir;
         $this->currentFilepath = $file;
       }
-      $cacheKey = get_class($this).$filePath;
+      $cacheKey = HOST."/".$filePath;
       if(!$this->isValidCached($cacheKey, $filePath)) {
         $this->storeCache($cacheKey, filemtime($filePath), $file);
         $useCache = false;
@@ -241,7 +241,7 @@ class Agregator extends Plugin implements SplObserver {
     }
     if(empty($vars)) return;
     $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
-    $cacheKey = HOST.get_class($this).$filePath;
+    $cacheKey = HOST."/".$filePath;
     if(!$this->isValidCached($cacheKey, $filePath)) {
       $this->storeCache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
       $useCache = false;
@@ -254,7 +254,8 @@ class Agregator extends Plugin implements SplObserver {
       }
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       // use cache
-      if($useCache) {
+      if(false) {
+      #if($useCache) {
         $sCache = $this->getSubDirCache($vName);
         if(!is_null($sCache)) {
           $doc = new DOMDocumentPlus();
@@ -335,8 +336,10 @@ class Agregator extends Plugin implements SplObserver {
       $i++;
       if(isset($patterns[$i])) $pattern = $patterns[$i];
       if(is_null($pattern) || !$pattern->childNodes->length) continue;
-      $item = $this->replaceVariables($pattern, $v);
-      $item = $root->appendChild($doc->importNode($item, true));
+      #$item = $this->replaceVariables($pattern, $v);
+      $item = $doc->importNode($pattern, true);
+      $item->processVariables($v, array(), true);
+      $item = $root->appendChild($item);
       $item->stripTag();
     }
     return $doc;

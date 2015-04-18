@@ -106,6 +106,8 @@ try {
 
   require_once(CORE_FOLDER.'/globals.php');
 
+  new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
+
   // prevent unauthorized no-cached requests
   if(is_null(Cms::getLoggedUser()) && isset($_COOKIE[session_name()])) {
     $params = session_get_cookie_params();
@@ -117,8 +119,6 @@ try {
     #$location = buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()), true);
     #redirTo($location, null, _("Unauthorized session cookies removed"));
   }
-
-  new Logger(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 
   initDirs();
   if(!IS_LOCALHOST) initLinks();

@@ -193,14 +193,15 @@ function buildQuery($pQuery, $questionMark=true) {
   return ($questionMark ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
-function normalize($s, $keep=null, $tolower=true, $convertToUtf8=false) {
+#fixme: ů to u not working?
+function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
   if($convertToUtf8) $s = utf8_encode($s);
   if($tolower) $s = mb_strtolower($s, "utf-8");
   $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
   if($tolower) $s = strtolower($s);
-  $s = str_replace(" ", "_", $s);
+  if(is_null($replace)) $replace = "_";
   if(is_null($keep)) $keep = "a-zA-Z0-9_-";
-  $s = @preg_replace("~[^$keep]~", "", $s);
+  $s = @preg_replace("~[^$keep]~", $replace, $s);
   if(is_null($s))
     throw new Exception(_("Invalid parameter 'keep'"));
   return $s;
@@ -478,7 +479,7 @@ if(!function_exists("apc_store")) {
 }
 
 function apc_get_path($key) {
-  return getcwd()."/../tmp_apc/".normalize($key);
+  return getcwd()."/../tmp_apc/".normalize($key, null, "+");
 }
 
 ?>
