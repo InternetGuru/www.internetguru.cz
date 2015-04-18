@@ -9,9 +9,11 @@ class Agregator extends Plugin implements SplObserver {
   private $edit;
   private $cfg;
   private static $sortKey;
+  const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
+    if(self::DEBUG) new Logger("DEBUG");
     $s->setPriority($this, 2);
     $this->edit = _("Edit");
   }
@@ -254,8 +256,7 @@ class Agregator extends Plugin implements SplObserver {
       }
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       // use cache
-      if(false) {
-      #if($useCache) {
+      if($useCache && !self::DEBUG) {
         $sCache = $this->getSubDirCache($vName);
         if(!is_null($sCache)) {
           $doc = new DOMDocumentPlus();
@@ -336,21 +337,11 @@ class Agregator extends Plugin implements SplObserver {
       $i++;
       if(isset($patterns[$i])) $pattern = $patterns[$i];
       if(is_null($pattern) || !$pattern->childNodes->length) continue;
-      #$item = $this->replaceVariables($pattern, $v);
-      $item = $doc->importNode($pattern, true);
+      $item = $root->appendChild($doc->importNode($pattern, true));
       $item->processVariables($v, array(), true);
-      $item = $root->appendChild($item);
       $item->stripTag();
     }
     return $doc;
-  }
-
-  private function replaceVariables(DOMElementPlus $element, Array $vars) {
-    $doc = new DOMDocumentPlus();
-    $doc->appendChild($doc->importNode($element, true));
-    $doc->processVariables($vars);
-    #$doc->processFunctions(array(), $vars);
-    return $doc->documentElement;
   }
 
   private function getHTMLVariables(HTMLPlus $doc, $filePath) {

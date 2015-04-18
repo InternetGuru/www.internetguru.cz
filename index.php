@@ -115,9 +115,7 @@ try {
       $params["path"], $params["domain"],
       $params["secure"], $params["httponly"]
     );
-    new ErrorPage(_("Unexpected session cookies removed"), 403);
-    #$location = buildLocalUrl(array("path" => getCurLink(), "query" => getCurQuery()), true);
-    #redirTo($location, null, _("Unauthorized session cookies removed"));
+    redirTo($_SERVER["REQUEST_URI"], 403, _("Invalid session cookies removed"));
   }
 
   initDirs();
@@ -158,8 +156,10 @@ try {
   http_response_code(500);
   echo $m;
 
-}
+} finally {
 
-session_write_close();
+  session_write_close();
+
+}
 
 ?>

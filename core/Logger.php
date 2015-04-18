@@ -26,10 +26,11 @@ class Logger {
   }
 
   private function getCaller() {
+    $i = 2;
     $callers = debug_backtrace();
     $c = array();
-    if(isset($callers[3]['class'])) $c[] = $callers[3]['class'];
-    if(CMS_DEBUG && isset($callers[3]['function'])) $c[] = $callers[3]['function'];
+    if(isset($callers[$i]['class'])) $c[] = $callers[$i]['class'];
+    if(CMS_DEBUG && isset($callers[$i]['function'])) $c[] = $callers[$i]['function'];
     if(empty($c)) return "core";
     return implode(".", $c);
   }

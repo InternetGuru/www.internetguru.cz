@@ -40,8 +40,9 @@ class DOMElementPlus extends DOMElement {
     else $this->setAttribute("class", $this->getAttribute("class")." $class");
   }
 
-  public function processVariables(Array $variables, $ignore = array(), $deep = false) {
+  public function processVariables(Array $variables, $ignore = array(), $deep = false, $debug = false) {
     $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
+    if($debug) var_dump($variables);
     foreach($this->getVariables("var", $ignoreAttr) as list($vName, $aName, $var)) {
       if(!isset($variables[$vName])) continue;
       try {

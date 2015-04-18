@@ -302,7 +302,7 @@ function initFiles() {
   copy_plus($src, $f);
   touch($f, filemtime($src));
   unlockFile($fp);
-  redirTo(buildLocalUrl(array("path" => getCurLink()), true), null, sprintf(_("Subdom file %s updated"), $f));
+  redirTo($_SERVER["REQUEST_URI"], null, sprintf(_("Subdom file %s updated"), $f));
 }
 
 function smartCopy($src, $dest) {

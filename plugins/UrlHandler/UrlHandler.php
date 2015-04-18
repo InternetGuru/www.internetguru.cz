@@ -38,7 +38,7 @@ class UrlHandler extends Plugin implements SplObserver {
         if(strpos($var->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
         #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
         $pLink = DOMBuilder::normalizeLink($pLink);
-        redirTo(buildLocalUrl($pLink, false));
+        redirTo(buildLocalUrl($pLink));
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
       }

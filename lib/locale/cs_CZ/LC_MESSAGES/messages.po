@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-17 12:14+0100\n"
-"PO-Revision-Date: 2015-04-17 12:16+0100\n"
+"POT-Creation-Date: 2015-04-18 11:44+0100\n"
+"PO-Revision-Date: 2015-04-18 11:44+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -199,32 +199,32 @@ msgstr "Došlo k vnitřní chybě funkce relaxNGValidate()"
 msgid "Caution: this message may be misleading"
 msgstr "Upozornění: tato informace může být zavádějící"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:51
+#: D:\wamp\www\cms/core/DOMElementPlus.php:52
 #, php-format
 msgid "Unable to insert variable %s: %s"
 msgstr "Nepodařilo se vložit proměnnou %s: %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:71
+#: D:\wamp\www\cms/core/DOMElementPlus.php:72
 #, php-format
 msgid "Unable to insert function %s: %s"
 msgstr "Nepodařilo se aplikovat funkci %s: %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:106
+#: D:\wamp\www\cms/core/DOMElementPlus.php:107
 #, php-format
 msgid "Unsupported variable type %s"
 msgstr "Nepodporovaný formát proměnné %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:181
+#: D:\wamp\www\cms/core/DOMElementPlus.php:183
 #, php-format
 msgid "Unable to insert array into '%s'"
 msgstr "Do '%s' nelze vložit proměnnou typu pole"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:239
+#: D:\wamp\www\cms/core/DOMElementPlus.php:241
 #, php-format
 msgid "Cannot modify attribute %s in element %s"
 msgstr "Nepodařilo se změnit atribut %s v elementu %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:280
+#: D:\wamp\www\cms/core/DOMElementPlus.php:282
 #, php-format
 msgid "Attribute %s stripped"
 msgstr "Odstraněn atribut %s"
@@ -427,67 +427,67 @@ msgstr "Nelze zpracovat atribut href '%s'"
 msgid "Link is cyclic"
 msgstr "Odkaz je cycklický"
 
-#: D:\wamp\www\cms/core/globals.php:205
+#: D:\wamp\www\cms/core/globals.php:206
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: D:\wamp\www\cms/core/globals.php:211 D:\wamp\www\cms/core/globals.php:241
+#: D:\wamp\www\cms/core/globals.php:212 D:\wamp\www\cms/core/globals.php:242
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/globals.php:214
+#: D:\wamp\www\cms/core/globals.php:215
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:216
+#: D:\wamp\www\cms/core/globals.php:217
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:218
+#: D:\wamp\www\cms/core/globals.php:219
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: D:\wamp\www\cms/core/globals.php:220
+#: D:\wamp\www\cms/core/globals.php:221
 msgid "Unable to delete.old file"
 msgstr "Nepodařilo se smazat soubor .old"
 
-#: D:\wamp\www\cms/core/globals.php:227
+#: D:\wamp\www\cms/core/globals.php:228
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: D:\wamp\www\cms/core/globals.php:248
+#: D:\wamp\www\cms/core/globals.php:249
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:254
+#: D:\wamp\www\cms/core/globals.php:255
 #, php-format
 msgid "Directory '%s' not found"
 msgstr "Složka '%s' nebyla nalezena"
 
-#: D:\wamp\www\cms/core/globals.php:304
+#: D:\wamp\www\cms/core/globals.php:305
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: D:\wamp\www\cms/core/globals.php:312
+#: D:\wamp\www\cms/core/globals.php:313
 msgid "File does not exist"
 msgstr "Soubor neexistuje"
 
-#: D:\wamp\www\cms/core/globals.php:314 D:\wamp\www\cms/core/globals.php:385
+#: D:\wamp\www\cms/core/globals.php:315 D:\wamp\www\cms/core/globals.php:386
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: D:\wamp\www\cms/core/globals.php:320
+#: D:\wamp\www\cms/core/globals.php:321
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: D:\wamp\www\cms/core/globals.php:400
+#: D:\wamp\www\cms/core/globals.php:401
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: D:\wamp\www\cms/core/globals.php:459
+#: D:\wamp\www\cms/core/globals.php:460
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
@@ -500,21 +500,21 @@ msgstr "Metoda %s již není k dispozici"
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: D:\wamp\www\cms/index.php:116
-msgid "Unexpected session cookies removed"
-msgstr "Odstraněna neočekávaná proměnná sessionid v cookies"
+#: D:\wamp\www\cms/index.php:118
+msgid "Invalid session cookies removed"
+msgstr "Odstraněna neplatná proměnná session z cookies"
 
-#: D:\wamp\www\cms/index.php:148
+#: D:\wamp\www\cms/index.php:146
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: D:\wamp\www\cms/index.php:153
+#: D:\wamp\www\cms/index.php:151
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: D:\wamp\www\cms/index.php:154
+#: D:\wamp\www\cms/index.php:152
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -616,30 +616,30 @@ msgstr "Nepodporované schéma '%s'"
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:16
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:18
 msgid "Edit"
 msgstr "Editovat"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:252
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:254
 msgid "Configuration element html missing attribute id"
 msgstr "Konfiguračnímu elementu html chybí atribut id"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:272
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:274
 #, php-format
 msgid "Sort variable %s not found; using default"
 msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:296
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:298
 #, php-format
 msgid "Unable to cache variable %s"
 msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:330
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:332
 #, php-format
 msgid "Redundant element(s) found in %s"
 msgstr "Nalezen nadbytečný element v %s"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:331
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:333
 msgid "No item element found"
 msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
 
@@ -998,6 +998,9 @@ msgstr "Modifikace souboru %s je vypnuta"
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "Unexpected session cookies removed"
+#~ msgstr "Odstraněna neočekávaná proměnná sessionid v cookies"
 
 #~ msgid "Attribute '%s' stripped"
 #~ msgstr "Atribut '%s' byl odstraněn"
