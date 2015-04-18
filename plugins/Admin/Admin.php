@@ -77,12 +77,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function purgeNginxCache($folder) {
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
-      if(is_dir("$folder/$f")) {
-        $this->purgeNginxCache("$folder/$f");
+      $ff = "$folder/$f";
+      if(is_dir($ff)) {
+        $this->purgeNginxCache($ff);
         continue;
       }
-      if(!empty(preg_grep("/KEY: ".SCHEME.HOST."/", file("$folder/$f")))) {
-        unlink("$folder/$f");
+      if(!empty(preg_grep("/KEY: https?".HOST."/", file($ff)))) {
+        unlink($ff);
       }
     }
   }
