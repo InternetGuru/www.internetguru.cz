@@ -348,31 +348,37 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
   private function addThemeFiles(DOMElement $e) {
     foreach($e->childElementsArray as $n) {
-      if($n->nodeValue == "") continue;
-      switch ($n->nodeName) {
-        case "xslt":
-        $user = !$n->hasAttribute("readonly");
-        $this->addTransformation($n->nodeValue, 5, $user);
-        break;
-        case "jsFile":
-        $user = !$n->hasAttribute("readonly");
-        $append = self::APPEND_HEAD;
-        $priority = 10;
-        if($n->hasAttribute("append")) $append = $n->getAttribute("append");
-        if($n->hasAttribute("priority")) $priority = $n->getAttribute("priority");
-        $this->addJsFile($n->nodeValue, $priority, $append, $user);
-        break;
-        case "stylesheet":
-        $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
-        $this->addCssFile($n->nodeValue, $media);
-        break;
-        case "favicon":
-        if(findFile($n->nodeValue) === false) {
-          new Logger(sprintf(_("Favicon %s not found"), $n->nodeValue), Logger::LOGGER_WARNING);
+      if($n->nodeValue == "" || in_array($n->nodeName, array("var", "themes"))) continue;
+      try {
+        switch ($n->nodeName) {
+          case "xslt":
+          Cms::addVariableItem("transformations", $n->nodeValue);
+          if(findFile($n->nodeValue) === false) throw new Exception();
+          $user = !$n->hasAttribute("readonly");
+          $this->addTransformation($n->nodeValue, 5, $user);
           break;
+          case "jsFile":
+          Cms::addVariableItem("javascripts", $n->nodeValue);
+          if(findFile($n->nodeValue) === false) throw new Exception();
+          $user = !$n->hasAttribute("readonly");
+          $append = self::APPEND_HEAD;
+          $priority = 10;
+          if($n->hasAttribute("append")) $append = $n->getAttribute("append");
+          if($n->hasAttribute("priority")) $priority = $n->getAttribute("priority");
+          $this->addJsFile($n->nodeValue, $priority, $append, $user);
+          break;
+          case "stylesheet":
+          Cms::addVariableItem("styles", $n->nodeValue);
+          if(findFile($n->nodeValue) === false) throw new Exception();
+          $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
+          $this->addCssFile($n->nodeValue, $media);
+          break;
+          case "favicon":
+          if(findFile($n->nodeValue) === false) throw new Exception();
+          $this->favIcon = $n->nodeValue;
         }
-        $this->favIcon = $n->nodeValue;
-        break;
+      } catch(Exception $e) {
+        new Logger(sprintf(_("File %s of type %s not found"), $n->nodeValue, $n->nodeName), Logger::LOGGER_WARNING);
       }
     }
   }
@@ -439,7 +445,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false) {
-    Cms::addVariableItem("javascripts", $filePath);
     $this->jsFiles[$filePath] = array(
       "file" => $filePath,
       "append" => $append,
@@ -468,7 +473,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
-    Cms::addVariableItem("styles", $filePath);
     $this->cssFiles[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
@@ -481,7 +485,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   public function addTransformation($filePath, $priority = 10, $user = true) {
     if(!$user && is_file(USER_FOLDER."/".$filePath))
       new Logger(sprintf(_("File %s modification is disabled"), $filePath), Logger::LOGGER_WARNING);
-    Cms::addVariableItem("transformations", $filePath);
     $this->transformations[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
