@@ -352,14 +352,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
       try {
         switch ($n->nodeName) {
           case "xslt":
-          Cms::addVariableItem("transformations", $n->nodeValue);
-          if(findFile($n->nodeValue) === false) throw new Exception();
           $user = !$n->hasAttribute("readonly");
           $this->addTransformation($n->nodeValue, 5, $user);
           break;
           case "jsFile":
-          Cms::addVariableItem("javascripts", $n->nodeValue);
-          if(findFile($n->nodeValue) === false) throw new Exception();
           $user = !$n->hasAttribute("readonly");
           $append = self::APPEND_HEAD;
           $priority = 10;
@@ -368,8 +364,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
           $this->addJsFile($n->nodeValue, $priority, $append, $user);
           break;
           case "stylesheet":
-          Cms::addVariableItem("styles", $n->nodeValue);
-          if(findFile($n->nodeValue) === false) throw new Exception();
           $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
           $this->addCssFile($n->nodeValue, $media);
           break;
@@ -445,6 +439,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false) {
+    Cms::addVariableItem("javascripts", $filePath);
+    if(findFile($filePath, $user) === false) throw new Exception();
     $this->jsFiles[$filePath] = array(
       "file" => $filePath,
       "append" => $append,
@@ -473,6 +469,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
+    Cms::addVariableItem("styles", $filePath);
+    if(findFile($filePath, $user) === false) throw new Exception();
     $this->cssFiles[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
@@ -483,6 +481,8 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
 
   public function addTransformation($filePath, $priority = 10, $user = true) {
+    Cms::addVariableItem("transformations", $filePath);
+    if(findFile($filePath, $user) === false) throw new Exception();
     if(!$user && is_file(USER_FOLDER."/".$filePath))
       new Logger(sprintf(_("File %s modification is disabled"), $filePath), Logger::LOGGER_WARNING);
     $this->transformations[$filePath] = array(
