@@ -13,7 +13,6 @@
 [class*=" flaticon-"] {
   font-family: Flaticon;
   font-style: normal;
-  width: 1em;
   display: inline-block;
   overflow: hidden;
   word-wrap: normal;
@@ -26,4 +25,13 @@
 .flaticon-drawing3:before {
   visibility: visible;
   content: "\e000";
+}
+
+.flaticon-magnifier56 {
+  padding: 0.1em;
+}
+
+.flaticon-magnifier56:before {
+  visibility: visible;
+  content: "\e001";
 }
