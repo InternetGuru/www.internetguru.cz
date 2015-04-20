@@ -20,11 +20,11 @@
 
   function appendStyle() {
     var css = '/* hideables.js */'
-      + ' .hide {display: none;}'
-      + ' .switch {text-decoration: none;'
+      + ' .hide { display: none }'
+      + ' a.switch { text-decoration: none;'
       + ' border: none;'
-      + ' font-family: "Emilbus Mono","Lucida Console",monospace;'
-      + ' font-weight: bold; color: black; }';
+      + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
+      + ' font-weight: bold }';
     var style = document.getElementsByTagName('style')[0];
     if(style == undefined) {
       var head = document.head || document.getElementsByTagName('head')[0];
