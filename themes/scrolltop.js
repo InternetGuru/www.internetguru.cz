@@ -11,7 +11,6 @@
       var scrollTimeOut = null,
       windowScrollTimeOut = null,
       button = null,
-      h1 = document.getElementsByTagName("h1")[0],
       displayed = false,
       step = null,
       wait = 10,
@@ -67,7 +66,6 @@
       },
       createButton = function() {
         button = document.createElement("a");
-        button.href = "#" + h1.id;
         button.id = Config.wrapperId;
         var span = document.createElement("span");
         span.innerHTML = Config.text;
