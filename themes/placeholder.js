@@ -21,12 +21,11 @@
       input.style.color = "#666";
     }
   }
-  function submit(value, input) {
+  function submit(e, value, input) {
     if(input.value.trim() == "" || input.value == value) {
       input.value = "";
       input.focus();
       e.preventDefault();
-      return false;
     }
   }
 
@@ -56,11 +55,11 @@
         blur(value, lInput);
       }
     })();
-    jsforms[i].onsubmit = (function(e) {
+    jsforms[i].onsubmit = (function() {
       var value = values[i];
       var lInput = input;
-      return function() {
-        return submit(e, value, lInput);
+      return function(e) {
+        submit(e, value, lInput);
       }
     })();
   }
