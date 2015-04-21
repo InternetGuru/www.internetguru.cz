@@ -25,6 +25,7 @@
     if(input.value.trim() == "" || input.value == value) {
       input.value = "";
       input.focus();
+      e.preventDefault();
       return false;
     }
   }
@@ -55,11 +56,11 @@
         blur(value, lInput);
       }
     })();
-    jsforms[i].onsubmit = (function() {
+    jsforms[i].onsubmit = (function(e) {
       var value = values[i];
       var lInput = input;
       return function() {
-        submit(value, lInput);
+        return submit(e, value, lInput);
       }
     })();
   }
