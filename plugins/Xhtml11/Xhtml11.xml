@@ -29,6 +29,7 @@
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
   <jsFile append="body">themes/syntaxhighlightjs.js</jsFile>
+  <jsFile append="body">themes/placeholder.js</jsFile>
   <jsFile append="body">themes/fragments.js</jsFile>
   <jsFile append="body" priority="5">themes/toc.js</jsFile>
   <jsFile append="body" priority="5">themes/tocinit.js</jsFile>
