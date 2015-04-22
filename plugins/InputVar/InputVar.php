@@ -93,7 +93,7 @@ class InputVar extends Plugin implements SplObserver {
           new Logger(_("Element data missing attribute name"), Logger::LOGGER_WARNING);
           continue;
         }
-        $tr[$d->getAttribute("name")] = $this->parse($d->nodeValue);
+        $tr["~(?<!\pL)".$d->getAttribute("name")."(?!\pL)~u"] = $this->parse($d->nodeValue);
       }
       $fn = $this->createFnReplace($id, $tr);
       break;
@@ -139,7 +139,8 @@ class InputVar extends Plugin implements SplObserver {
   private function createFnReplace($id, Array $replace) {
     if(empty($replace)) throw new Exception(_("No data found"));
     return function(DOMNode $node) use ($replace) {
-      return str_replace(array_keys($replace), $replace, $node->nodeValue);
+      #return str_replace(array_keys($replace), $replace, $node->nodeValue);
+      return preg_replace(array_keys($replace), $replace, $node->nodeValue);
     };
   }
 
