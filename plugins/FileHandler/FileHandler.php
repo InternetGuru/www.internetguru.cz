@@ -68,6 +68,7 @@ class FileHandler extends Plugin implements SplObserver {
       "application/pdf" => array("pdf"),
       "application/vnd.ms-fontobject" => array("eot"),
       "application/x-font-ttf" => array("ttf"),
+      "application/vnd.ms-opentype" => array("otf"),
     );
     $ext = pathinfo($src, PATHINFO_EXTENSION);
     if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
