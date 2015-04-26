@@ -74,8 +74,8 @@ class UrlHandler extends Plugin implements SplObserver {
       $link = array("path" => ""); // link to root heading permanent redir to root
       $code = 301;
     } else {
-      #$newLink = array("path" => normalize(getCurLink(), "a-zA-Z0-9/_-"));
       $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
+      $newLink = array("path" => $path);
       if(!DOMBuilder::isLink($path)) {
         if(self::DEBUG) var_dump($links);
         $linkId = $this->findSimilarLinkId($links, $path);
