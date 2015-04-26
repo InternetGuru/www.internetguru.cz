@@ -255,9 +255,10 @@ class Agregator extends Plugin implements SplObserver {
         continue;
       }
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+      $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$vName";
       // use cache
       if($useCache && !self::DEBUG) {
-        $sCache = $this->getSubDirCache($vName);
+        $sCache = $this->getSubDirCache($cacheKey);
         if(!is_null($sCache)) {
           $doc = new DOMDocumentPlus();
           $doc->loadXML($sCache["value"]);
@@ -285,7 +286,7 @@ class Agregator extends Plugin implements SplObserver {
           "name" => $vName,
           "value" => $vValue->saveXML(),
         );
-        $this->storeCache(HOST.get_class($this)."_subdir_$vName", $var, $vName);
+        $this->storeCache($cacheKey, $var, $vName);
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_WARNING);
         continue;
@@ -304,8 +305,7 @@ class Agregator extends Plugin implements SplObserver {
     return true;
   }
 
-  private function getSubDirCache($vName) {
-    $cacheKey = HOST.get_class($this)."_subdir_$vName";
+  private function getSubDirCache($cacheKey) {
     if(!apc_exists($cacheKey)) return null;
     return apc_fetch($cacheKey);
   }
