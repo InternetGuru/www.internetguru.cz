@@ -47,17 +47,23 @@ class DOMElementPlus extends DOMElement {
       if(!isset($variables[$vName])) continue;
       try {
         $this->removeAttrVal("var", $var);
+        if(!is_null($variables[$vName]) && empty($variables[$vName])) {
+          if(!is_null($aName)) $this->removeAttribute($aName);
+          else return false;
+        }
         $this->insertVariable($variables[$vName], $aName);
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
       }
-      #if(is_null($aName)) return;
     }
-    if(!$deep) return;
+    if(!$deep) return true;
+    $toRemove = array();
     foreach($this->childNodes as $e) {
       if($e->nodeType != XML_ELEMENT_NODE) continue;
-      $e->processVariables($variables, $ignore, $deep);
+      if(!$e->processVariables($variables, $ignore, $deep)) $toRemove[] = $e;
     }
+    foreach($toRemove as $e) $e->emptyRecursive();
+    return true;
   }
 
   public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array()) {
@@ -84,14 +90,9 @@ class DOMElementPlus extends DOMElement {
       case "boolean":
       $value = (string) $value;
       case "string":
-      if(!strlen($value)) {
-        $this->removeSelf($aName);
-        break;
-      }
       $this->insertVarString($value, $aName);
       break;
       case "array":
-      if(empty($value)) $this->removeSelf($aName);
       #$this = $this->prepareIfDl($this, $varName);
       $this->insertVarArray($value, $aName);
       break;
@@ -106,14 +107,6 @@ class DOMElementPlus extends DOMElement {
       }
       throw new Exception(sprintf(_("Unsupported variable type %s"), get_class($value)));
     }
-  }
-
-  private function removeSelf($aName) {
-    if(is_null($aName)) {
-      $this->emptyRecursive();
-      return;
-    }
-    $this->removeAttribute($aName);
   }
 
   private function emptyRecursive() {
