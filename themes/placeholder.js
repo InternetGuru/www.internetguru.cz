@@ -2,7 +2,8 @@
 
   var forms = document.getElementsByTagName("form"),
       jsforms = [],
-      values = [];
+      values = [],
+      debug  = false;
 
   for(var i = 0; i < forms.length; i++) {
     if(forms[i]["placeholder"]) {
@@ -26,6 +27,13 @@
       input.value = "";
       input.focus();
       e.preventDefault();
+      return false;
+    }
+    if(debug) {
+      alert("_gaq.push(['_trackEvent', 'placeholder', '" + e.target.action + "', '"
+          + input.name + "', '" + input.value + "']);");
+    } else if(typeof _gaq == "object") {
+      _gaq.push(['_trackEvent', 'placeholder', e.target.action, input.name, input.value]);
     }
   }
 
