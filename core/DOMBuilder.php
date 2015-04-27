@@ -192,7 +192,8 @@ class DOMBuilder {
     if(is_file(dirname($filePath)."/.".basename($filePath)))
       throw new Exception(sprintf(_("File disabled")));
 
-    $fInfo = self::getCache($filePath);
+    $cacheKey = HOST.$filePath;
+    $fInfo = self::getCache($cacheKey, $filePath);
     if(!is_null($fInfo)) {
       if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
       foreach($fInfo["includes"] as $file => $mtime) {
@@ -259,13 +260,13 @@ class DOMBuilder {
       "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
       "xml" => $doc->saveXML()
     );
-    $stored = apc_store($filePath, $fInfo, rand(3600*24*30*3, 3600*24*30*6));
+    $stored = apc_store($cacheKey, $fInfo, rand(3600*24*30*3, 3600*24*30*6));
     if(!$stored) new Logger(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
   }
 
-  private static function getCache($filePath) {
-    if(!apc_exists($filePath)) return null;
-    $fInfo = apc_fetch($filePath);
+  private static function getCache($cacheKey, $filePath) {
+    if(!apc_exists($cacheKey)) return null;
+    $fInfo = apc_fetch($cacheKey);
     if($fInfo["mtime"] != filemtime($filePath)) return null;
     foreach($fInfo["includes"] as $file => $mtime) {
       if($mtime != filemtime($file)) return null;

@@ -235,7 +235,7 @@ class Agregator extends Plugin implements SplObserver {
         $this->currentSubdir = $subDir;
         $this->currentFilepath = $file;
       }
-      $cacheKey = HOST."/".$filePath;
+      $cacheKey = HOST.$filePath;
       if(!$this->isValidCached($cacheKey, $filePath)) {
         $this->storeCache($cacheKey, filemtime($filePath), $file);
         $useCache = false;
@@ -243,7 +243,7 @@ class Agregator extends Plugin implements SplObserver {
     }
     if(empty($vars)) return;
     $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
-    $cacheKey = HOST."/".$filePath;
+    $cacheKey = HOST.$filePath;
     if(!$this->isValidCached($cacheKey, $filePath)) {
       $this->storeCache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
       $useCache = false;
