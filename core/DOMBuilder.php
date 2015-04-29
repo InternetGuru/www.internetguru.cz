@@ -233,15 +233,16 @@ class DOMBuilder {
     // HTML+ include
     $inclDom = array();
     $inclSrc = array();
-    foreach($doc->getElementsByTagName("include") as $include) {
-      $inclDom[] = $include;
-      $inclPath = dirname($filePath)."/".$include->getAttribute("src");
-      $inclSrc[$inclPath] = filemtime($inclPath);
-    }
+    foreach($doc->getElementsByTagName("include") as $include) $inclDom[] = $include;
     $offId = count(self::$linkToId);
     $offDesc = count(self::$linkToDesc);
     $offTitle = count(self::$linkToTitle);
-    if(!self::insertIncludes($inclDom, dirname($filePath))) $storeCache = false;
+    if(self::insertIncludes($inclDom, dirname($filePath))) {
+      foreach($inclDom as $include) {
+        $inclPath = dirname($filePath)."/".$include->getAttribute("src");
+        $inclSrc[$inclPath] = filemtime($inclPath);
+      }
+    } else $storeCache = false;
     // register links/ids; repair if duplicit
     if($included) return;
     if(!self::setIdentifiers($doc, $fShort)) $storeCache = false;
