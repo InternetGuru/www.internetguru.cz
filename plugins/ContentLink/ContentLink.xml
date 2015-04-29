@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentLink>
-  <!-- <var id="logo">logo.png</var> -->
+  <!-- <var id="logo" type="image/png">logo.png</var> -->
 </ContentLink>
