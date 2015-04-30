@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
-  <xsl:template match="/">
-    <xsl:apply-templates/>
-  </xsl:template>
-
-  <xsl:template match="//*[(parent::body or parent::div[contains(@class,'section')]) and (self::ul[not(contains(@class, 'nomultiple'))] or self::ol or self::dl)]">
+  <xsl:template match="//*[(parent::body or parent::div[contains(@class,'section')]) and (self::ul or self::ol or self::dl)][not(contains(@class, 'nomultiple'))]">
     <xsl:variable name="nm" select="name()"/>
     <xsl:choose>
       <!-- first list from a group of lists -->
