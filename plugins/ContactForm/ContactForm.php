@@ -18,6 +18,7 @@ class ContactForm extends Plugin implements SplObserver {
   private $rules = array();
   private $ruleTitles = array();
   private $errors = array();
+  const FILL_VALUES = true;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -51,12 +52,13 @@ class ContactForm extends Plugin implements SplObserver {
         if(array_key_exists($formId, $this->messages)) {
           $msg = replaceVariables($this->messages[$formId], $vars);
         } else $msg = $this->createMessage($this->cfg, $formId);
+        if(IS_LOCALHOST) throw new Exception("At localhost");
         $this->sendForm($form, $msg);
         redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=$formId")));
       } catch(Exception $e) {
         $this->finishForm($htmlForm, true);
-        $message = "<a href='#".$htmlForm->getAttribute("id")."'>"
-          .sprintf(_("Unable to send form: %s"), $e->getMessage())."</a>";
+        $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".$htmlForm->getAttribute("id")."'>"
+          .$htmlForm->getAttribute("id")."</a>", $e->getMessage());
         Cms::addMessage($message, Cms::MSG_ERROR);
         foreach($this->errors as $itemId => $message) {
           Cms::addMessage(sprintf("<label for='%s'>%s</label>", $itemId, $message), Cms::MSG_ERROR);
@@ -94,8 +96,8 @@ class ContactForm extends Plugin implements SplObserver {
   }
 
   private function isValidPost(DOMElementPlus $form) {
-    $prefix = strtolower(get_class($this))."-".$form->getAttribute("id")."-";
-    if(!empty($_POST)) foreach($this->formItems as $i) $this->setPostValue($i, $prefix);
+    #$prefix = strtolower(get_class($this))."-".$form->getAttribute("id")."-";
+    if(!empty($_POST)) foreach($this->formItems as $i) $this->setPostValue($i);
     if(!isset($_POST[get_class($this)])
       || $_POST[get_class($this)] != normalize(get_class($this))."-".$form->getAttribute("id")) return false;
     foreach($this->formItems as $i) {
@@ -246,7 +248,7 @@ class ContactForm extends Plugin implements SplObserver {
       $this->formItems[] = $e;
       $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
-      $name = $this->processFormItem($this->formNames, $e, "name", $prefix, $id, true);
+      $name = $this->processFormItem($this->formNames, $e, "name", "", $id, true);
     }
     $e->parentNode->appendChild($idInput);
     foreach($xpath->query("//label") as $e) {
@@ -296,12 +298,10 @@ class ContactForm extends Plugin implements SplObserver {
     $this->formGroupValues[$name][$value.$j] = null;
   }
 
-  private function setPostValue(DOMElementPlus $e, $prefix) {
-    $post = null;
+  private function setPostValue(DOMElementPlus $e) {
     $name = str_replace("[]", "", $e->getAttribute("name"));
-    $name = substr($name, strlen($prefix));
-    if(isset($_POST[$prefix.$name])) $post = $_POST[$prefix.$name];
-    switch($e->nodeName) {
+    $post = isset($_POST[$name]) ? $_POST[$name] : null;
+    if(self::FILL_VALUES) switch($e->nodeName) {
       case "input":
       switch($e->getAttribute("type")) {
         case "text":
@@ -359,24 +359,27 @@ class ContactForm extends Plugin implements SplObserver {
   }
 
   private function verifyItem(DOMElementPlus $e) {
+    $name = $e->getAttribute("name");
     $rule = $e->getAttribute("rule");
     $req = $e->hasAttribute("required");
     $err = $e->getAttribute("required");
+    $value = isset($_POST[$name]) ? $_POST[$name] : null;
     if($e->nodeName == "textarea") {
-      $this->verifyText($e->nodeValue, $rule, $req, $err);
+      $this->verifyText($value, $rule, $req, $err);
     } elseif($e->nodeName != "input") return;
     switch($e->getAttribute("type")) {
       case "text":
-      $this->verifyText($e->getAttribute("value"), $rule, $req, $err);
+      $this->verifyText($value, $rule, $req, $err);
       break;
       case "checkbox":
       case "radio":
-      $this->verifyChecked($e->hasAttribute("checked"), $req, $err);
+      $this->verifyChecked($value, $req, $err);
       break;
     }
   }
 
   private function verifyText($value, $ruleName, $required, $error) {
+    if(is_null($value)) throw new Exception(_("Value missing"));
     if(!strlen(trim($value))) {
       if(!$required) return;
       if(!strlen($error)) $error = _("Item is required");
