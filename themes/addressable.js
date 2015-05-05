@@ -2,11 +2,22 @@
 
   var Config = {};
   Config.class = "addressable";
-  Config.getAddress = "Get form address";
+  Config.buttonValue = "Get form URL";
 
   var Addressable = function() {
 
-    var serialize = function(form) {
+    var
+    input = null,
+    button = null,
+
+    initCfg = function(cfg) {
+      if(typeof cfg === 'undefined') return;
+      for(var attr in cfg) {
+        if(!Config.hasOwnProperty(attr)) continue;
+        Config[attr] = cfg[attr];
+      }
+    },
+    serialize = function(form) {
       if (!form || form.nodeName !== "FORM") {
         return;
       }
@@ -67,20 +78,67 @@
       return q.join("&");
     },
 
-    appendButtons = function() {
+    appendStyle = function() {
+      var css = '/* addressable.js */'
+        + ' p.addressable { padding: 1em }'
+        + ' p.addressable button, p.addressable input { padding: 0.5em 1em; font-size: inherit; width: 100%; box-sizing: border-box; line-height: 1em; max-width: 30em }';
+      var style = document.getElementsByTagName('style')[0];
+      if(style == undefined) {
+        var head = document.head || document.getElementsByTagName('head')[0];
+        style = document.createElement('style');
+        style.type = 'text/css';
+        head.appendChild(style);
+      }
+      style.appendChild(document.createTextNode(css));
+    },
+
+    appendButton = function() {
       var forms = document.getElementsByTagName("form");
       for(var i = 0; i < forms.length; i++) {
-        if(!forms[i].classList.hasClass(Config.class)) continue;
-        var printButton = document.createElement("button");
-        printButton.value = Config.getAddress;
-        forms[i].appendChild(printButton);
+        if(!forms[i].classList.contains(Config.class)) continue;
+        setFormEvent(forms[i]);
+        var p = document.createElement("p");
+        p.className = "hidden " + Config.class;
+        button = document.createElement("button");
+        button.innerHTML = Config.buttonValue;
+        button.type = "button";
+        button.addEventListener("click", performAction, false);
+        forms[i].appendChild(p);
+        p.appendChild(button);
       }
+    },
+
+    setFormEvent = function(form) {
+      var inputs = form.getElementsByTagName("input");
+      for(var i = 0; i < inputs.length; i++) {
+        if(inputs[i].type != "text") continue;
+        inputs[i].addEventListener("input", function() {
+          if(input === null) return;
+          input.parentNode.removeChild(input);
+          input = null;
+          button.style.display = "";
+        }, false);
+      }
+    },
+
+    performAction = function(e) {
+      if(input !== null) return;
+      var b = e.target;
+      var url = location.protocol + '//' + location.host + location.pathname + "?";
+      input = document.createElement("input");
+      input.value = url + serialize(b.form);
+      b.parentNode.appendChild(input);
+      b.style.display = "none";
+      input.addEventListener("focus", function(e) {e.target.setSelectionRange(0, e.target.value.length)}, false);
+      input.focus();
     };
 
     // public
     return {
       init : function(cfg) {
-        appendButtons();
+        initCfg(cfg);
+        appendButton();
+        appendStyle();
       }
     }
   };
