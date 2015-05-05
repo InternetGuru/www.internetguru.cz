@@ -36,6 +36,8 @@
   <jsFile append="body" priority="5">themes/selectable.js</jsFile>
   <jsFile append="body" priority="5">themes/selectableinit.js</jsFile>
   <jsFile append="body">themes/hideable.js</jsFile>
+  <jsFile append="body">themes/addressable.js</jsFile>
+  <jsFile append="body">themes/addressableinit.js</jsFile>
   <jsFile append="body">themes/editable.js</jsFile>
   <jsFile append="body">themes/editableinit.js</jsFile>
   <jsFile append="body">themes/scrolltop.js</jsFile>
