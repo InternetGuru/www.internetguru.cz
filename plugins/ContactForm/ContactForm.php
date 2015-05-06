@@ -18,7 +18,6 @@ class ContactForm extends Plugin implements SplObserver {
   private $rules = array();
   private $ruleTitles = array();
   private $errors = array();
-  const FILL_VALUES = true;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -97,7 +96,7 @@ class ContactForm extends Plugin implements SplObserver {
 
   private function isValidPost(DOMElementPlus $form) {
     #$prefix = strtolower(get_class($this))."-".$form->getAttribute("id")."-";
-    if(!empty($_POST)) foreach($this->formItems as $i) $this->setPostValue($i);
+    foreach($this->formItems as $i) $this->setItemValue($i);
     if(!isset($_POST[get_class($this)])
       || $_POST[get_class($this)] != normalize(get_class($this))."-".$form->getAttribute("id")) return false;
     foreach($this->formItems as $i) {
@@ -298,19 +297,20 @@ class ContactForm extends Plugin implements SplObserver {
     $this->formGroupValues[$name][$value.$j] = null;
   }
 
-  private function setPostValue(DOMElementPlus $e) {
+  private function setItemValue(DOMElementPlus $e) {
     $name = str_replace("[]", "", $e->getAttribute("name"));
-    $post = isset($_POST[$name]) ? $_POST[$name] : null;
-    if(self::FILL_VALUES) switch($e->nodeName) {
+    $value = isset($_POST[$name]) ? $_POST[$name] : null;
+    if(is_null($value) && isset($_GET[$name])) $value = $_GET[$name];
+    switch($e->nodeName) {
       case "input":
       switch($e->getAttribute("type")) {
         case "text":
-        $e->setAttribute("value", $post);
+        $e->setAttribute("value", $value);
         break;
         case "checkbox":
         case "radio":
-        if($post == $e->getAttribute("value")
-          || (is_array($post) && in_array($e->getAttribute("value"), $post))) {
+        if($value == $e->getAttribute("value")
+          || (is_array($value) && in_array($e->getAttribute("value"), $value))) {
           $e->setAttribute("checked", "checked");
         } else {
           $e->removeAttribute("checked");
@@ -318,17 +318,17 @@ class ContactForm extends Plugin implements SplObserver {
       }
       break;
       case "textarea":
-      $e->nodeValue = $post;
+      $e->nodeValue = $value;
       break;
       case "select":
       foreach($e->getElementsByTagName("option") as $o) {
-        if($post == $o->getAttribute("value")) $o->setAttribute("selected", "selected");
+        if($value == $o->getAttribute("value")) $o->setAttribute("selected", "selected");
         else $o->removeAttribute("selected");
       }
     }
-    if(is_null($post) || (is_array($post) && empty($post))
-      || (is_string($post) && !strlen(trim($post)))) $post = $this->vars["nothing"];
-    $this->formValues[$name] = $post;
+    if(is_null($value) || (is_array($value) && empty($value))
+      || (is_string($value) && !strlen(trim($value)))) $value = $this->vars["nothing"];
+    $this->formValues[$name] = $value;
   }
 
   private function processFormItem(Array &$register, DOMElementPlus $e, $aName, $prefix, $default, $arraySupport) {
