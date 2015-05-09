@@ -6,10 +6,14 @@
 #todo: default subject = Nová zpráva z webu $cms-host
 #todo: checkbox default value = trim first label
 
-class ContactForm extends Plugin implements SplObserver {
+class ContactForm extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;
   private $vars = array();
+  private $formToSend = null;
+  private $formIdToSend = null;
+  private $msgToSend = null;
+  private $formsElements = array();
   private $formIds;
   private $formVars;
   private $formValues;
@@ -24,46 +28,70 @@ class ContactForm extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    #$s->setPriority($this, 2);
+    #$s->setPriority($this, 5);
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("Xhtml11")) return;
-    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.get_class($this).'.css');
-    $this->cfg = $this->getDOMPlus();
-    $this->createGlobalVars();
-    foreach($this->forms as $formId => $form) {
-      try {
-        $htmlForm = $this->parseForm($form);
-        if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-          Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS);
-        }
-        if(!$this->isValidPost($form)) {
-          $this->finishForm($htmlForm, false);
-          continue;
-        }
-        $vars = array_merge(Cms::getAllVariables(), $this->formValues);
-        $vars["form_id"] = $formId;
-        foreach($this->formVars as $k => $v) {
-          $this->formVars[$k] = replaceVariables($v, $vars);
-        }
-        if(array_key_exists($formId, $this->messages)) {
-          $msg = replaceVariables($this->messages[$formId], $vars);
-        } else $msg = $this->createMessage($this->cfg, $formId);
-        if(IS_LOCALHOST) throw new Exception("At localhost");
-        $this->sendForm($form, $msg);
-        redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=$formId")));
-      } catch(Exception $e) {
-        $this->finishForm($htmlForm, true);
-        $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".$htmlForm->getAttribute("id")."'>"
-          .$htmlForm->getAttribute("id")."</a>", $e->getMessage());
-        Cms::addMessage($message, Cms::MSG_ERROR);
-        foreach($this->errors as $itemId => $message) {
-          Cms::addMessage(sprintf("<label for='%s'>%s</label>", $itemId, $message), Cms::MSG_ERROR);
+    if($subject->getStatus() == STATUS_INIT) {
+      Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.get_class($this).'.css');
+      $this->cfg = $this->getDOMPlus();
+      $this->createGlobalVars();
+      foreach($this->forms as $formId => $form) {
+        try {
+          $form->addClass("fillable");
+          $formVar = $this->parseForm($form);
+          $htmlForm = $formVar->documentElement->firstElement;
+          $this->formsElements[normalize(get_class($this))."-$formId"] = $formVar;
+          if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
+            Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS);
+          }
+          if(!$this->isValidPost($form)) {
+            $this->finishForm($htmlForm, false);
+            continue;
+          }
+          $this->formValues["form_id"] = $formId;
+          foreach($this->formVars as $k => $v) {
+            $this->formVars[$k] = replaceVariables($v, $this->formValues);
+          }
+          if(array_key_exists($formId, $this->messages)) {
+            $msg = replaceVariables($this->messages[$formId], $this->formValues);
+          } else $msg = $this->createMessage($this->cfg, $formId);
+          $this->formToSend = $form;
+          $this->formIdToSend = $formId;
+          $this->msgToSend = $msg;
+        } catch(Exception $e) {
+          $this->finishForm($htmlForm, true);
+          $message = sprintf(_("Unable to process form %s: %s"), "<a href='#".$htmlForm->getAttribute("id")."'>"
+            .$htmlForm->getAttribute("id")."</a>", $e->getMessage());
+          Cms::addMessage($message, Cms::MSG_ERROR);
+          foreach($this->errors as $itemId => $message) {
+            Cms::addMessage(sprintf("<label for='%s'>%s</label>", $itemId, $message), Cms::MSG_ERROR);
+          }
         }
       }
     }
+    if($subject->getStatus() == STATUS_PROCESS) {
+      if(is_null($this->formToSend)) return;
+      try {
+        if(IS_LOCALHOST) throw new Exception("At localhost");
+        foreach($this->formVars as $k => $v) {
+          $this->formVars[$k] = replaceVariables($v, Cms::getAllVariables());
+        }
+        replaceVariables($this->msgToSend, Cms::getAllVariables());
+        $this->sendForm($this->formToSend, $this->msgToSend);
+        redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$this->formIdToSend)));
+      } catch(Exception $e) {
+        $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".$this->formToSend->getAttribute("id")."'>"
+            .$this->formToSend->getAttribute("id")."</a>", $e->getMessage());
+        Cms::addMessage($message, Cms::MSG_ERROR);
+      }
+    }
+  }
+
+  public function getContent(HTMLPlus $content) {
+    if(is_null($this->formToSend)) $content->processVariables($this->formsElements);
+    return $content;
   }
 
   private function finishForm($form, $error) {
@@ -88,8 +116,8 @@ class ContactForm extends Plugin implements SplObserver {
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->createFormVars($form);
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
-    Cms::setVariable($formId, $doc);
-    return $htmlForm;
+    #Cms::setVariable($formId, $doc);
+    return $doc;
     #print_r($_POST);
     #echo $doc->saveXML();
   }
@@ -301,31 +329,6 @@ class ContactForm extends Plugin implements SplObserver {
     $name = str_replace("[]", "", $e->getAttribute("name"));
     $value = isset($_POST[$name]) ? $_POST[$name] : null;
     if(is_null($value) && isset($_GET[$name])) $value = $_GET[$name];
-    switch($e->nodeName) {
-      case "input":
-      switch($e->getAttribute("type")) {
-        case "text":
-        $e->setAttribute("value", $value);
-        break;
-        case "checkbox":
-        case "radio":
-        if($value == $e->getAttribute("value")
-          || (is_array($value) && in_array($e->getAttribute("value"), $value))) {
-          $e->setAttribute("checked", "checked");
-        } else {
-          $e->removeAttribute("checked");
-        }
-      }
-      break;
-      case "textarea":
-      $e->nodeValue = $value;
-      break;
-      case "select":
-      foreach($e->getElementsByTagName("option") as $o) {
-        if($value == $o->getAttribute("value")) $o->setAttribute("selected", "selected");
-        else $o->removeAttribute("selected");
-      }
-    }
     if(is_null($value) || (is_array($value) && empty($value))
       || (is_string($value) && !strlen(trim($value)))) $value = $this->vars["nothing"];
     $this->formValues[$name] = $value;
