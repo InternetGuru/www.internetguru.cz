@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-18 11:44+0100\n"
-"PO-Revision-Date: 2015-04-18 11:44+0100\n"
+"POT-Creation-Date: 2015-05-09 17:20+0100\n"
+"PO-Revision-Date: 2015-05-09 17:21+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -114,52 +114,52 @@ msgstr "Soubor '%s' byl již vložen"
 msgid "File disabled"
 msgstr "Soubor je neaktivní"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:212
+#: D:\wamp\www\cms/core/DOMBuilder.php:213
 #, php-format
 msgid "Invalid XML file %s"
 msgstr "Chybný XML soubor %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:227
+#: D:\wamp\www\cms/core/DOMBuilder.php:228
 #, php-format
 msgid "HTML+ file %s autocorrected: %s"
 msgstr "HTML+ soubor %s byl automaticky opraven: %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:263
+#: D:\wamp\www\cms/core/DOMBuilder.php:265
 #, php-format
 msgid "Unable to cache file %s"
 msgstr "Nepodařilo se uložit soubor %s do mezipaměti"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:284
+#: D:\wamp\www\cms/core/DOMBuilder.php:286
 #, php-format
 msgid "Duplicit prefix %s in %s renamed to %s"
 msgstr "Duplicitní prefix %s v %s přejmenován na %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:336
+#: D:\wamp\www\cms/core/DOMBuilder.php:338
 #, php-format
 msgid "Duplicit link %s skipped"
 msgstr "Byl vynechán duplicitní link %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:407
+#: D:\wamp\www\cms/core/DOMBuilder.php:409
 #, php-format
 msgid "Included file '%s' not found"
 msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:410
+#: D:\wamp\www\cms/core/DOMBuilder.php:412
 #, php-format
 msgid "Included file extension '%s' must be .html"
 msgstr "Přípona vkládaného souboru '%s' musí být .html"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:412
+#: D:\wamp\www\cms/core/DOMBuilder.php:414
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:418
+#: D:\wamp\www\cms/core/DOMBuilder.php:420
 #, php-format
 msgid "Unable to import '%s': %s"
 msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:426
+#: D:\wamp\www\cms/core/DOMBuilder.php:428
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -167,12 +167,12 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:438
+#: D:\wamp\www\cms/core/DOMBuilder.php:440
 #, php-format
 msgid "HTML+ autocorrected after inserting '%s': %s"
 msgstr "HTML+ automaticky opraven po vložení souboru '%s': %s"
 
-#: D:\wamp\www\cms/core/DOMBuilder.php:489
+#: D:\wamp\www\cms/core/DOMBuilder.php:491
 #, php-format
 msgid "ID '%s' conflicts with element '%s'"
 msgstr "Atribut ID '%s' koliduje s elementem '%s'"
@@ -199,32 +199,32 @@ msgstr "Došlo k vnitřní chybě funkce relaxNGValidate()"
 msgid "Caution: this message may be misleading"
 msgstr "Upozornění: tato informace může být zavádějící"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:52
+#: D:\wamp\www\cms/core/DOMElementPlus.php:56
 #, php-format
 msgid "Unable to insert variable %s: %s"
 msgstr "Nepodařilo se vložit proměnnou %s: %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:72
+#: D:\wamp\www\cms/core/DOMElementPlus.php:78
 #, php-format
 msgid "Unable to insert function %s: %s"
 msgstr "Nepodařilo se aplikovat funkci %s: %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:107
+#: D:\wamp\www\cms/core/DOMElementPlus.php:108
 #, php-format
 msgid "Unsupported variable type %s"
 msgstr "Nepodporovaný formát proměnné %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:183
+#: D:\wamp\www\cms/core/DOMElementPlus.php:176
 #, php-format
 msgid "Unable to insert array into '%s'"
 msgstr "Do '%s' nelze vložit proměnnou typu pole"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:241
+#: D:\wamp\www\cms/core/DOMElementPlus.php:234
 #, php-format
 msgid "Cannot modify attribute %s in element %s"
 msgstr "Nepodařilo se změnit atribut %s v elementu %s"
 
-#: D:\wamp\www\cms/core/DOMElementPlus.php:282
+#: D:\wamp\www\cms/core/DOMElementPlus.php:275
 #, php-format
 msgid "Attribute %s stripped"
 msgstr "Odstraněn atribut %s"
@@ -531,87 +531,98 @@ msgstr "aktivní soubor"
 msgid "inactive file"
 msgstr "neaktivní soubor"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:50
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:52
 msgid "Insufficient right to save changes"
 msgstr "Nedostatečná práva pro uložení změn"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:55
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:58
+#, php-format
+msgid "Unable to save changes: %s"
+msgstr "Nepodařilo se uložit změny: %s"
+
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:61
 msgid "No changes made"
 msgstr "Nebyly provedeny žádné změny"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:60
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:66
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:109
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:116
 msgid "replace"
 msgstr "nahrazení"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:109
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:116
 msgid "modify"
 msgstr "modifikace"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:126
-msgid "administration"
-msgstr "administrace"
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:133
+#, php-format
+msgid "File %s Administration"
+msgstr "Administrace souboru %s"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:206
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:152
+#, php-format
+msgid "%s - Administration"
+msgstr "%s - Administrace"
+
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:211
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:268
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:273
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:271
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:276
 msgid "My Heading"
 msgstr "Můj nadpis"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:272
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:277
 msgid "My Content Description"
 msgstr "Můj popis obsahu"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:273
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:278
 msgid "my, comma, separated, keywords"
 msgstr "moje, klíčová, slova, oddělená, čárkou"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:277
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:282
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:298
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:303
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:314
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:319
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:320
-msgid "Unable to save changes, administration may be locked"
-msgstr "Nepodařilo se uložit změny, administrace je pravděpodobně uzamčená"
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:327
+msgid "Administration may be locked"
+msgstr "Administrace je uzamčená"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:322
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:329
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:330
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:337
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:336
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:343
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:347
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:354
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: D:\wamp\www\cms/plugins/Admin/Admin.php:359
+#: D:\wamp\www\cms/plugins/Admin/Admin.php:366
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -624,12 +635,12 @@ msgstr "Editovat"
 msgid "Configuration element html missing attribute id"
 msgstr "Konfiguračnímu elementu html chybí atribut id"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:274
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:275
 #, php-format
 msgid "Sort variable %s not found; using default"
 msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
 
-#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:298
+#: D:\wamp\www\cms/plugins/Agregator/Agregator.php:299
 #, php-format
 msgid "Unable to cache variable %s"
 msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
@@ -647,79 +658,88 @@ msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
 msgid "Insufficient rights to view this content"
 msgstr "Nedostatečná práva pro zobrazení obsahu"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:59
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:65
 #, php-format
-msgid "Unable to send form: %s"
-msgstr "Nepodařilo se odeslat formulář: %s"
+msgid "Unable to process form %s: %s"
+msgstr "Nepodařilo se zpracovat formulář %s: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:114
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:85
+#, php-format
+msgid "Unable to send form %s: %s"
+msgstr "Nepodařilo se odeslat formulář %s: %s"
+
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:143
 #, php-format
 msgid "%s error(s) occured"
 msgstr "počet neplatných položek je %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:124
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:153
 msgid "Missing admin address"
 msgstr "Chybí adresa administrátora"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:126
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:155
 #, php-format
 msgid "Invalid admin email address: '%s'"
 msgstr "Neplatná adresa administrátora: '%s'"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:128
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:157
 #, php-format
 msgid "Invalid client email address: '%s'"
 msgstr "Neplatná adresa odesílatele: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:144
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:173
 msgid "Unable to send copy to empty client address"
 msgstr "Není možné odeslat kopii zprávy na prázdnou adresu"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:167
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:196
 #, php-format
 msgid "New massage from %s"
 msgstr "Nová zpráva z %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:175
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:204
 #, php-format
 msgid "E-mail successfully sent to %s"
 msgstr "Zpráva byla úspěšně odeslána na adresu %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:202
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:231
 #: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:49
 #, php-format
 msgid "Skipped element %s: %s"
 msgstr "Element %s byl vynechán: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:210
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:239
 #, php-format
 msgid "Missing attribute %s"
 msgstr "Chybí atribut %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:243
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:272
 msgid "Element input missing attribute type skipped"
 msgstr "Byl vynechán element input, neboť postrádá atribut type"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:382
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:385
+msgid "Value missing"
+msgstr "Chybí hodnota"
+
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:388
 msgid "Item is required"
 msgstr "Pložka je povinná"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:387
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:393
 #, php-format
 msgid "Form rule %s is not defined"
 msgstr "Formulářové pravidlo %s není definované"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:390
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:396
 #, php-format
 msgid "Form rule %s is invalid"
 msgstr "Formulářové pravidlo %s je neplatné"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:395
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:401
 #, php-format
 msgid "Item value does not match required format: %s"
 msgstr "Hodnota položky neodpovídá požadovanému formátu: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:401
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:407
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
 
@@ -750,6 +770,10 @@ msgstr "Nepodařilo se nelézt nadřazený nadpis pro '%s'"
 #, php-format
 msgid "Page '%s' not found"
 msgstr "Stránka '%s' nebyla nalezena"
+
+#: D:\wamp\www\cms/plugins/ContentLink/ContentLink.php:109
+msgid "Element logo missing attribute type"
+msgstr "Element logo postrádá atribut type"
 
 #: D:\wamp\www\cms/plugins/Convertor/Convertor.php:35
 msgid "File URL cannot be empty"
@@ -832,30 +856,30 @@ msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 msgid "Requested URL not found on this server"
 msgstr "Požadovaná URL nebyla nalezena"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:74
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:77
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:84
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:87
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:99
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:102
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:101
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:104
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:104
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:107
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:110
+#: D:\wamp\www\cms/plugins/FileHandler/FileHandler.php:113
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
@@ -902,15 +926,15 @@ msgid "Unknown function name"
 msgstr "Neznámá funkce"
 
 #: D:\wamp\www\cms/plugins/InputVar/InputVar.php:140
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:162
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:163
 msgid "No data found"
 msgstr "Nebyla nalezena data"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:147
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:148
 msgid "No content found"
 msgstr "Nebyl nalezen obsah"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:169
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:170
 #, php-format
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"
@@ -974,10 +998,10 @@ msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:371
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:375
 #, php-format
-msgid "Favicon %s not found"
-msgstr "Nepodařilo se nalézt ikonu (favicon) %s"
+msgid "File %s of type %s not found"
+msgstr "Soubor %s typu %s nebyl nalezen"
 
 #: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:384
 #, php-format
@@ -989,15 +1013,27 @@ msgstr "Neúspěšná kompilace transformace '%s'"
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:483
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:487
 #, php-format
 msgid "File %s modification is disabled"
 msgstr "Modifikace souboru %s je vypnuta"
 
-#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:540
+#: D:\wamp\www\cms/plugins/Xhtml11/Xhtml11.php:543
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
+
+#~ msgid "administration"
+#~ msgstr "administrace"
+
+#~ msgid "Unable to save changes, administration may be locked"
+#~ msgstr "Nepodařilo se uložit změny, administrace je pravděpodobně uzamčená"
+
+#~ msgid "Unable to send form: %s"
+#~ msgstr "Nepodařilo se odeslat formulář: %s"
+
+#~ msgid "Favicon %s not found"
+#~ msgstr "Nepodařilo se nalézt ikonu (favicon) %s"
 
 #~ msgid "Unexpected session cookies removed"
 #~ msgstr "Odstraněna neočekávaná proměnná sessionid v cookies"
