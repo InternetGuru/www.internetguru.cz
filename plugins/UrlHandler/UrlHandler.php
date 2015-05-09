@@ -69,25 +69,17 @@ class UrlHandler extends Plugin implements SplObserver {
 
   private function proceed() {
     $links = DOMBuilder::getLinks();
-    if(DOMBuilder::isLink(getCurLink())) {
-      if(getCurLink() != $links[0]) return;
-      $link = array("path" => ""); // link to root heading permanent redir to root
-      $code = 301;
-    } else {
-      $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
-      $newLink = array("path" => $path);
-      if(!DOMBuilder::isLink($path)) {
-        if(self::DEBUG) var_dump($links);
-        $linkId = $this->findSimilarLinkId($links, $path);
-        if(!is_null($linkId) && !$linkId == $links[0]) $newLink = parseLocalLink($links[$linkId]);
-        if(!isset($newLink["path"])) $newLink["path"] = "";
-      }
-      $link = $newLink;
-      $code = 404;
+    $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
+    if(!DOMBuilder::isLink($path)) {
+      if(self::DEBUG) var_dump($links);
+      $linkId = $this->findSimilarLinkId($links, $path);
+      if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    $link = buildLocalUrl($link);
-    if(self::DEBUG) die("Redirecting to $link");
-    redirTo($link, $code);
+    if(!DOMBuilder::isLink($path) || $path == $links[0]) $path = "";
+    if($path == getCurLink()) return;
+    $code = 404;
+    if(self::DEBUG) die("Redirecting to '$path'");
+    redirTo(buildLocalUrl(Array("path" => $path)), $code);
   }
 
   private function getBestId(Array $links, Array $found) {
