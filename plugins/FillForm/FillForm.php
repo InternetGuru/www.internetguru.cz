@@ -12,20 +12,52 @@ class FillForm extends Plugin implements SplObserver, ContentStrategyInterface {
   public function getContent(HTMLPlus $c) {
     foreach($c->getElementsByTagName("form") as $form) {
       if(!$form->hasClass("fillable")) continue;
-      if(strtolower($form->getAttribute("method")) == "post" && empty($_POST)) continue;
       $this->fillForm($form);
     }
     return $c;
   }
 
   private function fillForm(DOMElementPlus $form) {
-    $val = strtolower($form->getAttribute("method")) == "post" ? $_POST : $_GET;
-    if(empty($val)) return; // no data for current form
+    #$post = strtolower($form->getAttribute("method")) == "post";
     foreach($form->getElementsByTagName("input") as $input) {
-      if($input->getAttribute("type") != "text") continue;
-      if(!isset($val[$input->getAttribute("name")])) continue;
-      $input->setAttribute("value", $val[$input->getAttribute("name")]);
+      $value = $this->getRequestData($input->getAttribute("name"));
+      #var_dump($input->getAttribute("name"));
+      #var_dump($value);
+      if(is_null($value)) continue;
+      switch($input->getAttribute("type")) {
+        case "text":
+        $input->setAttribute("value", $value);
+        break;
+        case "checkbox":
+        case "radio":
+        if($value == $input->getAttribute("value")
+          || (is_array($value) && in_array($input->getAttribute("value"), $value))) {
+          $input->setAttribute("checked", "checked");
+        } else {
+          $input->removeAttribute("checked");
+        }
+      }
     }
+    foreach($form->getElementsByTagName("textarea") as $textarea) {
+      $value = $this->getRequestData($textarea->getAttribute("name"));
+      if(is_null($value)) continue;
+      $textarea->nodeValue = $value;
+    }
+    foreach($form->getElementsByTagName("select") as $select) {
+      $value = $this->getRequestData($select->getAttribute("name"));
+      if(is_null($value)) continue;
+      foreach($select->getElementsByTagName("option") as $option) {
+        if($value == $option->getAttribute("value")) $option->setAttribute("selected", "selected");
+        else $option->removeAttribute("selected");
+      }
+    }
+  }
+
+  private function getRequestData($name) {
+    $name = str_replace("[]", "", $name);
+    if(isset($_POST[$name])) return $_POST[$name];
+    if(isset($_GET[$name])) return $_GET[$name];
+    return null;
   }
 
 }
