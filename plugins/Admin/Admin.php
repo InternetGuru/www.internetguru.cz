@@ -44,13 +44,19 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       $this->setDefaultFile();
       $this->setDataFiles();
-      if($this->isPost()) $this->processPost();
-      else $this->setContent();
+      if($this->isPost()) {
+        $this->processPost();
+        $fileName = USER_FOLDER."/".$_POST["filename"];
+      } else $this->setContent();
       if(!$this->isResource($this->type)) $this->processXml();
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->isToEnable()) $this->enableDataFile();
-      if($this->contentChanged) {
-        $this->savePost();
+      if($this->isPost() && ($this->contentChanged || $this->dataFile != $fileName)) {
+        try {
+          $this->savePost($fileName);
+        } catch(Exception $e) {
+          throw new Exception(sprintf(_("Unable to save changes: %s"), $e->getMessage()));
+        }
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
         throw new Exception(_("No changes made"), 1);
       }
@@ -71,7 +77,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } else {
       if(!IS_LOCALHOST) $this->purgeNginxCache(NGINX_CACHE_FOLDER);
     }
-    $this->redir($this->defaultFile);
+    $this->redir($fileName);
   }
 
   private function purgeNginxCache($folder) {
@@ -89,7 +95,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function isPost() {
-    return isset($_POST["content"], $_POST["userfilehash"]);
+    return isset($_POST["content"], $_POST["userfilehash"], $_POST["filename"]);
   }
 
   public function getContent(HTMLPlus $content) {
@@ -124,7 +130,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     #$v = $d->appendChild($d->createElement("var"));
     #$v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
     #$vars["heading"] = $d->documentElement;
-    $vars["heading"] = $content->getElementsByTagName("h")->item(0)->nodeValue." ("._("administration").")";
+    $vars["heading"] = sprintf(_("File %s Administration"), $this->defaultFile);
     $vars["link"] = getCurLink();
     $vars["linkadmin"] = $la;
     if($this->contentValue !== "" ) $vars["content"] = $this->contentValue;
@@ -136,16 +142,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["resultcontent"] = $this->showContent(true);
     $vars["status"] = $this->dataFileStatuses[$this->dataFileStatus];
     $vars["userfilehash"] = $usrDestHash;
-    if((!$this->isPost() && $this->dataFileStatus != self::STATUS_DISABLED)
-      || isset($_POST["active"]))
-      $vars["checked"] = "checked";
-
+    if((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED)
+      || isset($_POST["disabled"])) $vars["checked"] = "checked";
     if($this->dataFileStatus == self::STATUS_NEW) {
       $vars["warning"] = "warning";
       $vars["nohide"] = "nohide";
     }
     $newContent->processVariables($vars);
-    Cms::setVariable("title", $this->defaultFile." - ".$vars["heading"]);
+    Cms::setVariable("title", sprintf(_("%s - Administration"), $this->defaultFile));
     return $newContent;
   }
 
@@ -231,14 +235,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function isToDisable() {
     if(!is_file($this->dataFile)) return false;
     if(isset($_GET[self::FILE_DISABLE])) return true;
-    if(count($_POST) && !isset($_POST["active"])) return true;
+    if(count($_POST) && isset($_POST["disabled"])) return true;
     return false;
   }
 
   private function isToEnable() {
     if(!is_file($this->dataFileDisabled)) return false;
     if(isset($_GET[self::FILE_ENABLE])) return true;
-    if(count($_POST) && isset($_POST["active"])) return true;
+    if(count($_POST) && !isset($_POST["disabled"])) return true;
     return false;
   }
 
@@ -315,10 +319,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       throw new Exception(sprintf(_("Unable to get contents from '%s'"), $this->dataFile));
   }
 
-  private function savePost() {
-    mkdir_plus(dirname($this->dataFile));
-    $b = file_put_contents($this->dataFile, $this->contentValue);
-    if($b === false) throw new Exception(_("Unable to save changes, administration may be locked"));
+  private function savePost($fileName) {
+    if($fileName != $this->dataFile && is_file($fileName) && !isset($_POST["overwrite"]))
+      throw new Exception("Destination file already exists");
+    mkdir_plus(dirname($fileName));
+    $b = file_put_contents($fileName, $this->contentValue);
+    if($b === false) throw new Exception(_("Administration may be locked"));
     $this->redir = true;
     Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $this->redir);
   }
@@ -370,5 +376,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
 }
+
 
 ?>

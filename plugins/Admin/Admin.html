@@ -2,14 +2,16 @@
 <body xml:lang="cs">
   <h var="heading" id="h.n4d">Administrace</h>
   <desc kw="administrace, plugin, soubory">Administrace souboru <samp var="filename">n/a</samp> ve formátu <samp var="schema">n/a</samp></desc>
-  <form class="editable" action="/" method="post" var="linkadmin@action">
+  <form class="editable fillable" action="/" method="post" var="linkadmin@action">
     <fieldset class="hideable nohide"><legend>Uživatelský soubor, mód <samp var="mode">n/a</samp>, stav <samp var="status warning@class">n/a</samp></legend>
       <textarea cols="40" name="content" rows="20" var="content classtype@class"/>
     </fieldset>
     <fieldset><legend>Ovládací panel</legend>
       <input name="userfilehash" type="hidden" value="" var="userfilehash@value"/>
       <ul>
-        <li><label><input name="active" type="checkbox" var="checked@checked"/> Aktivní soubor</label></li>
+        <li><label>Uložit do souboru <input name="filename" type="text" var="filename@value"/></label></li>
+        <li><label><input name="overwrite" type="checkbox"/> Přepsat editovaný soubor, pokud existuje</label></li>
+        <li><label><input name="disabled" type="checkbox" var="checked@checked"/> Deaktivovat editovaný soubor <samp var="filename">n/a</samp></label></li>
         <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
         <li><input name="saveandgo" type="submit" value="Uložit a odejít" title="Ctrl+Shift+S"/></li>
       </ul>
