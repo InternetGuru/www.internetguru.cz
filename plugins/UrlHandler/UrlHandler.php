@@ -79,7 +79,7 @@ class UrlHandler extends Plugin implements SplObserver {
     if($path == getCurLink()) return;
     $code = 404;
     if(self::DEBUG) die("Redirecting to '$path'");
-    redirTo(buildLocalUrl(Array("path" => $path)), $code);
+    redirTo(buildLocalUrl(Array("path" => $path, "query" => getCurQuery())), $code);
   }
 
   private function getBestId(Array $links, Array $found) {
