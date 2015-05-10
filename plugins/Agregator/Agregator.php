@@ -214,6 +214,11 @@ class Agregator extends Plugin implements SplObserver {
   private function createHtmlVar($subDir, Array $files) {
     $vars = array();
     $useCache = true;
+    $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$subDir";
+    if(!$this->isValidCached($cacheKey, count($files))) {
+      $this->storeCache($cacheKey, count($files), $subDir);
+      $useCache = false;
+    }
     foreach($files as $fileName) {
       if(pathinfo($fileName, PATHINFO_EXTENSION) != "html") continue;
       if(strlen($subDir)) $fileName = "$subDir/$fileName";
@@ -235,16 +240,16 @@ class Agregator extends Plugin implements SplObserver {
         $this->currentSubdir = $subDir;
         $this->currentFilepath = $file;
       }
-      $cacheKey = HOST.$filePath."/".get_class($this);
-      if(!$this->isValidCached($cacheKey, $filePath)) {
+      $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$filePath";
+      if(!$this->isValidCached($cacheKey, filemtime($filePath))) {
         $this->storeCache($cacheKey, filemtime($filePath), $file);
         $useCache = false;
       }
     }
     if(empty($vars)) return;
     $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
-    $cacheKey = HOST.$filePath."/".get_class($this);
-    if(!$this->isValidCached($cacheKey, $filePath)) {
+    $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$filePath";
+    if(!$this->isValidCached($cacheKey, filemtime($filePath))) {
       $this->storeCache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
       $useCache = false;
     }
@@ -299,9 +304,9 @@ class Agregator extends Plugin implements SplObserver {
     if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
   }
 
-  private function isValidCached($key, $filePath) {
+  private function isValidCached($key, $value) {
     if(!apc_exists($key)) return false;
-    if(apc_fetch($key) != filemtime($filePath)) return false;
+    if(apc_fetch($key) != $value) return false;
     return true;
   }
 
