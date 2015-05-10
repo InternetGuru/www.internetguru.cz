@@ -50,6 +50,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         $this->processPost();
         $fileName = USER_FOLDER."/".$_POST["filename"];
       } else $this->setContent();
+
       if(!$this->isResource($this->type)) $this->processXml();
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->isToEnable()) $this->enableDataFile();
@@ -73,12 +74,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       Cms::addMessage($e->getMessage(), $type, $this->redir);
       return;
     }
-    if(!$this->redir) return;
+    if(!$this->isPost()) return;
     if($this->isResource($this->type)) {
       if(is_file($this->defaultFile)) unlink($this->defaultFile);
     } else {
       if(!IS_LOCALHOST) $this->purgeNginxCache(NGINX_CACHE_FOLDER);
     }
+    if(!$this->redir) return;
     $this->redir($fileName);
   }
 
@@ -186,7 +188,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    */
   private function setDefaultFile() {
 
-    $f = ltrim($_GET[get_class($this)], "/");
+    #$f = ltrim($_GET[get_class($this)], "/");
+    $f = $_GET[get_class($this)];
     if(!strlen($f)) {
       $l = getCurLink().".html";
       if(findFile($l)) $f = $l;
@@ -195,11 +198,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
 
     // direct user/admin file input is disallowed
-    if(strpos($f, USER_ROOT_DIR."/") === 0) {
-      $this->redir(substr($f, strlen(USER_ROOT_DIR)+1));
+    if(strpos($f, USER_FOLDER."/") === 0) {
+      $this->redir(substr($f, strlen(USER_FOLDER)+1));
     }
-    if(strpos($f, ADMIN_ROOT_DIR."/") === 0) {
-      $this->redir(substr($f, strlen(ADMIN_ROOT_DIR)+1));
+    if(strpos($f, ADMIN_FOLDER."/") === 0) {
+      $this->redir(substr($f, strlen(ADMIN_FOLDER)+1));
     }
 
     // redir to plugin if no path or extension
