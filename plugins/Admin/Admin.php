@@ -45,6 +45,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->setDefaultFile();
       $this->setDataFiles();
       if($this->isPost()) {
+        if($this->dataFile == $fileName && $_POST["userfilehash"] != getFileHash($this->dataFile))
+          throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
         $this->processPost();
         $fileName = USER_FOLDER."/".$_POST["filename"];
       } else $this->setContent();
@@ -299,8 +301,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $post_n = str_replace("\r\n", "\n", $_POST["content"]);
     $post_rn = str_replace("\n", "\r\n", $post_n);
     $this->contentValue = $post_n;
-    if($_POST["userfilehash"] != getFileHash($this->dataFile))
-      throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
     #if((isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_DISABLED)
     #  || (!isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_ENABLED)) {
     #  $this->dataFile = $this->changeStatus($this->dataFile);
