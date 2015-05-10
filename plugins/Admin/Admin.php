@@ -368,14 +368,15 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function redir($f) {
-    $pLink = array("path" => getCurLink());
-    $fLink = pathinfo($f, PATHINFO_FILENAME);
+    $path = getCurLink();
+    if(pathinfo($f, PATHINFO_EXTENSION) == "html") $path = pathinfo($f, PATHINFO_FILENAME);
+    $pLink = array("path" => $path);
     if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=$f";
-    elseif(DOMBuilder::isLink($fLink)) $pLink["path"] = $fLink;
     redirTo(buildLocalUrl($pLink, true));
   }
 
 }
+
 
 
 ?>
