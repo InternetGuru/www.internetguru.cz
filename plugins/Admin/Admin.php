@@ -45,10 +45,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->setDefaultFile();
       $this->setDataFiles();
       if($this->isPost()) {
+        $fileName = USER_FOLDER."/".$_POST["filename"];
         if($this->dataFile == $fileName && $_POST["userfilehash"] != getFileHash($this->dataFile))
           throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
         $this->processPost();
-        $fileName = USER_FOLDER."/".$_POST["filename"];
       } else $this->setContent();
 
       if(!$this->isResource($this->type)) $this->processXml();
