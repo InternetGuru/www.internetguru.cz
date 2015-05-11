@@ -81,7 +81,16 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if(!IS_LOCALHOST) $this->purgeNginxCache(NGINX_CACHE_FOLDER);
     }
     if(!$this->redir) return;
-    $this->redir($fileName);
+    $pLink = array("path" => $this->getDestPath($_POST["filename"]));
+    if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=".$_POST["filename"];
+    redirTo(buildLocalUrl($pLink, true));
+  }
+
+  private function getDestPath($f) {
+    if(pathinfo($_POST["filename"], PATHINFO_EXTENSION) != "html") return getCurLink();
+    $path = pathinfo($f, PATHINFO_FILENAME);
+    if($this->dataFileStatus != self::STATUS_NEW && !DOMBuilder::isLink($path)) return getCurLink();
+    return $path;
   }
 
   private function purgeNginxCache($folder) {
@@ -187,43 +196,30 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    * themes/userFile.css -> usr/themes/userFile.css (dir/F.ext user)
    */
   private function setDefaultFile() {
+    $this->defaultFile = $this->getFilepath($_GET[get_class($this)]);
+    $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
+  }
 
-    #$f = ltrim($_GET[get_class($this)], "/");
-    $f = $_GET[get_class($this)];
+  private function getFilepath($f) {
     if(!strlen($f)) {
-      $f = findFile(getCurLink().".html") ? getCurLink().".html" : INDEX_HTML;
-      $pLink = array("path" => getCurLink(), "query" => get_class($this)."=$f");
-      redirTo(buildLocalUrl($pLink, true));
+      return findFile(getCurLink().".html") ? getCurLink().".html" : INDEX_HTML;
     }
-
-    // direct user/admin file input is disallowed
     if(strpos($f, USER_FOLDER."/") === 0) {
-      $this->redir(substr($f, strlen(USER_FOLDER)+1));
+      return substr($f, strlen(USER_FOLDER)+1);
     }
     if(strpos($f, ADMIN_FOLDER."/") === 0) {
-      $this->redir(substr($f, strlen(ADMIN_FOLDER)+1));
+      return substr($f, strlen(ADMIN_FOLDER)+1);
     }
-
-    // redir to plugin if no path or extension
     if(preg_match("~^[\w-]+$~", $f)) {
       $pluginFile = PLUGINS_DIR."/$f/$f.xml";
-      if(!findFile($pluginFile)) $this->redir("$f.xml");
-      $this->redir($pluginFile);
+      if(!findFile($pluginFile)) return "$f.xml";
+      return $pluginFile;
     }
-
-    if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{2,4}$~", $f))
+    if(!preg_match("~^([\w.-]+/)*([\w-]+\.)+[A-Za-z]{2,4}$~", $f)) {
       throw new Exception(sprintf(_("Unsupported file name format '%s'"), $f));
-
-    $this->defaultFile = $f;
-    $this->type = pathinfo($f, PATHINFO_EXTENSION);
-
-    // no direct match with extension [and path]
-    if(findFile($f, false)) return;
-    // check/redir to plugin dir
-    if(!findFile(PLUGINS_DIR."/$f", false)) return;
-    // found plugin file
-    $this->redir(PLUGINS_DIR."/$f");
-
+    }
+    if(findFile(PLUGINS_DIR."/$f", false)) PLUGINS_DIR."/$f";
+    return $f;
   }
 
   private function setDataFiles() {
@@ -367,14 +363,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(!file_exists($schema))
       throw new Exception(sprintf(_("Schema file '%s' not found"), $schema));
     return $schema;
-  }
-
-  private function redir($f) {
-    $path = getCurLink();
-    if(pathinfo($f, PATHINFO_EXTENSION) == "html") $path = pathinfo($f, PATHINFO_FILENAME);
-    $pLink = array("path" => $path);
-    if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=$f";
-    redirTo(buildLocalUrl($pLink, true));
   }
 
 }
