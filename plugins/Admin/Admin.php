@@ -191,10 +191,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     #$f = ltrim($_GET[get_class($this)], "/");
     $f = $_GET[get_class($this)];
     if(!strlen($f)) {
-      $l = getCurLink().".html";
-      if(findFile($l)) $f = $l;
-      else $f = INDEX_HTML;
-      $this->redir($f);
+      $f = findFile(getCurLink().".html") ? getCurLink().".html" : INDEX_HTML;
+      $pLink = array("path" => getCurLink(), "query" => get_class($this)."=$f");
+      redirTo(buildLocalUrl($pLink, true));
     }
 
     // direct user/admin file input is disallowed
