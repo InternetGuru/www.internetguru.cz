@@ -31,7 +31,7 @@
     if(!Editable) return;
     var form = Editable.getParentForm(TextArea);
     if(!form || !form.classList.contains(Editable.getEditableClass())) return;
-    setModified();
+    Editable.setModified();
   });
 
 })(window);
