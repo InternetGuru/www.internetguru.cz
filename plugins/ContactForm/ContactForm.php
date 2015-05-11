@@ -27,7 +27,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    #$s->setPriority($this, 5);
+    $s->setPriority($this, 20);
   }
 
   public function update(SplSubject $subject) {
