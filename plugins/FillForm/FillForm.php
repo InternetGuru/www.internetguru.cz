@@ -42,7 +42,7 @@ class FillForm extends Plugin implements SplObserver, ContentStrategyInterface {
     foreach($form->getElementsByTagName("textarea") as $textarea) {
       $value = $this->getRequestData($textarea->getAttribute("name"));
       if(is_null($value)) continue;
-      $textarea->nodeValue = $value;
+      $textarea->nodeValue = htmlspecialchars($value);
     }
     foreach($form->getElementsByTagName("select") as $select) {
       $value = $this->getRequestData($select->getAttribute("name"));
