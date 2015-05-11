@@ -12,7 +12,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $vars = array();
   private $formToSend = null;
   private $formIdToSend = null;
-  private $msgToSend = null;
   private $formsElements = array();
   private $formIds;
   private $formVars;
@@ -50,16 +49,10 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
             $this->finishForm($htmlForm, false);
             continue;
           }
+          $this->finishForm($htmlForm, true);
           $this->formValues["form_id"] = $formId;
-          foreach($this->formVars as $k => $v) {
-            $this->formVars[$k] = replaceVariables($v, $this->formValues);
-          }
-          if(array_key_exists($formId, $this->messages)) {
-            $msg = replaceVariables($this->messages[$formId], $this->formValues);
-          } else $msg = $this->createMessage($this->cfg, $formId);
           $this->formToSend = $form;
           $this->formIdToSend = $formId;
-          $this->msgToSend = $msg;
         } catch(Exception $e) {
           $this->finishForm($htmlForm, true);
           $message = sprintf(_("Unable to process form %s: %s"), "<a href='#".$htmlForm->getAttribute("id")."'>"
@@ -74,15 +67,18 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     if($subject->getStatus() == STATUS_PROCESS) {
       if(is_null($this->formToSend)) return;
       try {
-        if(IS_LOCALHOST) throw new Exception("At localhost");
+        $variables = array_merge($this->formValues, Cms::getAllVariables());
         foreach($this->formVars as $k => $v) {
-          $this->formVars[$k] = replaceVariables($v, Cms::getAllVariables());
+          $this->formVars[$k] = replaceVariables($v, $variables);
         }
-        replaceVariables($this->msgToSend, Cms::getAllVariables());
-        $this->sendForm($this->formToSend, $this->msgToSend);
+        if(array_key_exists($this->formIdToSend, $this->messages)) {
+          $msg = replaceVariables($this->messages[$this->formIdToSend], $variables);
+        } else $msg = $this->createMessage($this->cfg, $this->formIdToSend);
+        if(IS_LOCALHOST) throw new Exception("Not sending (at localhost)");
+        $this->sendForm($this->formToSend, $msg);
         redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$this->formIdToSend)));
       } catch(Exception $e) {
-        $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".$this->formToSend->getAttribute("id")."'>"
+        $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$this->formIdToSend."'>"
             .$this->formToSend->getAttribute("id")."</a>", $e->getMessage());
         Cms::addMessage($message, Cms::MSG_ERROR);
       }
@@ -90,7 +86,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $content) {
-    if(is_null($this->formToSend)) $content->processVariables($this->formsElements);
+    $content->processVariables($this->formsElements);
     return $content;
   }
 
