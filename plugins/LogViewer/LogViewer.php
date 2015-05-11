@@ -6,6 +6,8 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   const DEBUG = false;
   private $logFiles;
   private $verFiles;
+  private $curFilePath;
+  private $curFileName;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -27,35 +29,42 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function getContent(HTMLPlus $content) {
-    $fPath = null;
-    $fName = strlen($_GET[get_class($this)]) ? $_GET[get_class($this)] : "log";
-    switch($fName) {
-      case "ver":
-      $fPath = current($this->verFiles);
-      $fName = key($this->verFiles);
-      break;
-      case "log":
-      $fPath = current($this->logFiles);
-      $fName = key($this->logFiles);
-      break;
-      default:
-      $fPath = $this->getFilePath($fName);
-      if(!is_null($fPath)) break;
-      Cms::addMessage(sprintf(_("File or extension '%s' not found"), $fName), Cms::MSG_ERROR);
-      $fPath = current($this->logFiles);
-      $fName = key($this->logFiles);
+    $fName = $_GET[get_class($this)];
+    try {
+      $fPath = $this->getCurFilePath($fName);
+      $vars["content"] = htmlspecialchars($this->file_get_contents($fPath));
+    } catch(Exception $e) {
+      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
     }
-
     $newContent = $this->getHTMLPlus();
     $vars["cur_file"] = $fName;
     $vars["log_files"] = $this->makeLink($this->logFiles);
     $vars["ver_files"] = $this->makeLink($this->verFiles);
-
-    if(!is_null($fPath)) {
-      $vars["content"] = htmlspecialchars($this->file_get_contents($fPath));
-    }
     $newContent->processVariables($vars);
     return $newContent;
+  }
+
+  private function getCurFilePath($fName) {
+    $fPath = null;
+    switch($fName) {
+      case "ver":
+      reset($this->verFiles);
+      $this->redirTo(key($this->verFiles));
+      break;
+      case "":
+      case "log":
+      reset($this->logFiles);
+      $this->redirTo(key($this->logFiles));
+      break;
+      default:
+      $fPath = $this->getFilePath($fName);
+      if(is_null($fPath)) throw new Exception (sprintf(_("File or extension '%s' not found"), $fName));
+    }
+    return $fPath;
+  }
+
+  private function redirTo($fName) {
+    redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => get_class($this)."=$fName")));
   }
 
   private function makeLink(Array $array) {
@@ -68,7 +77,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function file_get_contents($file) {
     if(substr($file, -4) != ".zip") return file_get_contents($file);
-    return readZippedFile($file, substr(pathinfo($file, PATHINFO_BASENAME), 0, -4));
+    else return readZippedFile($file, substr(pathinfo($file, PATHINFO_BASENAME), 0, -4));
   }
 
   private function getFilePath($fName) {
