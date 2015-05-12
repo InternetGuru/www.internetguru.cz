@@ -2,7 +2,7 @@
 
   var forms = document.getElementsByTagName("form"),
       values = [],
-      debug  = true;
+      debug  = false;
 
   function focus(value, input) {
     if(input.value == value) input.value = "";
