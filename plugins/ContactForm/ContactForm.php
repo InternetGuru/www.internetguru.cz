@@ -92,6 +92,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function finishForm($form, $error) {
     foreach($this->formItems as $e) {
+      if($e->hasAttribute("required")) $e->addClass("required");
       $e->removeAttribute("rule");
       $e->removeAttribute("required");
     }
