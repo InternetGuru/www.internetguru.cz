@@ -26,11 +26,19 @@
       }
     }
     if(debug) {
-      alert("ga('send', 'event', 'placeholder', '" + e.target.action + "', '"
-          + input.name + "', '" + input.value + "');");
+      alert("akce: '" + e.target.action
+        + "'\nnazev: '" + input.name
+        + "'\nhodnota: '" + input.value + "'");
       e.preventDefault();
     } else if(typeof ga == "function") {
-      ga('send', 'event', 'placeholder', e.target.action, input.name, input.value);
+      ga('send', {
+        'hitType': 'event',
+        'eventCategory': 'placeholder',
+        'eventAction': e.target.action,
+        'eventLabel': input.name,
+        'eventValue': input.value
+      });
+
     }
   }
 
