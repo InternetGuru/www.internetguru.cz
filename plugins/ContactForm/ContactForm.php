@@ -42,13 +42,15 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           $formVar = $this->parseForm($form);
           $htmlForm = $formVar->documentElement->firstElement;
           $this->formsElements[normalize(get_class($this))."-$formId"] = $formVar;
+          $fv = $this->createFormVars($htmlForm);
           if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-            Cms::addMessage($this->formVars["success"], Cms::MSG_SUCCESS);
+            Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
           }
           if(!$this->isValidPost($form)) {
             $this->finishForm($htmlForm, false);
             continue;
           }
+          $this->formVars = $fv;
           $this->finishForm($htmlForm, true);
           $this->formValues["form_id"] = $formId;
           $this->formToSend = $form;
@@ -75,6 +77,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           $msg = replaceVariables($this->messages[$this->formIdToSend], $variables);
         } else $msg = $this->createMessage($this->cfg, $this->formIdToSend);
         if(IS_LOCALHOST) throw new Exception("Not sending (at localhost)");
+        var_dump($this->formVars);
         $this->sendForm($this->formToSend, $msg);
         redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$this->formIdToSend)));
       } catch(Exception $e) {
@@ -111,7 +114,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $htmlForm->setAttribute("action", getCurLink());
     #$htmlForm->setAttribute("var", "cms-link@action");
     $htmlForm->setAttribute("id", "$prefix-$formId");
-    $this->createFormVars($form);
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
     #Cms::setVariable($formId, $doc);
     return $doc;
@@ -138,9 +140,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     if(!empty($this->errors))
       throw new Exception(sprintf(_("%s error(s) occured"), count($this->errors)));
-    foreach(array("email", "name", "sendcopy") as $name) {
-      $this->formVars[$name] = isset($this->formValues[$name]) ? $this->formValues[$name] : "";
-    }
     #if(!strlen($this->formVars["email"]))
     #  new Logger(_("Attribute name email not sent or empty"), Logger::LOGGER_WARNING);
     return true;
@@ -237,13 +236,17 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   private function createFormVars(DOMElementPlus $form) {
-    $this->formVars = array();
+    $formVars = array();
+    foreach(array("email", "name", "sendcopy") as $name) {
+      $formVars[$name] = isset($this->formValues[$name]) ? $this->formValues[$name] : "";
+    }
     foreach($this->vars as $name => $value) {
-      $this->formVars[$name] = $value;
+      $formVars[$name] = $value;
       if(!$form->hasAttribute($name)) continue;
-      $this->formVars[$name] = $form->getAttribute($name);
+      $formVars[$name] = $form->getAttribute($name);
       $form->removeAttribute($name);
     }
+    return $formVars;
   }
 
   private function registerFormItems(DOMElementPlus $form, $prefix) {
