@@ -26,11 +26,11 @@
       }
     }
     if(debug) {
-      alert("_gaq.push(['_trackEvent', 'placeholder', '" + e.target.action + "', '"
-          + input.name + "', '" + input.value + "']);");
+      alert("ga('send', 'event', 'placeholder', '" + e.target.action + "', '"
+          + input.name + "', '" + input.value + "');");
       e.preventDefault();
-    } else if(typeof _gaq == "object") {
-      _gaq.push(['_trackEvent', 'placeholder', e.target.action, input.name, input.value]);
+    } else if(typeof ga == "function") {
+      ga('send', 'event', 'placeholder', e.target.action, input.name, input.value);
     }
   }
 
