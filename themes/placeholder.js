@@ -14,19 +14,22 @@
     }
   }
   function submit(e, defaults) {
+    var warningInput = null;
     for(var i = 0; i < defaults.length; i++) {
       var required = defaults[i][2];
       if(!required) continue;
       var input = defaults[i][0];
       var value = defaults[i][1];
       if(input.value.trim() == "" || input.value == value) {
-        input.value = "";
-        input.focus();
-        if(!input.classList.contains("warning"))
-          input.classList.add("warning");
-        e.preventDefault();
-        return false;
+        if(warningInput === null) warningInput = input;
+        if(!input.classList.contains("warning")) input.classList.add("warning");
       }
+    }
+    if(warningInput !== null) {
+      input.value = "";
+      input.focus();
+      e.preventDefault();
+      return false;
     }
     for(var i = 0; i < defaults.length; i++) {
       var input = defaults[i][0];
@@ -41,10 +44,9 @@
     } else if(typeof ga == "function") {
       ga('send', {
         'hitType': 'event',
-        'eventCategory': 'placeholder',
-        'eventAction': e.target.action,
-        'eventLabel': input.name,
-        'eventValue': input.value
+        'eventCategory': e.target.action,
+        'eventAction': input.name,
+        'eventLabel': input.value
       });
 
     }
