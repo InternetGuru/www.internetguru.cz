@@ -41,26 +41,35 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function processVariables(Array $variables, $ignore = array(), $deep = false, $debug = false) {
+    $toRemove = array();
+    $r = $this->doProcessVariables($variables, $ignore, $deep, $debug, $toRemove);
+    foreach($toRemove as $e) $e->emptyRecursive();
+    return $r;
+  }
+
+  public function doProcessVariables(Array $variables, $ignore = array(), $deep = false, $debug = false, &$del) {
     $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
     if($debug) var_dump($variables);
+    $toInsert = array();
+    $toRemove = array();
     foreach($this->getVariables("var", $ignoreAttr) as list($vName, $aName, $var)) {
       if(!isset($variables[$vName])) continue;
       try {
         $this->removeAttrVal("var", $var);
-        if(!is_null($variables[$vName]) && empty($variables[$vName])) {
+        if(!is_null($variables[$vName]) && !count($variables[$vName])) {
           if(!is_null($aName)) $this->removeAttribute($aName);
           else return false;
         }
-        $this->insertVariable($variables[$vName], $aName);
+        $el = $this->insertVariable($variables[$vName], $aName);
+        if(!is_null($el)) $del[] = $el;
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
       }
     }
     if(!$deep) return true;
-    $toRemove = array();
     foreach($this->childNodes as $e) {
       if($e->nodeType != XML_ELEMENT_NODE) continue;
-      if(!$e->processVariables($variables, $ignore, $deep)) $toRemove[] = $e;
+      if(!$e->doProcessVariables($variables, $ignore, $deep, $debug, $del)) $toRemove[] = $e;
     }
     foreach($toRemove as $e) $e->emptyRecursive();
     return true;
@@ -98,12 +107,10 @@ class DOMElementPlus extends DOMElement {
       break;
       default:
       if($value instanceof DOMDocumentPlus) {
-        $this->insertVarDOMElement($value->documentElement, $aName);
-        break;
+        return $this->insertVarDOMElement($value->documentElement, $aName);
       }
       if($value instanceof DOMElement) {
-        $this->insertVarDOMElement($value, $aName);
-        break;
+        return $this->insertVarDOMElement($value, $aName);
       }
       throw new Exception(sprintf(_("Unsupported variable type %s"), get_class($value)));
     }
@@ -192,8 +199,7 @@ class DOMElementPlus extends DOMElement {
       }
     }
     if(count($html) > 1) {
-      $this->insertVarDOMElement($dom->documentElement, null);
-      return;
+      return $this->insertVarDOMElement($dom->documentElement, null);
     }
     while($this->hasChildNodes()) $this->removeChild($this->firstChild);
     foreach($dom->documentElement->firstChild->childNodes as $n) {
@@ -221,7 +227,8 @@ class DOMElementPlus extends DOMElement {
         $n->setAttribute($aName, $aValue);
       }
     }
-    $this->parentNode->removeChild($this);
+    return $this;
+    #$this->parentNode->removeChild($this);
     # ??? $this->removeChildNodes();
   }
 
