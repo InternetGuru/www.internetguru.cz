@@ -26,8 +26,8 @@
       }
     }
     if(warningInput !== null) {
-      input.value = "";
-      input.focus();
+      warningInput.value = "";
+      warningInput.focus();
       e.preventDefault();
       return false;
     }
