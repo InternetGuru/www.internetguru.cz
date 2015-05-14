@@ -1,7 +1,6 @@
 (function(win){
 
   var forms = document.getElementsByTagName("form"),
-      values = [],
       debug  = false;
 
   function focus(value, input) {
@@ -14,15 +13,20 @@
       input.style.color = "#666";
     }
   }
-  function submit(e, required) {
-    for(var i = 0; i < required.length; i++) {
-      var input = required[i][0];
-      var value = required[i][1];
+  function submit(e, defaults) {
+    for(var i = 0; i < defaults.length; i++) {
+      var input = defaults[i][0];
+      var value = defaults[i][1];
+      var required = defaults[i][2];
       if(input.value.trim() == "" || input.value == value) {
         input.value = "";
-        input.focus();
-        e.preventDefault();
-        return false;
+        if(required) {
+          input.focus();
+          if(!input.classList.contains("warning"))
+            input.classList.add("warning");
+          e.preventDefault();
+          return false;
+        }
       }
     }
     if(debug) {
@@ -45,14 +49,14 @@
   for(var i = 0; i < forms.length; i++) {
     if(!forms[i]["placeholder"]) continue;
     var inputs = forms[i].getElementsByTagName("input");
-    var required = [];
+    var defaults = [];
     for(var j = 0; j < inputs.length; j++) {
       if(inputs[j].type != "text") continue;
       input = inputs[j];
-      if(input.nextElementSibling.type != "hidden" || input.nextElementSibling.name.indexOf("placeholder") != 0)
+      if(!input.nextElementSibling || input.nextElementSibling.type != "hidden" || input.nextElementSibling.name.indexOf("placeholder") != 0)
         continue;
       var placeholder = input.nextElementSibling.value + " ";
-      if(input.classList.contains("required")) required.push([input, placeholder]);
+      defaults.push([input, placeholder, input.classList.contains("required")]);
       input.value = placeholder;
       input.style.color = "#666";
       input.onfocus = (function() {
@@ -71,9 +75,9 @@
       })();
     }
     forms[i].onsubmit = (function() {
-      var lRequired = required;
+      var lDefaults = defaults;
       return function(e) {
-        submit(e, lRequired);
+        submit(e, lDefaults);
       }
     })();
   }
