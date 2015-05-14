@@ -15,19 +15,23 @@
   }
   function submit(e, defaults) {
     for(var i = 0; i < defaults.length; i++) {
+      var required = defaults[i][2];
+      if(!required) continue;
       var input = defaults[i][0];
       var value = defaults[i][1];
-      var required = defaults[i][2];
       if(input.value.trim() == "" || input.value == value) {
         input.value = "";
-        if(required) {
-          input.focus();
-          if(!input.classList.contains("warning"))
-            input.classList.add("warning");
-          e.preventDefault();
-          return false;
-        }
+        input.focus();
+        if(!input.classList.contains("warning"))
+          input.classList.add("warning");
+        e.preventDefault();
+        return false;
       }
+    }
+    for(var i = 0; i < defaults.length; i++) {
+      var input = defaults[i][0];
+      var value = defaults[i][1];
+      if(input.value.trim() == "" || input.value == value) input.value = "";
     }
     if(debug) {
       alert("akce: '" + e.target.action
