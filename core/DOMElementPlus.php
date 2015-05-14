@@ -99,12 +99,10 @@ class DOMElementPlus extends DOMElement {
       case "boolean":
       $value = (string) $value;
       case "string":
-      $this->insertVarString($value, $aName);
-      break;
+      return $this->insertVarString($value, $aName);
       case "array":
       #$this = $this->prepareIfDl($this, $varName);
-      $this->insertVarArray($value, $aName);
-      break;
+      return $this->insertVarArray($value, $aName);
       default:
       if($value instanceof DOMDocumentPlus) {
         return $this->insertVarDOMElement($value->documentElement, $aName);
@@ -127,8 +125,7 @@ class DOMElementPlus extends DOMElement {
 
   private function insertVarString($value, $aName) {
     if(is_null($aName)) {
-      $this->insertInnerHTML($value, "");
-      return;
+      return $this->insertInnerHTML($value, "");
     }
     if(!$this->hasAttribute($aName) || $this->getAttribute($aName) == "") {
       if(strlen($value)) $this->setAttribute($aName, $value);
@@ -150,8 +147,7 @@ class DOMElementPlus extends DOMElement {
 
   private function insertVarArray(Array $value, $aName) {
     if(!is_null($aName)) {
-      $this->insertVarString(implode(" ", $value), $aName);
-      return;
+      return $this->insertVarString(implode(" ", $value), $aName);
     }
     $sep = null;
     switch($this->nodeName) {
@@ -172,8 +168,7 @@ class DOMElementPlus extends DOMElement {
       case "ol":
       $this->removeChildNodes();
       $e = $this->appendChild($this->ownerDocument->createElement("li"));
-      $e->insertInnerHTML($value, $sep);
-      return;
+      return $e->insertInnerHTML($value, $sep);
       #case "body":
       #case "section":
       #case "dl":
@@ -183,7 +178,7 @@ class DOMElementPlus extends DOMElement {
       throw new Exception(sprintf(_("Unable to insert array into '%s'"), $this->nodeName));
       return;
     }
-    $this->insertInnerHTML($value, $sep);
+    return $this->insertInnerHTML($value, $sep);
   }
 
   private function insertInnerHTML($html, $sep) {
@@ -210,7 +205,7 @@ class DOMElementPlus extends DOMElement {
 
   private function insertVarDOMElement(DOMElement $element, $aName) {
     if(!is_null($aName)) {
-      $this->insertVarString($element->nodeValue, $aName);
+      return $this->insertVarString($element->nodeValue, $aName);
     }
 
     $var = $this->ownerDocument->importNode($element, true);
