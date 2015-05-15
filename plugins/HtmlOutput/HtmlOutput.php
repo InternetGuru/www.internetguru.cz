@@ -444,8 +444,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param integer $priority The higher priority the lower appearance
    */
   public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false) {
+    if(isset($this->jsFiles[$filePath])) return;
     Cms::addVariableItem("javascripts", $filePath);
-    if(findFile($filePath, $user) === false) throw new Exception();
+    #if(findFile($filePath, $user) === false) throw new Exception();
     $this->jsFiles[$filePath] = array(
       "file" => $filePath,
       "append" => $append,
@@ -474,8 +475,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param integer $priority The higher priority the lower appearance
    */
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true) {
+    if(isset($this->cssFiles[$filePath])) return;
     Cms::addVariableItem("styles", $filePath);
-    if(findFile($filePath, $user) === false) throw new Exception();
+    #if(findFile($filePath, $user) === false) throw new Exception();
     $this->cssFiles[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
@@ -486,8 +488,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
 
   public function addTransformation($filePath, $priority = 10, $user = true) {
+    if(isset($this->transformations[$filePath])) return;
     Cms::addVariableItem("transformations", $filePath);
-    if(findFile($filePath, $user) === false) throw new Exception();
+    #if(findFile($filePath, $user) === false) throw new Exception();
     if(!$user && is_file(USER_FOLDER."/".$filePath))
       new Logger(sprintf(_("File %s modification is disabled"), $filePath), Logger::LOGGER_WARNING);
     $this->transformations[$filePath] = array(
