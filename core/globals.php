@@ -52,6 +52,7 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
     }
     $value = $variables[$vName];
     if(is_array($value)) $value = implode(", ", $value);
+    elseif($value instanceof DOMElementPlus) $value = $value->nodeValue;
     elseif(!is_string($value)) {
       if(strpos($v, "@") !== 0)
         new Logger(sprintf(_("Variable '%s' is not string"), $vName), Logger::LOGGER_WARNING);
