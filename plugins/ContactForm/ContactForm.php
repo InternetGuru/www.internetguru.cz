@@ -77,7 +77,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           $msg = replaceVariables($this->messages[$this->formIdToSend], $variables);
         } else $msg = $this->createMessage($this->cfg, $this->formIdToSend);
         if(IS_LOCALHOST) throw new Exception("Not sending (at localhost)");
-        var_dump($this->formVars);
         $this->sendForm($this->formToSend, $msg);
         redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$this->formIdToSend)));
       } catch(Exception $e) {
