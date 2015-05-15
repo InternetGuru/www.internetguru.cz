@@ -208,19 +208,24 @@ function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=
   return $s;
 }
 
-function copy_plus($src, $dest, $keepOld=true) {
+function copy_plus($src, $dest, $mtime = false) {
   if(!is_file($src))
     throw new LoggerException(sprinft(_("Source file '%s' not found"), $src));
   mkdir_plus(dirname($dest));
-  if(!is_link($dest) && is_file($dest) && !copy($dest, "$dest.old"))
-    throw new LoggerException(_("Unable to backup destination file"));
+  if($mtime && is_file($dest))
+  if(!is_link($dest) && is_file($dest)) {
+    if($mtime && filemtime($src) == filemtime($dest)) return;
+    if(!copy($dest, "$dest.old"))
+      throw new LoggerException(_("Unable to backup destination file"));
+  }
   if(!copy($src, "$dest.new"))
     throw new LoggerException(_("Unable to copy source file"));
   if(!rename("$dest.new", $dest))
     throw new LoggerException(_("Unable to rename new file to destination"));
-  if(!$keepOld && is_file("$dest.old") && !unlink("$dest.old"))
-    throw new LoggerException(_("Unable to delete.old file"));
-  return true;
+  if($mtime && !touch($dest, filemtime($src)))
+    throw new LoggerException(_("Unable to touch destination file"));
+  #if(is_file("$dest.old") && !unlink("$dest.old"))
+  #  throw new LoggerException(_("Unable to delete.old file"));
 }
 
 function mkdir_plus($dir, $mode=0775, $recursive=true) {

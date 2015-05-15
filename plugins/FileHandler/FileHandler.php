@@ -40,43 +40,44 @@ class FileHandler extends Plugin implements SplObserver {
     }
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
     $fp = lockFile($src);
-    if(is_file($dest)) {
+    try {
+      if(is_file($dest)) return;
+      $mimeType = getFileMime($src);
+      if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
+        $modes = array(
+          "" => array(1000, 1000, 250*1024, 85), // default, e.g. resources like icons
+          "images" => array(1000, 1000, 250*1024, 85),
+          "preview" => array(500, 500, 150*1024, 85),
+          "thumbs" => array(200, 200, 50*1024, 85),
+          "big" => array(1500, 1500, 400*1024, 75),
+          "full" => array(0, 0, 0, 0));
+        if(!isset($modes[$mode])) $mode = "";
+        $this->handleImage(realpath($src), $dest, $modes[$mode]);
+        return;
+      }
+      $registeredMime = array(
+        "inode/x-empty" => array(), // empty file with any ext
+        "text/plain" => array("css", "js"),
+        "text/x-c" => array("js"),
+        "application/x-elc" => array("js"),
+        "application/x-empty" => array("css", "js"),
+        "application/octet-stream" => array("woff", "js"),
+        "image/svg+xml" => array("svg"),
+        "application/pdf" => array("pdf"),
+        "application/vnd.ms-fontobject" => array("eot"),
+        "application/x-font-ttf" => array("ttf"),
+        "application/vnd.ms-opentype" => array("otf"),
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx"),
+      );
+      $ext = pathinfo($src, PATHINFO_EXTENSION);
+      if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
+        throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
+      copy_plus($src, $dest, true);
+    } catch(Exception $e) {
+      throw $e;
+    } finally {
       unlockFile($fp);
-      return;
     }
-    $mimeType = getFileMime($src);
-    if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
-      $modes = array(
-        "" => array(1000, 1000, 250*1024, 85), // default, e.g. resources like icons
-        "images" => array(1000, 1000, 250*1024, 85),
-        "preview" => array(500, 500, 150*1024, 85),
-        "thumbs" => array(200, 200, 50*1024, 85),
-        "big" => array(1500, 1500, 400*1024, 75),
-        "full" => array(0, 0, 0, 0));
-      if(!isset($modes[$mode])) $mode = "";
-      $this->handleImage(realpath($src), $dest, $modes[$mode]);
-      unlockFile($fp);
-      return;
-    }
-    $registeredMime = array(
-      "inode/x-empty" => array(), // empty file with any ext
-      "text/plain" => array("css", "js"),
-      "text/x-c" => array("js"),
-      "application/x-elc" => array("js"),
-      "application/x-empty" => array("css", "js"),
-      "application/octet-stream" => array("woff", "js"),
-      "image/svg+xml" => array("svg"),
-      "application/pdf" => array("pdf"),
-      "application/vnd.ms-fontobject" => array("eot"),
-      "application/x-font-ttf" => array("ttf"),
-      "application/vnd.ms-opentype" => array("otf"),
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx"),
-    );
-    $ext = pathinfo($src, PATHINFO_EXTENSION);
-    if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
-      throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
-    copy_plus($src, $dest);
-    unlockFile($fp);
   }
 
   private function handleImage($src, $dest, $mode) {
