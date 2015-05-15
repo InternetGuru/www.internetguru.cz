@@ -18,7 +18,7 @@ label.contactform-warning.error,
 label.contactform-warning:not([for]) {
   color: rgb(152, 0, 0);
 }
-input.contactform-warning[type='text'],
+input.contactform-warning,
 textarea.contactform-warning {
   border-color: #A13939;
   background-color: #FFBBBB;

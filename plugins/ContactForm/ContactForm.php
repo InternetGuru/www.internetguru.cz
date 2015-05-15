@@ -1,9 +1,6 @@
 <?php
 
-#todo: max one default secret phrase warning
 #todo: invalid admin e-mail address warning
-#todo: default servername = $cms-host
-#todo: default subject = Nová zpráva z webu $cms-host
 #todo: checkbox default value = trim first label
 
 class ContactForm extends Plugin implements SplObserver, ContentStrategyInterface {
@@ -18,9 +15,8 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $formValues;
   private $formItems = array();
   private $messages;
-  private $rules = array();
-  private $ruleTitles = array();
   private $errors = array();
+  private $errorLabels = array();
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -46,17 +42,12 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
             Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
           }
-          if(!$this->isValidPost($form)) {
-            $this->finishForm($htmlForm, false);
-            continue;
-          }
+          if(!$this->isValidPost($form)) continue;
           $this->formVars = $fv;
-          $this->finishForm($htmlForm, true);
           $this->formValues["form_id"] = $formId;
           $this->formToSend = $form;
           $this->formIdToSend = $formId;
         } catch(Exception $e) {
-          $this->finishForm($htmlForm, true);
           $message = sprintf(_("Unable to process form %s: %s"), "<a href='#".$htmlForm->getAttribute("id")."'>"
             .$htmlForm->getAttribute("id")."</a>", $e->getMessage());
           Cms::addMessage($message, Cms::MSG_ERROR);
@@ -90,16 +81,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   public function getContent(HTMLPlus $content) {
     $content->processVariables($this->formsElements);
     return $content;
-  }
-
-  private function finishForm($form, $error) {
-    foreach($this->formItems as $e) {
-      if($e->hasAttribute("required")) $e->addClass("required");
-      $e->removeAttribute("rule");
-      $e->removeAttribute("required");
-    }
-    if($error) $this->ruleTitles["error"] = "";
-    $form->ownerDocument->processVariables($this->ruleTitles);
   }
 
   private function parseForm(DOMElementPlus $form) {
@@ -200,18 +181,12 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   private function createGlobalVars() {
-    $this->rules = array();
     foreach($this->cfg->documentElement->childElementsArray as $e) {
       try {
         switch($e->nodeName) {
           case "var":
           $this->validateElement($e, "id");
           $this->vars[$e->getAttribute("id")] = $e->nodeValue;
-          break;
-          case "rule":
-          $this->validateElement($e, "id");
-          $this->rules[$e->getAttribute("id")] = $e->nodeValue;
-          $this->ruleTitles[$e->getAttribute("id")] = $e->getAttribute("title");
           break;
           case "form":
           $this->validateElement($e, "id");
@@ -281,11 +256,14 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       if($e->hasAttribute("for")) {
         $for = $prefix.$e->getAttribute("for");
         $e->setAttribute("for", $for);
+        $this->errorLabels[$for][] = $e->nodeValue;
         $this->formIds[$for][] = $e;
         continue;
       }
       foreach($xpath->query("input | textarea | select", $e) as $f) {
         $this->formIds[$f->getAttribute("id")][] = $e;
+        if($f->nodeName != "input") continue;
+        $this->errorLabels[$f->getAttribute("id")][] = $e->nodeValue;
       }
     }
     foreach($this->formItems as $e) {
@@ -362,49 +340,52 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function verifyItem(DOMElementPlus $e) {
     $name = $e->getAttribute("name");
-    $rule = $e->getAttribute("rule");
+    $pattern = $e->getAttribute("pattern");
     $req = $e->hasAttribute("required");
-    $err = $e->getAttribute("required");
+    $id = $e->getAttribute("id");
     $value = isset($_POST[$name]) ? $_POST[$name] : null;
     if($e->nodeName == "textarea") {
-      $this->verifyText($value, $rule, $req, $err);
+      $this->verifyText($value, $pattern, $req);
     } elseif($e->nodeName != "input") return;
-    switch($e->getAttribute("type")) {
-      case "text":
-      $this->verifyText($value, $rule, $req, $err);
-      break;
-      case "checkbox":
-      case "radio":
-      $this->verifyChecked($value, $req, $err);
-      break;
+    try {
+      switch($e->getAttribute("type")) {
+        case "email":
+        if(!strlen($pattern)) $pattern = EMAIL_PATTERN;
+        case "text":
+        $this->verifyText($value, $pattern, $req);
+        break;
+        case "checkbox":
+        case "radio":
+        $this->verifyChecked($value, $req);
+        break;
+      }
+    } catch(Exception $ex) {
+      $error = $ex->getMessage();
+      if(isset($this->errorLabels[$id][0])) $name = $this->errorLabels[$id][0];
+      if(isset($this->errorLabels[$id][1])) $error = $this->errorLabels[$id][1];
+      throw new Exception("$name: $error");
     }
   }
 
-  private function verifyText($value, $ruleName, $required, $error) {
+  private function verifyText($value, $pattern, $required) {
     if(is_null($value)) throw new Exception(_("Value missing"));
     if(!strlen(trim($value))) {
       if(!$required) return;
-      if(!strlen($error)) $error = _("Item is required");
-      throw new Exception($error);
+      throw new Exception(_("Item is required"));
     }
-    if(!strlen($ruleName)) return;
-    if(!array_key_exists($ruleName, $this->rules))
-      new Logger(sprintf(_("Form rule %s is not defined"), $ruleName), Logger::LOGGER_WARNING);
-    $res = @preg_match("/".$this->rules[$ruleName]."/", $value);
+    if(!strlen($pattern)) return;
+    $res = @preg_match("/^(?:$pattern)$/", $value);
     if($res === false) {
-      new Logger(sprintf(_("Form rule %s is invalid"), $ruleName), Logger::LOGGER_WARNING);
+      new Logger(sprintf(_("Form pattern %s is invalid"), $pattern), Logger::LOGGER_WARNING);
       return;
     }
     if($res === 1) return;
-    if(!strlen($error)) $error = $this->ruleTitles[$ruleName];
-    if(!strlen($error)) $error = sprintf(_("Item value does not match required format: %s"), $this->rules[$ruleName]);
-    throw new Exception($error);
+    throw new Exception(_("Item value does not match required format"));
   }
 
-  private function verifyChecked($checked, $required, $error) {
+  private function verifyChecked($checked, $required) {
     if(!$required || $checked) return;
-    if(!strlen($error)) $error = _("Item must be checked");
-    throw new Exception($error);
+    throw new Exception(_("Item must be checked"));
   }
 
 }
