@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Xhtml11>
+<HtmlOutput>
 
   <!-- <themes readonly="readonly"/> -->
   <themes>
@@ -48,4 +48,4 @@
 
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
-</Xhtml11>
+</HtmlOutput>

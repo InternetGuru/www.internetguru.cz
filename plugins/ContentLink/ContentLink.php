@@ -15,7 +15,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->isRoot = getCurLink() == "";
     if($this->isRoot) return;
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached("Xhtml11")) return;
+    if($this->detachIfNotAttached("HtmlOutput")) return;
   }
 
   public function getContent(HTMLPlus $c) {

@@ -236,9 +236,9 @@
       <ref name="dl.attlist"/>
       <oneOrMore>
         <ref name="htmlplus.dt"/>
-        <zeroOrMore>
+        <oneOrMore>
           <ref name="htmlplus.dd"/>
-        </zeroOrMore>
+        </oneOrMore>
       </oneOrMore>
     </element>
   </define>

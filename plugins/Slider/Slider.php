@@ -6,7 +6,7 @@ class Slider extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
-    if($this->detachIfNotAttached("Xhtml11")) return;
+    if($this->detachIfNotAttached("HtmlOutput")) return;
     if(is_null($this->cms->getOutputStrategy())) {
       $subject->detach($this);
       return;

@@ -31,7 +31,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function update(SplSubject $subject) {
-    if($this->detachIfNotAttached("Xhtml11")) return;
+    if($this->detachIfNotAttached("HtmlOutput")) return;
     if($subject->getStatus() == STATUS_INIT) {
       Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.get_class($this).'.css');
       $this->cfg = $this->getDOMPlus();

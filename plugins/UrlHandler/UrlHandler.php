@@ -13,7 +13,7 @@ class UrlHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached(array("Xhtml11", "ContentLink"))) return;
+    if($this->detachIfNotAttached(array("HtmlOutput", "ContentLink"))) return;
     $this->cfgRedir();
     if(getCurLink() == "") {
       $subject->detach($this);

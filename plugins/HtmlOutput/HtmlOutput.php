@@ -1,6 +1,6 @@
 <?php
 
-class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
+class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
   private $jsFiles = array(); // String filename => Int priority
   private $jsFilesPriority = array(); // String filename => Int priority
   private $jsContent = array();
@@ -12,7 +12,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private $favIcon = null;
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
-  const DTD_FILE = 'lib/xhtml11-flat.dtd';
   const FAVICON = "favicon.ico";
   const DEBUG = false;
 
@@ -42,9 +41,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
 
     // create output DOM with doctype
     $imp = new DOMImplementation();
-    $dtd = $imp->createDocumentType('html',
-        '-//W3C//DTD XHTML 1.1//EN',
-        'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
+    $dtd = $imp->createDocumentType('html');
+    #$dtd = $imp->createDocumentType('html',
+    #    '-//W3C//DTD XHTML 1.1//EN',
+    #    'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
     $doc = $imp->createDocument(null, null, $dtd);
     $doc->encoding="utf-8";
 
@@ -58,9 +58,10 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     // add head element
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
-    $this->appendMeta($head, "Content-Type", "text/html; charset=utf-8");
+    #$this->appendMeta($head, "Content-Type", "text/html; charset=utf-8");
+    $this->appendMeta($head, "charset", "utf-8");
     $this->appendMeta($head, "viewport", "initial-scale=1");
-    $this->appendMeta($head, "Content-Language", $lang);
+    #$this->appendMeta($head, "Content-Language", $lang);
     $this->appendMeta($head, "generator", Cms::getVariable("cms-name"));
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
@@ -99,7 +100,6 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
     $html->appendChild($content);
     $this->appendJsFiles($content, self::APPEND_BODY);
 
-    #var_dump($doc->schemaValidate(CMS_FOLDER."/".self::DTD_FILE));
     $this->validateEmptyContent($doc);
     return $doc->saveXML();
   }
@@ -320,7 +320,7 @@ class Xhtml11 extends Plugin implements SplObserver, OutputStrategyInterface {
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->pluginDir."/Xhtml11.xsl", 1, false);
+    $this->addTransformation($this->pluginDir."/".get_class($this).".xsl", 1, false);
 
     // add template files
     $theme = $cfg->getElementById("theme");

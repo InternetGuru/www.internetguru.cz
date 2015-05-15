@@ -189,8 +189,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    *
    * EXAMPLES
    * /about?admin -> /about?admin=about.html -> /about?admin=INDEX_HTML
-   * Xhtml11 -> plugins/Xhtml11/Xhtml11.xml (F default plugin config)
-   * Xhtml11/Xhtml11.xsl -> plugins/Xhtml11/Xhtml11.xsl (dir/F.ext plugin)
+   * HtmlOutput -> plugins/HtmlOutput/HtmlOutput.xml (F default plugin config)
+   * HtmlOutput/HtmlOutput.xsl -> plugins/HtmlOutput/HtmlOutput.xsl (dir/F.ext plugin)
    * Cms.xml -> Cms.xml (F.ext direct match)
    * themes/simpleLayout.css -> themes/simpleLayout.css (dir/F.ext direct)
    * themes/userFile.css -> usr/themes/userFile.css (dir/F.ext user)
