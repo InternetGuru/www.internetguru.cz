@@ -59,6 +59,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
     #$this->appendMeta($head, "Content-Type", "text/html; charset=utf-8");
+    #$this->appendMeta($head, "Content-Type", "application/xhtml+xml; charset=UTF-8");
     $this->appendMeta($head, "charset", "utf-8", false, true);
     $this->appendMeta($head, "viewport", "initial-scale=1");
     #$this->appendMeta($head, "Content-Language", $lang);
@@ -101,7 +102,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendJsFiles($content, self::APPEND_BODY);
 
     $this->validateEmptyContent($doc);
-    return $doc->saveXML();
+    $html = $doc->saveXML();
+    return substr($html, strpos($html, "\n")+1);
   }
 
   private function applyTransformations(DOMDocumentPlus $content) {
