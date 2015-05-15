@@ -69,9 +69,9 @@ class DOMElementPlus extends DOMElement {
     if(!$deep) return true;
     foreach($this->childNodes as $e) {
       if($e->nodeType != XML_ELEMENT_NODE) continue;
-      if(!$e->doProcessVariables($variables, $ignore, $deep, $debug, $del)) $toRemove[] = $e;
+      if(!$e->doProcessVariables($variables, $ignore, $deep, $debug, $del)) $del[] = $e;
     }
-    foreach($toRemove as $e) $e->emptyRecursive();
+    #foreach($toRemove as $e) $e->emptyRecursive();
     return true;
   }
 
@@ -99,6 +99,7 @@ class DOMElementPlus extends DOMElement {
       case "boolean":
       $value = (string) $value;
       case "string":
+      if(!strlen($value) && is_null($aName)) return $this;
       return $this->insertVarString($value, $aName);
       case "array":
       #$this = $this->prepareIfDl($this, $varName);
