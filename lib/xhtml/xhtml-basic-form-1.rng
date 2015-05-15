@@ -68,7 +68,10 @@
 
 <define name="input">
   <element name="input">
-    <ref name="input.attlist"/>
+    <choice>
+      <ref name="input.attlist"/>
+      <ref name="input.text.attlist"/>
+    </choice>
   </element>
 </define>
 
@@ -81,6 +84,64 @@
   </optional>
   <optional>
     <attribute name="name"/>
+  </optional>
+  <optional>
+    <attribute name="required">
+      <value>required</value>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="value"/>
+  </optional>
+  <optional>
+    <attribute name="checked">
+      <value>checked</value>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="size"/>
+  </optional>
+  <optional>
+    <attribute name="maxlength">
+      <ref name="Number.datatype"/>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="src">
+       <ref name="URI.datatype"/>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="accesskey">
+      <ref name="Character.datatype"/>
+    </attribute>
+  </optional>
+</define>
+
+<define name="input.text.attlist">
+  <ref name="Common.attrib"/>
+  <optional>
+    <attribute name="type">
+      <choice>
+        <value>text</value>
+        <value>email</value>
+        <value>search</value>
+      </choice>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="placeholder"/>
+  </optional>
+  <optional>
+    <attribute name="pattern"/>
+  </optional>
+  <optional>
+    <attribute name="name"/>
+  </optional>
+  <optional>
+    <attribute name="required">
+      <value>required</value>
+    </attribute>
   </optional>
   <optional>
     <attribute name="value"/>
@@ -112,7 +173,6 @@
 
 <define name="InputType.class">
   <choice>
-    <value>text</value>
     <value>password</value>
     <value>checkbox</value>
     <value>radio</value>
@@ -171,6 +231,14 @@
 
 <define name="textarea.attlist">
   <ref name="Common.attrib"/>
+  <optional>
+    <attribute name="placeholder"/>
+  </optional>
+  <optional>
+    <attribute name="required">
+      <value>required</value>
+    </attribute>
+  </optional>
   <optional>
     <attribute name="name"/>
   </optional>
