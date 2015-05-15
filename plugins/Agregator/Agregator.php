@@ -285,7 +285,7 @@ class Agregator extends Plugin implements SplObserver {
       uasort($vars, array("Agregator", "cmp"));
       if($reverse) $vars = array_reverse($vars);
       try {
-        $vValue = $this->getDOM($vars, $html->childElementsArray, $html->getAttribute("id"));
+        $vValue = $this->getDOM($vars, $html);
         Cms::setVariable($vName, $vValue->documentElement);
         $var = array(
           "name" => $vName,
@@ -320,9 +320,13 @@ class Agregator extends Plugin implements SplObserver {
     return ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
   }
 
-  private function getDOM(Array $vars, Array $items, $id) {
+  private function getDOM(Array $vars, DOMElementPlus $html) {
+    $items = $html->childElementsArray;
+    $id = $html->getAttribute("id");
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
+    if(strlen($html->getAttribute("wrapper")))
+      $root = $root->appendChild($doc->createElement($html->getAttribute("wrapper")));
     $nonItemElement = false;
     $patterns = array();
     foreach($items as $item) {

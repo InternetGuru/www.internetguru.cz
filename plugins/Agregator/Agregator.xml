@@ -17,19 +17,10 @@
       sort | rsort (reverzní) s hodnotou dostupné proměnné (výchozí rsort="ctime")
 
   -->
-  <html id="li">
+  <html id="ul" wrapper="ul">
     <item><li><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li></item>
   </html>
-  <html id="topdt">
-    <item>
-      <dt><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformat" var="ctime">n/a</em>)</dt>
-      <dd var="kw">n/a</dd>
-      <dd var="desc">n/a</dd>
-    </item>
-    <item><dt><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformat" var="ctime">n/a</em>)</dt></item>
-    <item since="4"/>
-  </html>
-  <html id="dt">
+  <html id="dl" wrapper="dl">
     <item>
       <dt><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
       <dd>Poslední změna: <strong fn="inputvar-dateformat" var="mtime">n/a</strong></dd>
