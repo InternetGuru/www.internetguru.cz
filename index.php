@@ -13,11 +13,11 @@ try {
   define("CORE_DIR", "core");
   define("FILES_DIR", "files");
   define("SERVER_FILES_DIR", "_server");
-  define("LOG_DIR", "cmslog");
+  define("LOG_DIR", "log");
   define("DEBUG_FILE", "DEBUG");
   define("FORBIDDEN_FILE", "FORBIDDEN");
-  define("ADMIN_ROOT_DIR", "cmsadmin");
-  define("USER_ROOT_DIR", "cmsuser");
+  define("ADMIN_ROOT_DIR", "admin");
+  define("USER_ROOT_DIR", "user");
   define("FILE_LOCK_WAIT_SEC", 2);
   define('EMAIL_PATTERN', "[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}");
   define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
