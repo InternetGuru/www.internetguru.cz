@@ -15,6 +15,7 @@
   <xsl:param name="cms-ctime" select="''"/>
   <xsl:param name="cms-mtime" select="''"/>
   <xsl:param name="cms-version" select="''"/>
+  <xsl:param name="cms-name" select="''"/>
   <xsl:param name="cms-desc" select="''"/>
   <xsl:param name="cms-kw" select="''"/>
   <xsl:param name="cms-url" select="''"/>
@@ -39,6 +40,7 @@
   <xsl:param name="inputvar-creation" select="''"/>
   <xsl:param name="inputvar-cyear" select="''"/>
   <xsl:param name="inputvar-year" select="''"/>
+  <xsl:param name="inputvar-service_html" select="''"/>
 
   <xsl:variable name="copy">
     <xsl:choose>
@@ -55,45 +57,24 @@
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
           <li><xsl:value-of disable-output-escaping="yes" select="$copy"/>&#160;<xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
-          <li>Na službě: <a href='https://www.e-zakladna.cz'>E-Základna</a></li>
-          <xsl:if test="not($cms-resp = '')">
+          <xsl:if test="$inputvar-service_html">
+            <li>Na službě: <xsl:value-of select="$inputvar-service_html"/></li>
+          </xsl:if>
+          <xsl:if test="$cms-resp">
             <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
           </xsl:if>
           <xsl:if test="$cms-mtime">
-            <li>Upraveno: <em fn="inputvar-dateformat"><xsl:value-of select="$cms-mtime"/></em></li>
+            <li>Upraveno: <span fn="inputvar-dateformat"><xsl:value-of select="$cms-mtime"/></span></li>
           </xsl:if>
           <li class="link"><xsl:value-of select="$cms-uri"/></li>
-          <xsl:if test="not($cms-logged_user = '')">
+          <xsl:if test="$cms-logged_user">
             <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
+            <li><xsl:value-of select="$cms-name"/></li>
           </xsl:if>
-          <!-- <li><xsl:value-of select="$cms-version"/></li> -->
         </ul>
       </div>
     </body>
   </xsl:template>
-
-  <!--
-  <xsl:template match="div[@id='content']">
-    <xsl:element name="div">
-      <xsl:copy-of select="@*"/>
-      <xsl:apply-templates/>
-      <ul class="docinfo">
-        <xsl:if test="not($contentlink-author = '')">
-          <li class="creation"><xsl:value-of disable-output-escaping="yes" select="$inputvar-creation"/></li>
-        </xsl:if>
-        <xsl:if test="not($inputvar-linkmtime = $inputvar-linkctime)">
-          <li class="modification"><xsl:value-of disable-output-escaping="yes" select="$inputvar-modified"/></li>
-        </xsl:if>
-        <xsl:if test="not($contentlink-resp = '')">
-          <li class="responsible"><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
-        </xsl:if>
-        <xsl:if test="not($cms-super_user = '') and not($agregator-filepath = '')">
-          <li class="edit"><xsl:value-of disable-output-escaping="yes" select="$inputvar-edit"/></li>
-        </xsl:if>
-      </ul>
-    </xsl:element>
-  </xsl:template>
-  -->
 
   <xsl:template match="node()|@*">
     <xsl:copy>

@@ -53,33 +53,33 @@
     textarea.required [text or empty] pole, které má být povinné
   -->
   <message for="basic">
-Jméno: $name, $email
+Jméno: $name
 Telefonní kontakt: $telephone
 
 Zpráva:
 $msg
 
 --
-Posláno $inputvar-today z IP adresy $cms-ip
-Ze systému $cms-name
+Odesláno z IP adresy $cms-ip
+$inputvar-service_plain
   </message>
   <form id="basic">
     <dl>
       <dt><label for="name">Celé jméno</label></dt>
-      <dd><input type="text" id="name" required="Jméno je povinné"/></dd>
+      <dd><input type="text" id="name" required="Jméno je povinné"/><input type="hidden" name="placeholder" value="Josef novák"/></dd>
       <dd><label class="error" for="name">Jméno nesmí zůstat prázdné</label></dd>
       <dt><label for="email">E-mailová adresa</label></dt>
-      <dd><input type="text" rule="rule-email" id="email" required="E-mailová adresa odesílatele je povinná"/></dd>
+      <dd><input type="text" rule="rule-email" id="email" required="E-mailová adresa odesílatele je povinná"/><input type="hidden" name="placeholder" value="josef.novak@seznam.cz"/></dd>
       <dd><label class="error" for="email" var="rule-email">n/a</label></dd>
-      <dt><label for="telephone">Telefon (nepovinné)</label></dt>
-      <dd><input type="text" rule="rule-telephone" id="telephone"/></dd>
+      <dt><label for="telephone">Telefon <em>(nepovinné)</em></label></dt>
+      <dd><input type="text" rule="rule-telephone" id="telephone"/><input type="hidden" name="placeholder" value="+420 777123456"/></dd>
       <dd><label class="error" for="telephone">Telefonní číslo může zůstat prázdné; jinak musí obsahovat aspoň 9 čísel</label></dd>
       <dt><label for="msg">Zpráva</label></dt>
-      <dd><textarea id="msg" required="Zpráva je povinná"></textarea></dd>
+      <dd><textarea id="msg" required="Zpráva je povinná"/></dd>
       <dd><label class="error" for="msg">Nezapomeňte napsat zprávu</label></dd>
       <dt>Odeslání formuláře</dt>
       <dd><label><input type="checkbox" id="sendcopy"/> Poslat kopii této zprávy na uvedený e-mail</label></dd>
-      <dd><input type="submit" id="submit"/></dd>
+      <dd><input type="submit" id="submit" value="Odeslat"/></dd>
     </dl>
   </form>
 
