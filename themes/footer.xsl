@@ -58,7 +58,7 @@
         <ul>
           <li><xsl:value-of disable-output-escaping="yes" select="$copy"/>&#160;<xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
           <xsl:if test="$inputvar-service_html">
-            <li>Na službě: <xsl:value-of select="$inputvar-service_html"/></li>
+            <li>Na službě: <xsl:value-of disable-output-escaping="yes" select="$inputvar-service_html"/></li>
           </xsl:if>
           <xsl:if test="$cms-resp">
             <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
