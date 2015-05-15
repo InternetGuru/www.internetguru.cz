@@ -59,7 +59,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
     #$this->appendMeta($head, "Content-Type", "text/html; charset=utf-8");
-    $this->appendMeta($head, "charset", "utf-8");
+    $this->appendMeta($head, "charset", "utf-8", false, true);
     $this->appendMeta($head, "viewport", "initial-scale=1");
     #$this->appendMeta($head, "Content-Language", $lang);
     $this->appendMeta($head, "generator", Cms::getVariable("cms-name"));
@@ -396,10 +396,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param  boolean    $httpEquiv    Use attr.http-equiv instead of name
    * @return void
    */
-  private function appendMeta(DOMElement $e, $nameValue, $contentValue, $httpEquiv=false) {
+  private function appendMeta(DOMElement $e, $nameValue, $contentValue, $httpEquiv=false, $short=false) {
     $meta = $e->ownerDocument->createElement("meta");
-    $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"), $nameValue);
-    $meta->setAttribute("content", $contentValue);
+    if($short) $meta->setAttribute($nameValue, $contentValue);
+    else {
+      $meta->setAttribute(($httpEquiv ? "http-equiv" : "name"), $nameValue);
+      $meta->setAttribute("content", $contentValue);
+    }
     $e->appendChild($meta);
   }
 
