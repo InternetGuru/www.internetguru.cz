@@ -12,7 +12,7 @@
     <xsl:apply-templates/>
   </xsl:template>
 
-  <xsl:template match="div[contains(@id, 'footer')]/ul[last()]">
+  <xsl:template match="div[contains(@id, 'footer')]/*[1]">
     <xsl:if test="$cms-logged_user">
       <ul class="adminmenu">
         <li><a href="?admin">Administrace</a></li>
@@ -40,7 +40,6 @@
     <xsl:copy>
       <xsl:apply-templates select="node()|@*"/>
     </xsl:copy>
-
   </xsl:template>
 
   <xsl:template match="node()|@*">
