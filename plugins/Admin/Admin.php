@@ -32,6 +32,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
+    if($subject->getStatus() == STATUS_POSTPROCESS) {
+      $this->createFilepicker();
+    }
     if($subject->getStatus() == STATUS_PROCESS) {
       $os = Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Admin.xsl");
       return;
@@ -99,6 +102,45 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function isPost() {
     return isset($_POST["content"], $_POST["userfilehash"], $_POST["filename"]);
+  }
+
+  private function getFilesRecursive($folder, $prefix = "") {
+    $files = array();
+    foreach(scandir($folder) as $f) {
+      if(strpos($f, ".") === 0) continue;
+      if(is_dir($folder."/".$f))
+        $files = array_merge($files, $this->getFilesRecursive($folder."/$f", $prefix."$f/"));
+      else
+        $files[] = $prefix.$f;
+    }
+    return $files;
+  }
+
+  private function createFilepicker() {
+    $paths = array(
+      USER_FOLDER => "",
+      CMS_FOLDER."/".THEMES_DIR => THEMES_DIR."/",
+      PLUGINS_FOLDER => PLUGINS_DIR."/",
+    );
+    $files= array();
+    foreach ($paths as $path => $prefix) $files = array_unique(array_merge($files, $this->getFilesRecursive($path, $prefix)));
+    foreach ($files as $k => $f) if(!preg_match("/(\.html|\.xml|\.xsl)$/", $f)) unset($files[$k]);
+    $files = array_merge($files, Cms::getVariable("htmloutput-javascripts")); // TODO dávat do proměnné unikátně
+    $files = array_merge($files, Cms::getVariable("htmloutput-styles")); // TODO dávat do proměnné unikátně
+
+    $dom = new DOMDocumentPlus();
+    $var = $dom->createElement("var");
+    foreach ($files as $f) {
+      $option = $dom->createElement("option");
+      $option->setAttribute("value", $f);
+      $v = $f;
+      if(is_file(CMS_FOLDER."/$f")) $v .= " #default";
+      if(is_file(ADMIN_FOLDER."/$f")) $v .= " #admin";
+      if(is_file(USER_FOLDER."/$f")) $v .= " #user";
+      $option->nodeValue = $v;
+      $var->appendChild($option);
+    }
+    Cms::setVariable("navigfiles", $var);
   }
 
   public function getContent(HTMLPlus $content) {

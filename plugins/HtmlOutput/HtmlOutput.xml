@@ -42,6 +42,7 @@
   <jsFile append="body">themes/editableinit.js</jsFile>
   <jsFile append="body">themes/scrolltop.js</jsFile>
   <jsFile append="body">themes/scrolltopinit.js</jsFile>
+  <jsFile append="body">themes/completable.js</jsFile>
 
   <!-- <xslt readonly="readonly"/> -->
   <xslt>themes/cms-messages.xsl</xslt>

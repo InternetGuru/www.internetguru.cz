@@ -2,6 +2,14 @@
 <body xml:lang="cs">
   <h var="heading" id="h.n4d">Administrace</h>
   <desc kw="administrace, plugin, soubory">Administrace souboru <samp var="filename">n/a</samp> ve formátu <samp var="schema">n/a</samp></desc>
+  <form action="?" method="get">
+    <fieldset class="filepicker"><legend>Volba souboru</legend>
+      <ul>
+        <li><select name="Admin" class="completable"><option var="admin-navigfiles">n/a</option></select></li>
+        <li><input type="submit" value="Zvolit soubor"/></li>
+      </ul>
+    </fieldset>
+  </form>
   <form class="editable fillable" action="/" method="post" var="linkadmin@action">
     <fieldset class="hideable nohide"><legend>Uživatelský soubor, mód <samp var="mode">n/a</samp>, stav <samp var="status warning@class">n/a</samp></legend>
       <textarea cols="40" name="content" rows="20" var="content classtype@class"/>
