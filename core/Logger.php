@@ -8,6 +8,7 @@ class Logger {
   const LOGGER_ERROR = "Error";
   const LOGGER_WARNING = "Warning";
   const LOGGER_INFO = "Info";
+  const LOGGER_SUCCESS = "Success";
 
   function __construct($message, $type=null, $start_time=null, $cmsMsg = true) {
     if(!is_null($start_time))
@@ -16,7 +17,7 @@ class Logger {
       self::LOGGER_FATAL,
       self::LOGGER_ERROR,
       self::LOGGER_WARNING,
-      self::LOGGER_INFO))) $type = self::LOGGER_INFO;
+      self::LOGGER_SUCCESS))) $type = self::LOGGER_INFO;
     if($cmsMsg && Cms::isSuperUser()) {
       Cms::addMessage("$message [".$this->getCaller()."]", $type, Cms::isForceFlash());
     }
