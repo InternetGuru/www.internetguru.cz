@@ -67,10 +67,6 @@
             <li>Upraveno: <span fn="inputvar-dateformat"><xsl:value-of select="$cms-mtime"/></span></li>
           </xsl:if>
           <li class="link"><xsl:value-of select="$cms-uri"/></li>
-          <xsl:if test="$cms-logged_user">
-            <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
-            <li><xsl:value-of select="$cms-name"/></li>
-          </xsl:if>
         </ul>
       </div>
     </body>

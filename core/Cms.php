@@ -40,6 +40,7 @@ class Cms {
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
     self::setVariable("uri", URI);
+    self::setVariable("clearcacheurl", getCurLink()."?clearcache");
     self::setVariable("link", getCurLink());
     if(isset($_GET["PageSpeed"])) self::setVariable("pagespeed", $_GET["PageSpeed"]);
   }

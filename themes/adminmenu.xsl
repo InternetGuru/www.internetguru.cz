@@ -5,19 +5,23 @@
   <xsl:param name="cms-logged_user" select="''"/>
   <xsl:param name="cms-super_user" select="''"/>
   <xsl:param name="cms-pagespeed" select="''"/>
+  <xsl:param name="cms-clearcacheurl" select="''"/>
+  <xsl:param name="cms-name" select="''"/>
 
   <xsl:template match="/">
     <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template match="div[contains(@id, 'footer')]/ul[last()]">
-    <xsl:if test="not($cms-logged_user = '')">
+    <xsl:if test="$cms-logged_user">
       <ul class="adminmenu">
         <li><a href="?admin">Administrace</a></li>
         <li><a href="?log">Logy</a></li>
         <li><a href="?ver">Verze</a></li>
         <li><a href="?import">Import</a></li>
         <li><a href="?subdom">Poddomény</a></li>
+      </ul>
+      <ul class="adminmenu">
         <li>
           <xsl:choose>
             <xsl:when test="$cms-pagespeed = 'off'">
@@ -28,6 +32,9 @@
             </xsl:otherwise>
           </xsl:choose>
         </li>
+        <li><a var="cms-clearcacheurl@href">Smazat cache</a></li>
+        <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
+        <li><xsl:value-of select="$cms-name"/></li>
       </ul>
     </xsl:if>
     <xsl:copy>

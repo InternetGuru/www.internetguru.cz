@@ -9,10 +9,10 @@ function __autoload($className) {
   throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
-function findFile($filePath, $user=true, $admin=true) {
+function findFile($filePath, $user=true, $admin=true, $res=true) {
   if($user && is_file(USER_FOLDER."/$filePath")) return USER_FOLDER."/$filePath";
   if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
-  if(is_file($filePath)) return $filePath;
+  if($res && is_file($filePath)) return $filePath;
   if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
   #todo: return null (keep type)
   return false;
@@ -486,6 +486,35 @@ if(!function_exists("apc_store")) {
 
 function apc_get_path($key) {
   return getcwd()."/../tmp_apc/".normalize($key, null, "+");
+}
+
+function clearNginxCache($folder = null) {
+  $passed = true;
+  if(is_null($folder)) $folder = NGINX_CACHE_FOLDER;
+  foreach(scandir($folder) as $f) {
+    if(strpos($f, ".") === 0) continue;
+    $ff = "$folder/$f";
+    if(is_dir($ff)) {
+      try {
+        clearNginxCache($ff);
+      } catch(Exception $e) {
+        $passed = false;
+      }
+      continue;
+    }
+    if(!empty(preg_grep("/KEY: https?".HOST."/", file($ff)))) {
+      if(!unlink($ff)) $passed = false;
+    }
+  }
+  if(!$passed) throw new Exception(_("Failed to purge cache"));
+}
+
+// UNUSED
+function clearApcCache() {
+  $cache_info = apc_cache_info();
+  foreach($cache_info["cache_list"] as $data) {
+    if(strpos($data["info"], HOST) === 0) apc_delete($data["info"]);
+  }
 }
 
 ?>

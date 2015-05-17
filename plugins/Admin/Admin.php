@@ -78,7 +78,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->isResource($this->type)) {
       if(is_file($this->defaultFile)) unlink($this->defaultFile);
     } else {
-      if(!IS_LOCALHOST) $this->purgeNginxCache(NGINX_CACHE_FOLDER);
+      try {
+        if(!IS_LOCALHOST) clearNginxCache();
+      } catch(Exception $e) {
+        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+      }
     }
     if(!$this->redir) return;
     $pLink = array("path" => $this->getDestPath($_POST["filename"]));
@@ -91,20 +95,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $path = pathinfo($f, PATHINFO_FILENAME);
     if($this->dataFileStatus != self::STATUS_NEW && !DOMBuilder::isLink($path)) return getCurLink();
     return $path;
-  }
-
-  private function purgeNginxCache($folder) {
-    foreach(scandir($folder) as $f) {
-      if(strpos($f, ".") === 0) continue;
-      $ff = "$folder/$f";
-      if(is_dir($ff)) {
-        $this->purgeNginxCache($ff);
-        continue;
-      }
-      if(!empty(preg_grep("/KEY: https?".HOST."/", file($ff)))) {
-        unlink($ff);
-      }
-    }
   }
 
   private function isPost() {

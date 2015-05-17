@@ -118,6 +118,16 @@ try {
     redirTo($_SERVER["REQUEST_URI"], 403, _("Invalid session cookies removed"));
   }
 
+  if(!IS_LOCALHOST && !is_null(Cms::getLoggedUser()) && isset($_GET["clearcache"])) {
+    if(!Cms::isSuperUser()) new Logger(_("Insufficient rights to purge cache"), Logger::LOGGER_WARNING);
+    try {
+      clearNginxCache();
+      new Logger(_("Cache successfully purged"), Logger::LOGGER_SUCCESS);
+    } catch(Exception $e) {
+      new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+    }
+  }
+
   initDirs();
   if(!IS_LOCALHOST) initLinks();
   initFiles();
