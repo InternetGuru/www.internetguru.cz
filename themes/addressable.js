@@ -30,6 +30,8 @@
         case 'INPUT':
         switch (form.elements[i].type) {
           case 'text':
+          case 'email':
+          case 'search':
           case 'hidden':
           case 'password':
           case 'button':
@@ -111,7 +113,7 @@
     setFormEvent = function(form) {
       var inputs = form.getElementsByTagName("input");
       for(var i = 0; i < inputs.length; i++) {
-        if(inputs[i].type != "text") continue;
+        if(["text", "email", "search"].indexOf(inputs[i].type) === -1) continue;
         inputs[i].addEventListener("input", function() {
           if(input === null) return;
           input.parentNode.removeChild(input);
