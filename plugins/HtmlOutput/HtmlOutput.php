@@ -546,6 +546,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
     foreach($toExpand as $e) $e->appendChild($doc->createTextNode(""));
     foreach($toDelete as $e) {
+      if(!property_exists($e, "ownerDocument")) continue; // already deleted
       $eInfo = $e->nodeName;
       foreach($e->attributes as $a) $eInfo .= ".".$a->nodeName."=".$a->nodeValue;
       $this->removeEmptyElement($e, sprintf(_("Removed empty element %s"), $eInfo));
