@@ -1,17 +1,26 @@
 <?php
 
 class FileHandler extends Plugin implements SplObserver {
-  private $maxFileSize;
+
   const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1);
-    $this->maxFileSize = 50*1024*1024;
   }
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
+    Cms::setVariable("cfcurl", getCurLink()."?clearfilecache");
+    if(!is_null(Cms::getLoggedUser()) && isset($_GET["clearfilecache"])) {
+      if(!Cms::isSuperUser()) new Logger(_("Insufficient rights to purge file cache"), Logger::LOGGER_WARNING);
+      try {
+        $this->deleteOldResources();
+        new Logger(_("File cache successfully purged"), Logger::LOGGER_SUCCESS);
+      } catch(Exception $e) {
+        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+      }
+    }
     if(!preg_match("/".FILEPATH_PATTERN."/", getCurLink())) return;
     try {
       if(strpos(getCurLink(), FILES_DIR."/") !== 0 && strpos(getCurLink(), LIB_DIR."/") !== 0
@@ -26,18 +35,57 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
-  private function handleFile() {
-    $mode = "";
-    $dest = getCurLink();
-    $src = findFile($dest);
-    $pLink = explode("/", $dest);
-    if(count($pLink) > 2) {
-      $mode = $pLink[1];
-      if($src === false) {
-        unset($pLink[1]);
-        $src = findFile(implode("/", $pLink));
+  private function deleteOldResources() {
+    $dirs = array(THEMES_DIR => false, PLUGINS_DIR => false, LIB_DIR => false, FILES_DIR => true);
+    $e = null;
+    foreach($dirs as $dir => $checkSource) {
+      try {
+        $this->doDeleteOldResources($dir, $checkSource);
+      } catch(Exception $e) {}
+    }
+    if(!is_null($e)) throw new Exception($e->getMessage());
+  }
+
+  private function doDeleteOldResources($folder, $checkSource) {
+    $passed = true;
+    foreach(scandir($folder) as $f) {
+      if(strpos($f, ".") === 0) continue;
+      $ff = "$folder/$f";
+      if(is_dir($ff)) {
+        try {
+          $this->doDeleteOldResources($ff, $checkSource);
+        } catch(Exception $e) {
+          $passed = false;
+        }
+        continue;
+      }
+      $filePath = findFile($ff, true, true, false);
+      if(!$filePath && $checkSource) $filePath = $this->getSourceFile($ff);
+      if(!$filePath || filemtime($ff) != filemtime($filePath)) {
+        if(!unlink($ff)) $passed = false;
       }
     }
+    if(!$passed) throw new Exception(_("Failed to purge file cache"));
+  }
+
+  private function getSourceFile($dest, &$mode=null) {
+    $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
+    $pLink = explode("/", $dest);
+    if(count($pLink) > 2) {
+      if(!is_null($mode)) $mode = $pLink[1];
+      if($src === false) {
+        unset($pLink[1]);
+        $dest = implode("/", $pLink);
+        $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
+      }
+    }
+    return $src;
+  }
+
+  private function handleFile() {
+    $dest = getCurLink();
+    $mode = "";
+    $src = $this->getSourceFile($dest, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
     $fp = lockFile($src);
     try {
@@ -50,7 +98,8 @@ class FileHandler extends Plugin implements SplObserver {
           "preview" => array(500, 500, 150*1024, 85),
           "thumbs" => array(200, 200, 50*1024, 85),
           "big" => array(1500, 1500, 400*1024, 75),
-          "full" => array(0, 0, 0, 0));
+          "full" => array(0, 0, 0, 0)
+        );
         if(!isset($modes[$mode])) $mode = "";
         $this->handleImage(realpath($src), $dest, $modes[$mode]);
         return;

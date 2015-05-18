@@ -7,6 +7,7 @@
   <xsl:param name="cms-pagespeed" select="''"/>
   <xsl:param name="cms-clearcacheurl" select="''"/>
   <xsl:param name="cms-name" select="''"/>
+  <xsl:param name="filehandler-cfcurl" select="''"/>
 
   <xsl:template match="/">
     <xsl:apply-templates/>
@@ -33,6 +34,9 @@
           </xsl:choose>
         </li>
         <li><a var="cms-clearcacheurl@href">Smazat cache</a></li>
+        <xsl:if test="$filehandler-cfcurl">
+          <li><a var="filehandler-cfcurl@href">Smazat dočasné soubory</a></li>
+        </xsl:if>
         <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
         <li><xsl:value-of select="$cms-name"/></li>
       </ul>
