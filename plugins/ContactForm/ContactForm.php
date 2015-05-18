@@ -344,14 +344,15 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $req = $e->hasAttribute("required");
     $id = $e->getAttribute("id");
     $value = isset($_POST[$name]) ? $_POST[$name] : null;
-    if($e->nodeName == "textarea") {
-      $this->verifyText($value, $pattern, $req);
-    } elseif($e->nodeName != "input") return;
     try {
+      if($e->nodeName == "textarea") {
+        $this->verifyText($value, $pattern, $req);
+      } elseif($e->nodeName != "input") return;
       switch($e->getAttribute("type")) {
         case "email":
         if(!strlen($pattern)) $pattern = EMAIL_PATTERN;
         case "text":
+        case "search":
         $this->verifyText($value, $pattern, $req);
         break;
         case "checkbox":
@@ -376,7 +377,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     if(!strlen($pattern)) return;
     $res = @preg_match("/^(?:$pattern)$/", $value);
     if($res === false) {
-      new Logger(sprintf(_("Form pattern %s is invalid"), $pattern), Logger::LOGGER_WARNING);
+      new Logger(_("Invalid item pattern"), Logger::LOGGER_WARNING);
       return;
     }
     if($res === 1) return;

@@ -15,8 +15,8 @@ class FileHandler extends Plugin implements SplObserver {
     if(!is_null(Cms::getLoggedUser()) && isset($_GET["clearfilecache"])) {
       if(!Cms::isSuperUser()) new Logger(_("Insufficient rights to purge file cache"), Logger::LOGGER_WARNING);
       try {
-        $this->deleteOldResources();
-        new Logger(_("File cache successfully purged"), Logger::LOGGER_SUCCESS);
+        $this->deleteResources();
+        new Logger(_("Outdated files successfully removed"), Logger::LOGGER_SUCCESS);
       } catch(Exception $e) {
         new Logger($e->getMessage(), Logger::LOGGER_ERROR);
       }
@@ -35,25 +35,25 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
-  private function deleteOldResources() {
+  private function deleteResources() {
     $dirs = array(THEMES_DIR => false, PLUGINS_DIR => false, LIB_DIR => false, FILES_DIR => true);
     $e = null;
     foreach($dirs as $dir => $checkSource) {
       try {
-        $this->doDeleteOldResources($dir, $checkSource);
+        $this->doDeleteResources($dir, $checkSource);
       } catch(Exception $e) {}
     }
     if(!is_null($e)) throw new Exception($e->getMessage());
   }
 
-  private function doDeleteOldResources($folder, $checkSource) {
+  private function doDeleteResources($folder, $checkSource) {
     $passed = true;
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $ff = "$folder/$f";
       if(is_dir($ff)) {
         try {
-          $this->doDeleteOldResources($ff, $checkSource);
+          $this->doDeleteResources($ff, $checkSource);
         } catch(Exception $e) {
           $passed = false;
         }
@@ -65,7 +65,7 @@ class FileHandler extends Plugin implements SplObserver {
         if(!unlink($ff)) $passed = false;
       }
     }
-    if(!$passed) throw new Exception(_("Failed to purge file cache"));
+    if(!$passed) throw new Exception(_("Failed to remove outdated file(s)"));
   }
 
   private function getSourceFile($dest, &$mode=null) {
