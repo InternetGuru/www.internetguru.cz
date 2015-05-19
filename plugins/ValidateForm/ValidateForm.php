@@ -65,7 +65,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
         $name = $item->getAttribute("name");
         $value = isset($request[$name]) ? $request[$name] : null;
         $this->verifyItem($item, $value);
-        $values[] = $value;
+        $values[normalize($name, null, "", false)] = $value;
       } catch(Exception $e) {
         if(!$item->hasAttribute("id")) $item->setUniqueId();
         $id = $item->getAttribute("id");

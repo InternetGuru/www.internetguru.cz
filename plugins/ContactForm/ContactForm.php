@@ -7,8 +7,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private $cfg;
   private $vars = array();
-  private $formToSend = null;
-  private $formIdToSend = null;
   private $formsElements = array();
   private $formIds;
   private $formVars;
@@ -45,37 +43,45 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $form->addClass("fillable");
       $form->addClass("validable");
       $formVar = $this->parseForm($form);
-      $htmlForm = $formVar->documentElement->firstElement;
       $this->formsElements[normalize(get_class($this))."-$formId"] = $formVar;
-      $fv = $this->createFormVars($htmlForm);
-      if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-        Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
-      }
-      $this->formValues = Cms::getVariable("validateform-$formId");
-      if(is_null($this->formValues)) continue;
-      $this->formVars = $fv;
-      $this->formValues["form_id"] = $formId;
-      $this->formToSend = $form;
-      $this->formIdToSend = $formId;
     }
   }
 
   private function proceedForm() {
-    if(is_null($this->formToSend)) return;
+
+    $formToSend = null;
+    $formIdToSend = null;
+
+    foreach($this->forms as $formId => $form) {
+      $prefixedFormId = normalize(get_class($this))."-$formId";
+      $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
+      $fv = $this->createFormVars($htmlForm);
+      if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
+        Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
+      }
+      $this->formValues = Cms::getVariable("validateform-$prefixedFormId");
+      if(is_null($this->formValues)) continue;
+      $this->formValues["form_id"] = $formId;
+      $this->formVars = $fv;
+      $formToSend = $form;
+      $formIdToSend = $formId;
+    }
+
+    if(is_null($formToSend)) return;
     try {
       $variables = array_merge($this->formValues, Cms::getAllVariables());
       foreach($this->formVars as $k => $v) {
         $this->formVars[$k] = replaceVariables($v, $variables);
       }
-      if(array_key_exists($this->formIdToSend, $this->messages)) {
-        $msg = replaceVariables($this->messages[$this->formIdToSend], $variables);
-      } else $msg = $this->createMessage($this->cfg, $this->formIdToSend);
+      if(array_key_exists($formIdToSend, $this->messages)) {
+        $msg = replaceVariables($this->messages[$formIdToSend], $variables);
+      } else $msg = $this->createMessage($this->cfg, $formIdToSend);
       if(IS_LOCALHOST) throw new Exception("Not sending (at localhost)");
-      $this->sendForm($this->formToSend, $msg);
-      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$this->formIdToSend)));
+      $this->sendForm($formToSend, $msg);
+      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$formIdToSend)));
     } catch(Exception $e) {
-      $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$this->formIdToSend."'>"
-          .$this->formToSend->getAttribute("id")."</a>", $e->getMessage());
+      $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$formIdToSend."'>"
+          .$formToSend->getAttribute("id")."</a>", $e->getMessage());
       Cms::addMessage($message, Cms::MSG_ERROR);
     }
   }
