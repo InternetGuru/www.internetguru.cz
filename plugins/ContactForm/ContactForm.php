@@ -68,6 +68,9 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
 
     if(is_null($formToSend)) return;
+    foreach ($this->formValues as $name => $value) {
+      if(is_null($value) || !strlen($value)) $this->formValues[$name] = $this->formVars["nothing"];
+    }
     try {
       $variables = array_merge($this->formValues, Cms::getAllVariables());
       foreach($this->formVars as $k => $v) {

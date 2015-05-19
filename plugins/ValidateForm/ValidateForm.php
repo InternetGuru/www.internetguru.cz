@@ -62,10 +62,10 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     $values = array();
     foreach($xpath->query(".//input | .//textarea | .//select", $form) as $item) {
       try {
-        $name = $item->getAttribute("name");
+        $name = normalize($item->getAttribute("name"), null, "", false);
         $value = isset($request[$name]) ? $request[$name] : null;
         $this->verifyItem($item, $value);
-        $values[normalize($name, null, "", false)] = $value;
+        $values[$name] = is_array($value) ? implode(", ", $value) : $value;
       } catch(Exception $e) {
         if(!$item->hasAttribute("id")) $item->setUniqueId();
         $id = $item->getAttribute("id");
@@ -100,7 +100,8 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
         break;
         case "checkbox":
         case "radio":
-        $this->verifyChecked($value, $req);
+        if(!is_array($value)) $value = array($value);
+        $this->verifyChecked(in_array($e->getAttribute("value"), $value), $req);
         break;
       }
       break;
