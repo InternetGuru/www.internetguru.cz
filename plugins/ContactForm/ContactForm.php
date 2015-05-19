@@ -55,11 +55,11 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     foreach($this->forms as $formId => $form) {
       $prefixedFormId = normalize(get_class($this))."-$formId";
       $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
+      $this->formValues = Cms::getVariable("validateform-$prefixedFormId");
       $fv = $this->createFormVars($htmlForm);
       if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
         Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
       }
-      $this->formValues = Cms::getVariable("validateform-$prefixedFormId");
       if(is_null($this->formValues)) continue;
       $this->formValues["form_id"] = $formId;
       $this->formVars = $fv;
@@ -134,18 +134,16 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $bcc = "";
       $this->sendMail($email, $name, $adminaddr, $adminname, $msg, $bcc);
     }
-    if(!self::DEBUG) return;
-    #print_r($_POST);
-    #print_r($this->formVars);
-    #print_r($this->formValues);
-    die("CONTACTFORM DEBUG DIE");
+    if(self::DEBUG) {
+      var_dump($this->formVars);
+      var_dump($this->formValues);
+    }
   }
 
   private function sendMail($mailto, $mailtoname, $replyto, $replytoname, $msg, $bcc) {
     if(self::DEBUG) {
       echo $msg;
-      new Logger(sprintf("Sending e-mail to %s skipped", $mailto));
-      return;
+      throw new Exception (sprintf("Sending e-mail to %s skipped", $mailto));
     }
     $mail = new PHPMailer;
     $mail->CharSet = 'UTF-8';
