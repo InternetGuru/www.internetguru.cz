@@ -33,7 +33,7 @@
             </xsl:otherwise>
           </xsl:choose>
         </li>
-        <li><a var="cms-clearcacheurl@href">Smazat cache</a></li>
+        <li><a var="cms-clearcacheurl@href">Smazat mezipaměť</a></li>
         <xsl:if test="$filehandler-cfcurl">
           <li><a var="filehandler-cfcurl@href">Smazat dočasné soubory</a></li>
         </xsl:if>

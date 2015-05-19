@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-18 17:21+0100\n"
-"PO-Revision-Date: 2015-05-18 17:24+0100\n"
+"POT-Creation-Date: 2015-05-19 09:15+0100\n"
+"PO-Revision-Date: 2015-05-19 09:16+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -385,113 +385,113 @@ msgstr "Umístění rozšíření '%s' nebylo nalezeno"
 msgid "Unable to find class '%s' in '%s' nor '%s'"
 msgstr "Nepodařilo se najít třídu '%s' v '%s' ani v '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:26
+#: D:\wamp\www\cms/core/globals.php:30
 #, php-format
 msgid "Unable to create symlink '%s'"
 msgstr "Nelze vytvořit symbolický odkaz '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:29
+#: D:\wamp\www\cms/core/globals.php:33
 msgid "Symlink changed; may take time to apply"
 msgstr "Došlo ke změně symbolického odkazu; změny se mohou projevit později"
 
-#: D:\wamp\www\cms/core/globals.php:48
+#: D:\wamp\www\cms/core/globals.php:52
 #, php-format
 msgid "Variable '%s' does not exist"
 msgstr "Proměnná '%s' neexistuje"
 
-#: D:\wamp\www\cms/core/globals.php:58
+#: D:\wamp\www\cms/core/globals.php:62
 #, php-format
 msgid "Variable '%s' is not string"
 msgstr "Proměnná '%s' není řetězec"
 
-#: D:\wamp\www\cms/core/globals.php:72
+#: D:\wamp\www\cms/core/globals.php:76
 #, php-format
 msgid "Unable to parse URL '%s'"
 msgstr "Odkaz '%s' má chybný formát"
 
-#: D:\wamp\www\cms/core/globals.php:85
+#: D:\wamp\www\cms/core/globals.php:89
 msgid "Redirecting to empty string changed to root"
 msgstr "Přesměrování na prázdný řetězec změněno na kořenový adresář"
 
-#: D:\wamp\www\cms/core/globals.php:88
+#: D:\wamp\www\cms/core/globals.php:92
 #, php-format
 msgid "Redirecting to '%s'"
 msgstr "Přesměrování na '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:113
+#: D:\wamp\www\cms/core/globals.php:117
 #, php-format
 msgid "Unable to parse href '%s'"
 msgstr "Nelze zpracovat atribut href '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:131
+#: D:\wamp\www\cms/core/globals.php:135
 msgid "Link is cyclic"
 msgstr "Odkaz je cycklický"
 
-#: D:\wamp\www\cms/core/globals.php:207
+#: D:\wamp\www\cms/core/globals.php:211
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: D:\wamp\www\cms/core/globals.php:213 D:\wamp\www\cms/core/globals.php:248
+#: D:\wamp\www\cms/core/globals.php:217 D:\wamp\www\cms/core/globals.php:252
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: D:\wamp\www\cms/core/globals.php:219
+#: D:\wamp\www\cms/core/globals.php:223
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:222
+#: D:\wamp\www\cms/core/globals.php:226
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:224
+#: D:\wamp\www\cms/core/globals.php:228
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: D:\wamp\www\cms/core/globals.php:226
+#: D:\wamp\www\cms/core/globals.php:230
 msgid "Unable to touch destination file"
 msgstr "Nepodařilo se nastavit čas modifikace pro cílový soubor"
 
-#: D:\wamp\www\cms/core/globals.php:234
+#: D:\wamp\www\cms/core/globals.php:238
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: D:\wamp\www\cms/core/globals.php:255
+#: D:\wamp\www\cms/core/globals.php:259
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: D:\wamp\www\cms/core/globals.php:261
+#: D:\wamp\www\cms/core/globals.php:265
 #, php-format
 msgid "Directory '%s' not found"
 msgstr "Složka '%s' nebyla nalezena"
 
-#: D:\wamp\www\cms/core/globals.php:311
+#: D:\wamp\www\cms/core/globals.php:315
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: D:\wamp\www\cms/core/globals.php:319
+#: D:\wamp\www\cms/core/globals.php:323
 msgid "File does not exist"
 msgstr "Soubor neexistuje"
 
-#: D:\wamp\www\cms/core/globals.php:321 D:\wamp\www\cms/core/globals.php:392
+#: D:\wamp\www\cms/core/globals.php:325 D:\wamp\www\cms/core/globals.php:396
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: D:\wamp\www\cms/core/globals.php:327
+#: D:\wamp\www\cms/core/globals.php:331
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: D:\wamp\www\cms/core/globals.php:407
+#: D:\wamp\www\cms/core/globals.php:411
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: D:\wamp\www\cms/core/globals.php:466
+#: D:\wamp\www\cms/core/globals.php:470
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: D:\wamp\www\cms/core/globals.php:509
+#: D:\wamp\www\cms/core/globals.php:513
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
@@ -670,83 +670,53 @@ msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
 msgid "Insufficient rights to view this content"
 msgstr "Nedostatečná práva pro zobrazení obsahu"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:51
-#, php-format
-msgid "Unable to process form %s: %s"
-msgstr "Nepodařilo se zpracovat formulář %s: %s"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:74
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:77
 #, php-format
 msgid "Unable to send form %s: %s"
 msgstr "Nepodařilo se odeslat formulář %s: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:122
-#, php-format
-msgid "%s error(s) occured"
-msgstr "počet neplatných položek je %s"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:129
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:103
 msgid "Missing admin address"
 msgstr "Chybí adresa administrátora"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:131
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:105
 #, php-format
 msgid "Invalid admin email address: '%s'"
 msgstr "Neplatná adresa administrátora: '%s'"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:133
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:107
 #, php-format
 msgid "Invalid client email address: '%s'"
 msgstr "Neplatná adresa odesílatele: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:149
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:123
 msgid "Unable to send copy to empty client address"
 msgstr "Není možné odeslat kopii zprávy na prázdnou adresu"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:172
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:146
 #, php-format
 msgid "New massage from %s"
 msgstr "Nová zpráva z %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:180
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:154
 #, php-format
 msgid "E-mail successfully sent to %s"
 msgstr "Zpráva byla úspěšně odeslána na adresu %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:201
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:175
 #: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:49
 #, php-format
 msgid "Skipped element %s: %s"
 msgstr "Element %s byl vynechán: %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:209
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:183
 #, php-format
 msgid "Missing attribute %s"
 msgstr "Chybí atribut %s"
 
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:246
+#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:220
 msgid "Element input missing attribute type skipped"
 msgstr "Byl vynechán element input, neboť postrádá atribut type"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:372
-msgid "Value missing"
-msgstr "Chybí hodnota"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:375
-msgid "Item is required"
-msgstr "Pložka je povinná"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:380
-msgid "Invalid item pattern"
-msgstr "Neplatný formát předpisu (pattern)"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:384
-msgid "Item value does not match required format"
-msgstr "Hodnota položky neodpovídá požadovanému formátu"
-
-#: D:\wamp\www\cms/plugins/ContactForm/ContactForm.php:389
-msgid "Item must be checked"
-msgstr "Položka musí být zaškrtnutá"
 
 #: D:\wamp\www\cms/plugins/ContentBalancer/ContentBalancer.php:19
 msgid "No sets found"
@@ -1039,6 +1009,36 @@ msgstr "Funkce sequence přeskočila volání funkce: %s"
 #, php-format
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
+
+#: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:24
+msgid "Validable form missing attribute id"
+msgstr "Formulář s třídou validable postrádá atribut id."
+
+#: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:114
+msgid "Value missing"
+msgstr "Chybí hodnota"
+
+#: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:117
+msgid "Item is required"
+msgstr "Pložka je povinná"
+
+#: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:122
+msgid "Invalid item pattern"
+msgstr "Neplatný formát předpisu (pattern)"
+
+#: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:126
+msgid "Item value does not match required format"
+msgstr "Hodnota položky neodpovídá požadovanému formátu"
+
+#: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:131
+msgid "Item must be checked"
+msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Unable to process form %s: %s"
+#~ msgstr "Nepodařilo se zpracovat formulář %s: %s"
+
+#~ msgid "%s error(s) occured"
+#~ msgstr "počet neplatných položek je %s"
 
 #~ msgid "Item pattern %s is invalid"
 #~ msgstr "Položka má "

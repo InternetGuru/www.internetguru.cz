@@ -9,6 +9,10 @@ function __autoload($className) {
   throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
+function isValidId($id) {
+  return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
+}
+
 function findFile($filePath, $user=true, $admin=true, $res=true) {
   if($user && is_file(USER_FOLDER."/$filePath")) return USER_FOLDER."/$filePath";
   if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";

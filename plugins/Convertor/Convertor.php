@@ -150,7 +150,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $ids = array();
     foreach($doc->getElementsByTagName("h") as $h) {
       $oldId = $h->getAttribute("id");
-      $doc->setUniqueId($h);
+      $h->setUniqueId();
       $ids[$oldId] = $h->getAttribute("id");
     }
     return $ids;

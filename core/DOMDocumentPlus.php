@@ -100,17 +100,6 @@ class DOMDocumentPlus extends DOMDocument {
     return true;
   }
 
-  public function setUniqueId(DOMElement $e) {
-    $id = $e->nodeName.".".substr(md5(microtime().rand()), 0, 3);
-    if(!$this->isValidId($id)) $this->setUniqueId($e);
-    if(!is_null($this->getElementById($id))) $this->setUniqueId($e);
-    $e->setAttribute("id", $id);
-  }
-
-  protected function isValidId($id) {
-    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
-  }
-
   private function removeVar($e, $attr) {
     if(!is_null($attr)) {
       if($e->hasAttribute($attr)) $e->removeAttribute($attr);

@@ -16,7 +16,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $formItems = array();
   private $messages;
   private $errors = array();
-  private $errorLabels = array();
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -28,53 +27,56 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
 
   public function update(SplSubject $subject) {
     if($this->detachIfNotAttached("HtmlOutput")) return;
-    if($subject->getStatus() == STATUS_INIT) {
-      Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.get_class($this).'.css');
-      $this->cfg = $this->getDOMPlus();
-      $this->createGlobalVars();
-      foreach($this->forms as $formId => $form) {
-        try {
-          $form->addClass("fillable");
-          $formVar = $this->parseForm($form);
-          $htmlForm = $formVar->documentElement->firstElement;
-          $this->formsElements[normalize(get_class($this))."-$formId"] = $formVar;
-          $fv = $this->createFormVars($htmlForm);
-          if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-            Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
-          }
-          if(!$this->isValidPost($form)) continue;
-          $this->formVars = $fv;
-          $this->formValues["form_id"] = $formId;
-          $this->formToSend = $form;
-          $this->formIdToSend = $formId;
-        } catch(Exception $e) {
-          $message = sprintf(_("Unable to process form %s: %s"), "<a href='#".$htmlForm->getAttribute("id")."'>"
-            .$htmlForm->getAttribute("id")."</a>", $e->getMessage());
-          Cms::addMessage($message, Cms::MSG_ERROR);
-          foreach($this->errors as $itemId => $message) {
-            Cms::addMessage(sprintf("<label for='%s'>%s</label>", $itemId, $message), Cms::MSG_ERROR);
-          }
-        }
-      }
+    if($this->detachIfNotAttached("ValidateForm")) return;
+    switch($subject->getStatus()) {
+      case STATUS_INIT:
+      $this->initForm();
+      break;
+      case STATUS_PROCESS:
+      $this->proceedForm();
+      break;
     }
-    if($subject->getStatus() == STATUS_PROCESS) {
-      if(is_null($this->formToSend)) return;
-      try {
-        $variables = array_merge($this->formValues, Cms::getAllVariables());
-        foreach($this->formVars as $k => $v) {
-          $this->formVars[$k] = replaceVariables($v, $variables);
-        }
-        if(array_key_exists($this->formIdToSend, $this->messages)) {
-          $msg = replaceVariables($this->messages[$this->formIdToSend], $variables);
-        } else $msg = $this->createMessage($this->cfg, $this->formIdToSend);
-        if(IS_LOCALHOST) throw new Exception("Not sending (at localhost)");
-        $this->sendForm($this->formToSend, $msg);
-        redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$this->formIdToSend)));
-      } catch(Exception $e) {
-        $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$this->formIdToSend."'>"
-            .$this->formToSend->getAttribute("id")."</a>", $e->getMessage());
-        Cms::addMessage($message, Cms::MSG_ERROR);
+  }
+
+  private function initForm() {
+    $this->cfg = $this->getDOMPlus();
+    $this->createGlobalVars();
+    foreach($this->forms as $formId => $form) {
+      $form->addClass("fillable");
+      $form->addClass("validable");
+      $formVar = $this->parseForm($form);
+      $htmlForm = $formVar->documentElement->firstElement;
+      $this->formsElements[normalize(get_class($this))."-$formId"] = $formVar;
+      $fv = $this->createFormVars($htmlForm);
+      if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
+        Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
       }
+      $this->formValues = Cms::getVariable("validateform-$formId");
+      if(is_null($this->formValues)) continue;
+      $this->formVars = $fv;
+      $this->formValues["form_id"] = $formId;
+      $this->formToSend = $form;
+      $this->formIdToSend = $formId;
+    }
+  }
+
+  private function proceedForm() {
+    if(is_null($this->formToSend)) return;
+    try {
+      $variables = array_merge($this->formValues, Cms::getAllVariables());
+      foreach($this->formVars as $k => $v) {
+        $this->formVars[$k] = replaceVariables($v, $variables);
+      }
+      if(array_key_exists($this->formIdToSend, $this->messages)) {
+        $msg = replaceVariables($this->messages[$this->formIdToSend], $variables);
+      } else $msg = $this->createMessage($this->cfg, $this->formIdToSend);
+      if(IS_LOCALHOST) throw new Exception("Not sending (at localhost)");
+      $this->sendForm($this->formToSend, $msg);
+      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$this->formIdToSend)));
+    } catch(Exception $e) {
+      $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$this->formIdToSend."'>"
+          .$this->formToSend->getAttribute("id")."</a>", $e->getMessage());
+      Cms::addMessage($message, Cms::MSG_ERROR);
     }
   }
 
@@ -92,37 +94,9 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $htmlForm->removeAllAttributes(array("id", "class"));
     $htmlForm->setAttribute("method", "post");
     $htmlForm->setAttribute("action", getCurLink());
-    #$htmlForm->setAttribute("var", "cms-link@action");
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
-    #Cms::setVariable($formId, $doc);
     return $doc;
-    #print_r($_POST);
-    #echo $doc->saveXML();
-  }
-
-  private function isValidPost(DOMElementPlus $form) {
-    #$prefix = strtolower(get_class($this))."-".$form->getAttribute("id")."-";
-    foreach($this->formItems as $i) $this->setItemValue($i);
-    if(!isset($_POST[get_class($this)])
-      || $_POST[get_class($this)] != normalize(get_class($this))."-".$form->getAttribute("id")) return false;
-    foreach($this->formItems as $i) {
-      try {
-        $this->verifyItem($i);
-      } catch(Exception $e) {
-        $this->errors[$i->getAttribute("id")] = $e->getMessage();
-        $i->addClass(self::CSS_WARNING);
-        $i->parentNode->addClass(self::CSS_WARNING);
-        foreach($this->formIds[$i->getAttribute("id")] as $l) {
-          $l->addClass(self::CSS_WARNING);
-        }
-      }
-    }
-    if(!empty($this->errors))
-      throw new Exception(sprintf(_("%s error(s) occured"), count($this->errors)));
-    #if(!strlen($this->formVars["email"]))
-    #  new Logger(_("Attribute name email not sent or empty"), Logger::LOGGER_WARNING);
-    return true;
   }
 
   private function sendForm(DOMElementPlus $form, $msg) {
@@ -256,14 +230,11 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       if($e->hasAttribute("for")) {
         $for = $prefix.$e->getAttribute("for");
         $e->setAttribute("for", $for);
-        $this->errorLabels[$for][] = $e->nodeValue;
         $this->formIds[$for][] = $e;
         continue;
       }
       foreach($xpath->query("input | textarea | select", $e) as $f) {
         $this->formIds[$f->getAttribute("id")][] = $e;
-        if($f->nodeName != "input") continue;
-        $this->errorLabels[$f->getAttribute("id")][] = $e->nodeValue;
       }
     }
     foreach($this->formItems as $e) {
@@ -302,15 +273,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->formGroupValues[$name][$value.$j] = null;
   }
 
-  private function setItemValue(DOMElementPlus $e) {
-    $name = str_replace("[]", "", $e->getAttribute("name"));
-    $value = isset($_POST[$name]) ? $_POST[$name] : null;
-    if(is_null($value) && isset($_GET[$name])) $value = $_GET[$name];
-    if(is_null($value) || (is_array($value) && empty($value))
-      || (is_string($value) && !strlen(trim($value)))) $value = $this->vars["nothing"];
-    $this->formValues[$name] = $value;
-  }
-
   private function processFormItem(Array &$register, DOMElementPlus $e, $aName, $prefix, $default, $arraySupport) {
     $value = normalize($e->getAttribute($aName), null, null, false); // remove "[]"" and stuff...
     if(!strlen($value)) $value = $default;
@@ -336,57 +298,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $msg[] = "$k: $v";
     }
     return implode("\n", $msg);
-  }
-
-  private function verifyItem(DOMElementPlus $e) {
-    $name = $e->getAttribute("name");
-    $pattern = $e->getAttribute("pattern");
-    $req = $e->hasAttribute("required");
-    $id = $e->getAttribute("id");
-    $value = isset($_POST[$name]) ? $_POST[$name] : null;
-    try {
-      if($e->nodeName == "textarea") {
-        $this->verifyText($value, $pattern, $req);
-      } elseif($e->nodeName != "input") return;
-      switch($e->getAttribute("type")) {
-        case "email":
-        if(!strlen($pattern)) $pattern = EMAIL_PATTERN;
-        case "text":
-        case "search":
-        $this->verifyText($value, $pattern, $req);
-        break;
-        case "checkbox":
-        case "radio":
-        $this->verifyChecked($value, $req);
-        break;
-      }
-    } catch(Exception $ex) {
-      $error = $ex->getMessage();
-      if(isset($this->errorLabels[$id][0])) $name = $this->errorLabels[$id][0];
-      if(isset($this->errorLabels[$id][1])) $error = $this->errorLabels[$id][1];
-      throw new Exception("$name: $error");
-    }
-  }
-
-  private function verifyText($value, $pattern, $required) {
-    if(is_null($value)) throw new Exception(_("Value missing"));
-    if(!strlen(trim($value))) {
-      if(!$required) return;
-      throw new Exception(_("Item is required"));
-    }
-    if(!strlen($pattern)) return;
-    $res = @preg_match("/^(?:$pattern)$/", $value);
-    if($res === false) {
-      new Logger(_("Invalid item pattern"), Logger::LOGGER_WARNING);
-      return;
-    }
-    if($res === 1) return;
-    throw new Exception(_("Item value does not match required format"));
-  }
-
-  private function verifyChecked($checked, $required) {
-    if(!$required || $checked) return;
-    throw new Exception(_("Item must be checked"));
   }
 
 }
