@@ -17,6 +17,49 @@ input:not([type="radio"]) {
   padding: 0.15em 0.3em;
 }
 
+form dt {
+  font-size: 1rem;
+  max-width: 15em;
+  width: 100%;
+  display: inline-block;
+}
+
+form dt, form dd {
+  margin: 0.5rem 0;
+}
+
+form dt, form dt+dd {
+  float: left;
+}
+
+form dt, form dt+dd+dd {
+  clear:left;
+}
+
+form textarea {
+  background: #EAF2F5;
+}
+
+form dd > input[type="text"],
+form dd > input[type="email"] {
+  border: none;
+  background: #EAF2F5;
+  width: 80vw;
+  max-width: 25em;
+  border-bottom: 0.1em solid rgb(165, 165, 165);
+}
+
+form fieldset {
+  border-top: 0.15em solid rgb(204, 217, 226);
+}
+
+form dd > textarea {
+  width: 80vw;
+  max-width: 25em;
+  font: inherit;
+  box-sizing: content-box;
+}
+
 samp, pre, textarea,
 p code, li code, dt code, dd code {
   border: 0.15em solid #e5e5e5;
