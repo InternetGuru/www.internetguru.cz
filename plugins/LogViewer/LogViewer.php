@@ -26,7 +26,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     }
     if($subject->getStatus() != STATUS_INIT) return;
     $this->logFiles = $this->getFiles(LOG_FOLDER, 15, "log");
-    $this->mailFiles = $this->getFiles(LOG_FOLDER, 15, "mail.log");
+    $this->mailFiles = $this->getFiles(LOG_FOLDER, 15, "mail");
     $this->verFiles = $this->getFiles(VER_FOLDER);
   }
 
@@ -97,7 +97,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $files = array();
     foreach(scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {
       if(!is_file("$dir/$f")) continue;
-      if(!is_null($ext) && substr($f, strpos($f, ".")+1) != $ext) continue;
+      if(!is_null($ext) && pathinfo($f, PATHINFO_EXTENSION) != $ext) continue;
       $id = (substr($f, -4) == ".zip") ? substr($f, 0, -4) : $f;
       $files[$id] = "$dir/$f";
       if(count($files) == $limit) break;
