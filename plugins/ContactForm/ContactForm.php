@@ -55,12 +55,13 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     foreach($this->forms as $formId => $form) {
       $prefixedFormId = normalize(get_class($this))."-$formId";
       $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
-      $this->formValues = Cms::getVariable("validateform-$prefixedFormId");
+      $formValues = Cms::getVariable("validateform-$prefixedFormId");
       $fv = $this->createFormVars($htmlForm);
       if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
         Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
       }
-      if(is_null($this->formValues)) continue;
+      if(is_null($formValues)) continue;
+      $this->formValues = $formValues;
       $this->formValues["form_id"] = $formId;
       $this->formVars = $fv;
       $formToSend = $form;
@@ -68,7 +69,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
 
     if(is_null($formToSend)) return;
-    foreach ($this->formValues as $name => $value) {
+    foreach($this->formValues as $name => $value) {
       if(is_null($value) || !strlen($value)) $this->formValues[$name] = $this->formVars["nothing"];
     }
     try {
@@ -158,7 +159,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(strlen($bcc)) $mail->addBCC($bcc, '');
     new Logger(sprintf(_("Sending mail: to=%s<%s>; replyto=%s<%s>; bcc=%s; subject=%s; msg=%s"),
-      $mailtoname, $mailto, $replytoname, $replyto, $bcc, $msg), null, null, null, "mail.log");
+      $mailtoname, $mailto, $replytoname, $replyto, $bcc, $mail->Subject, $msg), null, null, null, "mail.log");
     if(!$mail->send()) throw new Exception($mail->ErrorInfo);
     new Logger(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }
