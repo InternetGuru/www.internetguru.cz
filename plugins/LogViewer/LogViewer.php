@@ -5,6 +5,7 @@
 class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $logFiles;
+  private $mailFiles;
   private $verFiles;
   private $curFilePath;
   private $curFileName;
@@ -24,7 +25,8 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
       $subject->detach($this);
     }
     if($subject->getStatus() != STATUS_INIT) return;
-    $this->logFiles = $this->getFiles(LOG_FOLDER, 15);
+    $this->logFiles = $this->getFiles(LOG_FOLDER, 15, "log");
+    $this->mailFiles = $this->getFiles(LOG_FOLDER, 15, "mail.log");
     $this->verFiles = $this->getFiles(VER_FOLDER);
   }
 
@@ -39,6 +41,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $newContent = $this->getHTMLPlus();
     $vars["cur_file"] = $fName;
     $vars["log_files"] = $this->makeLink($this->logFiles);
+    $vars["log_mailfiles"] = $this->makeLink($this->mailFiles);
     $vars["ver_files"] = $this->makeLink($this->verFiles);
     $newContent->processVariables($vars);
     return $newContent;
@@ -88,10 +91,11 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     return null;
   }
 
-  private function getFiles($dir, $limit=0) {
+  private function getFiles($dir, $limit=0, $ext=null) {
     $files = array();
     foreach(scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {
       if(!is_file("$dir/$f")) continue;
+      if(!is_null($ext) && substr($f, strpos($f, ".")+1) != $ext) continue;
       $id = (substr($f, -4) == ".zip") ? substr($f, 0, -4) : $f;
       $files[$id] = "$dir/$f";
       if(count($files) == $limit) break;
