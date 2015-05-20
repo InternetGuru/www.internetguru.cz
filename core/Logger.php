@@ -10,7 +10,7 @@ class Logger {
   const LOGGER_INFO = "Info";
   const LOGGER_SUCCESS = "Success";
 
-  function __construct($message, $type=null, $start_time=null, $cmsMsg = true) {
+  function __construct($message, $type=null, $start_time=null, $cmsMsg = true, $ext="log") {
     if(!is_null($start_time))
       $this->duration = round((microtime(true) - $start_time)*1000)."ms";
     if(!in_array($type, array(
@@ -24,7 +24,7 @@ class Logger {
     if(Cms::getLoggedUser() == "server") return;
     $this->message = $message;
     $this->type = $type;
-    $this->log();
+    $this->log($ext);
   }
 
   private function getCaller() {
@@ -37,8 +37,8 @@ class Logger {
     return implode(".", $c);
   }
 
-  private function log() {
-    $logFile = LOG_FOLDER."/".date("Ymd").".log";
+  private function log($ext) {
+    $logFile = LOG_FOLDER."/".date("Ymd").".$ext";
     if(isset($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_PORT"]))
       $msg[] = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
     else
