@@ -61,9 +61,12 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
       }
       if(is_null($formValues)) continue;
+      foreach(array("email", "name", "sendcopy") as $name) {
+        $fv[$name] = isset($formValues[$name]) ? $formValues[$name] : "";
+      }
       $this->formValues = $formValues;
-      $this->formValues["form_id"] = $formId;
       $this->formVars = $fv;
+      $this->formValues["form_id"] = $formId;
       $formToSend = $form;
       $formIdToSend = $formId;
     }
@@ -128,7 +131,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $bcc = "pavel@petrzela.eu";
     }
     $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
-    if(is_array($this->formVars["sendcopy"])) {
+    if(strlen($this->formVars["sendcopy"])) {
       if(!strlen($this->formVars["email"]))
         throw new Exception(_("Unable to send copy to empty client address"));
       $msg = $this->formVars["copymsg"]."\n\n$msg";
@@ -195,9 +198,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function createFormVars(DOMElementPlus $form) {
     $formVars = array();
-    foreach(array("email", "name", "sendcopy") as $name) {
-      $formVars[$name] = isset($this->formValues[$name]) ? $this->formValues[$name] : "";
-    }
     foreach($this->vars as $name => $value) {
       $formVars[$name] = $value;
       if(!$form->hasAttribute($name)) continue;
