@@ -40,8 +40,10 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     }
     $newContent = $this->getHTMLPlus();
     $vars["cur_file"] = $fName;
-    $vars["log_files"] = $this->makeLink($this->logFiles);
-    $vars["log_mailfiles"] = $this->makeLink($this->mailFiles);
+    $lf = $this->makeLink($this->logFiles);
+    $vars["log_files"] = empty($lf) ? null : $lf;
+    $mlf = $this->makeLink($this->mailFiles);
+    $vars["log_mailfiles"] = empty($mlf) ? null : $mlf;
     $vars["ver_files"] = $this->makeLink($this->verFiles);
     $newContent->processVariables($vars);
     return $newContent;
