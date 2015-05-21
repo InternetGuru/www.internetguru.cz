@@ -33,9 +33,23 @@
             </xsl:otherwise>
           </xsl:choose>
         </li>
-        <li><a var="cms-clearcacheurl@href">Smazat mezipaměť</a></li>
+        <li>
+          <xsl:element name="a">
+            <xsl:attribute name="href">
+              <xsl:value-of select="$cms-clearcacheurl"/>
+            </xsl:attribute>
+            <xsl:text>Smazat mezipaměť</xsl:text>
+          </xsl:element>
+        </li>
         <xsl:if test="$filehandler-cfcurl">
-          <li><a var="filehandler-cfcurl@href">Smazat dočasné soubory</a></li>
+          <li>
+            <xsl:element name="a">
+              <xsl:attribute name="href">
+                <xsl:value-of select="$filehandler-cfcurl"/>
+              </xsl:attribute>
+              <xsl:text>Smazat dočasné soubory</xsl:text>
+            </xsl:element>
+          </li>
         </xsl:if>
         <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
         <li><xsl:value-of select="$cms-name"/></li>
