@@ -147,7 +147,7 @@ class DOMElementPlus extends DOMElement {
       return $this->insertVarString($element->nodeValue, $aName);
     }
     $res = null;
-    $var = $this->ownerDocument->importNode($element, true);
+    $var = $this->ownerDocument->importNode(clone $element, true);
     $attributes = array();
     foreach($this->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     $nodes = array();

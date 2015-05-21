@@ -54,7 +54,7 @@ class DOMDocumentPlus extends DOMDocument {
   public function elementProcessVariables(Array $variables, $ignore = array(), DOMElementPlus $element, $deep = false) {
     $toRemove = array();
     $res = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
-    if(!$res->isSameNode($element)) $toRemove[] = $element;
+    if(is_null($res) || !$res->isSameNode($element)) $toRemove[] = $element;
     foreach($toRemove as $e) $e->emptyRecursive();
     return $res;
   }
@@ -78,7 +78,7 @@ class DOMDocumentPlus extends DOMDocument {
     if($deep) foreach($element->childNodes as $e) {
       if($e->nodeType != XML_ELEMENT_NODE) continue;
       $r = $this->doProcessVariables($variables, $ignore, $e, $deep, $toRemove);
-      if(!$r->isSameNode($e)) $toRemove[] = $e;
+      if(is_null($r) || !$e->isSameNode($r)) $toRemove[] = $e;
     }
     return $res;
   }
