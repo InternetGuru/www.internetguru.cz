@@ -140,15 +140,6 @@ class DOMElementPlus extends DOMElement {
       }
     }
     return $this->insertVarDOMElement($dom->documentElement, null);
-    /*
-    if(count($html) > 1) {
-      return $this->insertVarDOMElement($dom->documentElement, null);
-    }
-    while($this->hasChildNodes()) $this->removeChild($this->firstChild);
-    foreach($dom->documentElement->firstChild->childNodes as $n) {
-      $this->appendChild($this->ownerDocument->importNode($n, true));
-    }
-    */
   }
 
   public function insertVarDOMElement(DOMElement $element, $aName) {

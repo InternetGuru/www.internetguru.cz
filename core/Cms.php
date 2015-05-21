@@ -51,7 +51,6 @@ class Cms {
     $ul = self::$flashList->appendChild($doc->createElement("ul"));
     #$ul->setAttribute("class", "selectable");
     self::setVariable("messages", self::$flashList);
-    return $doc; // possible bug solved by return $doc (?)
   }
 
   private static function addFlashItem($message, $type) {
@@ -190,7 +189,7 @@ class Cms {
       else $_SESSION["cms"]["flash"][$type][] = $message;
       return;
     }
-    if(is_null(self::$flashList)) $doc = self::createFlashList(); // possible bug solved by "$doc =" (?)
+    if(is_null(self::$flashList)) self::createFlashList();
     self::addFlashItem($message, $type);
   }
 
