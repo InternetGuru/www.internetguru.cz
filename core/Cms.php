@@ -51,6 +51,7 @@ class Cms {
     $ul = self::$flashList->appendChild($doc->createElement("ul"));
     #$ul->setAttribute("class", "selectable");
     self::setVariable("messages", self::$flashList);
+    return $doc; // possible bug solved by return $doc (?)
   }
 
   private static function addFlashItem($message, $type) {
@@ -147,13 +148,11 @@ class Cms {
 
   public static function contentProcessVariables() {
     $oldContent = clone self::$content;
-    self::$content->processVariables(self::$variables);
-    self::$content->processFunctions(self::$functions, self::$variables);
     try {
-      self::$content->validatePlus(true);
+      self::$content = self::$content->processVariables(self::$variables);
+      #self::$content->processFunctions(self::$functions, self::$variables);
     } catch(Exception $e) {
-      #echo self::$content->saveXML();die();
-      new Logger(sprintf(_("Some variables or functions causing HTML+ error: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      new Logger(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
       self::$content = $oldContent;
     }
   }
@@ -186,7 +185,7 @@ class Cms {
       else $_SESSION["cms"]["flash"][$type][] = $message;
       return;
     }
-    if(is_null(self::$flashList)) self::createFlashList();
+    if(is_null(self::$flashList)) $doc = self::createFlashList(); // possible bug solved by "$doc =" (?)
     self::addFlashItem($message, $type);
   }
 

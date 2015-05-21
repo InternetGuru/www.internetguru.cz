@@ -48,7 +48,64 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function processVariables(Array $variables, $ignore = array()) {
-    $this->documentElement->processVariables($variables, $ignore, true);
+    return $this->elementProcessVariables($variables, $ignore, $this->documentElement, true);
+  }
+
+  public function elementProcessVariables(Array $variables, $ignore = array(), DOMElementPlus $element, $deep = false) {
+    $toRemove = array();
+    $res = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
+    if(!$res->isSameNode($element)) $toRemove[] = $element;
+    foreach($toRemove as $e) $e->emptyRecursive();
+    return $res;
+  }
+
+  private function doProcessVariables(Array $variables, $ignore, DOMElementPlus $element, $deep, Array &$toRemove) {
+    $res = $element;
+    $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
+    foreach($element->getVariables("var", $ignoreAttr) as list($vName, $aName, $var)) {
+      if(!isset($variables[$vName])) continue;
+      try {
+        $element->removeAttrVal("var", $var);
+        if(!is_null($variables[$vName]) && !count($variables[$vName])) {
+          if(!is_null($aName)) $this->removeAttribute($aName);
+          else return null;
+        }
+        $res = $this->insertVariable($element, $variables[$vName], $aName);
+      } catch(Exception $e) {
+        new Logger(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
+      }
+    }
+    if($deep) foreach($element->childNodes as $e) {
+      if($e->nodeType != XML_ELEMENT_NODE) continue;
+      $r = $this->doProcessVariables($variables, $ignore, $e, $deep, $toRemove);
+      if(!$r->isSameNode($e)) $toRemove[] = $e;
+    }
+    return $res;
+  }
+
+  public function insertVariable(DOMElementPlus $element, $value, $aName=null) {
+    if(is_null($element->parentNode)) return $element;
+    switch(gettype($value)) {
+      case "NULL":
+      return $element;
+      case "integer":
+      case "boolean":
+      $value = (string) $value;
+      case "string":
+      if(!strlen($value) && is_null($aName)) return null;
+      return $element->insertVarString($value, $aName);
+      case "array":
+      #$this = $this->prepareIfDl($this, $varName);
+      return $element->insertVarArray($value, $aName);
+      default:
+      if($value instanceof DOMDocumentPlus) {
+        return $element->insertVarDOMElement($value->documentElement, $aName);
+      }
+      if($value instanceof DOMElement) {
+        return $element->insertVarDOMElement($value, $aName);
+      }
+      throw new Exception(sprintf(_("Unsupported variable type %s"), get_class($value)));
+    }
   }
 
   public function processFunctions(Array $functions, Array $variables = Array(), $ignore = array()) {

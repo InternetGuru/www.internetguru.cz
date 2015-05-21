@@ -40,39 +40,8 @@ class DOMElementPlus extends DOMElement {
     else $this->setAttribute("class", $this->getAttribute("class")." $class");
   }
 
-  public function processVariables(Array $variables, $ignore = array(), $deep = false, $debug = false) {
-    $toRemove = array();
-    $r = $this->doProcessVariables($variables, $ignore, $deep, $debug, $toRemove);
-    foreach($toRemove as $e) $e->emptyRecursive();
-    return $r;
-  }
-
-  public function doProcessVariables(Array $variables, $ignore = array(), $deep = false, $debug = false, &$del) {
-    $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
-    if($debug) var_dump($variables);
-    $toInsert = array();
-    $toRemove = array();
-    foreach($this->getVariables("var", $ignoreAttr) as list($vName, $aName, $var)) {
-      if(!isset($variables[$vName])) continue;
-      try {
-        $this->removeAttrVal("var", $var);
-        if(!is_null($variables[$vName]) && !count($variables[$vName])) {
-          if(!is_null($aName)) $this->removeAttribute($aName);
-          else return false;
-        }
-        $el = $this->insertVariable($variables[$vName], $aName);
-        if(!is_null($el)) $del[] = $el;
-      } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
-      }
-    }
-    if(!$deep) return true;
-    foreach($this->childNodes as $e) {
-      if($e->nodeType != XML_ELEMENT_NODE) continue;
-      if(!$e->doProcessVariables($variables, $ignore, $deep, $debug, $del)) $del[] = $e;
-    }
-    #foreach($toRemove as $e) $e->emptyRecursive();
-    return true;
+  public function processVariables(Array $variables, $ignore = array(), $deep = false) {
+    return $this->ownerDocument->elementProcessVariables($variables, $ignore, $this, $deep);
   }
 
   public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array()) {
@@ -82,7 +51,8 @@ class DOMElementPlus extends DOMElement {
         if(is_null($f)) continue;
         $this->removeAttrVal("fn", $fn);
         $v = call_user_func($f, is_null($aName) ? $this : $this->getAttributeNode($aName));
-        $this->insertVariable($v, $aName);
+        $res = $this->ownerDocument->insertVariable($this, $v, $aName);
+        if(!$res->isSameNode($this)) $this->emptyRecursive();
       } catch(Exception $e) {
         new Logger(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
       }
@@ -90,32 +60,7 @@ class DOMElementPlus extends DOMElement {
     }
   }
 
-  public function insertVariable($value, $aName=null) {
-    if(is_null($this->parentNode)) return;
-    switch(gettype($value)) {
-      case "NULL":
-      break;
-      case "integer":
-      case "boolean":
-      $value = (string) $value;
-      case "string":
-      if(!strlen($value) && is_null($aName)) return $this;
-      return $this->insertVarString($value, $aName);
-      case "array":
-      #$this = $this->prepareIfDl($this, $varName);
-      return $this->insertVarArray($value, $aName);
-      default:
-      if($value instanceof DOMDocumentPlus) {
-        return $this->insertVarDOMElement($value->documentElement, $aName);
-      }
-      if($value instanceof DOMElement) {
-        return $this->insertVarDOMElement($value, $aName);
-      }
-      throw new Exception(sprintf(_("Unsupported variable type %s"), get_class($value)));
-    }
-  }
-
-  private function emptyRecursive() {
+  public function emptyRecursive() {
     $p = $this->parentNode;
     if(is_null($p)) return;
     $p->removeChild($this);
@@ -124,29 +69,30 @@ class DOMElementPlus extends DOMElement {
     $p->emptyRecursive();
   }
 
-  private function insertVarString($value, $aName) {
+  public function insertVarString($value, $aName) {
     if(is_null($aName)) {
       return $this->insertInnerHTML($value, "");
     }
     if(!$this->hasAttribute($aName) || $this->getAttribute($aName) == "") {
       if(strlen($value)) $this->setAttribute($aName, $value);
       elseif($this->hasAttribute($aName)) $this->removeAttribute($aName);
-      return;
+      return $this;
     }
     $temp = @sprintf($this->getAttribute($aName), $value);
     if($temp !== false && $temp != $this->getAttribute($aName)) {
       $this->setAttribute($aName, $temp);
-      return;
+      return $this;
     }
     if(!strlen($value)) {
       $this->removeAttribute($aName);
-      return;
+      return $this;
     }
     if($aName == "class") $this->addClass($value);
     else $this->setAttribute($aName, $value);
+    return $this;
   }
 
-  private function insertVarArray(Array $value, $aName) {
+  public function insertVarArray(Array $value, $aName) {
     if(!is_null($aName)) {
       return $this->insertVarString(implode(" ", $value), $aName);
     }
@@ -177,7 +123,6 @@ class DOMElementPlus extends DOMElement {
       #case "fieldset":
       default:
       throw new Exception(sprintf(_("Unable to insert array into '%s'"), $this->nodeName));
-      return;
     }
     return $this->insertInnerHTML($value, $sep);
   }
@@ -194,6 +139,8 @@ class DOMElementPlus extends DOMElement {
         $e->nodeValue = htmlspecialchars($html[$k]);
       }
     }
+    return $this->insertVarDOMElement($dom->documentElement, null);
+    /*
     if(count($html) > 1) {
       return $this->insertVarDOMElement($dom->documentElement, null);
     }
@@ -201,21 +148,23 @@ class DOMElementPlus extends DOMElement {
     foreach($dom->documentElement->firstChild->childNodes as $n) {
       $this->appendChild($this->ownerDocument->importNode($n, true));
     }
-    #var_dump($this->nodeValue);
+    */
   }
 
-  private function insertVarDOMElement(DOMElement $element, $aName) {
+  public function insertVarDOMElement(DOMElement $element, $aName) {
     if(!is_null($aName)) {
       return $this->insertVarString($element->nodeValue, $aName);
     }
-
+    $res = null;
     $var = $this->ownerDocument->importNode($element, true);
     $attributes = array();
     foreach($this->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     $nodes = array();
     foreach($var->childNodes as $n) $nodes[] = $n;
-    if(is_null($this->parentNode)) return;
+    #todo: already checked?
+    #if(is_null($this->parentNode)) return $element;
     foreach($nodes as $n) {
+      $res = $n;
       $this->parentNode->insertBefore($n, $this);
       if($n->nodeType != XML_ELEMENT_NODE) continue;
       foreach($attributes as $aName => $aValue) {
@@ -223,12 +172,10 @@ class DOMElementPlus extends DOMElement {
         $n->setAttribute($aName, $aValue);
       }
     }
-    return $this;
-    #$this->parentNode->removeChild($this);
-    # ??? $this->removeChildNodes();
+    return $res;
   }
 
-  private function getVariables($attr, Array $ignore) {
+  public function getVariables($attr, Array $ignore) {
     $variables = array();
     if(!$this->hasAttribute($attr)) return $variables;
     foreach(explode(" ", $this->getAttribute($attr)) as $var) {

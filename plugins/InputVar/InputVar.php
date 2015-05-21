@@ -39,7 +39,7 @@ class InputVar extends Plugin implements SplObserver {
   }
 
   private function processRule(DOMElement $el) {
-    $el->processVariables(Cms::getAllVariables(), array(), true);
+    $el = $el->processVariables(Cms::getAllVariables(), array(), true);
     if(!$el->hasAttribute("fn")) {
       $this->setVar($el->nodeName, $el->getAttribute("id"), $el);
       return;

@@ -85,7 +85,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     // final validation
     $contentPlus = new DOMDocumentPlus();
     $contentPlus->loadXML($content->saveXML());
-    $contentPlus->processVariables(Cms::getAllVariables());
+    #$contentPlus->processVariables(Cms::getAllVariables());
     $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
     $xPath = new DOMXPath($contentPlus);
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
