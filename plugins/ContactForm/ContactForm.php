@@ -89,7 +89,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     } catch(Exception $e) {
       $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$formIdToSend."'>"
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
-      Cms::addMessage($message, Cms::MSG_ERROR);
+      new Logger($message, Logger::LOGGER_ERROR);
     }
   }
 
