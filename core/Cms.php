@@ -59,8 +59,13 @@ class Cms {
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
     $li->setAttribute("class", strtolower($type));
-    $li->setAttribute("var", "message");
-    $li->processVariables(array("message" => $message));
+    $doc = new DOMDocumentPlus();
+    if(!@$doc->loadXML("<var>$message</var>")) {
+      $li->nodeValue = htmlspecialchars($message);
+    } else {
+      foreach($doc->documentElement->childNodes as $ch)
+        $li->appendChild($li->ownerDocument->importNode($ch, true));
+    }
   }
 
   private static function getMessages() {
