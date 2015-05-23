@@ -48,10 +48,8 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private function loadVars() {
     if(!is_file(USER_FOLDER."/".$this->pluginDir."/".get_class($this).".xml")) return;
     $userCfg = new DOMDocumentPlus();
-    $content = file_get_contents($this->userCfgPath);
-    if($content === false)
-      throw new Exception(sprintf(_("Unable to get contents from user config")));
-    $userCfg->loadXml($content);
+    if(!@$userCfg->load($this->userCfgPath))
+      throw new Exception(sprintf(_("Unable to load content from user config")));
     foreach($userCfg->documentElement->childElementsArray as $e) {
       if($e->nodeName == "var") $this->vars[$e->getAttribute("id")] = $e;
     }
