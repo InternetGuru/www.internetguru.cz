@@ -2,35 +2,163 @@
 
 #TODO: silent error support (@ sign)
 
-class InputVar extends Plugin implements SplObserver {
+class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
+  private $userCfgPath = null;
   private $contentXPath;
+  private $cfg = null;
+  private $formId = null;
+  private $vars = array();
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 1);
+    $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".get_class($this).".xml";
+    $s->setPriority($this, 5);
   }
 
   public function update(SplSubject $subject) {
-    if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
-    $dom = $this->getDOMPlus();
-    foreach($dom->documentElement->childElementsArray as $e) {
-      if(!$e->hasAttribute("id")) {
-        new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName), Logger::LOGGER_WARNING);
-        continue;
+    try {
+      if($subject->getStatus() == STATUS_POSTPROCESS) $this->processPost();
+      if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
+      if($subject->getStatus() == STATUS_INIT) $this->loadVars();
+      $this->cfg = $this->getDOMPlus();
+      foreach($this->cfg->documentElement->childElementsArray as $e) {
+        if($e->nodeName == "edit") continue;
+        if(!$e->hasAttribute("id")) {
+          new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName), Logger::LOGGER_WARNING);
+          continue;
+        }
+        switch($e->nodeName) {
+          case "var":
+          if($subject->getStatus() != STATUS_PROCESS) continue;
+          $this->processRule($e);
+          case "fn":
+          if($subject->getStatus() != STATUS_INIT) continue;
+          $this->processRule($e);
+          break;
+          default:
+          new Logger(sprintf(_("Unknown element name %s"), $e->nodeName), Logger::LOGGER_WARNING);
+        }
       }
-      switch($e->nodeName) {
-        case "var":
-        if($subject->getStatus() != STATUS_PROCESS) continue;
-        $this->processRule($e);
-        case "fn":
-        if($subject->getStatus() != STATUS_INIT) continue;
-        $this->processRule($e);
-        break;
-        default:
-        new Logger(sprintf(_("Unknown element name %s"), $e->nodeName), Logger::LOGGER_WARNING);
-      }
+    } catch(Exception $ex) {
+      new Logger($ex->getMessage(), Logger::LOGGER_ERROR);
     }
     #var_dump(Cms::getAllVariables());
+  }
+
+  private function loadVars() {
+    if(!is_file(USER_FOLDER."/".$this->pluginDir."/".get_class($this).".xml")) return;
+    $userCfg = new DOMDocumentPlus();
+    $content = file_get_contents($this->userCfgPath);
+    if($content === false)
+      throw new Exception(sprintf(_("Unable to get contents from user config")));
+    $userCfg->loadXml($content);
+    foreach($userCfg->documentElement->childElementsArray as $e) {
+      if($e->nodeName == "var") $this->vars[$e->getAttribute("id")] = $e;
+    }
+
+  }
+
+  public function getContent(HTMLPlus $content) {
+    if(!isset($_GET[get_class($this)])) return $content;
+    $newContent = $this->getHTMLPlus();
+    $this->formId = $newContent->getElementsByTagName("form")->item(0)->getAttribute("id");
+    $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
+    foreach($this->cfg->getElementsByTagName("edit") as $e) {
+      $this->createDl($newContent, $fieldset, $e);
+    }
+    $fieldset->parentNode->removeChild($fieldset);
+    $vars = array();
+    $vars["action"] = "?".get_class($this);
+    $newContent->processVariables($vars);
+    return $newContent;
+  }
+
+  private function createDl(HTMLPlus $content, DOMElementPlus $fieldset, DOMElementPlus $edit) {
+    $for = $edit->getAttribute("for");
+    $dataList = $edit->getAttribute("datalist");
+    foreach(explode(" ", $for) as $rule) {
+      $list = $this->filterVars($rule);
+      if(!count($list)) continue;
+      $doc = new DOMDocumentPlus();
+      $doc->appendChild($doc->importNode($fieldset, true));
+      $inputDoc = new DOMDocumentPlus();
+      $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
+      $dl = $inputVar->appendChild($inputDoc->createElement("dl"));
+      $dataListArray = array();
+      foreach(explode(" ", $dataList) as $d) {
+        $dataListArray = array_merge($dataListArray, $this->filterVars($d));
+      }
+      foreach($list as $v) {
+        $id = normalize(get_class($this)."-".$v->getAttribute("id"));
+        try {
+          $select = $this->createSelect($inputDoc, $dataListArray, $v->getAttribute("id"));
+        } catch(Exception $e) {
+          new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+          continue;
+        }
+        $dt = $inputDoc->createElement("dt");
+        $label = $dt->appendChild($inputDoc->createElement("label", $v->nodeValue));
+        $label->setAttribute("for", $id);
+        $dl->appendChild($dt);
+        $dd = $inputDoc->createElement("dd");
+        $dd->appendChild($select);
+        $select->setAttribute("id", $id);
+        $dl->appendChild($dd);
+      }
+      $vars["group"] = strlen($edit->nodeValue) ? $edit->nodeValue : $rule;
+      $vars["inputs"] = $inputVar;
+      $doc->processVariables($vars);
+      $fieldset->parentNode->insertBefore($content->importNode($doc->documentElement, true), $fieldset);
+    }
+  }
+
+  private function createSelect(DOMDocumentPlus $doc, Array $vars, $selectId) {
+    $select = $doc->createElement("select");
+    $select->setAttribute("name", $selectId);
+    $select->setAttribute("required", "required");
+    if(is_null($this->vars[$selectId]->firstElement) ||
+      !$this->vars[$selectId]->firstElement->hasAttribute("var")) {
+      throw new Exception(sprintf(_("Variable %s missing inner element with attribute var"), $selectId));
+    }
+    $selected = substr($this->vars[$selectId]->firstElement->getAttribute("var"), strlen(get_class($this))+1);
+    foreach($vars as $v) {
+      $id = $v->getAttribute("id");
+      $value = strlen($v->nodeValue) ? $v->nodeValue : $id;
+      $option = $doc->appendChild($doc->createElement("option", $value));
+      $option->setAttribute("value", $id);
+      if($id == $selected) $option->setAttribute("selected", "selected");
+      $select->appendChild($option);
+    }
+    return $select;
+  }
+
+  private function filterVars($rule) {
+    $r = array();
+    foreach($this->vars as $v) {
+      $id = $v->getAttribute("id");
+      if(!@preg_match("/^".$rule."$/", $id)) continue;
+      $r[] = $v;
+    }
+    return $r;
+  }
+
+  private function processPost() {
+    if(!is_file(USER_FOLDER."/".$this->pluginDir."/".get_class($this).".xml")) return;
+    $req = Cms::getVariable("validateform-".$this->formId);
+    if(is_null($req)) return;
+    $var = null;
+    foreach($req as $k => $v) {
+      if(isset($this->vars[$k])) {
+        if(is_null($this->vars[$k]->firstElement)) continue;
+        $var = $this->vars[$k];
+        $this->vars[$k]->firstElement->setAttribute("var", normalize(get_class($this)."-$v"));
+      }
+    }
+    if(@$var->ownerDocument->save($this->userCfgPath) === false)
+      throw new Exception(_("Unabe to save user config"));
+    if(!IS_LOCALHOST) clearNginxCache();
+    Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, true);
+    redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => get_class($this)), true));
   }
 
   private function setVar($var, $name, $value) {

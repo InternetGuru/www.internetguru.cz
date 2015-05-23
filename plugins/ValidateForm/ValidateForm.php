@@ -106,7 +106,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       }
       break;
       case "select":
-      #todo
+      $this->verifyText($value, $pattern, $req);
       break;
     }
   }
