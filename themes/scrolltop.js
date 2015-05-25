@@ -4,6 +4,7 @@
   Config.wrapperId = "scrolltop"; // wrapper element (a) id value
   Config.time = 250; // int ms to scroll
   Config.text = "^"; // text content
+  Config.title = "Nahoru"; // text content
   Config.hidePosition = 200; // display / hide button int px from top
 
    var ScrollTop = function() {
@@ -22,9 +23,11 @@
         }
       },
       appendStyle = function() {
+        /* scrolltop.js */
         var css = '/* scrolltop.js */'
-          + 'a#scrolltop { position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; cursor: pointer }'
-          + 'a#scrolltop span { position: relative; top: -0.1em; }'
+          + 'a#scrolltop { font-family: "Times New Roman" serif; position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; cursor: pointer }'
+          + 'a#scrolltop:hover { background: rgba(0, 0, 0, 0.65) }'
+          + 'a#scrolltop span { position: relative; top: -0.05em; font-size: 2.3rem; }'
           + 'a#scrolltop.scrollhide { display: none; }';
           var style = document.getElementsByTagName('style')[0];
         if(style == undefined) {
@@ -67,6 +70,7 @@
       createButton = function() {
         button = document.createElement("a");
         button.id = Config.wrapperId;
+        button.title = Config.title;
         var span = document.createElement("span");
         span.innerHTML = Config.text;
         button.appendChild(span);
