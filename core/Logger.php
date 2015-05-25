@@ -17,7 +17,7 @@ class Logger {
       self::LOGGER_WARNING,
       self::LOGGER_SUCCESS))) $type = self::LOGGER_INFO;
     if($cmsMsg && Cms::isSuperUser()) {
-      Cms::addMessage("$message [".self::getCaller()."]", $type, Cms::isForceFlash());
+      Cms::addMessage("$message [".self::getCaller()."]", $type);
     }
     if(Cms::getLoggedUser() == "server") return;
     self::doLog($ext, $duration, $message, $type);

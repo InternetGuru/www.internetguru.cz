@@ -76,9 +76,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendCssFiles($head);
     $html->appendChild($head);
 
-    // no more direct system messages
-    Cms::setForceFlash();
-
     // apply transformations
     $content = $this->applyTransformations($content);
 

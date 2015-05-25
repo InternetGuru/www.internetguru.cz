@@ -150,6 +150,7 @@ try {
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
+  Cms::getMessages();
   Cms::contentProcessVariables();
   echo Cms::getOutput();
   new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time, false);
