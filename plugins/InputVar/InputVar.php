@@ -22,7 +22,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       if($subject->getStatus() == STATUS_INIT) $this->loadVars();
       $this->cfg = $this->getDOMPlus();
       foreach($this->cfg->documentElement->childElementsArray as $e) {
-        if($e->nodeName == "edit") continue;
+        if($e->nodeName == "set") continue;
         if(!$e->hasAttribute("id")) {
           new Logger(sprintf(_("Missing attribute id in element %s"), $e->nodeName), Logger::LOGGER_WARNING);
           continue;
@@ -61,8 +61,12 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $newContent = $this->getHTMLPlus();
     $this->formId = $newContent->getElementsByTagName("form")->item(0)->getAttribute("id");
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
-    foreach($this->cfg->getElementsByTagName("edit") as $e) {
-      $this->createDl($newContent, $fieldset, $e);
+    foreach($this->cfg->getElementsByTagName("set") as $e) {
+      if(!$e->hasAttribute("type")) {
+        new Logger(_("Element fieldset missing attribute type"), Logger::LOGGER_WARNING);
+        continue;
+      }
+      $this->createFieldset($newContent, $fieldset, $e);
     }
     $fieldset->parentNode->removeChild($fieldset);
     $vars = array();
@@ -71,43 +75,97 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     return $newContent;
   }
 
-  private function createDl(HTMLPlus $content, DOMElementPlus $fieldset, DOMElementPlus $edit) {
-    $for = $edit->getAttribute("for");
-    $dataList = $edit->getAttribute("datalist");
+  private function createFieldset(HTMLPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set) {
+    switch($set->getAttribute("type")) {
+      case "text":
+      case "select":
+      $this->createFs($content, $fieldset, $set, $set->getAttribute("type"));
+      break;
+      default:
+      new Logger(sprintf(_("Element fieldset uknown type %s"), $set->getAttribute("type")), Logger::LOGGER_WARNING);
+    }
+  }
+
+  private function createFs(DOMDocumentPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set, $type) {
+    $for = $set->getAttribute("for");
     foreach(explode(" ", $for) as $rule) {
+      $inputVar = null;
       $list = $this->filterVars($rule);
       if(!count($list)) continue;
       $doc = new DOMDocumentPlus();
       $doc->appendChild($doc->importNode($fieldset, true));
-      $inputDoc = new DOMDocumentPlus();
-      $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
-      $dl = $inputVar->appendChild($inputDoc->createElement("dl"));
-      $dataListArray = array();
-      foreach(explode(" ", $dataList) as $d) {
-        $dataListArray = array_merge($dataListArray, $this->filterVars($d));
+      switch($type) {
+        case "text":
+        $inputVar = $this->createTextFs($list, $set, $rule);
+        break;
+        case "select":
+        $inputVar = $this->createSelectFs($list, $set);
+        break;
+        default:
+        // double check?
+        return;
       }
-      foreach($list as $v) {
-        $id = normalize(get_class($this)."-".$v->getAttribute("id"));
-        try {
-          $select = $this->createSelect($inputDoc, $dataListArray, $v->getAttribute("id"));
-        } catch(Exception $e) {
-          new Logger($e->getMessage(), Logger::LOGGER_WARNING);
-          continue;
-        }
-        $dt = $inputDoc->createElement("dt");
-        $label = $dt->appendChild($inputDoc->createElement("label", $v->nodeValue));
-        $label->setAttribute("for", $id);
-        $dl->appendChild($dt);
-        $dd = $inputDoc->createElement("dd");
-        $dd->appendChild($select);
-        $select->setAttribute("id", $id);
-        $dl->appendChild($dd);
+      if(is_null($inputVar)) {
+        new Logger(sprintf(_("Cannot create fieldset for %s"), $rule), Logger::LOGGER_WARNING); // never happend?
+        continue;
       }
-      $vars["group"] = strlen($edit->nodeValue) ? $edit->nodeValue : $rule;
+      $vars["group"] = strlen($set->nodeValue) ? $set->nodeValue : $rule;
       $vars["inputs"] = $inputVar;
       $doc->processVariables($vars);
       $fieldset->parentNode->insertBefore($content->importNode($doc->documentElement, true), $fieldset);
     }
+  }
+
+  private function createSelectFs(Array $list, DOMElementPlus $set) {
+    $inputDoc = new DOMDocumentPlus();
+    $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
+    $dl = $inputVar->appendChild($inputDoc->createElement("dl"));
+    $dataListArray = array();
+    foreach(explode(" ", $set->getAttribute("datalist")) as $d) {
+      $dataListArray = array_merge($dataListArray, $this->filterVars($d));
+    }
+    foreach($list as $v) {
+      $id = normalize(get_class($this)."-".$v->getAttribute("id"));
+      try {
+        $select = $this->createSelect($inputDoc, $dataListArray, $v->getAttribute("id"));
+      } catch(Exception $e) {
+        new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+        continue;
+      }
+      $dt = $inputDoc->createElement("dt");
+      $label = $dt->appendChild($inputDoc->createElement("label", $v->nodeValue));
+      $label->setAttribute("for", $id);
+      $dl->appendChild($dt);
+      $dd = $inputDoc->createElement("dd");
+      $dd->appendChild($select);
+      $select->setAttribute("id", $id);
+      $dl->appendChild($dd);
+    }
+    return $inputVar;
+  }
+
+  // todo refactor: neopakovat kod ...
+  private function createTextFs(Array $list, DOMElementPlus $set, $rule) {
+    $inputDoc = new DOMDocumentPlus();
+    $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
+    $dl = $inputVar->appendChild($inputDoc->createElement("dl"));
+    foreach($list as $v) {
+      $id = normalize(get_class($this)."-".$v->getAttribute("id"));
+      $dt = $inputDoc->createElement("dt");
+      $label = $dt->appendChild($inputDoc->createElement("label", $v->getAttribute("id")));
+      $label->setAttribute("for", $id);
+      $dl->appendChild($dt);
+      $dd = $inputDoc->createElement("dd");
+      $text = $dd->appendChild($inputDoc->createElement("input"));
+      $text->setAttribute("type", "text");
+      $text->setAttribute("id", $id);
+      $text->setAttribute("name", $v->getAttribute("id"));
+      $text->setAttribute("value", $v->nodeValue);
+      if($set->hasAttribute("pattern")) $text->setAttribute("pattern", $set->getAttribute("pattern"));
+      $dd->appendChild($text);
+      $dl->appendChild($dd);
+    }
+    return $inputVar;
   }
 
   private function createSelect(DOMDocumentPlus $doc, Array $vars, $selectId) {
@@ -147,9 +205,11 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $var = null;
     foreach($req as $k => $v) {
       if(isset($this->vars[$k])) {
-        if(is_null($this->vars[$k]->firstElement)) continue;
+        if(!is_null($this->vars[$k]->firstElement))
+          $this->vars[$k]->firstElement->setAttribute("var", normalize(get_class($this)."-$v"));
+        else
+          $this->vars[$k]->nodeValue = $v;
         $var = $this->vars[$k];
-        $this->vars[$k]->firstElement->setAttribute("var", normalize(get_class($this)."-$v"));
       }
     }
     if(@$var->ownerDocument->save($this->userCfgPath) === false)
@@ -211,6 +271,11 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       case "sprintf":
       $fn = $this->createFnSprintf($id, $el->nodeValue);
       break;
+      case "pregreplace":
+      $pattern = $el->hasAttribute("pattern") ? $el->getAttribute("pattern") : null;
+      $replacement = $el->hasAttribute("replacement") ? $el->getAttribute("replacement") : null;
+      $fn = $this->createFnPregReplace($id, $pattern, $replacement);
+      break;
       case "replace":
       $tr = array();
       foreach($el->childElementsArray as $d) {
@@ -259,6 +324,14 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       $value = $node->nodeValue;
       $date = trim(strftime($format, strtotime($value)));
       return $date ? $date : $value;
+    };
+  }
+
+  private function createFnPregReplace($id, $pattern, $replacement) {
+    if(is_null($pattern)) throw new Exception(_("No pattern found"));
+    if(is_null($replacement)) throw new Exception(_("No replacement found"));
+    return function(DOMNode $node) use ($pattern, $replacement) {
+      return preg_replace("/^(?:".$pattern.")$/", $replacement, $node->nodeValue);
     };
   }
 
