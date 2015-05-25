@@ -161,7 +161,10 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       $text->setAttribute("id", $id);
       $text->setAttribute("name", $v->getAttribute("id"));
       $text->setAttribute("value", $v->nodeValue);
-      if($set->hasAttribute("pattern")) $text->setAttribute("pattern", $set->getAttribute("pattern"));
+      if($set->hasAttribute("placeholder"))
+        $text->setAttribute("placeholder", $set->getAttribute("placeholder"));
+      if($set->hasAttribute("pattern"))
+        $text->setAttribute("pattern", $set->getAttribute("pattern"));
       $dd->appendChild($text);
       $dl->appendChild($dd);
     }
