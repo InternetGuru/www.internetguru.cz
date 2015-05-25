@@ -13,7 +13,7 @@ class Agregator extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    if(self::DEBUG) new Logger("DEBUG");
+    if(self::DEBUG) Logger::log("DEBUG");
     $s->setPriority($this, 2);
     $this->edit = _("Edit");
   }
@@ -33,7 +33,7 @@ class Agregator extends Plugin implements SplObserver {
         $this->createHtmlVar($subDir, $files);
       }
     } catch(Exception $e) {
-      new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+      Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
       return;
     }
     #$filesList = $this->createList(FILES_FOLDER);
@@ -228,7 +228,7 @@ class Agregator extends Plugin implements SplObserver {
       try {
         $doc = DOMBuilder::buildHTMLPlus($filePath);
       } catch(Exception $e) {
-        new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
         continue;
       }
       $vars[$filePath] = $this->getHTMLVariables($doc, $file);
@@ -256,7 +256,7 @@ class Agregator extends Plugin implements SplObserver {
     foreach($this->cfg->documentElement->childElementsArray as $html) {
       if($html->nodeName != "html") continue;
       if(!$html->hasAttribute("id")) {
-        new Logger(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
+        Logger::log(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
         continue;
       }
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
@@ -277,7 +277,7 @@ class Agregator extends Plugin implements SplObserver {
         $reverse = $html->hasAttribute("rsort");
         $userKey = $html->hasAttribute("sort") ? $html->getAttribute("sort") : $html->getAttribute("rsort");
         if(!array_key_exists($userKey, current($vars))) {
-          new Logger(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
+          Logger::log(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
         } else {
           self::$sortKey = $userKey;
         }
@@ -293,7 +293,7 @@ class Agregator extends Plugin implements SplObserver {
         );
         $this->storeCache($cacheKey, $var, $vName);
       } catch(Exception $e) {
-        new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
         continue;
       }
     }
@@ -301,7 +301,7 @@ class Agregator extends Plugin implements SplObserver {
 
   private function storeCache($key, $value, $name) {
     $stored = apc_store($key, $value, rand(3600*24*30*3, 3600*24*30*6));
-    if(!$stored) new Logger(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
+    if(!$stored) Logger::log(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
   }
 
   private function isValidCached($key, $value) {
@@ -338,7 +338,7 @@ class Agregator extends Plugin implements SplObserver {
         $patterns[$item->getAttribute("since")-1] = $item;
       else $patterns[] = $item;
     }
-    if($nonItemElement) new Logger(sprintf(_("Redundant element(s) found in %s"), $id), Logger::LOGGER_WARNING);
+    if($nonItemElement) Logger::log(sprintf(_("Redundant element(s) found in %s"), $id), Logger::LOGGER_WARNING);
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
     $pattern = null;

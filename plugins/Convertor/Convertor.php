@@ -109,7 +109,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
     $this->file = "$f.html";
     if(@file_put_contents($this->tmpFolder."/$f.html", $this->html) !== false) return;
-    new Logger(sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f), "error");
+    Logger::log(sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f), "error");
   }
 
   private function parseContent(HTMLPlus $doc, $eName, $aName) {

@@ -89,7 +89,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     } catch(Exception $e) {
       $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$formIdToSend."'>"
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
-      new Logger($message, Logger::LOGGER_ERROR);
+      Logger::log($message, Logger::LOGGER_ERROR);
     }
   }
 
@@ -161,10 +161,10 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(strlen($bcc)) $mail->addBCC($bcc, '');
-    new Logger(sprintf(_("Sending mail: to=%s<%s>; replyto=%s<%s>; bcc=%s; subject=%s; msg=%s"),
+    Logger::log(sprintf(_("Sending mail: to=%s<%s>; replyto=%s<%s>; bcc=%s; subject=%s; msg=%s"),
       $mailtoname, $mailto, $replytoname, $replyto, $bcc, $mail->Subject, $msg), null, null, null, "mail");
     if(!$mail->send()) throw new Exception($mail->ErrorInfo);
-    new Logger(sprintf(_("E-mail successfully sent to %s"), $mailto));
+    Logger::log(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }
 
   private function createGlobalVars() {
@@ -185,7 +185,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           break;
         }
       } catch(Exception $ex) {
-        new Logger(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
+        Logger::log(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
       }
     }
     if(self::DEBUG) $this->vars["adminaddr"] = "debug@somedomain.cz";
@@ -227,7 +227,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 7);
       }
       if($e->nodeName == "input" && !$e->hasAttribute("type")) {
-        new Logger(_("Element input missing attribute type skipped"), Logger::LOGGER_WARNING);
+        Logger::log(_("Element input missing attribute type skipped"), Logger::LOGGER_WARNING);
         continue;
       }
       $this->formItems[] = $e;

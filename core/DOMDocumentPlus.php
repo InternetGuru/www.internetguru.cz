@@ -4,7 +4,7 @@ class DOMDocumentPlus extends DOMDocument {
   const DEBUG = false;
 
   function __construct($version="1.0", $encoding="utf-8") {
-    if(self::DEBUG) new Logger("DEBUG");
+    if(self::DEBUG) Logger::log("DEBUG");
     parent::__construct($version, $encoding);
     $r = $this->registerNodeClass("DOMElement", "DOMElementPlus");
   }
@@ -38,12 +38,12 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function insertVar($varName, $varValue, $element=null) {
-    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 
   public function insertFn($varName, $varValue, $element=null) {
-    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 
@@ -72,7 +72,7 @@ class DOMDocumentPlus extends DOMDocument {
         }
         $res = $this->insertVariable($element, $variables[$vName], $aName);
       } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
+        Logger::log(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
       }
     }
     if($deep) foreach($element->childNodes as $e) {
@@ -130,7 +130,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function validatePlus($repair = false) {
-    new Logger(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 

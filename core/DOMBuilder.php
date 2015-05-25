@@ -131,7 +131,7 @@ class DOMBuilder {
       if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
         self::updateDOM($doc, $f, true);
     } catch(Exception $e) {
-      new Logger(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      Logger::log(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
@@ -142,7 +142,7 @@ class DOMBuilder {
       if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
         self::updateDOM($doc, $f);
     } catch(Exception $e) {
-      new Logger(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      Logger::log(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
   }
@@ -169,7 +169,7 @@ class DOMBuilder {
       try {
         self::loadDOM($f, $doc, null);
       } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()), Logger::LOGGER_ERROR);
+        Logger::log(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
       }
       $success = true;
@@ -225,7 +225,7 @@ class DOMBuilder {
       $doc->validatePlus(true);
       $storeCache = false;
       if(strpos($filePath, CMS_FOLDER) !== 0) {
-        new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+        Logger::log(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
       }
     }
     // generate ctime/mtime from file if not set
@@ -262,7 +262,7 @@ class DOMBuilder {
       "xml" => $doc->saveXML()
     );
     $stored = apc_store($cacheKey, $fInfo, rand(3600*24*30*3, 3600*24*30*6));
-    if(!$stored) new Logger(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
+    if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
   }
 
   private static function getCache($cacheKey, $filePath) {
@@ -283,7 +283,7 @@ class DOMBuilder {
     #if(empty(self::$idToLink)) $prefix = "";
     if(array_key_exists($prefix, self::$idToLink)) {
       $prefix = self::generateUniqueVal($prefix, self::$idToLink);
-      new Logger(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
+      Logger::log(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
         $fShort, $prefix), Logger::LOGGER_WARNING);
       $h1->setAttribute("link", $prefix);
       $storeCache = false;
@@ -335,7 +335,7 @@ class DOMBuilder {
       }
       if(empty(self::$linkToId)) $linkId = "";
       if(array_key_exists($linkId, self::$linkToId)) {
-        new Logger(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
+        Logger::log(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
         $storeCache = false;
         continue;
       }
@@ -393,7 +393,7 @@ class DOMBuilder {
         $toStripElement[] = $include;
       } catch(Exception $e) {
         $toStripTag[] = $include;
-        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
       }
     }
     foreach($toStripTag as $include) $include->stripTag();
@@ -425,7 +425,7 @@ class DOMBuilder {
     $sectLang = self::getSectionLang($include->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
+      Logger::log(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
         $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
     $impAuthor = $doc->documentElement->firstElement->getAttribute("author");
     if($impAuthor == $author)
@@ -437,7 +437,7 @@ class DOMBuilder {
       $include->ownerDocument->validatePlus();
     } catch(Exception $e) {
       $include->ownerDocument->validatePlus(true);
-      new Logger(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
+      Logger::log(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }
   }
 

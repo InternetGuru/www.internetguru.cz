@@ -13,12 +13,12 @@ class FileHandler extends Plugin implements SplObserver {
     if($subject->getStatus() != STATUS_PREINIT) return;
     Cms::setVariable("cfcurl", getCurLink()."?clearfilecache");
     if(!is_null(Cms::getLoggedUser()) && isset($_GET["clearfilecache"])) {
-      if(!Cms::isSuperUser()) new Logger(_("Insufficient rights to purge file cache"), Logger::LOGGER_WARNING);
+      if(!Cms::isSuperUser()) Logger::log(_("Insufficient rights to purge file cache"), Logger::LOGGER_WARNING);
       try {
         $this->deleteResources();
-        new Logger(_("Outdated files successfully removed"), Logger::LOGGER_SUCCESS);
+        Logger::log(_("Outdated files successfully removed"), Logger::LOGGER_SUCCESS);
       } catch(Exception $e) {
-        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
       }
     }
     if(!preg_match("/".FILEPATH_PATTERN."/", getCurLink())) return;

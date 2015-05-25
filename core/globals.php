@@ -30,7 +30,7 @@ function createSymlink($link, $target) {
     throw new Exception(sprintf(_("Unable to create symlink '%s'"), $link));
   #if($restart && !touch(APACHE_RESTART_FILEPATH))
   if(!$restart) return;
-  new Logger(_("Symlink changed; may take time to apply"), Logger::LOGGER_WARNING);
+  Logger::log(_("Symlink changed; may take time to apply"), Logger::LOGGER_WARNING);
 }
 
 function replaceVariables($string, Array $variables, $varPrefix=null) {
@@ -49,7 +49,7 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
       $vName = $varPrefix.$vName;
       if(!array_key_exists($vName, $variables)) {
         if(strpos($v, "@") !== 0)
-          new Logger(sprintf(_("Variable '%s' does not exist"), $vName), Logger::LOGGER_WARNING);
+          Logger::log(sprintf(_("Variable '%s' does not exist"), $vName), Logger::LOGGER_WARNING);
         $newString .= $v;
         continue;
       }
@@ -59,7 +59,7 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
     elseif($value instanceof DOMElementPlus) $value = $value->nodeValue;
     elseif(!is_string($value)) {
       if(strpos($v, "@") !== 0)
-        new Logger(sprintf(_("Variable '%s' is not string"), $vName), Logger::LOGGER_WARNING);
+        Logger::log(sprintf(_("Variable '%s' is not string"), $vName), Logger::LOGGER_WARNING);
       $newString .= $v;
       continue;
     }
@@ -86,10 +86,10 @@ function redirTo($link, $code=null, $msg=null) {
   if(!strlen($link)) {
     $link = ROOT_URL;
     if(class_exists("Logger"))
-      new Logger(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING);
+      Logger::log(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING);
   }
   if(class_exists("Logger"))
-    new Logger(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
+    Logger::log(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
   #var_dump($link); die();
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
@@ -114,7 +114,7 @@ function implodeLink(Array $p, $query=true) {
 
 function parseLocalLink($link, $host=null) {
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerExceptoin(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
   if(isset($pLink["path"])) $pLink["path"] = trim($pLink["path"], "/");
   if(isset($pLink["scheme"])) {
@@ -267,7 +267,7 @@ function duplicateDir($dir, $deep=true) {
   $bakDir = $info["dirname"]."/~".$info["basename"];
   copyFiles($dir, $bakDir, $deep);
   deleteRedundantFiles($bakDir, $dir);
-  #new Logger("Active data backup updated");
+  #Logger::log("Active data backup updated");
   return $bakDir;
 }
 

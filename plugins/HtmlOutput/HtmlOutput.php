@@ -20,7 +20,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $s->setPriority($this, 1000);
     $this->favIcon = $this->pluginDir."/".self::FAVICON;
     Cms::setOutputStrategy($this);
-    if(self::DEBUG) new Logger("DEBUG");
+    if(self::DEBUG) Logger::log("DEBUG");
   }
 
   public function update(SplSubject $subject) {
@@ -119,7 +119,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
         $content = $newContent;
       } catch(Exception $e) {
-        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
       } finally {
         #unset($this->transformations[$xslt]);
         #unset($this->transformationsPriority[$xslt]);
@@ -142,7 +142,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($toStrip as $e) {
       $m = sprintf(_("Removed duplicit id %s"), $e->getAttribute("id"));
       $e->stripAttr("id", $m);
-      new Logger($m, Logger::LOGGER_WARNING);
+      Logger::log($m, Logger::LOGGER_WARNING);
     }
     return $ids;
   }
@@ -160,7 +160,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           if(Cms::isSuperUser() && $eName == "object" && is_file($pUrl["path"])) {
             $mimeType = getFileMime($pUrl["path"]);
             if($a->getAttribute("type") != $mimeType)
-              new Logger(sprintf(_("Object %s attribute type invalid or missing: %s"), $pUrl["path"], $mimeType), Logger::LOGGER_ERROR);
+              Logger::log(sprintf(_("Object %s attribute type invalid or missing: %s"), $pUrl["path"], $mimeType), Logger::LOGGER_ERROR);
           }
           $a->setAttribute($aName, ROOT_URL.$pUrl["path"]);
           continue;
@@ -237,15 +237,15 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $dataFile, $mime));
         if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
           $o->setAttribute("type", $mime);
-          new Logger(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime), Logger::LOGGER_WARNING);
+          Logger::log(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime), Logger::LOGGER_WARNING);
         }
         if(array_key_exists("full", $query)) {
           unset($query["full"]);
           $o->setAttribute("data", $pUrl["path"].buildQuery($query));
-          new Logger(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile), Logger::LOGGER_WARNING);
+          Logger::log(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile), Logger::LOGGER_WARNING);
         }
       } catch(Exception $e) {
-        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
         $toStrip[] = array($o, $e->getMessage());
       }
     }
@@ -266,11 +266,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       throw new Exception("invalid object '$filePath' mime type '$mime'");
     if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
       $o->setAttribute("type", $mime);
-      new Logger("Object '$filePath' attr type set to '".$mime."'", "warning");
+      Logger::log("Object '$filePath' attr type set to '".$mime."'", "warning");
     }
     $size = (int) $headers["Content-Length"];
     if(!$size || $size > 350*1024) {
-      new Logger("Object '$filePath' too big or invalid size ".fileSizeConvert($size), "warning");
+      Logger::log("Object '$filePath' too big or invalid size ".fileSizeConvert($size), "warning");
     }
   }
   */
@@ -297,7 +297,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       } elseif(is_array($v)) {
         $s = implode(", ", $v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
-        new Logger(sprintf(_("Unable to convert variable '%s' to string"), $k), Logger::LOGGER_ERROR);
+        Logger::log(sprintf(_("Unable to convert variable '%s' to string"), $k), Logger::LOGGER_ERROR);
         continue;
       } else {
         $s = (string) $v;
@@ -329,7 +329,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if(!is_null($theme)) {
       $themeId = $theme->nodeValue;
       $t = $cfg->getElementById($themeId);
-      if(is_null($t)) new Logger(sprintf(_("Theme '%s' not found"), $themeId), Logger::LOGGER_ERROR);
+      if(is_null($t)) Logger::log(sprintf(_("Theme '%s' not found"), $themeId), Logger::LOGGER_ERROR);
       else $this->addThemeFiles($t);
     }
 
@@ -374,7 +374,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           $this->favIcon = $n->nodeValue;
         }
       } catch(Exception $e) {
-        new Logger(sprintf(_("File %s of type %s not found"), $n->nodeValue, $n->nodeName), Logger::LOGGER_WARNING);
+        Logger::log(sprintf(_("File %s of type %s not found"), $n->nodeValue, $n->nodeName), Logger::LOGGER_WARNING);
       }
     }
   }
@@ -426,7 +426,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if(!strlen($f)) {
       $comment = sprintf(_("Link [%s] file '%s' not found"), $rel, $file);
       $parent->appendChild(new DOMComment(" $comment "));
-      new Logger($comment, Logger::LOGGER_ERROR);
+      Logger::log($comment, Logger::LOGGER_ERROR);
       return;
     }
     */
@@ -492,7 +492,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     Cms::addVariableItem("transformations", $filePath);
     #if(findFile($filePath, $user) === false) throw new Exception();
     if(!$user && is_file(USER_FOLDER."/".$filePath))
-      new Logger(sprintf(_("File %s modification is disabled"), $filePath), Logger::LOGGER_WARNING);
+      Logger::log(sprintf(_("File %s modification is disabled"), $filePath), Logger::LOGGER_WARNING);
     $this->transformations[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,
@@ -517,7 +517,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         if($f === false) {
           $comment = sprintf(_("Javascript file '%s' not found"), $k);
           $parent->appendChild(new DOMComment(" $comment "));
-          new Logger($comment, Logger::LOGGER_ERROR);
+          Logger::log($comment, Logger::LOGGER_ERROR);
           continue;
         }
       }

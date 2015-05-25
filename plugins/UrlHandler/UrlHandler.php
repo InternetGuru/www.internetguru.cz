@@ -40,7 +40,7 @@ class UrlHandler extends Plugin implements SplObserver {
         $pLink = DOMBuilder::normalizeLink($pLink);
         redirTo(buildLocalUrl($pLink));
       } catch(Exception $e) {
-        new Logger($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
       }
     }
   }

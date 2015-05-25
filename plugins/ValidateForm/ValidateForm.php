@@ -21,7 +21,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     foreach($xpath->query("//form") as $form) {
       if(!$form->hasClass("validable")) continue;
       if(!$form->hasAttribute("id")) {
-        new Logger(_("Validable form missing attribute id"));
+        Logger::log(_("Validable form missing attribute id"));
         continue;
       }
       $id = $form->getAttribute("id");
@@ -120,7 +120,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     if(!strlen($pattern)) return;
     $res = @preg_match("/^(?:$pattern)$/", $value);
     if($res === false) {
-      new Logger(_("Invalid item pattern"), Logger::LOGGER_WARNING);
+      Logger::log(_("Invalid item pattern"), Logger::LOGGER_WARNING);
       return;
     }
     if($res === 1) return;
