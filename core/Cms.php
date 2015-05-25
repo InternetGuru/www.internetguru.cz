@@ -182,7 +182,8 @@ class Cms {
       $_SESSION["cms"]["flash"][$type][] = $message;
       return;
     }
-    // TODO ?
+    if(is_null(self::$flashList)) self::createFlashList();
+    self::addFlashItem($message, $type);
   }
 
   public static function getVariable($name) {
