@@ -1,7 +1,5 @@
 <?php
 
-#todo: files list, next/prev
-
 class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $logFiles;

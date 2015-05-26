@@ -1,7 +1,5 @@
 <?php
 
-#TODO: silent error support (@ sign)
-
 class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private $userCfgPath = null;
   private $contentXPath;
@@ -144,7 +142,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     return $inputVar;
   }
 
-  // todo refactor: neopakovat kod ...
+  # todo refactor: neopakovat kod ...
   private function createTextFs(Array $list, DOMElementPlus $set, $rule) {
     $inputDoc = new DOMDocumentPlus();
     $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));

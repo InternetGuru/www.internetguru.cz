@@ -1,14 +1,5 @@
 <?php
 
-#TODO: more textarea support (js)
-#TODO: alt+.to end an element
-#TODO: search result jump to first occurence
-#TODO: search zero match found message!
-#TODO: replace (ctrl+h) buttons color
-
-#fixme: moving up/down changes word wrapping (issue 13)
-#https://bitbucket.org/igwr/cms/issue/13/codemirror-changing-word-wrap
-
 class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
   const CM_DIR = "CodeMirror";

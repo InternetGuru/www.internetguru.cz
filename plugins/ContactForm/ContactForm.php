@@ -1,8 +1,5 @@
 <?php
 
-#todo: invalid admin e-mail address warning
-#todo: checkbox default value = trim first label
-
 class ContactForm extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;

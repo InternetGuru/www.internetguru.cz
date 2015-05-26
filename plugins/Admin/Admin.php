@@ -1,9 +1,5 @@
 <?php
 
-#TODO: js button 'copy default to user'
-#TODO: js warning if saving inactive file
-#TODO: enable to use readonly?
-
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const STATUS_NEW = 0;
   const STATUS_ENABLED = 1;
@@ -125,8 +121,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $files= array();
     foreach ($paths as $path => $prefix) $files = array_unique(array_merge($files, $this->getFilesRecursive($path, $prefix)));
     foreach ($files as $k => $f) if(!preg_match("/(\.html|\.xml|\.xsl)$/", $f)) unset($files[$k]);
-    $files = array_merge($files, Cms::getVariable("htmloutput-javascripts")); // TODO dávat do proměnné unikátně
-    $files = array_merge($files, Cms::getVariable("htmloutput-styles")); // TODO dávat do proměnné unikátně
+    $files = array_merge($files, Cms::getVariable("htmloutput-javascripts"));
+    $files = array_merge($files, Cms::getVariable("htmloutput-styles"));
 
     $dom = new DOMDocumentPlus();
     $var = $dom->createElement("var");

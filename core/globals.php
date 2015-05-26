@@ -5,7 +5,6 @@ function __autoload($className) {
   if(@include $fp) return;
   $fc = CORE_FOLDER."/$className.php";
   if(@include $fc) return;
-  #todo: log shortPath
   throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
 }
 
@@ -18,7 +17,6 @@ function findFile($filePath, $user=true, $admin=true, $res=true) {
   if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
   if($res && is_file($filePath)) return $filePath;
   if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
-  #todo: return null (keep type)
   return false;
 }
 
@@ -198,7 +196,6 @@ function buildQuery($pQuery, $questionMark=true) {
   return ($questionMark ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
-#fixme: ů to u not working?
 function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
   if($convertToUtf8) $s = utf8_encode($s);
   if($tolower) $s = mb_strtolower($s, "utf-8");

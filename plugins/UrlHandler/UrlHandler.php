@@ -1,8 +1,5 @@
 <?php
 
-#TODO: keep missing url_parts from var->nodeValue
-#TODO: user redir in preinit
-
 class UrlHandler extends Plugin implements SplObserver {
   const DEBUG = false;
 
@@ -45,7 +42,6 @@ class UrlHandler extends Plugin implements SplObserver {
     }
   }
 
-  #todo: simplify parse_str()
   private function alterQuery($query, $pNam) {
     $param = array();
     foreach(explode("&", $query) as $p) {
@@ -58,7 +54,6 @@ class UrlHandler extends Plugin implements SplObserver {
     return implode("&", $query);
   }
 
-  #todo: simplify $_GET
   private function queryMatch($pNam, $pVal) {
     foreach(explode("&", getCurQuery()) as $q) {
       if(is_null($pVal) && strpos("$q=", "$pNam=") === 0) return true;

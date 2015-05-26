@@ -1,9 +1,5 @@
 <?php
 
-#todo: export
-#todo: support file upload
-#todo: js copy content to clipboard
-#todo: get real creation date?
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
