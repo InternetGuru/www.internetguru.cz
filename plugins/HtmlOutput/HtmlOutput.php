@@ -10,6 +10,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private $transformationsPriority = array();
   private $transformations = array();
   private $favIcon = null;
+  private $cfg = null;
   const APPEND_HEAD = "head";
   const APPEND_BODY = "body";
   const FAVICON = "favicon.ico";
@@ -25,8 +26,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
-    $cfg = $this->getDOMPlus();
-    $this->registerThemes($cfg);
+    $this->cfg = $this->getDOMPlus();
+    $this->registerThemes($this->cfg);
   }
 
   /**
@@ -67,7 +68,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    $this->appendMeta($head, "robots", "all");
+    $robots = $this->cfg->getElementById("robots");
+    $this->appendMeta($head, "robots", $robots->nodeValue);
     $this->copyToRoot(findFile($this->favIcon), self::FAVICON);
     $this->appendLinkElement($head, self::FAVICON, "shortcut icon");
     $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");

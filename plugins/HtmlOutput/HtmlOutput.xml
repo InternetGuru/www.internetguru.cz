@@ -48,4 +48,7 @@
 
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
+
+  <var id="robots" modifyonly="modifyonly">all</var>
+
 </HtmlOutput>
