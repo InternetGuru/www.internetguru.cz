@@ -84,10 +84,10 @@ function redirTo($link, $code=null, $msg=null) {
   if(!strlen($link)) {
     $link = ROOT_URL;
     if(class_exists("Logger"))
-      Logger::log(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING);
+      Logger::log(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING, null, false);
   }
   if(class_exists("Logger"))
-    Logger::log(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
+    Logger::log(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""), Logger::LOGGER_INFO, null, false);
   #var_dump($link); die();
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");

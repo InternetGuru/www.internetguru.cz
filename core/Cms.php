@@ -15,10 +15,6 @@ class Cms {
   const MSG_INFO = "Info";
   const MSG_SUCCESS = "Success";
 
-  public static function isForceFlash() {
-    return self::$forceFlash;
-  }
-
   public static function init() {
     global $plugins;
     if(self::DEBUG) Logger::log("DEBUG");
@@ -49,7 +45,6 @@ class Cms {
     $doc = new DOMDocumentPlus();
     self::$flashList = $doc->appendChild($doc->createElement("root"));
     $ul = self::$flashList->appendChild($doc->createElement("ul"));
-    #$ul->setAttribute("class", "selectable");
     self::setVariable("messages", self::$flashList);
   }
 
@@ -67,7 +62,7 @@ class Cms {
     }
   }
 
-  private static function getMessages() {
+  public static function getMessages() {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
     if(is_null(self::$flashList)) self::createFlashList();
     foreach($_SESSION["cms"]["flash"] as $type => $item) {
@@ -81,7 +76,6 @@ class Cms {
   }
 
   public static function buildContent() {
-    self::getMessages();
     if(is_null(self::$contentFull)) throw new Exception(_("Full content must be set to build content"));
     if(!is_null(self::$content)) throw new Exception(_("Method cannot run twice"));
     self::$content = clone self::$contentFull;
@@ -179,14 +173,9 @@ class Cms {
     self::$outputStrategy = $strategy;
   }
 
-  public static function addMessage($message, $type, $flash = false) {
-    if(!$flash && self::$forceFlash) {
-      Logger::log(_("Adding message after output - forcing flash"));
-      $flash = true;
-    }
-    if($flash) {
-      if(!Cms::isSuperUser()) Logger::log(_("Unable to set flash message if super user not logged"));
-      else $_SESSION["cms"]["flash"][$type][] = $message;
+  public static function addMessage($message, $type) {
+    if(Cms::isSuperUser()) {
+      $_SESSION["cms"]["flash"][$type][] = $message;
       return;
     }
     if(is_null(self::$flashList)) self::createFlashList();
