@@ -4,4 +4,5 @@ p, ul, ol, dl, div:not(.section) {page-break-inside: avoid;}
 body {font-size:10pt; font-family: Charter, Georgia, sans;}
 @page {size: auto; margin: 21mm 20mm;}
 #footer.link {display: auto;}
-body a#scrolltop, .hidden, .adminmenu, .edit, .admin, .contentlink-bc {display: none;}
+.hideable dt a, body a#scrolltop, .hidden, .adminmenu, .edit, .admin, .contentlink-bc {display: none;}
+.hideable dd {margin-left:0;}
