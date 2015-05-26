@@ -30,6 +30,15 @@
     visible = !visible;
   }
 
+  function scrollToCursor(c) {
+    var cursor = c.getCursor();
+    var line = cursor.line;
+    var char = cursor.ch;
+    cm.setCursor({line:line,ch:char});
+    var myHeight = cm.getScrollInfo().clientHeight;
+    var coords = cm.charCoords({line: line, ch: char}, "global");
+    window.scrollTo(0, (coords.top + coords.bottom - myHeight) / 2);
+  }
 
   function init(textarea) {
     cm = CodeMirror.fromTextArea(TextArea, {
@@ -50,9 +59,18 @@
       extraKeys: {
         "Tab": false,
         "Shift-Tab": false,
+        "Ctrl-G": "gotoLine",
         "Ctrl-E": "deleteLine",
         "End": "goLineRight",
-        "Home": "goLineLeft"
+        "Home": "goLineLeft",
+        "F3": function(c) {
+          c.execCommand("findNext");
+          scrollToCursor(c);
+        },
+        "Shift-F3": function(c) {
+          c.execCommand("findPrev");
+          scrollToCursor(c);
+        }
       }
     });
     cm.on("change",function(cm,change) {

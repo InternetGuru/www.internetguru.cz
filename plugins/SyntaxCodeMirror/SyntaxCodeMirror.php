@@ -57,6 +57,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/search.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/goto-line.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
 
