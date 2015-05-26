@@ -50,6 +50,8 @@
 
   <var id="service_plain">E-Základna, www.e-zakladna.cz</var>
   <var id="service_html"><a href="https://www.e-zakladna.cz">E-Základna</a></var>
+  <!-- <var id="service_plain">Nestárnoucí weby, www.nestarnouciweby.cz</var> -->
+  <!-- <var id="service_html"><a href="http://www.nestarnouciweby.cz">Nestárnoucí weby</a></var> -->
   <var id="cyear" fn="yearformat" var="cms-ctime"/>
   <var id="year" fn="yearformat">now</var>
   <var id="today" fn="dateformat">now</var>
