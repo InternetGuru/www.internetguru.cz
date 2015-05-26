@@ -15,10 +15,6 @@ class Cms {
   const MSG_INFO = "Info";
   const MSG_SUCCESS = "Success";
 
-  public static function isForceFlash() {
-    return self::$forceFlash;
-  }
-
   public static function init() {
     global $plugins;
     if(self::DEBUG) Logger::log("DEBUG");
