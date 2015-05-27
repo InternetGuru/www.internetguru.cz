@@ -158,8 +158,9 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(strlen($bcc)) $mail->addBCC($bcc, '');
-    Logger::log(sprintf(_("Sending mail: to=%s<%s>; replyto=%s<%s>; bcc=%s; subject=%s; msg=%s"),
-      $mailtoname, $mailto, $replytoname, $replyto, $bcc, $mail->Subject, $msg), null, null, null, "mail");
+    Logger::log(sprintf(_("Sending e-mail: %s"),
+      "to=$mailtoname<$mailto>; replyto=$replytoname<$replyto>; bcc=$bcc; subject={$mail->Subject}; msg=$msg"),
+      null, null, null, "mail");
     if(!$mail->send()) throw new Exception($mail->ErrorInfo);
     Logger::log(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }

@@ -61,7 +61,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
     foreach($this->cfg->getElementsByTagName("set") as $e) {
       if(!$e->hasAttribute("type")) {
-        Logger::log(_("Element fieldset missing attribute type"), Logger::LOGGER_WARNING);
+        Logger::log(_("Element set missing attribute type"), Logger::LOGGER_WARNING);
         continue;
       }
       $this->createFieldset($newContent, $fieldset, $e);
@@ -80,7 +80,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->createFs($content, $fieldset, $set, $set->getAttribute("type"));
       break;
       default:
-      Logger::log(sprintf(_("Element fieldset uknown type %s"), $set->getAttribute("type")), Logger::LOGGER_WARNING);
+      Logger::log(sprintf(_("Element set uknown type %s"), $set->getAttribute("type")), Logger::LOGGER_WARNING);
     }
   }
 
