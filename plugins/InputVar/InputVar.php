@@ -5,6 +5,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private $contentXPath;
   private $cfg = null;
   private $formId = null;
+  private $passwd = null;
   private $vars = array();
 
   public function __construct(SplSubject $s) {
@@ -21,6 +22,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->cfg = $this->getDOMPlus();
       foreach($this->cfg->documentElement->childElementsArray as $e) {
         if($e->nodeName == "set") continue;
+        if($e->nodeName == "passwd") continue;
         if(!$e->hasAttribute("id")) {
           Logger::log(sprintf(_("Missing attribute id in element %s"), $e->nodeName), Logger::LOGGER_WARNING);
           continue;
@@ -50,6 +52,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       throw new Exception(sprintf(_("Unable to load content from user config")));
     foreach($userCfg->documentElement->childElementsArray as $e) {
       if($e->nodeName == "var") $this->vars[$e->getAttribute("id")] = $e;
+      if($e->nodeName == "passwd") $this->passwd = $e->nodeValue;
     }
 
   }
@@ -57,7 +60,8 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   public function getContent(HTMLPlus $content) {
     if(!isset($_GET[get_class($this)])) return $content;
     $newContent = $this->getHTMLPlus();
-    $this->formId = $newContent->getElementsByTagName("form")->item(0)->getAttribute("id");
+    $form = $newContent->getElementsByTagName("form")->item(0);
+    $this->formId = $form->getAttribute("id");
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
     foreach($this->cfg->getElementsByTagName("set") as $e) {
       if(!$e->hasAttribute("type")) {
@@ -68,6 +72,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     $fieldset->parentNode->removeChild($fieldset);
     $vars = array();
+    if(is_null($this->passwd)) $vars["nopasswd"] = "";
     $vars["action"] = "?".get_class($this);
     $newContent->processVariables($vars);
     return $newContent;
@@ -203,6 +208,11 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     if(!is_file(USER_FOLDER."/".$this->pluginDir."/".get_class($this).".xml")) return;
     $req = Cms::getVariable("validateform-".$this->formId);
     if(is_null($req)) return;
+    if(!IS_LOCALHOST && isset($req["passwd"])
+      && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {
+      Logger::log(_("Wrong password"), Logger::LOGGER_ERROR);
+      return;
+    }
     $var = null;
     foreach($req as $k => $v) {
       if(isset($this->vars[$k])) {
