@@ -107,6 +107,7 @@
           var dd = document.createElement("dd");
           dd.appendChild(ol);
           tocWrapper.appendChild(dd);
+          appendStyle();
         }
       }
    };
