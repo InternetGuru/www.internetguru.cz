@@ -22,7 +22,7 @@
     var css = '/* hideables.js */'
       + ' .hide { display: none }'
       + ' a.switch { text-decoration: none;'
-      + ' border: none;'
+      + ' border: none !important;'
       + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
       + ' font-weight: bold }';
     var style = document.getElementsByTagName('style')[0];
