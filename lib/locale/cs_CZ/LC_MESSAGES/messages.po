@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-27 11:24+0100\n"
-"PO-Revision-Date: 2015-05-27 11:31+0100\n"
+"POT-Creation-Date: 2015-05-29 10:12+0100\n"
+"PO-Revision-Date: 2015-05-29 10:12+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -610,7 +610,7 @@ msgid "Administration may be locked"
 msgstr "Administrace je uzamčená"
 
 #: D:\wamp\www\cms/plugins/Admin/Admin.php:358
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:219
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:227
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
@@ -957,84 +957,88 @@ msgstr "Modifikace souboru %s je vypnuta"
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:25
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:27
 #, php-format
 msgid "Missing attribute id in element %s"
 msgstr "Element %s postrádá atribut id"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:37
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:39
 #, php-format
 msgid "Unknown element name %s"
 msgstr "Neznámý název elementu %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:50
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:52
 #, php-format
 msgid "Unable to load content from user config"
 msgstr "Nepodařilo se načíst obsah z uživatelského nastavení"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:64
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:68
 msgid "Element set missing attribute type"
 msgstr "Element set postrádá atribut type"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:83
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:88
 #, php-format
 msgid "Element set uknown type %s"
 msgstr "Element set má neznámý typ %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:107
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:112
 #, php-format
 msgid "Cannot create fieldset for %s"
 msgstr "Nepodařilo se vytvořit fieldset pro %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:178
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:183
 #, php-format
 msgid "Variable %s missing inner element with attribute var"
 msgstr "Proměnná %s postrádá vnořený element s atributem var"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:217
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:212
+msgid "Incorrect password"
+msgstr "Chybné heslo"
+
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:225
 msgid "Unabe to save user config"
 msgstr "Nepodařilo se uložit uživatelské nastavení"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:241
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:249
 #, php-format
 msgid "Unable to apply function: %s"
 msgstr "Nepodařilo se aplikovat funkci: %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:252
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:260
 #, php-format
 msgid "Unable to register function %s: %s"
 msgstr "Nepodařilo se zaregistrovat funkci %s: %s"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:285
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:293
 msgid "Element data missing attribute name"
 msgstr "Element data postrádá atribut name"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:297
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:305
 msgid "Element call missing content"
 msgstr "Element call postrádá obsah"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:305
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:313
 msgid "Unknown function name"
 msgstr "Neznámá funkce"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:332
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:340
 msgid "No pattern found"
 msgstr "Nebyl nalezen atribut pattern"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:333
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:341
 msgid "No replacement found"
 msgstr "Nebyl nalezen atribut replacement"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:340
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:363
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:348
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:371
 msgid "No data found"
 msgstr "Nebyla nalezena data"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:348
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:356
 msgid "No content found"
 msgstr "Nebyl nalezen obsah"
 
-#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:370
+#: D:\wamp\www\cms/plugins/InputVar/InputVar.php:378
 #, php-format
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"

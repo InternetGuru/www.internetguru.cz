@@ -52,7 +52,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       throw new Exception(sprintf(_("Unable to load content from user config")));
     foreach($userCfg->documentElement->childElementsArray as $e) {
       if($e->nodeName == "var") $this->vars[$e->getAttribute("id")] = $e;
-      if($e->nodeName == "passwd") $this->passwd = $e->nodeValue;
+      if(!IS_LOCALHOST && $e->nodeName == "passwd") $this->passwd = $e->nodeValue;
     }
 
   }
@@ -208,10 +208,8 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     if(!is_file(USER_FOLDER."/".$this->pluginDir."/".get_class($this).".xml")) return;
     $req = Cms::getVariable("validateform-".$this->formId);
     if(is_null($req)) return;
-    if(!IS_LOCALHOST && isset($req["passwd"])
-      && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {
-      Logger::log(_("Wrong password"), Logger::LOGGER_ERROR);
-      return;
+    if(isset($req["passwd"]) && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {
+      throw new Exception(_("Incorrect password"));
     }
     $var = null;
     foreach($req as $k => $v) {
