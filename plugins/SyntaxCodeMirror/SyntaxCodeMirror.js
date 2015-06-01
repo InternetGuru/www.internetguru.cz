@@ -46,7 +46,7 @@
       keyMap:"sublime",
       theme:"tomorrow-night-eighties",
       lineNumbers: true,
-      mode: TextArea.className,
+      mode: TextArea.classList.item(0),
       width:"100%",
       lineWrapping: true,
       //tabSize: 2,

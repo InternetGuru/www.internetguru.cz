@@ -141,6 +141,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function getContent(HTMLPlus $content) {
     Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
+    Cms::getOutputStrategy()->addJs("
+      Admin.init({
+        saveInactive: '"._("Data file is inactive. Are you sure?")."'
+      });
+      ", 100, "body");
     $format = $this->type;
     if($this->type == "html") $format = "html+";
     if(!is_null($this->schema)) $format .= " (".pathinfo($this->schema, PATHINFO_BASENAME).")";
@@ -179,6 +184,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["schema"] = $format;
     $vars["mode"] = $mode;
     $vars["classtype"] = $type;
+    if($this->dataFileStatus == self::STATUS_DISABLED)
+      $vars["disabled"] = "disabled";
     $vars["defaultcontent"] = $this->showContent(false);
     $vars["resultcontent"] = $this->showContent(true);
     $vars["status"] = $this->dataFileStatuses[$this->dataFileStatus];
