@@ -6,6 +6,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private $cfg = null;
   private $formId = null;
   private $passwd = null;
+  private $getOk = "ivok";
   private $vars = array();
 
   public function __construct(SplSubject $s) {
@@ -18,7 +19,10 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       if($subject->getStatus() == STATUS_POSTPROCESS) $this->processPost();
       if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
-      if($subject->getStatus() == STATUS_INIT) $this->loadVars();
+      if($subject->getStatus() == STATUS_INIT) {
+        if(isset($_GET[$this->getOk])) Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS);
+        $this->loadVars();
+      }
       $this->cfg = $this->getDOMPlus();
       foreach($this->cfg->documentElement->childElementsArray as $e) {
         if($e->nodeName == "set") continue;
@@ -40,9 +44,8 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
         }
       }
     } catch(Exception $ex) {
-      Logger::log($ex->getMessage(), Logger::LOGGER_ERROR);
+      Cms::addMessage($ex->getMessage(), Cms::MSG_ERROR);
     }
-    #var_dump(Cms::getAllVariables());
   }
 
   private function loadVars() {
@@ -224,8 +227,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     if(@$var->ownerDocument->save($this->userCfgPath) === false)
       throw new Exception(_("Unabe to save user config"));
     if(!IS_LOCALHOST) clearNginxCache();
-    Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, true);
-    redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => get_class($this)), true));
+    redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => get_class($this)."&".$this->getOk), true));
   }
 
   private function setVar($var, $name, $value) {
