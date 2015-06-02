@@ -8,6 +8,7 @@
       <xslt>themes/basicLayout.xsl</xslt>
       <xslt>themes/footer.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
+      <stylesheet media="screen">themes/basic.css</stylesheet>
     </theme>
     <theme id="simple">
       <xslt>themes/lists.xsl</xslt>
