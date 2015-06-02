@@ -133,6 +133,14 @@ try {
   initFiles();
 
   Cms::checkAuth();
+  // remove ?login form url
+  if(isset($_GET["login"])) {
+    parse_str($_SERVER['QUERY_STRING'], $query);
+    unset($query["login"]);
+    unset($query["q"]);
+    redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => buildQuery($query, false))));
+  }
+
   $start_time = microtime(true);
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
