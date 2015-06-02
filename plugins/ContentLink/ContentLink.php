@@ -89,12 +89,14 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $ol = $root->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class", "contentlink-bc");
     $subtitles = array();
+    $lastA = null;
     $a = null;
     $li = null;
     $h = null;
     foreach($this->hPath as $link => $h) {
       $li = $ol->insertBefore($bc->createElement("li"), $ol->firstElement);
       $a = $li->appendChild($bc->createElement("a", $h->nodeValue));
+      if(is_null($lastA)) $lastA = $a;
       if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
       $a->setAttribute("href", $link);
       if(empty($subtitles)) {
@@ -102,6 +104,9 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
         $subtitles[] = $h->nodeValue;
       } else $subtitles[] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
     }
+    // reset
+    if(getCurLink(true) != "" && $lastA->getAttribute("href") != getCurLink(true))
+      $lastA->nodeValue .= $this->vars["reset"]->nodeValue;
     if(array_key_exists("logo", $this->vars)) {
       $o = $bc->createElement("object");
       $o->setAttribute("data", $this->vars["logo"]->nodeValue);
