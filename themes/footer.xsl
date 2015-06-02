@@ -66,7 +66,7 @@
           <xsl:if test="$cms-mtime">
             <li>Upraveno: <span fn="inputvar-dateformat"><xsl:value-of select="$cms-mtime"/></span></li>
           </xsl:if>
-          <li class="link"><xsl:value-of select="$cms-uri"/></li>
+          <li class="print"><xsl:value-of select="$cms-uri"/></li>
         </ul>
       </div>
     </body>
