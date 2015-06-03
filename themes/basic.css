@@ -107,10 +107,11 @@ div.section > pre {
   margin: 0;
 }
 
-#content, #header, #footer {
+#content, #header > *, #footer > * {
   max-width: 62rem;
   margin-left: auto;
   margin-right: auto;
+  box-sizing: border-box;
 }
 
 #footer {
