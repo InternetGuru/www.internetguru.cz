@@ -1,7 +1,5 @@
 <?php
 
-# todo: linklist-href style
-
 class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cssClass = "linklist";
@@ -64,9 +62,13 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
       $li = $list->appendChild($list->ownerDocument->createElement("li"));
       $text = $link->getAttribute("title");
       if(!$link->hasAttribute("title")) {
-        $text = $link->getAttribute("href");
-        $text = preg_replace("/^\w+:\/\//", "", $text);
-        $text = getShortString($text, 25, 35, "/");
+        $href = $link->getAttribute("href");
+        $text = DOMBuilder::getTitle($href);
+        if(is_null($text)) {
+          $text = $href;
+          $text = preg_replace("/^\w+:\/\//", "", $text);
+          $text = getShortString($text, 25, 35, "/");
+        }
       }
       $a = $li->appendChild($li->ownerDocument->createElement("a"));
       $a->setAttribute("id", "{$this->cssClass}-$i");
