@@ -71,7 +71,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $robots = $this->cfg->getElementById("robots");
     $this->appendMeta($head, "robots", $robots->nodeValue);
     $this->copyToRoot(findFile($this->favIcon), self::FAVICON);
-    $this->appendLinkElement($head, self::FAVICON, "shortcut icon");
+    $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true, false);
     $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
     $this->appendJsFiles($head);
@@ -125,6 +125,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
     }
     return $content;
+  }
+
+  private function getFavIcon() {
+    if(Cms::getError()) return "data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%02%00%00%00%90%91h6%00%00%00%19IDAT(%91c%BCd%AB%C2%40%0A%60%22I%F5%A8%86Q%0DCJ%03%00%DE%B5%01S%07%88%8FG%00%00%00%00IEND%AEB%60%82";
+    if(Cms::getWarning()) return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QUZFQUZBMTkwQTEyMTFFNTkzNDZEQzNFMkEzODgxRUUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QUZFQUZBMUEwQTEyMTFFNTkzNDZEQzNFMkEzODgxRUUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpBRkVBRkExNzBBMTIxMUU1OTM0NkRDM0UyQTM4ODFFRSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpBRkVBRkExODBBMTIxMUU1OTM0NkRDM0UyQTM4ODFFRSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pi0y9jUAAAAaSURBVHjaYlxWwUASYGJgGNUwqmG4agAIMACehwE+QRw0MgAAAABJRU5ErkJggg==";
+    if(Cms::getSuccess()) return "data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%02%00%00%00%90%91h6%00%00%00%19IDAT(%91c%0C%DD%10%C5%40%0A%60%22I%F5%A8%86Q%0DCJ%03%00dy%01%7F%0C%9F0%7D%00%00%00%00IEND%AEB%60%82";
+    if(Cms::getInfo()) return "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OEJENDBDN0YwQTEyMTFFNTgwNzVEMUVDMTZEOEE0ODciIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OEJENDBDODAwQTEyMTFFNTgwNzVEMUVDMTZEOEE0ODciPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4QkQ0MEM3RDBBMTIxMUU1ODA3NUQxRUMxNkQ4QTQ4NyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4QkQ0MEM3RTBBMTIxMUU1ODA3NUQxRUMxNkQ4QTQ4NyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PjGqmSUAAAAcSURBVHjaYmSQ+M9ACmBiIBGMahjVMHQ0AAQYAIeAATeNcdSsAAAAAElFTkSuQmCC";
+    return self::FAVICON;
   }
 
   private function getIds(DOMXPath $xPath) {
@@ -413,7 +421,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $e->appendChild($meta);
   }
 
-  private function appendLinkElement(DOMElement $parent, $file, $rel, $type=false, $media=false, $user=true) {
+  private function appendLinkElement(DOMElement $parent, $file, $rel, $type=false, $media=false, $user=true, $root=true) {
     /*
     try {
       $f = $file;
@@ -433,7 +441,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
     if($media) $e->setAttribute("media", $media);
-    $e->setAttribute("href", ROOT_URL.$file);
+    $e->setAttribute("href", ($root ? ROOT_URL : "").$file);
     $parent->appendChild($e);
   }
 

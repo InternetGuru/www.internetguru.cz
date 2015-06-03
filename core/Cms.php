@@ -9,6 +9,10 @@ class Cms {
   private static $functions = array();
   private static $forceFlash = false;
   private static $flashList = null;
+  private static $error = false;
+  private static $warning = false;
+  private static $info = false;
+  private static $success = false;
   const DEBUG = false;
   const MSG_ERROR = "Error";
   const MSG_WARNING = "Warning";
@@ -49,6 +53,12 @@ class Cms {
   }
 
   private static function addFlashItem($message, $type) {
+    switch($type) {
+      case self::MSG_ERROR: self::$error = true; break;
+      case self::MSG_WARNING: self::$warning = true; break;
+      case self::MSG_SUCCESS: self::$success = true; break;
+      case self::MSG_INFO: self::$info = true; break;
+    }
     if(!is_null(self::getLoggedUser())) $message = "$type: $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
@@ -213,6 +223,11 @@ class Cms {
     if($varId == $name) return $varId;
     return $varId.(strlen($name) ? "-".normalize($name) : "");
   }
+
+  public static function getError() { return self::$error; }
+  public static function getWarning() { return self::$warning; }
+  public static function getInfo() { return self::$info; }
+  public static function getSuccess() { return self::$success; }
 
   public static function setFunction($name, $value) {
     if(!$value instanceof Closure) {
