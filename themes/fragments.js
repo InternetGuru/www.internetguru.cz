@@ -6,6 +6,10 @@ function headingLookup(event) {
 }
 
 function changeFragment(e) {
+  if(e.nodeName.toLowerCase() == "h1") {
+    window.history.replaceState("", "", window.location.href.split('#')[0]);
+    return false;
+  }
   if(!/h[2-6]/.test(e.nodeName.toLowerCase())) return false;
   window.history.replaceState("", "", "#"+e.id);
   return true;
