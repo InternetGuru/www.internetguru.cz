@@ -71,7 +71,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
       $a = $li->appendChild($li->ownerDocument->createElement("a"));
       $a->setAttribute("id", "{$this->cssClass}-$i");
       $a->setAttribute("href", $link->getAttribute("href"));
-      $a->nodeValue = $text;
+      $a->nodeValue = trim($text, "/");
     }
   }
 
