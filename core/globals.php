@@ -444,16 +444,14 @@ function stripDataFolder($filePath) {
   return str_replace($remove, array(), "?$filePath");
 }
 
-function getShortString($str) {
-  $lLimit = 60;
-  $hLimit = 80;
+function getShortString($str, $lLimit=60, $hLimit=80, $delim=" ") {
   if(strlen($str) < $hLimit) return $str;
-  $w = explode(" ", $str);
+  $w = explode($delim, $str);
   $sStr = $w[0];
   $i = 1;
   while(strlen($sStr) < $lLimit) {
     if(!isset($w[$i])) break;
-    $sStr .= " ".$w[$i++];
+    $sStr .= $delim.$w[$i++];
   }
   if(strlen($str) - strlen($sStr) < $hLimit - $lLimit) return $str;
   return $sStr."…";
