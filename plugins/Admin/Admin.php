@@ -143,7 +143,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
     Cms::getOutputStrategy()->addJs("
       Admin.init({
-        saveInactive: '"._("Data file is inactive. Are you sure?")."'
+        saveInactive: '"._("Data file is inactive. Save anyways?")."'
       });
       ", 100, "body");
     $format = $this->type;
