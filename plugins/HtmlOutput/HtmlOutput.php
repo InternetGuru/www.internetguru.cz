@@ -200,7 +200,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $localUrl = buildLocalUrl($link, $a->nodeName == "form");
     #var_dump($localUrl);
     if(strpos($localUrl, "#") === 0 && !array_key_exists($pLink["fragment"], $ids))
-      throw new Exception(_("Local fragment to undefined id"));
+      throw new Exception(sprintf(_("Local fragment %s to undefined id"), $pLink["fragment"]));
     $a->setAttribute($aName, $localUrl);
   }
 

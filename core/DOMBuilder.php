@@ -65,7 +65,7 @@ class DOMBuilder {
       #if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
       #return implodeLink($pUrl);
     #}
-    throw new Exception(sprintf(_("Link %s not found"), implodeLink($pUrl)));
+    throw new Exception(_("Link not found"));
   }
 
   public static function getDesc($link) {

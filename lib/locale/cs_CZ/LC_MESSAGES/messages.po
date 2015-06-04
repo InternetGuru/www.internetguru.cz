@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-04 01:12+0100\n"
-"PO-Revision-Date: 2015-06-04 01:12+0100\n"
+"POT-Creation-Date: 2015-06-04 18:49+0100\n"
+"PO-Revision-Date: 2015-06-04 18:49+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -67,9 +67,8 @@ msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
 
 #: D:\wamp\www\cms/core/DOMBuilder.php:68
-#, php-format
-msgid "Link %s not found"
-msgstr "Odkaz %s nebyl nalezen"
+msgid "Link not found"
+msgstr "Odkaz nebyl nalezen"
 
 #: D:\wamp\www\cms/core/DOMBuilder.php:134
 #, php-format
@@ -903,8 +902,9 @@ msgid "Link %s removed: %s"
 msgstr "Odkaz %s odstraněn: %s"
 
 #: D:\wamp\www\cms/plugins/HtmlOutput/HtmlOutput.php:203
-msgid "Local fragment to undefined id"
-msgstr "Lokální fragment na neexistující id"
+#, php-format
+msgid "Local fragment %s to undefined id"
+msgstr "Lokální fragment na neexistující id %s"
 
 #: D:\wamp\www\cms/plugins/HtmlOutput/HtmlOutput.php:238
 #, php-format
@@ -1052,6 +1052,11 @@ msgstr "Funkce sequence přeskočila volání funkce: %s"
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
 
+#: D:\wamp\www\cms/plugins/UrlHandler/UrlHandler.php:40
+#, php-format
+msgid "Unable to redir to %s: %s"
+msgstr "Nepodařilo se přesměrovat na %s: %s"
+
 #: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:24
 msgid "Validable form missing attribute id"
 msgstr "Formulář s třídou validable postrádá atribut id."
@@ -1075,6 +1080,12 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: D:\wamp\www\cms/plugins/ValidateForm/ValidateForm.php:132
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Link %s not found"
+#~ msgstr "Odkaz %s nebyl nalezen"
+
+#~ msgid "Local fragment to undefined id"
+#~ msgstr "Lokální fragment na neexistující id"
 
 #~ msgid "Element fieldset missing attribute type"
 #~ msgstr "Element fieldset postrádá atribut type"

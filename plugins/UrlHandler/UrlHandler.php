@@ -37,7 +37,7 @@ class UrlHandler extends Plugin implements SplObserver {
         $pLink = DOMBuilder::normalizeLink($pLink);
         redirTo(buildLocalUrl($pLink));
       } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::log(sprintf(_("Unable to redir to %s: %s"), $var->nodeValue, $e->getMessage()), Logger::LOGGER_WARNING);
       }
     }
   }
