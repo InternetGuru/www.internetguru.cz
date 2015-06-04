@@ -21,6 +21,8 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->createLinkList($content->documentElement);
     }
     Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".get_class($this)."/".get_class($this).".css");
+    #echo $content->saveXML($content);
+    #die();
     return $content;
   }
 
@@ -34,11 +36,15 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
     $count = 0;
     $links = array();
     $linksArray = array();
+    $list = $wrapper->ownerDocument->createElement("ol");
     foreach($wrapper->getElementsByTagName("a") as $l) { $links[] = $l; }
     foreach($links as $l) {
       if(!$l->hasAttribute("href")) continue;
       $i++;
-      if(!isset($linksArray[$l->getAttribute("href")])) $count++;
+      if(!isset($linksArray[$l->getAttribute("href")])) {
+        $count++;
+        if(!$this->addLi($list, $l, $count)) continue;
+      }
       $linksArray[$l->getAttribute("href")] = $l;
       $a = $l->ownerDocument->createElement("a");
       $a->nodeValue = "[$count]";
@@ -47,6 +53,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
       if(!is_null($l->nextSibling)) $l->parentNode->insertBefore($a, $l->nextSibling);
       else $l->parentNode->appendChild($a);
     }
+    if($i == 0) return;
     $section = $wrapper;
     if($wrapper->nodeName == "body") {
       $section = $wrapper->getElementsByTagName("section")->item(0);
@@ -55,26 +62,31 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
     $section->appendChild($section->ownerDocument->createElement("desc"));
     $h->nodeValue = $vars["heading"]->nodeValue;
     $h->setAttribute("id", $this->cssClass);
-    $list = $section->appendChild($wrapper->ownerDocument->createElement("ol"));
-    $i = 0;
-    foreach($linksArray as $link) {
-      $i++;
-      $li = $list->appendChild($list->ownerDocument->createElement("li"));
-      $text = $link->getAttribute("title");
-      if(!$link->hasAttribute("title")) {
-        $href = $link->getAttribute("href");
-        $text = DOMBuilder::getTitle($href);
-        if(is_null($text)) {
-          $text = $href;
-          $text = preg_replace("/^\w+:\/\//", "", $text);
-          $text = getShortString($text, 25, 35, "/");
+    $section->appendChild($list);
+  }
+
+  private function addLi(DOMElementPlus $list, DOMElementPlus $link, $i) {
+    $li = $list->ownerDocument->createElement("li");
+    $text = $link->getAttribute("title");
+    if(!$link->hasAttribute("title")) {
+      $href = $link->getAttribute("href");
+      $text = DOMBuilder::getTitle($href);
+      if(is_null($text)) {
+        $text = $href;
+        $c = 0;
+        $text = preg_replace("/^\w+:\/\//", "", $text, -1, $c);
+        if($c == 0) { // nonexist local link
+          if(is_null(Cms::getLoggedUser())) return false;
         }
+        $text = getShortString($text, 25, 35, "/");
       }
-      $a = $li->appendChild($li->ownerDocument->createElement("a"));
-      $a->setAttribute("id", "{$this->cssClass}-$i");
-      $a->setAttribute("href", $link->getAttribute("href"));
-      $a->nodeValue = trim($text, "/");
     }
+    $list->appendChild($li);
+    $a = $li->appendChild($li->ownerDocument->createElement("a"));
+    $a->setAttribute("id", "{$this->cssClass}-$i");
+    $a->setAttribute("href", $link->getAttribute("href"));
+    $a->nodeValue = trim($text, "/");
+    return true;
   }
 
 }
