@@ -20,6 +20,7 @@ try {
   define("USER_ROOT_DIR", "user");
   define("FILE_LOCK_WAIT_SEC", 2);
   define('EMAIL_PATTERN', "[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}");
+  define('EMAIL_PATTERN_EXT', "([_a-zA-Z0-9-]+(?:\.[_a-zA-Z0-9-]+)*)(@)([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)(\.)([a-zA-Z]{2,})");
   define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
   define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
   define('FILEPATH_PATTERN', "(?:[.a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}");
