@@ -1,3 +1,53 @@
+1.6.2 2015-06-05
+Indikace systémového hlášení zbarvením ikony prohlížeče (d14eac7)
+LinkList: nové rozšíření pro zobrazení seznamu odkazů (e401eff)
+Možnost zasílání událostí do GA, eventable.js (420977c)
+Přidání basic.css (718daa7)
+Admin: potvrzení uložení neaktivního souboru (c4dd1eb)
+InputVar: přidání nepovinného hesla (eeada85)
+HtmlOutput: přidání nastavení robots (913e06a)
+CodeMirror: klávesová zkratka ctrl+g (defeefd)
+SyntaxCodeMirror: tlačítko pro de/aktivaci (ccb64bb)
+InputVar: přidáno uživatelské rozhranní (0e0d7fd)
+ContactForm: logování poslaných zpráv (62f9c7f)
+
+1.6.1 2015-05-19
+ValidateForm: nové rozšíření pro kontrolu formuláře (e91ea9e)
+FileHandler: přidán odkaz na smazání dočasných souborů (4d5f72a)
+addressable.js: podpora polí typu email a search (ae8340d)
+Administrátorské nabídka jako první prvek v zápatí (3e28b18)
+Admin: přidání pole pro výběr editovaného souboru (3fe98e8)
+Odkaz na smazání mezipaměti (fad53ca)
+DOMElementPlus: smazání elementu pomocí prázdné proměnné (5bd00f6)
+ContactForm: podpora formulářových prvků HTML5 (f27a811)
+HtmlOutput: výstupní kód stánek v HTML5 (46d860b)
+Agregator: přidání volitelného atributu wrapper (7e4a7af)
+
+1.6.0 2015-05-15
+InputVar: název systému v zápatí jako proměnná (34ba67c)
+
+1.5.3 2015-05-09
+Vylepšené rozhraní administrace (2d3a682)
+Nová funkcionalita addressable pro odkázání vyplněného formuláře (bf7963a)
+Nové rozšíření FillForm vyplňující špatně vyplněné formuláře (415cc4d)
+FileHandler: nový formát obrázku "preview" (76a5208)
+Admin: uložit a přejít na editovaný soubor, pokud cesta existuje (83de136)
+ContentLink: hodnota drobečkové navigace na úvodní stránce podle atributu title hlavního nadpisu (1631084)
+
+1.5.2 2015-04-18
+TOC: přidání parametru maximální hloubky (bbc150e)
+Agregator: transformace pro umístění informací o dokumentu agregator.xsl (b9e9649)
+Agregator: konfigurovatelné informace o dokumentu (03e8868)
+
+1.5.0 2015-04-12
+Agregátor informace o dokumentu docinfo (64343ae)
+Odkaz na přesunutí stránky nahoru scrolltop.js (1a86664)
+Administrace dostupná pouze přes HTTPS (6e09dc0)
+
+1.4.2 2015-03-31
+Vylepšení globálních stylů (8ea587c)
+Odkaz na vypnutí PageSpeed (b147aa4)
+
 1.4.0 2015-03-15
 Auth: přidána možnost zakázat všem kromě admina (d4f4c3e)
 
