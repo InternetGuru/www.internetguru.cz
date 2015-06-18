@@ -34,7 +34,7 @@ body.doc h4:before {
 }
 body.doc div.section p:before {
   counter-increment: par;
-  content: counter(par) ") ";
+  content: counter(par, lower-alpha) ") ";
   font-size: 1.1em;
 }
 body.doc div.paragraph > ol,

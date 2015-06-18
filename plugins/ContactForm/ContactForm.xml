@@ -44,7 +44,7 @@ $inputvar-service_plain
   <form id="basic">
     <dl>
       <dt><label for="name">Celé jméno <em>(povinné)</em></label></dt>
-      <dd><input type="text" pattern=".*\S+.*" id="name" required="required" placeholder="Josef novák"/></dd>
+      <dd><input type="text" pattern=".*\S+.*" id="name" required="required" placeholder="Josef Novák"/></dd>
       <dt><label for="email">E-mailová adresa <em>(povinné)</em></label></dt>
       <dd><input type="email" id="email" required="required" placeholder="josef.novak@seznam.cz"/></dd>
       <dt><label for="telephone">Telefon</label></dt>
