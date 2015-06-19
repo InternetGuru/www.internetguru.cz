@@ -12,7 +12,7 @@ class EmailBreaker extends Plugin implements SplObserver, ContentStrategyInterfa
     $contentStr = $content->saveXML();
     $at = $cfg->getElementById("at")->nodeValue;
     $dot = $cfg->getElementById("dot")->nodeValue;
-    $contentStr = preg_replace("/\b".EMAIL_PATTERN_EXT."\b/", "$1$at$3$dot$5", $contentStr);
+    $contentStr = preg_replace("/\b".EMAIL_PATTERN."\b/", "$1$at$2$dot$3", $contentStr);
     if(!$contentStr) return $content;
     Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".get_class($this).".js");
     Cms::getOutputStrategy()->addJs("EmailBreaker.init({

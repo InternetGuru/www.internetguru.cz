@@ -9,11 +9,13 @@
         <dd>n/a</dd>
       </dl>
     </fieldset>
-    <fieldset><legend>Ovládací panel</legend>
-      <ul>
-        <li><label var="nopasswd">Heslo <input name="passwd" type="password"/></label></li>
-        <li><input type="submit" value="Uložit"/></li>
-      </ul>
+    <fieldset var="nopasswd"><legend>Ovládací panel</legend>
+      <dl>
+        <dt><label for="inputvar-passwd">Heslo</label></dt>
+        <dd><input name="passwd" required="required" type="password" id="inputvar-passwd"/></dd>
+        <dt> </dt>
+        <dd><input type="submit" value="Uložit"/></dd>
+      </dl>
     </fieldset>
   </form>
 </body>
