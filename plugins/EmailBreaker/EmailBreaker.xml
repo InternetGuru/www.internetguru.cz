@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <EmailBreaker>
 
-  <var id="at" modifyonly="modifyonly">(zavináč)</var>
-  <var id="dot" modifyonly="modifyonly">(tečka)</var>
+  <var id="at" modifyonly="modifyonly"> (zavináč) </var>
+  <var id="dot" modifyonly="modifyonly"> (tečka) </var>
 
 </EmailBreaker>

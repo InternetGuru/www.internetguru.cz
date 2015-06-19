@@ -8,3 +8,4 @@ Disallow: /*?import
 Disallow: /*?Convertor
 Disallow: /*?subdom
 Disallow: /*?SubdomManager
+Disallow: /*?InputVar
