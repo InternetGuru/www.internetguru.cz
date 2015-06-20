@@ -2,9 +2,8 @@ var a = 1;
 
 (function(win) {
 
-  var Config = {}
-  Config.at = "(at)";
-  Config.dot = "(dot)";
+  var Config = {};
+  Config.rep = [];
 
    var EmailBreaker = function() {
 
@@ -18,11 +17,22 @@ var a = 1;
         }
       },
       createEmails = function() {
-        Config.at = preg_quote(Config.at);
-        Config.dot = preg_quote(Config.dot);
-        var emailPatt = new RegExp("\\b([_a-zA-Z0-9.-]+)"+Config.at+"([_a-zA-Z0-9.-]+)"+Config.dot+"([a-zA-Z]{2,})\\b", "g");
-        document.body.innerHTML = document.body.innerHTML.replace(emailPatt, "<"+"a href='mailto:$1@$2.$3'>$1@$2.$3<"+"/a>");
+        var a = document.getElementsByTagName("a");
+        for(var i = 0; i < a.length; i++) {
+          if(a[i].href) continue;
+          var spans = a[i].getElementsByTagName("span");
+          for(var j = 0; j < spans.length; j++) createEmailLink(spans[j]);
+        }
       },
+      createEmailLink = function(span) {
+        var a = span.parentNode;
+        var email = span.innerText;
+        for(var i = 0; i < Config.rep.length; i++) {
+          email = email.replace(new RegExp(preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
+        }
+        span.innerText = email;
+        a.href = "mailto://" + email;
+      }
       preg_quote = function (str, delimiter) {
         return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
       }

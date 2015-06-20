@@ -27,10 +27,17 @@ class EmailBreaker extends Plugin implements SplObserver, ContentStrategyInterfa
     foreach($content->getElementsByTagName("a") as $a) {
       if(strpos($a->getAttribute("href"), "mailto://") === false) continue;
       $address = substr($a->getAttribute("href"), 9);
-      $brokenAddress = $content->ownerDocument->createElement("span");
+      $brokenAddress = $content->createElement("span");
       $brokenAddress->nodeValue = str_replace($pat, $rep, $address);
-      $a->nodeValue = str_replace($address, $brokenAddress, $a->nodeValue, $count);
-      if(!$count) {
+      if(strpos($a->nodeValue, $address) !== false) {
+        $val = $a->nodeValue;
+        $a->nodeValue = "";
+        foreach(explode($address, $val) as $k => $part) {
+          if($k % 2 != 0) $a->appendChild($brokenAddress);
+          $a->appendChild($a->ownerDocument->createTextNode($part));
+        }
+      }
+      else {
         $a->nodeValue .= " ";
         $a->appendChild($brokenAddress);
       }
