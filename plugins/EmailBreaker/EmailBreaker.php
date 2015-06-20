@@ -9,19 +9,47 @@ class EmailBreaker extends Plugin implements SplObserver, ContentStrategyInterfa
 
   public function getContent(HTMLPlus $content) {
     $cfg = $this->getDOMPlus();
-    $contentStr = $content->saveXML();
-    $at = $cfg->getElementById("at")->nodeValue;
-    $dot = $cfg->getElementById("dot")->nodeValue;
-    $contentStr = preg_replace("/\b".EMAIL_PATTERN."\b/", "$1$at$2$dot$3", $contentStr);
-    if(!$contentStr) return $content;
+    $appendJs = false;
+    $pat = array();
+    $rep = array();
+    foreach($cfg->getElementsByTagName("replace") as $replace) {
+      if(!$replace->hasAttribute("pattern")) {
+        Logger::log(_("Element replace missing attribute pattern"), Logger::LOGGER_WARNING);
+        continue;
+      }
+      if(!strlen($replace->nodeValue)) {
+        Logger::log(_("Element replace missing value"), Logger::LOGGER_WARNING);
+        continue;
+      }
+      $pat[] = $replace->getAttribute("pattern");
+      $rep[] = $replace->nodeValue;
+    }
+    foreach($content->getElementsByTagName("a") as $a) {
+      if(strpos($a->getAttribute("href"), "mailto://") === false) continue;
+      $address = substr($a->getAttribute("href"), 9);
+      $brokenAddress = $content->ownerDocument->createElement("span");
+      $brokenAddress->nodeValue = str_replace($pat, $rep, $address);
+      $a->nodeValue = str_replace($address, $brokenAddress, $a->nodeValue, $count);
+      if(!$count) {
+        $a->nodeValue .= " ";
+        $a->appendChild($brokenAddress);
+      }
+      $a->removeAttribute("href");
+      $appendJs = true;
+    }
+    if($appendJs) $this->appendJs($pat, $rep);
+    return $content;
+  }
+
+  private function appendJs($pat, $rep) {
+    $jsRep = array();
+    foreach($pat as $k => $p) {
+      $jsRep[] = "['$p','{$rep[$k]}']";
+    }
     Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".get_class($this).".js");
     Cms::getOutputStrategy()->addJs("EmailBreaker.init({
-      at: '$at',
-      dot: '$dot'
+      rep: [".implode(",", $jsRep)."]
     });");
-    $newContent = new HTMLPlus();
-    $newContent->loadXml($contentStr);
-    return $newContent;
   }
 
 }
