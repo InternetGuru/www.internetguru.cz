@@ -69,10 +69,11 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
 
     if(is_null($formToSend)) return;
-    foreach($this->formValues as $name => $value) {
-      if(is_null($value) || !strlen($value)) $this->formValues[$name] = $this->formVars["nothing"];
-    }
     try {
+      $this->securityCheck();
+      foreach($this->formValues as $name => $value) {
+        if(is_null($value) || !strlen($value)) $this->formValues[$name] = $this->formVars["nothing"];
+      }
       $variables = array_merge($this->formValues, Cms::getAllVariables());
       foreach($this->formVars as $k => $v) {
         $this->formVars[$k] = replaceVariables($v, $variables);
@@ -88,6 +89,22 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
       Logger::log($message, Logger::LOGGER_ERROR);
     }
+  }
+
+  private function securityCheck() {
+    $IP = getIP();
+    $IP = str_replace(":", "-", $IP);
+    $IPFilePath = USER_FOLDER."/".$this->pluginDir."/$IP";
+    $bannedIPFilePath = USER_FOLDER."/".$this->pluginDir."/.$IP";
+    if(is_file($bannedIPFilePath)) {
+      throw new Exception(sprintf(_("Your IP adress %s is banned"), $IP));
+    }
+    if(is_file($IPFilePath)) {
+      if(time() - filemtime($IPFilePath)  < 60*2) { // 2 min timeout
+        throw new Exception(_("The form can not be sent in such quick succession, please try it again in a minute"));
+      }
+    }
+    if(!touch($IPFilePath)) throw new Exception(_("Unable to create security file"));
   }
 
   public function getContent(HTMLPlus $content) {

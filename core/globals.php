@@ -508,6 +508,12 @@ function clearNginxCache($folder = null) {
   if(!$passed) throw new Exception(_("Failed to purge cache"));
 }
 
+function getIP() {
+  if(!empty($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
+  if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
+  return $_SERVER['REMOTE_ADDR'];
+}
+
 // UNUSED
 function clearApcCache() {
   $cache_info = apc_cache_info();
