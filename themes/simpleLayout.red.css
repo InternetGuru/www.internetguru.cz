@@ -7,10 +7,6 @@ div.contentbalancer-simple:not(.section) a,
   background: #FD563B;
 }
 
-ol.contentlink-bc li a[href] {
-  color: #E02000;
-}
-
 a:link {
   color: #E02000;
 }
