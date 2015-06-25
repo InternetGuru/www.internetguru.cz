@@ -31,7 +31,7 @@ var a = 1;
           email = email.replace(new RegExp(preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
         }
         span.innerText = email;
-        a.href = "mailto://" + email;
+        a.href = "mailto:" + email;
       }
       preg_quote = function (str, delimiter) {
         return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
