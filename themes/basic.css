@@ -19,15 +19,15 @@ object {
 h1,h2,h3,h4,h5,h6,p,ul,ol,dl,
 div.paragraph {
   margin: 1em auto;
+  padding-left: 1em;
   padding-left: 1rem;
+  padding-right: 1em;
   padding-right: 1rem;
 }
 
 div.list.multiple div {
   margin: 0 auto;
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
   padding-left: 0;
   padding-right: 0;
@@ -57,6 +57,7 @@ dl ul, dl ol, dl dl {
 }
 
 li li {
+  margin-left: 1em;
   margin-left: 1rem;
 }
 
@@ -74,6 +75,7 @@ div.list > dl > *:first-child {
 }
 
 h1, h2, h3, h4 {
+  margin: 1.5em auto 1em;
   margin: 1.5rem auto 1rem;
 }
 
@@ -88,7 +90,9 @@ button[disabled] {
 }
 
 li, dd, dt {
+  margin-top: 0.5em;
   margin-top: 0.5rem;
+  margin-bottom: 0.5em;
   margin-bottom: 0.5rem;
 }
 
@@ -97,7 +101,9 @@ li, dd {
 }
 
 div.section > pre {
+  margin: 1em auto;
   margin: 1rem auto;
+  padding: 1em;
   padding: 1rem;
 }
 
@@ -108,6 +114,7 @@ div.section > pre {
 }
 
 #content, #header > *, #footer > * {
+  max-width: 62em;
   max-width: 62rem;
   margin-left: auto;
   margin-right: auto;
@@ -120,11 +127,8 @@ div.section > pre {
 }
 
 #footer > ul {
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
-  -webkit-justify-content: center;
   justify-content: center;
   list-style: none;
 }
@@ -165,4 +169,19 @@ div.section > pre {
 
 #footer .link {
   display: none;
+}
+
+/* Browser compatibility */
+
+.no-flexbox div.list.multiple div dl {
+  display: inline-block;
+}
+
+.no-flexbox #footer > ul {
+  display: table;
+}
+
+.no-flexbox #footer > ul li {
+  display: inline-block;
+  padding: 0 0.5em;
 }

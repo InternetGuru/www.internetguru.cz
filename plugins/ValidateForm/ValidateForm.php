@@ -36,6 +36,12 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       $request = $method == "post" ? $_POST : $_GET;
       if(empty($request)) continue;
       if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
+      try {
+        $this->securityCheck();
+      } catch(Exception $e) {
+        Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
+        continue;
+      }
       $this->getLabels($xpath, $form);
       Cms::setVariable($id, $this->verifyItems($xpath, $form, $request));
     }
@@ -80,6 +86,23 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if(!$isValid) return null;
     return $values;
+  }
+
+  private function securityCheck() {
+    $IP = getIP();
+    $IPFile = str_replace(":", "-", $IP);
+    $IPFilePath = USER_FOLDER."/".$this->pluginDir."/$IPFile";
+    $bannedIPFilePath = USER_FOLDER."/".$this->pluginDir."/.$IPFile";
+    if(is_file($bannedIPFilePath)) {
+      throw new Exception(sprintf(_("Your IP adress %s is banned"), $IP));
+    }
+    if(is_file($IPFilePath)) {
+      if(time() - filemtime($IPFilePath)  < 60*2) { // 2 min timeout
+        throw new Exception(_("The form can not be sent in such quick succession, please try it again in a minute"));
+      }
+    }
+    mkdir_plus(dirname($IPFilePath));
+    if(!touch($IPFilePath)) throw new Exception(_("Unable to create security file"));
   }
 
   private function verifyItem(DOMElementPlus $e, $value) {
