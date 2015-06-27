@@ -202,7 +202,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function showContent($user) {
-    $df = findFile($this->defaultFile, $user);
+    $df = findFile($this->defaultFile, $user, true, false);
     if(!$df) return "n/a";
     if($this->replace) return file_get_contents($df);
     $doc = $this->getDOMPlus($this->defaultFile, false, $user);
