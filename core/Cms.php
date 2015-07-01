@@ -123,11 +123,8 @@ class Cms {
 
   public static function setLoggedUser($user) {
     self::setVariable("logged_user", $user);
-    if(!self::isSuperUser()) {
-      self::setVariable("super_user", "");
-      return;
-    }
-    self::setVariable("super_user", $user);
+    if(self::isSuperUser()) self::setVariable("super_user", $user);
+    else self::setVariable("super_user", "");
     if((session_status() == PHP_SESSION_NONE && !session_start())
       || !session_regenerate_id()) {
       throw new Exception(_("Unable to re/generate session ID"));
