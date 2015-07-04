@@ -75,6 +75,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if(!$this->isPost()) return;
     if($this->isResource($this->type)) {
+      if(is_file(RESOURCES_DIR."/".$this->defaultFile)) unlink(RESOURCES_DIR."/".$this->defaultFile);
       if(is_file($this->defaultFile)) unlink($this->defaultFile);
     } else {
       try {
