@@ -9,17 +9,13 @@ strong {
 
 h1,h2,h3,h4,h5,h6,p,ul,ol,dl,
 div.paragraph {
-  max-width: 60em;
   max-width: 60rem;
   margin: 1.5em auto;
-  padding-left: 1em;
   padding-left: 1rem;
-  padding-right: 1em;
   padding-right: 1rem;
 }
 
 div.list.multiple div {
-  max-width: 62em;
   max-width: 62rem;
   margin: 0 auto;
   display: flex;
@@ -53,7 +49,6 @@ dl ul, dl ol, dl dl {
 }
 
 li li {
-  margin-left: 1em;
   margin-left: 1rem;
 }
 
@@ -109,10 +104,8 @@ ul.docinfo {
 
 p.creation, p.edit {
   margin-top: 0;
-  margin-bottom: -1em;
   margin-bottom: -1rem;
   position: relative;
-  top: 1em;
   top: 1rem;
   font-weight: 100;
 }
@@ -131,14 +124,10 @@ p.edit {
 ol.contentlink-bc {
   list-style: none;
   padding: 0;
-  margin-top: -2em;
   margin-top: -2rem;
-  padding-bottom: 0.5em;
   padding-bottom: 0.5rem;
   margin-bottom: 0;
-  padding-left: 1em;
   padding-left: 1rem;
-  max-width: 61em;
   max-width: 61rem;
 }
 
@@ -183,9 +172,7 @@ fieldset > dl {
 }
 
 li, dd, dt {
-  margin-top: 0.5em;
   margin-top: 0.5rem;
-  margin-bottom: 0.5em;
   margin-bottom: 0.5rem;
 }
 
