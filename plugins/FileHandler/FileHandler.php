@@ -36,7 +36,7 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function deleteResources() {
-    $dirs = array(THEMES_DIR => false, PLUGINS_DIR => false, LIB_DIR => false, FILES_DIR => true);
+    $dirs = array(RESOURCES_DIR."/".THEMES_DIR => false, RESOURCES_DIR."/".PLUGINS_DIR => false, RESOURCES_DIR."/".LIB_DIR => false, FILES_DIR => true);
     $e = null;
     foreach($dirs as $dir => $checkSource) {
       try {
