@@ -20,7 +20,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
     if($content->documentElement->hasClass($this->cssClass)) {
       $this->createLinkList($content->documentElement);
     }
-    Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".get_class($this)."/".get_class($this).".css");
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".get_class($this).".css");
     #echo $content->saveXML($content);
     #die();
     return $content;
