@@ -7,6 +7,7 @@ try {
   define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
   define("PLUGINS_DIR", "plugins");
   define("THEMES_DIR", "themes");
+  define("RESOURCES_DIR", "res");
   define("CMS_DIR", "cms");
   define("VER_DIR", "ver");
   define("LIB_DIR", "lib");

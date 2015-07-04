@@ -90,6 +90,10 @@ class FileHandler extends Plugin implements SplObserver {
     $fp = lockFile($src);
     try {
       if(is_file($dest)) return;
+      if(!IS_LOCALHOST && $this->isResource($src)) {
+        copy_plus($src, RESOURCES_DIR."/".$dest, true);
+        return;
+      }
       $mimeType = getFileMime($src);
       if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
         $modes = array(
@@ -106,11 +110,11 @@ class FileHandler extends Plugin implements SplObserver {
       }
       $registeredMime = array(
         "inode/x-empty" => array(), // empty file with any ext
-        "text/plain" => array("css", "js"),
-        "text/x-c" => array("js"),
-        "application/x-elc" => array("js"),
-        "application/x-empty" => array("css", "js"),
-        "application/octet-stream" => array("woff", "js"),
+        //"text/plain" => array("css", "js"),
+        //"text/x-c" => array("js"),
+        //"application/x-elc" => array("js"),
+        //"application/x-empty" => array("css", "js"),
+        "application/octet-stream" => array("woff"/*, "js"*/),
         "image/svg+xml" => array("svg"),
         "application/pdf" => array("pdf"),
         "application/vnd.ms-fontobject" => array("eot"),
@@ -127,6 +131,10 @@ class FileHandler extends Plugin implements SplObserver {
     } finally {
       unlockFile($fp);
     }
+  }
+
+  private function isResource($src) {
+    return in_array(pathinfo($src, PATHINFO_EXTENSION), array("scss", "less", "css", "js", "coffee"));
   }
 
   private function handleImage($src, $dest, $mode) {
