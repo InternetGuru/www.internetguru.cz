@@ -50,8 +50,6 @@
   <!-- Browser compatibility -->
   <jsFile>themes/modernizer.js</jsFile>
   <jsFile if="lt IE 9">themes/ie9.js</jsFile>
-  <jsFile>themes/prefixfree.js</jsFile>
-
 
   <!-- <xslt readonly="readonly"/> -->
   <xslt>themes/cms-messages.xsl</xslt>
