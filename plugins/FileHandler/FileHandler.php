@@ -63,7 +63,7 @@ class FileHandler extends Plugin implements SplObserver {
       if(!$filePath && $checkSource) $filePath = $this->getSourceFile($ff);
       if(!$filePath || filemtime($ff) != filemtime($filePath)) {
         if(!unlink($ff)) $passed = false;
-        if(isfile(RESOURCES_DIR."/$ff") && !unlink(RESOURCES_DIR."/$ff")) $passed = false;
+        if(is_file(RESOURCES_DIR."/$ff") && !unlink(RESOURCES_DIR."/$ff")) $passed = false;
       }
     }
     if(!$passed) throw new Exception(_("Failed to remove outdated file(s)"));
@@ -111,11 +111,11 @@ class FileHandler extends Plugin implements SplObserver {
       }
       $registeredMime = array(
         "inode/x-empty" => array(), // empty file with any ext
-        //"text/plain" => array("css", "js"),
-        //"text/x-c" => array("js"),
-        //"application/x-elc" => array("js"),
-        //"application/x-empty" => array("css", "js"),
-        "application/octet-stream" => array("woff"/*, "js"*/),
+        "text/plain" => array("css", "js"),
+        "text/x-c" => array("js"),
+        "application/x-elc" => array("js"),
+        "application/x-empty" => array("css", "js"),
+        "application/octet-stream" => array("woff", "js"),
         "image/svg+xml" => array("svg"),
         "application/pdf" => array("pdf"),
         "application/vnd.ms-fontobject" => array("eot"),
