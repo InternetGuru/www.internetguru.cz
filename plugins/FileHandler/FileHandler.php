@@ -61,7 +61,9 @@ class FileHandler extends Plugin implements SplObserver {
       }
       $filePath = findFile($ff, true, true, false);
       if(!$filePath && $checkSource) $filePath = $this->getSourceFile($ff);
-      if(!$filePath || filemtime($ff) != filemtime($filePath)) {
+      if(is_file(RESOURCES_DIR."/$ff")) $mtime = filemtime(RESOURCES_DIR."/$ff");
+      else $mtime = filemtime($ff);
+      if(!$filePath || $mtime != filemtime($filePath)) {
         if(!unlink($ff)) $passed = false;
         if(is_file(RESOURCES_DIR."/$ff") && !unlink(RESOURCES_DIR."/$ff")) $passed = false;
       }
