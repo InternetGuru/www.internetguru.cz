@@ -94,7 +94,18 @@ class FileHandler extends Plugin implements SplObserver {
     try {
       if(is_file($dest)) return;
       if(!IS_LOCALHOST && $this->isResource($src)) {
-        copy_plus($src, RESOURCES_DIR."/".$dest, true);
+        if(is_file(RESOURCES_DIR."/$dest")) {
+          unlink(RESOURCES_DIR."/$dest");
+          sleep(2);
+        }
+        copy_plus($src, RESOURCES_DIR."/$dest", true);
+        $sleeps = 0;
+        while(!is_file($dest)) {
+          if(++$maxSleep == 10) return;
+          usleep(rand(1,3)*100000);
+        }
+        //exec('cd '.WWW_FOLDER);
+        //exec('grunt --src domains/'.HOST."/".RESOURCES_DIR."/$dest --dest domains/".HOST."/$dest");
         return;
       }
       $mimeType = getFileMime($src);
@@ -137,7 +148,8 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function isResource($src) {
-    return in_array(pathinfo($src, PATHINFO_EXTENSION), array("scss", "less", "css", "js", "coffee"));
+    //return in_array(pathinfo($src, PATHINFO_EXTENSION), array("scss", "less", "css", "js", "coffee"));
+    return in_array(pathinfo($src, PATHINFO_EXTENSION), array("css", "js"));
   }
 
   private function handleImage($src, $dest, $mode) {
