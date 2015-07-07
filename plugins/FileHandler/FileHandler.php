@@ -93,21 +93,6 @@ class FileHandler extends Plugin implements SplObserver {
     $fp = lockFile($src);
     try {
       if(is_file($dest)) return;
-      if(!IS_LOCALHOST && $this->isResource($src)) {
-        if(is_file(RESOURCES_DIR."/$dest")) {
-          unlink(RESOURCES_DIR."/$dest");
-          sleep(2);
-        }
-        copy_plus($src, RESOURCES_DIR."/$dest", true);
-        $sleeps = 0;
-        while(!is_file($dest)) {
-          if(++$maxSleep == 10) return;
-          usleep(rand(1,3)*100000);
-        }
-        //exec('cd '.WWW_FOLDER);
-        //exec('grunt --src domains/'.HOST."/".RESOURCES_DIR."/$dest --dest domains/".HOST."/$dest");
-        return;
-      }
       $mimeType = getFileMime($src);
       if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
         $modes = array(
@@ -139,6 +124,22 @@ class FileHandler extends Plugin implements SplObserver {
       $ext = pathinfo($src, PATHINFO_EXTENSION);
       if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
+
+      if(!IS_LOCALHOST && $this->isResource($src)) {
+        if(is_file(RESOURCES_DIR."/$dest")) {
+          unlink(RESOURCES_DIR."/$dest");
+          sleep(2);
+        }
+        copy_plus($src, RESOURCES_DIR."/$dest", true);
+        $sleeps = 0;
+        while(!is_file($dest)) {
+          if(++$maxSleep == 10) return;
+          usleep(rand(1,3)*100000);
+        }
+        //exec('cd '.WWW_FOLDER);
+        //exec('grunt --src domains/'.HOST."/".RESOURCES_DIR."/$dest --dest domains/".HOST."/$dest");
+        return;
+      }
       copy_plus($src, $dest, true);
     } catch(Exception $e) {
       throw $e;
