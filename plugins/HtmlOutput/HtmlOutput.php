@@ -540,9 +540,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $e->setAttribute("type", "text/javascript");
       if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", ROOT_URL.$this->jsFiles[$k]["file"]);
       $if = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : false;
-      if($if)
+      if($if) {
+        $e->nodeValue = " ";
         $parent->appendChild($parent->ownerDocument->createComment("[if $if]>".$e->ownerDocument->saveXML($e)."<![endif]"));
-      else
+      } else
         $parent->appendChild($e);
     }
   }
