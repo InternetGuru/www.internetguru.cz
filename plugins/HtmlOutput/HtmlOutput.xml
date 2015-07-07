@@ -46,10 +46,12 @@
   <jsFile append="body">themes/scrolltop.js</jsFile>
   <jsFile append="body">themes/scrolltopinit.js</jsFile>
   <jsFile append="body">themes/completable.js</jsFile>
+  <jsFile append="body">themes/browserdetect.js</jsFile>
 
   <!-- Browser compatibility -->
   <jsFile>themes/modernizer.js</jsFile>
   <jsFile if="lt IE 9">themes/ie9.js</jsFile>
+  <jsFile append="body">themes/iefixes.js</jsFile>
 
   <!-- <xslt readonly="readonly"/> -->
   <xslt>themes/cms-messages.xsl</xslt>
