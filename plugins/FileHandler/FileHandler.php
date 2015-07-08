@@ -126,6 +126,11 @@ class FileHandler extends Plugin implements SplObserver {
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
 
       if(!IS_LOCALHOST && $this->isResource($src)) {
+        if(!is_dir(RESOURCES_DIR)) {
+          mkdir_plus(RESOURCES_DIR);
+          exec('/etc/init.d/gruntwatch restart');
+          sleep(2);
+        }
         if(is_file(RESOURCES_DIR."/$dest")) {
           unlink(RESOURCES_DIR."/$dest");
           //sleep(2);
