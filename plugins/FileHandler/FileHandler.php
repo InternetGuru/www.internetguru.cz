@@ -128,8 +128,8 @@ class FileHandler extends Plugin implements SplObserver {
       if(!IS_LOCALHOST && $this->isResource($src)) {
         if(!is_dir(RESOURCES_DIR)) {
           mkdir_plus(RESOURCES_DIR);
-          exec('/etc/init.d/gruntwatch restart');
-          sleep(2);
+          exec('/etc/init.d/gruntwatch stop');
+          //sleep(10);
         }
         if(is_file(RESOURCES_DIR."/$dest")) {
           unlink(RESOURCES_DIR."/$dest");
