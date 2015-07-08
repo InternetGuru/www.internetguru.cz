@@ -128,12 +128,12 @@ class FileHandler extends Plugin implements SplObserver {
       if(!IS_LOCALHOST && $this->isResource($src)) {
         if(is_file(RESOURCES_DIR."/$dest")) {
           unlink(RESOURCES_DIR."/$dest");
-          sleep(2);
+          //sleep(2);
         }
         copy_plus($src, RESOURCES_DIR."/$dest", true);
         $sleeps = 0;
         while(!is_file($dest)) {
-          if(++$maxSleep == 10) return;
+          if(++$maxSleep == 5) return;
           usleep(rand(1,3)*100000);
         }
         //exec('cd '.WWW_FOLDER);
