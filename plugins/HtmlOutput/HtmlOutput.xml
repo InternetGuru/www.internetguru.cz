@@ -31,22 +31,23 @@
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
   <!-- Default scripts -->
-  <jsFile append="body">themes/syntaxhighlightjs.js</jsFile>
   <jsFile append="body">themes/fragments.js</jsFile>
-  <jsFile append="body" priority="5">themes/toc.js</jsFile>
-  <jsFile append="body" priority="5">themes/tocinit.js</jsFile>
-  <jsFile append="body" priority="5">themes/selectable.js</jsFile>
-  <jsFile append="body" priority="5">themes/selectableinit.js</jsFile>
-  <jsFile append="body">themes/hideable.js</jsFile>
-  <jsFile append="body">themes/eventable.js</jsFile>
-  <jsFile append="body">themes/addressable.js</jsFile>
-  <jsFile append="body">themes/addressableinit.js</jsFile>
-  <jsFile append="body">themes/editable.js</jsFile>
-  <jsFile append="body">themes/editableinit.js</jsFile>
   <jsFile append="body">themes/scrolltop.js</jsFile>
   <jsFile append="body">themes/scrolltopinit.js</jsFile>
-  <jsFile append="body">themes/completable.js</jsFile>
   <jsFile append="body">themes/browserdetect.js</jsFile>
+  <jsFile append="body" if-xpath="//code[not(contains(@class, 'nohighlight'))]">themes/syntaxhighlightjs.js</jsFile>
+  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc')]">themes/toc.js</jsFile>
+  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc')]">themes/tocinit.js</jsFile>
+  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'selectable')]">themes/selectable.js</jsFile>
+  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'selectable')]">themes/selectableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable')]">themes/hideable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable')]">themes/hideableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'eventable')]">themes/eventable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'addressable')]">themes/addressable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'addressable')]">themes/addressableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//select[contains(@class, 'completable')]">themes/completable.js</jsFile>
 
   <!-- Browser compatibility -->
   <jsFile>themes/modernizer.js</jsFile>

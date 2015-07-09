@@ -37,6 +37,13 @@
         }
         style.appendChild(document.createTextNode(css));
       },
+      include = function(src, e) {
+        var base = window.Base ? window.Base : "/";
+        script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = base + src;
+        e.appendChild(script);
+      },
       createTocWrapper = function() {
         var d = document.getElementsByTagName("div");
         var i = 0;
@@ -108,6 +115,8 @@
           dd.appendChild(ol);
           tocWrapper.appendChild(dd);
           appendStyle();
+          if(!window.Hideable) include("themes/hideable.js", document.body);
+          if(!window.Hideable) include("themes/hideableinit.js", document.body);
         }
       }
    };

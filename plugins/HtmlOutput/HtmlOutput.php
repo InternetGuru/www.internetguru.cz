@@ -74,7 +74,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true, false);
     $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
     #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
-    $this->appendJsFiles($head);
     $this->appendCssFiles($head);
     $html->appendChild($head);
 
@@ -98,7 +97,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement, true);
     $html->appendChild($content);
-    $this->appendJsFiles($content, self::APPEND_BODY);
+    $cXpath = new DOMXPath($html->ownerDocument);
+    $this->addJs("window.Base = '".ROOT_URL."';", 1, self::APPEND_HEAD);
+    $this->appendJsFiles($html->getElementsByTagName("head")->item(0), self::APPEND_HEAD, $cXpath);
+    $this->appendJsFiles($content, self::APPEND_BODY, $cXpath);
 
     $this->validateEmptyContent($doc);
     $html = $doc->saveXML();
@@ -371,7 +373,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           if($n->hasAttribute("append")) $append = $n->getAttribute("append");
           if($n->hasAttribute("priority")) $priority = $n->getAttribute("priority");
           $if = ($n->hasAttribute("if") ? $n->getAttribute("if") : false);
-          $this->addJsFile($n->nodeValue, $priority, $append, $user, $if);
+          $ifXpath = ($n->hasAttribute("if-xpath") ? $n->getAttribute("if-xpath") : false);
+          $this->addJsFile($n->nodeValue, $priority, $append, $user, $if, $ifXpath);
           break;
           case "stylesheet":
           $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
@@ -454,7 +457,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string  $filePath JS file to be registered
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false, $if=false) {
+  public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false, $if=false, $ifXpath=false) {
     if(isset($this->jsFiles[$filePath])) return;
     Cms::addVariableItem("javascripts", $filePath);
     #if(findFile($filePath, $user) === false) throw new Exception();
@@ -463,6 +466,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       "append" => $append,
       "content" => "",
       "user" => $user,
+      "ifXpath" => $ifXpath,
       "if" => $if);
     $this->jsFilesPriority[$filePath] = $priority;
   }
@@ -518,7 +522,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param  DOMElement $parent Element to append JS files to
    * @return void
    */
-  private function appendJsFiles(DOMElement $parent, $append = self::APPEND_HEAD) {
+  private function appendJsFiles(DOMElement $parent, $append = self::APPEND_HEAD, DOMXPath $xPath) {
     foreach($this->jsFilesPriority as $k => $v) {
       if($append != $this->jsFiles[$k]["append"]) continue;
       /*
@@ -535,6 +539,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         }
       }
       */
+      $ifXpath = isset($this->jsFiles[$k]["ifXpath"]) ? $this->jsFiles[$k]["ifXpath"] : false;
+      if($ifXpath !== false) {
+        $r = $xPath->query($ifXpath);
+        if($r === false || $r->length === 0) continue;
+      }
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
