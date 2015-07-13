@@ -25,7 +25,7 @@
       appendStyle = function() {
         /* scrolltop.js */
         var css = '/* scrolltop.js */'
-          + 'a#scrolltop { font-family: "Times New Roman" serif; position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; cursor: pointer }'
+          + 'a#scrolltop { font-family: "Times new roman", serif; position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; cursor: pointer }'
           + 'a#scrolltop:hover { background: rgba(0, 0, 0, 0.65) }'
           + 'a#scrolltop span { position: relative; top: -0.05em; font-size: 2.3rem; }'
           + 'a#scrolltop.scrollhide { display: none; }';
