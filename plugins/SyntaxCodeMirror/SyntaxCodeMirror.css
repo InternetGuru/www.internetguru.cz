@@ -54,11 +54,13 @@ div.CodeMirror {
 .cm-s-tomorrow-night-eighties .CodeMirror-dialog.CodeMirror-dialog-top {
   background: black;
   color: #ccc;
-  padding: 0.3em 0.5em !important;
+  padding: 0.5em !important;
   border-color: #ffcc66;
+  z-index: 10;
 }
 .cm-s-tomorrow-night-eighties .CodeMirror-dialog.CodeMirror-dialog-top * {
   font-family: inherit !important;
-  color: inherit !important;
+  color: black !important;
   font-size: inherit !important;
+  padding: 0.2em 0.5em;
 }
