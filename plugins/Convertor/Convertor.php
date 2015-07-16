@@ -6,6 +6,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private $error = false;
   private $html = null;
   private $file = null;
+  private $docName = null;
   private $tmpFolder;
   private $importedFiles = array();
 
@@ -86,6 +87,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $doc->validatePlus(true);
     } catch(Exception $e) {}
     $this->parseContent($doc, "h", "short");
+    $firstHeading = $doc->documentElement->firstElement;
+    if(!$firstHeading->hasAttribute("short") && !is_null($this->docName))
+      $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
     try {
@@ -122,7 +126,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private function addLinks(HTMLPlus $doc) {
     foreach($doc->getElementsByTagName("h") as $e) {
       if(!$e->hasAttribute("short")) continue;
-      $e->setAttribute("link", normalize($e->getAttribute("short"), "a-zA-Z0-9/_-"));
+      $e->setAttribute("link", normalize($e->getAttribute("short"), "a-zA-Z0-9/_-", ""));
     }
   }
 
@@ -164,6 +168,16 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $purl = parse_url($url);
     if($purl === false) throw new Exception(_("Unable to parse link"));
     if(!isset($purl["scheme"])) return null;
+    $defaultContext = array('http' => array('method' => '', 'header' => ''));
+    stream_context_get_default($defaultContext);
+    stream_context_set_default(
+      array(
+        'http' => array(
+          'method' => 'HEAD',
+          'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.132 Safari/537.36"
+        )
+      )
+    );
     if($purl["host"] == "docs.google.com") {
       $url = $purl["scheme"]."://".$purl["host"].$purl["path"]."/export?format=doc";
       $headers = @get_headers($url);
@@ -172,21 +186,28 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
         $headers = @get_headers($url);
       }
     } else $headers = @get_headers($url);
+    $rh = $http_response_header;
     if(strpos($headers[0], '302') !== false)
       throw new Exception(_("Destination URL is unaccessible; must be shared publically"));
     elseif(strpos($headers[0], '200') === false)
       throw new Exception(sprintf(_("Destination URL error: %s"), $headers[0]));
+    stream_context_set_default($defaultContext);
     $data = file_get_contents($url);
-    $filename = $this->get_real_filename($http_response_header, $url);
+    $filename = $this->get_real_filename($rh, $url);
     file_put_contents($this->tmpFolder."/$filename", $data);
     return $filename;
   }
 
   private function get_real_filename($headers, $url) {
     foreach($headers as $header) {
-      if (strpos(strtolower($header), 'content-disposition') !== false) {
-        $tmp_name = explode('=', $header);
-        if($tmp_name[1]) return normalize(trim($tmp_name[1], '";\''), "a-zA-Z0-9/_.-", null, false, true);
+      if(strpos(strtolower($header), 'content-disposition') !== false) {
+        $tmp_name = explode('\'\'', $header);
+        if(!isset($tmp_name[1]))
+          $tmp_name = explode('filename="', $header);
+        if(isset($tmp_name[1])) {
+          $this->docName = pathinfo(urldecode($tmp_name[1]), PATHINFO_FILENAME);
+          return normalize(trim(urldecode($tmp_name[1]), '";\''), "a-zA-Z0-9/_.-", "", false);
+        }
       }
     }
     $stripped_url = preg_replace('/\\?.*/', '', $url);
