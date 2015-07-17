@@ -576,7 +576,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $xpath = new DOMXPath($doc);
     $toExpand = array();
     $toDelete = array();
-    foreach($xpath->query("//*[not(node()) or string-length() = 0]") as $e) {
+    foreach($xpath->query("//*[not(node()) and not(normalize-space())]") as $e) {
       if(in_array($e->nodeName, $emptyShort)) continue;
       if(in_array($e->nodeName, $emptyLong)) {
         $toExpand[] = $e;
