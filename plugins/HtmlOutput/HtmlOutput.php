@@ -40,49 +40,23 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $h1 = $content->documentElement->firstElement;
     $lang = $content->documentElement->getAttribute("xml:lang");
 
-    // create output DOM with doctype
-    $imp = new DOMImplementation();
-    $dtd = $imp->createDocumentType('html');
-    #$dtd = $imp->createDocumentType('html',
-    #    '-//W3C//DTD XHTML 1.1//EN',
-    #    'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
-    $doc = $imp->createDocument(null, null, $dtd);
-    $doc->encoding="utf-8";
-
-    // add root element
-    $html = $doc->createElement("html");
-    $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-    $html->setAttribute("xml:lang", $lang);
-    $html->setAttribute("lang", $lang);
-    $doc->appendChild($html);
-
-    // add head element
-    $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
-    #$this->appendMeta($head, "Content-Type", "text/html; charset=utf-8");
-    #$this->appendMeta($head, "Content-Type", "application/xhtml+xml; charset=UTF-8");
-    $this->appendMeta($head, "charset", "utf-8", false, true);
-    $this->appendMeta($head, "viewport", "initial-scale=1");
-    #$this->appendMeta($head, "Content-Language", $lang);
-    $this->appendMeta($head, "generator", Cms::getVariable("cms-name"));
-    $this->appendMeta($head, "author", $h1->getAttribute("author"));
-    $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
-    $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    $robots = $this->cfg->getElementById("robots");
-    $this->appendMeta($head, "robots", $robots->nodeValue);
-    $this->copyToRoot(findFile($this->favIcon), self::FAVICON);
-    $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true, false);
-    $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
-    #if(!is_null($this->favIcon)) $this->appendLinkElement($head, $this->favIcon, "shortcut icon", false, false, false);
-    $this->appendCssFiles($head);
-    $html->appendChild($head);
-
     // apply transformations
     $content = $this->applyTransformations($content);
-
-    // final validation
     $contentPlus = new DOMDocumentPlus();
     $contentPlus->loadXML($content->saveXML());
+
+    // final plugin modification
+    global $plugins;
+    foreach($plugins->getIsInterface("FinalContentStrategyInterface") as $fcs) {
+      $contentPlus = $fcs->getContent($contentPlus);
+    }
+
+    // create output DOM with doctype
+    $doc = $this->createDoc();
+    $html = $this->addRoot($doc, $lang);
+    $head = $this->addHead($doc, $html, $h1);
+
+    // final validation
     #$contentPlus->processVariables(Cms::getAllVariables());
     $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
     $xPath = new DOMXPath($contentPlus);
@@ -105,6 +79,45 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->validateEmptyContent($doc);
     $html = $doc->saveXML();
     return substr($html, strpos($html, "\n")+1);
+  }
+
+  private function createDoc() {
+    $imp = new DOMImplementation();
+    $dtd = $imp->createDocumentType('html');
+    #$dtd = $imp->createDocumentType('html',
+    #    '-//W3C//DTD XHTML 1.1//EN',
+    #    'http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd');
+    $doc = $imp->createDocument(null, null, $dtd);
+    $doc->encoding="utf-8";
+    return $doc;
+  }
+
+  private function addRoot(DOMDocument $doc, $lang) {
+    $html = $doc->createElement("html");
+    $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    $html->setAttribute("xml:lang", $lang);
+    $html->setAttribute("lang", $lang);
+    $doc->appendChild($html);
+    return $html;
+  }
+
+  private function addHead(DOMDocument $doc, DOMElement $html, DOMElementPlus $h1) {
+    $head = $doc->createElement("head");
+    $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
+    $this->appendMeta($head, "charset", "utf-8", false, true);
+    $this->appendMeta($head, "viewport", "initial-scale=1");
+    $this->appendMeta($head, "generator", Cms::getVariable("cms-name"));
+    $this->appendMeta($head, "author", $h1->getAttribute("author"));
+    $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
+    $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
+    $robots = $this->cfg->getElementById("robots");
+    $this->appendMeta($head, "robots", $robots->nodeValue);
+    $this->copyToRoot(findFile($this->favIcon), self::FAVICON);
+    $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true, false);
+    $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
+    $this->appendCssFiles($head);
+    $html->appendChild($head);
+    return $head;
   }
 
   private function applyTransformations(DOMDocumentPlus $content) {
@@ -563,7 +576,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $xpath = new DOMXPath($doc);
     $toExpand = array();
     $toDelete = array();
-    foreach($xpath->query("//*[not(node()) or text()='']") as $e) {
+    foreach($xpath->query("//*[not(node()) or string-length() = 0]") as $e) {
       if(in_array($e->nodeName, $emptyShort)) continue;
       if(in_array($e->nodeName, $emptyLong)) {
         $toExpand[] = $e;
