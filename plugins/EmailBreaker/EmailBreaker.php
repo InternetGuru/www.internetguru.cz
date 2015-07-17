@@ -1,13 +1,13 @@
 <?php
 
-class EmailBreaker extends Plugin implements SplObserver, ContentStrategyInterface {
+class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyInterface {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function getContent(DOMDocumentPlus $content) {
     $cfg = $this->getDOMPlus();
     $appendJs = false;
     $pat = array();
