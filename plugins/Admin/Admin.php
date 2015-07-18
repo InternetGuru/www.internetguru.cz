@@ -163,6 +163,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $mode = $this->replace ? _("replace") : _("modify");
     switch($this->type) {
       case "html":
+      $type = "htmlmixed";
+      break;
       case "xsl":
       $type = "xml";
       break;

@@ -11,13 +11,9 @@
   init(TextArea);
 
   var ul = document.createElement("ul");
-  var li = document.createElement("li");
-  ul.appendChild(li);
-  var toggleButton = document.createElement("button");
-  li.appendChild(toggleButton);
-  toggleButton.type = "button";
-  toggleButton.innerText = on;
+  toggleButton = appendButton(on, ul);
   TextArea.parentNode.insertBefore(ul, TextArea);
+
   toggleButton.onclick = function() {
     if(visible) {
       cm.toTextArea();
@@ -28,6 +24,35 @@
       toggleButton.innerText = on;
     }
     visible = !visible;
+  }
+
+  function appendButton(text, ul) {
+    var li = document.createElement("li");
+    ul.appendChild(li);
+    var b = document.createElement("button");
+    li.appendChild(b);
+    b.type = "button";
+    b.innerText = text;
+    return b;
+  }
+
+  function getSelectedRange(c) {
+    var start = c.getCursor(true),
+        end = c.getCursor(false);
+    if(start == end) { // all
+      return { from: {line: 0, ch: 0}, to: {line: c.lineCount()} }
+    }
+    return { from: c.getCursor(true), to: c.getCursor(false) };
+  }
+
+  function autoFormatSelection(c) {
+    var range = getSelectedRange(c);
+    c.autoFormatRange(range.from, range.to);
+  }
+
+  function autoIndentSelection(c) {
+    var range = getSelectedRange(c);
+    c.autoIndentRange(range.from, range.to);
   }
 
   function scrollToCursor(c) {
@@ -59,10 +84,17 @@
       extraKeys: {
         "Tab": false,
         "Shift-Tab": false,
+        "Ctrl--": "toggleComment",
         "Ctrl-G": "gotoLine",
         "Ctrl-E": "deleteLine",
         "End": "goLineRight",
         "Home": "goLineLeft",
+        "Ctrl-Alt-F": function(c) {
+          autoFormatSelection(c);
+        },
+        "Ctrl-Alt-I": function(c) {
+          autoIndentSelection(c);
+        },
         "F3": function(c) {
           c.execCommand("findNext");
           scrollToCursor(c);
@@ -70,6 +102,12 @@
         "Shift-F3": function(c) {
           c.execCommand("findPrev");
           scrollToCursor(c);
+        },
+        "F11": function(c) {
+          c.setOption("fullScreen", !cm.getOption("fullScreen"));
+        },
+        "Esc": function(c) {
+          if (c.getOption("fullScreen")) c.setOption("fullScreen", false);
         }
       }
     });

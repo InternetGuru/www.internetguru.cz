@@ -25,18 +25,24 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
       return $content;
     }
 
+    $xml = LIB_DIR."/".self::CM_DIR."/mode/xml/xml.js";
+    $css = LIB_DIR."/".self::CM_DIR."/mode/css/css.js";
+    $js = LIB_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
+    $html = LIB_DIR."/".self::CM_DIR."/mode/htmlmixed/htmlmixed.js";
+
     // supported syntax only
     $modes = array(
-      "xml" => LIB_DIR."/".self::CM_DIR."/mode/xml/xml.js",
-      "css" => LIB_DIR."/".self::CM_DIR."/mode/css/css.js",
-      "javascript" => LIB_DIR."/".self::CM_DIR."/mode/javascript/javascript.js",
+      "xml" => array($xml),
+      "css" => array($css),
+      "javascript" => array($js),
+      "htmlmixed" => array($xml, $css, $js, $html),
       );
     $libs = array();
     foreach($ta as $t) {
       if(!$t->hasAttribute("class")) continue;
       foreach(explode(" ", $t->getAttribute("class")) as $c) {
         if(array_key_exists($c, $modes)) {
-          $libs[] = $modes[$c];
+          $libs = array_merge($libs, $modes[$c]);
           break;
         }
       }
@@ -67,6 +73,9 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/format/formatting.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
+    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
 
     $os->addJsFile($this->pluginDir.'/SyntaxCodeMirror.js', 10, "body");
 
