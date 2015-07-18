@@ -317,8 +317,7 @@ function smartCopy($src, $dest) {
 }
 
 function lockFile($filePath) {
-  if(!is_file($filePath)) throw new Exception(_("File does not exist"));
-  $fp = @fopen($filePath, "r+");
+  $fp = @fopen($filePath, "c+");
   if(!$fp) throw new Exception(_("Unable to open file"));
   $start_time = microtime(true);
   do {
@@ -403,19 +402,27 @@ function readZippedFile($archiveFile, $dataFile) {
   return $data;
 }
 
-function getFileMime($file) {
-  #if(IS_LOCALHOST) {
+function getFileMime($filePath) {
+  $fh=fopen($filePath,'rb');
+  if(!$fh) throw new Exception(_("Unable to open file"));
+  try {
+    $bytes6 = fread($fh, 6);
+    if($bytes6 === false) throw new Exception(_("Unable to read file"));
+    if(substr($bytes6, 0, 3) == "\xff\xd8\xff") return 'image/jpeg';
+    if($bytes6 == "\x89PNG\x0d\x0a") return 'image/png';
+    if($bytes6 == "GIF87a" || $bytes6 == "GIF89a") return 'image/gif';
     if(!function_exists("finfo_file")) throw new Exception(_("Function finfo_file() not supported"));
     $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
-    $mime = finfo_file($finfo, $file); // avg. 2ms
+    $stat = fstat($fh);
+    $size = $stat['size'];
+    $mime = finfo_buffer($finfo, fread($fh, $size)); // avg. 2ms
     finfo_close($finfo);
     return $mime;
-  #}
-  #$file = escapeshellarg($file);
-  #$mime = shell_exec("file -bi ".$file." 2>&1"); // command file not found: TODO create script in cms
-  #var_dump($mime);
-  #$mime = explode(";", $mime);
-  #return $mime[0];
+  } catch(Exception $e) {
+    throw $e;
+  } finally {
+    fclose($fh);
+  }
 }
 
 function fileSizeConvert($b) {
