@@ -90,7 +90,7 @@ class FileHandler extends Plugin implements SplObserver {
     $mode = "";
     $src = $this->getSourceFile($dest, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
-    $fp = lockFile($src);
+    $fp = lockFile("$src.lock");
     try {
       if(is_file($dest)) return;
       $mimeType = getFileMime($src);
@@ -150,6 +150,7 @@ class FileHandler extends Plugin implements SplObserver {
       throw $e;
     } finally {
       unlockFile($fp);
+      unlink("$src.lock");
     }
   }
 
