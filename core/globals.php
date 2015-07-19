@@ -127,7 +127,8 @@ function parseLocalLink($link, $host=null) {
 }
 
 function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
-  addPageSpeedOff($pLink);
+  addPermParam($pLink, "PageSpeed");
+  addPermParam($pLink, "Grunt");
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
@@ -157,14 +158,19 @@ function isCyclicLink(Array $pLink) {
   return true;
 }
 
-function addPageSpeedOff(Array &$pLink) {
-  $psoff = "PageSpeed=off";
-  $pson = "PageSpeed=start";
-  if(!isset($_GET["PageSpeed"]) || $_GET["PageSpeed"] != "off") return;
+function addPermParam(Array &$pLink, $parName, $off="off", $on="on") {
+  if(!isset($_GET[$parName]) || $_GET[$parName] != $off) return;
+  $parOn = "$parName=$on";
+  $parOff = "$parName=$off";
   if(isset($pLink["query"])) {
-    if(strpos($pLink["query"], $pson) !== false) return;
-    $pLink["query"] = $pLink["query"]."&".$psoff;
-  } else $pLink["query"] = $psoff;
+    if(strpos($pLink["query"], $parOn) !== false) {
+      $pLink["query"] = str_replace("&$parOn", "", $pLink["query"]);
+      $pLink["query"] = str_replace("$parOn&", "", $pLink["query"]);
+      $pLink["query"] = str_replace($parOn, "", $pLink["query"]);
+      return;
+    }
+    $pLink["query"] = $pLink["query"]."&$parOff";
+  } else $pLink["query"] = $parOff;
 }
 
 function __toString($o) {

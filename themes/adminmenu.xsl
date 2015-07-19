@@ -7,6 +7,7 @@
   <xsl:param name="cms-pagespeed" select="''"/>
   <xsl:param name="cms-clearcacheurl" select="''"/>
   <xsl:param name="cms-name" select="''"/>
+  <xsl:param name="cms-link" select="''"/>
   <xsl:param name="filehandler-cfcurl" select="''"/>
 
   <xsl:template match="/">
@@ -26,10 +27,16 @@
         <li>
           <xsl:choose>
             <xsl:when test="$cms-pagespeed = 'off'">
-              <a href="?PageSpeed=start">Zapnout PageSpeed</a>
+              <xsl:element name="a">
+                <xsl:attribute name="href">
+                  <xsl:value-of select="$cms-link"/>
+                  <xsl:text>?PageSpeed=on&amp;Grunt=on</xsl:text>
+                </xsl:attribute>
+                <xsl:text>Vypnout režim ladění</xsl:text>
+              </xsl:element>
             </xsl:when>
             <xsl:otherwise>
-              <a href="?PageSpeed=off">Vypnout PageSpeed</a>
+              <a href="?PageSpeed=off&amp;Grunt=off">Zapnout režim ladění</a>
             </xsl:otherwise>
           </xsl:choose>
         </li>

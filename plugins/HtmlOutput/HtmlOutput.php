@@ -440,21 +440,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   private function appendLinkElement(DOMElement $parent, $file, $rel, $type=false, $media=false, $user=true, $root=true, $if=false) {
-    /*
-    try {
-      $f = $file;
-      if(!is_null(parseLocalLink($f)) && !is_file($f))
-        $f = findFile($file, $user, true, true);
-    } catch (Exception $e) {
-      $f = false;
-    }
-    if(!strlen($f)) {
-      $comment = sprintf(_("Link [%s] file '%s' not found"), $rel, $file);
-      $parent->appendChild(new DOMComment(" $comment "));
-      Logger::log($comment, Logger::LOGGER_ERROR);
-      return;
-    }
-    */
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
@@ -538,20 +523,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function appendJsFiles(DOMElement $parent, $append = self::APPEND_HEAD, DOMXPath $xPath) {
     foreach($this->jsFilesPriority as $k => $v) {
       if($append != $this->jsFiles[$k]["append"]) continue;
-      /*
-      $f = false;
-      if(!is_null($this->jsFiles[$k]["file"])) {
-        try {
-          $f = findFile($this->jsFiles[$k]["file"], $this->jsFiles[$k]["user"], true, true);
-        } catch (Exception $ex) {}
-        if($f === false) {
-          $comment = sprintf(_("Javascript file '%s' not found"), $k);
-          $parent->appendChild(new DOMComment(" $comment "));
-          Logger::log($comment, Logger::LOGGER_ERROR);
-          continue;
-        }
-      }
-      */
       $ifXpath = isset($this->jsFiles[$k]["ifXpath"]) ? $this->jsFiles[$k]["ifXpath"] : false;
       if($ifXpath !== false) {
         $r = $xPath->query($ifXpath);
@@ -560,7 +531,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
-      if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", ROOT_URL.$this->jsFiles[$k]["file"]);
+      $resRoot = ROOT_URL;
+      if($this->useGruntRes()) $resRoot .= RESOURCES_DIR."/";
+      if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", $resRoot.$this->jsFiles[$k]["file"]);
       $if = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : false;
       if($if) {
         $e->nodeValue = " ";
@@ -568,6 +541,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       } else
         $parent->appendChild($e);
     }
+  }
+
+  private function useGruntRes() {
+    if(IS_LOCALHOST) return false;
+    if(is_null(Cms::getLoggedUser())) return false;
+    return isset($_GET["Grunt"]) && $_GET["Grunt"] == "off";
   }
 
   private function validateEmptyContent(DOMDocument $doc) {
@@ -623,8 +602,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function appendCssFiles(DOMElement $parent) {
     foreach($this->cssFilesPriority as $k => $v) {
       $if = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : false;
-      $this->appendLinkElement($parent, $this->cssFiles[$k]["file"], "stylesheet",
-        "text/css", $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], true, $if);
+      $filePath = $this->cssFiles[$k]["file"];
+      if($this->useGruntRes()) $filePath = RESOURCES_DIR."/$filePath";
+      $this->appendLinkElement($parent, $filePath, "stylesheet", "text/css",
+        $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], true, $if);
     }
   }
 
