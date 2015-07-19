@@ -413,9 +413,7 @@ function getFileMime($filePath) {
     if($bytes6 == "GIF87a" || $bytes6 == "GIF89a") return 'image/gif';
     if(!function_exists("finfo_file")) throw new Exception(_("Function finfo_file() not supported"));
     $finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
-    $stat = fstat($fh);
-    $size = $stat['size'];
-    $mime = finfo_buffer($finfo, fread($fh, $size)); // avg. 2ms
+    $mime = finfo_file($finfo, $filePath); // avg. 2ms
     finfo_close($finfo);
     return $mime;
   } catch(Exception $e) {
