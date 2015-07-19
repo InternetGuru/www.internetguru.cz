@@ -1,5 +1,7 @@
 (function(win) {
 
+  if(win.Hideable) return;
+
   var Config = {}
 
   Config.expand = "[+]";
@@ -12,6 +14,7 @@
    var Hideable = function() {
 
     var
+    inited = false,
     initCfg = function(cfg) {
       if(typeof cfg === 'undefined') return;
       for(var attr in cfg) {
@@ -98,7 +101,9 @@
         initCfg(cfg);
         appendStyle();
         toggleHideables();
-      }
+        inited = true;
+      },
+      isInit : function() { return inited; }
     }
   };
 

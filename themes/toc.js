@@ -115,8 +115,8 @@
           dd.appendChild(ol);
           tocWrapper.appendChild(dd);
           appendStyle();
-          if(!window.Hideable) include("themes/hideable.js", document.body);
-          if(!window.Hideable) include("themes/hideableinit.js", document.body);
+          if(!win.Hideable) include("themes/hideable.js", document.body);
+          if(!win.Hideable) include("themes/hideableinit.js", document.body);
         }
       }
    };

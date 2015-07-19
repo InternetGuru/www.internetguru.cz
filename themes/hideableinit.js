@@ -1,1 +1,1 @@
-Hideable.init({});
+if(!Hideable || !Hideable.isInit()) Hideable.init({});
