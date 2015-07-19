@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Basket>
+
+  <var id="template" modifyonly="modifyonly">default</var>
+
+  <template id="default">
+    <form method="post" var="action@action">
+      <ul>
+        <li><input type="number" id="cnt" required="required" /></li>
+        <li>
+          <input type="hidden" name="id" var="id@value"/>
+          <input type="submit" id="submit" value="Přidat do košíku"/>
+        </li>
+      </ul>
+    </form>
+  </template>
+
+  <product id="63-11" price="152" />
+  <product id="62-67" price="207" />
+
+</Basket>
