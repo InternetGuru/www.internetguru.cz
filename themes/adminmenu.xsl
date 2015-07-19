@@ -29,7 +29,14 @@
             <xsl:when test="$cms-pagespeed = 'off'">
               <xsl:element name="a">
                 <xsl:attribute name="href">
-                  <xsl:value-of select="$cms-link"/>
+                  <xsl:choose>
+                    <xsl:when test="$cms-link">
+                      <xsl:value-of select="$cms-link"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:text>/</xsl:text>
+                    </xsl:otherwise>
+                  </xsl:choose>
                   <xsl:text>?PageSpeed=on&amp;Grunt=on</xsl:text>
                 </xsl:attribute>
                 <xsl:text>Vypnout režim ladění</xsl:text>

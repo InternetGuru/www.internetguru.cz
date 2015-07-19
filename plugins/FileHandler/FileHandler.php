@@ -1,8 +1,7 @@
 <?php
 
 class FileHandler extends Plugin implements SplObserver {
-
-  const DEBUG = false;
+  const CLEAR_CACHE_PARAM = "clearfilecache";
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -11,8 +10,7 @@ class FileHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
-    Cms::setVariable("cfcurl", getCurLink()."?clearfilecache");
-    if(!is_null(Cms::getLoggedUser()) && isset($_GET["clearfilecache"])) {
+    if(!is_null(Cms::getLoggedUser()) && isset($_GET[self::CLEAR_CACHE_PARAM])) {
       if(!Cms::isSuperUser()) Logger::log(_("Insufficient rights to purge file cache"), Logger::LOGGER_WARNING);
       try {
         $this->deleteResources();
@@ -21,12 +19,19 @@ class FileHandler extends Plugin implements SplObserver {
         Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
       }
     }
-    if(!preg_match("/".FILEPATH_PATTERN."/", getCurLink())) return;
+    $filePath = getCurLink();
+    if(!preg_match("/".FILEPATH_PATTERN."/", $filePath)) {
+      Cms::setVariable("cfcurl", "$filePath?".self::CLEAR_CACHE_PARAM);
+      return;
+    }
+    if(strpos($filePath, RESOURCES_DIR) === 0) $filePath = substr($filePath, strlen(RESOURCES_DIR)+1);
     try {
-      if(strpos(getCurLink(), FILES_DIR."/") !== 0 && strpos(getCurLink(), LIB_DIR."/") !== 0
-        && strpos(getCurLink(), THEMES_DIR."/") !== 0 && strpos(getCurLink(), PLUGINS_DIR."/") !== 0)
-      throw new Exception(_("File illegal path"), 404);
-      $this->handleFile();
+      $legal = false;
+      foreach(array(FILES_DIR, LIB_DIR, THEMES_DIR, PLUGINS_DIR) as $dir) {
+        if(strpos($filePath, "$dir/") === 0) $legal = true;
+      }
+      if(!$legal) throw new Exception(_("File illegal path"), 404);
+      $this->handleFile($filePath);
       redirTo(ROOT_URL.getCurLink());
     } catch(Exception $e) {
       $errno = 500;
@@ -85,8 +90,7 @@ class FileHandler extends Plugin implements SplObserver {
     return $src;
   }
 
-  private function handleFile() {
-    $dest = getCurLink();
+  private function handleFile($dest) {
     $mode = "";
     $src = $this->getSourceFile($dest, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);

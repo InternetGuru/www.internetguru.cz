@@ -525,6 +525,12 @@ function getIP() {
   return $_SERVER['REMOTE_ADDR'];
 }
 
+function useGruntRes() {
+  if(IS_LOCALHOST) return false;
+  if(is_null(Cms::getLoggedUser())) return false;
+  return isset($_GET["Grunt"]) && $_GET["Grunt"] == "off";
+}
+
 // UNUSED
 function clearApcCache() {
   $cache_info = apc_cache_info();

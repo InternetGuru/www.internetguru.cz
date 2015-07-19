@@ -532,7 +532,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
       $resRoot = ROOT_URL;
-      if($this->useGruntRes()) $resRoot .= RESOURCES_DIR."/";
+      if(useGruntRes()) $resRoot .= RESOURCES_DIR."/";
       if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", $resRoot.$this->jsFiles[$k]["file"]);
       $if = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : false;
       if($if) {
@@ -541,12 +541,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       } else
         $parent->appendChild($e);
     }
-  }
-
-  private function useGruntRes() {
-    if(IS_LOCALHOST) return false;
-    if(is_null(Cms::getLoggedUser())) return false;
-    return isset($_GET["Grunt"]) && $_GET["Grunt"] == "off";
   }
 
   private function validateEmptyContent(DOMDocument $doc) {
@@ -603,7 +597,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($this->cssFilesPriority as $k => $v) {
       $if = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : false;
       $filePath = $this->cssFiles[$k]["file"];
-      if($this->useGruntRes()) $filePath = RESOURCES_DIR."/$filePath";
+      if(useGruntRes()) $filePath = RESOURCES_DIR."/$filePath";
       $this->appendLinkElement($parent, $filePath, "stylesheet", "text/css",
         $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], true, $if);
     }
