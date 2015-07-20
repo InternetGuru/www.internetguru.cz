@@ -3,35 +3,142 @@
 class Basket extends Plugin implements SplObserver {
 
   private $cfg;
+  private $vars = array();
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
-
-    $this->cfg = $this->getDOMPlus();
-    $this->createVars();
-  }
-
-  private function createVars() {
-    $defaultTemplate = $this->cfg->getElementById("template")->nodeValue;
-    foreach($this->cfg->getElementsByTagName("product") as $product) {
-      if(!$product->hasAttribute("id"))
-        throw new Exception(_("Element product missing attribute id"));
-      if(!$product->hasAttribute("price"))
-        throw new Exception(_("Element product missing attribute price"));
-      $template = $product->hasAttribute("template") ? $product->getAttribute("template") : $defaultTemplate;
-      $productHtml = $this->modifyTemplate($template, $product->getAttribute("id"), $product->getAttribute("price"));
+    try {
+      // load config
+      $this->cfg = $this->getDOMPlus();
+      $products = $this->loadProducts();
+      if(!count($products)) {
+        $this->subject->detach($this);
+        return;
+      }
+      $templates = $this->loadTemplates();
+      $this->loadVariables();
+      // show success message
+      if(isset($_GET["btok"]) && isset($products[$_GET["btok"]])) {
+        Cms::addMessage($this->vars['success'], Cms::MSG_SUCCESS);
+        $orderLink = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
+        Cms::addMessage($orderLink, Cms::MSG_SUCCESS);
+      }
+      // save post data
+      if($this->isPost()) $this->processPost();
+      // create product variables
+      $this->createProductVars($templates, $products);
+      // fill order form
+      if(getCurLink() == $this->vars['formpage']) $this->createFormVar();
+      // create basket var
+      $this->createBasketVar();
+    } catch(Exception $e) {
+      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
     }
   }
 
-  private function modifyTemplate($templateName, $id, $price) {
-    $vars = array(
-      "action" => URI,
-      "id" => $id,
-      "price" => $price,
-    );
-    $template = $this->cfg->getElementById($templateName);
-    if(is_null($template)) throw new Exception(spritf(_("Template %s does not exist"), $templateName));
+  private function createBasketVar() {
+    if(getCurLink() == $this->vars['formpage']) return;
+    $doc = new DOMDocumentPlus();
+    $wrapper = $doc->appendChild($doc->createElement('div'));
+    $wrapper->setAttribute('class', 'basket-wrapper');
+    $a = $wrapper->appendChild($doc->createElement('a'));
+    $a->setAttribute('href', $this->vars['formpage']);
+    $a->nodeValue = 'Přejít do košíku';
+    Cms::setVariable('button', $doc);
+  }
+
+  private function createFormVar() {
+    $var = "";
+    foreach($_COOKIE as $name => $value) {
+      if(strpos($name, 'basket-') !== 0) continue;
+      $id = substr($name, 7);
+      $var .= "$id – $value ks\n";
+    }
+    if(strlen($var)) Cms::setVariable('order', $var);
+  }
+
+  private function processPost() {
+    $id = 'basket-'.$_POST['id'];
+    $cnt = (int)($_POST['cnt']);
+    if(isset($_COOKIE[$id])) $cnt += (int)($_COOKIE[$id]);
+    setcookie($id, $cnt, time() + (86400 * 30), "/"); // 30 days
+    redirTo(buildLocalUrl(array('path' => getCurLink(), 'query' => 'btok='.$_POST['id'])));
+  }
+
+  private function isPost() {
+    return isset($_POST['basket']) && isset($_POST['id']) && strlen($_POST['id'])
+      && isset($_POST['cnt']) && strlen($_POST['cnt']);
+  }
+
+  private function createProductVars(Array $templates, Array $products) {
+    foreach($templates as $tplName => $tpl) {
+      foreach($products as $product) {
+        $var = $this->modifyTemplate($tpl, $product);
+        Cms::setVariable("$tplName-".$product['id'], $var);
+      }
+    }
+  }
+
+  private function loadVariables() {
+    foreach($this->cfg->getElementsByTagName("var") as $var) {
+      if(!$var->hasAttribute("id"))
+        throw new Exception(_("Element var missing attribute id"));
+      $this->vars[$var->getAttribute('id')] = $var->nodeValue;
+    }
+  }
+
+  private function loadTemplates() {
+    $templates = array();
+    foreach($this->cfg->getElementsByTagName("template") as $tpl) {
+      if(!$tpl->hasAttribute("id"))
+        throw new Exception(_("Element template missing attribute id"));
+      $templates[$tpl->getAttribute("id")] = $tpl;
+    }
+    if(!count($templates)) throw new Exception(_("Template element(s) not found"));
+    return $templates;
+  }
+
+  private function loadProducts() {
+    $products = array();
+    foreach($this->cfg->getElementsByTagName("product") as $product) {
+      if(!$product->hasAttribute("id"))
+        throw new Exception(_("Element product missing attribute id"));
+      $attrs = array();
+      $id = $product->getAttribute("id");
+      $attrs["id"] = $id;
+      foreach($product->getElementsByTagName("attr") as $attr) {
+        if(!$attr->hasAttribute("vname")) {
+          Logger::log(sprintf(_("Product id %s element attr missing attribute vname"), $id), Logger::LOGGER_WARNING);
+          continue;
+        }
+        $vname = $attr->getAttribute("vname");
+        $doc = new DOMDocumentPlus();
+        $doc->appendChild($doc->importNode($attr, true));
+        $attrs[$vname] = $doc;
+        if($attr->hasAttribute("name")) $attrs["$vname-name"] = $attr->getAttribute("name");
+        if($vname == "price" && $attr->hasAttribute("currency")) {  #TODO: default currency?
+          $attrs["$vname-full"] = $attr->nodeValue." ".$attr->getAttribute("currency");
+        }
+      }
+      if(!isset($attrs["price"])) {
+        Logger::log(sprintf(_("Product id %s missing price"), $id), Logger::LOGGER_WARNING);
+        continue;
+      }
+      $products[$id] = $attrs;
+    }
+    return $products;
+  }
+
+  private function modifyTemplate($template, $product) {
+    $tmptpl = clone $template;
+    $vars = array_merge($product, array(
+      "action" => getCurLink(true),
+    ));
+    $tmptpl->processVariables($vars, array(), true);
+    $doc = new DOMDocumentPlus();
+    $doc->appendChild($doc->importNode($tmptpl, true));
+    return $doc;
   }
 
 }

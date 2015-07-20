@@ -1,21 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Basket>
 
-  <var id="template" modifyonly="modifyonly">default</var>
+  <var id="formpage" modifyonly="modifyonly">objednavka</var>
+  <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
+  <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
 
-  <template id="default">
-    <form method="post" var="action@action">
-      <ul>
-        <li><input type="number" id="cnt" required="required" /></li>
-        <li>
-          <input type="hidden" name="id" var="id@value"/>
-          <input type="submit" id="submit" value="Přidat do košíku"/>
-        </li>
-      </ul>
+  <template id="basic">
+    <form method="post" var="action@action" class="product">
+      <dl>
+        <dt var="name-name"></dt>
+        <dd><span var="name"/></dd>
+        <dt var="img-name"></dt>
+        <dd><span var="img"/></dd>
+        <dt var="price-name"></dt>
+        <dd var="price-full"></dd>
+        <dd>
+          <ul>
+            <li><input type="text" required="required" name="cnt" value="1" /></li>
+            <li>
+              <input type="hidden" name="basket"/>
+              <input type="hidden" name="id" var="id@value"/>
+              <button type="submit" title="Přidat do košíku"><span class="flaticon-shopping232">Koupit</span></button>
+            </li>
+          </ul>
+        </dd>
+      </dl>
     </form>
   </template>
-
-  <product id="63-11" price="152" />
-  <product id="62-67" price="207" />
 
 </Basket>
