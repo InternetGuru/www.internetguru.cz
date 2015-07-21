@@ -4,6 +4,7 @@
   <var id="formpage" modifyonly="modifyonly">objednavka</var>
   <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
   <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
+  <var id="totalprice" modifyonly="modifyonly">Celková cena:</var>
 
   <template id="basic">
     <form method="post" var="action@action" class="product">

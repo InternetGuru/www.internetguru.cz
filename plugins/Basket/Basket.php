@@ -29,7 +29,7 @@ class Basket extends Plugin implements SplObserver {
       // create product variables
       $this->createProductVars($templates, $products);
       // fill order form
-      if(getCurLink() == $this->vars['formpage']) $this->createFormVar();
+      if(getCurLink() == $this->vars['formpage']) $this->createFormVar($products);
       // create basket var
       $this->createBasketVar();
     } catch(Exception $e) {
@@ -48,13 +48,23 @@ class Basket extends Plugin implements SplObserver {
     Cms::setVariable('button', $doc);
   }
 
-  private function createFormVar() {
+  private function createFormVar(Array $products) {
     $var = "";
+    $price = null;
     foreach($_COOKIE as $name => $value) {
       if(strpos($name, 'basket-') !== 0) continue;
       $id = substr($name, 7);
-      $var .= "$id – $value ks\n";
+      if(!isset($products[$id])) continue;
+      $product = $products[$id];
+      $name = isset($product['name']) ? $product['name'] : $id;
+      $var .= "– ".$name->documentElement->nodeValue;
+      if(isset($product['price'])) $var .= " (".$product['price-full'].")";
+      $var .= " … ${value} ks";
+      $var .= "\n";
+      $price = (int)$price + (int)$product['price']->documentElement->nodeValue * (int)$value;
     }
+    if(!is_null($price))
+      $var .= "=====\n".$this->vars['totalprice']." ${price} ${product['price-currency']}";
     if(strlen($var)) Cms::setVariable('order', $var);
   }
 
@@ -107,24 +117,24 @@ class Basket extends Plugin implements SplObserver {
       $attrs = array();
       $id = $product->getAttribute("id");
       $attrs["id"] = $id;
-      foreach($product->getElementsByTagName("attr") as $attr) {
-        if(!$attr->hasAttribute("vname")) {
-          Logger::log(sprintf(_("Product id %s element attr missing attribute vname"), $id), Logger::LOGGER_WARNING);
-          continue;
-        }
-        $vname = $attr->getAttribute("vname");
+      foreach($product->childNodes as $attr) {
+        if($attr->nodeType != XML_ELEMENT_NODE) continue;
+        $vname = strtolower($attr->nodeName);
         $doc = new DOMDocumentPlus();
         $doc->appendChild($doc->importNode($attr, true));
         $attrs[$vname] = $doc;
         if($attr->hasAttribute("name")) $attrs["$vname-name"] = $attr->getAttribute("name");
         if($vname == "price" && $attr->hasAttribute("currency")) {  #TODO: default currency?
+          $attrs["$vname-currency"] = $attr->getAttribute("currency");
           $attrs["$vname-full"] = $attr->nodeValue." ".$attr->getAttribute("currency");
         }
       }
+      /*
       if(!isset($attrs["price"])) {
         Logger::log(sprintf(_("Product id %s missing price"), $id), Logger::LOGGER_WARNING);
         continue;
       }
+      */
       $products[$id] = $attrs;
     }
     return $products;
