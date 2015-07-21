@@ -6,6 +6,7 @@ class FileHandler extends Plugin implements SplObserver {
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1);
+    if(!is_dir(USER_FOLDER."/".$this->pluginDir)) mkdir_plus(USER_FOLDER."/".$this->pluginDir);
   }
 
   public function update(SplSubject $subject) {
@@ -130,25 +131,23 @@ class FileHandler extends Plugin implements SplObserver {
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
 
       if(!IS_LOCALHOST && $this->isResource($src)) {
-        $stop = false;
+        $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
+        $rfp = lockFile("$restartFile.lock");
         if(!is_dir(RESOURCES_DIR)) {
           mkdir_plus(RESOURCES_DIR);
-          $stop = true;
-        }
-        if(!is_dir(dirname($dest))) $stop = true;
-        if($stop) {
+          touch($restartFile);
           exec('/etc/init.d/gruntwatch stop');
-          sleep(5);
         }
+        if(!is_dir(dirname($dest)) && (!is_file($restartFile) || (time() - filemtime($restartFile)) >= 35 )) {
+          touch($restartFile);
+          exec('/etc/init.d/gruntwatch stop');
+        }  
         if(is_file(RESOURCES_DIR."/$dest")) {
           unlink(RESOURCES_DIR."/$dest");
         }
+        unlockFile($rfp);
         copy_plus($src, RESOURCES_DIR."/$dest", true);
-        $sleeps = 0;
-        while(!is_file($dest)) {
-          if(++$sleeps == 5) return;
-          usleep(rand(1,3)*100000);
-        }
+        usleep(rand(5,15)*100000);
         return;
       }
       copy_plus($src, $dest, true);
@@ -200,3 +199,4 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
 }
+
