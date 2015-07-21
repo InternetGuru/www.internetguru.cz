@@ -130,14 +130,18 @@ class FileHandler extends Plugin implements SplObserver {
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
 
       if(!IS_LOCALHOST && $this->isResource($src)) {
+        $stop = false;
         if(!is_dir(RESOURCES_DIR)) {
           mkdir_plus(RESOURCES_DIR);
+          $stop = true;
+        }
+        if(!is_dir(dirname(RESOURCES_DIR."/$dest"))) $stop = true;
+        if($stop) {
           exec('/etc/init.d/gruntwatch stop');
-          //sleep(10);
+          sleep(5);
         }
         if(is_file(RESOURCES_DIR."/$dest")) {
           unlink(RESOURCES_DIR."/$dest");
-          //sleep(2);
         }
         copy_plus($src, RESOURCES_DIR."/$dest", true);
         $sleeps = 0;
@@ -145,8 +149,6 @@ class FileHandler extends Plugin implements SplObserver {
           if(++$sleeps == 5) return;
           usleep(rand(1,3)*100000);
         }
-        //exec('cd '.WWW_FOLDER);
-        //exec('grunt --src domains/'.HOST."/".RESOURCES_DIR."/$dest --dest domains/".HOST."/$dest");
         return;
       }
       copy_plus($src, $dest, true);
