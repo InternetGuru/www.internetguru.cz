@@ -135,7 +135,7 @@ class FileHandler extends Plugin implements SplObserver {
           mkdir_plus(RESOURCES_DIR);
           $stop = true;
         }
-        if(!is_dir(dirname(RESOURCES_DIR."/$dest"))) $stop = true;
+        if(!is_dir(dirname($dest))) $stop = true;
         if($stop) {
           exec('/etc/init.d/gruntwatch stop');
           sleep(5);
