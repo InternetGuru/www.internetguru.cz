@@ -4,6 +4,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;
   private $vars = array();
+  private $products = array();
   private $productVars = array();
   private $cookieProducts = array();
 
@@ -45,19 +46,18 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
         $this->removeBasketCookies();
         redirTo(buildLocalUrl(array('path' => getCurLink(), 'query' => 'btdelok'), true));
       }
-      $products = $this->loadProducts();
-      if(!count($products)) {
+      $this->products = $this->loadProducts();
+      if(!count($this->products)) {
         $this->subject->detach($this);
         return;
       }
       $templates = $this->loadTemplates();
       // load product from cookie;
       $this->cookieProducts = $this->getCookieProducts();
-
       // create product variables
-      $this->createProductVars($templates, $products);
+      $this->createProductVars($templates);
       // fill order form
-      if(getCurLink() == $this->vars['formpage']) $this->createFormVar($products);
+      if(getCurLink() == $this->vars['formpage']) $this->createFormVar();
       // create basket var
       $this->createBasketVar();
       // create basket-empty var
@@ -74,7 +74,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     if(isset($_GET["btdelok"])) {
       Cms::addMessage($this->vars['deletesucess'], Cms::MSG_SUCCESS);
     }
-    if(isset($_GET["btok"]) && isset($products[$_GET["btok"]])) {
+    if(isset($_GET["btok"]) && isset($this->products[$_GET["btok"]])) {
       $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
       Cms::addMessage($this->vars['success']." – $gotoorder", Cms::MSG_SUCCESS);
     }
@@ -111,15 +111,15 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     Cms::setVariable('button', $var);
   }
 
-  private function createFormVar(Array $products) {
+  private function createFormVar() {
     $summary = "";
     $summaryProduct = $this->vars['summary-product'];
     $summarySeparator = $this->vars['summary-separator'];
     $summaryTotal = $this->vars['summary-total'];
     $price = null;
     foreach($this->cookieProducts as $id => $value) {
-      if(!isset($products[$id])) continue;
-      $product = $products[$id];
+      if(!isset($this->products[$id])) continue;
+      $product = $this->products[$id];
       $vars = array_merge($product, array(
         'currency' => $this->vars['currency'],
         'summary-ammount' => $value,
@@ -150,9 +150,9 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     return isset($_POST['id']) && !is_null(Cms::getVariable('validateform-'.$_POST['id']));
   }
 
-  private function createProductVars(Array $templates, Array $products) {
+  private function createProductVars(Array $templates) {
     foreach($templates as $tplName => $tpl) {
-      foreach($products as $product) {
+      foreach($this->products as $product) {
         $var = $this->modifyTemplate($tpl, $product);
         $id = "basket-$tplName-".$product['product-id'];
         $this->productVars[$id] = $var;
