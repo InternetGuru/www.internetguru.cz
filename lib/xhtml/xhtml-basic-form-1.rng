@@ -70,6 +70,7 @@
   <element name="input">
     <choice>
       <ref name="input.attlist"/>
+      <ref name="input.number.attlist"/>
       <ref name="input.text.attlist"/>
     </choice>
   </element>
@@ -114,6 +115,57 @@
   <optional>
     <attribute name="accesskey">
       <ref name="Character.datatype"/>
+    </attribute>
+  </optional>
+</define>
+
+<define name="input.number.attlist">
+  <ref name="Common.attrib"/>
+  <optional>
+    <attribute name="type">
+      <value>number</value>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="pattern"/>
+  </optional>
+  <optional>
+    <attribute name="name"/>
+  </optional>
+  <optional>
+    <attribute name="required">
+      <value>required</value>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="value"/>
+  </optional>
+  <optional>
+    <attribute name="size"/>
+  </optional>
+  <optional>
+    <attribute name="maxlength">
+      <ref name="Number.datatype"/>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="accesskey">
+      <ref name="Character.datatype"/>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="min">
+      <ref name="Number.datatype"/>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="max">
+      <ref name="Number.datatype"/>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="step">
+      <ref name="Number.datatype"/>
     </attribute>
   </optional>
 </define>
