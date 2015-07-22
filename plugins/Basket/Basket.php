@@ -22,23 +22,34 @@ class Basket extends Plugin implements SplObserver {
         return;
       }
       $templates = $this->loadTemplates();
+      // save post data
+      if($this->isPost()) $this->processPost($cookieProducts);
       // show success message
       if(isset($_GET["btok"]) && isset($products[$_GET["btok"]])) {
-        Cms::addMessage($this->vars['success'], Cms::MSG_SUCCESS);
-        $orderLink = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
-        Cms::addMessage($orderLink, Cms::MSG_SUCCESS);
+        $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
+        Cms::addMessage($this->vars['success']." – $gotoorder", Cms::MSG_SUCCESS);
       }
-      // save post data
-      if($this->isPost()) $this->processPost();
       // create product variables
       $this->createProductVars($templates, $products);
+      // load product from cookie;
+      $cookieProducts = $this->getCookieProducts();
       // fill order form
-      if(getCurLink() == $this->vars['formpage']) $this->createFormVar($products);
+      if(getCurLink() == $this->vars['formpage']) $this->createFormVar($products, $cookieProducts);
       // create basket var
-      $this->createBasketVar();
+      $this->createBasketVar($cookieProducts);
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
     }
+  }
+
+  private function getCookieProducts() {
+    $p = array();
+    foreach($_COOKIE as $name => $value) {
+      if(strpos($name, 'basket-') !== 0) continue;
+      $id = substr($name, 7);
+      $p[$id] = $value;
+    }
+    return $p;
   }
 
   private function removeBasketCookies() {
@@ -49,35 +60,43 @@ class Basket extends Plugin implements SplObserver {
     }
   }
 
-  private function createBasketVar() {
+  private function createBasketVar(Array $cookieProducts) {
     if(getCurLink() == $this->vars['formpage']) return;
+    $this->vars['basket-button']->processVariables($this->vars, array(), true);
     $doc = new DOMDocumentPlus();
     $wrapper = $doc->appendChild($doc->createElement('div'));
-    $wrapper->setAttribute('class', 'basket-wrapper');
-    $a = $wrapper->appendChild($doc->createElement('a'));
-    $a->setAttribute('href', $this->vars['formpage']);
-    $a->nodeValue = 'Přejít do košíku';
+    $wrapper->setAttribute('id', 'basket-wrapper');
+    if(!count($cookieProducts)) $wrapper->setAttribute('class', 'basket-empty');
+    foreach($this->vars['basket-button']->documentElement->childElementsArray as $e) {
+      $wrapper->appendChild($doc->importNode($e, true));
+    }
     Cms::setVariable('button', $doc);
   }
 
-  private function createFormVar(Array $products) {
-    $var = "";
+  private function createFormVar(Array $products, Array $cookieProducts) {
+    $summary = "";
+    $summaryProduct = $this->vars['summary-product'];
+    $summarySeparator = $this->vars['summary-separator'];
+    $summaryTotal = $this->vars['summary-total'];
     $price = null;
-    foreach($_COOKIE as $name => $value) {
-      if(strpos($name, 'basket-') !== 0) continue;
-      $id = substr($name, 7);
+    foreach($cookieProducts as $id => $value) {
       if(!isset($products[$id])) continue;
       $product = $products[$id];
-      $name = isset($product['name']) ? $product['name'] : $id;
-      $var .= "– ".$name->documentElement->nodeValue;
-      if(isset($product['price'])) $var .= " (".$product['price-full'].")";
-      $var .= " … ${value} ks";
-      $var .= "\n";
-      $price = (int)$price + (int)$product['price']->documentElement->nodeValue * (int)$value;
+      $vars = array_merge($product, array(
+        'currency' => $this->vars['currency'],
+        'summary-ammount' => $value,
+      ));
+      $summary .= replaceVariables($summaryProduct, $vars)."\n";
+      $p = gettype($product['price']) == 'object' ? $product['price']->documentElement->nodeValue : $product['price'];
+      $price = (int)$price + (int)$p * (int)$value;
     }
-    if(!is_null($price))
-      $var .= "=====\n".$this->vars['totalprice']." ${price} ${product['price-currency']}";
-    if(strlen($var)) Cms::setVariable('order', $var);
+    if(strlen($summary)) {
+      $summary .= "$summarySeparator\n";
+      if(!is_null($price))
+        $summary .= replaceVariables($summaryTotal,
+          array('summary-total' => (string)$price, 'currency' => $this->vars['currency']))."\n";
+      Cms::setVariable('order', $summary);
+    }
   }
 
   private function processPost() {
@@ -97,7 +116,7 @@ class Basket extends Plugin implements SplObserver {
     foreach($templates as $tplName => $tpl) {
       foreach($products as $product) {
         $var = $this->modifyTemplate($tpl, $product);
-        Cms::setVariable("$tplName-".$product['id'], $var);
+        Cms::setVariable("$tplName-".$product['product-id'], $var);
       }
     }
   }
@@ -106,7 +125,15 @@ class Basket extends Plugin implements SplObserver {
     foreach($this->cfg->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id"))
         throw new Exception(_("Element var missing attribute id"));
-      $this->vars[$var->getAttribute('id')] = $var->nodeValue;
+      $value = null;
+      if(count($var->childElementsArray)) {
+          $doc = new DOMDocumentPlus();
+          $doc->appendChild($doc->importNode($var, true));
+          $value = $doc;
+        } else {
+          $value = $var->nodeValue;
+        }
+      $this->vars[$var->getAttribute('id')] = $value;
     }
   }
 
@@ -127,18 +154,21 @@ class Basket extends Plugin implements SplObserver {
       if(!$product->hasAttribute("id"))
         throw new Exception(_("Element product missing attribute id"));
       $attrs = array();
-      $id = $product->getAttribute("id");
-      $attrs["id"] = $id;
+      foreach($product->attributes as $attrName => $attrNode) {
+        $attrs["product-$attrName"] = $attrNode->nodeValue;
+      }
       foreach($product->childNodes as $attr) {
         if($attr->nodeType != XML_ELEMENT_NODE) continue;
         $vname = strtolower($attr->nodeName);
-        $doc = new DOMDocumentPlus();
-        $doc->appendChild($doc->importNode($attr, true));
-        $attrs[$vname] = $doc;
-        if($attr->hasAttribute("name")) $attrs["$vname-name"] = $attr->getAttribute("name");
-        if($vname == "price" && $attr->hasAttribute("currency")) {  #TODO: default currency?
-          $attrs["$vname-currency"] = $attr->getAttribute("currency");
-          $attrs["$vname-full"] = $attr->nodeValue." ".$attr->getAttribute("currency");
+        if(count($attr->childElementsArray)) {
+          $doc = new DOMDocumentPlus();
+          $doc->appendChild($doc->importNode($attr, true));
+          $attrs[$vname] = $doc;
+        } else {
+          $attrs[$vname] = $attr->nodeValue;
+        }
+        foreach($attr->attributes as $attrName => $attrNode) {
+          $attrs["$vname-$attrName"] = $attrNode->nodeValue;
         }
       }
       /*
@@ -147,7 +177,7 @@ class Basket extends Plugin implements SplObserver {
         continue;
       }
       */
-      $products[$id] = $attrs;
+      $products[$attrs['product-id']] = $attrs;
     }
     return $products;
   }
@@ -156,6 +186,7 @@ class Basket extends Plugin implements SplObserver {
     $tmptpl = clone $template;
     $vars = array_merge($product, array(
       "action" => getCurLink(true),
+      "currency" => $this->vars['currency'],
     ));
     $tmptpl->processVariables($vars, array(), true);
     $doc = new DOMDocumentPlus();

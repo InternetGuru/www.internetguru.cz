@@ -5,31 +5,31 @@
   <var id="formid" modifyonly="modifyonly">objednavka</var>
   <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
   <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
-  <var id="totalprice" modifyonly="modifyonly">Celková cena:</var>
+  <var id="currency">Kč</var>
 
-  <!--
-    Definice šablony:
-      <template id="TEMPLATE_ID">
-        [HTML+]
-      <template>
+  <var id="summary-product" modifyonly="modifyonly">– $name ($product-id) … $summary-ammount ks * $price $currency</var> <!-- proměnná $summary-ammount -->
+  <var id="summary-separator" modifyonly="modifyonly">=====</var>
+  <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var> <!-- proměnná $summary-total -->
 
-    Například:
-  -->
+  <var id="basket-button">
+    <a class="basket-button" var="gotoorder@title formpage@href"><span class="flaticon-shopping232" var="gotoorder"></span></a>
+  </var>
+
   <template id="basic">
     <form method="post" var="action@action" class="product">
       <dl>
         <dt var="name-name"></dt>
-        <dd><span var="name"/></dd>
-        <dt var="img-name"></dt>
-        <dd><span var="img"/></dd>
+        <dd><span var="name"></span></dd>
+        <dt var="image-name"></dt>
+        <dd><span var="image"/></dd>
         <dt var="price-name"></dt>
-        <dd><span var="price"/> <span var="price-currency"/></dd>
+        <dd><span var="price"/> <span var="currency"/></dd>
         <dd>
           <ul>
-            <li><input type="text" required="required" name="cnt" value="1" /></li>
+            <li><input type="text" required="required" pattern="[1-9][0-9]*" name="cnt" value="1" /></li>
             <li>
               <input type="hidden" name="basket"/>
-              <input type="hidden" name="id" var="id@value"/>
+              <input type="hidden" name="id" var="product-id@value"/>
               <button type="submit" title="Přidat do košíku"><span class="flaticon-shopping232">Koupit</span></button>
             </li>
           </ul>
@@ -40,27 +40,33 @@
 
   <!--
 
-  Definice produktu:
-    <product id="PRODUCT_ID">
-      [<price currency="CURRENCY" [name="FULL_NAME"]>PRICE_VALUE</price>]
-      [<elementName [name="FULL_NAME"]>ELEMENT_VALUE</elementName>]
-      [...]
-    </product>
-    => vytváří proměnné:
-       - id (PRODUCT_ID)
-       - price (VALUE)
-       - price-name (FULL_NAME)
-       - price-currency (CURRENCY)
-       - elementname (ELEMENT_VALUE)
-       - elementname-name (FULL_NAME)
-       - [...]
+  Definice produktu jako
+    - element product s atributem id (a libovolnými dalšími) obsahující
+    - libovolný počet libovolných elementů, jejich hodnot a atributů, z toho
+    - nepovinný element price s číselnou hodnotou.
+  Vytvořené proměnné ve formátu
+    - [název_elementu] = [hodnota_elementu]
+    - [název_elementu]-[název atributu] = [hodnota_atributu]
 
-  Například:
-    <product id="63-11">
-      <price name="Cena" currency="Kč">152</price>
-      <name name="Název"><span>63-11</span></name>
-      <img name="Obrázek"><a href="files/dymky/63-11.jpg"><object type="image/jpeg" data="files/thumbs/dymky/63-11.jpg">63-11</object></a></img>
-    </product>
+  Ukázka produktu:
+  <product id="hreben-modry-x">
+    <price name="Cena">152</price>
+    <name name="Název">Modrý hřeben, velikost X</name>
+    <image name="Obrázek">
+      <a href="files/hreben-modry-x.jpg">
+        <object type="image/jpeg" data="files/thumbs/hreben-modry-x.jpg">Modrý hřeben, velikost X</object>
+      </a>
+    </image>
+  </product>
+
+  Vytvořené proměnné
+    - product-id = hreben-modry-x
+    - price = <strong>152</strong>
+    - price-name = Cena
+    - name = <span>Modrý hřeben, velikost X</span>
+    - name-name = Název
+    - image = [odkaz na obrázek]
+    - image-name = Obrázek
 
   -->
 
