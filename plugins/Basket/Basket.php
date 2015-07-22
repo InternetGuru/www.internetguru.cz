@@ -11,13 +11,17 @@ class Basket extends Plugin implements SplObserver {
     try {
       // load config
       $this->cfg = $this->getDOMPlus();
+      $this->loadVariables();
+      // after submitting form delete cookies
+      // !empty($_POST) && !is_null(Cms::getVariable('validateform-'.$this->vars['formid'])
+      if(getCurLink(true) == $this->vars['formpage']."?cfok=".$this->vars['formid'])
+        $this->removeBasketCookies();
       $products = $this->loadProducts();
       if(!count($products)) {
         $this->subject->detach($this);
         return;
       }
       $templates = $this->loadTemplates();
-      $this->loadVariables();
       // show success message
       if(isset($_GET["btok"]) && isset($products[$_GET["btok"]])) {
         Cms::addMessage($this->vars['success'], Cms::MSG_SUCCESS);
@@ -34,6 +38,14 @@ class Basket extends Plugin implements SplObserver {
       $this->createBasketVar();
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+    }
+  }
+
+  private function removeBasketCookies() {
+    foreach($_COOKIE as $name => $value) {
+      if(strpos($name, 'basket-') !== 0) continue;
+      unset($_COOKIE[$name]);
+      setcookie($name, null, -1, '/');
     }
   }
 
@@ -73,7 +85,7 @@ class Basket extends Plugin implements SplObserver {
     $cnt = (int)($_POST['cnt']);
     if(isset($_COOKIE[$id])) $cnt += (int)($_COOKIE[$id]);
     setcookie($id, $cnt, time() + (86400 * 30), "/"); // 30 days
-    redirTo(buildLocalUrl(array('path' => getCurLink(), 'query' => 'btok='.$_POST['id'])));
+    redirTo(buildLocalUrl(array('path' => getCurLink(), 'query' => 'btok='.$_POST['id']), true));
   }
 
   private function isPost() {

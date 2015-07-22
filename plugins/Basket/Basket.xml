@@ -2,10 +2,19 @@
 <Basket>
 
   <var id="formpage" modifyonly="modifyonly">objednavka</var>
+  <var id="formid" modifyonly="modifyonly">objednavka</var>
   <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
   <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
   <var id="totalprice" modifyonly="modifyonly">Celková cena:</var>
 
+  <!--
+    Definice šablony:
+      <template id="TEMPLATE_ID">
+        [HTML+]
+      <template>
+
+    Například:
+  -->
   <template id="basic">
     <form method="post" var="action@action" class="product">
       <dl>
@@ -14,7 +23,7 @@
         <dt var="img-name"></dt>
         <dd><span var="img"/></dd>
         <dt var="price-name"></dt>
-        <dd var="price-full"></dd>
+        <dd><span var="price"/> <span var="price-currency"/></dd>
         <dd>
           <ul>
             <li><input type="text" required="required" name="cnt" value="1" /></li>
@@ -28,5 +37,31 @@
       </dl>
     </form>
   </template>
+
+  <!--
+
+  Definice produktu:
+    <product id="PRODUCT_ID">
+      [<price currency="CURRENCY" [name="FULL_NAME"]>PRICE_VALUE</price>]
+      [<elementName [name="FULL_NAME"]>ELEMENT_VALUE</elementName>]
+      [...]
+    </product>
+    => vytváří proměnné:
+       - id (PRODUCT_ID)
+       - price (VALUE)
+       - price-name (FULL_NAME)
+       - price-currency (CURRENCY)
+       - elementname (ELEMENT_VALUE)
+       - elementname-name (FULL_NAME)
+       - [...]
+
+  Například:
+    <product id="63-11">
+      <price name="Cena" currency="Kč">152</price>
+      <name name="Název"><span>63-11</span></name>
+      <img name="Obrázek"><a href="files/dymky/63-11.jpg"><object type="image/jpeg" data="files/thumbs/dymky/63-11.jpg">63-11</object></a></img>
+    </product>
+
+  -->
 
 </Basket>
