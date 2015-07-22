@@ -5,6 +5,7 @@
   <var id="formid" modifyonly="modifyonly">objednavka</var>
   <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
   <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
+  <var id="basketempty" modifyonly="modifyonly">Košík je prázdný</var>
   <var id="delete" modifyonly="modifyonly">Vyprázdnit košík</var>
   <var id="deletesucess" modifyonly="modifyonly">Košík byl úpěšně vyprázdněn</var>
   <var id="currency">Kč</var>
@@ -13,13 +14,12 @@
   <var id="summary-separator" modifyonly="modifyonly">=====</var>
   <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var> <!-- proměnná $summary-total -->
 
-  <var id="basket-button">
-    <a class="basket-button" var="gotoorder@title formpage@href"><span class="flaticon-shopping232" var="gotoorder"></span></a>
-    <a class="basket-button basket-button-delete" var="delete@title deletelink@href"><span>x</span></a>
-  </var> <!-- proměnná deletelink -->
+  <div id="basket-wrapper" var="status@class" modifyonly="modifyonly">
+    <a class="basket-button" var="title@title formpage@href"><span class="flaticon-shopping232" var="gotoorder"></span></a>
+  </div> <!-- proměnná empty, title -->
 
   <template id="basic">
-    <form method="post" var="action@action" class="product">
+    <form method="post" var="product-id@id action@action" class="product fillable validable validateform-notime">
       <dl>
         <dt var="name-name"></dt>
         <dd><span var="name"></span></dd>
@@ -29,9 +29,8 @@
         <dd><span var="price"/> <span var="currency"/></dd>
         <dd>
           <ul>
-            <li><input type="text" required="required" pattern="[1-9][0-9]*" name="cnt" value="1" /></li>
+            <li><input type="number" min="1" required="required" var="product-id@name" name="cnt-%s" value="1" /></li>
             <li>
-              <input type="hidden" name="basket"/>
               <input type="hidden" name="id" var="product-id@value"/>
               <button type="submit" title="Přidat do košíku"><span class="flaticon-shopping232">Koupit</span></button>
             </li>

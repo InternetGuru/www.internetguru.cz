@@ -1,19 +1,43 @@
 <?php
 
-class Basket extends Plugin implements SplObserver {
+class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;
   private $vars = array();
+  private $productVars = array();
+  private $cookieProducts = array();
+
+
+  public function getContent(HTMLPlus $content) {
+    $oldContent = clone $content;
+    try {
+      $content->processVariables($this->productVars);
+    } catch(Exception $e) {
+      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      #echo $content->saveXML(); die();
+      return $oldContent;
+    }
+    return $content;
+  }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
+    switch($subject->getStatus()) {
+      case STATUS_INIT:
+      $this->build();
+      break;
+      case STATUS_PROCESS:
+      $this->process();
+      break;
+    }
+  }
+
+  private function build() {
     if($this->detachIfNotAttached("HtmlOutput")) return;
     try {
       // load config
       $this->cfg = $this->getDOMPlus();
       $this->loadVariables();
       // after submitting form delete cookies
-      // !empty($_POST) && !is_null(Cms::getVariable('validateform-'.$this->vars['formid'])
       if(getCurLink(true) == $this->vars['formpage']."?cfok=".$this->vars['formid'])
         $this->removeBasketCookies();
       // delete basket
@@ -27,26 +51,32 @@ class Basket extends Plugin implements SplObserver {
         return;
       }
       $templates = $this->loadTemplates();
-      // save post data
-      if($this->isPost()) $this->processPost($cookieProducts);
-      // show success message
-      if(isset($_GET["btdelok"])) {
-        Cms::addMessage($this->vars['deletesucess'], Cms::MSG_SUCCESS);
-      }
-      if(isset($_GET["btok"]) && isset($products[$_GET["btok"]])) {
-        $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
-        Cms::addMessage($this->vars['success']." – $gotoorder", Cms::MSG_SUCCESS);
-      }
+      // load product from cookie;
+      $this->cookieProducts = $this->getCookieProducts();
+
       // create product variables
       $this->createProductVars($templates, $products);
-      // load product from cookie;
-      $cookieProducts = $this->getCookieProducts();
       // fill order form
-      if(getCurLink() == $this->vars['formpage']) $this->createFormVar($products, $cookieProducts);
+      if(getCurLink() == $this->vars['formpage']) $this->createFormVar($products);
       // create basket var
-      $this->createBasketVar($cookieProducts);
+      $this->createBasketVar();
+      // create basket-empty var
+      Cms::setVariable('empty', (count($this->cookieProducts) ? null : ''));
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+    }
+  }
+
+  private function process() {
+    // save post data
+    if($this->isPost()) $this->processPost();
+    // show success message
+    if(isset($_GET["btdelok"])) {
+      Cms::addMessage($this->vars['deletesucess'], Cms::MSG_SUCCESS);
+    }
+    if(isset($_GET["btok"]) && isset($products[$_GET["btok"]])) {
+      $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
+      Cms::addMessage($this->vars['success']." – $gotoorder", Cms::MSG_SUCCESS);
     }
   }
 
@@ -68,29 +98,26 @@ class Basket extends Plugin implements SplObserver {
     }
   }
 
-  private function createBasketVar(Array $cookieProducts) {
+  private function createBasketVar() {
     if(getCurLink() == $this->vars['formpage']) return;
     $vars = array_merge($this->vars, array(
-      'deletelink' => "?btdel",
+      'status' => (count($this->cookieProducts) ? 'basket-full' : 'basket-empty'),
+      'title' => (count($this->cookieProducts) ? $this->vars['gotoorder'] : $this->vars['basketempty']),
     ));
-    $this->vars['basket-button']->processVariables($vars, array(), true);
-    $doc = new DOMDocumentPlus();
-    $wrapper = $doc->appendChild($doc->createElement('div'));
-    $wrapper->setAttribute('id', 'basket-wrapper');
-    if(!count($cookieProducts)) $wrapper->setAttribute('class', 'basket-empty');
-    foreach($this->vars['basket-button']->documentElement->childElementsArray as $e) {
-      $wrapper->appendChild($doc->importNode($e, true));
-    }
-    Cms::setVariable('button', $doc);
+    $var = $this->cfg->createElement("var");
+    $wrapper = $this->cfg->getElementById('basket-wrapper');
+    $wrapper->processVariables($vars, array(), true);
+    $var->appendChild($wrapper);
+    Cms::setVariable('button', $var);
   }
 
-  private function createFormVar(Array $products, Array $cookieProducts) {
+  private function createFormVar(Array $products) {
     $summary = "";
     $summaryProduct = $this->vars['summary-product'];
     $summarySeparator = $this->vars['summary-separator'];
     $summaryTotal = $this->vars['summary-total'];
     $price = null;
-    foreach($cookieProducts as $id => $value) {
+    foreach($this->cookieProducts as $id => $value) {
       if(!isset($products[$id])) continue;
       $product = $products[$id];
       $vars = array_merge($product, array(
@@ -112,22 +139,23 @@ class Basket extends Plugin implements SplObserver {
 
   private function processPost() {
     $id = 'basket-'.$_POST['id'];
-    $cnt = (int)($_POST['cnt']);
+    $formValues = Cms::getVariable('validateform-'.$_POST['id']);
+    $cnt = (int)($formValues['cnt-'.$_POST['id']]);
     if(isset($_COOKIE[$id])) $cnt += (int)($_COOKIE[$id]);
     setcookie($id, $cnt, time() + (86400 * 30), "/"); // 30 days
     redirTo(buildLocalUrl(array('path' => getCurLink(), 'query' => 'btok='.$_POST['id']), true));
   }
 
   private function isPost() {
-    return isset($_POST['basket']) && isset($_POST['id']) && strlen($_POST['id'])
-      && isset($_POST['cnt']) && strlen($_POST['cnt']);
+    return isset($_POST['id']) && !is_null(Cms::getVariable('validateform-'.$_POST['id']));
   }
 
   private function createProductVars(Array $templates, Array $products) {
     foreach($templates as $tplName => $tpl) {
       foreach($products as $product) {
         $var = $this->modifyTemplate($tpl, $product);
-        Cms::setVariable("$tplName-".$product['product-id'], $var);
+        $id = "basket-$tplName-".$product['product-id'];
+        $this->productVars[$id] = $var;
       }
     }
   }
