@@ -24,6 +24,8 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
         Logger::log(_("Validable form missing attribute id"));
         continue;
       }
+      $securityCheck = true;
+      if($form->hasClass("validateform-notime")) $securityCheck = false;
       $id = $form->getAttribute("id");
       $hInput = $content->createElement("input");
       $hInput->setAttribute("type", "hidden");
@@ -37,7 +39,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       if(empty($request)) continue;
       if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
       try {
-        $this->securityCheck();
+        if($securityCheck) $this->securityCheck();
       } catch(Exception $e) {
         Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
         continue;
@@ -115,6 +117,12 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       break;
       case "input":
       switch($e->getAttribute("type")) {
+        case "number":
+        $this->verifyText($value, $pattern, $req);
+        $min = $e->getAttribute("min");
+        $max = $e->getAttribute("max");
+        $this->verifyNumber($value, $min, $max);
+        break;
         case "email":
         if(!strlen($pattern)) $pattern = EMAIL_PATTERN;
         case "text":
@@ -132,6 +140,11 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       $this->verifyText($value, $pattern, $req);
       break;
     }
+  }
+
+  private function verifyNumber($value, $min, $max) {
+    if(strlen($min) && (int)$value < (int)$min) throw new Exception(_("Item value is lower then allowed minimum"));
+    if(strlen($max) && (int)$value > (int)$max) throw new Exception(_("Item value is greater then allowed maximum"));
   }
 
   private function verifyText($value, $pattern, $required) {
