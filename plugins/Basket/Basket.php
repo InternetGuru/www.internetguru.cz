@@ -185,7 +185,7 @@ class Basket extends Plugin implements SplObserver {
   private function modifyTemplate($template, $product) {
     $tmptpl = clone $template;
     $vars = array_merge($product, array(
-      "action" => getCurLink(true),
+      "action" => getCurLink(true) == "" ? "/" : getCurLink(true),
       "currency" => $this->vars['currency'],
     ));
     $tmptpl->processVariables($vars, array(), true);
