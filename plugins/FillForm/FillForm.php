@@ -27,8 +27,9 @@ class FillForm extends Plugin implements SplObserver, ContentStrategyInterface {
       switch($input->getAttribute("type")) {
         case "text":
         case "email":
+        case "number":
         case "search":
-        case "hidden":
+        //case "hidden":
         $input->setAttribute("value", $value);
         break;
         case "checkbox":
