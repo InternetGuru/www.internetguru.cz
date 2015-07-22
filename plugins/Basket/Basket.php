@@ -16,6 +16,11 @@ class Basket extends Plugin implements SplObserver {
       // !empty($_POST) && !is_null(Cms::getVariable('validateform-'.$this->vars['formid'])
       if(getCurLink(true) == $this->vars['formpage']."?cfok=".$this->vars['formid'])
         $this->removeBasketCookies();
+      // delete basket
+      if(isset($_GET["btdel"])) {
+        $this->removeBasketCookies();
+        redirTo(buildLocalUrl(array('path' => getCurLink(), 'query' => 'btdelok'), true));
+      }
       $products = $this->loadProducts();
       if(!count($products)) {
         $this->subject->detach($this);
@@ -25,6 +30,9 @@ class Basket extends Plugin implements SplObserver {
       // save post data
       if($this->isPost()) $this->processPost($cookieProducts);
       // show success message
+      if(isset($_GET["btdelok"])) {
+        Cms::addMessage($this->vars['deletesucess'], Cms::MSG_SUCCESS);
+      }
       if(isset($_GET["btok"]) && isset($products[$_GET["btok"]])) {
         $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
         Cms::addMessage($this->vars['success']." – $gotoorder", Cms::MSG_SUCCESS);
@@ -62,7 +70,10 @@ class Basket extends Plugin implements SplObserver {
 
   private function createBasketVar(Array $cookieProducts) {
     if(getCurLink() == $this->vars['formpage']) return;
-    $this->vars['basket-button']->processVariables($this->vars, array(), true);
+    $vars = array_merge($this->vars, array(
+      'deletelink' => "?btdel",
+    ));
+    $this->vars['basket-button']->processVariables($vars, array(), true);
     $doc = new DOMDocumentPlus();
     $wrapper = $doc->appendChild($doc->createElement('div'));
     $wrapper->setAttribute('id', 'basket-wrapper');

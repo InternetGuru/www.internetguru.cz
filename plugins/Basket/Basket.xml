@@ -5,6 +5,8 @@
   <var id="formid" modifyonly="modifyonly">objednavka</var>
   <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
   <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
+  <var id="delete" modifyonly="modifyonly">Vyprázdnit košík</var>
+  <var id="deletesucess" modifyonly="modifyonly">Košík byl úpěšně vyprázdněn</var>
   <var id="currency">Kč</var>
 
   <var id="summary-product" modifyonly="modifyonly">– $name ($product-id) … $summary-ammount ks * $price $currency</var> <!-- proměnná $summary-ammount -->
@@ -13,7 +15,8 @@
 
   <var id="basket-button">
     <a class="basket-button" var="gotoorder@title formpage@href"><span class="flaticon-shopping232" var="gotoorder"></span></a>
-  </var>
+    <a class="basket-button basket-button-delete" var="delete@title deletelink@href"><span>x</span></a>
+  </var> <!-- proměnná deletelink -->
 
   <template id="basic">
     <form method="post" var="action@action" class="product">
