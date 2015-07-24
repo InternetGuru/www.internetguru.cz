@@ -129,34 +129,41 @@ class FileHandler extends Plugin implements SplObserver {
       $ext = pathinfo($src, PATHINFO_EXTENSION);
       if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
-
-      if(!IS_LOCALHOST && $this->isResource($src)) {
-        $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
-        $rfp = lockFile("$restartFile.lock");
-        if(!is_dir(RESOURCES_DIR)) {
-          mkdir_plus(RESOURCES_DIR);
-          touch($restartFile);
-          exec('/etc/init.d/gruntwatch stop');
-        }
-        if(!is_dir(dirname($dest)) && (!is_file($restartFile) || (time() - filemtime($restartFile)) >= 35 )) {
-          touch($restartFile);
-          exec('/etc/init.d/gruntwatch stop');
-        }  
-        if(is_file(RESOURCES_DIR."/$dest")) {
-          unlink(RESOURCES_DIR."/$dest");
-        }
-        unlockFile($rfp);
-        copy_plus($src, RESOURCES_DIR."/$dest", true);
-        usleep(rand(5,15)*100000);
+      if(IS_LOCALHOST || !$this->isResource($src)) {
+        $this->copy_mtime($src, $dest);
         return;
       }
-      copy_plus($src, $dest, true);
+      $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
+      $rfp = lockFile("$restartFile.lock");
+      if(!is_dir(RESOURCES_DIR)) {
+        mkdir_plus(RESOURCES_DIR);
+        touch($restartFile);
+        exec('/etc/init.d/gruntwatch stop');
+      }
+      if(!is_dir(dirname($dest)) && (!is_file($restartFile) || (time() - filemtime($restartFile)) >= 35 )) {
+        touch($restartFile);
+        exec('/etc/init.d/gruntwatch stop');
+      }
+      if(is_file(RESOURCES_DIR."/$dest")) {
+        unlink(RESOURCES_DIR."/$dest");
+      }
+      unlockFile($rfp);
+      $this->copy_mtime($src, RESOURCES_DIR."/$dest");
+      usleep(rand(5,15)*100000);
     } catch(Exception $e) {
       throw $e;
     } finally {
       unlockFile($fp);
       unlink("$src.lock");
     }
+  }
+
+  private function copy_mtime($src, $dest) {
+    if(!is_link($dest) && is_file($dest) &&
+      filemtime($src) == filemtime($dest)) return;
+    copy_plus($src, $dest);
+    if(!touch($dest, filemtime($src)))
+      throw new Exception(_("Unable to touch destination file"));
   }
 
   private function isResource($src) {

@@ -215,24 +215,27 @@ function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=
   return $s;
 }
 
-function copy_plus($src, $dest, $mtime = false) {
-  if(!is_file($src))
-    throw new LoggerException(sprinft(_("Source file '%s' not found"), $src));
+function file_put_contents_plus($dest, $string) {
+  $b = file_put_contents("$dest.new", $string);
+  if($b === false) throw new Exception(_("Unable to save content"));
+  copy_plus("$dest.new", $dest, true);
+}
+
+function copy_plus($src, $dest, $keepSrc = true) {
+  if(is_link($src)) throw new Exception(_("Source file is a link"));
+  if(!is_file($src)) throw new Exception(_("Source file not found"));
   mkdir_plus(dirname($dest));
-  if($mtime && is_file($dest))
-  if(!is_link($dest) && is_file($dest)) {
-    if($mtime && filemtime($src) == filemtime($dest)) return;
-    if(!copy($dest, "$dest.old"))
-      throw new LoggerException(_("Unable to backup destination file"));
+  if(!is_link($dest) && is_file($dest) && !copy($dest, "$dest.old"))
+    throw new Exception(_("Unable to backup destination file"));
+  if($keepSrc) {
+    if(!copy($src, "$dest.new"))
+      throw new Exception(_("Unable to copy source file"));
+    $src = "$dest.new";
   }
-  if(!copy($src, "$dest.new"))
-    throw new LoggerException(_("Unable to copy source file"));
-  if(!rename("$dest.new", $dest))
-    throw new LoggerException(_("Unable to rename new file to destination"));
-  if($mtime && !touch($dest, filemtime($src)))
-    throw new LoggerException(_("Unable to touch destination file"));
+  if(!rename($src, $dest))
+    throw new Exception(_("Unable to rename new file to destination"));
   #if(is_file("$dest.old") && !unlink("$dest.old"))
-  #  throw new LoggerException(_("Unable to delete.old file"));
+  #  throw new Exception(_("Unable to delete.old file"));
 }
 
 function mkdir_plus($dir, $mode=0775, $recursive=true) {
