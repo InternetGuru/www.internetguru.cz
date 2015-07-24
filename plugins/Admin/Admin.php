@@ -57,7 +57,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         try {
           $this->savePost($fileName);
         } catch(Exception $e) {
-          throw new Exception(sprintf(_("Unable to save changes: %s"), $e->getMessage()));
+          throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $fileName, $e->getMessage()));
         }
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
         throw new Exception(_("No changes made"), 1);
@@ -359,13 +359,20 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function savePost($fileName) {
-    if($fileName != $this->dataFile && is_file($fileName) && !isset($_POST["overwrite"]))
-      throw new Exception("Destination file already exists");
     mkdir_plus(dirname($fileName));
-    $b = file_put_contents($fileName, $this->contentValue);
-    if($b === false) throw new Exception(_("Administration may be locked"));
-    $this->redir = true;
-    Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $this->redir);
+    $fp = lockFile("$fileName.lock");
+    try {
+      if($fileName != $this->dataFile && is_file($fileName) && !isset($_POST["overwrite"]))
+        throw new Exception(_("Destination file already exists"));
+      file_put_contents_plus($fileName, $this->contentValue);
+      $this->redir = true;
+      Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $this->redir);
+    } catch(Exception $e) {
+      throw $e;
+    } finally {
+      unlockFile($fp);
+      unlink("$fileName.lock");
+    }
   }
 
   private function enableDataFile() {
