@@ -57,7 +57,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         try {
           $this->savePost($fileName);
         } catch(Exception $e) {
-          throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $fileName, $e->getMessage()));
+          throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $e->getMessage()));
         }
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
         throw new Exception(_("No changes made"), 1);

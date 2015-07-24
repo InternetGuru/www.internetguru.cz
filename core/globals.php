@@ -218,7 +218,7 @@ function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=
 function file_put_contents_plus($dest, $string) {
   $b = file_put_contents("$dest.new", $string);
   if($b === false) throw new Exception(_("Unable to save content"));
-  copy_plus("$dest.new", $dest, true);
+  copy_plus("$dest.new", $dest, false);
 }
 
 function copy_plus($src, $dest, $keepSrc = true) {
