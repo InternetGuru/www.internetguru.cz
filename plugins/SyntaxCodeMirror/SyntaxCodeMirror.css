@@ -91,11 +91,12 @@ ul.codemirror-user-controll li {
 }
 
 ul.codemirror-user-controll li button {
-    padding: 0.5em 1em;
+    padding: 0.35em 0.75em;
     background-color: rgb(247, 247, 247);
     border: 0;
     cursor: pointer;
     font-family: inherit;
     border-radius: 0.2em;
     background-image: linear-gradient(to bottom, #fff, #DFDDDD);
+    color: #333;
 }
