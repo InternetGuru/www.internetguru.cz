@@ -101,11 +101,11 @@ class FileHandler extends Plugin implements SplObserver {
       $mimeType = getFileMime($src);
       if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
         $modes = array(
-          "" => array(1000, 1000, 250*1024, 85), // default, e.g. resources like icons
-          "images" => array(1000, 1000, 250*1024, 85),
-          "preview" => array(500, 500, 150*1024, 85),
-          "thumbs" => array(200, 200, 50*1024, 85),
-          "big" => array(1500, 1500, 400*1024, 75),
+          "" => array(1000, 1000, 300*1024, 85), // default, e.g. resources like icons
+          "images" => array(1000, 1000, 300*1024, 85),
+          "preview" => array(500, 500, 200*1024, 85),
+          "thumbs" => array(200, 200, 70*1024, 85),
+          "big" => array(1500, 1500, 450*1024, 75),
           "full" => array(0, 0, 0, 0)
         );
         if(!isset($modes[$mode])) $mode = "";
