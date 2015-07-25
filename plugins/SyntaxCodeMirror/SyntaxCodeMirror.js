@@ -106,9 +106,6 @@
         "F11": function(c) {
           c.setOption("fullScreen", !cm.getOption("fullScreen"));
         },
-        "Esc": function(c) {
-          if (c.getOption("fullScreen")) c.setOption("fullScreen", false);
-        }
       }
     });
     cm.on("change",function(cm,change) {
