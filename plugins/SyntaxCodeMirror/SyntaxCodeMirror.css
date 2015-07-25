@@ -67,3 +67,31 @@ div.CodeMirror {
 .cm-s-tomorrow-night-eighties .CodeMirror-dialog.CodeMirror-dialog-top button {
   color: black !important;
 }
+
+.CodeMirror-fullscreen {
+  margin-top: 0 !important;
+}
+
+ul.codemirror-user-controll {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: rgb(60, 60, 60);
+    max-width: 100%;
+    margin-bottom: 0.5em;
+}
+
+ul.codemirror-user-controll li {
+    display: inline-block;
+    margin: 0.5em 0.25em;
+}
+
+ul.codemirror-user-controll li button {
+    padding: 0.5em 1em;
+    background-color: rgb(247, 247, 247);
+    border: 0;
+    cursor: pointer;
+    font-family: inherit;
+    border-radius: 0.2em;
+    background-image: linear-gradient(to bottom, #fff, #DFDDDD);
+}

@@ -7,6 +7,9 @@
   var visible = true;
   var on = "Vypnout CodeMirror";
   var off = "Zapnout CodeMirror";
+  var format = "Formátovat (vybraný) text";
+  var fullScreenOn = "Vypnout režim celé obrazovky";
+  var fullScreenOff = "Zapnout režim celé obrazovky";
 
   init(TextArea);
 
@@ -24,6 +27,26 @@
       toggleButton.innerText = on;
     }
     visible = !visible;
+  }
+
+  function userInit() {
+    var ul = document.createElement("ul");
+    ul.className="codemirror-user-controll";
+    formatButton = appendButton(format, ul);
+    formatButton.title = "Ctrl+Alt+F";
+    fullScreenButton = appendButton(fullScreenOff, ul);
+    fullScreenButton.title = "F11";
+    TextArea.nextSibling.insertBefore(ul, TextArea.nextSibling.firstChild);
+
+    fullScreenButton.onclick = function() {
+      cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+      if(cm.getOption("fullScreen")) fullScreenButton.innerText = fullScreenOn;
+      else fullScreenButton.innerText = fullScreenOff;
+    }
+
+    formatButton.onclick = function() {
+      autoFormatSelection(cm);
+    }
   }
 
   function appendButton(text, ul) {
@@ -104,10 +127,11 @@
           scrollToCursor(c);
         },
         "F11": function(c) {
-          c.setOption("fullScreen", !cm.getOption("fullScreen"));
+          c.setOption("fullScreen", !c.getOption("fullScreen"));
         },
       }
     });
+    userInit();
     cm.on("change",function(cm,change) {
       if(!Editable) return;
       var form = Editable.getParentForm(TextArea);
