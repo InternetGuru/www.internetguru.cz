@@ -54,11 +54,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->isToEnable()) $this->enableDataFile();
       if($this->isPost() && ($this->contentChanged || $this->dataFile != $fileName)) {
-        try {
-          $this->savePost($fileName);
-        } catch(Exception $e) {
-          throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $e->getMessage()));
-        }
+        $this->savePost($fileName);
       } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
         throw new Exception(_("No changes made"), 1);
       }
@@ -362,9 +358,18 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     mkdir_plus(dirname($fileName));
     $fp = lockFile("$fileName.lock");
     try {
-      if($fileName != $this->dataFile && is_file($fileName) && !isset($_POST["overwrite"]))
-        throw new Exception(_("Destination file already exists"));
-      file_put_contents_plus($fileName, $this->contentValue);
+      try {
+        if($fileName != $this->dataFile && is_file($fileName) && !isset($_POST["overwrite"]))
+          throw new Exception(_("Destination file already exists"));
+        file_put_contents_plus($fileName, $this->contentValue);
+      } catch(Exception $e) {
+        throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $e->getMessage()));
+      }
+      try {
+        incrementalRename("$fileName.old", "$fileName.");
+      } catch(Exception $e) {
+        throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $e->getMessage()));
+      }
       $this->redir = true;
       Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS, $this->redir);
     } catch(Exception $e) {
