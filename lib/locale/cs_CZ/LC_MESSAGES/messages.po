@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-24 09:29+0100\n"
-"PO-Revision-Date: 2015-07-24 09:33+0100\n"
+"POT-Creation-Date: 2015-07-25 09:50+0200\n"
+"PO-Revision-Date: 2015-07-25 09:51+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.7.5\n"
-"X-Poedit-Basepath: ..\\..\\..\\..\\\n"
+"X-Generator: Poedit 1.8.3\n"
+"X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
@@ -455,42 +455,42 @@ msgstr "Nepodařilo se vytvořit složku"
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: core/globals.php:265
+#: core/globals.php:263
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: core/globals.php:271
+#: core/globals.php:269
 #, php-format
 msgid "Directory '%s' not found"
 msgstr "Složka '%s' nebyla nalezena"
 
-#: core/globals.php:321
+#: core/globals.php:319
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: core/globals.php:330 core/globals.php:401 core/globals.php:416
+#: core/globals.php:328 core/globals.php:399 core/globals.php:414
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: core/globals.php:336
+#: core/globals.php:334
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: core/globals.php:419
+#: core/globals.php:417
 msgid "Unable to read file"
 msgstr "Nepodařilo se přečíst soubor"
 
-#: core/globals.php:423
+#: core/globals.php:421
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: core/globals.php:479
+#: core/globals.php:477
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:522
+#: core/globals.php:520
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
@@ -551,93 +551,98 @@ msgstr "Uživatelský soubor '%s' se během úprav změnil"
 msgid "Insufficient right to save changes"
 msgstr "Nedostatečná práva pro uložení změn"
 
-#: plugins/Admin/Admin.php:60
-#, php-format
-msgid "Unable to save changes to %s: %s"
-msgstr "Nepodařilo se uložit změny do %s: %s"
-
-#: plugins/Admin/Admin.php:63
+#: plugins/Admin/Admin.php:59
 msgid "No changes made"
 msgstr "Nebyly provedeny žádné změny"
 
-#: plugins/Admin/Admin.php:68
+#: plugins/Admin/Admin.php:64
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: plugins/Admin/Admin.php:147
+#: plugins/Admin/Admin.php:143
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:163
+#: plugins/Admin/Admin.php:159
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:163
+#: plugins/Admin/Admin.php:159
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:182
+#: plugins/Admin/Admin.php:178
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:203
+#: plugins/Admin/Admin.php:199
 #, php-format
 msgid "%s - Administration"
 msgstr "%s - Administrace"
 
-#: plugins/Admin/Admin.php:260
+#: plugins/Admin/Admin.php:256
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: plugins/Admin/Admin.php:314
+#: plugins/Admin/Admin.php:310
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:317
+#: plugins/Admin/Admin.php:313
 msgid "My Heading"
 msgstr "Můj nadpis"
 
-#: plugins/Admin/Admin.php:318
+#: plugins/Admin/Admin.php:314
 msgid "My Content Description"
 msgstr "Můj popis obsahu"
 
-#: plugins/Admin/Admin.php:319
+#: plugins/Admin/Admin.php:315
 msgid "my, comma, separated, keywords"
 msgstr "moje, klíčová, slova, oddělená, čárkou"
 
-#: plugins/Admin/Admin.php:323
+#: plugins/Admin/Admin.php:319
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: plugins/Admin/Admin.php:358
+#: plugins/Admin/Admin.php:354
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:366
+#: plugins/Admin/Admin.php:363
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:369 plugins/InputVar/InputVar.php:23
+#: plugins/Admin/Admin.php:366
+#, php-format
+msgid "Unable to save changes to %s: %s"
+msgstr "Nepodařilo se uložit změny do %s: %s"
+
+#: plugins/Admin/Admin.php:371
+#, php-format
+msgid "Unable to backup %s: %s"
+msgstr "Nepodařilo se zálohovat %s: %s"
+
+#: plugins/Admin/Admin.php:374 plugins/InputVar/InputVar.php:23
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:383
+#: plugins/Admin/Admin.php:388
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:389
+#: plugins/Admin/Admin.php:394
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:400
+#: plugins/Admin/Admin.php:405
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:412
+#: plugins/Admin/Admin.php:417
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -791,37 +796,40 @@ msgstr "Například: Toto je popisek @ toto, jsou, klíčová, slova"
 msgid "File successfully imported"
 msgstr "Soubor byl úspěšně importován"
 
-#: plugins/Convertor/Convertor.php:112
+#: plugins/Convertor/Convertor.php:117
 #, php-format
-msgid "Unable to save imported file '%s.html' into temp folder"
-msgstr ""
-"Nepodařilo se uložit importovaný soubor '%s.html' do složky dočasných "
-"souborů."
+msgid "Unable to save file %s: %s"
+msgstr "Nepodařilo se uložit soubor %s: %s"
 
-#: plugins/Convertor/Convertor.php:163
+#: plugins/Convertor/Convertor.php:122
+#, php-format
+msgid "Unable to backup file %s: %s"
+msgstr "Nepodařilo se zálohovat soubor %s: %s"
+
+#: plugins/Convertor/Convertor.php:180
 #, php-format
 msgid "File '%s' not found in temp folder"
 msgstr "Soubor '%s' nebyl nalezen mezi dočasnými soubory"
 
-#: plugins/Convertor/Convertor.php:169
+#: plugins/Convertor/Convertor.php:186
 msgid "Unable to parse link"
 msgstr "Odkaz má neplatný formát"
 
-#: plugins/Convertor/Convertor.php:191
+#: plugins/Convertor/Convertor.php:208
 msgid "Destination URL is unaccessible; must be shared publically"
 msgstr "Cílový odkaz je nedostupný; dokument musí být veřejně sdílený"
 
-#: plugins/Convertor/Convertor.php:193
+#: plugins/Convertor/Convertor.php:210
 #, php-format
 msgid "Destination URL error: %s"
 msgstr "Chyba cílového odkazu: %s"
 
-#: plugins/Convertor/Convertor.php:241
+#: plugins/Convertor/Convertor.php:258
 #, php-format
 msgid "Unable to locate '%s' in '%s'"
 msgstr "Nepodařilo se nalézt soubor '%s' v archivu '%s'"
 
-#: plugins/Convertor/Convertor.php:256
+#: plugins/Convertor/Convertor.php:273
 #, php-format
 msgid "Failed to apply transformation '%s'"
 msgstr "Nepodařilo se aplikovat transformaci '%s'"
@@ -1114,6 +1122,11 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:155
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Unable to save imported file '%s.html' into temp folder"
+#~ msgstr ""
+#~ "Nepodařilo se uložit importovaný soubor '%s.html' do složky dočasných "
+#~ "souborů."
 
 #~ msgid "File does not exist"
 #~ msgstr "Soubor neexistuje"
