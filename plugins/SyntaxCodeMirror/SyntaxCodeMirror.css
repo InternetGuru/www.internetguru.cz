@@ -72,6 +72,10 @@ div.CodeMirror {
   margin-top: 0 !important;
 }
 
+.CodeMirror-fullscreen .CodeMirror-scroll {
+  overflow: auto !important;
+}
+
 ul.codemirror-user-controll {
     list-style: none;
     margin: 0;

@@ -99,7 +99,7 @@
       lineWrapping: true,
       matchTags: {bothTags: true},
       //tabSize: 2,
-      //styleActiveLine: true,
+      styleActiveLine: true,
       styleSelectedText: true,
       autoCloseTags: {
         whenClosing: true,
