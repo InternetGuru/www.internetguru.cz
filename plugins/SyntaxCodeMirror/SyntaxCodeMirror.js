@@ -97,6 +97,7 @@
       mode: TextArea.classList.item(0),
       width:"100%",
       lineWrapping: true,
+      matchTags: {bothTags: true},
       //tabSize: 2,
       //styleActiveLine: true,
       styleSelectedText: true,

@@ -71,8 +71,10 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/selection/mark-selection.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/comment/comment.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/xml-fold.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/matchtags.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/format/formatting.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
