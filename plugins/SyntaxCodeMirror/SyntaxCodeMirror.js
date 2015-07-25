@@ -39,11 +39,8 @@
     TextArea.nextSibling.insertBefore(ul, TextArea.nextSibling.firstChild);
 
     fullScreenButton.onclick = function() {
-      cm.setOption("fullScreen", !cm.getOption("fullScreen"));
-      if(cm.getOption("fullScreen")) fullScreenButton.innerText = fullScreenOn;
-      else fullScreenButton.innerText = fullScreenOff;
+      toggleFullScreen(cm);
     }
-
     formatButton.onclick = function() {
       autoFormatSelection(cm);
     }
@@ -88,6 +85,12 @@
     window.scrollTo(0, (coords.top + coords.bottom - myHeight) / 2);
   }
 
+  function toggleFullScreen(c) {
+    c.setOption("fullScreen", !c.getOption("fullScreen"));
+    if(c.getOption("fullScreen")) fullScreenButton.innerText = fullScreenOn;
+    else fullScreenButton.innerText = fullScreenOff;
+  }
+
   function init(textarea) {
     cm = CodeMirror.fromTextArea(TextArea, {
       tabMode: "default",
@@ -128,7 +131,7 @@
           scrollToCursor(c);
         },
         "F11": function(c) {
-          c.setOption("fullScreen", !c.getOption("fullScreen"));
+          toggleFullScreen(cm);
         },
       }
     });
