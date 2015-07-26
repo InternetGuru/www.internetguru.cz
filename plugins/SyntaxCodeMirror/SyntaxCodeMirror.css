@@ -21,7 +21,6 @@ div.CodeMirror {
 }
 
 .cm-s-tomorrow-night-eighties .CodeMirror-activeline-background {
-  /*background: rgb(50,50,50) !important;*/
   background: transparent !important;
 }
 
@@ -35,6 +34,8 @@ div.CodeMirror {
 
 .cm-s-tomorrow-night-eighties.CodeMirror {
   background: rgb(25,25,25);
+  display: flex;
+  flex-direction: column;
 }
 
 .cm-s-tomorrow-night-eighties span.cm-searching {
@@ -73,30 +74,51 @@ div.CodeMirror {
 }
 
 .CodeMirror-fullscreen .CodeMirror-scroll {
-  overflow: auto !important;
+  overflow: auto!important;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
 ul.codemirror-user-controll {
     list-style: none;
     margin: 0;
     padding: 0;
-    background-color: rgb(60, 60, 60);
+    background-color: rgb(73, 73, 73);
     max-width: 100%;
-    margin-bottom: 0.5em;
+    /* margin-bottom: 0.5em; */
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 ul.codemirror-user-controll li {
     display: inline-block;
-    margin: 0.5em 0.25em;
+    margin: 0;
 }
 
 ul.codemirror-user-controll li button {
-    padding: 0.35em 0.75em;
-    background-color: rgb(247, 247, 247);
+    padding: 0.5em 0.8em;
+    background-color: transparent;
     border: 0;
     cursor: pointer;
-    font-family: inherit;
-    border-radius: 0.2em;
-    background-image: linear-gradient(to bottom, #fff, #DFDDDD);
-    color: #333;
+    font-family: "Open Sans";
+    color: #CCC;
+    font-size: 1rem;
+}
+
+ul.codemirror-user-controll:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+ul.codemirror-user-controll li:nth-child(3) {
+    flex-grow: 2;
+}
+ul.codemirror-user-controll li button:hover {
+    background-color: #616161;
+}
+
+.CodeMirror-fullscreen .CodeMirror-vscrollbar {
+    display: none !important;
 }

@@ -5,44 +5,72 @@
   var cm = false
   var TextArea = document.getElementsByTagName("textarea")[0];
   var visible = true;
-  var on = "Vypnout CodeMirror";
-  var off = "Zapnout CodeMirror";
-  var format = "Formátovat (vybraný) text";
-  var fullScreenOn = "Vypnout režim celé obrazovky";
-  var fullScreenOff = "Zapnout režim celé obrazovky";
+  var appDisable = "×";
+  var appDisableTitle = "Deaktivovat CodeMirror (F4)";
+  var appEnable = "Aktivovat CodeMirror";
+  var appEnableTitle = "F4";
+  var format = "Formátovat";
+  var formatTitle = "Ctrl+Alt+F";
+  var fullscreenDisable = "▫";
+  var fullscreenDisableTitle = "Obnovit (F11)";
+  var fullscreenEnable = "□";
+  var fullScreenEnableTitle = "Maximalizovat (F11)";
+  var find = "Najít";
+  var findTitle = "Ctrl+F";
+  var replace = "Nahradit";
+  var replaceTitle = "Ctrl+H";
+  var appName = "CodeMirror";
 
   init(TextArea);
 
   var ul = document.createElement("ul");
-  toggleButton = appendButton(on, ul);
+  activateButton = appendButton(appEnable, ul);
   TextArea.parentNode.insertBefore(ul, TextArea);
-
-  toggleButton.onclick = function() {
-    if(visible) {
-      cm.toTextArea();
-      toggleButton.innerText = off;
-    }
-    else {
-      init(cm.getTextArea());
-      toggleButton.innerText = on;
-    }
-    visible = !visible;
+  ul.style.display = "none";
+  activateButton.onclick = function() {
+    toggleApp(cm);
   }
 
   function userInit() {
     var ul = document.createElement("ul");
     ul.className="codemirror-user-controll";
+
+    findButton = appendButton(find, ul);
+    findButton.title = findTitle;
+    replaceButton = appendButton(replace, ul);
+    replaceButton.title = replaceTitle;
     formatButton = appendButton(format, ul);
-    formatButton.title = "Ctrl+Alt+F";
-    fullScreenButton = appendButton(fullScreenOff, ul);
-    fullScreenButton.title = "F11";
+    formatButton.title = formatTitle;
+    fullScreenButton = appendButton(fullscreenEnable, ul);
+    fullScreenButton.title = fullScreenEnableTitle;
+    disableButton = appendButton(appDisable, ul);
+    disableButton.title = appDisableTitle;
     TextArea.nextSibling.insertBefore(ul, TextArea.nextSibling.firstChild);
 
+    findButton.onclick = function() {
+      CodeMirror.commands.find(cm);
+    }
+    replaceButton.onclick = function() {
+      CodeMirror.commands.replace(cm);
+    }
     fullScreenButton.onclick = function() {
       toggleFullScreen(cm);
     }
     formatButton.onclick = function() {
       autoFormatSelection(cm);
+    }
+    disableButton.onclick = function() {
+      toggleApp(cm);
+    }
+  }
+
+  function toggleApp(cm) {
+    if(activateButton.parentNode.parentNode.style.display == "none") {
+      cm.toTextArea();
+      activateButton.parentNode.parentNode.style.display = "initial";
+    } else {
+      init(cm.getTextArea());
+      activateButton.parentNode.parentNode.style.display = "none";
     }
   }
 
@@ -87,8 +115,20 @@
 
   function toggleFullScreen(c) {
     c.setOption("fullScreen", !c.getOption("fullScreen"));
-    if(c.getOption("fullScreen")) fullScreenButton.innerText = fullScreenOn;
-    else fullScreenButton.innerText = fullScreenOff;
+    if(c.getOption("fullScreen")) {
+      fullScreenButton.innerText = fullscreenDisable;
+      fullScreenButton.title = fullscreenDisableTitle;
+    } else {
+      fullScreenButton.innerText = fullscreenEnable;
+      fullScreenButton.title = fullScreenEnableTitle;
+    }
+  }
+
+  window.onkeydown = function(e) {
+    // letter F4
+    if(e.keyCode != 115) return true;
+    toggleApp(cm);
+    return false;
   }
 
   function init(textarea) {
