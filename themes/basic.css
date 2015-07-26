@@ -145,7 +145,6 @@ div.section > pre {
 }
 
 #footer > ul.globalmenu > li a {
-  text-decoration: none;
   padding: 0.1em 0.7em;
   display: inline-block;
 }
