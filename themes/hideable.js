@@ -34,7 +34,7 @@
 
     appendStyle = function() {
       var css = '/* hideables.js */'
-        + ' .hide { display: none }'
+        + ' .hide { display: none !important; }'
         + ' a.switch { text-decoration: none;'
         + ' border: none !important;'
         + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
