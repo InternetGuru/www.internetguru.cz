@@ -30,7 +30,7 @@ form dt, form dd {
 }
 
 form dt, form dt+dd {
-  float: left;
+  float: none;
 }
 
 form dt, form dt+dd+dd {
@@ -66,6 +66,9 @@ form dd > textarea {
   form dd > input[type="email"],
   form dd > textarea {
     width: 80vw;
+  }
+  form dt, form dt+dd {
+    float: left;
   }
 }
 
