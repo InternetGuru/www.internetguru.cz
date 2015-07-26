@@ -45,7 +45,7 @@ form dd > input[type="text"],
 form dd > input[type="email"] {
   border: none;
   background: #EAF2F5;
-  width: 80vw;
+  width: 100%;
   max-width: 25em;
   border-bottom: 0.1em solid rgb(165, 165, 165);
 }
@@ -55,10 +55,18 @@ form fieldset {
 }
 
 form dd > textarea {
-  width: 80vw;
+  width: 100%;
   max-width: 25em;
   font: inherit;
   box-sizing: content-box;
+}
+
+@media all and (min-width: 32em) {
+  form dd > input[type="text"],
+  form dd > input[type="email"],
+  form dd > textarea {
+    width: 80vw;
+  }
 }
 
 samp, pre, textarea,
