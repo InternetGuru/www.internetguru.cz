@@ -39,6 +39,7 @@
       list.className = "navigList";
       textNavig = document.createElement("input");
       textNavig.autocomplete = "off";
+      if(Config.navig.tabIndex) textNavig.tabIndex = Config.navig.tabIndex;
       textNavig.name = Config.navig.name;
       textNavig.type = "text";
       textNavig.className = "completable-input";
