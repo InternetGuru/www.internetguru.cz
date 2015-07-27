@@ -12,9 +12,9 @@
   var format = "Formátovat";
   var formatTitle = "Ctrl+Alt+F";
   var fullscreenDisable = "▫";
-  var fullscreenDisableTitle = "Obnovit (F11)";
+  var fullscreenDisableTitle = "Obnovit (Shift+F11)";
   var fullscreenEnable = "□";
-  var fullScreenEnableTitle = "Maximalizovat (F11)";
+  var fullScreenEnableTitle = "Maximalizovat (Shift+F11)";
   var find = "Najít";
   var findTitle = "Ctrl+F";
   var replace = "Nahradit";
