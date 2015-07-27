@@ -68,9 +68,11 @@
     if(activateButton.parentNode.parentNode.style.display == "none") {
       cm.toTextArea();
       activateButton.parentNode.parentNode.style.display = "initial";
+      TextArea.focus();
     } else {
-      init(cm.getTextArea());
+      cm = init(cm.getTextArea());
       activateButton.parentNode.parentNode.style.display = "none";
+      cm.focus();
     }
   }
 
@@ -125,9 +127,29 @@
   }
 
   window.onkeydown = function(e) {
-    // letter F4
-    if(e.keyCode != 115) return true;
-    toggleApp(cm);
+    var key;
+    var isShift;
+    if (window.event) {
+      key = window.event.keyCode;
+      isShift = !!window.event.shiftKey; // typecast to boolean
+    } else {
+      key = ev.which;
+      isShift = !!ev.shiftKey;
+    }
+    switch (e.keyCode) {
+      // F4
+      case 115:
+      toggleApp(cm);
+      break;
+      // Shift + F11
+      case 122:
+      if(isShift) {
+        toggleFullScreen(cm);
+        cm.focus();
+        break;
+      }
+      default: return true;
+    }
     return false;
   }
 
@@ -170,9 +192,6 @@
           c.execCommand("findPrev");
           scrollToCursor(c);
         },
-        "F11": function(c) {
-          toggleFullScreen(cm);
-        },
       }
     });
     userInit();
@@ -182,6 +201,7 @@
       if(!form || !form.classList.contains(Editable.getEditableClass())) return;
       Editable.setModified();
     });
+    return cm;
   }
 
 })(window);
