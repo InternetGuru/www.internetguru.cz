@@ -366,7 +366,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $e->getMessage()));
       }
       try {
-        incrementalRename("$fileName.old", "$fileName.");
+        if(is_file("$fileName.old"))
+          incrementalRename("$fileName.old", "$fileName.");
       } catch(Exception $e) {
         throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $e->getMessage()));
       }
