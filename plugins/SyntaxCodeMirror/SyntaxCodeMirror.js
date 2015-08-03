@@ -10,7 +10,7 @@
   var appEnable = "Aktivovat CodeMirror";
   var appEnableTitle = "F4";
   var format = "Formátovat";
-  var formatTitle = "Ctrl+Alt+F";
+  var formatTitle = "Ctrl+Shift+F";
   var fullscreenDisable = "▫";
   var fullscreenDisableTitle = "Obnovit (Shift+F11)";
   var fullscreenEnable = "□";
@@ -177,7 +177,7 @@
         whenClosing: true,
         whenOpening: false
       },
-      extraKeys: {
+      extraKeys: CodeMirror.normalizeKeyMap({
         "Tab": false,
         "Shift-Tab": false,
         "Ctrl--": "toggleComment",
@@ -185,10 +185,10 @@
         "Ctrl-E": "deleteLine",
         "End": "goLineRight",
         "Home": "goLineLeft",
-        "Ctrl-Alt-F": function(c) {
+        "Ctrl-Shift-F": function(c) {
           autoFormatSelection(c);
         },
-        "Ctrl-Alt-I": function(c) {
+        "Ctrl-Shift-I": function(c) {
           autoIndentSelection(c);
         },
         "F3": function(c) {
@@ -199,7 +199,7 @@
           c.execCommand("findPrev");
           scrollToCursor(c);
         },
-      }
+      })
     });
     userInit();
     cm.on("change",function(cm,change) {
