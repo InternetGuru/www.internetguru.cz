@@ -4,6 +4,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
   const FORM_ID = "validateform-id";
+  const WAIT = 120;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -24,8 +25,8 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
         Logger::log(_("Validable form missing attribute id"));
         continue;
       }
-      $securityCheck = true;
-      if($form->hasClass("validateform-notime")) $securityCheck = false;
+      $time = $this->getWaitTime($form);
+      if($form->hasClass("validateform-notime")) $time = 0;
       $id = $form->getAttribute("id");
       $hInput = $content->createElement("input");
       $hInput->setAttribute("type", "hidden");
@@ -39,7 +40,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       if(empty($request)) continue;
       if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
       try {
-        if($securityCheck) $this->securityCheck();
+        $this->securityCheck($time);
       } catch(Exception $e) {
         Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
         continue;
@@ -90,7 +91,18 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     return $values;
   }
 
-  private function securityCheck() {
+  private function getWaitTime($form) {
+    $time = self::WAIT;
+    foreach(explode(" ", $form->getAttribute("class")) as $class) {
+      if(strpos($class, "validateform-") !== 0) continue;
+      $time = (int)substr($class, strlen("validateform-"));
+      break;
+    }
+    return $time;
+  }
+
+  private function securityCheck($time) {
+    if($time == 0) return;
     $IP = getIP();
     $IPFile = str_replace(":", "-", $IP);
     $IPFilePath = USER_FOLDER."/".$this->pluginDir."/$IPFile";
@@ -99,8 +111,8 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       throw new Exception(sprintf(_("Your IP adress %s is banned"), $IP));
     }
     if(is_file($IPFilePath)) {
-      if(time() - filemtime($IPFilePath)  < 60*2) { // 2 min timeout
-        throw new Exception(_("The form can not be sent in such quick succession, please try it again in a minute"));
+      if(time() - filemtime($IPFilePath) < $time) { // 2 min timeout
+        throw new Exception(sprintf(_("The form can not be sent in such quick succession, please try it again in %s seconds"), $time - (time() - filemtime($IPFilePath))));
       }
     }
     mkdir_plus(dirname($IPFilePath));

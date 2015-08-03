@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-25 09:50+0200\n"
-"PO-Revision-Date: 2015-07-25 09:51+0200\n"
+"POT-Creation-Date: 2015-08-03 18:19+0100\n"
+"PO-Revision-Date: 2015-08-03 18:22+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.3\n"
+"X-Generator: Poedit 1.8.1\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -620,29 +620,29 @@ msgstr "Cílový soubor již existuje"
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:371
+#: plugins/Admin/Admin.php:372
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:374 plugins/InputVar/InputVar.php:23
+#: plugins/Admin/Admin.php:375 plugins/InputVar/InputVar.php:23
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:388
+#: plugins/Admin/Admin.php:389
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:394
+#: plugins/Admin/Admin.php:395
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:405
+#: plugins/Admin/Admin.php:406
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:417
+#: plugins/Admin/Admin.php:418
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -677,6 +677,22 @@ msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
 #: plugins/Auth/Auth.php:20
 msgid "Insufficient rights to view this content"
 msgstr "Nedostatečná práva pro zobrazení obsahu"
+
+#: plugins/Basket/Basket.php:166
+msgid "Element var missing attribute id"
+msgstr "Element var postrádá atribut id"
+
+#: plugins/Basket/Basket.php:183
+msgid "Element template missing attribute id"
+msgstr "Element template postrádá atribut id"
+
+#: plugins/Basket/Basket.php:186
+msgid "Template element(s) not found"
+msgstr "Element template postrádá obsah"
+
+#: plugins/Basket/Basket.php:194
+msgid "Element product missing attribute id"
+msgstr "Element product postrádá atribut id"
 
 #: plugins/ContactForm/ContactForm.php:87
 #, php-format
@@ -1083,45 +1099,61 @@ msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
 msgid "Unable to redir to %s: %s"
 msgstr "Nepodařilo se přesměrovat na %s: %s"
 
-#: plugins/ValidateForm/ValidateForm.php:24
+#: plugins/ValidateForm/ValidateForm.php:25
 msgid "Validable form missing attribute id"
 msgstr "Formulář s třídou validable postrádá atribut id."
 
-#: plugins/ValidateForm/ValidateForm.php:97
+#: plugins/ValidateForm/ValidateForm.php:111
 #, php-format
 msgid "Your IP adress %s is banned"
 msgstr "Odesílání je z Vaší IP adresy %s zakázáno"
 
-#: plugins/ValidateForm/ValidateForm.php:101
+#: plugins/ValidateForm/ValidateForm.php:115
+#, php-format
 msgid ""
-"The form can not be sent in such quick succession, please try it again in a "
-"minute"
+"The form can not be sent in such quick succession, please try it again in %s "
+"seconds"
 msgstr ""
-"Formulář není možné odesílat takto rychle za sebou, zkuste za chvíli znovu"
+"Formulář není možné odesílat takto rychle za sebou, zkuste to znuvu za %s "
+"vteřin"
 
-#: plugins/ValidateForm/ValidateForm.php:105
+#: plugins/ValidateForm/ValidateForm.php:119
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
 
-#: plugins/ValidateForm/ValidateForm.php:138
+#: plugins/ValidateForm/ValidateForm.php:158
+msgid "Item value is lower then allowed minimum"
+msgstr "Hodnota je menší než povolené minimum"
+
+#: plugins/ValidateForm/ValidateForm.php:159
+msgid "Item value is greater then allowed maximum"
+msgstr "Hodnota je větší než povolené minimum"
+
+#: plugins/ValidateForm/ValidateForm.php:163
 msgid "Value missing"
 msgstr "Chybí hodnota"
 
-#: plugins/ValidateForm/ValidateForm.php:141
+#: plugins/ValidateForm/ValidateForm.php:166
 msgid "Item is required"
 msgstr "Pložka je povinná"
 
-#: plugins/ValidateForm/ValidateForm.php:146
+#: plugins/ValidateForm/ValidateForm.php:171
 msgid "Invalid item pattern"
 msgstr "Neplatný formát předpisu (pattern)"
 
-#: plugins/ValidateForm/ValidateForm.php:150
+#: plugins/ValidateForm/ValidateForm.php:175
 msgid "Item value does not match required format"
 msgstr "Hodnota položky neodpovídá požadovanému formátu"
 
-#: plugins/ValidateForm/ValidateForm.php:155
+#: plugins/ValidateForm/ValidateForm.php:180
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid ""
+#~ "The form can not be sent in such quick succession, please try it again in "
+#~ "a minute"
+#~ msgstr ""
+#~ "Formulář není možné odesílat takto rychle za sebou, zkuste za chvíli znovu"
 
 #~ msgid "Unable to save imported file '%s.html' into temp folder"
 #~ msgstr ""
