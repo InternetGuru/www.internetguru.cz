@@ -122,12 +122,12 @@
 
   function toggleFullScreen(c) {
     if(!cmActive()) return;
-    if(c.getOption("fullScreen")) {
-      c.setOption("fullScreen", false);
+    if(!c.getOption("fullScreen")) {
+      c.setOption("fullScreen", true);
       fullScreenButton.innerText = fullscreenDisable;
       fullScreenButton.title = fullscreenDisableTitle;
     } else {
-      c.setOption("fullScreen", true);
+      c.setOption("fullScreen", false);
       fullScreenButton.innerText = fullscreenEnable;
       fullScreenButton.title = fullScreenEnableTitle;
     }
