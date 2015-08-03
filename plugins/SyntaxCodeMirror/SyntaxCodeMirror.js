@@ -65,7 +65,8 @@
   }
 
   function toggleApp(cm) {
-    if(activateButton.parentNode.parentNode.style.display == "none") {
+    if(cm.getOption("fullScreen")) toggleFullScreen(cm);
+    if(cmActive()) {
       cm.toTextArea();
       activateButton.parentNode.parentNode.style.display = "initial";
       TextArea.focus();
@@ -74,6 +75,10 @@
       activateButton.parentNode.parentNode.style.display = "none";
       cm.focus();
     }
+  }
+
+  function cmActive() {
+    return activateButton.parentNode.parentNode.style.display == "none";
   }
 
   function appendButton(text, ul) {
@@ -116,11 +121,13 @@
   }
 
   function toggleFullScreen(c) {
-    c.setOption("fullScreen", !c.getOption("fullScreen"));
+    if(!cmActive()) return;
     if(c.getOption("fullScreen")) {
+      c.setOption("fullScreen", false);
       fullScreenButton.innerText = fullscreenDisable;
       fullScreenButton.title = fullscreenDisableTitle;
     } else {
+      c.setOption("fullScreen", true);
       fullScreenButton.innerText = fullscreenEnable;
       fullScreenButton.title = fullScreenEnableTitle;
     }
