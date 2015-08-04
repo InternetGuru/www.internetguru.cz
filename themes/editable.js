@@ -66,6 +66,7 @@
       getEditableClass : function() { return Config.editable_class; },
 
       init : function(cfg) {
+        initCfg(cfg);
         setEvents();
         indicateChange();
       }
