@@ -32,13 +32,16 @@ class Agregator extends Plugin implements SplObserver {
       foreach($list as $subDir => $files) {
         $this->createHtmlVar($subDir, $files);
       }
+      $list = array();
+      $this->createList(FILES_FOLDER, $list);
+      #$this->createFilesVar(FILES_FOLDER);
+      foreach($list as $subDir => $files) {
+        $this->createImgVar(FILES_DIR, $subDir, $files);
+      }
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
       return;
     }
-    #$filesList = $this->createList(FILES_FOLDER);
-    #$this->createFilesVar(FILES_FOLDER);
-    #$this->createImgVar(FILES_FOLDER);
     if(is_null($this->currentDoc)) return;
     Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
     $this->insertDocInfo($this->currentDoc);
@@ -169,29 +172,59 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function createImgVar($rootDir) {
-    foreach($this->files as $subDir => $null) {
-      $workingDir = $subDir == "" ? $rootDir : "$rootDir/$subDir";
-      $doc = new DOMDocumentPlus();
-      $root = $doc->appendChild($doc->createElement("root"));
-      $ol = $root->appendChild($doc->createElement("ol"));
-      $found = false;
-      foreach($this->files[$subDir] as $f => $null) {
-        $mime = getFileMime("$workingDir/$f");
-        if(strpos($mime, "image/") !== 0) continue;
-        $li = $ol->appendChild($doc->createElement("li"));
-        $a = $li->appendChild($doc->createElement("a"));
-        $href = $subDir == "" ? $f : "$subDir/$f";
-        $a->setAttribute("href", "/$href");
-        $o = $a->appendChild($doc->createElement("object"));
-        $o->setAttribute("data", "/$href?thumb");
-        $o->setAttribute("type", $mime);
-        $o->nodeValue = $href;
-        $found = true;
+  private function createImgVar($root, $subDir, Array $files) {
+    $alts = $this->buildImgAlts();
+    $vars = $this->buildImgVars($files, $alts, $root, $subDir);
+    if(empty($vars)) return;
+    foreach($this->cfg->documentElement->childElementsArray as $image) {
+      if($image->nodeName != "image") continue;
+      if(!$image->hasAttribute("id")) {
+        Logger::log(_("Configuration element image missing attribute id"), Logger::LOGGER_WARNING);
+        continue;
       }
-      if(!$found) continue;
-      Cms::setVariable("img".($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)), $root);
+      $vName = $image->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+      self::$sortKey = "name";
+      $vars = $this->sort($vars, $image);
+      $vValue = $this->getDOM($vars, $image);
+      Cms::setVariable($vName, $vValue->documentElement);
     }
+  }
+
+  private function buildImgAlts() {
+    $alts = array();
+    foreach($this->cfg->documentElement->childElementsArray as $alt) {
+      if($alt->nodeName != "alt") continue;
+      if(!$alt->hasAttribute("for")) {
+        Logger::log(_("Configuration element alt missing attribute for"), Logger::LOGGER_WARNING);
+        continue;
+      }
+      $alts[$alt->getAttribute("for")] = $alt->nodeValue;
+    }
+    return $alts;
+  }
+
+  private function buildImgVars(Array $files, Array $alts, $root, $subDir) {
+    $vars = array();
+    foreach($files as $fileName) {
+      $sd = $subDir;
+      if(strlen($subDir)) $sd .= "/";
+      $filePath = USER_FOLDER."/$root/$sd$fileName";
+      $mimeType = getFileMime($filePath);
+      if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") !== 0) continue;
+      $v = array();
+      $v["name"] = $fileName;
+      $v["type"] = $mimeType;
+      $v["mtime"] = filemtime($filePath);
+      $v["url"] = $filePath;
+      $v["url-images"] = $filePath;
+      $v["url-thumbs"] = "$root/thumbs/$sd$fileName";
+      $v["url-preview"] = "$root/preview/$sd$fileName";
+      $v["url-big"] = "$root/big/$sd$fileName";
+      $v["url-full"] = "$root/full/$sd$fileName";
+      if(isset($alts[$fileName])) $v["alt"] = $alts[$fileName];
+      $vars[$filePath] = $v;
+    }
+    return $vars;
   }
 
   private function createFilesVar($rootDir) {
@@ -272,18 +305,7 @@ class Agregator extends Plugin implements SplObserver {
         }
       }
       self::$sortKey = "ctime";
-      $reverse = true;
-      if($html->hasAttribute("sort") || $html->hasAttribute("rsort")) {
-        $reverse = $html->hasAttribute("rsort");
-        $userKey = $html->hasAttribute("sort") ? $html->getAttribute("sort") : $html->getAttribute("rsort");
-        if(!array_key_exists($userKey, current($vars))) {
-          Logger::log(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
-        } else {
-          self::$sortKey = $userKey;
-        }
-      }
-      uasort($vars, array("Agregator", "cmp"));
-      if($reverse) $vars = array_reverse($vars);
+      $vars = $this->sort($vars, $html);
       try {
         $vValue = $this->getDOM($vars, $html);
         Cms::setVariable($vName, $vValue->documentElement);
@@ -297,6 +319,22 @@ class Agregator extends Plugin implements SplObserver {
         continue;
       }
     }
+  }
+
+  private function sort($vars, $e) {
+    $reverse = true;
+    if($e->hasAttribute("sort") || $e->hasAttribute("rsort")) {
+      $reverse = $e->hasAttribute("rsort");
+      $userKey = $e->hasAttribute("sort") ? $e->getAttribute("sort") : $e->getAttribute("rsort");
+      if(!array_key_exists($userKey, current($vars))) {
+        Logger::log(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
+      } else {
+        self::$sortKey = $userKey;
+      }
+    }
+    uasort($vars, array("Agregator", "cmp"));
+    if($reverse) $vars = array_reverse($vars);
+    return $vars;
   }
 
   private function storeCache($key, $value, $name) {
@@ -323,10 +361,12 @@ class Agregator extends Plugin implements SplObserver {
   private function getDOM(Array $vars, DOMElementPlus $html) {
     $items = $html->childElementsArray;
     $id = $html->getAttribute("id");
+    $class = $html->getAttribute("class");
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
     if(strlen($html->getAttribute("wrapper")))
       $root = $root->appendChild($doc->createElement($html->getAttribute("wrapper")));
+    if(strlen($class)) $root->setAttribute("class", $class);
     $nonItemElement = false;
     $patterns = array();
     foreach($items as $item) {
