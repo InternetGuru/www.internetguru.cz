@@ -1,3 +1,6 @@
+# Load local variables
+source ~/.bashrc_user
+
 export PATH=$PATH:/var/scripts
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
@@ -55,6 +58,13 @@ else
 fi
 PS1="\[$SU\]\u\[$NC\]@\h:\[$BWhite\]\w\[$NC\]\\$ \[\e]0;\u@\h:\w\a\]"
 
+#ssh-agent
+run=0
+ps | grep -q ssh-agent || run=1
+((run)) && ssh-agent.exe > ~/ssh-agent.sh
+source ~/ssh-agent.sh
+((run)) && ssh-add ~/.ssh/id_rsa
+
 # GIT
 alias gaas='git add -A; gs'
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
@@ -71,15 +81,10 @@ alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _'
 alias gs='git status && git submodule status'
 
 # BASH
-alias sshcmsadmin='ssh -i ~/.ssh/id_rsa cmsadmin@46.28.109.142'
 alias sshcms='ssh -i ~/.ssh/id_rsa cms@31.31.75.247'
 alias less='less -rSX'
 alias ll='ls -lah'
 alias phplint='find . -name "*.php" -type f -exec php -l "{}" \;'
 
 # LOCAL
-CMS_FOLDER_1='/cygdrive/c/wamp/www/cms'
-CMS_FOLDER_2='/cygdrive/d/wamp/www/cms'
-CMS_FOLDER_3='/cygdrive/e/Instal/wamp/www/cms/'
-CMS_FOLDER="$( if [ -d "$CMS_FOLDER_1" ]; then echo "$CMS_FOLDER_1"; elif [ -d "$CMS_FOLDER_2" ]; then echo "$CMS_FOLDER_2"; elif [ -d "$CMS_FOLDER_3" ]; then echo "$CMS_FOLDER_3"; else echo "dir not found"; fi )"
 alias cms='cd "$CMS_FOLDER"'
