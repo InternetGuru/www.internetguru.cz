@@ -67,11 +67,4 @@
 
   -->
 
-  <!-- FILE (todo) -->
-
-  <!-- XSLT (todo)
-  <xslt htmldir="article" file="article.xsl"/>
-  <xslt htmldir="dokumenty" file="dokumenty.xsl"/>
-  -->
-
 </Agregator>
