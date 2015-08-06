@@ -1,4 +1,32 @@
+1.8.1 2015-08-07
+Agregator: přidána podpora hromadného vkládání obrázků (0202406)
+ValidateForm: vlastní prodleva mezi odesláním formuláře pomocí třídy (8750fe0)
+Admin: pole s výběrem souboru na první stisknutí tabulátoru (c85f0ae)
+SyntaxCodeMirrror.js: globální zkratka Shift+F11 s fokusem (817d886)
+cms-default.css: flexibilní šířka elementů input na malých obrazovkách (69c03a9)
+basic.css: podtržení odkazů v globální navigaci zápatí (01e499b)
+admin/convertor: ukládání záloh veškerých změn (d358b13)
+přidána podpora pro input type number (55e6049)
+Basket: nové rozšíření nákupní košík (13eabab)
+vypnutí PageSpeed rozšřeno o Grunt na Režim ladění (f3c0d00)
+cms-print.css: skrytí hodnot placeholder pro tisk (53330da)
+CodeMirror: přidány funkce a zkratky pro fullscreen, comment, format/indent text (1e3e5e3)
+ContactForm: změna výchozí konfigurace (2d04bd6)
+
+1.8.0 2015-07-08
+HtmlOutput: přidán browserdetect.js a iefixes.js (f90a807)
+FileHandler: podpora technologie Grunt (eb3bb4a)
+
+1.7.0 2015-06-27
+výchozí CSS: kompatibilita prohlížečů (51dcb84)
+HtmlOutput: přidán atribut 'if' pro elementy stylesheet a jsFile (2b9ce00)
+ValidateForm: 2 minuty prodleva pomocí souboru IP v názvu, možnost banu pomocí .IP souboru (75c551d)
+EmailBreaker: nové rozšíření na boření e-mailových adres (14d5dab)
+
 1.6.2 2015-06-05
+HtmlOutput: systémové favicony jsou nastavitelné (4c35a97)
+LinkList: kontrola existence lokálních odkazů (a6fb154)
+LinkList: zobrazuje skutečné názvy lokálních odkazů (720b2f0)
 Indikace systémového hlášení zbarvením ikony prohlížeče (d14eac7)
 LinkList: nové rozšíření pro zobrazení seznamu odkazů (e401eff)
 Možnost zasílání událostí do GA, eventable.js (420977c)
