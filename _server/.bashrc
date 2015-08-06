@@ -1,24 +1,3 @@
-# Load local variables
-source ~/.bashrc_user
-
-export PATH=$PATH:/var/scripts
-# If not running interactively, don't do anything
-[ -z "$PS1" ] && return
-# don't put duplicate lines in the history. See bash(1) for more options
-# don't overwrite GNU Midnight Commander's setting of `ignorespace'.
-HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
-# ... or force ignoredups and ignorespace
-HISTCONTROL=ignoreboth
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# Color settings
-if [ -x /usr/bin/dircolors ]; then
-test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
-alias ls='ls --color=auto'
-fi
-export TERM=xterm-256color
-
 # Normal Colors
 Black='\e[0;30m'        # Black
 Red='\e[0;31m'          # Red
@@ -48,43 +27,59 @@ On_Cyan='\e[46m'        # Cyan
 On_White='\e[47m'       # White
 # Color reset
 NC="\e[m"
-# Color2user
-if [[ $USER == "root" ]]; then
-  SU=$BRed
-elif [[ $USER == "cms" ]]; then
-    SU=$BGreen
-else
-    SU=$BCyan
+
+# set local variables (definable in .bash_profile)
+[ -z "$CMS_FOLDER" ] && CMS_FOLDER="$HOME/cms"
+[ -z "$SU" ] && SU=$BCyan
+[ -z "$MYPS1" ] && MYPS1="\[$SU\]\u\[$NC\]@\h:\[$BWhite\]\w\[$NC\]\\$ \[\e]0;\u@\h:\w\a\]"
+
+PS1="$MYPS1"
+export PATH=$PATH:/var/scripts
+# don't put duplicate lines in the history. See bash(1) for more options
+# don't overwrite GNU Midnight Commander's setting of `ignorespace'.
+HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoreboth
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# env color settings
+if [ -x /usr/bin/dircolors ]; then
+test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+alias ls='ls --color=auto'
 fi
-PS1="\[$SU\]\u\[$NC\]@\h:\[$BWhite\]\w\[$NC\]\\$ \[\e]0;\u@\h:\w\a\]"
+export TERM=xterm-256color
 
 #ssh-agent
-run=0
-ps | grep -q ssh-agent || run=1
-((run)) && ssh-agent.exe > ~/ssh-agent.sh
-source ~/ssh-agent.sh
-((run)) && ssh-add ~/.ssh/id_rsa
+start=0
+ps | grep -q ssh-agent || start=1 # start ssh if not running
+((start)) && ssh-agent.exe > ~/ssh-agent.sh # run ssh-agent and save output (variables)
+source ~/ssh-agent.sh # register saved variables
+((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
 # GIT
 alias gaas='git add -A; gs'
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
 alias gdc='_(){ git log $1^..$1 -p; }; _' # git diff commit [param HASH]
-alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _'
+alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _' # git delete branch local & remote [param BRANCH]
 alias gc='git commit'
-alias gl='git log --decorate --all --oneline --graph'
-alias glc='git log --decorate --oneline'
+alias gl='git log --decorate --all --oneline --graph' # git log all branches
+alias glc='git log --decorate --oneline' # git log current branch
 alias gpush='git push --all; git push --tags'
 alias gpull='git pull --all --tags && git fetch -p && git submodule update --init --recursive'
 alias gpullhard='git reset --hard && gpull'
-alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _'
+alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _' # git uncommit
 alias gs='git status && git submodule status'
 
 # BASH
-alias sshcms='ssh -i ~/.ssh/id_rsa cms@31.31.75.247'
-alias less='less -rSX'
+alias .='cd ~'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
 alias ll='ls -lah'
-alias phplint='find . -name "*.php" -type f -exec php -l "{}" \;'
-
-# LOCAL
+alias less='less -rSX'
 alias cms='cd "$CMS_FOLDER"'
+alias sshcms='ssh cms@31.31.75.247'
+#alias sshcms='ssh -i ~/.ssh/id_rsa cms@31.31.75.247'
+alias phplint='find . -name "*.php" -type f -exec php -l "{}" \;'
