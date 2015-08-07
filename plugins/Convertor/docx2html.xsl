@@ -114,7 +114,9 @@
               <xsl:choose>
                 <xsl:when test="//p[position() = $curHPos+1][pPr/jc/@val='center'][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">·
   <xsl:copy-of select="$secIndent"/><desc>
-                    <xsl:apply-templates select="//p[position() = $curHPos+1]/r"/>
+                    <xsl:apply-templates select="//p[position() = $curHPos+1]">
+                      <xsl:with-param name="nop" select="1"/>
+                    </xsl:apply-templates>
                   </desc>
                 </xsl:when>
                 <xsl:otherwise>·
@@ -249,44 +251,50 @@
 
   <xsl:template match="p">
     <xsl:param name="pIndent" select="'  '"/>
+    <xsl:param name="nop" select="''"/>
 
     <xsl:if test="r/t">
-    <xsl:choose>
-      <!-- list items -->
-      <xsl:when test="pPr/numPr">
-        <!-- mind first list item only -->
-        <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)]">
-          <!-- unreliable -->
-          <!-- or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0) -->
+      <xsl:choose>
+        <!-- list items -->
+        <xsl:when test="pPr/numPr">
+          <!-- mind first list item only -->
+          <xsl:if test="preceding-sibling::p[1][not(pPr/numPr)]">
+            <!-- unreliable -->
+            <!-- or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0) -->
+            <xsl:choose>
+              <!-- definition list if first is bold -->
+              <xsl:when test="count(r) = 1 and r/rPr/b/@val = 1">·
+    <xsl:copy-of select="$pIndent"/><dl>·
+      <xsl:copy-of select="$pIndent"/><dt>
+                    <xsl:copy-of select="r/t/text()"/>
+                  </dt>
+                  <xsl:call-template name="insertDefListItem">
+                    <xsl:with-param name="i" select="1"/>
+                    <xsl:with-param name="pIndent" select="$pIndent"/>
+                  </xsl:call-template>·
+    <xsl:copy-of select="$pIndent"/></dl>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:call-template name="buildList">
+                  <xsl:with-param name="ilvlActual" select="0"/>
+                  <xsl:with-param name="i" select="0"/>
+                  <xsl:with-param name="ilvl" select="pPr/numPr/ilvl/@val"/>
+                  <xsl:with-param name="numId" select="pPr/numPr/numId/@val"/>
+                  <xsl:with-param name="indent" select="concat($pIndent,'  ')"/>
+                </xsl:call-template>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:if>
+        </xsl:when>
+        <xsl:otherwise>
           <xsl:choose>
-            <!-- definition list if first is bold -->
-            <xsl:when test="count(r) = 1 and r/rPr/b/@val = 1">·
-  <xsl:copy-of select="$pIndent"/><dl>·
-    <xsl:copy-of select="$pIndent"/><dt>
-                  <xsl:copy-of select="r/t/text()"/>
-                </dt>
-                <xsl:call-template name="insertDefListItem">
-                  <xsl:with-param name="i" select="1"/>
-                  <xsl:with-param name="pIndent" select="$pIndent"/>
-                </xsl:call-template>·
-  <xsl:copy-of select="$pIndent"/></dl>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:call-template name="buildList">
-                <xsl:with-param name="ilvlActual" select="0"/>
-                <xsl:with-param name="i" select="0"/>
-                <xsl:with-param name="ilvl" select="pPr/numPr/ilvl/@val"/>
-                <xsl:with-param name="numId" select="pPr/numPr/numId/@val"/>
-                <xsl:with-param name="indent" select="concat($pIndent,'  ')"/>
-              </xsl:call-template>
+            <xsl:when test="$nop"><xsl:apply-templates select="node()"/></xsl:when>
+            <xsl:otherwise>·
+    <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
             </xsl:otherwise>
           </xsl:choose>
-        </xsl:if>
-      </xsl:when>
-      <xsl:otherwise>·
-  <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
-      </xsl:otherwise>
-    </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
     </xsl:if>
 
   </xsl:template>
@@ -449,7 +457,6 @@
   -->
   <!-- Template for hyperlinks -->
     <xsl:template match="hyperlink">
-
       <xsl:variable name="relationships" select="document($relationsFile)"/>
 
       <xsl:element name="a">

@@ -92,6 +92,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
+    echo $doc->saveXML(); die();
     try {
       $doc->validatePlus(true);
     } catch(Exception $e) {
@@ -131,12 +132,18 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function parseContent(HTMLPlus $doc, $eName, $aName) {
     foreach($doc->getElementsByTagName($eName) as $e) {
-      $var = explode("@", $e->nodeValue);
+      $lastText = null;
+      foreach($e->childNodes as $ch) {
+        if($ch->nodeType != XML_TEXT_NODE) continue;
+        $lastText = $ch;
+      }
+      if(is_null($lastText)) continue;
+      $var = explode("@", $lastText->nodeValue);
       if(count($var) < 2) continue;
       $aVal = trim(array_pop($var));
       if(!strlen($aVal)) continue;
+      $lastText->nodeValue = trim(implode("@", $var));
       $e->setAttribute($aName, $aVal);
-      $e->nodeValue = trim(implode("@", $var));
     }
   }
 
