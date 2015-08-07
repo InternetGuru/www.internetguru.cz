@@ -78,6 +78,9 @@ body .CodeMirror-fullscreen {
   overflow: auto!important;
   margin-bottom: 0;
   padding-bottom: 0;
+  /* margin-top: -2em; */
+  /* padding-top: 2em; */
+  height: 98%;
 }
 
 ul.codemirror-user-controll {
@@ -90,6 +93,8 @@ ul.codemirror-user-controll {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
+    z-index: 10;
+    position: relative;
 }
 
 ul.codemirror-user-controll li {
