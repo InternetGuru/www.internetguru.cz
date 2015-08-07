@@ -75,7 +75,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if(is_file($this->defaultFile)) unlink($this->defaultFile);
     } else {
       try {
-        if(!IS_LOCALHOST) clearNginxCache();
+        if(!IS_LOCALHOST && isset($_POST["clearcache"])) clearNginxCache();
       } catch(Exception $e) {
         Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
       }
