@@ -6,6 +6,10 @@ body {
   word-wrap: break-word;
 }
 
+p {
+  line-height: 1.4;
+}
+
 code, samp, textarea {
   font-family: "Emilbus Mono", "Lucida Console", monospace;
 }
