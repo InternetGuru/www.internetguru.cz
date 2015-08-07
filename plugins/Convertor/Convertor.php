@@ -92,7 +92,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
-    echo $doc->saveXML(); die();
     try {
       $doc->validatePlus(true);
     } catch(Exception $e) {

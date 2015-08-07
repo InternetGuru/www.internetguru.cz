@@ -224,14 +224,15 @@
   </xsl:template>
 
   <xsl:template match="t" priority="1">
+    <xsl:param name="nostrong" select="''"/>
     <xsl:variable name="b" select="preceding-sibling::rPr[1]/b/@val = 1"/>
     <xsl:variable name="i" select="preceding-sibling::rPr[1]/i/@val = 1"/>
-  	<xsl:variable name="u" select="preceding-sibling::rPr[1]/u/@val = 'single'"/>
+    <xsl:variable name="u" select="preceding-sibling::rPr[1]/u/@val = 'single'"/>
     <xsl:variable name="del" select="preceding-sibling::rPr[1]/strike/@val = 1"/>
-  	<xsl:variable name="sup" select="preceding-sibling::rPr[1]/vertAlign/@val = 'superscript'"/>
-  	<xsl:variable name="sub" select="preceding-sibling::rPr[1]/vertAlign/@val = 'subscript'"/>
+    <xsl:variable name="sup" select="preceding-sibling::rPr[1]/vertAlign/@val = 'superscript'"/>
+    <xsl:variable name="sub" select="preceding-sibling::rPr[1]/vertAlign/@val = 'subscript'"/>
 
-    <xsl:if test="$b"><xsl:text disable-output-escaping="yes">&lt;strong></xsl:text></xsl:if>
+    <xsl:if test="$b and not($nostrong)"><xsl:text disable-output-escaping="yes">&lt;strong></xsl:text></xsl:if>
     <xsl:if test="$i"><xsl:text disable-output-escaping="yes">&lt;em></xsl:text></xsl:if>
     <xsl:if test="$u"><xsl:text disable-output-escaping="yes">&lt;samp></xsl:text></xsl:if>
     <xsl:if test="$del"><xsl:text disable-output-escaping="yes">&lt;del></xsl:text></xsl:if>
@@ -245,7 +246,7 @@
     <xsl:if test="$del"><xsl:text disable-output-escaping="yes">&lt;/del></xsl:text></xsl:if>
     <xsl:if test="$u"><xsl:text disable-output-escaping="yes">&lt;/samp></xsl:text></xsl:if>
     <xsl:if test="$i"><xsl:text disable-output-escaping="yes">&lt;/em></xsl:text></xsl:if>
-    <xsl:if test="$b"><xsl:text disable-output-escaping="yes">&lt;/strong></xsl:text></xsl:if>
+    <xsl:if test="$b and not($nostrong)"><xsl:text disable-output-escaping="yes">&lt;/strong></xsl:text></xsl:if>
 
   </xsl:template>
 
@@ -263,10 +264,13 @@
             <!-- or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0) -->
             <xsl:choose>
               <!-- definition list if first is bold -->
-              <xsl:when test="count(r) = 1 and r/rPr/b/@val = 1">·
+              <xsl:when test="count(r) = count(r/rPr/b[@val = 1])">·
     <xsl:copy-of select="$pIndent"/><dl>·
       <xsl:copy-of select="$pIndent"/><dt>
-                    <xsl:copy-of select="r/t/text()"/>
+                    <xsl:apply-templates select="node()">
+                      <xsl:with-param name="nostrong" select="1"/>
+                    </xsl:apply-templates>
+                    <!-- <xsl:copy-of select="r/t/text()"/> -->
                   </dt>
                   <xsl:call-template name="insertDefListItem">
                     <xsl:with-param name="i" select="1"/>
@@ -304,12 +308,14 @@
     <xsl:param name="pIndent" select="'  '"/>
     <xsl:variable name="item" select="following-sibling::p[$i]"/>
 
-    <xsl:if test="$item/r/t">
+    <xsl:if test="$item//r/t">
     <xsl:choose>
       <xsl:when test="$item/pPr/numPr/ilvl/@val = 0 and ($item/r[1]/rPr/b/@val = 1 or following-sibling::p[$i+1]/pPr/numPr/ilvl/@val &gt; 0)">·
     <xsl:copy-of select="$pIndent"/><dt>
-          <xsl:copy-of select="$item//t/text()"/>
-          <!-- <xsl:apply-templates select="$item/node()"/> -->
+          <!-- <xsl:copy-of select="$item//t/text()"/> -->
+          <xsl:apply-templates select="$item/node()">
+            <xsl:with-param name="nostrong" select="1"/>
+          </xsl:apply-templates>
         </dt>
       </xsl:when>
       <xsl:otherwise>·
@@ -427,11 +433,11 @@
 
   <!-- Template for images -->
   <xsl:template match="drawing">
-  	<xsl:for-each select="inline/graphic/graphicData/pic">
-  		<xsl:for-each select="nvPicPr/cNvPr">
-  			<img src="../media/{@name}" />
-  		</xsl:for-each>
-  	</xsl:for-each>
+    <xsl:for-each select="inline/graphic/graphicData/pic">
+      <xsl:for-each select="nvPicPr/cNvPr">
+        <img src="../media/{@name}" />
+      </xsl:for-each>
+    </xsl:for-each>
   </xsl:template>
 
   <!-- Math -->
@@ -518,7 +524,7 @@
           <xsl:otherwise><xsl:element name="br" /></xsl:otherwise>
       </xsl:choose>
           <!-- Is a page break?
-  	<xsl:element name="br">
+    <xsl:element name="br">
               <xsl:if test="contains(@type, 'page')">
                       <xsl:attribute name="style">page-break-before:always</xsl:attribute>
               </xsl:if>
