@@ -142,7 +142,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function parseSyntaxVariable(DOMText $n) {
-    if(strpos($n->nodeValue, 'cms-') === false) return;
+    //if(strpos($n->nodeValue, 'cms-') === false) return;
     foreach(explode('\$', $n->nodeValue) as $src) {
       $p = preg_split('/\$('.VARIABLE_PATTERN.")/", $src, -1, PREG_SPLIT_DELIM_CAPTURE);
       if(count($p) < 2) return;
