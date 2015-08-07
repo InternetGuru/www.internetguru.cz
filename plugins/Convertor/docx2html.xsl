@@ -254,7 +254,7 @@
     <xsl:param name="pIndent" select="'  '"/>
     <xsl:param name="nop" select="''"/>
 
-    <xsl:if test="r/t">
+    <xsl:if test=".//r/t">
       <xsl:choose>
         <!-- list items -->
         <xsl:when test="pPr/numPr">
