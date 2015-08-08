@@ -120,16 +120,17 @@
     window.scrollTo(0, (coords.top + coords.bottom - myHeight) / 2);
   }
 
-  function toggleFullScreen(c) {
+  function toggleFullScreen(c, off) {
+    if(typeof off === "undefined") off = false;
     if(!cmActive()) return;
-    if(!c.getOption("fullScreen")) {
-      c.setOption("fullScreen", true);
-      fullScreenButton.innerText = fullscreenDisable;
-      fullScreenButton.title = fullscreenDisableTitle;
-    } else {
+    if(c.getOption("fullScreen") || off) {
       c.setOption("fullScreen", false);
       fullScreenButton.innerText = fullscreenEnable;
       fullScreenButton.title = fullScreenEnableTitle;
+    } else {
+      c.setOption("fullScreen", true);
+      fullScreenButton.innerText = fullscreenDisable;
+      fullScreenButton.title = fullscreenDisableTitle;
     }
   }
 
@@ -155,6 +156,9 @@
         cm.focus();
         break;
       }
+      // Tab, Shift+Tab
+      case 9:
+      toggleFullScreen(cm, true);
       default: return true;
     }
     return false;
