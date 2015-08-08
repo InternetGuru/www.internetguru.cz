@@ -56,4 +56,42 @@
   <var id="year" fn="yearformat">now</var>
   <var id="today" fn="dateformat">now</var>
 
+
+  <!--
+
+    Uživatelská editace
+
+    1) Element set:
+      - atribut type="select nebo text" (povinný) -> typ pole
+      - atribut for="RegExp( RegExp)*" (povinný) -> na jaké proměnné se má aplikovat
+      - hodnota elementu -> název skupiny
+
+    a) Element set type="select":
+      - atribut datalist="RegExp( RegExp)*" (povinný) -> data podle názvů proměnných
+
+    Například:
+      <var id="nic"/>
+      <var id="jidlo1">0,33 l Hovězí vývar se strouháním 22 Kč<var>
+      <var id="jidlo2">120 g Smažený karbanátek, vařený brambor, rajčatový salát 89 Kč</var>
+      <var id="akce1"><span var="inputvar-jidlo1">Akce 1</span></var>
+      <var id="akce2"><span var="inputvar-nic">Akce 2</span></var>
+      <var id="akce3"><span var="inputvar-nic">Akce 3</span></var>
+      <set for="akce\d " datalist="jidlo\d+ nic">Akce</set>
+
+    b) Element set type="text":
+      - atribut placeholder (nepovinný)
+      - atribut pattern (nepovinný)
+
+    Například:
+      <var id="akce1">200 g Tatarský biftek, 6 ks topinek 179 Kč</var>
+      <var id="akce2">500 g Tatarský biftek, 12 ks topinek 350 Kč</var>
+      <var id="akce3"></var>
+      <set type="text" pattern="\s*((?:\d+ \w+)|(?:\d+,\d+ \w+)) (.*) (\d+ Kč)?\s*" placeholder="200 g Tatarský biftek, 6 ks topinek 179 Kč" for="akce\d+">Akce</set>
+
+
+    2) Element passwd (volitelně):
+      - hodnota elementu je otisk hesla vytvořený funkcí crypt, v UNIXu lze vytvořit například příkazem "openssl passwd -crypt myPassword"
+
+   -->
+
 </InputVar>
