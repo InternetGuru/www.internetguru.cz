@@ -134,6 +134,9 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $bcc = "pavel@petrzela.eu";
     }
     $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
+    Logger::log(sprintf(_("Sending e-mail: %s"),
+      "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"),
+      null, null, null, "mail");
     if(strlen($this->formVars["sendcopy"])) {
       if(!strlen($this->formVars["email"]))
         throw new Exception(_("Unable to send copy to empty client address"));
@@ -164,9 +167,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(strlen($bcc)) $mail->addBCC($bcc, '');
-    Logger::log(sprintf(_("Sending e-mail: %s"),
-      "to=$mailtoname<$mailto>; replyto=$replytoname<$replyto>; bcc=$bcc; subject={$mail->Subject}; msg=$msg"),
-      null, null, null, "mail");
     if(!$mail->send()) throw new Exception($mail->ErrorInfo);
     Logger::log(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }
