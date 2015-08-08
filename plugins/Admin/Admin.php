@@ -48,6 +48,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         if($this->dataFile == $fileName && $_POST["userfilehash"] != getFileHash($this->dataFile))
           throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
         $this->processPost();
+        $_SESSION["clearcache"] = isset($_POST["clearcache"]) ? true : false;
       } else $this->setContent();
 
       if(!$this->isResource($this->type)) $this->processXml();
@@ -191,6 +192,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["userfilehash"] = $usrDestHash;
     if((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED)
       || isset($_POST["disabled"])) $vars["checked"] = "checked";
+
+    $cachechecked = "checked";
+    if(isset($_SESSION["clearcache"])) {
+      $cachechecked = $_SESSION["clearcache"] ? "checked" : null;
+    }
+    $vars["cachechecked"] = $cachechecked;
+
     if($this->dataFileStatus == self::STATUS_NEW) {
       $vars["warning"] = "warning";
       $vars["nohide"] = "nohide";
