@@ -90,7 +90,7 @@
 
 
     2) Element passwd (volitelně):
-      - hodnota elementu je otisk hesla vytvořený funkcí crypt, v UNIXu lze vytvořit například příkazem "openssl passwd -crypt myPassword"
+      - hodnota elementu je otisk hesla vytvořený funkcí crypt, v UNIXu lze vytvořit například příkazem "openssl passwd -1"
 
    -->
 
