@@ -66,7 +66,7 @@
       - atribut for="RegExp( RegExp)*" (povinný) -> na jaké proměnné se má aplikovat
       - hodnota elementu -> název skupiny
 
-    a) Element set type="select":
+    a) Typ select:
       - atribut datalist="RegExp( RegExp)*" (povinný) -> data podle názvů proměnných
 
     Například:
@@ -78,7 +78,7 @@
       <var id="akce3"><span var="inputvar-nic">Akce 3</span></var>
       <set for="akce\d " datalist="jidlo\d+ nic">Akce</set>
 
-    b) Element set type="text":
+    b) Typ text:
       - atribut placeholder (nepovinný)
       - atribut pattern (nepovinný)
 
