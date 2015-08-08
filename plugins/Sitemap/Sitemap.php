@@ -1,0 +1,175 @@
+<?php
+
+/**
+ * Generate sitemap.xml from Cms::contentFull hiearchic content and save it to the root of current domain
+ * @see http://www.sitemaps.org/protocol.html Sitemap definition
+ */
+class Sitemap extends Plugin implements SplObserver {
+
+  /**
+   * @var array Names of configurable elements
+   */
+  private $configurableElements = array("changefreq", "priority", "lastmod");
+  /**
+   * Allowed values for changefreq element
+   * @var array
+   */
+  private $changefreqVals = array("always", "hourly", "daily", "weekly", "monthly", "yearly", "never", "");
+  /**
+   * @var DOMDocumentPlus Config
+   */
+  private $cfg = null;
+
+
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this, 200);
+    $this->cfg = $this->getDOMPlus();
+  }
+
+  /**
+   * Main function
+   * @param SplSubject $subject
+   */
+  public function update(SplSubject $subject) {
+    if($subject->getStatus() != STATUS_POSTPROCESS) return;
+    try {
+      $rootHeading = Cms::getContentFull()->documentElement->getElementsByTagName("h")->item(0);
+      $links = $this->getLinks($rootHeading);
+      $lastmods = $this->getLastmod($links, $rootHeading);
+      $cfgLinks = $this->getConfigLinks();
+      // update user lastmod by $lastmods
+      foreach($lastmods as $link => $mod) {
+        if(isset($cfgLinks[$link]) && isset($cfgLinks[$link]["lastmod"])) continue;
+        $cfgLinks[$link]["lastmod"] = $lastmods[$link];
+      }
+      $cfgDefaults = $this->getConfigDefaults();
+      $this->createSitemap($links, $cfgLinks, $cfgDefaults);
+    } catch(Exception $e) {
+      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+    }
+  }
+
+  /**
+   * TODO: get filemtime from includes
+   * Get lastmod from mtimes
+   * @param  Array          $links
+   * @param  DOMElementPlus $rootHeading
+   * @return Array Associative array of links => mtime
+   */
+  private function getLastmod(Array $links, DOMElementPlus $rootHeading) {
+    $mtimes = array();
+    $rootMtime = $rootHeading->hasAttribute("mtime")
+      ? $rootHeading->getAttribute("mtime")
+      : strftime(DATE_W3C, filemtime(INDEX_HTML));
+    foreach($links as $link => $h) {
+      if($h->hasAttribute("mtime")) $mtimes[$link] = $h->getAttribute("mtime");
+      else $mtimes[$link] = $rootMtime;
+    }
+    return $mtimes;
+  }
+
+  /**
+   * Get links from first section of full content + root link "/"
+   * @param DOMElementPlus $rootHeading
+   * @return Array links
+   */
+  private function getLinks(DOMElementPlus $rootHeading) {
+    $links = array();
+    $section = Cms::getContentFull()->getElementsByTagName("section")->item(0);
+    foreach($section->getElementsByTagName("h") as $h) {
+      if(!$h->hasAttribute("link")) continue;
+      $links[$h->getAttribute("link")] = $h;
+    }
+    $links["/"] = $rootHeading;
+    return $links;
+  }
+
+  /**
+   * Get links from configuration
+   * @return Array Asociative array of links => the values of their elements
+   */
+  private function getConfigLinks() {
+    $links = array();
+    foreach($this->cfg->documentElement->childElementsArray as $e) {
+      if($e->nodeName != "url") continue;
+      if(!$e->hasAttribute("link")) throw new Exception(_("Element url missing atribute link"));
+      foreach($e->childElementsArray as $f) {
+        if(!in_array($f->nodeName, $this->configurableElements)) continue;
+        $links[$e->getAttribute("link")][$f->nodeName] = $f->nodeValue;
+      }
+    }
+    return $links;
+  }
+
+  /**
+   * Get default config values
+   * @return Array Associative array of configuration elements
+   */
+  private function getConfigDefaults() {
+    $defaults = array();
+    foreach($this->cfg->documentElement->childElementsArray as $e) {
+      if(!in_array($e->nodeName, $this->configurableElements)) continue;
+      $defaults[$e->nodeName] = $e->nodeValue;
+    }
+    return $defaults;
+  }
+
+  /**
+   * Create sitemap.xml according to $links modified by $cfgLinks
+   * @param  Array  $links
+   * @param  Array  $cfgLinks
+   * @param  Array  $cfgDefaults
+   */
+  private function createSitemap(Array $links, Array $cfgLinks, Array $cfgDefaults) {
+    $sitemap = new DOMDocumentPlus();
+    $sitemap->formatOutput = true;
+    $urlset = $sitemap->appendChild($sitemap->createElement("urlset"));
+    $urlset->setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
+    foreach($links as $link => $h) {
+      $url = $urlset->appendChild($sitemap->createElement("url"));
+      // loc
+      $url->appendChild($sitemap->createElement("loc", URL."/".trim($link, "/")));
+      // changefreq
+      $changefreq = $this->getValue("changefreq", $link, $cfgLinks, $cfgDefaults);
+      if(!is_null($changefreq)) {
+        if(!in_array($changefreq, $this->changefreqVals))
+          throw new Exception(sprintf(_("Element changefreq has forbidden value %s"), $changefreq));
+        $url->appendChild($sitemap->createElement("changefreq", $changefreq));
+      }
+      // priority
+      $priority = $this->getValue("priority", $link, $cfgLinks, $cfgDefaults);
+      if(!is_null($priority)) {
+        if($priority < 0 || $priority > 1)
+          throw new Exception(sprintf(_("Element priority has invalid value %s"), $priority));
+        $url->appendChild($sitemap->createElement("priority", $priority));
+      }
+      // lastmod
+      $lastmod = $this->getValue("lastmod", $link, $cfgLinks, $cfgDefaults);
+      if(!is_null($lastmod)) {
+        if(!preg_match("/^".W3C_DATETIME_PATTERN."$/", $lastmod))
+          throw new Exception(sprintf(_("Element lastmod has invalid value %s"), $lastmod));
+        $url->appendChild($sitemap->createElement("lastmod", $lastmod));
+      }
+    }
+    $sitemap->save("sitemap.xml");
+  }
+
+  /**
+   * Get correct value iff exits
+   * @param  String $name
+   * @param  Array  $cfgLinks
+   * @param  Array  $cfgDefaults
+   * @return String|null
+   */
+  private function getValue($name, $link, $cfgLinks, $cfgDefaults) {
+    if(isset($cfgLinks[$link]) && isset($cfgLinks[$link][$name]) && strlen($cfgLinks[$link][$name]))
+      return $cfgLinks[$link][$name];
+    if(isset($cfgDefaults[$name]) && strlen($cfgDefaults[$name]))
+      return $cfgDefaults[$name];
+    return null;
+  }
+
+}
+
+?>
