@@ -77,7 +77,7 @@ class Sitemap extends Plugin implements SplObserver {
   private function getLinks(DOMElementPlus $rootHeading) {
     $links = array();
     $section = Cms::getContentFull()->getElementsByTagName("section")->item(0);
-    foreach($section->getElementsByTagName("h") as $h) {
+    if(!is_null($section)) foreach($section->getElementsByTagName("h") as $h) {
       if(!$h->hasAttribute("link")) continue;
       $links[$h->getAttribute("link")] = $h;
     }
