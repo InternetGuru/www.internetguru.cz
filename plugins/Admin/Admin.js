@@ -30,17 +30,36 @@
       },
       setSaveEvents = function(form) {
         form.onkeydown = function(e) {
-          // letter s and ctrl or meta
-          if(e.keyCode != 83) return true;
-          if(!e.ctrlKey && !e.metaKey) return true;
-          // save and exit if shift
-          if(e.shiftKey) {
-            form['saveandgo'].click();
-            return false;
+          var key = (window.event) ? window.event.keyCode : key = ev.which;
+          var isCtrl;
+          var isShift;
+          if (window.event) {
+            key = window.event.keyCode;
+            isShift = !!window.event.shiftKey; // typecast to boolean
+            isCtrl = !!window.event.ctrlKey; // typecast to boolean
+          } else {
+            key = ev.which;
+            isShift = !!ev.shiftKey;
+            isCtrl = !!ev.ctrlKey;
           }
-          // save and stay
-          form['saveandstay'].click();
-          return false;
+          // letter s and ctrl or meta
+          if(!e.ctrlKey && !e.metaKey) return true;
+          switch(key) {
+            // S
+            case 83:
+            // save and exit if shift
+            if(isShift) {
+              form['saveandgo'].click();
+              return false;
+            }
+            // save and stay
+            form['saveandstay'].click();
+            return false;
+            break;
+
+            default: return true;
+          }
+
         }
 
         form['saveandgo'].onclick = function(e) { confirmInactive(e, form); }
