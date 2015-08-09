@@ -140,11 +140,13 @@
     if (window.event) {
       key = window.event.keyCode;
       isShift = !!window.event.shiftKey; // typecast to boolean
+      isCtrl = !!window.event.ctrlKey; // typecast to boolean
     } else {
       key = ev.which;
       isShift = !!ev.shiftKey;
+      isCtrl = !!ev.ctrlKey;
     }
-    switch (e.keyCode) {
+    switch (key) {
       // F4
       case 115:
       toggleApp(cm);
@@ -163,6 +165,16 @@
     }
     return false;
   }
+
+  function scrollWin(step) {
+    var doc = document.documentElement;
+    var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+    var height = document.body.scrollHeight;
+    var scrollTo = top + step;
+    if(scrollTo < 0 || scrollTo > height ) return;
+    window.scrollTo(0, scrollTo);
+  }
+
 
   function init(textarea) {
     cm = CodeMirror.fromTextArea(TextArea, {
@@ -184,6 +196,16 @@
       extraKeys: CodeMirror.normalizeKeyMap({
         "Tab": false,
         "Shift-Tab": false,
+        "Ctrl-Up": function(c) {
+          if(c.getOption("fullScreen"))
+            c.execCommand("scrollLineUp");
+          else scrollWin(-32);
+        },
+        "Ctrl-Down": function(c) {
+          if(c.getOption("fullScreen"))
+            c.execCommand("scrollLineDown");
+          else scrollWin(32);
+        },
         "Ctrl--": "toggleComment",
         "Ctrl-G": "gotoLine",
         "Ctrl-E": "deleteLine",
