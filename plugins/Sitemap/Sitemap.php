@@ -23,7 +23,7 @@ class Sitemap extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 200);
+    $s->setPriority($this, 1); // before agregator(2)
     $this->cfg = $this->getDOMPlus();
   }
 
@@ -32,7 +32,7 @@ class Sitemap extends Plugin implements SplObserver {
    * @param SplSubject $subject
    */
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_POSTPROCESS) return;
+    if($subject->getStatus() != STATUS_INIT) return;
     try {
       $rootHeading = Cms::getContentFull()->documentElement->getElementsByTagName("h")->item(0);
       $links = $this->getLinks($rootHeading);
@@ -51,8 +51,8 @@ class Sitemap extends Plugin implements SplObserver {
   }
 
   /**
-   * TODO: get filemtime from includes
    * Get lastmod from mtimes
+   * TODO: get filemtime from includes
    * @param  Array          $links
    * @param  DOMElementPlus $rootHeading
    * @return Array Associative array of links => mtime
@@ -103,7 +103,7 @@ class Sitemap extends Plugin implements SplObserver {
   }
 
   /**
-   * Get default config values
+   * Get default config values from root configirable elements
    * @return Array Associative array of configuration elements
    */
   private function getConfigDefaults() {
@@ -156,7 +156,7 @@ class Sitemap extends Plugin implements SplObserver {
   }
 
   /**
-   * Get correct value iff exits
+   * Get value from $cfgLinks or from $cfgDefaults or null
    * @param  String $name
    * @param  Array  $cfgLinks
    * @param  Array  $cfgDefaults

@@ -224,7 +224,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   /**
    * LOGIC (-> == redir if exists)
-   * null -> [current_link].html -> INDEX_HTML
+   * null -> [current_link].html in loaded html files -> INDEX_HTML
    * F -> plugins/$0/$0.xml -> $0.xml
    * [dir/]+F -> $0.xml
    * [dir/]*F.ext (direct match) -> plugins/$0
@@ -247,7 +247,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function getFilepath($f) {
     if(!strlen($f)) {
-      return findFile(getCurLink().".html") ? getCurLink().".html" : INDEX_HTML;
+      foreach(Cms::getVariable("dombuilder-html") as $path) {
+        if(pathinfo($path, PATHINFO_FILENAME) != getCurLink()) continue;
+        return $path;
+      }
+      return INDEX_HTML;
     }
     if(strpos($f, USER_FOLDER."/") === 0) {
       return substr($f, strlen(USER_FOLDER)+1);
