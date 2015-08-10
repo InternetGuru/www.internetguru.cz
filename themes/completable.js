@@ -162,7 +162,6 @@
           var navig = Config.navig;
           return function() {
             Config.navig.value = localPath;
-            Config.navig.form.submit();
           }
         })();
         list.appendChild(li);
