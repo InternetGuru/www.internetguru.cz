@@ -1,6 +1,6 @@
 (function(win) {
 
-  var Navigation = function() {
+  var Completable = function() {
 
     var
     Config = {},
@@ -8,17 +8,8 @@
     active = -1,
     textNavigValue = "",
     list = null,
+    key = null,
 
-    updateQueryStringParameter = function(uri, key, value) {
-      var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
-      var separator = uri.indexOf('?') !== -1 ? "&" : "?";
-      if (uri.match(re)) {
-        return uri.replace(re, '$1' + key + "=" + value + '$2');
-      }
-      else {
-        return uri + separator + key + "=" + value;
-      }
-    },
     clone = function(obj) {
         if (null == obj || "object" != typeof obj) return obj;
         var copy = obj.constructor();
@@ -63,55 +54,69 @@
     },
     processKey = function(e) {
       switch(e.keyCode) {
-        case 13: //enter
-          if(!open) return;
-          redir();
-          e.preventDefault();
-        break;
         case 27: //esc
           Config.navig.value = textNavigValue;
           close();
         break;
         case 38: //up
-          if(active - 1 <= -1) {
+          if(typeof list.childNodes[active] !== "undefined")
+            list.childNodes[active].classList.remove("active");
+          if(active == -1) active = list.childNodes.length;
+          if(--active <= -1) {
             Config.navig.value = textNavigValue;
-            close();
             e.preventDefault();
             return;
           }
-          list.childNodes[active].classList.remove("active");
-          list.childNodes[--active].classList.add("active");
-          Config.navig.value = list.childNodes[active].innerText;
+          list.childNodes[active].classList.add("active");
+          Config.navig.value = list.childNodes[active].dataset.path;
           e.preventDefault();
         break;
         case 40: //down
           if(!open) {
             inputText(null);
           }
-          if(active + 1 >= list.childNodes.length) return;
-          if(active != -1) list.childNodes[active].classList.remove("active");
-          list.childNodes[++active].classList.add("active");
-          Config.navig.value = list.childNodes[active].innerText;
+          if(typeof list.childNodes[active] !== "undefined")
+            list.childNodes[active].classList.remove("active");
+          if(active == list.childNodes.length) active = -1;
+          if(++active >= list.childNodes.length) {
+            Config.navig.value = textNavigValue;
+            e.preventDefault();
+            return;
+          }
+          list.childNodes[active].classList.add("active");
+          Config.navig.value = list.childNodes[active].dataset.path;
           e.preventDefault();
         break;
+        default:
+          key = e.keyCode;
+          return true;
       }
-    },
-    redir = function(path) {
-      if(typeof path == "undefined") {
-        var clickEvent = document.createEvent ('MouseEvents');
-        clickEvent.initEvent("mousedown", true, true);
-        list.childNodes[active].dispatchEvent(clickEvent);
-        return;
-      }
-      win.location.href = updateQueryStringParameter(win.location.href, "Admin", path);
     },
     inputText = function(e) {
       close();
       open = true;
-      var value = e === null ? Config.navig.value : e.target.value;
+      var navig = e === null ? Config.navig : e.target;
+      var value = navig.value;
       textNavigValue = value;
       var fs = filter(Config.files, value);
       update(fs);
+    },
+    createSelection = function(navig, start, end) {
+      if(navig.createTextRange) {
+        var selRange = navig.createTextRange();
+        selRange.collapse(true);
+        selRange.moveStart('character', start);
+        selRange.moveEnd('character', end);
+        selRange.select();
+        navig.focus();
+      } else if(navig.setSelectionRange) {
+        navig.focus();
+        navig.setSelectionRange(start, end);
+      } else if(typeof navig.selectionStart != 'undefined') {
+        navig.selectionStart = start;
+        navig.selectionEnd = end;
+        navig.focus();
+      }
     },
     updateSize = function() {
       list.style.width = Config.navig.offsetWidth+"px";
@@ -139,16 +144,25 @@
     update = function(fs) {
       first = true;
       for(var i = 0; i < fs.length; i++) {
+        if(Config.navig.value.length && key !== 8 && fs[i].path.indexOf(Config.navig.value) == 0) { // 8 is backspace
+          var start = Config.navig.value.length;
+          var end = fs[i].path.length;
+          Config.navig.value = fs[i].path;
+          createSelection(Config.navig, start, end);
+        }
         var li = document.createElement("li");
         if(first) {
           first = false;
         }
         li.innerHTML = fs[i].val;
         if(fs[i].user) li.classList.add("user");
+        li.dataset.path = fs[i].path;
         li.onmousedown = (function() {
           var localPath = fs[i].path;
+          var navig = Config.navig;
           return function() {
-            redir(localPath);
+            Config.navig.value = localPath;
+            Config.navig.form.submit();
           }
         })();
         list.appendChild(li);
@@ -195,8 +209,8 @@
   if(found) appendStyle();
 
   for (var i = 0; i < toInit.length; i++) {
-    navigation = new Navigation();
-    navigation.init(toInit[i]);
+    completable = new Completable();
+    completable.init(toInit[i]);
   }
 
 
