@@ -181,11 +181,11 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $select = $doc->createElement("select");
     $select->setAttribute("name", $selectId);
     $select->setAttribute("required", "required");
-    if(is_null($this->vars[$selectId]->firstElement) ||
+    /*if(is_null($this->vars[$selectId]->firstElement) ||
       !$this->vars[$selectId]->firstElement->hasAttribute("var")) {
       throw new Exception(sprintf(_("Variable %s missing inner element with attribute var"), $selectId));
-    }
-    $selected = substr($this->vars[$selectId]->firstElement->getAttribute("var"), strlen(get_class($this))+1);
+    }*/
+    $selected = substr($this->vars[$selectId]->getAttribute("var"), strlen(get_class($this))+1);
     foreach($vars as $v) {
       $id = $v->getAttribute("id");
       $value = strlen($v->nodeValue) ? $v->nodeValue : $id;
@@ -217,8 +217,8 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $var = null;
     foreach($req as $k => $v) {
       if(isset($this->vars[$k])) {
-        if(!is_null($this->vars[$k]->firstElement))
-          $this->vars[$k]->firstElement->setAttribute("var", normalize(get_class($this)."-$v"));
+        if($this->vars[$k]->hasAttribute("var"))
+          $this->vars[$k]->setAttribute("var", normalize(get_class($this)."-$v"));
         else
           $this->vars[$k]->nodeValue = $v;
         $var = $this->vars[$k];
@@ -235,10 +235,23 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     else Cms::setVariable($name, $value);
   }
 
-  private function processRule(DOMElement $el) {
-    $el = $el->processVariables(Cms::getAllVariables(), array(), true);
+  private function processRule(DOMElement $element) {
+    $id = $element->getAttribute("id");
+    $name = $element->nodeName;
+    $attributes = array();
+    foreach($element->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
+    $el = $element->processVariables(Cms::getAllVariables(), array(), true); // pouze posledni node
+    if(is_null($el) || (gettype($el) == "object" && get_class($el) != "DOMElementPlus" && !$el->isSameNode($element))) {
+      if(is_null($el)) $el = new DOMText("");
+      $var = $element->ownerDocument->createElement("var");
+      foreach($attributes as $aName => $aValue) {
+        $var->setAttribute($aName, $aValue);
+      }
+      $var->appendChild($el);
+      $el = $var;
+    }
     if(!$el->hasAttribute("fn")) {
-      $this->setVar($el->nodeName, $el->getAttribute("id"), $el);
+      $this->setVar($name, $id, $el);
       return;
     }
     $f = $el->getAttribute("fn");
@@ -253,7 +266,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       }
     }
     if(!is_null($result)) {
-      $this->setVar($el->nodeName, $el->getAttribute("id"), $result);
+      $this->setVar($el->nodeName, $id, $result);
       return;
     }
     try {
@@ -262,7 +275,6 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       Logger::log(sprintf(_("Unable to register function %s: %s"), $el->getAttribute("fn"), $e->getMessage()), Logger::LOGGER_WARNING);
       return;
     }
-    $id = $el->getAttribute("id");
     if($el->nodeName == "fn") Cms::setFunction($id, $fn);
     else Cms::setVariable($id, $fn($el));
   }

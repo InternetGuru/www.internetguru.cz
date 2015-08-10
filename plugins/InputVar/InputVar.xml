@@ -64,23 +64,23 @@
     1) Element set
       - atribut type: typ pole "select" nebo "text" (níže)
       - atribut for: jaké proměnné se mají editovat
-      -- jeden nebo více regulárních výrazů oddělených mezerou
+        - jeden nebo více regulárních výrazů oddělených mezerou
       - hodnota elementu: název skupiny
 
     a) Typ select
       - atribut datalist: proměnné, jejichž hodnoty mohou editované proměnné nabývat
-      -- jeden nebo více regulárních výrazů oddělených mezerou
+        - jeden nebo více regulárních výrazů oddělených mezerou
 
     Například: 2 akce mohou nabývat hodnot a1, a2, a3 nebo empty
 
       <var id="empty"/>
-      <var id="a1">K nákupu káva zdarma<var>
+      <var id="a1">K nákupu káva zdarma</var>
       <var id="a2">Sleva na vybrané zboží 50 %</var>
       <var id="a3">Rozvoz po Praza zdarma</var>
 
       <var id="akce1" var="empty">Akce 1</var>
       <var id="akce2" var="empty">Akce 2</var>
-      <set for="akce\d " datalist="a\d+ empty">Akce</set>
+      <set type="select" for="akce\d " datalist="a\d+ empty">Akce</set>
 
     b) Typ text
       - atribut placeholder (nepovinný)
@@ -88,15 +88,15 @@
 
     Například:
 
-      <var id="akce1">Nanuk Míša, 12 Kč (sleva 15 %)<var>
-      <var id="akce2">Sušenky BeBe, 19 Kč (sleva 25 %)<var>
+      <var id="akce1">Nanuk Míša, 12 Kč (sleva 15 %)</var>
+      <var id="akce2">Sušenky BeBe, 19 Kč (sleva 25 %)</var>
       <set type="text" for="akce\d+"
         pattern=".[5,20], \d\d Kč \(sleva \d\d %\)"
         placeholder="Čokoláda Orion, 22 Kč (sleva 20 %)">Akce</set>
 
     2) Element passwd (volitelný)
       - zabezpečení formuláře pomocí vlastního hesla
-      -- otisk hesla vytvořený funkcí crypt (například příkazem "openssl passwd -1")
+        - otisk hesla vytvořený funkcí crypt (například příkazem "openssl passwd -1")
 
    -->
 
