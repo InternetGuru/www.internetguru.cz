@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Generate sitemap.xml from Cms::contentFull hiearchic content and save it to the root of current domain
+ * Generate sitemap.xml from all loaded files and save it to the root of current domain
  * @see http://www.sitemaps.org/protocol.html Sitemap definition
  */
 class Sitemap extends Plugin implements SplObserver {
@@ -16,7 +16,12 @@ class Sitemap extends Plugin implements SplObserver {
    */
   private $changefreqVals = array("always", "hourly", "daily", "weekly", "monthly", "yearly", "never", "");
   /**
-   * @var DOMDocumentPlus Config
+   * Which files will be proceeded; Defined in constructor
+   * @var array
+   */
+  private $allowedPaths = array();
+  /**
+   * @var DOMDocumentPlus Plugin configuration file; Defined in constructor
    */
   private $cfg = null;
 
@@ -25,6 +30,7 @@ class Sitemap extends Plugin implements SplObserver {
     parent::__construct($s);
     $s->setPriority($this, 1); // before agregator(2)
     $this->cfg = $this->getDOMPlus();
+    $this->allowedPaths = array("((?!plugins\/).)*", ".*?\/plugins\/Agregator\/.*?");
   }
 
   /**
@@ -32,16 +38,16 @@ class Sitemap extends Plugin implements SplObserver {
    * @param SplSubject $subject
    */
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
+    if($subject->getStatus() != STATUS_POSTPROCESS) return;
     try {
-      $rootHeading = Cms::getContentFull()->documentElement->getElementsByTagName("h")->item(0);
-      $links = $this->getLinks($rootHeading);
-      $lastmods = $this->getLastmod($links, $rootHeading);
+      $links = $this->getLinks();
+      $links["/"] = $links[""];
+      unset($links[""]);
       $cfgLinks = $this->getConfigLinks();
       // update user lastmod by $lastmods
-      foreach($lastmods as $link => $mod) {
+      foreach($links as $link => $mod) {
         if(isset($cfgLinks[$link]) && isset($cfgLinks[$link]["lastmod"])) continue;
-        $cfgLinks[$link]["lastmod"] = $lastmods[$link];
+        $cfgLinks[$link]["lastmod"] = $links[$link];
       }
       $cfgDefaults = $this->getConfigDefaults();
       $this->createSitemap($links, $cfgLinks, $cfgDefaults);
@@ -51,37 +57,24 @@ class Sitemap extends Plugin implements SplObserver {
   }
 
   /**
-   * Get lastmod from mtimes
-   * TODO: get filemtime from includes
-   * @param  Array          $links
-   * @param  DOMElementPlus $rootHeading
-   * @return Array Associative array of links => mtime
+   * Get links from all included files + root link "/"
+   * @return Array links Asociative array of links => mtime in W3C format
    */
-  private function getLastmod(Array $links, DOMElementPlus $rootHeading) {
-    $mtimes = array();
-    $rootMtime = $rootHeading->hasAttribute("mtime")
-      ? $rootHeading->getAttribute("mtime")
-      : strftime(DATE_W3C, filemtime(INDEX_HTML));
-    foreach($links as $link => $h) {
-      if($h->hasAttribute("mtime")) $mtimes[$link] = $h->getAttribute("mtime");
-      else $mtimes[$link] = $rootMtime;
-    }
-    return $mtimes;
-  }
-
-  /**
-   * Get links from first section of full content + root link "/"
-   * @param DOMElementPlus $rootHeading
-   * @return Array links
-   */
-  private function getLinks(DOMElementPlus $rootHeading) {
+  private function getLinks() {
     $links = array();
-    $section = Cms::getContentFull()->getElementsByTagName("section")->item(0);
-    if(!is_null($section)) foreach($section->getElementsByTagName("h") as $h) {
-      if(!$h->hasAttribute("link")) continue;
-      $links[$h->getAttribute("link")] = $h;
+    $files = Cms::getVariable("dombuilder-html");
+    $dt = new DateTime();
+    foreach($files as $f) {
+      $fPath = findFile($f);
+      $allowed = false;
+      foreach($this->allowedPaths as $ap) if(preg_match('/^'.$ap.'$/', $fPath)) $allowed = true;
+      if(!$allowed) continue;
+      if(is_null($fPath)) continue;
+      $fInfo = DOMBuilder::getFinfo($fPath);
+      $dt->setTimestamp($fInfo["mtime"]);
+      $mtime = $dt->format(DATE_W3C);
+      if(count($fInfo["linktodesc"])) foreach($fInfo["linktodesc"] as $link => $desc) $links[$link] = $mtime;
     }
-    $links["/"] = $rootHeading;
     return $links;
   }
 
