@@ -73,7 +73,12 @@ class Sitemap extends Plugin implements SplObserver {
       $fInfo = DOMBuilder::getFinfo($fPath);
       $dt->setTimestamp($fInfo["mtime"]);
       $mtime = $dt->format(DATE_W3C);
-      if(count($fInfo["linktodesc"])) foreach($fInfo["linktodesc"] as $link => $desc) $links[$link] = $mtime;
+      if(count($fInfo["linktodesc"])) {
+        foreach($fInfo["linktodesc"] as $link => $desc) {
+          if(strpos($link, "#") !== false) continue;
+          $links[$link] = $mtime;
+        }
+      }
     }
     return $links;
   }
