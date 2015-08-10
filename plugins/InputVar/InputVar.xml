@@ -61,36 +61,42 @@
 
     Uživatelská editace
 
-    1) Element set:
-      - atribut type="select nebo text" (povinný) -> typ pole
-      - atribut for="RegExp( RegExp)*" (povinný) -> na jaké proměnné se má aplikovat
-      - hodnota elementu -> název skupiny
+    1) Element set
+      - atribut type: typ pole "select" nebo "text" (níže)
+      - atribut for: jaké proměnné se mají editovat
+      -- jeden nebo více regulárních výrazů oddělených mezerou
+      - hodnota elementu: název skupiny
 
-    a) Typ select:
-      - atribut datalist="RegExp( RegExp)*" (povinný) -> data podle názvů proměnných
+    a) Typ select
+      - atribut datalist: proměnné, jejichž hodnoty mohou editované proměnné nabývat
+      -- jeden nebo více regulárních výrazů oddělených mezerou
 
-    Například:
-      <var id="nic"/>
-      <var id="jidlo1">0,33 l Hovězí vývar se strouháním 22 Kč<var>
-      <var id="jidlo2">120 g Smažený karbanátek, vařený brambor, rajčatový salát 89 Kč</var>
-      <var id="akce1"><span var="inputvar-jidlo1">Akce 1</span></var>
-      <var id="akce2"><span var="inputvar-nic">Akce 2</span></var>
-      <var id="akce3"><span var="inputvar-nic">Akce 3</span></var>
-      <set for="akce\d " datalist="jidlo\d+ nic">Akce</set>
+    Například: 2 akce mohou nabývat hodnot a1, a2, a3 nebo empty
 
-    b) Typ text:
+      <var id="empty"/>
+      <var id="a1">K nákupu káva zdarma<var>
+      <var id="a2">Sleva na vybrané zboží 50 %</var>
+      <var id="a3">Rozvoz po Praza zdarma</var>
+
+      <var id="akce1" var="empty">Akce 1</var>
+      <var id="akce2" var="empty">Akce 2</var>
+      <set for="akce\d " datalist="a\d+ empty">Akce</set>
+
+    b) Typ text
       - atribut placeholder (nepovinný)
       - atribut pattern (nepovinný)
 
     Například:
-      <var id="akce1">200 g Tatarský biftek, 6 ks topinek 179 Kč</var>
-      <var id="akce2">500 g Tatarský biftek, 12 ks topinek 350 Kč</var>
-      <var id="akce3"></var>
-      <set type="text" pattern="\s*((?:\d+ \w+)|(?:\d+,\d+ \w+)) (.*) (\d+ Kč)?\s*" placeholder="200 g Tatarský biftek, 6 ks topinek 179 Kč" for="akce\d+">Akce</set>
 
+      <var id="akce1">Nanuk Míša, 12 Kč (sleva 15 %)<var>
+      <var id="akce2">Sušenky BeBe, 19 Kč (sleva 25 %)<var>
+      <set type="text" for="akce\d+"
+        pattern=".[5,20], \d\d Kč \(sleva \d\d %\)"
+        placeholder="Čokoláda Orion, 22 Kč (sleva 20 %)">Akce</set>
 
-    2) Element passwd (volitelně):
-      - hodnota elementu je otisk hesla vytvořený funkcí crypt, v UNIXu lze vytvořit například příkazem "openssl passwd -1"
+    2) Element passwd (volitelný)
+      - zabezpečení formuláře pomocí vlastního hesla
+      -- otisk hesla vytvořený funkcí crypt (například příkazem "openssl passwd -1")
 
    -->
 
