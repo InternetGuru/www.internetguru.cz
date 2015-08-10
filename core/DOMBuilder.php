@@ -265,6 +265,10 @@ class DOMBuilder {
     if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
   }
 
+  public static function getFinfo($filePath) {
+    return self::getCache(HOST.$filePath, $filePath);
+  }
+
   private static function getCache($cacheKey, $filePath) {
     if(!apc_exists($cacheKey)) return null;
     $fInfo = apc_fetch($cacheKey);
