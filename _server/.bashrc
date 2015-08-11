@@ -70,6 +70,7 @@ alias gpush='git push --all; git push --tags'
 alias gpull='git pull --all --tags && git fetch -p && git submodule update --init --recursive'
 alias gpullhard='git reset --hard && gpull'
 alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _' # git uncommit
+alias gup='_(){ git branch -u ${1:-$(echo "origin/$(git status | head -1 | cut -d" " -f 3)")}; }; _' # git track branch
 alias gs='git status && git submodule status'
 
 # BASH
