@@ -132,21 +132,21 @@ class Sitemap extends Plugin implements SplObserver {
       $changefreq = $this->getValue("changefreq", $link, $cfgLinks, $cfgDefaults);
       if(!is_null($changefreq)) {
         if(!in_array($changefreq, $this->changefreqVals))
-          throw new Exception(sprintf(_("Element changefreq has forbidden value %s"), $changefreq));
+          throw new Exception(sprintf(_("Invalid element changefreq value: %s"), $changefreq));
         $url->appendChild($sitemap->createElement("changefreq", $changefreq));
       }
       // priority
       $priority = $this->getValue("priority", $link, $cfgLinks, $cfgDefaults);
       if(!is_null($priority)) {
         if($priority < 0 || $priority > 1)
-          throw new Exception(sprintf(_("Element priority has invalid value %s"), $priority));
+          throw new Exception(sprintf(_("Invalid element priority value: %s"), $priority));
         $url->appendChild($sitemap->createElement("priority", $priority));
       }
       // lastmod
       $lastmod = $this->getValue("lastmod", $link, $cfgLinks, $cfgDefaults);
       if(!is_null($lastmod)) {
         if(!preg_match("/^".W3C_DATETIME_PATTERN."$/", $lastmod))
-          throw new Exception(sprintf(_("Element lastmod has invalid value %s"), $lastmod));
+          throw new Exception(sprintf(_("Invalid element lastmod value: %s"), $lastmod));
         $url->appendChild($sitemap->createElement("lastmod", $lastmod));
       }
     }

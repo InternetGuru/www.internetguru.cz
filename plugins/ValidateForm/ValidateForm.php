@@ -149,9 +149,23 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       }
       break;
       case "select":
-      $this->verifyText($value, $pattern, $req);
+      try {
+        $this->verifySelect($e, $value);
+      } catch (Exception $ex) {
+        if(!strlen($pattern)) throw $ex;
+        $this->verifyText($value, $pattern, $req);
+      }
       break;
     }
+  }
+
+  private function verifySelect(DOMElementPlus $select, $value) {
+    $match = false;
+    foreach($select->getElementsByTagName("option") as $option) {
+      $oVal = $option->hasAttribute("value") ? $option->getAttribute("value") : $option->nodeValue;
+      if($oVal == $value) $match = true;
+    }
+    if(!$match) throw new Exception(_("Select value does not match any option"));
   }
 
   private function verifyNumber($value, $min, $max) {
@@ -172,7 +186,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       return;
     }
     if($res === 1) return;
-    throw new Exception(_("Item value does not match required format"));
+    throw new Exception(_("Item value does not match required pattern"));
   }
 
   private function verifyChecked($checked, $required) {

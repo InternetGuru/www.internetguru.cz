@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-03 18:19+0100\n"
-"PO-Revision-Date: 2015-08-03 18:22+0100\n"
+"POT-Creation-Date: 2015-08-11 15:48+0200\n"
+"PO-Revision-Date: 2015-08-11 15:50+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.1\n"
+"X-Generator: Poedit 1.8.3\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -120,37 +120,37 @@ msgstr "HTML+ soubor %s byl automaticky opraven: %s"
 msgid "Unable to cache file %s"
 msgstr "Nepodařilo se uložit soubor %s do mezipaměti"
 
-#: core/DOMBuilder.php:286
+#: core/DOMBuilder.php:290
 #, php-format
 msgid "Duplicit prefix %s in %s renamed to %s"
 msgstr "Duplicitní prefix %s v %s přejmenován na %s"
 
-#: core/DOMBuilder.php:338
+#: core/DOMBuilder.php:342
 #, php-format
 msgid "Duplicit link %s skipped"
 msgstr "Byl vynechán duplicitní link %s"
 
-#: core/DOMBuilder.php:409
+#: core/DOMBuilder.php:413
 #, php-format
 msgid "Included file '%s' not found"
 msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
 
-#: core/DOMBuilder.php:412
+#: core/DOMBuilder.php:416
 #, php-format
 msgid "Included file extension '%s' must be .html"
 msgstr "Přípona vkládaného souboru '%s' musí být .html"
 
-#: core/DOMBuilder.php:414
+#: core/DOMBuilder.php:418
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
 
-#: core/DOMBuilder.php:420
+#: core/DOMBuilder.php:424
 #, php-format
 msgid "Unable to import '%s': %s"
 msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: core/DOMBuilder.php:428
+#: core/DOMBuilder.php:432
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -158,12 +158,12 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: core/DOMBuilder.php:440
+#: core/DOMBuilder.php:444
 #, php-format
 msgid "HTML+ autocorrected after inserting '%s': %s"
 msgstr "HTML+ automaticky opraven po vložení souboru '%s': %s"
 
-#: core/DOMBuilder.php:491
+#: core/DOMBuilder.php:495
 #, php-format
 msgid "ID '%s' conflicts with element '%s'"
 msgstr "Atribut ID '%s' koliduje s elementem '%s'"
@@ -494,38 +494,38 @@ msgstr "Vyžadována autorizace"
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
-#: index.php:105
+#: index.php:106
 #, php-format
 msgid "Method %s is no longer available"
 msgstr "Metoda %s již není k dispozici"
 
-#: index.php:106
+#: index.php:107
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: index.php:119
+#: index.php:120
 msgid "Invalid session cookies removed"
 msgstr "Odstraněna neplatná proměnná session z cookies"
 
-#: index.php:123
+#: index.php:124
 msgid "Insufficient rights to purge cache"
 msgstr "Nedostatečná práva pro smazání mezipaměti (cache)"
 
-#: index.php:126
+#: index.php:127
 msgid "Cache successfully purged"
 msgstr "Mezipaměť (cache) byla úspěšně vymazána"
 
-#: index.php:165
+#: index.php:166
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: index.php:170
+#: index.php:171
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: index.php:171
+#: index.php:172
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -547,102 +547,102 @@ msgstr "neaktivní soubor"
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: plugins/Admin/Admin.php:54
+#: plugins/Admin/Admin.php:55
 msgid "Insufficient right to save changes"
 msgstr "Nedostatečná práva pro uložení změn"
 
-#: plugins/Admin/Admin.php:59
+#: plugins/Admin/Admin.php:60
 msgid "No changes made"
 msgstr "Nebyly provedeny žádné změny"
 
-#: plugins/Admin/Admin.php:64
+#: plugins/Admin/Admin.php:65
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: plugins/Admin/Admin.php:143
+#: plugins/Admin/Admin.php:144
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:159
+#: plugins/Admin/Admin.php:160
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:159
+#: plugins/Admin/Admin.php:160
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:178
+#: plugins/Admin/Admin.php:179
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:199
+#: plugins/Admin/Admin.php:207
 #, php-format
 msgid "%s - Administration"
 msgstr "%s - Administrace"
 
-#: plugins/Admin/Admin.php:256
+#: plugins/Admin/Admin.php:268
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: plugins/Admin/Admin.php:310
+#: plugins/Admin/Admin.php:322
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:313
+#: plugins/Admin/Admin.php:325
 msgid "My Heading"
 msgstr "Můj nadpis"
 
-#: plugins/Admin/Admin.php:314
+#: plugins/Admin/Admin.php:326
 msgid "My Content Description"
 msgstr "Můj popis obsahu"
 
-#: plugins/Admin/Admin.php:315
+#: plugins/Admin/Admin.php:327
 msgid "my, comma, separated, keywords"
 msgstr "moje, klíčová, slova, oddělená, čárkou"
 
-#: plugins/Admin/Admin.php:319
+#: plugins/Admin/Admin.php:331
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: plugins/Admin/Admin.php:354
+#: plugins/Admin/Admin.php:366
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:363
+#: plugins/Admin/Admin.php:375
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:366
+#: plugins/Admin/Admin.php:378
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:372
+#: plugins/Admin/Admin.php:384
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:375 plugins/InputVar/InputVar.php:23
+#: plugins/Admin/Admin.php:387 plugins/InputVar/InputVar.php:23
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:389
+#: plugins/Admin/Admin.php:401
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:395
+#: plugins/Admin/Admin.php:407
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:406
+#: plugins/Admin/Admin.php:418
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:418
+#: plugins/Admin/Admin.php:430
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -651,26 +651,34 @@ msgstr "Schéma souboru '%s' nebylo nalezeno"
 msgid "Edit"
 msgstr "Editovat"
 
-#: plugins/Agregator/Agregator.php:259
+#: plugins/Agregator/Agregator.php:182
+msgid "Configuration element image missing attribute id"
+msgstr "Konfigurační element image postrádá atribut id"
+
+#: plugins/Agregator/Agregator.php:198
+msgid "Configuration element alt missing attribute for"
+msgstr "Konfigurační element alt postrádá atribut for"
+
+#: plugins/Agregator/Agregator.php:292
 msgid "Configuration element html missing attribute id"
 msgstr "Konfiguračnímu elementu html chybí atribut id"
 
-#: plugins/Agregator/Agregator.php:280
+#: plugins/Agregator/Agregator.php:330
 #, php-format
 msgid "Sort variable %s not found; using default"
 msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
 
-#: plugins/Agregator/Agregator.php:304
+#: plugins/Agregator/Agregator.php:342
 #, php-format
 msgid "Unable to cache variable %s"
 msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
 
-#: plugins/Agregator/Agregator.php:341
+#: plugins/Agregator/Agregator.php:381
 #, php-format
 msgid "Redundant element(s) found in %s"
 msgstr "Nalezen nadbytečný element v %s"
 
-#: plugins/Agregator/Agregator.php:342
+#: plugins/Agregator/Agregator.php:382
 msgid "No item element found"
 msgstr "Nebyly nalezeny žádné prvky seznamu - elementy item"
 
@@ -713,19 +721,19 @@ msgstr "Neplatná adresa administrátora: '%s'"
 msgid "Invalid client email address: '%s'"
 msgstr "Neplatná adresa odesílatele: %s"
 
-#: plugins/ContactForm/ContactForm.php:139
-msgid "Unable to send copy to empty client address"
-msgstr "Není možné odeslat kopii zprávy na prázdnou adresu"
-
-#: plugins/ContactForm/ContactForm.php:160
-#, php-format
-msgid "New massage from %s"
-msgstr "Nová zpráva z %s"
-
-#: plugins/ContactForm/ContactForm.php:167
+#: plugins/ContactForm/ContactForm.php:137
 #, php-format
 msgid "Sending e-mail: %s"
 msgstr "Odesílání e-mailu: %s"
+
+#: plugins/ContactForm/ContactForm.php:142
+msgid "Unable to send copy to empty client address"
+msgstr "Není možné odeslat kopii zprávy na prázdnou adresu"
+
+#: plugins/ContactForm/ContactForm.php:163
+#, php-format
+msgid "New massage from %s"
+msgstr "Nová zpráva z %s"
 
 #: plugins/ContactForm/ContactForm.php:171
 #, php-format
@@ -822,30 +830,30 @@ msgstr "Nepodařilo se uložit soubor %s: %s"
 msgid "Unable to backup file %s: %s"
 msgstr "Nepodařilo se zálohovat soubor %s: %s"
 
-#: plugins/Convertor/Convertor.php:180
+#: plugins/Convertor/Convertor.php:186
 #, php-format
 msgid "File '%s' not found in temp folder"
 msgstr "Soubor '%s' nebyl nalezen mezi dočasnými soubory"
 
-#: plugins/Convertor/Convertor.php:186
+#: plugins/Convertor/Convertor.php:192
 msgid "Unable to parse link"
 msgstr "Odkaz má neplatný formát"
 
-#: plugins/Convertor/Convertor.php:208
+#: plugins/Convertor/Convertor.php:214
 msgid "Destination URL is unaccessible; must be shared publically"
 msgstr "Cílový odkaz je nedostupný; dokument musí být veřejně sdílený"
 
-#: plugins/Convertor/Convertor.php:210
+#: plugins/Convertor/Convertor.php:216
 #, php-format
 msgid "Destination URL error: %s"
 msgstr "Chyba cílového odkazu: %s"
 
-#: plugins/Convertor/Convertor.php:258
+#: plugins/Convertor/Convertor.php:264
 #, php-format
 msgid "Unable to locate '%s' in '%s'"
 msgstr "Nepodařilo se nalézt soubor '%s' v archivu '%s'"
 
-#: plugins/Convertor/Convertor.php:273
+#: plugins/Convertor/Convertor.php:279
 #, php-format
 msgid "Failed to apply transformation '%s'"
 msgstr "Nepodařilo se aplikovat transformaci '%s'"
@@ -924,82 +932,82 @@ msgstr "Chybný formát ga_id '%s'"
 msgid "GA (%s) disabled if administrator logged"
 msgstr "GA (%s) je neaktivní v administračním režimu"
 
-#: plugins/HtmlOutput/HtmlOutput.php:133
+#: plugins/HtmlOutput/HtmlOutput.php:134
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:165
+#: plugins/HtmlOutput/HtmlOutput.php:166
 #, php-format
 msgid "Removed duplicit id %s"
 msgstr "Odstraněn duplicitní identifikátor %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:185
+#: plugins/HtmlOutput/HtmlOutput.php:186
 #, php-format
 msgid "Object %s attribute type invalid or missing: %s"
 msgstr "Atribut type elementu object %s je neplatný nebo chybí: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:192
+#: plugins/HtmlOutput/HtmlOutput.php:193
 #, php-format
 msgid "Link %s removed: %s"
 msgstr "Odkaz %s odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:218
+#: plugins/HtmlOutput/HtmlOutput.php:219
 #, php-format
 msgid "Local fragment %s to undefined id"
 msgstr "Lokální fragment na neexistující id %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:253
+#: plugins/HtmlOutput/HtmlOutput.php:254
 #, php-format
 msgid "Object data '%s' not found"
 msgstr "Cílový soubor elementu object '%s' nebyl nenalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:259
+#: plugins/HtmlOutput/HtmlOutput.php:260
 #, php-format
 msgid "Invalid object '%s' MIME type '%s'"
 msgstr "Element object '%s' má chybný MIME typ '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:262
+#: plugins/HtmlOutput/HtmlOutput.php:263
 #, php-format
 msgid "Object '%s' attribute type set to '%s'"
 msgstr "Atribut elementu '%s' byl nastaven na '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:267
+#: plugins/HtmlOutput/HtmlOutput.php:268
 #, php-format
 msgid "Parameter 'full' removed from data attribute '%s'"
 msgstr "Odstraněn parametr 'full' z atributu data '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:322
+#: plugins/HtmlOutput/HtmlOutput.php:323
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:354
+#: plugins/HtmlOutput/HtmlOutput.php:355
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:402
+#: plugins/HtmlOutput/HtmlOutput.php:403
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:411
+#: plugins/HtmlOutput/HtmlOutput.php:412
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:413
+#: plugins/HtmlOutput/HtmlOutput.php:414
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:510
+#: plugins/HtmlOutput/HtmlOutput.php:511
 #, php-format
 msgid "File %s modification is disabled"
 msgstr "Modifikace souboru %s je vypnuta"
 
-#: plugins/HtmlOutput/HtmlOutput.php:565
+#: plugins/HtmlOutput/HtmlOutput.php:566
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1033,11 +1041,6 @@ msgstr "Element set má neznámý typ %s"
 msgid "Cannot create fieldset for %s"
 msgstr "Nepodařilo se vytvořit fieldset pro %s"
 
-#: plugins/InputVar/InputVar.php:186
-#, php-format
-msgid "Variable %s missing inner element with attribute var"
-msgstr "Proměnná %s postrádá vnořený element s atributem var"
-
 #: plugins/InputVar/InputVar.php:215
 msgid "Incorrect password"
 msgstr "Chybné heslo"
@@ -1046,53 +1049,72 @@ msgstr "Chybné heslo"
 msgid "Unabe to save user config"
 msgstr "Nepodařilo se uložit uživatelské nastavení"
 
-#: plugins/InputVar/InputVar.php:251
+#: plugins/InputVar/InputVar.php:264
 #, php-format
 msgid "Unable to apply function: %s"
 msgstr "Nepodařilo se aplikovat funkci: %s"
 
-#: plugins/InputVar/InputVar.php:262
+#: plugins/InputVar/InputVar.php:275
 #, php-format
 msgid "Unable to register function %s: %s"
 msgstr "Nepodařilo se zaregistrovat funkci %s: %s"
 
-#: plugins/InputVar/InputVar.php:295
+#: plugins/InputVar/InputVar.php:307
 msgid "Element data missing attribute name"
 msgstr "Element data postrádá atribut name"
 
-#: plugins/InputVar/InputVar.php:307
+#: plugins/InputVar/InputVar.php:319
 msgid "Element call missing content"
 msgstr "Element call postrádá obsah"
 
-#: plugins/InputVar/InputVar.php:315
+#: plugins/InputVar/InputVar.php:327
 msgid "Unknown function name"
 msgstr "Neznámá funkce"
 
-#: plugins/InputVar/InputVar.php:342
+#: plugins/InputVar/InputVar.php:354
 msgid "No pattern found"
 msgstr "Nebyl nalezen atribut pattern"
 
-#: plugins/InputVar/InputVar.php:343
+#: plugins/InputVar/InputVar.php:355
 msgid "No replacement found"
 msgstr "Nebyl nalezen atribut replacement"
 
-#: plugins/InputVar/InputVar.php:350 plugins/InputVar/InputVar.php:373
+#: plugins/InputVar/InputVar.php:362 plugins/InputVar/InputVar.php:385
 msgid "No data found"
 msgstr "Nebyla nalezena data"
 
-#: plugins/InputVar/InputVar.php:358
+#: plugins/InputVar/InputVar.php:370
 msgid "No content found"
 msgstr "Nebyl nalezen obsah"
 
-#: plugins/InputVar/InputVar.php:380
+#: plugins/InputVar/InputVar.php:392
 #, php-format
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"
 
-#: plugins/LogViewer/LogViewer.php:64
+#: plugins/LogViewer/LogViewer.php:68
 #, php-format
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
+
+#: plugins/Sitemap/Sitemap.php:94
+msgid "Element url missing atribute link"
+msgstr "Element url postrádá atribut link"
+
+#: plugins/Sitemap/Sitemap.php:135
+#, php-format
+msgid "Invalid element changefreq value: %s"
+msgstr "Neplatná hodnota elementu changefreq: %s"
+
+#: plugins/Sitemap/Sitemap.php:142
+#, php-format
+msgid "Invalid element priority value: %s"
+msgstr "Neplatná hodnota elementu priority: %s"
+
+#: plugins/Sitemap/Sitemap.php:149
+#, php-format
+msgid "Invalid element lastmod value: %s"
+msgstr "Neplatná hodnota elementu lastmod: %s"
 
 #: plugins/UrlHandler/UrlHandler.php:40
 #, php-format
@@ -1121,33 +1143,43 @@ msgstr ""
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
 
-#: plugins/ValidateForm/ValidateForm.php:158
+#: plugins/ValidateForm/ValidateForm.php:168
+msgid "Select value does not match any option"
+msgstr "Hodnota výběru neodpovídá žádné z možností"
+
+#: plugins/ValidateForm/ValidateForm.php:172
 msgid "Item value is lower then allowed minimum"
 msgstr "Hodnota je menší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:159
+#: plugins/ValidateForm/ValidateForm.php:173
 msgid "Item value is greater then allowed maximum"
 msgstr "Hodnota je větší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:163
+#: plugins/ValidateForm/ValidateForm.php:177
 msgid "Value missing"
 msgstr "Chybí hodnota"
 
-#: plugins/ValidateForm/ValidateForm.php:166
+#: plugins/ValidateForm/ValidateForm.php:180
 msgid "Item is required"
 msgstr "Pložka je povinná"
 
-#: plugins/ValidateForm/ValidateForm.php:171
+#: plugins/ValidateForm/ValidateForm.php:185
 msgid "Invalid item pattern"
 msgstr "Neplatný formát předpisu (pattern)"
 
-#: plugins/ValidateForm/ValidateForm.php:175
-msgid "Item value does not match required format"
+#: plugins/ValidateForm/ValidateForm.php:189
+msgid "Item value does not match required pattern"
 msgstr "Hodnota položky neodpovídá požadovanému formátu"
 
-#: plugins/ValidateForm/ValidateForm.php:180
+#: plugins/ValidateForm/ValidateForm.php:194
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Variable %s missing inner element with attribute var"
+#~ msgstr "Proměnná %s postrádá vnořený element s atributem var"
+
+#~ msgid "Item value does not match required format"
+#~ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 
 #~ msgid ""
 #~ "The form can not be sent in such quick succession, please try it again in "

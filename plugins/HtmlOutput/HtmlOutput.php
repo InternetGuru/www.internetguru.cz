@@ -62,6 +62,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $xPath = new DOMXPath($contentPlus);
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
     foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
+    foreach($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
     $ids = $this->getIds($xPath);
     $this->fragToLinks($contentPlus, $ids, "a", "href");
     $this->fragToLinks($contentPlus, $ids, "form", "action");

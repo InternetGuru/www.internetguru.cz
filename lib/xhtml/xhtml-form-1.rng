@@ -113,13 +113,16 @@
     </attribute>
   </optional>
   <optional>
-    <attribute name="required">
-      <value>required</value>
-    </attribute>
-  </optional>
-  <optional>
     <attribute name="tabindex">
       <ref name="Number.datatype"/>
+    </attribute>
+  </optional>
+    <optional>
+    <attribute name="pattern"/>
+  </optional>
+  <optional>
+    <attribute name="required">
+      <value>required</value>
     </attribute>
   </optional>
 </define>
