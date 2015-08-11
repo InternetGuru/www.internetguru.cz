@@ -3,27 +3,29 @@
 
   <!--
 
-    Konfigurovatelné hodnoty, viz http://www.sitemaps.org/protocol.html#xmlTagDefinitions
-      - lastmod
+    Sitemap, viz viz http://www.sitemaps.org/protocol.html#xmlTagDefinitions
+
+    Konfigurovatelné hodnoty jako hodnoty elementů:
       - changefreq
+      - lastmod
       - priority
 
-    a) Na obecné úrovni
+    a) Globální hodnoty
 
-    Příklad:
-      <changefreq modifyonly="modifyonly">weekly</changefreq>
+      <changefreq>weekly</changefreq>
+      <lastmod>2015-08-28</lastmod>
+      <priority>0.5</priority>
 
-    b) Pro konkrétní stránku (přepisují obecné hodnoty)
+    b) Individuální hodnoty (pro konkrétní stránku)
+      - přepisují obecné hodnoty
       - element url s povinným atributem link
 
-    Příklad:
-      <url link="/">
-        <changefreq>daily</changefreq>
-        <lastmod>2015-08-08</lastmod>
-        <priority>0.8</priority>
+      <url link="/archiv">
+        <changefreq>monthly</changefreq>
+        <lastmod>2015-08-28</lastmod>
+        <priority>0.2</priority>
       </url>
-  -->
 
-  <changefreq modifyonly="modifyonly">weekly</changefreq>
+  -->
 
 </Sitemap>
