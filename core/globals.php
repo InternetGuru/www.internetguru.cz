@@ -496,7 +496,9 @@ if(!function_exists("apc_store")) {
 }
 
 function apc_get_path($key) {
-  return getcwd()."/../tmp_apc/".normalize($key, null, "+");
+  $apcDir = getcwd()."/../tmp_apc/";
+  mkdir_plus($apcDir);
+  return $apcDir.normalize($key, null, "+");
 }
 
 function clearNginxCache($folder = null) {
