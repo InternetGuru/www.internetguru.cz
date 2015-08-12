@@ -204,7 +204,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $vars["nohide"] = "nohide";
     }
     $newContent->processVariables($vars);
-    Cms::setVariable("title", sprintf(_("%s - Administration"), $this->defaultFile));
+    Cms::setVariable("title", sprintf(_("%s (%s) - Administration"),
+      basename($this->defaultFile), ROOT_URL.$this->defaultFile));
     return $newContent;
   }
 
