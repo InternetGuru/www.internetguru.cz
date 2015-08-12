@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Generate sitemap.xml from all loaded files and save it to the root of current domain
+ * Unlogged user (on root url) generate sitemap.xml from all loaded files and save it to the root of current domain
  * @see http://www.sitemaps.org/protocol.html Sitemap definition
  */
 class Sitemap extends Plugin implements SplObserver {
@@ -38,6 +38,10 @@ class Sitemap extends Plugin implements SplObserver {
    * @param SplSubject $subject
    */
   public function update(SplSubject $subject) {
+    if(!is_null(Cms::getLoggedUser()) || getCurLink() !== "") {
+      $subject->detach($this);
+      return;
+    }
     if($subject->getStatus() != STATUS_POSTPROCESS) return;
     try {
       $links = $this->getLinks();
@@ -127,7 +131,9 @@ class Sitemap extends Plugin implements SplObserver {
     foreach($links as $link => $h) {
       $url = $urlset->appendChild($sitemap->createElement("url"));
       // loc
-      $url->appendChild($sitemap->createElement("loc", URL."/".trim($link, "/")));
+      $scheme = Cms::getVariable("urlhandler-default_protocol");
+      if(is_null($scheme)) $scheme = "http";
+      $url->appendChild($sitemap->createElement("loc", "$scheme://".HOST."/".trim($link, "/")));
       // changefreq
       $changefreq = $this->getValue("changefreq", $link, $cfgLinks, $cfgDefaults);
       if(!is_null($changefreq)) {
