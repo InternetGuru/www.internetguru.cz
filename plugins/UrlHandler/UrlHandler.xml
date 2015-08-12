@@ -1,13 +1,19 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <UrlHandler>
 
   <!--
-    ATRIBUTY elementu var
+    Adresy běžící na https (prázné pro celý web)
+  -->
+
+  <https>?login</https>
+
+
+  <!--
+    ATRIBUTY elementu redir
     - link     ... cesta
     - parName  ... název parametru
     - parValue ... hodnota parametru
 
-    CÍLOVÁ ADRESA (obsah elementu var)
+    CÍLOVÁ ADRESA (obsah elementu redir)
       / nebo ""     ... domovská stránka
       bez cesty     ... zachová aktuální cestu, např. "?Admin"
       prázdná cesta ... smaže aktuální cestu, např. "/?Admin"
@@ -15,26 +21,27 @@
       prázdný param ... smaže aktuální parametry, např. "/?"
   -->
 
-  <var link="login">?login</var>
-  <var link="Login">?login</var>
-  <var link="Admin">/?Admin</var>
-  <var link="admin">/?Admin</var>
-  <var link="log">/?LogViewer=log</var>
-  <var link="ver">/?LogViewer=ver</var>
-  <var link="import">/?Convertor</var>
-  <var link="subdom">/?SubdomManager</var>
+  <redir link="login">?login</redir>
+  <redir link="Login">?login</redir>
+  <redir link="Admin">/?Admin</redir>
+  <redir link="admin">/?Admin</redir>
+  <redir link="log">/?LogViewer=log</redir>
+  <redir link="ver">/?LogViewer=ver</redir>
+  <redir link="import">/?Convertor</redir>
+  <redir link="subdom">/?SubdomManager</redir>
 
-  <var parName="ver" parValue="">?LogViewer=ver</var>
-  <var parName="log" parValue="">?LogViewer=log</var>
+  <redir parName="ver" parValue="">?LogViewer=ver</redir>
+  <redir parName="log" parValue="">?LogViewer=log</redir>
 
-  <var parName="PageSpeed" parValue="on">?</var>
-  <var parName="Grunt" parValue="on">?</var>
+  <redir parName="PageSpeed" parValue="on">?</redir>
+  <redir parName="Grunt" parValue="on">?</redir>
 
-  <var parName="Login">?login</var>
-  <var parName="admin">?Admin</var>
-  <var parName="log">?LogViewer</var>
-  <var parName="ver">?LogViewer</var>
-  <var parName="import">?Convertor</var>
-  <var parName="subdom">?SubdomManager</var>
+  <redir parName="Login">?login</redir>
+  <redir parName="admin">?Admin</redir>
+  <redir parName="log">?LogViewer</redir>
+  <redir parName="ver">?LogViewer</redir>
+  <redir parName="import">?Convertor</redir>
+  <redir parName="subdom">?SubdomManager</redir>
 
 </UrlHandler>
+
