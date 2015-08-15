@@ -16,11 +16,6 @@ class Sitemap extends Plugin implements SplObserver {
    */
   private $changefreqVals = array("always", "hourly", "daily", "weekly", "monthly", "yearly", "never", "");
   /**
-   * Which files will be proceeded; Defined in constructor
-   * @var array
-   */
-  private $allowedPaths = array();
-  /**
    * @var DOMDocumentPlus Plugin configuration file; Defined in constructor
    */
   private $cfg = null;
@@ -30,7 +25,6 @@ class Sitemap extends Plugin implements SplObserver {
     parent::__construct($s);
     $s->setPriority($this, 1); // before agregator(2)
     $this->cfg = $this->getDOMPlus();
-    $this->allowedPaths = array("((?!plugins\/).)*", ".*?\/plugins\/Agregator\/.*?");
   }
 
   /**
@@ -62,27 +56,15 @@ class Sitemap extends Plugin implements SplObserver {
 
   /**
    * Get links from all included files + root link "/"
-   * @return Array links Asociative array of links => mtime in W3C format
+   * @return Array links Asociative array [ link => mtime ] in W3C format
    */
   private function getLinks() {
     $links = array();
-    $files = Cms::getVariable("dombuilder-html");
     $dt = new DateTime();
-    foreach($files as $f) {
-      $fPath = findFile($f);
-      $allowed = false;
-      foreach($this->allowedPaths as $ap) if(preg_match('/^'.$ap.'$/', $fPath)) $allowed = true;
-      if(!$allowed) continue;
-      if(is_null($fPath)) continue;
-      $fInfo = DOMBuilder::getFinfo($fPath);
-      $dt->setTimestamp($fInfo["mtime"]);
-      $mtime = $dt->format(DATE_W3C);
-      if(count($fInfo["linktodesc"])) {
-        foreach($fInfo["linktodesc"] as $link => $desc) {
-          if(strpos($link, "#") !== false) continue;
-          $links[$link] = $mtime;
-        }
-      }
+    foreach(DOMBuilder::getLinks(false) as $link) {
+      $m = DOMBuilder::getFileMtime(DOMBuilder::getFile($link));
+      $dt->setTimestamp($m);
+      $links[$link] = $dt->format(DATE_W3C);
     }
     return $links;
   }

@@ -12,9 +12,11 @@ class DOMBuilder {
   #const USE_CACHE = true;
   private static $included = array();
   private static $idToLink = array(); // id => closest or self link
-  private static $linkToDesc = array(); // id => shorted description
-  private static $linkToTitle = array(); // id => self title or shorted content
+  private static $linkToDesc = array(); // link => shorted description
+  private static $linkToTitle = array(); // link => self title or shorted content
   private static $linkToId = array(); // link => null
+  private static $linkToFile = array(); // link => closest or self link
+  private static $fileToMtime = array(); // file => file mtime
   private static $defaultPrefix = null;
 
   public static function buildHTMLPlus($filePath, $user=true) {
@@ -76,6 +78,16 @@ class DOMBuilder {
     return null;
   }
 
+  public static function getFileMtime($filepath) {
+    if(array_key_exists($filepath, self::$fileToMtime)) return self::$fileToMtime[$filepath];
+    return null;
+  }
+
+  public static function getFile($link) {
+    if(array_key_exists($link, self::$linkToFile)) return self::$linkToFile[$link];
+    return null;
+  }
+
   public static function getTitle($link) {
     #var_dump(self::$linkToTitle); die();
     if(array_key_exists($link, self::$linkToTitle)) return self::$linkToTitle[$link];
@@ -90,8 +102,13 @@ class DOMBuilder {
     return key(self::$idToLink);
   }
 
-  public static function getLinks() {
-    return array_keys(self::$linkToId);
+  public static function getLinks($fragments = true) {
+    if($fragments) return array_keys(self::$linkToId);
+    $links = array();
+    foreach(array_keys(self::$linkToId) as $link) {
+      if(strpos($link, "#") === false) $links[] = $link;
+    }
+    return $links;
   }
 
   public static function isLink($link) {
@@ -192,7 +209,7 @@ class DOMBuilder {
     if(is_file(dirname($filePath)."/.".basename($filePath)))
       throw new Exception(sprintf(_("File disabled")));
 
-    $cacheKey = HOST.$filePath;
+    $cacheKey = HOST."/$filePath";
     $fInfo = self::getCache($cacheKey, $filePath);
     if(!is_null($fInfo)) {
       if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
@@ -261,12 +278,14 @@ class DOMBuilder {
       "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
       "xml" => $doc->saveXML()
     );
+    self::$fileToMtime[$filePath] = $fInfo["mtime"];
+    self::$linkToFile[$fInfo["prefix"]] = $filePath;
+    foreach($fInfo["linktoid"] as $link => $id) {
+      if(strpos($link, "#") !== false) continue;
+      self::$linkToFile[$link] = $filePath;
+    }
     $stored = apc_store($cacheKey, $fInfo, rand(3600*24*30*3, 3600*24*30*6));
     if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
-  }
-
-  public static function getFinfo($filePath) {
-    return self::getCache(HOST.$filePath, $filePath);
   }
 
   private static function getCache($cacheKey, $filePath) {

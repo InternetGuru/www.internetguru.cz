@@ -260,10 +260,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function getFilepath($f) {
     if(!strlen($f)) {
-      #todo: check links according to curlink
-      foreach(Cms::getVariable("dombuilder-html") as $path) {
-        if(pathinfo($path, PATHINFO_FILENAME) == getCurLink()) return $path;
-      }
+      $path = DOMBuilder::getFile(getCurLink());
+      if(!is_null($path)) return $path;
       return INDEX_HTML;
     }
     if(strpos($f, USER_FOLDER."/") === 0) {
