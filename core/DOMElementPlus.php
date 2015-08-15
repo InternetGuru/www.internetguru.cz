@@ -243,6 +243,21 @@ class DOMElementPlus extends DOMElement {
     return null;
   }
 
+  public function getParentValue($attName=null, $eName=null) {
+    if(is_null($eName)) $eName = $this->nodeName;
+    $parent = $this;
+    while(!is_null($parent)) {
+      $parent = $parent->parentNode;
+      if(is_null($parent) || $parent->nodeName != $eName) continue;
+      if(!is_null($attName) && $parent->hasAttribute($attName)) {
+        return $parent->getAttribute($attName);
+      } elseif(is_null($attName) && strlen($parent->nodeValue)) {
+        return htmlspecialchars($parent->nodeValue);
+      }
+    }
+    return null;
+  }
+
   public function getAncestorValue($attName=null, $eName=null) {
     if(is_null($eName)) $eName = $this->nodeName;
     $ancestor = $this->parentNode;
@@ -258,7 +273,7 @@ class DOMElementPlus extends DOMElement {
     return null;
   }
 
-  private function removeChildNodes() {
+  public function removeChildNodes() {
     $r = array();
     foreach($this->childNodes as $n) $r[] = $n;
     foreach($r as $n) $this->removeChild($n);
