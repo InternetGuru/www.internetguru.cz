@@ -10,14 +10,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
 
 
   public function getContent(HTMLPlus $content) {
-    $oldContent = clone $content;
-    try {
-      $content->processVariables($this->productVars);
-    } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-      #echo $content->saveXML(); die();
-      return $oldContent;
-    }
+    $content->processVariables($this->productVars);
     return $content;
   }
 

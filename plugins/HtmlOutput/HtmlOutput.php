@@ -132,12 +132,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         $xml = $newContent->saveXML();
         if(!@$newContent->loadXML($xml))
           throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
+        #todo: validate HTML5 validity
         $content = $newContent;
       } catch(Exception $e) {
         Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-      } finally {
-        #unset($this->transformations[$xslt]);
-        #unset($this->transformationsPriority[$xslt]);
       }
     }
     return $content;

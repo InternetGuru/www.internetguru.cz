@@ -91,13 +91,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $content) {
-    $oldContent = clone $content;
-    try {
-      $content->processVariables($this->formsElements);
-    } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-      return $oldContent;
-    }
+    $content->processVariables($this->formsElements);
     return $content;
   }
 

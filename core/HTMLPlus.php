@@ -42,14 +42,12 @@ class HTMLPlus extends DOMDocumentPlus {
   public function processVariables(Array $variables) {
     $ignore = array("h" => array("id", "link"));
     $newContent = parent::processVariables($variables, $ignore);
-    $newContent->ownerDocument->validatePlus(true);
     return $newContent->ownerDocument;
   }
 
   public function processFunctions(Array $functions, Array $variables) {
     $ignore = array("h" => array("id", "link"));
     parent::processFunctions($functions, $variables, $ignore);
-    $this->validatePlus(true);
   }
 
   public function applySyntax() {
