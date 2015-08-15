@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-11 15:48+0200\n"
-"PO-Revision-Date: 2015-08-11 15:50+0200\n"
+"POT-Creation-Date: 2015-08-15 11:57+0200\n"
+"PO-Revision-Date: 2015-08-15 11:57+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.3\n"
+"X-Generator: Poedit 1.8.4\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -490,7 +490,7 @@ msgstr "Funkce finfo_file() není podporovaná"
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:520
+#: core/globals.php:522
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
@@ -530,119 +530,131 @@ msgstr "%s v %s na řádku %s"
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
 
-#: plugins/Admin/Admin.php:27
+#: plugins/Admin/Admin.php:29
 msgid "new file"
 msgstr "nový soubor"
 
-#: plugins/Admin/Admin.php:27
+#: plugins/Admin/Admin.php:29
 msgid "active file"
 msgstr "aktivní soubor"
 
-#: plugins/Admin/Admin.php:27
+#: plugins/Admin/Admin.php:30
 msgid "inactive file"
 msgstr "neaktivní soubor"
 
-#: plugins/Admin/Admin.php:49
+#: plugins/Admin/Admin.php:30
+msgid "invalid file"
+msgstr "neplatný soubor"
+
+#: plugins/Admin/Admin.php:30
+msgid "unknown status"
+msgstr "neznámý stav"
+
+#: plugins/Admin/Admin.php:54
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: plugins/Admin/Admin.php:55
+#: plugins/Admin/Admin.php:60
 msgid "Insufficient right to save changes"
 msgstr "Nedostatečná práva pro uložení změn"
 
-#: plugins/Admin/Admin.php:60
+#: plugins/Admin/Admin.php:69
 msgid "No changes made"
 msgstr "Nebyly provedeny žádné změny"
 
-#: plugins/Admin/Admin.php:65
+#: plugins/Admin/Admin.php:74
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: plugins/Admin/Admin.php:144
+#: plugins/Admin/Admin.php:158
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:160
+#: plugins/Admin/Admin.php:174
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:160
+#: plugins/Admin/Admin.php:174
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:179
+#: plugins/Admin/Admin.php:193
+msgid "Administration"
+msgstr "Administrace"
+
+#: plugins/Admin/Admin.php:195
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:207
+#: plugins/Admin/Admin.php:224
 #, php-format
-msgid "%s - Administration"
-msgstr "%s - Administrace"
+msgid "%s (%s) - Administration"
+msgstr "%s (%s) - Administrace"
 
-#: plugins/Admin/Admin.php:268
+#: plugins/Admin/Admin.php:288
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: plugins/Admin/Admin.php:322
+#: plugins/Admin/Admin.php:342
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:325
+#: plugins/Admin/Admin.php:345
 msgid "My Heading"
 msgstr "Můj nadpis"
 
-#: plugins/Admin/Admin.php:326
+#: plugins/Admin/Admin.php:346
 msgid "My Content Description"
 msgstr "Můj popis obsahu"
 
-#: plugins/Admin/Admin.php:327
+#: plugins/Admin/Admin.php:347
 msgid "my, comma, separated, keywords"
 msgstr "moje, klíčová, slova, oddělená, čárkou"
 
-#: plugins/Admin/Admin.php:331
+#: plugins/Admin/Admin.php:351
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: plugins/Admin/Admin.php:366
+#: plugins/Admin/Admin.php:386
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:375
+#: plugins/Admin/Admin.php:395
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:378
+#: plugins/Admin/Admin.php:398
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:384
+#: plugins/Admin/Admin.php:404
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:387 plugins/InputVar/InputVar.php:23
+#: plugins/Admin/Admin.php:407 plugins/InputVar/InputVar.php:23
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:401
+#: plugins/Admin/Admin.php:421
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:407
+#: plugins/Admin/Admin.php:427
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:418
+#: plugins/Admin/Admin.php:438
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:430
+#: plugins/Admin/Admin.php:450
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -1097,26 +1109,26 @@ msgstr "Funkce sequence přeskočila volání funkce: %s"
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
 
-#: plugins/Sitemap/Sitemap.php:94
+#: plugins/Sitemap/Sitemap.php:98
 msgid "Element url missing atribute link"
 msgstr "Element url postrádá atribut link"
 
-#: plugins/Sitemap/Sitemap.php:135
+#: plugins/Sitemap/Sitemap.php:141
 #, php-format
 msgid "Invalid element changefreq value: %s"
 msgstr "Neplatná hodnota elementu changefreq: %s"
 
-#: plugins/Sitemap/Sitemap.php:142
+#: plugins/Sitemap/Sitemap.php:148
 #, php-format
 msgid "Invalid element priority value: %s"
 msgstr "Neplatná hodnota elementu priority: %s"
 
-#: plugins/Sitemap/Sitemap.php:149
+#: plugins/Sitemap/Sitemap.php:155
 #, php-format
 msgid "Invalid element lastmod value: %s"
 msgstr "Neplatná hodnota elementu lastmod: %s"
 
-#: plugins/UrlHandler/UrlHandler.php:40
+#: plugins/UrlHandler/UrlHandler.php:64
 #, php-format
 msgid "Unable to redir to %s: %s"
 msgstr "Nepodařilo se přesměrovat na %s: %s"
@@ -1174,6 +1186,9 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:194
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "%s - Administration"
+#~ msgstr "%s - Administrace"
 
 #~ msgid "Variable %s missing inner element with attribute var"
 #~ msgstr "Proměnná %s postrádá vnořený element s atributem var"
