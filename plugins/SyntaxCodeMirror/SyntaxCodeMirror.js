@@ -142,9 +142,9 @@
       isShift = !!window.event.shiftKey; // typecast to boolean
       isCtrl = !!window.event.ctrlKey; // typecast to boolean
     } else {
-      key = ev.which;
-      isShift = !!ev.shiftKey;
-      isCtrl = !!ev.ctrlKey;
+      key = e.which;
+      isShift = !!e.shiftKey;
+      isCtrl = !!e.ctrlKey;
     }
     switch (key) {
       // F4

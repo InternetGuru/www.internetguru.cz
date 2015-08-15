@@ -131,10 +131,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
     $dom = new DOMDocumentPlus();
     $var = $dom->createElement("var");
-    foreach ($files as $f) {
+    usort($files, "strnatcmp");
+    foreach($files as $f) {
       $option = $dom->createElement("option");
       $option->setAttribute("value", $f);
-      $v = $f;
+      $v = basename($f)." $f";
       if(is_file(CMS_FOLDER."/$f")) $v .= " #default";
       if(is_file(ADMIN_FOLDER."/$f")) $v .= " #admin";
       if(is_file(USER_FOLDER."/$f")) $v .= " #user";
