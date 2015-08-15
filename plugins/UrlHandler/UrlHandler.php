@@ -35,7 +35,7 @@ class UrlHandler extends Plugin implements SplObserver {
     }
     Cms::setVariable("default_protocol", ($https ? "https" : "http"));
     if(SCHEME == "https") {
-      if(is_null(Cms::getLoggedUser()) && !$urlMatch) {
+      if(is_null(Cms::getLoggedUser()) && !$urlMatch && !$https) {
         redirTo("http://".HOST.$_SERVER["REQUEST_URI"]);
       }
      return;
