@@ -61,7 +61,7 @@ source ~/ssh-agent.sh # register saved variables
 alias gaas='git add -A; gs'
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
-alias gdc='_(){ git log $1^..$1 -p; }; _' # git diff commit [param HASH]
+alias gdc='_(){ git log $1^..$1 -p $2; }; _' # git diff commit [param HASH] of a [param file] (optional)
 alias gdel='_(){ git branch -d $1; git push origin :$1; }; _' # git delete branch local & remote [param BRANCH]
 alias gc='git commit'
 alias gl='git log --decorate --all --oneline --graph' # git log all branches
