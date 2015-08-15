@@ -18,39 +18,39 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
   public function getContent(HTMLPlus $content) {
 
-    // detach and return if no textarea or blockcode
-    $ta = $content->getElementsByTagName("textarea");
-    if($ta->length == 0) {
-      $this->subject->detach($this);
-      return $content;
-    }
-
+    // supported syntax only
     $xml = LIB_DIR."/".self::CM_DIR."/mode/xml/xml.js";
     $css = LIB_DIR."/".self::CM_DIR."/mode/css/css.js";
     $js = LIB_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
     $html = LIB_DIR."/".self::CM_DIR."/mode/htmlmixed/htmlmixed.js";
-
-    // supported syntax only
     $modes = array(
       "xml" => array($xml),
       "css" => array($css),
       "javascript" => array($js),
       "htmlmixed" => array($xml, $css, $js, $html),
       );
+
+    // return if no textarea containing class "codemirror"
     $libs = array();
-    foreach($ta as $t) {
-      if(!$t->hasAttribute("class")) continue;
-      foreach(explode(" ", $t->getAttribute("class")) as $c) {
+    $codemirror = false;
+    foreach($content->getElementsByTagName("textarea") as $t) {
+      $classes = explode(" ", $t->getAttribute("class"));
+      if(!in_array("codemirror", $classes)) continue;
+      $codemirror = true;
+      foreach($classes as $c) {
         if(array_key_exists($c, $modes)) {
           $libs = array_merge($libs, $modes[$c]);
           break;
         }
       }
     }
-    if(empty($libs)) {
-      $this->subject->detach($this);
-      return $content;
-    }
+
+    // add sources and return
+    if($codemirror) $this->addSources($libs);
+    return $content;
+  }
+
+  private function addSources(Array $libs) {
     $os = Cms::getOutputStrategy();
 
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.css");
@@ -80,8 +80,6 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
 
     $os->addJsFile($this->pluginDir.'/SyntaxCodeMirror.js', 10, "body");
-
-    return $content;
   }
 
 }

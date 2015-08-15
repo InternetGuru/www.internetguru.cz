@@ -182,7 +182,7 @@
       keyMap:"sublime",
       theme:"tomorrow-night-eighties",
       lineNumbers: true,
-      mode: TextArea.classList.item(0),
+      mode: TextArea.classList.item(1),
       width:"100%",
       lineWrapping: true,
       matchTags: {bothTags: true},
