@@ -384,7 +384,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $fp = lockFile("$filePath.lock");
     try {
       try {
-        if($filePath != $_GET[get_class($this)] && is_file($filePath) && !isset($_POST["overwrite"]))
+        if($_POST["filename"] != $_GET[get_class($this)] && is_file($filePath) && !isset($_POST["overwrite"]))
           throw new Exception(_("Destination file already exists"));
         file_put_contents_plus($filePath, $this->contentValue);
       } catch(Exception $e) {
