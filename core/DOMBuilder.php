@@ -222,6 +222,8 @@ class DOMBuilder {
       self::$linkToId = array_merge(self::$linkToId, $fInfo["linktoid"]);
       self::$linkToDesc = array_merge(self::$linkToDesc, $fInfo["linktodesc"]);
       self::$linkToTitle = array_merge(self::$linkToTitle, $fInfo["linktotitle"]);
+      self::$linkToFile = array_merge(self::$linkToFile, $fInfo["linktofile"]);
+      self::$fileToMtime = array_merge(self::$fileToMtime, $fInfo["filetomtime"]);
       return;
     }
 
@@ -278,12 +280,14 @@ class DOMBuilder {
       "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
       "xml" => $doc->saveXML()
     );
-    self::$fileToMtime[$filePath] = $fInfo["mtime"];
-    self::$linkToFile[$fInfo["prefix"]] = $filePath;
+    $fileToMtime[$filePath] = $fInfo["mtime"];
+    $linkToFile[$fInfo["prefix"]] = $filePath;
     foreach($fInfo["linktoid"] as $link => $id) {
       if(strpos($link, "#") !== false) continue;
-      self::$linkToFile[$link] = $filePath;
+      $linkToFile[$link] = $filePath;
     }
+    $fInfo["linktofile"] = $linkToFile;
+    $fInfo["filetomtime"] = $fileToMtime;
     $stored = apc_store($cacheKey, $fInfo, rand(3600*24*30*3, 3600*24*30*6));
     if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
   }
