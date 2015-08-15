@@ -155,6 +155,7 @@ class Cms {
     $oldContent = clone self::$content;
     try {
       self::$content = self::$content->processVariables(self::$variables);
+      self::$content->validatePlus(true);
       #self::$content->processFunctions(self::$functions, self::$variables);
     } catch(Exception $e) {
       Logger::log(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()), Logger::LOGGER_ERROR);

@@ -120,16 +120,17 @@
     window.scrollTo(0, (coords.top + coords.bottom - myHeight) / 2);
   }
 
-  function toggleFullScreen(c) {
+  function toggleFullScreen(c, off) {
+    if(typeof off === "undefined") off = false;
     if(!cmActive()) return;
-    if(!c.getOption("fullScreen")) {
-      c.setOption("fullScreen", true);
-      fullScreenButton.innerText = fullscreenDisable;
-      fullScreenButton.title = fullscreenDisableTitle;
-    } else {
+    if(c.getOption("fullScreen") || off) {
       c.setOption("fullScreen", false);
       fullScreenButton.innerText = fullscreenEnable;
       fullScreenButton.title = fullScreenEnableTitle;
+    } else {
+      c.setOption("fullScreen", true);
+      fullScreenButton.innerText = fullscreenDisable;
+      fullScreenButton.title = fullscreenDisableTitle;
     }
   }
 
@@ -139,11 +140,13 @@
     if (window.event) {
       key = window.event.keyCode;
       isShift = !!window.event.shiftKey; // typecast to boolean
+      isCtrl = !!window.event.ctrlKey; // typecast to boolean
     } else {
-      key = ev.which;
-      isShift = !!ev.shiftKey;
+      key = e.which;
+      isShift = !!e.shiftKey;
+      isCtrl = !!e.ctrlKey;
     }
-    switch (e.keyCode) {
+    switch (key) {
       // F4
       case 115:
       toggleApp(cm);
@@ -155,10 +158,23 @@
         cm.focus();
         break;
       }
+      // Tab, Shift+Tab
+      case 9:
+      toggleFullScreen(cm, true);
       default: return true;
     }
     return false;
   }
+
+  function scrollWin(step) {
+    var doc = document.documentElement;
+    var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+    var height = document.body.scrollHeight;
+    var scrollTo = top + step;
+    if(scrollTo < 0 || scrollTo > height ) return;
+    window.scrollTo(0, scrollTo);
+  }
+
 
   function init(textarea) {
     cm = CodeMirror.fromTextArea(TextArea, {
@@ -166,7 +182,7 @@
       keyMap:"sublime",
       theme:"tomorrow-night-eighties",
       lineNumbers: true,
-      mode: TextArea.classList.item(0),
+      mode: TextArea.classList.item(1),
       width:"100%",
       lineWrapping: true,
       matchTags: {bothTags: true},
@@ -180,6 +196,16 @@
       extraKeys: CodeMirror.normalizeKeyMap({
         "Tab": false,
         "Shift-Tab": false,
+        "Ctrl-Up": function(c) {
+          if(c.getOption("fullScreen"))
+            c.execCommand("scrollLineUp");
+          else scrollWin(-32);
+        },
+        "Ctrl-Down": function(c) {
+          if(c.getOption("fullScreen"))
+            c.execCommand("scrollLineDown");
+          else scrollWin(32);
+        },
         "Ctrl--": "toggleComment",
         "Ctrl-G": "gotoLine",
         "Ctrl-E": "deleteLine",

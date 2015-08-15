@@ -42,14 +42,12 @@ class HTMLPlus extends DOMDocumentPlus {
   public function processVariables(Array $variables) {
     $ignore = array("h" => array("id", "link"));
     $newContent = parent::processVariables($variables, $ignore);
-    $newContent->ownerDocument->validatePlus(true);
     return $newContent->ownerDocument;
   }
 
   public function processFunctions(Array $functions, Array $variables) {
     $ignore = array("h" => array("id", "link"));
     parent::processFunctions($functions, $variables, $ignore);
-    $this->validatePlus(true);
   }
 
   public function applySyntax() {
@@ -142,7 +140,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function parseSyntaxVariable(DOMText $n) {
-    if(strpos($n->nodeValue, 'cms-') === false) return;
+    //if(strpos($n->nodeValue, 'cms-') === false) return;
     foreach(explode('\$', $n->nodeValue) as $src) {
       $p = preg_split('/\$('.VARIABLE_PATTERN.")/", $src, -1, PREG_SPLIT_DELIM_CAPTURE);
       if(count($p) < 2) return;

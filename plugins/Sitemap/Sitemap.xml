@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Sitemap>
+
+  <!--
+
+    Sitemap, viz viz http://www.sitemaps.org/protocol.html#xmlTagDefinitions
+
+    Konfigurovatelné hodnoty jako hodnoty elementů:
+      - changefreq
+      - lastmod
+      - priority
+
+    a) Globální hodnoty
+
+      <changefreq>weekly</changefreq>
+      <lastmod>2015-08-28</lastmod>
+      <priority>0.5</priority>
+
+    b) Individuální hodnoty (pro konkrétní stránku)
+      - přepisují obecné hodnoty
+      - element url s povinným atributem link
+
+      <url link="/archiv">
+        <changefreq>monthly</changefreq>
+        <lastmod>2015-08-28</lastmod>
+        <priority>0.2</priority>
+      </url>
+
+  -->
+
+</Sitemap>

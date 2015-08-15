@@ -12,14 +12,15 @@
   </form>
   <form class="editable fillable" action="/" method="post" var="linkadmin@action disabled@class">
     <fieldset class="hideable nohide"><legend>Uživatelský soubor, mód <samp var="mode">n/a</samp>, stav <samp var="status warning@class">n/a</samp></legend>
-      <textarea cols="40" name="content" rows="20" var="content classtype@class"/>
+      <textarea cols="40" name="content" rows="20" class="codemirror" var="content classtype@class"/>
     </fieldset>
     <fieldset><legend>Ovládací panel</legend>
       <input name="userfilehash" type="hidden" value="" var="userfilehash@value"/>
       <ul>
-        <li><label>Uložit do souboru <input name="filename" type="text" var="filename@value"/></label></li>
+        <li><label>Uložit do souboru <input name="filename" type="text" var="filename@value filepathpattern@pattern"/></label></li>
         <li><label><input name="overwrite" type="checkbox"/> Přepsat soubor, pokud existuje</label></li>
         <li><label><input name="disabled" type="checkbox" var="checked@checked"/> Deaktivovat editovaný soubor <samp var="filename">n/a</samp></label></li>
+        <li><label><input name="clearcache" type="checkbox" var="cachechecked@checked"/> Smazat mezipaměť</label></li>
         <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
         <li><input name="saveandgo" type="submit" value="Uložit a přejít" title="Ctrl+Shift+S"/></li>
       </ul>

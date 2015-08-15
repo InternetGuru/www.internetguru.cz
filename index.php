@@ -20,6 +20,7 @@ try {
   define("ADMIN_ROOT_DIR", "admin");
   define("USER_ROOT_DIR", "user");
   define("FILE_LOCK_WAIT_SEC", 2);
+  define('W3C_DATETIME_PATTERN', "(19|20)\d\d(-(0[1-9]|1[012])(-(0[1-9]|[12]\d|3[01])(T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00)?)?)?");
   define('EMAIL_PATTERN', "([_a-zA-Z0-9-]+(?:\.[_a-zA-Z0-9-]+)*)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)\.([a-zA-Z]{2,})");
   define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
   define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');

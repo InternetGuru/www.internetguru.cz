@@ -61,15 +61,16 @@ source ~/ssh-agent.sh # register saved variables
 alias gaas='git add -A; gs'
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
-alias gdc='_(){ git log $1^..$1 -p; }; _' # git diff commit [param HASH]
-alias gdel='_(){ git branch -d $1 && git push origin :$1; }; _' # git delete branch local & remote [param BRANCH]
+alias gdc='_(){ git log $1^..$1 -p $2; }; _' # git diff commit [param HASH] of a [param file] (optional)
+alias gdel='_(){ git branch -d $1; git push origin :$1; }; _' # git delete branch local & remote [param BRANCH]
 alias gc='git commit'
 alias gl='git log --decorate --all --oneline --graph' # git log all branches
 alias glc='git log --decorate --oneline' # git log current branch
 alias gpush='git push --all; git push --tags'
-alias gpull='git pull --all --tags && git fetch -p && git submodule update --init --recursive'
+alias gpull='git pull --all --tags; git fetch -p; git submodule update --init --recursive'
 alias gpullhard='git reset --hard && gpull'
 alias guc='_(){ git reset --soft ${1:-HEAD~1}; }; _' # git uncommit
+alias gup='_(){ git branch -u ${1:-$(echo "origin/$(git status | head -1 | cut -d" " -f 3)")}; }; _' # git track branch
 alias gs='git status && git submodule status'
 
 # BASH
@@ -83,3 +84,4 @@ alias cms='cd "$CMS_FOLDER"'
 alias sshcms='ssh cms@31.31.75.247'
 #alias sshcms='ssh -i ~/.ssh/id_rsa cms@31.31.75.247'
 alias phplint='find . -name "*.php" -type f -exec php -l "{}" \;'
+alias wchtml='wc -w *.html | awk '\''{ print $1-80"\t"$2 }'\'' | sort -k 1n'

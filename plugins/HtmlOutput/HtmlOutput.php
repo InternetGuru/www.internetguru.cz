@@ -62,6 +62,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $xPath = new DOMXPath($contentPlus);
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
     foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
+    foreach($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
     $ids = $this->getIds($xPath);
     $this->fragToLinks($contentPlus, $ids, "a", "href");
     $this->fragToLinks($contentPlus, $ids, "form", "action");
@@ -131,12 +132,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         $xml = $newContent->saveXML();
         if(!@$newContent->loadXML($xml))
           throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
+        #todo: validate HTML5 validity
         $content = $newContent;
       } catch(Exception $e) {
         Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-      } finally {
-        #unset($this->transformations[$xslt]);
-        #unset($this->transformationsPriority[$xslt]);
       }
     }
     return $content;
