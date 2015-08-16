@@ -26,11 +26,11 @@ var a = 1;
       },
       createEmailLink = function(span) {
         var a = span.parentNode;
-        var email = span.innerText;
+        var email = span.textContent;
         for(var i = 0; i < Config.rep.length; i++) {
           email = email.replace(new RegExp(preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
         }
-        span.innerText = email;
+        span.textContent = email;
         a.href = "mailto:" + email;
       }
       preg_quote = function (str, delimiter) {
