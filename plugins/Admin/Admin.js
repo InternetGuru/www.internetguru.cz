@@ -30,7 +30,7 @@
       },
       setSaveEvents = function(form) {
         form.onkeydown = function(e) {
-          var key = (window.event) ? window.event.keyCode : key = ev.which;
+          var key = (window.event) ? window.event.keyCode : key = e.which;
           var isCtrl;
           var isShift;
           if (window.event) {
@@ -38,9 +38,9 @@
             isShift = !!window.event.shiftKey; // typecast to boolean
             isCtrl = !!window.event.ctrlKey; // typecast to boolean
           } else {
-            key = ev.which;
-            isShift = !!ev.shiftKey;
-            isCtrl = !!ev.ctrlKey;
+            key = e.which;
+            isShift = !!e.shiftKey;
+            isCtrl = !!e.ctrlKey;
           }
           // letter s and ctrl or meta
           if(!e.ctrlKey && !e.metaKey) return true;
