@@ -47,7 +47,7 @@
         Config[attr] = cfg[attr];
       }
     },
-    initStructure = function(){
+    initStructure = function() {
       list = document.createElement("ul");
       list.className = "navigList";
       textNavig = document.createElement("input");
@@ -64,9 +64,9 @@
     initEvents = function() {
       //Config.navig.addEventListener("focus", inputText, false);
       Config.navig.addEventListener("input", inputText, false);
-      Config.navig.addEventListener("blur", close, false);
+      Config.navig.addEventListener("blur", closeNavig, false);
       Config.navig.form.addEventListener("submit", fillVal, false);
-      //list.addEventListener("blur", close, false);
+      //list.addEventListener("blur", closeNavig, false);
       win.addEventListener("resize", updateSize, false);
       win.addEventListener("scroll", updateSize, false);
       //win.addEventListener("mousedown", function(e){activeElement = e.target}, false);
@@ -81,7 +81,7 @@
         Config.navig.value = files[i].path;
       }
     },
-    close = function(e) {
+    closeNavig = function(e) {
       //if(e && activeElement && activeElement.className == "navigList") return;
       list.innerHTML = "";
       textNavigValue = "";
@@ -92,7 +92,7 @@
       switch(e.keyCode) {
         case 27: //esc
           Config.navig.value = textNavigValue;
-          close();
+          closeNavig();
         break;
         case 38: //up
           if(typeof list.childNodes[active] !== "undefined")
@@ -129,7 +129,7 @@
       }
     },
     inputText = function(e) {
-      close();
+      closeNavig();
       open = true;
       var navig = e === null ? Config.navig : e.target;
       var value = navig.value;
@@ -237,7 +237,7 @@
             navig.value = localValue;
             window.setTimeout(function(){
               navig.focus();
-              close();
+              closeNavig();
             }, 50);
           }
         })();
@@ -292,7 +292,7 @@
   function appendStyle() {
     var css = '/* completable.js */'
       + ' .completable-input { width: 35em; max-width: 100%; }'
-      + ' ul.navigList {overflow-y: scroll; position: absolute; background: white; z-index: 100; /*width: 25em; max-width: 100%;*/ margin: 0; padding: 0; list-style: none; box-shadow: 0.2em 0.2em 0.2em #555; }'
+      + ' ul.navigList {overflow-y: auto; position: absolute; background: white; z-index: 100; /*width: 25em; max-width: 100%;*/ margin: 0; padding: 0; list-style: none; box-shadow: 0.2em 0.2em 0.2em #555; }'
       + ' ul.navigList li { margin: 0; padding: 0.25em 0.5em; }'
       + ' ul.navigList li:hover { background: #eee; cursor: pointer; }'
       + ' ul.navigList li.active { background: #ddd; }'
