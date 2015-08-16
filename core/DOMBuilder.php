@@ -404,17 +404,17 @@ class DOMBuilder {
   }
 
   private static function insertIncludes(Array $includes, $homeDir) {
-    $error = false;
+    $success = true;
     foreach($includes as $include) {
       try {
         self::insertHtmlPlus($include, $homeDir);
       } catch(Exception $e) {
         Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-        $error = true;
+        $success = false;
         $include->stripTag();
       }
     }
-    return $error;
+    return $success;
   }
 
   private static function insertHtmlPlus(DOMElement $include, $homeDir) {
