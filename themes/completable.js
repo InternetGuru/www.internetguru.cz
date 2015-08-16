@@ -205,7 +205,7 @@
             priority = 2;
           }
         }
-        r.val = f.val.replace(matchPatt, "<strong>$1</strong>") + " (" + priority + ")";
+        r.val = f.val.replace(matchPatt, "<strong>$1</strong>");
         r.priority = priority;
         r.defaultVal = f.defaultVal;
         r.path = f.path;
