@@ -195,16 +195,17 @@
       try {
         if(!f.val.match(testPatt)) return;
         r = {};
-        r.val = f.val.replace(matchPatt, "<strong>$1</strong>");
         //var priority = f.val.search(matchPatt);
         var priority = 3;
-        if(f.path.indexOf(value) == 0) priority = 0;
-        if(f.path.replace(/^.*[\\\/]/, '').indexOf(value) == 0) priority = 1;
-        var parts = f.path.split(/[ _\/-]/);
-        for(var i = 0; i < parts.length; i++) {
-          if(parts[i].indexOf(value) != 0) continue;
-          priority = 2;
+        if(f.path.replace(/^.*[\\\/]/, '').indexOf(value) === 0) priority = 1;
+        else {
+          var parts = f.path.split(/[ _\/-]/);
+          for(var i = 0; i < parts.length; i++) {
+            if(parts[i].indexOf(value) !== 0) continue;
+            priority = 2;
+          }
         }
+        r.val = f.val.replace(matchPatt, "<strong>$1</strong>") + " (" + priority + ")";
         r.priority = priority;
         r.defaultVal = f.defaultVal;
         r.path = f.path;
