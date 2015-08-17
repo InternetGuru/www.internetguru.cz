@@ -205,6 +205,9 @@ function buildQuery($pQuery, $questionMark=true) {
 function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
   if($convertToUtf8) $s = utf8_encode($s);
   if($tolower) $s = mb_strtolower($s, "utf-8");
+  // iconv
+  // http://php.net/manual/en/function.iconv.php#74101
+  // works with setlocale(LC_ALL, "[any].UTF-8")
   $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
   if($tolower) $s = strtolower($s);
   if(is_null($replace)) $replace = "_";
