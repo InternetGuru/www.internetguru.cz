@@ -1,4 +1,24 @@
+----------------
+1.8.2 2015-08-18
+----------------
+
+completable.js: vylepšení UX, filtrování, řazení (a6f2115)
+UrlHandler: přesměrování mezi http/https (911b37d)
+html+ přidána podpora atributu pattern pro select (cf80991)
+
+----------------
 1.8.1 2015-08-07
+----------------
+
+Sitemap: nové rozšíření generující /sitemap.xml (09bfc62)
+Convertor: podpora řádkových elementů v definičních seznamech (c827591)
+Convertor: podpora řádkových elementů ve shrnutí (a97db26)
+Admin: přidána volba smazání mezipaměti (cache) při ukládání změn (a82b65f)
+
+----------------
+1.8.0 2015-07-08
+----------------
+
 Agregator: přidána podpora hromadného vkládání obrázků (0202406)
 ValidateForm: vlastní prodleva mezi odesláním formuláře pomocí třídy (8750fe0)
 Admin: pole s výběrem souboru na první stisknutí tabulátoru (c85f0ae)
@@ -10,20 +30,24 @@ přidána podpora pro input type number (55e6049)
 Basket: nové rozšíření nákupní košík (13eabab)
 vypnutí PageSpeed rozšřeno o Grunt na Režim ladění (f3c0d00)
 cms-print.css: skrytí hodnot placeholder pro tisk (53330da)
-CodeMirror: přidány funkce a zkratky pro fullscreen, comment, format/indent text (1e3e5e3)
+CodeMirror: přidány funkce a klávesové zkratky (1e3e5e3)
 ContactForm: změna výchozí konfigurace (2d04bd6)
 
-1.8.0 2015-07-08
+----------------
+1.7.0 2015-06-27
+----------------
+
 HtmlOutput: přidán browserdetect.js a iefixes.js (f90a807)
 FileHandler: podpora technologie Grunt (eb3bb4a)
-
-1.7.0 2015-06-27
 výchozí CSS: kompatibilita prohlížečů (51dcb84)
 HtmlOutput: přidán atribut 'if' pro elementy stylesheet a jsFile (2b9ce00)
 ValidateForm: 2 minuty prodleva pomocí souboru IP v názvu, možnost banu pomocí .IP souboru (75c551d)
 EmailBreaker: nové rozšíření na boření e-mailových adres (14d5dab)
 
+----------------
 1.6.2 2015-06-05
+----------------
+
 HtmlOutput: systémové favicony jsou nastavitelné (4c35a97)
 LinkList: kontrola existence lokálních odkazů (a6fb154)
 LinkList: zobrazuje skutečné názvy lokálních odkazů (720b2f0)
@@ -39,7 +63,10 @@ SyntaxCodeMirror: tlačítko pro de/aktivaci (ccb64bb)
 InputVar: přidáno uživatelské rozhranní (0e0d7fd)
 ContactForm: logování poslaných zpráv (62f9c7f)
 
+----------------
 1.6.1 2015-05-19
+----------------
+
 ValidateForm: nové rozšíření pro kontrolu formuláře (e91ea9e)
 FileHandler: přidán odkaz na smazání dočasných souborů (4d5f72a)
 addressable.js: podpora polí typu email a search (ae8340d)
@@ -51,10 +78,16 @@ ContactForm: podpora formulářových prvků HTML5 (f27a811)
 HtmlOutput: výstupní kód stánek v HTML5 (46d860b)
 Agregator: přidání volitelného atributu wrapper (7e4a7af)
 
+----------------
 1.6.0 2015-05-15
+----------------
+
 InputVar: název systému v zápatí jako proměnná (34ba67c)
 
+----------------
 1.5.3 2015-05-09
+----------------
+
 Vylepšené rozhraní administrace (2d3a682)
 Nová funkcionalita addressable pro odkázání vyplněného formuláře (bf7963a)
 Nové rozšíření FillForm vyplňující špatně vyplněné formuláře (415cc4d)
@@ -62,41 +95,68 @@ FileHandler: nový formát obrázku "preview" (76a5208)
 Admin: uložit a přejít na editovaný soubor, pokud cesta existuje (83de136)
 ContentLink: hodnota drobečkové navigace na úvodní stránce podle atributu title hlavního nadpisu (1631084)
 
+----------------
 1.5.2 2015-04-18
+----------------
+
 TOC: přidání parametru maximální hloubky (bbc150e)
 Agregator: transformace pro umístění informací o dokumentu agregator.xsl (b9e9649)
 Agregator: konfigurovatelné informace o dokumentu (03e8868)
 
+----------------
 1.5.0 2015-04-12
+----------------
+
 Agregátor informace o dokumentu docinfo (64343ae)
 Odkaz na přesunutí stránky nahoru scrolltop.js (1a86664)
 Administrace dostupná pouze přes HTTPS (6e09dc0)
 
+----------------
 1.4.2 2015-03-31
+----------------
+
 Vylepšení globálních stylů (8ea587c)
 Odkaz na vypnutí PageSpeed (b147aa4)
 
+----------------
 1.4.0 2015-03-15
+----------------
+
 Auth: přidána možnost zakázat všem kromě admina (d4f4c3e)
 
+----------------
 1.3.0 2015-03-10
+----------------
+
 Komentáře v kódu se zobrazí pouze vlastníkovi webu (68d915a)
 InputVar: nová struktura uživatelských proměnných (5625bcc)
 GlobalMenu: přidává třídu current do všech položek v cestě (e8f29e0)
 
+----------------
 1.2.0 2015-03-06
+----------------
+
 Agregátor: přidány odkazy pro editaci (11f6094)
 
+----------------
 1.1.0 2015-02-21
+----------------
+
 ContentBalancer: přidána možnost nezobrazovat (1afbd2a)
 ContentBalancer: vlastní sestavy s odkazy (260343e)
 Agregátor: přidána podpora prefixů odkazů (1400bdf)
 
+----------------
 1.0.1 2015-02-15
+----------------
+
 Admin: vedle XML zobrazuje i HTML soubory rozšíření (7ddf982)
 Přidáno automatické generování titulků k odkazům (3c2087d)
 
+----------------
 1.0.0 2015-02-13
+----------------
+
 cms-default.css: barvy a výchozí font systémových hlášení (64a3a5e)
 Explicitně zobrazená verze vyžaduje přihlášení (ca44b40)
 Podpora zobrazení webu na všech dostupných verzí přímo z URL (5215c13)
