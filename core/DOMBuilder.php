@@ -132,7 +132,7 @@ class DOMBuilder {
     }
 
     $f = findFile($fileName, false, false);
-    if($f) {
+    if(!is_null($f)) {
       self::loadDOM($f, $doc);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
     }
@@ -160,7 +160,7 @@ class DOMBuilder {
 
   private static function findFile($fileName, $user=true, $admin=true) {
     $f = findFile($fileName, $user, $admin);
-    if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
+    if(is_null($f)) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
     return $f;
   }
 
