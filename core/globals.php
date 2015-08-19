@@ -17,7 +17,7 @@ function findFile($filePath, $user=true, $admin=true, $res=true) {
   if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
   if($res && is_file($filePath)) return $filePath;
   if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
-  return false;
+  return null;
 }
 
 function createSymlink($link, $target) {
