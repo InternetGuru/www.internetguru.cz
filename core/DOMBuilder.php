@@ -100,6 +100,12 @@ class DOMBuilder {
     return $links;
   }
 
+  public static function getLink($file) {
+    $k = array_search($file, self::$linkToFile);
+    if($k !== false) return $k;
+    return null;
+  }
+
   public static function getFile($link) {
     if(array_key_exists($link, self::$linkToFile)) return self::$linkToFile[$link];
     return null;

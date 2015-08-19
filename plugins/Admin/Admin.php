@@ -253,9 +253,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    */
   private function setDefaultFile($fileName) {
     $this->defaultFile = $this->getFilepath($fileName);
-    if($this->defaultFile != $fileName) {
-      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => get_class($this)."=".$this->defaultFile)));
-    }
+    $redirPath = null;
+    $fLink = DOMBuilder::getLink(findFile($fileName));
+    if($this->defaultFile != $fileName) { $redirPath = getCurLink(); }
+    else if(getCurLink() != $fLink) { $redirPath = $fLink; }
+    if(!is_null($redirPath)) redirTo(buildLocalUrl(array("path" => $fLink, "query" => get_class($this)."=".$this->defaultFile)));
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
   }
 
