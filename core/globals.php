@@ -5,7 +5,7 @@ function __autoload($className) {
   if(@include $fp) return;
   $fc = CORE_FOLDER."/$className.php";
   if(@include $fc) return;
-  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
+  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, PLUGINS_DIR, CORE_DIR));
 }
 
 function isValidId($id) {
