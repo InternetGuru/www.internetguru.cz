@@ -91,6 +91,11 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $content) {
+    $xpath = new DOMXPath($content);
+    if(!$xpath->query("//*[contains(@var, 'contactform-')]")->length) return $content;
+    if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
+      Logger::log(_("Admin address is not set or invalid"), Logger::LOGGER_WARNING);
+    }
     $content->processVariables($this->formsElements);
     return $content;
   }
