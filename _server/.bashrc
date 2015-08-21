@@ -53,7 +53,7 @@ export TERM=xterm-256color
 #ssh-agent
 start=0
 ps | grep -q ssh-agent || start=1 # start ssh if not running
-((start)) && ssh-agent.exe > ~/ssh-agent.sh # run ssh-agent and save output (variables)
+((start)) && ssh-agent > ~/ssh-agent.sh # run ssh-agent and save output (variables)
 source ~/ssh-agent.sh # register saved variables
 ((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
