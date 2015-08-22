@@ -84,8 +84,9 @@
       }
     },
     initKws = function() {
-      for(var kw = 0; kw < tags.length; kw++) {
+      for(var kw in tags) {
         for(var i = 0; i < tags[kw].length; i++) {
+          if(!tags[kw][i]) continue;
           if(tags[kw].length > 1) {
             tags[kw][i].info.textContent = tags[kw].length;
             tags[kw][i].size = tags[kw].length;
@@ -117,7 +118,7 @@
       for(var i = 0; i < dds.length; i++) { dds[i].className = "" }
       var dts = wrapper.getElementsByTagName("dt");
       for(var i = 0; i < dts.length; i++) { dts[i].className = "" }
-      for(var kw = 0; kw < tags.length; kw++) {
+      for(var kw in tags) {
         if(tags[kw].length > 1) for(i in tags[kw]) {
           deactivate(tags[kw][i].tag);
           tags[kw][i].info.textContent = tags[kw][i].size;
@@ -171,7 +172,7 @@
         clearFilter();
         return;
       }
-      for(var kw = 0; kw < tags.length; kw++) {
+      for(var kw in tags) {
         if(kw != value) continue;
         for(var i = 0; i < tags[kw]. length; i++) {
           activate(tags[kw][i].tag);
