@@ -87,18 +87,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       }
     }
     if(!$this->redir) return;
-    $pLink["path"] = $this->getDestPath($_POST["filename"]);
+    $pLink["path"] = getCurLink();
     if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
-  }
-
-  private function getDestPath($f) {
-    if(pathinfo($_POST["filename"], PATHINFO_EXTENSION) != "html") return getCurLink();
-    $doc = new HTMLPlus();
-    $doc->loadXML($_POST["content"]);
-    $link = $doc->documentElement->firstElement->getAttribute("link");
-    if(DOMBuilder::isLink($link)) return $link;
-    return getCurLink();
   }
 
   private function isPost() {
@@ -257,7 +248,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $fLink = DOMBuilder::getLink(findFile($fileName));
     if($this->defaultFile != $fileName) { $redirPath = getCurLink(); }
     else if(getCurLink() != $fLink) { $redirPath = $fLink; }
-    if(!is_null($redirPath)) redirTo(buildLocalUrl(array("path" => $fLink, "query" => get_class($this)."=".$this->defaultFile)));
+    if(!is_null($redirPath)) redirTo(buildLocalUrl(array("path" => $redirPath, "query" => get_class($this)."=".$this->defaultFile)));
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
   }
 
