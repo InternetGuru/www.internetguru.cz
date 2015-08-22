@@ -62,16 +62,11 @@
       updateSize();
     },
     initEvents = function() {
-      //Config.navig.addEventListener("focus", inputText, false);
       Config.navig.addEventListener("input", inputText, false);
       Config.navig.addEventListener("blur", closeNavig, false);
       Config.navig.form.addEventListener("submit", fillVal, false);
-      //list.addEventListener("blur", closeNavig, false);
       win.addEventListener("resize", updateSize, false);
       win.addEventListener("scroll", updateSize, false);
-      //win.addEventListener("mousedown", function(e){activeElement = e.target}, false);
-      //win.addEventListener("mousedown", function(e) {}, false);
-      //win.addEventListener("mouseup", function(e){activeElement = null}, false);
       Config.navig.addEventListener("keydown", processKey, false);
     },
     fillVal = function(e) {
@@ -131,7 +126,8 @@
     inputText = function(e) {
       closeNavig();
       open = true;
-      var navig = e === null ? Config.navig : e.target;
+      var target = e.target || e.srcElement;
+      var navig = e === null ? Config.navig : target;
       var value = navig.value;
       textNavigValue = value;
       var fs = filter(Config.files, value);
@@ -298,14 +294,11 @@
       + ' ul.navigList li.active { background: #ddd; }'
       + ' ul.navigList li.user { background: #E7F6FE; }'
       + ' ul.navigList li.user.active, ul.navigList li.user:hover { background: #D4E5EE; }';
-    var style = document.getElementsByTagName('style')[0];
-    if(style == undefined) {
-      var head = document.head || document.getElementsByTagName('head')[0];
-      style = document.createElement('style');
-      style.type = 'text/css';
-      head.appendChild(style);
-    }
-    style.appendChild(document.createTextNode(css));
+    var elem=document.createElement('style');
+    elem.setAttribute('type', 'text/css');
+    if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
+    else elem.appendChild(document.createTextNode(css));
+    document.getElementsByTagName('head')[0].appendChild(elem);
   }
 
 })(window);

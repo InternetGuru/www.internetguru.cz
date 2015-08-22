@@ -84,14 +84,11 @@
       var css = '/* addressable.js */'
         + ' p.addressable { padding: 1em }'
         + ' p.addressable button, p.addressable input { padding: 0.5em 1em; font-size: inherit; width: 100%; box-sizing: border-box; line-height: 1em; max-width: 30em }';
-      var style = document.getElementsByTagName('style')[0];
-      if(style == undefined) {
-        var head = document.head || document.getElementsByTagName('head')[0];
-        style = document.createElement('style');
-        style.type = 'text/css';
-        head.appendChild(style);
-      }
-      style.appendChild(document.createTextNode(css));
+      var elem=document.createElement('style');
+      elem.setAttribute('type', 'text/css');
+      if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
+      else elem.appendChild(document.createTextNode(css));
+      document.getElementsByTagName('head')[0].appendChild(elem);
     },
 
     appendButton = function() {
@@ -125,13 +122,14 @@
 
     performAction = function(e) {
       if(input !== null) return;
-      var b = e.target;
+      var target = e.target || e.srcElement;
+      var b = target;
       var url = location.protocol + '//' + location.host + location.pathname + "?";
       input = document.createElement("input");
       input.value = url + serialize(b.form);
       b.parentNode.appendChild(input);
       b.style.display = "none";
-      input.addEventListener("focus", function(e) {e.target.setSelectionRange(0, e.target.value.length)}, false);
+      input.addEventListener("focus", function(e) {target.setSelectionRange(0, target.value.length)}, false);
       input.focus();
     };
 

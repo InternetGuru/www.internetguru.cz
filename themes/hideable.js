@@ -39,14 +39,11 @@
         + ' border: none !important;'
         + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
         + ' font-weight: bold }';
-      var style = document.getElementsByTagName('style')[0];
-      if(style == undefined) {
-        var head = document.head || document.getElementsByTagName('head')[0];
-        style = document.createElement('style');
-        style.type = 'text/css';
-        head.appendChild(style);
-      }
-      style.appendChild(document.createTextNode(css));
+      var elem=document.createElement('style');
+      elem.setAttribute('type', 'text/css');
+      if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
+      else elem.appendChild(document.createTextNode(css));
+      document.getElementsByTagName('head')[0].appendChild(elem);
     },
 
     toggleHideables = function() {
@@ -67,7 +64,8 @@
     }
 
     function toggle(e) {
-      toggleElement(e.target);
+      var target = e.target || e.srcElement;
+      toggleElement(target);
       e.preventDefault();
     }
 

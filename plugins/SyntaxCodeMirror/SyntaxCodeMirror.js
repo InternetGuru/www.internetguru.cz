@@ -86,7 +86,7 @@
     ul.appendChild(li);
     var b = document.createElement("button");
     li.appendChild(b);
-    b.type = "button";
+    b.setAttribute("type", "button");
     b.textContent = text;
     return b;
   }
