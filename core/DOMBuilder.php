@@ -256,16 +256,18 @@ class DOMBuilder {
     $offDesc = count(self::$linkToDesc);
     $offTitle = count(self::$linkToTitle);
     $offFile = count(self::$linkToFile);
+    $toStrip = array();
     if(self::insertIncludes($inclDom, dirname($filePath))) {
       foreach($inclDom as $include) {
         $inclPath = dirname($filePath)."/".$include->getAttribute("src");
         $inclSrc[$inclPath] = filemtime($inclPath);
-        $include->stripTag();
+        $toStrip[] = $include;
       }
     } else $storeCache = false;
     // register links/ids; repair if duplicit
     if($included) return;
     if(!self::setIdentifiers($doc, $filePath, $fShort)) $storeCache = false;
+    foreach($toStrip as $include) $include->stripTag();
     #var_dump(self::$idToLink);
     #var_dump(self::$linkToFile);
     #var_dump(self::$linkToId);
