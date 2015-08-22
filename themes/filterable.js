@@ -120,6 +120,7 @@
       for(var i = 0; i < dts.length; i++) { dts[i].className = "" }
       for(var kw in tags) {
         if(tags[kw].length > 1) for(i in tags[kw]) {
+          if(typeof tags[kw][i] !== "object") continue;
           deactivate(tags[kw][i].tag);
           tags[kw][i].info.textContent = tags[kw][i].size;
         }
@@ -131,7 +132,7 @@
         e.className = "hide";
         e = e.previousSibling;
       }
-      e.previousSibling.className = "hide";
+      if(e.previousSibling) e.previousSibling.className = "hide";
     },
     removeFilter = function(e) {
       clearFilter();
@@ -139,11 +140,13 @@
       deactivate(findParentBySelector(target, "."+Config.classPrefix+"tag"));
     },
     deactivate = function(el) {
+      if(!el) return;
       el.classList.remove(Config.classPrefix+"active");
       el.addEventListener("click", filter, false);
       el.removeEventListener("click", removeFilter, false);
     },
     activate = function(el) {
+      if(!el) return;
       el.classList.add(Config.classPrefix+"active");
       el.removeEventListener("click", filter, false);
       el.addEventListener("click", removeFilter, false);
