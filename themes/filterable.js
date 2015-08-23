@@ -2,7 +2,7 @@
   var Config = {}
   Config.initClass = "filterable";
   Config.classPrefix = "filterable-";
-  Config.close = "×";
+  Config.close = "❌";
 
   Filterable = function() {
     var
@@ -351,7 +351,7 @@
         for(var i = 0; i < tags[kw].length; i++) {
           if(!tags[kw][i]) continue;
           if(tags[kw].length > 1) {
-            tags[kw][i].info.textContent = tags[kw].length;
+            tags[kw][i].info.textContent = tags[kw].length + "×";
             tags[kw][i].size = tags[kw].length;
             tags[kw][i].tag.addEventListener("click", filter, false);
           } else {
@@ -364,7 +364,7 @@
     },
     sortKws = function() {
       for(var i = 0; i < rows.length; i++) {
-        rows[i].kws.sort(function(a, b){ return b.info.textContent - a.info.textContent });
+        rows[i].kws.sort(function(a, b){ return b.size - a.size });
         for(var j = 0; j < rows[i].kws.length; j++) {
           rows[i].dd.appendChild(rows[i].kws[j].tag);
         }
@@ -385,7 +385,7 @@
         if(tags[kw].length > 1) for(i in tags[kw]) {
           if(typeof tags[kw][i] !== "object") continue;
           deactivate(tags[kw][i].tag);
-          tags[kw][i].info.textContent = tags[kw][i].size;
+          tags[kw][i].info.textContent = tags[kw][i].size + "×";
         }
       }
     },
@@ -445,7 +445,7 @@
         if(kw != value) continue;
         for(var i = 0; i < tags[kw]. length; i++) {
           activate(tags[kw][i].tag);
-          tags[kw][i].info.textContent = "×";
+          tags[kw][i].info.textContent = Config.close;
         }
       }
     },
