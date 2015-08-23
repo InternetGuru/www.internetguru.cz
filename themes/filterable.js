@@ -52,16 +52,16 @@
     createKw = function(dd, kw) {
       var a = document.createElement("a");
       a.href = "#" + kw;
-      a.textContent = kw;
+      a.setAttribute("dataset-value", kw);
+      a.className = Config.classPrefix+"tag";
       var info = document.createElement("span");
       info.textContent = "1";
       var span = document.createElement("span");
-      span.className = Config.classPrefix+"tag";
-      span.setAttribute("dataset-value", kw);
-      span.appendChild(a);
-      span.appendChild(info);
+      span.textContent = kw;
+      a.appendChild(span);
+      a.appendChild(info);
       if(!(kw in tags)) tags[kw] = [];
-      return {tag: span, info: info, size: 1, a: a, dd: dd};
+      return {tag: a, info: info, size: 1, dd: dd};
     }
     loadKws = function() {
       var dds = dl.querySelectorAll("dd.kw");
@@ -93,7 +93,6 @@
             tags[kw][i].tag.addEventListener("click", filter, false);
           } else {
             tags[kw][i].info.parentNode.removeChild(tags[kw][i].info);
-            tags[kw][i].a.onclick = function() { return false };
             tags[kw][i].tag.classList.add(Config.classPrefix+"inactive");
           }
         }
@@ -138,6 +137,8 @@
       clearFilter();
       var target = e.target || e.srcElement;
       deactivate(findParentBySelector(target, "."+Config.classPrefix+"tag"));
+      window.history.replaceState("", "", window.location.href.split('#')[0]);
+      e.preventDefault();
     },
     deactivate = function(el) {
       if(!el) return;
@@ -202,14 +203,14 @@
     // append style
   var css = '/* filterable.js */'
     + '.filterable .'+Config.classPrefix+'tag {display: inline-block; border: 0; margin: 0.1em; border-radius: 0.15em; border: 0.1em solid #aaa; color: #000; cursor: pointer; }'
-    + '.filterable .'+Config.classPrefix+'tag span {display: inline-block; padding: 0.1em 0.4em; border-left: 0.1em solid #ddd; }'
-    + '.filterable .'+Config.classPrefix+'inactive span {border-color: #eee; }'
+    + '.filterable .'+Config.classPrefix+'tag span+span {display: inline-block; padding: 0.1em 0.4em; border-left: 0.1em solid #ddd; }'
+    + '.filterable .'+Config.classPrefix+'inactive span+span {border-color: #eee; }'
     + '.filterable .'+Config.classPrefix+'inactive {border-color: #eee; color: #555; cursor: text; }'
     + '.filterable .'+Config.classPrefix+'active {background-color: #E8E8E8; }'
-    + '.filterable .'+Config.classPrefix+'active span {border-color: #A4A4A4; }'
-    + '.filterable .'+Config.classPrefix+'tag a {border: 0 none; color: #000 !important; display: inline-block; padding: 0.1em 0.4em; }'
-    + '.filterable .'+Config.classPrefix+'inactive a {color: #555 !important; cursor: text; }'
-    + '.filterable .'+Config.classPrefix+'active a { }';
+    + '.filterable .'+Config.classPrefix+'active span+span {border-color: #A4A4A4; }'
+    + '.filterable .'+Config.classPrefix+'tag span {border: 0 none; color: #000 !important; display: inline-block; padding: 0.1em 0.4em; }'
+    + '.filterable .'+Config.classPrefix+'inactive {color: #555 !important; cursor: text; }'
+    + '.filterable .'+Config.classPrefix+'active span { }';
   var elem=document.createElement('style');
   elem.setAttribute('type', 'text/css');
   if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
