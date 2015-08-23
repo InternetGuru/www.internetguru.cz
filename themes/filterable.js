@@ -428,6 +428,7 @@
         var found = false;
         for(var j = 0; j < rows[i].kws.length; j++) {
           if(rows[i].kws[j].tag.getAttribute("dataset-value") != value) continue;
+          if(rows[i].kws[j].tag.classList.contains(Config.classPrefix+"inactive")) continue;
           found = true;
           break;
         }
@@ -443,7 +444,6 @@
       for(var kw in tags) {
         if(kw != value) continue;
         for(var i = 0; i < tags[kw]. length; i++) {
-          if(tags[kw][i].tag.classList.contains(Config.classPrefix+"inactive")) continue;
           activate(tags[kw][i].tag);
           tags[kw][i].info.textContent = "×";
         }
