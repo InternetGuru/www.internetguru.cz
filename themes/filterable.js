@@ -309,7 +309,7 @@
       return cur; //will return null if not found
     },
     normalize = function(str) {
-      return removeDiacritics(str.replace(" ", "_"));
+      return removeDiacritics(str.replace(/ /g, "_"));
     },
     createKw = function(dd, kw, kwn) {
       var a = document.createElement("a");
