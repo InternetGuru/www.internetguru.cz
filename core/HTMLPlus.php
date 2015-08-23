@@ -101,7 +101,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function parseSyntaxCodeTag(DOMElementPlus $n) {
-    $pat = "/<code(?: [a-z]+)?>(.+?)<\/code>/";
+    $pat = "/<code(?: [a-z]+)?>((?:.|\n)+?)<\/code>/m";
     $p = preg_split($pat, $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
     $n->nodeValue = "";
