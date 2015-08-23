@@ -443,7 +443,7 @@
       for(var kw in tags) {
         if(kw != value) continue;
         for(var i = 0; i < tags[kw]. length; i++) {
-          tags[kw][i].tag.classList.contains(Config.classPrefix+"inactive") continue;
+          if(tags[kw][i].tag.classList.contains(Config.classPrefix+"inactive")) continue;
           activate(tags[kw][i].tag);
           tags[kw][i].info.textContent = "×";
         }
