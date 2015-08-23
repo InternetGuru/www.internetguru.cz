@@ -51,62 +51,62 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function applySyntax() {
-    $extend = array("strong", "em", "ins", "del", "sub", "sup", "a", "h", "desc");
+    $extend = array(/*"strong", "em", "ins", "del", "sub", "sup", "a",*/ "h", "desc");
 
     // hide noparse
     $noparse = array();
-    foreach($this->getInlineTextNodes($extend) as $n)
+    foreach($this->getNodes($extend) as $n)
       $noparse = array_merge($noparse, $this->parseSyntaxNoparse($n));
 
     // proceed syntax translation
-    foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCodeTag($n);
-    foreach($this->getInlineTextNodes() as $n) $this->parseSyntaxCode($n);
-    foreach($this->getInlineTextNodes($extend) as $n) $this->parseSyntaxVariable($n);
-    foreach($this->getInlineTextNodes($extend) as $n) $this->parseSyntaxComment($n);
+    foreach($this->getNodes() as $n) $this->parseSyntaxCodeTag($n);
+    foreach($this->getNodes() as $n) $this->parseSyntaxCode($n);
+    foreach($this->getNodes($extend) as $n) $this->parseSyntaxVariable($n);
+    foreach($this->getNodes($extend) as $n) $this->parseSyntaxComment($n);
 
     // restore noparse
     foreach($noparse as $n) {
-      $newNode = $this->createTextNode($n[1]);
+      $n[0]->nodeValue = $n[1];
+      /*$newNode = $this->createTextNode($n[1]);
       $n[0]->parentNode->insertBefore($newNode, $n[0]);
-      $n[0]->parentNode->removeChild($n[0]);
+      $n[0]->parentNode->removeChild($n[0]);*/
     }
   }
 
-  private function getInlineTextNodes($extend = array()) {
-    $textNodes = array();
+  private function getNodes($extend = array()) {
+    $nodes = array();
     foreach(array_merge(array("p", "dt", "dd", "li"), $extend) as $eNam) {
       foreach($this->getElementsByTagName($eNam) as $e) {
-        foreach($e->childNodes as $n) {
-          if($n->nodeType == XML_TEXT_NODE) $textNodes[] = $n;
-        }
+        $nodes[] = $e;
       }
     }
-    return $textNodes;
+    return $nodes;
   }
 
-  private function parseSyntaxNoparse(DOMText $n) {
+  private function parseSyntaxNoparse(DOMElementPlus $n) {
     $noparse = array();
     $pat = "/<noparse>(.+?)<\/noparse>/";
     $p = preg_split($pat, $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return $noparse;
+    $n->nodeValue = "";
     foreach($p as $i => $v) {
-      if($i % 2 == 0) $newNode = $this->createTextNode($v);
+      if($i % 2 == 0) $text = $n->ownerDocument->createTextNode($v);
       else {
-        $newNode = $this->createElement("noparse");
-        $noparse[] = array($newNode, $v);
+        $text = $n->ownerDocument->createTextNode("");
+        $noparse[] = array($text, $v);
       }
-      $n->parentNode->insertBefore($newNode, $n);
+      $n->appendChild($text);
     }
-    $n->parentNode->removeChild($n);
     return $noparse;
   }
 
-  private function parseSyntaxCodeTag(DOMText $n) {
+  private function parseSyntaxCodeTag(DOMElementPlus $n) {
     $pat = "/<code(?: [a-z]+)?>(.+?)<\/code>/";
     $p = preg_split($pat, $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
+    $n->nodeValue = "";
     foreach($p as $i => $v) {
-      if($i % 2 == 0) $newNode = $this->createTextNode($v);
+      if($i % 2 == 0) $n->appendChild($n->ownerDocument->createTextNode($v));
       else {
         $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
         $r = array('"', '"', '"', "'", "'");
@@ -115,64 +115,64 @@ class HTMLPlus extends DOMDocumentPlus {
         if(preg_match("/<code ([a-z]+)>/", $n->nodeValue, $match)) {
           $newNode->setAttribute("class", $match[1]);
         }
+        $n->appendChild($newNode);
       }
-      $n->parentNode->insertBefore($newNode, $n);
     }
-    $n->parentNode->removeChild($n);
   }
 
-  private function parseSyntaxCode(DOMText $n) {
+  private function parseSyntaxCode(DOMElementPlus $n) {
     $pat = "/(?:&lsquo;|&rsquo;|'){2}(.+?)(?:&lsquo;|&rsquo;|'){2}/";
     $src = translateUtf8Entities($n->nodeValue, true);
     $p = preg_split($pat, $src, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
+    $n->nodeValue = "";
     foreach($p as $i => $v) {
-      if($i % 2 == 0) $newNode = $this->createTextNode(translateUtf8Entities($v));
+      if($i % 2 == 0) $n->appendChild($n->ownerDocument->createTextNode($v));
       else {
         $s = array("&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;");
         $r = array('"', '"', '"', "'", "'");
         $v = str_replace($s, $r, $v);
         $newNode = $this->createElement("code", translateUtf8Entities($v));
+        $n->appendChild($newNode);
       }
-      $n->parentNode->insertBefore($newNode, $n);
     }
-    $n->parentNode->removeChild($n);
   }
 
-  private function parseSyntaxVariable(DOMText $n) {
+  private function parseSyntaxVariable(DOMElementPlus $n) {
     //if(strpos($n->nodeValue, 'cms-') === false) return;
     foreach(explode('\$', $n->nodeValue) as $src) {
       $p = preg_split('/\$('.VARIABLE_PATTERN.")/", $src, -1, PREG_SPLIT_DELIM_CAPTURE);
       if(count($p) < 2) return;
+      $defVal = $n->nodeValue;
+      $n->nodeValue = "";
       foreach($p as $i => $v) {
-        if($i % 2 == 0) $newNode = $this->createTextNode($v);
+        if($i % 2 == 0) $n->appendChild($n->ownerDocument->createTextNode($v));
         else {
           // <p>$varname</p> -> <p var="varname"/>
           // <p><strong>$varname</strong></p> -> <p><strong var="varname"/></p>
           // else
           // <p>aaa $varname</p> -> <p>aaa <em var="varname"/></p>
-          if($n->parentNode->nodeValue == "\$$v") {
-            $n->parentNode->setAttribute("var", $v);
-            continue;
+          if($defVal == "\$$v") {
+            $n->setAttribute("var", $v);
           } else {
             $newNode = $this->createElement("em");
             $newNode->setAttribute("var", $v);
+            $n->appendChild($newNode);
           }
         }
-        $n->parentNode->insertBefore($newNode, $n);
       }
+
     }
-    $n->parentNode->removeChild($n);
   }
 
-  private function parseSyntaxComment(DOMText $n) {
+  private function parseSyntaxComment(DOMElementPlus $n) {
     $p = preg_split('/\(\(\s*(.+)\s*\)\)/', $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
+    $n->nodeValue = "";
     foreach($p as $i => $v) {
-      if($i % 2 == 0) $n->parentNode->insertBefore($this->createTextNode($v), $n);
-      else $n->parentNode->insertBefore($this->createComment(" $v "), $n);
+      if($i % 2 == 0) $n->appendChild($n->ownerDocument->createTextNode($v));
+      else $n->appendChild($this->createComment(" $v "));
     }
-    $n->parentNode->removeChild($n);
   }
 
   public function validatePlus($repair = false) {
