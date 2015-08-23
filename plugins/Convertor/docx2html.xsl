@@ -521,7 +521,8 @@
   <xsl:template match="br">
       <xsl:choose>
           <xsl:when test="contains(@type, 'page')"><xsl:element name="pagebreak" /></xsl:when>
-          <xsl:otherwise><xsl:element name="br" /></xsl:otherwise>
+          <xsl:otherwise><xsl:element name="br" />·
+        </xsl:otherwise>
       </xsl:choose>
           <!-- Is a page break?
     <xsl:element name="br">

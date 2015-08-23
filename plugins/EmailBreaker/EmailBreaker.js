@@ -1,5 +1,3 @@
-var a = 1;
-
 (function(win) {
 
   var Config = {};
