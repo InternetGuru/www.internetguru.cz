@@ -336,8 +336,8 @@
         kwsObjects = [];
         var vals = [];
         for(var j = 0; j < kws.length; j++) {
-          if(vals.indexOf(kws[j]) != -1) continue; // ignore duplicits
           var kwn = normalize(kws[j]);
+          if(vals.indexOf(kwn) != -1) continue; // ignore duplicits
           var kw = createKw(dds[i], kws[j], kwn);
           kwsObjects.push(kw);
           tags[kwn].push(kw);
