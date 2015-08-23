@@ -202,14 +202,14 @@
     // append style
   var css = '/* filterable.js */'
     + '.filterable .'+Config.classPrefix+'tag {display: inline-block; border: 0; margin: 0.1em; border-radius: 0.15em; border: 0.1em solid #aaa; color: #000; cursor: pointer; }'
-    + '.filterable .'+Config.classPrefix+'tag span {display: inline-block; padding: 0.25em 0.5em; border-left: 0.1em solid #ddd; }'
+    + '.filterable .'+Config.classPrefix+'tag span {display: inline-block; padding: 0.1em 0.4em; border-left: 0.1em solid #ddd; }'
     + '.filterable .'+Config.classPrefix+'inactive span {border-color: #eee; }'
     + '.filterable .'+Config.classPrefix+'inactive {border-color: #eee; color: #555; cursor: text; }'
-    + '.filterable .'+Config.classPrefix+'active {background-color: #8E8E8E; color: white; border-color: #4E4E4E; }'
+    + '.filterable .'+Config.classPrefix+'active {background-color: #E8E8E8; }'
     + '.filterable .'+Config.classPrefix+'active span {border-color: #A4A4A4; }'
-    + '.filterable .'+Config.classPrefix+'tag a {border: 0 none; color: #000 !important; display: inline-block; padding: 0.25em 0.5em; }'
+    + '.filterable .'+Config.classPrefix+'tag a {border: 0 none; color: #000 !important; display: inline-block; padding: 0.1em 0.4em; }'
     + '.filterable .'+Config.classPrefix+'inactive a {color: #555 !important; cursor: text; }'
-    + '.filterable .'+Config.classPrefix+'active a {color: white !important; }';
+    + '.filterable .'+Config.classPrefix+'active a { }';
   var elem=document.createElement('style');
   elem.setAttribute('type', 'text/css');
   if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
