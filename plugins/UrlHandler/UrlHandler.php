@@ -54,14 +54,19 @@ class UrlHandler extends Plugin implements SplObserver {
         if($redir->nodeValue == "/" || $redir->nodeValue == "") redirTo(array("path" => ""));
         $pLink = parseLocalLink($redir->nodeValue);
         if(is_null($pLink)) redirTo($redir->nodeValue); // external redir
-        if(!isset($pLink["path"])) $pLink["path"] = getCurLink(); // no path = keep current path
+        $silent = !isset($pLink["path"]);
+        if($silent) $pLink["path"] = getCurLink(); // no path = keep current path
         if(strpos($redir->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
         #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
-        $pLink = DOMBuilder::normalizeLink($pLink);
-        #todo: configurable status code
-        redirTo(buildLocalUrl($pLink));
+        try {
+          $pLink = DOMBuilder::normalizeLink($pLink);
+          #todo: configurable status code
+          redirTo(buildLocalUrl($pLink));
+        } catch(Exception $e) {
+          if(!$silent) throw $e;
+        }
       } catch(Exception $e) {
-        Logger::log(sprintf(_("Unable to redir to %s: %s"), $redir->nodeValue, $e->getMessage()), Logger::LOGGER_WARNING);
+        Logger::log(sprintf(_("Unable to redir to %s: %s"), implodeLink($pLink), $e->getMessage()), Logger::LOGGER_WARNING);
       }
     }
   }

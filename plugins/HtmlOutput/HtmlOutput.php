@@ -19,7 +19,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1000);
-    $this->favIcon = $this->pluginDir."/".self::FAVICON;
     Cms::setOutputStrategy($this);
     if(self::DEBUG) Logger::log("DEBUG");
   }
@@ -28,6 +27,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if($subject->getStatus() != STATUS_PROCESS) return;
     $this->cfg = $this->getDOMPlus();
     $this->registerThemes($this->cfg);
+    if(is_null($this->favIcon)) $this->favIcon = findfile($this->pluginDir."/".self::FAVICON);
   }
 
   /**
@@ -113,7 +113,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $robots = $this->cfg->getElementById("robots");
     $this->appendMeta($head, "robots", $robots->nodeValue);
-    $this->copyToRoot(findFile($this->favIcon), self::FAVICON);
+    $this->copyToRoot($this->favIcon, self::FAVICON);
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true, false);
     $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
     $this->appendCssFiles($head);
@@ -237,7 +237,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       if(!$o->hasAttribute("data")) continue;
       if(strpos($dataFile, ROOT_URL) === 0) $dataFile = substr($o->getAttribute("data"), strlen(ROOT_URL));
       $dataFile = findFile($o->getAttribute("data"));
-      if($dataFile === false) continue;
+      if(is_null($dataFile)) continue;
       try {
         $pUrl = parseLocalLink($dataFile);
       } catch(Exception $e) {
@@ -394,8 +394,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           $this->addCssFile($n->nodeValue, $media, 10, true, $if);
           break;
           case "favicon":
-          if(findFile($n->nodeValue) === false) throw new Exception();
-          $this->favIcon = $n->nodeValue;
+          $this->favIcon = findFile($n->nodeValue);
         }
       } catch(Exception $e) {
         Logger::log(sprintf(_("File %s of type %s not found"), $n->nodeValue, $n->nodeName), Logger::LOGGER_WARNING);
