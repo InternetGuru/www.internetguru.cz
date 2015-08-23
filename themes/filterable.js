@@ -355,6 +355,7 @@
             tags[kw][i].size = tags[kw].length;
             tags[kw][i].tag.addEventListener("click", filter, false);
           } else {
+            tags[kw][i].tag.onclick = function() {return false};
             tags[kw][i].info.parentNode.removeChild(tags[kw][i].info);
             tags[kw][i].tag.classList.add(Config.classPrefix+"inactive");
           }
