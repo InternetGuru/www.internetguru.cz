@@ -15,21 +15,23 @@
         }
       },
       createEmails = function() {
-        var a = document.getElementsByTagName("a");
-        for(var i = 0; i < a.length; i++) {
-          if(a[i].href) continue;
-          var spans = a[i].getElementsByTagName("span");
-          for(var j = 0; j < spans.length; j++) createEmailLink(spans[j]);
+        var spans = document.getElementsByTagName("span");
+        for(var i = 0; i < spans.length; i++) {
+          if(!spans[i].classList.contains("emailbreaker")) continue;
+          createEmailLink(spans[i]);
         }
       },
       createEmailLink = function(span) {
-        var a = span.parentNode;
+        var a = document.createElement("a");
         var email = span.textContent;
         for(var i = 0; i < Config.rep.length; i++) {
           email = email.replace(new RegExp(preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
         }
         span.textContent = email;
         a.href = "mailto:" + email;
+        span.parentNode.insertBefore(a, span);
+        span.parentNode.removeChild(span);
+        a.appendChild(span);
       }
       preg_quote = function (str, delimiter) {
         return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');

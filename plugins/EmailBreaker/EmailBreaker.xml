@@ -3,6 +3,7 @@
 
   <replace pattern="@"> zavináč </replace>
   <replace pattern="-"> pomlčka </replace>
+  <replace pattern="_"> podtržítko </replace>
   <replace pattern="."> tečka </replace>
 
 </EmailBreaker>
