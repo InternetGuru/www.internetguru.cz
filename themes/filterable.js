@@ -2,7 +2,7 @@
   var Config = {}
   Config.initClass = "filterable";
   Config.classPrefix = "filterable-";
-  Config.close = "❌";
+  Config.close = "✕";
 
   Filterable = function() {
     var
