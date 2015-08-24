@@ -32,7 +32,7 @@
         span.parentNode.insertBefore(a, span);
         span.parentNode.removeChild(span);
         a.appendChild(span);
-      }
+      },
       preg_quote = function (str, delimiter) {
         return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
       }
