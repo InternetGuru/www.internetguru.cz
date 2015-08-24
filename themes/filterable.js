@@ -401,7 +401,7 @@
       clearFilter();
       var target = e.target || e.srcElement;
       deactivate(findParentBySelector(target, "."+Config.classPrefix+"tag"));
-      window.history.replaceState("", "", window.location.href.split('#')[0]);
+      window.history.replaceState("", "", window.location.href.split('#')[0]+"#!");
       e.preventDefault();
     },
     deactivate = function(el) {
@@ -457,6 +457,7 @@
       init : function() {
         initStrucure();
         win.addEventListener("load", filterHash, false);
+        win.addEventListener("popstate", filterHash, false);
       }
     }
   }
