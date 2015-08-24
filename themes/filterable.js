@@ -3,10 +3,30 @@
   Config.initClass = "filterable";
   Config.classPrefix = "filterable-";
   Config.close = "✕";
+  Config.clearFilter = "Resetovat filtr";
+  Config.disableFilter = "Vypnout filtry";
+  Config.enableFilter = "Zapnout filtry";
 
   Filterable = function() {
     var
     that = this,
+    appendStyle = function() {
+      var css = '/* filterable.js */'
+        + '.filterable .'+Config.classPrefix+'tag {display: inline-block; border: 0; margin: 0.1em; border-radius: 0.15em; border: 0.1em solid #aaa; color: #000; cursor: pointer; }'
+        + '.filterable .'+Config.classPrefix+'tag span+span {display: inline-block; padding: 0.1em 0.4em; border-left: 0.1em solid #ddd; }'
+        + '.filterable .'+Config.classPrefix+'inactive span+span {border-color: #eee; }'
+        + '.filterable .'+Config.classPrefix+'inactive {border-color: #eee; color: #555; cursor: text; }'
+        + '.filterable .'+Config.classPrefix+'active {background-color: #E8E8E8; }'
+        + '.filterable .'+Config.classPrefix+'active span+span {border-color: #A4A4A4; }'
+        + '.filterable .'+Config.classPrefix+'tag span {border: 0 none; color: #000 !important; display: inline-block; padding: 0.1em 0.4em; }'
+        + '.filterable .'+Config.classPrefix+'inactive {color: #555 !important; cursor: text; }'
+        + '.filterable .'+Config.classPrefix+'active span { }';
+      var elem=document.createElement('style');
+      elem.setAttribute('type', 'text/css');
+      if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
+      else elem.appendChild(document.createTextNode(css));
+      document.getElementsByTagName('head')[0].appendChild(elem);
+    },
     initCfg = function(cfg) {
       if(typeof cfg === 'undefined') return;
       for(var attr in cfg) {
@@ -15,7 +35,7 @@
       }
     },
     initFilters = function() {
-      var dls = document.querySelectorAll("." + Config.initClass);
+      var dls = document.querySelectorAll("dl." + Config.initClass);
       for(var i = 0; i < dls.length; i++) {
         var fDl = new FilterableDl(dls[i]);
         fDl.init();
@@ -24,6 +44,7 @@
     return {
       init : function(cfg) {
         initCfg(cfg);
+        appendStyle();
         initFilters();
       }
     }
@@ -32,7 +53,9 @@
   FilterableDl = function(dl) {
     var
     that = this,
+    filterButton = null,
     wrapper = dl,
+    defaultDl = dl.cloneNode(true),
     tags = [],
     rows = [],
     defaultDiacriticsRemovalMap = [{
@@ -326,7 +349,7 @@
       return {tag: a, info: info, size: 1, dd: dd};
     }
     loadKws = function() {
-      var dds = dl.querySelectorAll("dd.kw");
+      var dds = wrapper.querySelectorAll("dd.kw");
       for(var i = 0; i < dds.length; i++) {
         var kws = dds[i].textContent.split(",");
         for (var k = 0; k < kws.length; k++) {
@@ -370,11 +393,54 @@
         }
       }
     },
+    initControlls = function() {
+      var ul = document.createElement("ul");
+      wrapper.parentNode.insertBefore(ul, wrapper);
+      var li = document.createElement("li");
+      filterButton = document.createElement("button");
+      filterButton.className = Config.classPrefix+"toggle";
+      filterButton.setAttribute("type", "button");
+      filterButton.textContent = Config.disableFilter;
+      filterButton.addEventListener("click", toggleFilterButton.bind(that), false);
+      li.appendChild(filterButton);
+      ul.appendChild(li);
+    },
     initStrucure = function() {
       loadKws();
       initKws();
       sortKws();
-      //removeDuplicit();
+      initControlls();
+    },
+    disable = function() {
+      var tmpDl = defaultDl.cloneNode(true);
+      wrapper.parentNode.replaceChild(tmpDl, wrapper);
+      wrapper = tmpDl;
+      tags = [];
+      rows = [];
+    },
+    enable = function() {
+      loadKws();
+      initKws();
+      sortKws();
+    },
+    setFilterButton = function(active) {
+      filterButton.textContent = active ? Config.clearFilter : Config.disableFilter;
+    },
+    toggleFilterButton = function(e) {
+      switch(filterButton.textContent) {
+        case Config.clearFilter:
+          clearFilter();
+          setFilterButton(false);
+        break;
+        case Config.disableFilter:
+          disable();
+          filterButton.textContent = Config.enableFilter;
+        break;
+        case Config.enableFilter:
+          enable();
+          setFilterButton(false);
+        break;
+      }
     },
     clearFilter = function() {
       var dds = wrapper.getElementsByTagName("dd");
@@ -406,12 +472,14 @@
     },
     deactivate = function(el) {
       if(!el) return;
+      setFilterButton(false);
       el.classList.remove(Config.classPrefix+"active");
       el.addEventListener("click", filter, false);
       el.removeEventListener("click", removeFilter, false);
     },
     activate = function(el) {
       if(!el) return;
+      setFilterButton(true);
       el.classList.add(Config.classPrefix+"active");
       el.removeEventListener("click", filter, false);
       el.addEventListener("click", removeFilter, false);
@@ -451,7 +519,9 @@
     },
     filterHash = function(e) {
       var hash = normalize(window.location.hash ? window.location.hash.substring(1) : "");
-      if(hash.length) doFilter(hash);
+      if(hash.length) {
+        doFilter(hash);
+      }
     }
     return {
       init : function() {
@@ -464,23 +534,5 @@
 
   filterable = new Filterable();
   win.Filterable = filterable;
-  filterable.init();
-
-    // append style
-  var css = '/* filterable.js */'
-    + '.filterable .'+Config.classPrefix+'tag {display: inline-block; border: 0; margin: 0.1em; border-radius: 0.15em; border: 0.1em solid #aaa; color: #000; cursor: pointer; }'
-    + '.filterable .'+Config.classPrefix+'tag span+span {display: inline-block; padding: 0.1em 0.4em; border-left: 0.1em solid #ddd; }'
-    + '.filterable .'+Config.classPrefix+'inactive span+span {border-color: #eee; }'
-    + '.filterable .'+Config.classPrefix+'inactive {border-color: #eee; color: #555; cursor: text; }'
-    + '.filterable .'+Config.classPrefix+'active {background-color: #E8E8E8; }'
-    + '.filterable .'+Config.classPrefix+'active span+span {border-color: #A4A4A4; }'
-    + '.filterable .'+Config.classPrefix+'tag span {border: 0 none; color: #000 !important; display: inline-block; padding: 0.1em 0.4em; }'
-    + '.filterable .'+Config.classPrefix+'inactive {color: #555 !important; cursor: text; }'
-    + '.filterable .'+Config.classPrefix+'active span { }';
-  var elem=document.createElement('style');
-  elem.setAttribute('type', 'text/css');
-  if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
-  else elem.appendChild(document.createTextNode(css));
-  document.getElementsByTagName('head')[0].appendChild(elem);
 
 })(window);

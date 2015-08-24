@@ -48,6 +48,7 @@
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc')]">themes/toc.js</jsFile>
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc')]">themes/tocinit.js</jsFile>
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'filterable')]">themes/filterable.js</jsFile>
+  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'filterable')]">themes/filterableinit.js</jsFile>
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'selectable')]">themes/selectable.js</jsFile>
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'selectable')]">themes/selectableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'hideable')]">themes/hideable.js</jsFile>
