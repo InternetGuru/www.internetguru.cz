@@ -1,4 +1,12 @@
 ----------------
+1.8.3 2015-08-23
+----------------
+
+Convertor: podpora víceřádkového elementu code (425a60c)
+ContactForm: varování, pokud není definovaný příjemce (6913fd5)
+Admin: přesměrování link editovaného HTML souboru (d6a39b0)
+
+----------------
 1.8.2 2015-08-18
 ----------------
 
