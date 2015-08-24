@@ -355,6 +355,7 @@
         for (var k = 0; k < kws.length; k++) {
           kws[k] = kws[k].replace(/^\s\s*/, '').replace(/\s\s*$/, '');
         }
+        dds[i].className = "";
         dds[i].innerHTML = "";
         kwsObjects = [];
         var vals = [];
