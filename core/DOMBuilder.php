@@ -100,6 +100,12 @@ class DOMBuilder {
     return $links;
   }
 
+  public static function getLink($file) {
+    $k = array_search($file, self::$linkToFile);
+    if($k !== false) return $k;
+    return null;
+  }
+
   public static function getFile($link) {
     if(array_key_exists($link, self::$linkToFile)) return self::$linkToFile[$link];
     return null;
@@ -132,7 +138,7 @@ class DOMBuilder {
     }
 
     $f = findFile($fileName, false, false);
-    if($f) {
+    if(!is_null($f)) {
       self::loadDOM($f, $doc);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
     }
@@ -160,7 +166,7 @@ class DOMBuilder {
 
   private static function findFile($fileName, $user=true, $admin=true) {
     $f = findFile($fileName, $user, $admin);
-    if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
+    if(is_null($f)) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
     return $f;
   }
 
@@ -250,16 +256,18 @@ class DOMBuilder {
     $offDesc = count(self::$linkToDesc);
     $offTitle = count(self::$linkToTitle);
     $offFile = count(self::$linkToFile);
+    $toStrip = array();
     if(self::insertIncludes($inclDom, dirname($filePath))) {
       foreach($inclDom as $include) {
         $inclPath = dirname($filePath)."/".$include->getAttribute("src");
         $inclSrc[$inclPath] = filemtime($inclPath);
-        $include->stripTag();
+        $toStrip[] = $include;
       }
     } else $storeCache = false;
     // register links/ids; repair if duplicit
     if($included) return;
     if(!self::setIdentifiers($doc, $filePath, $fShort)) $storeCache = false;
+    foreach($toStrip as $include) $include->stripTag();
     #var_dump(self::$idToLink);
     #var_dump(self::$linkToFile);
     #var_dump(self::$linkToId);

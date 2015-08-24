@@ -6,6 +6,7 @@ class Agregator extends Plugin implements SplObserver {
   private $currentDoc = null;
   private $currentSubdir = null;
   private $currentFilepath = null;
+  private $useCache = true;
   private $edit;
   private $cfg;
   private static $sortKey;
@@ -27,10 +28,12 @@ class Agregator extends Plugin implements SplObserver {
       mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
       mkdir_plus(USER_FOLDER."/".$this->pluginDir);
       $list = array();
-      $this->createList(USER_FOLDER."/".$this->pluginDir, $list);
-      $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list);
+      $this->createList(USER_FOLDER."/".$this->pluginDir, $list, "html");
+      $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list, "html");
       foreach($list as $subDir => $files) {
-        $this->createHtmlVar($subDir, $files);
+        $vars = $this->getFileVars($subDir, $files);
+        if(!count($vars)) continue;
+        $this->createCmsVars($subDir, $vars);
       }
       $list = array();
       $this->createList(FILES_FOLDER, $list);
@@ -157,16 +160,17 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function createList($rootDir, Array &$list, $subDir=null) {
+  private function createList($rootDir, Array &$list, $ext=null, $subDir=null) {
     if(!is_dir($rootDir)) return;
     if(!is_null($subDir) && isset($list[$subDir])) return;
     $workingDir = is_null($subDir) ? $rootDir : "$rootDir/$subDir";
     foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
       if(is_dir("$workingDir/$f")) {
-        $this->createList($rootDir, $list, is_null($subDir) ? $f : "$subDir/$f");
+        $this->createList($rootDir, $list, $ext, is_null($subDir) ? $f : "$subDir/$f");
         continue;
       }
+      if(!is_null($ext) && pathinfo($f, PATHINFO_EXTENSION) != $ext) continue;
       if(is_file("$workingDir/.$f")) continue;
       $list[$subDir][] = $f;
     }
@@ -207,7 +211,7 @@ class Agregator extends Plugin implements SplObserver {
     $vars = array();
     foreach($files as $fileName) {
       $sd = $subDir;
-      if(strlen($subDir)) $sd .= "/";
+      if(strlen($subDir)) $sd.= "/";
       $filePath = USER_FOLDER."/$root/$sd$fileName";
       $mimeType = getFileMime($filePath);
       if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") !== 0) continue;
@@ -244,16 +248,14 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function createHtmlVar($subDir, Array $files) {
+  private function getFileVars($subDir, Array $files) {
     $vars = array();
-    $useCache = true;
     $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$subDir";
-    if(!$this->isValidCached($cacheKey, count($files))) {
+    if(!$this->isValidCache($cacheKey, count($files))) {
       $this->storeCache($cacheKey, count($files), $subDir);
-      $useCache = false;
+      $this->useCache = false;
     }
     foreach($files as $fileName) {
-      if(pathinfo($fileName, PATHINFO_EXTENSION) != "html") continue;
       if(strlen($subDir)) $fileName = "$subDir/$fileName";
       $file = $this->pluginDir."/$fileName";
       $filePath = USER_FOLDER."/".$file;
@@ -274,17 +276,20 @@ class Agregator extends Plugin implements SplObserver {
         $this->currentFilepath = $file;
       }
       $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$filePath";
-      if(!$this->isValidCached($cacheKey, filemtime($filePath))) {
+      if(!$this->isValidCache($cacheKey, filemtime($filePath))) {
         $this->storeCache($cacheKey, filemtime($filePath), $file);
-        $useCache = false;
+        $this->useCache = false;
       }
     }
-    if(empty($vars)) return;
+    return $vars;
+  }
+
+  private function createCmsVars($subDir, Array $vars) {
     $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
     $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$filePath";
-    if(!$this->isValidCached($cacheKey, filemtime($filePath))) {
+    if(!$this->isValidCache($cacheKey, filemtime($filePath))) {
       $this->storeCache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
-      $useCache = false;
+      $this->useCache = false;
     }
     foreach($this->cfg->documentElement->childElementsArray as $html) {
       if($html->nodeName != "html") continue;
@@ -295,7 +300,7 @@ class Agregator extends Plugin implements SplObserver {
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$vName";
       // use cache
-      if($useCache && !self::DEBUG) {
+      if($this->useCache && !self::DEBUG) {
         $sCache = $this->getSubDirCache($cacheKey);
         if(!is_null($sCache)) {
           $doc = new DOMDocumentPlus();
@@ -342,7 +347,7 @@ class Agregator extends Plugin implements SplObserver {
     if(!$stored) Logger::log(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
   }
 
-  private function isValidCached($key, $value) {
+  private function isValidCache($key, $value) {
     if(!apc_exists($key)) return false;
     if(apc_fetch($key) != $value) return false;
     return true;

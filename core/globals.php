@@ -5,7 +5,7 @@ function __autoload($className) {
   if(@include $fp) return;
   $fc = CORE_FOLDER."/$className.php";
   if(@include $fc) return;
-  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, $fp, $fc));
+  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, PLUGINS_DIR, CORE_DIR));
 }
 
 function isValidId($id) {
@@ -17,7 +17,7 @@ function findFile($filePath, $user=true, $admin=true, $res=true) {
   if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
   if($res && is_file($filePath)) return $filePath;
   if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
-  return false;
+  return null;
 }
 
 function createSymlink($link, $target) {
@@ -205,6 +205,9 @@ function buildQuery($pQuery, $questionMark=true) {
 function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
   if($convertToUtf8) $s = utf8_encode($s);
   if($tolower) $s = mb_strtolower($s, "utf-8");
+  // iconv
+  // http://php.net/manual/en/function.iconv.php#74101
+  // works with setlocale(LC_ALL, "[any].UTF-8")
   $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
   if($tolower) $s = strtolower($s);
   if(is_null($replace)) $replace = "_";

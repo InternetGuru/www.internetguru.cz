@@ -1,7 +1,7 @@
 (function(win) {
 
   var Config = {};
-  Config.class = "addressable";
+  Config.classPrefix = "addressable";
   Config.buttonValue = "Get form URL";
 
   var Addressable = function() {
@@ -94,10 +94,10 @@
     appendButton = function() {
       var forms = document.getElementsByTagName("form");
       for(var i = 0; i < forms.length; i++) {
-        if(!forms[i].classList.contains(Config.class)) continue;
+        if(!forms[i].classList.contains(Config.classPrefix)) continue;
         setFormEvent(forms[i]);
         var p = document.createElement("p");
-        p.className = "hidden " + Config.class;
+        p.className = "hidden " + Config.classPrefix;
         button = document.createElement("button");
         button.innerHTML = Config.buttonValue;
         button.type = "button";

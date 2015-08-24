@@ -10,7 +10,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const FILE_ENABLE = "enable";
   private $content = null;
   private $contentValue = null;
-  private $schema = null;
+  private $scheme = null;
   private $type = "txt";
   private $redir = false;
   private $replace = true;
@@ -87,18 +87,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       }
     }
     if(!$this->redir) return;
-    $pLink["path"] = $this->getDestPath($_POST["filename"]);
+    $pLink["path"] = getCurLink();
     if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
-  }
-
-  private function getDestPath($f) {
-    if(pathinfo($_POST["filename"], PATHINFO_EXTENSION) != "html") return getCurLink();
-    $doc = new HTMLPlus();
-    $doc->loadXML($_POST["content"]);
-    $link = $doc->documentElement->firstElement->getAttribute("link");
-    if(DOMBuilder::isLink($link)) return $link;
-    return getCurLink();
   }
 
   private function isPost() {
@@ -154,7 +145,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       ", 100, "body");
     $format = $this->type;
     if($this->type == "html") $format = "html+";
-    if(!is_null($this->schema)) $format .= " (".pathinfo($this->schema, PATHINFO_BASENAME).")";
+    if(!is_null($this->scheme)) $format .= " (".pathinfo($this->scheme, PATHINFO_BASENAME).")";
 
     $newContent = $this->getHTMLPlus();
 
@@ -224,7 +215,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function showContent($user) {
     if(is_null($this->defaultFile)) return null;
     $df = findFile($this->defaultFile, $user, true, false);
-    if(!$df) return null;
+    if(is_null($df)) return null;
     if($this->replace) return file_get_contents($df);
     $doc = $this->getDOMPlus($this->defaultFile, false, $user);
     $doc->removeNodes("//*[@readonly]");
@@ -253,14 +244,17 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    */
   private function setDefaultFile($fileName) {
     $this->defaultFile = $this->getFilepath($fileName);
-    if($this->defaultFile != $fileName) {
-      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => get_class($this)."=".$this->defaultFile)));
-    }
+    $redirPath = null;
+    $fLink = DOMBuilder::getLink(findFile($fileName));
+    if($this->defaultFile != $fileName) { $redirPath = getCurLink(); }
+    else if(getCurLink() != $fLink) { $redirPath = $fLink; }
+    if(!is_null($redirPath)) redirTo(buildLocalUrl(array("path" => $redirPath, "query" => get_class($this)."=".$this->defaultFile)));
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
   }
 
   private function getFilepath($f) {
     if(!strlen($f)) {
+      if(getCurLink() == "") return INDEX_HTML;
       $path = DOMBuilder::getFile(getCurLink());
       if(!is_null($path)) return $path;
       return INDEX_HTML;
@@ -273,14 +267,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if(preg_match("~^[\w-]+$~", $f)) {
       $pluginFile = PLUGINS_DIR."/$f/$f.xml";
-      if(!findFile($pluginFile)) return "$f.xml";
+      if(is_null(findFile($pluginFile))) return "$f.xml";
       return $pluginFile;
     }
     if(!preg_match("/^".FILEPATH_PATTERN."$/", $f)) {
       $this->dataFileStatus = self::STATUS_INVALID;
       throw new Exception(sprintf(_("Unsupported file name format '%s'"), $f));
     }
-    if(findFile(PLUGINS_DIR."/$f", false)) PLUGINS_DIR."/$f";
+    if(!is_null(findFile(PLUGINS_DIR."/$f", false))) PLUGINS_DIR."/$f";
     return $f;
   }
 
@@ -314,12 +308,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function processXml() {
     // get default schema
-    if($df = findFile($this->defaultFile, false)) {
-      $this->schema = $this->getSchema($df);
-    }
+    $df = findFile($this->defaultFile, false);
+    if(!is_null($df)) $this->scheme = $this->getScheme($df);
     // get user schema if default schema not exists
-    if(is_null($this->schema) && file_exists($this->dataFile)) {
-      $this->schema = $this->getSchema($this->dataFile);
+    if(is_null($this->scheme) && file_exists($this->dataFile)) {
+      $this->scheme = $this->getScheme($this->dataFile);
     }
     if($this->type == "html") {
       $doc = new HTMLPlus();
@@ -422,17 +415,17 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function validateXml(DOMDocumentPlus $doc) {
-    if(is_null($this->schema)) return;
-    switch(pathinfo($this->schema, PATHINFO_EXTENSION)) {
+    if(is_null($this->scheme)) return;
+    switch(pathinfo($this->scheme, PATHINFO_EXTENSION)) {
       case "rng":
-      $doc->relaxNGValidatePlus($this->schema);
+      $doc->relaxNGValidatePlus($this->scheme);
       break;
       default:
-      throw new Exception(sprintf(_("Unsupported schema '%s'"), $this->schema));
+      throw new Exception(sprintf(_("Unsupported schema '%s'"), $this->scheme));
     }
   }
 
-  private function getSchema($f) {
+  private function getScheme($f) {
     $h = fopen($f, "r");
     fgets($h); // skip first line
     $line = str_replace("'", '"', fgets($h));

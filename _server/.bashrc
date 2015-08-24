@@ -53,7 +53,7 @@ export TERM=xterm-256color
 #ssh-agent
 start=0
 ps | grep -q ssh-agent || start=1 # start ssh if not running
-((start)) && ssh-agent.exe > ~/ssh-agent.sh # run ssh-agent and save output (variables)
+((start)) && ssh-agent > ~/ssh-agent.sh # run ssh-agent and save output (variables)
 source ~/ssh-agent.sh # register saved variables
 ((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
@@ -65,7 +65,7 @@ alias gdc='_(){ git log $1^..$1 -p $2; }; _' # git diff commit [param HASH] of a
 alias gdel='_(){ git branch -d $1; git push origin :$1; }; _' # git delete branch local & remote [param BRANCH]
 alias gc='git commit'
 alias gl='git log --decorate --all --oneline --graph' # git log all branches
-alias glc='_(){ git log --decorate --oneline $1~1..; }; _' # git log from actual to [commit] including
+alias gls='_(){ git log --decorate --oneline ${1:+$1~1..}; }; _' # git log since [commit] (optional) to HEAD
 alias gpush='git push --all; git push --tags'
 alias gpull='git pull --all --tags; git fetch -p; git submodule update --init --recursive'
 alias gpullhard='git reset --hard && gpull'

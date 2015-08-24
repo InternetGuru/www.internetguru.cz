@@ -61,15 +61,15 @@
         hideables[i].classList.add(Config.noHideClass);
         toggleElement(link);
       }
-    }
+    },
 
-    function toggle(e) {
+    toggle = function(e) {
       var target = e.target || e.srcElement;
       toggleElement(target);
       e.preventDefault();
-    }
+    },
 
-    function toggleElement(link) {
+    toggleElement = function(link) {
       var e = link.parentNode.parentNode;
       if(e.classList.contains(Config.noHideClass)) {
         e.classList.remove(Config.noHideClass);
