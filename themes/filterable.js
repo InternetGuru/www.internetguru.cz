@@ -352,6 +352,8 @@
       return {tag: a, info: info, size: 1, dd: dd};
     }
     loadKws = function() {
+      wrapper.classList.add(Config.classPrefix+"on");
+      wrapper.classList.remove(Config.classPrefix+"off");
       var dds = wrapper.querySelectorAll("dd.kw");
       for(var i = 0; i < dds.length; i++) {
         var kws = dds[i].textContent.split(",");
@@ -425,6 +427,8 @@
       var tmpDl = defaultDl.cloneNode(true);
       wrapper.parentNode.replaceChild(tmpDl, wrapper);
       wrapper = tmpDl;
+      wrapper.classList.remove(Config.classPrefix+"on");
+      wrapper.classList.add(Config.classPrefix+"off");
       tags = [];
       rows = [];
     },
