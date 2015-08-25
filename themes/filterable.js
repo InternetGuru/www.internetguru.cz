@@ -476,7 +476,7 @@
       if(e.previousSibling) e.previousSibling.className = Config.classPrefix+"hide";
     },
     clearHash = function() {
-      window.history.replaceState("", "", window.location.href.split('#')[0]);
+      window.history.pushState("", "", window.location.href.split('#')[0]);
     },
     sendGAEvent = function(options) {
       if(events) ga('send', options);
