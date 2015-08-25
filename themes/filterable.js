@@ -404,6 +404,7 @@
     },
     initControlls = function() {
       var ul = document.createElement("ul");
+      ul.className = Config.classPrefix+"controlls";
       wrapper.parentNode.insertBefore(ul, wrapper);
       var li = document.createElement("li");
       filterButton = document.createElement("button");
