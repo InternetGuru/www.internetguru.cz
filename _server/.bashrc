@@ -1,3 +1,7 @@
+# VERSION
+BASHRC="IG .bashrc, ver. 1.0.0 (version)"
+echo $BASHRC
+
 # Normal Colors
 Black='\e[0;30m'        # Black
 Red='\e[0;31m'          # Red
