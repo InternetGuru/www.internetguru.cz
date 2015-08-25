@@ -435,6 +435,7 @@
     },
     setFilterButton = function(active) {
       filterButton.textContent = active ? Config.clearFilter : Config.disableFilter;
+      filterButton.className = Config.classPrefix+"toggle "+Config.classPrefix+ (active ? "clear" : "disable");
     },
     toggleFilterButton = function(e) {
       var options = { 'hitType': 'event', 'eventCategory': 'filterable', 'eventAction': 'filter button', 'eventLabel': filterButton.textContent };
@@ -448,6 +449,7 @@
         case Config.disableFilter:
           disable();
           filterButton.textContent = Config.enableFilter;
+          filterButton.className = Config.classPrefix+"toggle "+Config.classPrefix+"enable";
         break;
         case Config.enableFilter:
           enable();
