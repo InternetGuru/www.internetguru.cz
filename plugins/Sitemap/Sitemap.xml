@@ -7,13 +7,11 @@
 
     Konfigurovatelné hodnoty jako hodnoty elementů:
       - changefreq
-      - lastmod
       - priority
 
     a) Globální hodnoty
 
       <changefreq>weekly</changefreq>
-      <lastmod>2015-08-28</lastmod>
       <priority>0.5</priority>
 
     b) Individuální hodnoty (pro konkrétní stránku)
@@ -22,7 +20,6 @@
 
       <url link="/archiv">
         <changefreq>monthly</changefreq>
-        <lastmod>2015-08-28</lastmod>
         <priority>0.2</priority>
       </url>
 
