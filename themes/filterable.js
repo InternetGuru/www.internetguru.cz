@@ -12,6 +12,8 @@
     that = this,
     appendStyle = function() {
       var css = '/* filterable.js */'
+        + '.filterable .'+Config.classPrefix+'row {display: block; }'
+        + '.filterable .'+Config.classPrefix+'hide {display: none; }'
         + '.filterable .'+Config.classPrefix+'tag {display: inline-block; border: 0; margin: 0.1em; border-radius: 0.15em; border: 0.1em solid #aaa; color: #000; cursor: pointer; }'
         + '.filterable .'+Config.classPrefix+'tag span+span {display: inline-block; padding: 0.1em 0.4em; border-left: 0.1em solid #ddd; }'
         + '.filterable .'+Config.classPrefix+'inactive span+span {border-color: #eee; }'
@@ -55,6 +57,7 @@
     that = this,
     filterButton = null,
     wrapper = dl,
+    events = false,
     defaultDl = dl.cloneNode(true),
     tags = [],
     rows = [],
@@ -355,7 +358,7 @@
         for (var k = 0; k < kws.length; k++) {
           kws[k] = kws[k].replace(/^\s\s*/, '').replace(/\s\s*$/, '');
         }
-        dds[i].className = "";
+        dds[i].className = Config.classPrefix+"row";
         dds[i].innerHTML = "";
         kwsObjects = [];
         var vals = [];
@@ -377,9 +380,14 @@
           if(tags[kw].length > 1) {
             tags[kw][i].info.textContent = tags[kw].length + "×";
             tags[kw][i].size = tags[kw].length;
+            tags[kw][i].tag.setAttribute("dataset-count", tags[kw].length);
             tags[kw][i].tag.addEventListener("click", filter, false);
           } else {
-            tags[kw][i].tag.onclick = function() {return false};
+            tags[kw][i].tag.onclick = function() {
+              var options = { 'hitType': 'event', 'eventCategory': 'filterable', 'eventAction': 'try inactive', 'eventLabel': normalize(this.textContent) };
+              sendGAEvent(options);
+              return false
+            };
             tags[kw][i].info.parentNode.removeChild(tags[kw][i].info);
             tags[kw][i].tag.classList.add(Config.classPrefix+"inactive");
           }
@@ -428,9 +436,12 @@
       filterButton.textContent = active ? Config.clearFilter : Config.disableFilter;
     },
     toggleFilterButton = function(e) {
+      var options = { 'hitType': 'event', 'eventCategory': 'filterable', 'eventAction': 'filter button', 'eventLabel': filterButton.textContent };
+      sendGAEvent(options);
       switch(filterButton.textContent) {
         case Config.clearFilter:
           clearFilter();
+          clearHash();
           setFilterButton(false);
         break;
         case Config.disableFilter:
@@ -445,7 +456,7 @@
     },
     clearFilter = function() {
       var dds = wrapper.getElementsByTagName("dd");
-      for(var i = 0; i < dds.length; i++) { dds[i].className = "" }
+      for(var i = 0; i < dds.length; i++) { dds[i].className = Config.classPrefix+"row" }
       var dts = wrapper.getElementsByTagName("dt");
       for(var i = 0; i < dts.length; i++) { dts[i].className = "" }
       for(var kw in tags) {
@@ -459,16 +470,28 @@
     hideRow = function(el) {
       var e = el;
       while(e.nodeName.toLowerCase() == "dd") {
-        e.className = "hide";
+        e.className = Config.classPrefix+"hide";
         e = e.previousSibling;
       }
-      if(e.previousSibling) e.previousSibling.className = "hide";
+      if(e.previousSibling) e.previousSibling.className = Config.classPrefix+"hide";
+    },
+    clearHash = function() {
+      window.history.replaceState("", "", window.location.href.split('#')[0]+"#!");
+    },
+    sendGAEvent = function(options) {
+      if(events) ga('send', options);
+      else console.log(options);
     },
     removeFilter = function(e) {
       clearFilter();
       var target = e.target || e.srcElement;
-      deactivate(findParentBySelector(target, "."+Config.classPrefix+"tag"));
-      window.history.replaceState("", "", window.location.href.split('#')[0]+"#!");
+      var tag = findParentBySelector(target, "."+Config.classPrefix+"tag");
+      deactivate(tag);
+      var value = normalize(tag.getAttribute("dataset-value"));
+      var count = tag.getAttribute("dataset-count");
+      var options = { 'hitType': 'event', 'eventCategory': 'filterable', 'eventAction': 'deactivate filter', 'eventLabel': value, 'eventValue': count };
+      sendGAEvent(options);
+      clearHash();
       e.preventDefault();
     },
     deactivate = function(el) {
@@ -487,7 +510,11 @@
     },
     filter = function(e) {
       var target = e.target || e.srcElement;
-      var value = normalize(findParentBySelector(target, "."+Config.classPrefix+"tag").getAttribute("dataset-value"));
+      var tag = findParentBySelector(target, "."+Config.classPrefix+"tag");
+      var value = normalize(tag.getAttribute("dataset-value"));
+      var count = tag.getAttribute("dataset-count");
+      var options = { 'hitType': 'event', 'eventCategory': 'filterable', 'eventAction': 'activate filter', 'eventLabel': value, 'eventValue': count };
+      sendGAEvent(options);
       doFilter(value);
     },
     doFilter = function(value) {
@@ -526,6 +553,7 @@
     }
     return {
       init : function() {
+        if(typeof ga == "function" || Config.debug) events = true;
         initStrucure();
         win.addEventListener("load", filterHash, false);
         win.addEventListener("popstate", filterHash, false);
