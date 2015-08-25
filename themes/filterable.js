@@ -476,7 +476,7 @@
       if(e.previousSibling) e.previousSibling.className = Config.classPrefix+"hide";
     },
     clearHash = function() {
-      window.history.replaceState("", "", window.location.href.split('#')[0]+"#!");
+      window.history.replaceState("", "", window.location.href.split('#')[0]);
     },
     sendGAEvent = function(options) {
       if(events) ga('send', options);
@@ -547,9 +547,7 @@
     },
     filterHash = function(e) {
       var hash = normalize(window.location.hash ? window.location.hash.substring(1) : "");
-      if(hash.length) {
-        doFilter(hash);
-      }
+      doFilter(hash);
     }
     return {
       init : function() {
