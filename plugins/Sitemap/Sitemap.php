@@ -9,7 +9,7 @@ class Sitemap extends Plugin implements SplObserver {
   /**
    * @var array Names of configurable elements
    */
-  private $configurableElements = array("changefreq", "priority", "lastmod");
+  private $configurableElements = array("changefreq", "priority");
   /**
    * Allowed values for changefreq element
    * @var array
