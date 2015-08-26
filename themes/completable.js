@@ -72,7 +72,7 @@
     fillVal = function(e) {
       files = Config.files;
       for(var i = 0; i < files.length; i++) {
-        if(files[i].defaultVal != Config.navig.value) continue;
+        if(files[i].defaultVal.toLowerCase() != Config.navig.value.toLowerCase()) continue;
         Config.navig.value = files[i].path;
       }
     },
@@ -212,7 +212,7 @@
     update = function(fs) {
       first = true;
       for(var i = 0; i < fs.length; i++) {
-        if(Config.navig.value.length && key !== 8 && fs[i].defaultVal.indexOf(Config.navig.value) == 0) { // 8 is backspace
+        if(Config.navig.value.length && key !== 8 && fs[i].defaultVal.toLowerCase().indexOf(Config.navig.value.toLowerCase()) == 0) { // 8 is backspace
           var start = Config.navig.value.length;
           var end = fs[i].defaultVal.length;
           Config.navig.value = fs[i].defaultVal;
