@@ -24,7 +24,7 @@
       setEvents = function() {
         var forms = document.getElementsByTagName("form");
         for(var i = 0; i < forms.length; i++) {
-          if(!forms[i].classList.contains(Editable.getEditableClass())) continue;
+          if(!forms[i].classList.contains(IGCMS.Editable.getEditableClass())) continue;
           setSaveEvents(forms[i]);
         }
       },
