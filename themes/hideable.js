@@ -1,5 +1,7 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   if(win.Hideable) return;
 
   var Config = {}
@@ -15,13 +17,6 @@
 
     var
     inited = false,
-    initCfg = function(cfg) {
-      if(typeof cfg === 'undefined') return;
-      for(var attr in cfg) {
-        if(!Config.hasOwnProperty(attr)) continue;
-        Config[attr] = cfg[attr];
-      }
-    },
     getHideables = function() {
       if (document.querySelectorAll) return document.querySelectorAll("." + Config.hideableClass);
       var hideables = [];
@@ -31,21 +26,6 @@
       }
       return hideables;
     },
-
-    appendStyle = function() {
-      var css = '/* hideables.js */'
-        + ' .hide { display: none !important; }'
-        + ' a.switch { text-decoration: none;'
-        + ' border: none !important;'
-        + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
-        + ' font-weight: bold }';
-      var elem=document.createElement('style');
-      elem.setAttribute('type', 'text/css');
-      if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
-      else elem.appendChild(document.createTextNode(css));
-      document.getElementsByTagName('head')[0].appendChild(elem);
-    },
-
     toggleHideables = function() {
       var hideables = getHideables();
       for(var i = 0; i < hideables.length; i++) {
@@ -96,16 +76,21 @@
     // public
     return {
       init : function(cfg) {
-        initCfg(cfg);
-        appendStyle();
+        if(inited) return;
+        IGCMS.initCfg(Config, cfg);
+        var css = '/* hideables.js */'
+          + ' .hide { display: none !important; }'
+          + ' a.switch { text-decoration: none;'
+          + ' border: none !important;'
+          + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
+          + ' font-weight: bold }';
+        IGCMS.appendStyle(css);
         toggleHideables();
         inited = true;
-      },
-      isInit : function() { return inited; }
+      }
     }
   };
 
-   var hideable = new Hideable();
-   win.Hideable = hideable;
+   IGCMS.Hideable = new Hideable();
 
 })(window);

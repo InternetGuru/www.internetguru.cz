@@ -97,8 +97,9 @@
           + 'dl.toc ol > li {margin-left: 1em; }'
           + 'dl.toc ol > li:before {content: counters(item, ".") " "; counter-increment: item; }';
           IGCMS.appendStyle();
-          if(!win.Hideable) include("themes/hideable.js", document.body);
-          if(!win.Hideable) include("themes/hideableinit.js", document.body);
+          if(IGCMS.Hideable) return;
+          include("themes/hideable.js", document.body);
+          include("themes/hideableinit.js", document.body);
         }
       }
    };
