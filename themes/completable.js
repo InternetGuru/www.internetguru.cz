@@ -40,13 +40,6 @@
       }
       return copy;
     },
-    initCfg = function(cfg) {
-      if(typeof cfg === 'undefined') return;
-      for(var attr in cfg) {
-        if(!Config.hasOwnProperty(attr)) continue;
-        Config[attr] = cfg[attr];
-      }
-    },
     initStructure = function() {
       list = document.createElement("ul");
       list.className = "navigList";
@@ -246,7 +239,7 @@
       init : function(cfg) {
         Config.files = {};
         Config.navig = null;
-        initCfg(cfg);
+        IGCMS.initCfg(Config, cfg);
         if(Config.navig === null) throw "Config.navig is null";
         initStructure();
         initEvents();
@@ -277,15 +270,7 @@
     toInit.push({files: files, navig: s });
   }
 
-  if(found) appendStyle();
-
-  for (var i = 0; i < toInit.length; i++) {
-    completable = new Completable();
-    completable.init(toInit[i]);
-  }
-
-
-  function appendStyle() {
+  if(found) {
     var css = '/* completable.js */'
       + ' .completable-input { width: 35em; max-width: 100%; }'
       + ' ul.navigList {overflow-y: auto; position: absolute; background: white; z-index: 100; /*width: 25em; max-width: 100%;*/ margin: 0; padding: 0; list-style: none; box-shadow: 0.2em 0.2em 0.2em #555; }'
@@ -294,11 +279,12 @@
       + ' ul.navigList li.active { background: #ddd; }'
       + ' ul.navigList li.user { background: #E7F6FE; }'
       + ' ul.navigList li.user.active, ul.navigList li.user:hover { background: #D4E5EE; }';
-    var elem=document.createElement('style');
-    elem.setAttribute('type', 'text/css');
-    if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
-    else elem.appendChild(document.createTextNode(css));
-    document.getElementsByTagName('head')[0].appendChild(elem);
+    IGCMS.appendStyle(css);
+  }
+
+  for (var i = 0; i < toInit.length; i++) {
+    completable = new Completable();
+    completable.init(toInit[i]);
   }
 
 })(window);
