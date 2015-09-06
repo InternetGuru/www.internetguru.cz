@@ -1,4 +1,7 @@
 (function(win){
+
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   var Config = {}
   Config.initClass = "filterable";
   Config.classPrefix = "filterable-";
@@ -7,11 +10,20 @@
   Config.disableFilter = "Vypnout filtry";
   Config.enableFilter = "Zapnout filtry";
 
-  Filterable = function() {
+  var Filterable = function() {
     var
     that = this,
-    appendStyle = function() {
-      var css = '/* filterable.js */'
+    initFilters = function() {
+      var dls = document.querySelectorAll("dl." + Config.initClass);
+      for(var i = 0; i < dls.length; i++) {
+        var fDl = new FilterableDl(dls[i]);
+        fDl.init();
+      }
+    }
+    return {
+      init : function(cfg) {
+        IGCMS.initCfg(Config,cfg);
+        var css = '/* filterable.js */'
         + '.filterable .'+Config.classPrefix+'row {display: block; }'
         + '.filterable .'+Config.classPrefix+'hide {display: none; }'
         + '.filterable .'+Config.classPrefix+'tag {display: inline-block; border: 0; margin: 0.1em; border-radius: 0.15em; border: 0.1em solid #aaa; color: #000; cursor: pointer; }'
@@ -23,30 +35,7 @@
         + '.filterable .'+Config.classPrefix+'tag span {border: 0 none; color: #000 !important; display: inline-block; padding: 0.1em 0.4em; }'
         + '.filterable .'+Config.classPrefix+'inactive {color: #555 !important; cursor: text; }'
         + '.filterable .'+Config.classPrefix+'active span { }';
-      var elem=document.createElement('style');
-      elem.setAttribute('type', 'text/css');
-      if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
-      else elem.appendChild(document.createTextNode(css));
-      document.getElementsByTagName('head')[0].appendChild(elem);
-    },
-    initCfg = function(cfg) {
-      if(typeof cfg === 'undefined') return;
-      for(var attr in cfg) {
-        if(!Config.hasOwnProperty(attr)) continue;
-        Config[attr] = cfg[attr];
-      }
-    },
-    initFilters = function() {
-      var dls = document.querySelectorAll("dl." + Config.initClass);
-      for(var i = 0; i < dls.length; i++) {
-        var fDl = new FilterableDl(dls[i]);
-        fDl.init();
-      }
-    }
-    return {
-      init : function(cfg) {
-        initCfg(cfg);
-        appendStyle();
+        IGCMS.appendStyle(css);
         initFilters();
       }
     }
@@ -320,20 +309,6 @@
       }
       return str;
     },
-    collectionHas = function(a, b) {
-      for(var i = 0, len = a.length; i < len; i ++) {
-        if(a[i] == b) return true;
-      }
-      return false;
-    },
-    findParentBySelector = function(elm, selector) {
-      var all = document.querySelectorAll(selector);
-      var cur = elm;
-      while(cur && !collectionHas(all, cur)) { //keep going up until you find a match
-        cur = cur.parentNode; //go up
-      }
-      return cur; //will return null if not found
-    },
     normalize = function(str) {
       return removeDiacritics(str.replace(/ /g, "_"));
     },
@@ -492,7 +467,7 @@
     removeFilter = function(e) {
       clearFilter();
       var target = e.target || e.srcElement;
-      var tag = findParentBySelector(target, "."+Config.classPrefix+"tag");
+      var tag = IGCMS.findParentBySelector(target, "."+Config.classPrefix+"tag");
       deactivate(tag);
       var value = normalize(tag.getAttribute("dataset-value"));
       var count = tag.getAttribute("dataset-count");
@@ -517,7 +492,7 @@
     },
     filter = function(e) {
       var target = e.target || e.srcElement;
-      var tag = findParentBySelector(target, "."+Config.classPrefix+"tag");
+      var tag = IGCMS.findParentBySelector(target, "."+Config.classPrefix+"tag");
       var value = normalize(tag.getAttribute("dataset-value"));
       var count = tag.getAttribute("dataset-count");
       var options = { 'hitType': 'event', 'eventCategory': 'filterable', 'eventAction': 'activate filter', 'eventLabel': value, 'eventValue': count };
@@ -566,7 +541,6 @@
     }
   }
 
-  filterable = new Filterable();
-  win.Filterable = filterable;
+  IGCMS.Filterable = new Filterable();
 
 })(window);
