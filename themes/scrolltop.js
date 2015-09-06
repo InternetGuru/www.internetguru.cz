@@ -29,14 +29,11 @@
           + 'a#scrolltop:hover { background: rgba(0, 0, 0, 0.65) }'
           + 'a#scrolltop span { position: relative; top: -0.05em; font-size: 2.3rem; }'
           + 'a#scrolltop.scrollhide { display: none; }';
-          var style = document.getElementsByTagName('style')[0];
-        if(style == undefined) {
-          var head = document.head || document.getElementsByTagName('head')[0];
-          style = document.createElement('style');
-          style.type = 'text/css';
-          head.appendChild(style);
-        }
-        style.appendChild(document.createTextNode(css));
+        var elem=document.createElement('style');
+        elem.setAttribute('type', 'text/css');
+        if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
+        else elem.appendChild(document.createTextNode(css));
+        document.getElementsByTagName('head')[0].appendChild(elem);
       },
       getScrollTop = function() {
         return document.body.scrollTop || document.documentElement.scrollTop;

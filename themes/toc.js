@@ -28,14 +28,11 @@
           + 'dl.toc ol {counter-reset: item; list-style: none; }'
           + 'dl.toc ol > li {margin-left: 1em; }'
           + 'dl.toc ol > li:before {content: counters(item, ".") " "; counter-increment: item; }';
-          var style = document.getElementsByTagName('style')[0];
-        if(style == undefined) {
-          var head = document.head || document.getElementsByTagName('head')[0];
-          style = document.createElement('style');
-          style.type = 'text/css';
-          head.appendChild(style);
-        }
-        style.appendChild(document.createTextNode(css));
+        var elem=document.createElement('style');
+        elem.setAttribute('type', 'text/css');
+        if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
+        else elem.appendChild(document.createTextNode(css));
+        document.getElementsByTagName('head')[0].appendChild(elem);
       },
       include = function(src, e) {
         var base = window.Base ? window.Base : "/";

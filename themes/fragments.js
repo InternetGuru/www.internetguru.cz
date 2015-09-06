@@ -1,4 +1,4 @@
-document.addEventListener("click", headingLookup);
+document.addEventListener("click", headingLookup, false);
 
 function headingLookup(event) {
   if(changeFragment(event.target)) return;

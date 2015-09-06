@@ -26,16 +26,6 @@
     visible = true,
     active = true,
     activateUl = null,
-
-     /*
-     initCfg = function(cfg) {
-       if(typeof cfg === 'undefined') return;
-       for(var attr in cfg) {
-         if(!Config.hasOwnProperty(attr)) continue;
-         Config[attr] = cfg[attr];
-       }
-     },
-     */
     appendButton = function(text, ul) {
       var li = document.createElement("li");
       ul.appendChild(li);
@@ -47,7 +37,6 @@
     },
     toggleApp = function() {
       if(cm.getOption("fullScreen")) toggleFullScreen(cm);
-      console.log(active);
       if(active) {
         cm.toTextArea();
         activateUl.style.display = "";
@@ -143,7 +132,7 @@
         }
         return false;
       }
-    }
+    },
     initEditor = function() {
       cm = CodeMirror.fromTextArea(textarea, {
         tabMode: "default",
@@ -237,7 +226,6 @@
       }
     },
     _init = function() {
-      console.log(scm);
       initEditor();
       initUserMenu();
     }

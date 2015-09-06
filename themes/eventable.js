@@ -1,7 +1,7 @@
 (function(win) {
 
   var Config = {}
-  Config.class = "eventable";
+  Config.classPrefix = "eventable";
 
    var Eventable = function() {
 
@@ -24,7 +24,7 @@
           if(!form || elements[i].nodeName.toLowerCase() != "input") continue; // working only on form inputs
           var m = form.className.match(idRegExp);
           if(!m) {
-            m = Config.class+"-"+i;
+            m = Config.classPrefix+"-"+i;
             form.classList.add(m);
             form.onsubmit = sendGAEvents;
           }
@@ -60,8 +60,8 @@
         debug : debug,
         init : function(cfg) {
           initCfg(cfg);
-          idRegExp = new RegExp(Config.class+"-\\d+");
-          elements = document.getElementsByClassName(Config.class);
+          idRegExp = new RegExp(Config.classPrefix+"-\\d+");
+          elements = document.getElementsByClassName(Config.classPrefix);
           if(elements.length == 0) return;
           fireEvents();
         }
