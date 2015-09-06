@@ -48,9 +48,9 @@
   <jsFile append="body" if-xpath="body[contains(@class, 'scrolltopable')]">themes/scrolltopableinit.js</jsFile>
   <jsFile append="body" if-xpath="body[contains(@class, 'fragmentable')]">themes/fragmentable.js</jsFile>
   <jsFile append="body" if-xpath="body[contains(@class, 'fragmentable')]">themes/fragmentableinit.js</jsFile>
+  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc') or contains(@class, 'tocable')]">themes/tocable.js</jsFile>
+  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc') or contains(@class, 'tocable')]">themes/tocableinit.js</jsFile>
   <jsFile append="body" if-xpath="//code[not(contains(@class, 'nohighlight'))]">themes/syntaxhighlightjs.js</jsFile>
-  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc')]">themes/toc.js</jsFile>
-  <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'contenttoc')]">themes/tocinit.js</jsFile>
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'filterable')]">themes/filterable.js</jsFile>
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'filterable')]">themes/filterableinit.js</jsFile>
   <jsFile append="body" priority="5" if-xpath="//*[contains(@class, 'selectable')]">themes/selectable.js</jsFile>
