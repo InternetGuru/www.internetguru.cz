@@ -4,6 +4,7 @@
 
 
   Config = {};
+  Config.ns = "fragmentable";
 
   var Fragmentable = function() {
 
@@ -30,7 +31,12 @@
     }
 
     return {
+      /**
+       * Works only for body with class=[Config.ns]
+       * @param  {Object} cfg custom configuration
+       */
       init: function(cfg) {
+        if(!document.body.classList.contains(Config.ns)) throw "Element body missing "+Config.ns+" class";
         IGCMS.initCfg(Config, cfg);
         fireEvents();
       }
