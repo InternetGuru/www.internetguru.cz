@@ -1,5 +1,7 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   var Completable = function() {
 
     var
