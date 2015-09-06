@@ -30,6 +30,9 @@
   <stylesheet media="print">themes/cms-print.css</stylesheet>
   <!-- <stylesheet>themes/document.css</stylesheet> -->
 
+  <!-- IGCMS global object -->
+  <jsFile append="head">themes/igcms.js</jsFile>
+
   <!-- Browser compatibility -->
   <jsFile>themes/modernizer.js</jsFile>
   <jsFile if="lte IE 8" priority="1">themes/events.js</jsFile>
@@ -40,7 +43,8 @@
   <jsFile append="body">themes/iefixes.js</jsFile>
 
   <!-- Default scripts -->
-  <jsFile append="body">themes/fragments.js</jsFile>
+  <jsFile append="body">themes/fragmentable.js</jsFile>
+  <jsFile append="body">themes/fragmentableinit.js</jsFile>
   <jsFile append="body">themes/scrolltop.js</jsFile>
   <jsFile append="body">themes/scrolltopinit.js</jsFile>
   <jsFile append="body">themes/browserdetect.js</jsFile>
