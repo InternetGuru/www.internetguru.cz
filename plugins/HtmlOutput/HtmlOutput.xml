@@ -43,9 +43,9 @@
   <jsFile append="body">themes/iefixes.js</jsFile>
 
   <!-- Default scripts -->
-  <jsFile append="body">themes/scrolltop.js</jsFile>
-  <jsFile append="body">themes/scrolltopinit.js</jsFile>
   <jsFile append="body">themes/browserdetect.js</jsFile>
+  <jsFile append="body" if-xpath="body[contains(@class, 'scrolltopable')]">themes/scrolltopable.js</jsFile>
+  <jsFile append="body" if-xpath="body[contains(@class, 'scrolltopable')]">themes/scrolltopableinit.js</jsFile>
   <jsFile append="body" if-xpath="body[contains(@class, 'fragmentable')]">themes/fragmentable.js</jsFile>
   <jsFile append="body" if-xpath="body[contains(@class, 'fragmentable')]">themes/fragmentableinit.js</jsFile>
   <jsFile append="body" if-xpath="//code[not(contains(@class, 'nohighlight'))]">themes/syntaxhighlightjs.js</jsFile>

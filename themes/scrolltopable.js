@@ -1,13 +1,17 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
+
   var Config = {};
+  Config.ns = "scrolltopable"; // wrapper element (a) id value
   Config.wrapperId = "scrolltop"; // wrapper element (a) id value
   Config.time = 250; // int ms to scroll
   Config.text = "^"; // text content
   Config.title = "Nahoru"; // text content
   Config.hidePosition = 200; // display / hide button int px from top
 
-   var ScrollTop = function() {
+   var ScrollTopable = function() {
 
       var scrollTimeOut = null,
       windowScrollTimeOut = null,
@@ -15,26 +19,6 @@
       displayed = false,
       step = null,
       wait = 10,
-      initCfg = function(cfg) {
-        if(typeof cfg === 'undefined') return;
-        for(var attr in cfg) {
-          if(!Config.hasOwnProperty(attr)) continue;
-          Config[attr] = cfg[attr];
-        }
-      },
-      appendStyle = function() {
-        /* scrolltop.js */
-        var css = '/* scrolltop.js */'
-          + 'a#scrolltop { font-family: "Times new roman", serif; position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; cursor: pointer }'
-          + 'a#scrolltop:hover { background: rgba(0, 0, 0, 0.65) }'
-          + 'a#scrolltop span { position: relative; top: -0.05em; font-size: 2.3rem; }'
-          + 'a#scrolltop.scrollhide { display: none; }';
-        var elem=document.createElement('style');
-        elem.setAttribute('type', 'text/css');
-        if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
-        else elem.appendChild(document.createTextNode(css));
-        document.getElementsByTagName('head')[0].appendChild(elem);
-      },
       getScrollTop = function() {
         return document.body.scrollTop || document.documentElement.scrollTop;
       },
@@ -80,17 +64,24 @@
         }
       };
 
-      // public
       return {
+        /**
+         * Works only for body with class=[Config.ns]
+         * @param  {Object} cfg custom configuration
+         */
         init : function(cfg) {
-          initCfg(cfg);
-          appendStyle();
+          IGCMS.initCfg(Config, cfg);
+          var css = '/* scrolltopable.js */'
+          + 'a#scrolltop { font-family: "Times new roman", serif; position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; cursor: pointer }'
+          + 'a#scrolltop:hover { background: rgba(0, 0, 0, 0.65) }'
+          + 'a#scrolltop span { position: relative; top: -0.05em; font-size: 2.3rem; }'
+          + 'a#scrolltop.scrollhide { display: none; }';
+          IGCMS.appendStyle(css);
           setScrollEvent();
         }
       }
    };
 
-   var scrolltop = new ScrollTop();
-   win.ScrollTop = scrolltop;
+   win.IGCMS.ScrollTopable = new ScrollTopable();
 
 })(window);

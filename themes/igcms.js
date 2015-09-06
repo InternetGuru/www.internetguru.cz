@@ -18,7 +18,6 @@
     }
 
     return {
-
       /**
        * Update existing Config properities by cfg properities
        * @param  {Object} Config updated object
@@ -31,7 +30,6 @@
           Config[attr] = cfg[attr];
         }
       },
-
       /**
        * Return element ancestor which match given selector or null if ancestor not exits
        * @param  {DOMElement} elm      starting element
@@ -45,6 +43,17 @@
           cur = cur.parentNode; // go up
         }
         return cur; // will return null if not found
+      },
+      /**
+       * Append new element style with given css
+       * @param {String} css
+       */
+      appendStyle: function(css) {
+        var elem=document.createElement('style');
+        elem.setAttribute('type', 'text/css');
+        if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
+        else elem.appendChild(document.createTextNode(css));
+        document.getElementsByTagName('head')[0].appendChild(elem);
       }
 
     }
