@@ -2,7 +2,7 @@
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  if(win.Hideable) return;
+  if(IGCMS.Hideable) return;
 
   var Config = {}
 
@@ -87,7 +87,8 @@
         IGCMS.appendStyle(css);
         toggleHideables();
         inited = true;
-      }
+      },
+      isInit : function() { return inited; }
     }
   };
 

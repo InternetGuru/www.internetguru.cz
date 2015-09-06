@@ -1,7 +1,9 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   var Config = {}
-  Config.classPrefix = "eventable";
+  Config.ns = "eventable";
 
    var Eventable = function() {
 
@@ -10,13 +12,6 @@
       debug = false,
       elements = null,
       idRegExp = null,
-      initCfg = function(cfg) {
-        if(typeof cfg === 'undefined') return;
-        for(var attr in cfg) {
-          if(!Config.hasOwnProperty(attr)) continue;
-          Config[attr] = cfg[attr];
-        }
-      },
       fireEvents = function() {
         formElemets = [];
         for(var i = 0; i < elements.length; i++) {
@@ -24,7 +19,7 @@
           if(!form || elements[i].nodeName.toLowerCase() != "input") continue; // working only on form inputs
           var m = form.className.match(idRegExp);
           if(!m) {
-            m = Config.classPrefix+"-"+i;
+            m = Config.ns+"-"+i;
             form.classList.add(m);
             form.onsubmit = sendGAEvents;
           }
@@ -59,18 +54,15 @@
       return {
         debug : debug,
         init : function(cfg) {
-          initCfg(cfg);
-          idRegExp = new RegExp(Config.classPrefix+"-\\d+");
-          elements = document.getElementsByClassName(Config.classPrefix);
+          IGCMS.initCfg(cfg);
+          idRegExp = new RegExp(Config.ns+"-\\d+");
+          elements = document.getElementsByClassName(Config.ns);
           if(elements.length == 0) return;
           fireEvents();
         }
       }
    };
 
-   var eventable = new Eventable();
-   win.Eventable = eventable;
-
-  if(typeof ga == "function" || eventable.debug) eventable.init({});
+   IGCMS.Eventable = Eventable();
 
 })(window);
