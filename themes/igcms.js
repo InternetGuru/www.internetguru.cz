@@ -8,7 +8,7 @@
     var
     /**
      * Check if collection has element
-     * @return {bool} a has b
+     * @return {bool} collection has element
      */
     collectionHas = function(collection, element) {
       for(var i = 0, len = collection.length; i < len; i ++) {
