@@ -59,6 +59,7 @@
     initEvents = function() {
       Config.navig.addEventListener("input", inputText, false);
       Config.navig.addEventListener("blur", closeNavig, false);
+      Config.navig.addEventListener("click", openNavig, false);
       Config.navig.form.addEventListener("submit", fillVal, false);
       win.addEventListener("resize", updateSize, false);
       win.addEventListener("scroll", updateSize, false);
@@ -71,12 +72,17 @@
         Config.navig.value = files[i].path;
       }
     },
+    openNavig = function(e) {
+      if(list.classList.contains("active")) inputText(null);
+      else list.classList.add("active");
+    }
     closeNavig = function(e) {
       //if(e && activeElement && activeElement.className == "navigList") return;
       list.innerHTML = "";
       textNavigValue = "";
       open = false;
       active = -1;
+      list.classList.remove("active");
     },
     processKey = function(e) {
       switch(e.keyCode) {
@@ -121,8 +127,7 @@
     inputText = function(e) {
       closeNavig();
       open = true;
-      var target = e.target || e.srcElement;
-      var navig = e === null ? Config.navig : target;
+      var navig = e === null ? Config.navig : e.target || e.srcElement;
       var value = navig.value;
       textNavigValue = value;
       var fs = filter(Config.files, value);
