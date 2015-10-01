@@ -22,7 +22,12 @@
     <ref name="htmlplus.h"/>
     <ref name="desc"/>
     <optional>
-      <ref name="contentElements"/>
+      <interleave>
+        <ref name="contentElements"/>
+        <zeroOrMore>
+          <ref name="form"/>
+        </zeroOrMore>
+      </interleave>
     </optional>
     <optional>
       <element name="section">
@@ -36,7 +41,12 @@
       </element>
     </optional>
     <optional>
-      <ref name="contentElements"/>
+      <interleave>
+        <ref name="contentElements"/>
+        <zeroOrMore>
+          <ref name="form"/>
+        </zeroOrMore>
+      </interleave>
     </optional>
   </define>
 
@@ -158,10 +168,6 @@
       <zeroOrMore>
         <ref name="htmlplus.dl"/>
       </zeroOrMore>
-      <zeroOrMore>
-        <ref name="form"/>
-      </zeroOrMore>
-
     </interleave>
   </define>
 

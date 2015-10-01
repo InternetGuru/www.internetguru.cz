@@ -183,7 +183,10 @@
   <element name="fieldset">
     <ref name="fieldset.attlist"/>
     <ref name="legend"/>
-    <ref name="Flow.model"/>
+    <interleave>
+      <ref name="contentElements"/>
+      <ref name="Inline.model"/>
+    </interleave>
   </element>
 </define>
 
@@ -194,7 +197,7 @@
 <define name="button">
   <element name="button">
     <ref name="button.attlist"/>
-    <ref name="Flow.model"/>
+    <ref name="contentElements"/>
   </element>
 </define>
 
