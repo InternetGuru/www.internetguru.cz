@@ -1,39 +1,20 @@
 (function(win) {
 
-  var Config = {}
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
+  var Config = {}
   Config.tocTitle = "Table of contents";
   Config.maxDepth = 2; // 0 for no limit
-  Config.tocNS = "contenttoc";
+  Config.ns = "tocable";
 
-   var TOC = function() {
+   var TOCable = function() {
 
-      // private
       var
       tocWrapper = null,
       hElements = [],
       hLevels = [],
       headingsPatt = null,
       tocRoot = null,
-      initCfg = function(cfg) {
-        if(typeof cfg === 'undefined') return;
-        for(var attr in cfg) {
-          if(!Config.hasOwnProperty(attr)) continue;
-          Config[attr] = cfg[attr];
-        }
-      },
-      appendStyle = function() {
-        var css = '/* toc.js */'
-          + 'dl.toc dd {margin-left: 0em; font-style: normal; }'
-          + 'dl.toc ol {counter-reset: item; list-style: none; }'
-          + 'dl.toc ol > li {margin-left: 1em; }'
-          + 'dl.toc ol > li:before {content: counters(item, ".") " "; counter-increment: item; }';
-        var elem=document.createElement('style');
-        elem.setAttribute('type', 'text/css');
-        if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
-        else elem.appendChild(document.createTextNode(css));
-        document.getElementsByTagName('head')[0].appendChild(elem);
-      },
       include = function(src, e) {
         var base = window.Base ? window.Base : "/";
         script = document.createElement('script');
@@ -45,7 +26,7 @@
         var d = document.getElementsByTagName("div");
         var i = 0;
         for(; i<d.length; i++) {
-          if(!d[i].classList.contains(Config.tocNS)) continue;
+          if(!d[i].classList.contains(Config.ns)) continue;
           tocRoot = d[i];
           break;
         }
@@ -92,13 +73,12 @@
         }
       }
 
-      // public
       return {
         init : function(cfg) {
+          IGCMS.initCfg(Config, cfg);
           // create toc
           var wrapper = createTocWrapper();
           if(!wrapper) return;
-          initCfg(cfg);
           headingsPatt = new RegExp("h([1-6])");
           getHeadings(tocRoot);
           var ol = win.document.createElement('ol');
@@ -111,14 +91,19 @@
           var dd = document.createElement("dd");
           dd.appendChild(ol);
           tocWrapper.appendChild(dd);
-          appendStyle();
-          if(!win.Hideable) include("themes/hideable.js", document.body);
-          if(!win.Hideable) include("themes/hideableinit.js", document.body);
+          var css = '/* toc.js */'
+          + 'dl.toc dd {margin-left: 0em; font-style: normal; }'
+          + 'dl.toc ol {counter-reset: item; list-style: none; }'
+          + 'dl.toc ol > li {margin-left: 1em; }'
+          + 'dl.toc ol > li:before {content: counters(item, ".") " "; counter-increment: item; }';
+          IGCMS.appendStyle();
+          if(IGCMS.Hideable) return;
+          include("themes/hideable.js", document.body);
+          include("themes/hideableinit.js", document.body);
         }
       }
    };
 
-   var toc = new TOC();
-   win.TOC = toc;
+   win.IGCMS.TOCable = TOCable();
 
 })(window);

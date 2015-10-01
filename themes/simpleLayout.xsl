@@ -40,6 +40,9 @@
   <xsl:template match="/body">
     <body>
       <xsl:copy-of select="@*"/>
+      <xsl:attribute name="class">
+         <xsl:value-of select="concat(@class,' fragmentable scrolltopable')"/>
+      </xsl:attribute>
       <div id="content">
         <xsl:apply-templates/>
       </div>

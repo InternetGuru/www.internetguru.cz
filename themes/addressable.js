@@ -1,7 +1,9 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   var Config = {};
-  Config.classPrefix = "addressable";
+  Config.ns = "addressable";
   Config.buttonValue = "Get form URL";
 
   var Addressable = function() {
@@ -9,14 +11,6 @@
     var
     input = null,
     button = null,
-
-    initCfg = function(cfg) {
-      if(typeof cfg === 'undefined') return;
-      for(var attr in cfg) {
-        if(!Config.hasOwnProperty(attr)) continue;
-        Config[attr] = cfg[attr];
-      }
-    },
     serialize = function(form) {
       if (!form || form.nodeName !== "FORM") {
         return;
@@ -79,25 +73,13 @@
       }
       return q.join("&");
     },
-
-    appendStyle = function() {
-      var css = '/* addressable.js */'
-        + ' p.addressable { padding: 1em }'
-        + ' p.addressable button, p.addressable input { padding: 0.5em 1em; font-size: inherit; width: 100%; box-sizing: border-box; line-height: 1em; max-width: 30em }';
-      var elem=document.createElement('style');
-      elem.setAttribute('type', 'text/css');
-      if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
-      else elem.appendChild(document.createTextNode(css));
-      document.getElementsByTagName('head')[0].appendChild(elem);
-    },
-
     appendButton = function() {
       var forms = document.getElementsByTagName("form");
       for(var i = 0; i < forms.length; i++) {
-        if(!forms[i].classList.contains(Config.classPrefix)) continue;
+        if(!forms[i].classList.contains(Config.ns)) continue;
         setFormEvent(forms[i]);
         var p = document.createElement("p");
-        p.className = "hidden " + Config.classPrefix;
+        p.className = "hidden " + Config.ns;
         button = document.createElement("button");
         button.innerHTML = Config.buttonValue;
         button.type = "button";
@@ -106,7 +88,6 @@
         p.appendChild(button);
       }
     },
-
     setFormEvent = function(form) {
       var inputs = form.getElementsByTagName("input");
       for(var i = 0; i < inputs.length; i++) {
@@ -119,7 +100,6 @@
         }, false);
       }
     },
-
     performAction = function(e) {
       if(input !== null) return;
       var target = e.target || e.srcElement;
@@ -136,14 +116,16 @@
     // public
     return {
       init : function(cfg) {
-        initCfg(cfg);
+        IGCMS.initCfg(Config, cfg);
         appendButton();
-        appendStyle();
+         var css = '/* addressable.js */'
+           + ' p.addressable { padding: 1em }'
+           + ' p.addressable button, p.addressable input { padding: 0.5em 1em; font-size: inherit; width: 100%; box-sizing: border-box; line-height: 1em; max-width: 30em }';
+        appendStyle(css);
       }
     }
   };
 
-  var addressable = new Addressable();
-  win.Addressable = addressable;
+  IGCMS.Addressable = new Addressable();
 
 })(window);

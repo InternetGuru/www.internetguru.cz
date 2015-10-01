@@ -1,4 +1,5 @@
 if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
-IGCMS.Selectable.init({
-  selectTitle: "Vybrat vše"
+IGCMS.TOCable.init({
+  tocTitle: "Obsah",
+  ns: "contenttoc"
 });

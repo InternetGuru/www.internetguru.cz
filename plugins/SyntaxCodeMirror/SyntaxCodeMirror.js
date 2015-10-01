@@ -96,10 +96,10 @@
     },
     fireEvents = function() {
       cm.on("change",function(cm,change) {
-        if(!Editable) return;
-        var form = Editable.getParentForm(textarea);
-        if(!form || !form.classList.contains(Editable.getEditableClass())) return;
-        Editable.setModified();
+        if(!IGCMS.Editable) return;
+        var form = IGCMS.Editable.getParentForm(textarea);
+        if(!form || !form.classList.contains(IGCMS.Editable.getEditableClass())) return;
+        IGCMS.Editable.setModified();
       });
       win.onkeydown = function(e) {
         var key;

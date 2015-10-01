@@ -1,5 +1,7 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   var Config = {}
   Config.change = "* ";
   Config.unload_msg = "Form content has been changed.";
@@ -10,13 +12,6 @@
     // private
     var
     modified = false,
-    initCfg = function(cfg) {
-      if(typeof cfg === 'undefined') return;
-      for(var attr in cfg) {
-        if(!Config.hasOwnProperty(attr)) continue;
-        Config[attr] = cfg[attr];
-      }
-    },
     setEvents = function() {
       var forms = document.getElementsByTagName("form");
       //if(forms.length != 1) return; // multiple forms not supported
@@ -66,14 +61,13 @@
       getEditableClass : function() { return Config.editable_class; },
 
       init : function(cfg) {
-        initCfg(cfg);
+        IGCMS.initCfg(Config, cfg);
         setEvents();
         indicateChange();
       }
     }
   };
 
-  var editable = new Editable();
-  win.Editable = editable;
+  IGCMS.Editable = new Editable();
 
 })(window);

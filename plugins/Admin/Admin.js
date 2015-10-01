@@ -1,5 +1,7 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   var Config = {}
   Config.saveInactive = "Data file is inactive. Are you sure?";
 
@@ -7,13 +9,6 @@
 
       // private
       var
-      initCfg = function(cfg) {
-        if(typeof cfg === 'undefined') return;
-        for(var attr in cfg) {
-          if(!Config.hasOwnProperty(attr)) continue;
-          Config[attr] = cfg[attr];
-        }
-      },
       confirmInactive = function(e, form) {
         if(!form.classList.contains("disabled")) return true;
         if(!form["disabled"].checked) return true;
@@ -24,7 +19,7 @@
       setEvents = function() {
         var forms = document.getElementsByTagName("form");
         for(var i = 0; i < forms.length; i++) {
-          if(!forms[i].classList.contains(Editable.getEditableClass())) continue;
+          if(!forms[i].classList.contains(IGCMS.Editable.getEditableClass())) continue;
           setSaveEvents(forms[i]);
         }
       },
@@ -69,13 +64,12 @@
       // public
       return {
         init : function(cfg) {
-          initCfg(cfg);
+          IGCMS.initCfg(Config, cfg);
           setEvents();
         }
       }
    };
 
-   var admin = new Admin();
-   win.Admin = admin;
+   IGCMS.Admin = new Admin();
 
 })(window);

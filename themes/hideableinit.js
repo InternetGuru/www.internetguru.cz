@@ -1,1 +1,2 @@
-if(!Hideable || !Hideable.isInit()) Hideable.init({});
+if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+IGCMS.Hideable.init({});

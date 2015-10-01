@@ -139,7 +139,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   public function getContent(HTMLPlus $content) {
     Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
     Cms::getOutputStrategy()->addJs("
-      Admin.init({
+      if(typeof IGCMS === \"undefined\") throw \"IGCMS is not defined\";
+      IGCMS.Admin.init({
         saveInactive: '"._("Data file is inactive. Save anyways?")."'
       });
       ", 100, "body");
