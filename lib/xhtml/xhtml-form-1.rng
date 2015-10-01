@@ -197,7 +197,7 @@
 <define name="button">
   <element name="button">
     <ref name="button.attlist"/>
-    <ref name="contentElements"/>
+    <ref name="Inline.model"/>
   </element>
 </define>
 
