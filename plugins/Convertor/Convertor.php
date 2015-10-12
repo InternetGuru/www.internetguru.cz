@@ -117,7 +117,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
         throw new Exception(sprintf(_("Unable to save file %s: %s"), $this->file, $e->getMessage()));
       }
       try {
-        incrementalRename("$dest.old", "$dest.");
+        if(is_file("$dest.old")) incrementalRename("$dest.old", "$dest.");
       } catch(Exception $e) {
         throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $e->getMessage()));
       }
