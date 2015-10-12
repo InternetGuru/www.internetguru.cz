@@ -85,7 +85,10 @@
         button.type = "button";
         button.addEventListener("click", performAction, false);
         forms[i].appendChild(p);
+        input = document.createElement("input");
+        input.type = "text";
         p.appendChild(button);
+        p.appendChild(input);
       }
     },
     setFormEvent = function(form) {
@@ -101,15 +104,17 @@
       }
     },
     performAction = function(e) {
-      if(input !== null) return;
+      // if(input !== null) return;
       var target = e.target || e.srcElement;
       var b = target;
       var url = location.protocol + '//' + location.host + location.pathname + "?";
-      input = document.createElement("input");
       input.value = url + serialize(b.form);
-      b.parentNode.appendChild(input);
       b.style.display = "none";
-      input.addEventListener("focus", function(e) {target.setSelectionRange(0, target.value.length)}, false);
+      input.addEventListener("focus", function(e) {
+        e.target.setSelectionRange(0, e.target.value.length);
+        console.log("focus");
+      }, false);
+      input.style.display = "block";
       input.focus();
     };
 
@@ -120,8 +125,9 @@
         appendButton();
          var css = '/* addressable.js */'
            + ' p.addressable { padding: 1em }'
-           + ' p.addressable button, p.addressable input { padding: 0.5em 1em; font-size: inherit; width: 100%; box-sizing: border-box; line-height: 1em; max-width: 30em }';
-        appendStyle(css);
+           + ' p.addressable button, p.addressable input { padding: 0.5em 1em; font-size: inherit; width: 100%; box-sizing: border-box; line-height: 1em; max-width: 30em }'
+           + ' p.addressable input { display: none; width: 50vw; max-width: 100%; }';
+        IGCMS.appendStyle(css);
       }
     }
   };
