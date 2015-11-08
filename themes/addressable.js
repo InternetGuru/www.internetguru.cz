@@ -5,6 +5,7 @@
   var Config = {};
   Config.ns = "addressable";
   Config.buttonValue = "Get form URL";
+  Config.hint = "Ctrl+C";
 
   var Addressable = function() {
 
@@ -87,6 +88,7 @@
         forms[i].appendChild(p);
         input = document.createElement("input");
         input.type = "text";
+        input.title = Config.hint;
         p.appendChild(button);
         p.appendChild(input);
       }
@@ -97,14 +99,12 @@
         if(["text", "email", "search"].indexOf(inputs[i].type) === -1) continue;
         inputs[i].addEventListener("input", function() {
           if(input === null) return;
-          input.parentNode.removeChild(input);
-          input = null;
+          input.style.display = "none";
           button.style.display = "";
         }, false);
       }
     },
     performAction = function(e) {
-      // if(input !== null) return;
       var target = e.target || e.srcElement;
       var b = target;
       var url = location.protocol + '//' + location.host + location.pathname + "?";
@@ -112,7 +112,6 @@
       b.style.display = "none";
       input.addEventListener("focus", function(e) {
         e.target.setSelectionRange(0, e.target.value.length);
-        console.log("focus");
       }, false);
       input.style.display = "block";
       input.focus();
