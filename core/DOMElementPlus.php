@@ -244,11 +244,11 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function getParentValue($attName=null, $eName=null) {
-    if(is_null($eName)) $eName = $this->nodeName;
     $parent = $this;
     while(!is_null($parent)) {
       $parent = $parent->parentNode;
-      if(is_null($parent) || $parent->nodeName != $eName) continue;
+      if(is_null($parent)) continue;
+      if(!is_null($eName) && $parent->nodeName != $eName) continue;
       if(!is_null($attName) && $parent->hasAttribute($attName)) {
         return $parent->getAttribute($attName);
       } elseif(is_null($attName) && strlen($parent->nodeValue)) {
