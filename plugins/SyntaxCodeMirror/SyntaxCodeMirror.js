@@ -167,7 +167,7 @@
           "Ctrl-G": "gotoLine",
           "Ctrl-E": "deleteLine",
           "End": "goLineRight",
-          "Home": "goLineLeft",
+          "Home": "goLineLeftSmart",
           "Ctrl-Shift-F": function(c) {
             autoFormatSelection(c);
           },
