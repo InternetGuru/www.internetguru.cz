@@ -135,17 +135,11 @@ div.section > pre {
   margin-right: 0.7em;
 }
 
-#footer > ul.globalmenu li {
-  margin-left: 0;
-  margin-right: 0;
-}
-
 #footer ul ul li {
   margin: 0;
 }
 
 #footer > ul.globalmenu > li a {
-  padding: 0.1em 0.7em;
   display: inline-block;
 }
 
