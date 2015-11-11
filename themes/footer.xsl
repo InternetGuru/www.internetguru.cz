@@ -40,7 +40,9 @@
   <xsl:param name="inputvar-creation" select="''"/>
   <xsl:param name="inputvar-cyear" select="''"/>
   <xsl:param name="inputvar-year" select="''"/>
-  <xsl:param name="inputvar-service_html" select="''"/>
+  <xsl:param name="inputvar-service" select="''"/>
+  <xsl:param name="inputvar-resp" select="''"/>
+  <xsl:param name="inputvar-mtime" select="''"/>
 
   <xsl:variable name="copy">
     <xsl:choose>
@@ -56,15 +58,18 @@
       <div id="footer">
         <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
+          <xsl:attribute name="lang">
+            <xsl:value-of disable-output-escaping="yes" select="$cms-lang"/>
+          </xsl:attribute>
           <li><xsl:value-of disable-output-escaping="yes" select="$copy"/>&#160;<xsl:value-of disable-output-escaping="yes" select="$cms-author"/></li>
-          <xsl:if test="$inputvar-service_html">
-            <li>Na službě: <xsl:value-of disable-output-escaping="yes" select="$inputvar-service_html"/></li>
+          <xsl:if test="$inputvar-service">
+            <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-service"/></li>
           </xsl:if>
           <xsl:if test="$cms-resp">
-            <li>Zodpovídá: <xsl:value-of select="$cms-resp"/></li>
+            <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-resp"/></li>
           </xsl:if>
           <xsl:if test="$cms-mtime">
-            <li>Upraveno: <span fn="inputvar-dateformat"><xsl:value-of select="$cms-mtime"/></span></li>
+            <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-mtime"/></li>
           </xsl:if>
           <li class="print"><xsl:value-of select="$cms-uri"/></li>
         </ul>

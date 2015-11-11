@@ -50,17 +50,21 @@ class GlobalMenu extends Plugin implements SplObserver {
     return true;
   }
 
-  private function getMenu(DOMDocumentPlus $doc, DOMElement $section) {
+  private function getMenu(DOMDocumentPlus $doc, DOMElement $section, $lang=null) {
     $ul = $doc->createElement("ul");
+    if(is_null($lang)) {
+      $lang = Cms::getVariable("cms-lang");
+      $ul->setAttribute("lang", $lang); //?
+    }
     $li = null;
     $prefix = Cms::getContentFull()->documentElement->firstElement->getAttribute("link");
     foreach($section->childElementsArray as $n) {
       if($n->nodeName == "section") {
-        $menu = $this->getMenu($doc, $n);
-        if(!is_null($menu)) {
-          $li->appendChild($menu);
-        }
-        continue;
+        $menu = $this->getMenu($doc, $n, $lang);
+        if(is_null($menu)) continue;
+        $curLang = $n->firstElement->getParentValue("xml:lang");
+        if($curLang != $lang) $menu->setAttribute("lang", $curLang);
+        $li->appendChild($menu);
       }
       if($n->nodeName != "h") continue;
       $li = $doc->createElement("li");

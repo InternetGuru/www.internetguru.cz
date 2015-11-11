@@ -53,7 +53,11 @@
     <div>
       <div>
         <xsl:if test="not($contentlink-author = '')">
-          <p class="creation"><xsl:value-of disable-output-escaping="yes" select="$inputvar-creation"/></p>
+          <p class="creation"><xsl:value-of disable-output-escaping="yes" select="$inputvar-creation"/>
+            <xsl:attribute name="lang">
+              <xsl:value-of disable-output-escaping="yes" select="$cms-lang"/>
+            </xsl:attribute>
+          </p>
         </xsl:if>
         <xsl:copy-of select="."/>
         <xsl:value-of disable-output-escaping="yes" select="$contentlink-bc"/>

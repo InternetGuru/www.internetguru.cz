@@ -46,7 +46,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->handleAttribute($h1, "authorid");
     $this->handleAttribute($h1, "resp");
     $this->handleAttribute($h1, "respid");
-    $this->handleAttribute($h1->parentNode, "xml:lang", "lang", Cms::getVariable("cms-lang"));
+    $this->handleAttribute($h1->parentNode, "xml:lang", "lang", true);
 
     $content = new HTMLPlus();
     $content->formatOutput = true;
@@ -60,7 +60,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     return $content;
   }
 
-  private function handleAttribute(DOMElement $e, $aName, $vName=null, $def=null) {
+  private function handleAttribute(DOMElement $e, $aName, $vName=null, $throwNull=false) {
     if(is_null($vName)) $vName = $aName;
     if($e->hasAttribute($aName)) {
       Cms::setVariable($vName, $e->getAttribute($aName));
@@ -68,8 +68,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
     $value = $e->getAncestorValue($aName);
     if(is_null($value)) {
-      if(is_null($def)) return;
-      $value = $def;
+      if(!$throwNull) return;
+      throw new Exception("Attribute '$aName' value not found.");
     }
     $e->setAttribute($aName, $value);
     if($value == Cms::getVariable("cms-$vName")) return;
@@ -88,6 +88,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $root = $bc->appendChild($bc->createElement("root"));
     $ol = $root->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class", "contentlink-bc");
+    $cmsLang = Cms::getVariable("cms-lang");
+    $ol->setAttribute("lang", $cmsLang);
     $subtitles = array();
     $lastA = null;
     $a = null;
@@ -95,6 +97,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $h = null;
     foreach($this->hPath as $link => $h) {
       $li = $ol->insertBefore($bc->createElement("li"), $ol->firstElement);
+      $lang = $h->getParentValue("xml:lang");
+      if($lang != $cmsLang) $li->setAttribute("lang", $lang);
       $a = $li->appendChild($bc->createElement("a", $h->nodeValue));
       if(is_null($lastA)) $lastA = $a;
       if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
