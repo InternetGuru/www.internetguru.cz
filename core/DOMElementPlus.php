@@ -232,11 +232,10 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function getPreviousElement($eName=null) {
-    if(is_null($eName)) $eName = $this->nodeName;
     $e = $this->previousElement;
     if(is_null($e)) $e = $this->parentNode;
     while($e instanceof DOMElement) {
-      if($e->nodeName == $eName) return $e;
+      if(is_null($eName) || $e->nodeName == $eName) return $e;
       if(!is_null($e->previousElement)) $e = $e->previousElement;
       else $e = $e->parentNode;
     }
@@ -259,7 +258,6 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function getAncestorValue($attName=null, $eName=null) {
-    if(is_null($eName)) $eName = $this->nodeName;
     $ancestor = $this->parentNode;
     while(!is_null($ancestor)) {
       if(!is_null($attName) && $ancestor->hasAttribute($attName)) {

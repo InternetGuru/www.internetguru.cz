@@ -103,7 +103,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $vars = array();
     $desc = $h->nextElement;
     $vars['heading'] = $h->nodeValue;
-    $vars['link'] = $h->hasAttribute("link") ? $h->getAttribute("link") : $h->getAncestorValue("link")."#".$h->getAttribute("id");
+    $vars['link'] = $h->hasAttribute("link") ? $h->getAttribute("link") : $h->getAncestorValue("link", "h")."#".$h->getAttribute("id");
     $vars['headingplus'] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
     $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
     $vars['desc'] = strlen($desc->nodeValue) ? $desc->nodeValue : null;

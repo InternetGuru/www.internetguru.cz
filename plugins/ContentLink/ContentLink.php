@@ -37,8 +37,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     if($this->isRoot) return $c;
 
     $desc = $h1->nextElement;
-    if(!strlen($desc->nodeValue)) $desc->nodeValue = $desc->getAncestorValue();
-    if(!$desc->hasAttribute("kw")) $desc->setAttribute("kw", $desc->getAncestorValue("kw"));
+    if(!strlen($desc->nodeValue)) $desc->nodeValue = $desc->getAncestorValue(null, "desc");
+    if(!$desc->hasAttribute("kw")) $desc->setAttribute("kw", $desc->getAncestorValue("kw", "desc"));
 
     $this->handleAttribute($h1, "ctime");
     $this->handleAttribute($h1, "mtime");
@@ -60,17 +60,15 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     return $content;
   }
 
-  private function handleAttribute(DOMElement $e, $aName, $vName=null, $throwNull=false) {
+  private function handleAttribute(DOMElement $e, $aName, $vName=null, $anyElement=false) {
     if(is_null($vName)) $vName = $aName;
     if($e->hasAttribute($aName)) {
       Cms::setVariable($vName, $e->getAttribute($aName));
       return;
     }
-    $value = $e->getAncestorValue($aName);
-    if(is_null($value)) {
-      if(!$throwNull) return;
-      throw new Exception("Attribute '$aName' value not found.");
-    }
+    $eName = $anyElement ? null : $e->nodeName;
+    $value = $e->getAncestorValue($aName, $eName);
+    if(is_null($value)) return;
     $e->setAttribute($aName, $value);
     if($value == Cms::getVariable("cms-$vName")) return;
     Cms::setVariable($vName, $value);

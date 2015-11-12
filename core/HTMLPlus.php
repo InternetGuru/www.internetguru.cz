@@ -413,7 +413,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if($h->hasAttribute("ctime")) $ctime = $h->getAttribute("ctime");
       if($h->hasAttribute("mtime")) $mtime = $h->getAttribute("mtime");
       if(is_null($ctime) && is_null($mtime)) continue;
-      if(is_null($ctime)) $ctime = $h->getAncestorValue("ctime");
+      if(is_null($ctime)) $ctime = $h->getAncestorValue("ctime", "h");
       if(is_null($ctime)) {
         if(!$repair) throw new Exception(_("Attribute 'mtime' requires 'ctime'"));
         $ctime = $mtime;
