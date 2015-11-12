@@ -117,7 +117,7 @@ try {
       $params["path"], $params["domain"],
       $params["secure"], $params["httponly"]
     );
-    redirTo($_SERVER["REQUEST_URI"], 403, _("Invalid session cookies removed"));
+    redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
   if(!IS_LOCALHOST && !is_null(Cms::getLoggedUser()) && isset($_GET["clearcache"])) {
