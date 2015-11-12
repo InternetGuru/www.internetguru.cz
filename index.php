@@ -85,7 +85,7 @@ try {
   define('THEMES_FOLDER', USER_FOLDER."/".THEMES_DIR);
   define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
   define('CMS_VERSION_FILENAME', "VERSION");
-  define('CMS_VERSION', file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME));
+  define('CMS_VERSION', trim(file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME)));
   define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
   #print_r(get_defined_constants(true)); die();
   #todo: date_default_timezone_set()
