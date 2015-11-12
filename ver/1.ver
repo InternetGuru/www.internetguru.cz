@@ -1,4 +1,48 @@
 ----------------
+1.8.6 2015-11-11
+----------------
+
+úprava výchozích stylů, issue #21 a issue #26 (ee9ba0b)
+Codemirror: chytré tlačítko [home] (af00ffa)
+addressable.js: opravy issue #25 a issue #27 (7af0b5f, 0d9c5ed)
+přidána podpora různých jazyků obsahu (4527d64)
+Convertor: oprava pro neexistující soubory, issue #22 (3849d83)
+rng: oprava definice elementu form, issue #1 (8e0bcd0, df8c0d2)
+
+----------------
+1.8.5 2015-10-01
+----------------
+
+completable.js: šipka dolů a kliknutí otevře nabídku (e72c79f)
+admin.js: podpora igcms.js (895ed6b)
+completable.js: podpora igcms.js (1062021)
+editable.js: podpora igcms.js (4633a45)
+addressable.js: podpora igcms.js (31e9a05)
+eventable.js: podpora igcms.js (50f8c33)
+hideable.js: podpora igcms.js (35ad621)
+selectable.js: podpora igcms.js (27ca328)
+filterable.js: podpora igcms.js (1777c8f)
+toc.js: přejmenováno na tocable.js (f2e98e5)
+scrolltop.js: přejmenováno na scrolltopable.js, omezení na body.scrolltopable (f5a75ea)
+global: výchozí třída body.fragmentable (d98b66c)
+fragmentable.js: omezení na body.fragmentable (93c393b)
+fragments.js: přejmenováno na fragmentable.js, přidán igcms.js (9b9c14c)
+completable.js: nezávislost na velikosti písmen při vyplňování (093156a)
+filterable.js: třídy do elementů (124b32c, ff26946, 49d064a)
+filterable.js: oprava historie prohlížeče (addd6d5)
+Sitemap: odstraněn parametr lastmod (296dde1, 7306a12)
+filterable.js: přidána podpora GA (a595a9d)
+filterable.js: vylepšení a opravy (f66b465)
+
+----------------
+1.8.4 2015-08-24
+----------------
+
+global: drobné opravy souborů javascript (9d61b5c)
+EmailBreaker: element span místo a, přidáno podtržítko (05f268f)
+filterable.js: filtrování seznamů podle klíčových slov (06ffdbf)
+
+----------------
 1.8.3 2015-08-23
 ----------------
 
