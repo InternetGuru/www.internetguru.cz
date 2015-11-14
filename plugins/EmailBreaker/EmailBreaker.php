@@ -24,24 +24,29 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
       $pat[] = $replace->getAttribute("pattern");
       $rep[] = $replace->nodeValue;
     }
-    foreach($content->getElementsByTagName("a") as $a) {
+    $anchors = array();
+    foreach($content->getElementsByTagName("a") as $a) $anchors[] = $a;
+    foreach($anchors as $a) {
       if(strpos($a->getAttribute("href"), "mailto:") === false) continue;
       $address = substr($a->getAttribute("href"), 7);
+      $container = $content->createElement("span");
+      $container->setAttribute("class", "emailbreaker");
       $brokenAddress = $content->createElement("span");
-      $brokenAddress->setAttribute("class", "emailbreaker");
+      $brokenAddress->setAttribute("class", "addr");
       $brokenAddress->nodeValue = str_replace($pat, $rep, $address);
       if(strpos($a->nodeValue, $address) !== false) {
         $val = $a->nodeValue;
-        $a->nodeValue = "";
         foreach(explode($address, $val) as $k => $part) {
-          if($k % 2 != 0) $a->appendChild($brokenAddress);
-          $a->appendChild($a->ownerDocument->createTextNode($part));
+          if($k % 2 != 0) $container->appendChild($brokenAddress);
+          else $container->appendChild($a->ownerDocument->createTextNode($part));
         }
       }
       else {
-        $a->nodeValue .= " ";
-        $a->appendChild($brokenAddress);
+        $container->nodeValue .= $a->nodeValue." ";
+        $container->appendChild($brokenAddress);
       }
+      $a->nodeValue = "";
+      $a->appendChild($container);
       $a->stripTag();
       $appendJs = true;
     }
