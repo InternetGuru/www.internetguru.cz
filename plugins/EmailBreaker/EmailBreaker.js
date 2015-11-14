@@ -39,8 +39,9 @@
         for(var i = 0; i < Config.rep.length; i++) {
           email = email.replace(new RegExp(preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
         }
-        addr.textContent = email;
-        a.href = "mailto:" + email;
+        a.href = "mailto:" + email.replace(" ", "");
+        if(addr.classList.contains("del")) addr.parentNode.removeChild(addr);
+        else addr.textContent = email;
         span.parentNode.insertBefore(a, span);
         span.parentNode.removeChild(span);
         a.appendChild(span);

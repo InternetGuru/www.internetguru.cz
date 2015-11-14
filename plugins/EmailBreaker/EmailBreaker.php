@@ -31,19 +31,20 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
       $address = substr($a->getAttribute("href"), 7);
       $container = $content->createElement("span");
       $container->setAttribute("class", "emailbreaker");
-      $brokenAddress = $content->createElement("span");
-      $brokenAddress->setAttribute("class", "addr");
-      $brokenAddress->nodeValue = str_replace($pat, $rep, $address);
+      $spanAddr = $content->createElement("span");
+      $spanAddr->setAttribute("class", "addr");
+      $spanAddr->nodeValue = str_replace($pat, $rep, $address);
       if(strpos($a->nodeValue, $address) !== false) {
         $val = $a->nodeValue;
         foreach(explode($address, $val) as $k => $part) {
-          if($k % 2 != 0) $container->appendChild($brokenAddress);
+          if($k % 2 != 0) $container->appendChild($spanAddr);
           else $container->appendChild($a->ownerDocument->createTextNode($part));
         }
-      }
-      else {
-        $container->nodeValue .= $a->nodeValue." ";
-        $container->appendChild($brokenAddress);
+      } else {
+        $spanAddr->addClass("del");
+        $spanAddr->nodeValue = " ".$spanAddr->nodeValue;
+        $container->nodeValue = $a->nodeValue;
+        $container->appendChild($spanAddr);
       }
       $a->nodeValue = "";
       $a->appendChild($container);
