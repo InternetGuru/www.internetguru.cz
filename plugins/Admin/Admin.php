@@ -34,6 +34,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_POSTPROCESS) {
       $this->createFilepicker();
+      if(!IS_LOCALHOST) $this->checkCacheAge();
     }
     if($subject->getStatus() == STATUS_PROCESS) {
       $os = Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Admin.xsl");
@@ -94,6 +95,24 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function isPost() {
     return isset($_POST["content"], $_POST["userfilehash"], $_POST["filename"]);
+  }
+
+  private function checkCacheAge() {
+    foreach(Cms::getVariable("dombuilder-html") as $fileName) {
+      $fPath = findFile($fileName);
+      $link = DOMBuilder::getLink($fPath);
+      $newestCacheFilePath = null;
+      $newestCacheFileMod = 0;
+      foreach(getNginxCacheFiles(null, $link) as $cacheFilePath) {
+        $cacheMtime = filemtime($cacheFilePath);
+        if($cacheMtime < $newestCacheFileMod) continue;
+        $newestCacheFilePath = $cacheFilePath;
+        $newestCacheFileMod = $cacheMtime;
+      }
+      if(is_null($newestCacheFilePath)) continue; // no cache
+      if(filemtime($fPath) <= $newestCacheFileMod) continue; // cache is younger then file
+      Cms::addMessage(sprintf(_("Cache is older than file %s"), $fileName), Cms::MSG_WARNING);
+    }
   }
 
   private function getFilesRecursive($folder, $prefix = "") {

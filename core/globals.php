@@ -505,24 +505,25 @@ function apc_get_path($key) {
 }
 
 function clearNginxCache($folder = null) {
-  $passed = true;
+  foreach(getNginxCacheFiles() as $fPath) {
+    if(!unlink($fPath)) throw new Exception(_("Failed to purge cache"));
+  }
+}
+
+function getNginxCacheFiles($folder = null, $link = "") {
   if(is_null($folder)) $folder = NGINX_CACHE_FOLDER;
+  $fPaths = array();
   foreach(scandir($folder) as $f) {
     if(strpos($f, ".") === 0) continue;
     $ff = "$folder/$f";
     if(is_dir($ff)) {
-      try {
-        clearNginxCache($ff);
-      } catch(Exception $e) {
-        $passed = false;
-      }
+      $fPaths = array_merge($fPaths, getNginxCacheFiles($ff, $link));
       continue;
     }
-    if(!empty(preg_grep("/KEY: https?".HOST."/", file($ff)))) {
-      if(!unlink($ff)) $passed = false;
-    }
+    if(empty(preg_grep("/KEY: https?".HOST."/$link", file($ff)))) continue;
+    $fPaths[] = $ff;
   }
-  if(!$passed) throw new Exception(_("Failed to purge cache"));
+  return $fPaths;
 }
 
 function getIP() {
