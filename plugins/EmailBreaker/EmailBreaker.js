@@ -14,24 +14,17 @@
           Config[attr] = cfg[attr];
         }
       },
-      unwrap = function(el) {
-        var parent = el.parentNode;
-        while (el.firstChild) parent.insertBefore(el.firstChild, el);
-        parent.removeChild(el);
-      },
       createEmails = function() {
         var spans = document.getElementsByTagName("span");
         var toUnwrap = [];
         for(var i = 0; i < spans.length; i++) {
           if(!spans[i].classList.contains("emailbreaker")) continue;
-          var addrs = spans[i].querySelectorAll(".addr");
+          var addrs = spans[i].getElementsByTagName("span");
           for(var j = 0; j < addrs.length; j++) {
+            if(!addrs[j].classList.contains("addr")) continue;
             createEmailLink(spans[i], addrs[j]);
-            toUnwrap.push(addrs[j]);
           }
-          unwrap(spans[i]);
         }
-        for(var i = 0; i < toUnwrap.length; i++) unwrap(toUnwrap[i]);
       },
       createEmailLink = function(span, addr) {
         var a = document.createElement("a");
