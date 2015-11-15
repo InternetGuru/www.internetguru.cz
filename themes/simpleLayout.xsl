@@ -43,6 +43,16 @@
       <xsl:attribute name="class">
          <xsl:value-of select="concat(@class,' fragmentable scrolltopable')"/>
       </xsl:attribute>
+      <xsl:text disable-output-escaping="yes">&lt;!--[if lte IE 7]&gt;</xsl:text>
+      <div class="old-ie-warning" style="background:#333;color:white;padding:1em 2em">
+        <p>Upozornění: <strong>Používáte zastaralou verzi prohlížeče!</strong> Pro pohodlné prohlížení internetu:</p>
+        <ul>
+          <li><a style="color:skyblue" href="http://windows.microsoft.com/cs-cz/internet-explorer/download-ie">aktualizujte</a> na vyšší verzi,</li>
+          <li>nainstalujte <a style="color:skyblue" href="https://www.google.com/chrome">alternativní prohlížeč</a> nebo</li>
+          <li>kontaktujte správce svého počítače.</li>
+        </ul>
+      </div>
+      <xsl:text disable-output-escaping="yes">&lt;![endif]]]--&gt;</xsl:text>
       <div id="content">
         <xsl:apply-templates/>
       </div>
