@@ -8,6 +8,7 @@
   <xsl:param name="cms-clearcacheurl" select="''"/>
   <xsl:param name="cms-name" select="''"/>
   <xsl:param name="cms-link" select="''"/>
+  <xsl:param name="inputvar-reportbug" select="''"/>
   <xsl:param name="filehandler-cfcurl" select="''"/>
 
   <xsl:template match="/">
@@ -64,6 +65,9 @@
               <xsl:text>Smazat dočasné soubory</xsl:text>
             </xsl:element>
           </li>
+        </xsl:if>
+        <xsl:if test="$inputvar-reportbug">
+          <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-reportbug"/></li>
         </xsl:if>
         <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
         <li><xsl:value-of select="$cms-name"/></li>
