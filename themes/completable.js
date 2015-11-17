@@ -206,6 +206,7 @@
         r.defaultVal = f.defaultVal;
         r.path = f.path;
         r.user = f.user;
+        r.disable = f.disable;
         return r;
       } catch(e) {}
     },
@@ -224,6 +225,7 @@
         }
         li.innerHTML = fs[i].val;
         if(fs[i].user) li.classList.add("user");
+        if(fs[i].disable) li.classList.add("disabled");
         li.dataset.path = fs[i].path;
         li.dataset.val = fs[i].defaultVal;
         li.onmousedown = (function() {
@@ -271,7 +273,8 @@
         priority: 0,
         val: val,
         defaultVal: val,
-        user: val.indexOf("#user") !== -1
+        user: val.indexOf("#user") !== -1,
+        disable: val.indexOf("#disabled") !== -1
       })
     }
     toInit.push({files: files, navig: s });
@@ -285,7 +288,9 @@
       + ' ul.navigList li:hover { background: #eee; cursor: pointer; }'
       + ' ul.navigList li.active { background: #ddd; }'
       + ' ul.navigList li.user { background: #E7F6FE; }'
-      + ' ul.navigList li.user.active, ul.navigList li.user:hover { background: #D4E5EE; }';
+      + ' ul.navigList li.disabled { background: #ccc; }'
+      + ' ul.navigList li.user.active, ul.navigList li.user:hover { background: #D4E5EE; }'
+      + ' ul.navigList li.disabled.active, ul.navigList li.disabled:hover { background: #bbb; }';
     IGCMS.appendStyle(css);
   }
 
