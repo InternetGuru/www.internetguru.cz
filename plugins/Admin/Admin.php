@@ -118,11 +118,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function getFilesRecursive($folder, $prefix = "") {
     $files = array();
     foreach(scandir($folder) as $f) {
-      if(strpos($f, ".") === 0) continue;
+      if($f == "." || $f == "..") continue;
       if(is_dir($folder."/".$f))
         $files = array_merge($files, $this->getFilesRecursive($folder."/$f", $prefix."$f/"));
       else
-        $files[] = $prefix.$f;
+        $files[$prefix.$f] = $prefix.$f;
     }
     return $files;
   }
@@ -135,7 +135,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     );
     $files= array();
     foreach ($paths as $path => $prefix) $files = array_unique(array_merge($files, $this->getFilesRecursive($path, $prefix)));
-    foreach ($files as $k => $f) if(!preg_match("/(\.html|\.xml|\.xsl)$/", $f)) unset($files[$k]);
+    foreach ($files as $k => $f) {
+      if(!preg_match("/(\.html|\.xml|\.xsl)$/", $f)) unset($files[$k]);
+      if(isset($files[".$f"])) unset($files[$k]);
+    }
     $files = array_merge($files, Cms::getVariable("htmloutput-javascripts"));
     $files = array_merge($files, Cms::getVariable("htmloutput-styles"));
 
@@ -144,11 +147,19 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     usort($files, "strnatcmp");
     foreach($files as $f) {
       $option = $dom->createElement("option");
-      $option->setAttribute("value", $f);
-      $v = basename($f)." $f";
+      $disabled = false;
+      $fName = $f;
+      if(strpos(basename($f), ".") === 0) {
+        $disabled = true;
+        $dirname = dirname($f) == "." ? "" : dirname($f)."/";
+        $fName = $dirname.substr(basename($f), 1);
+      }
+      $option->setAttribute("value", $fName);
+      $v = basename($fName)." $fName";
       if(is_file(CMS_FOLDER."/$f")) $v .= " #default";
       if(is_file(ADMIN_FOLDER."/$f")) $v .= " #admin";
       if(is_file(USER_FOLDER."/$f")) $v .= " #user";
+      if($disabled) $v .= " #disabled";
       $option->nodeValue = $v;
       $var->appendChild($option);
     }
