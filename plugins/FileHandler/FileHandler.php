@@ -11,11 +11,11 @@ class FileHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
-    if(!is_null(Cms::getLoggedUser()) && isset($_GET[self::CLEAR_CACHE_PARAM])) {
-      if(!Cms::isSuperUser()) Logger::log(_("Insufficient rights to purge file cache"), Logger::LOGGER_WARNING);
+    if(Cms::isSuperUser()) {
       try {
-        $this->deleteResources();
-        Logger::log(_("Outdated files successfully removed"), Logger::LOGGER_SUCCESS);
+        $this->checkResources();
+        if(isset($_GET[self::CLEAR_CACHE_PARAM]))
+          Logger::log(_("Outdated files successfully removed"), Logger::LOGGER_SUCCESS);
       } catch(Exception $e) {
         Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
       }
@@ -41,25 +41,25 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
-  private function deleteResources() {
+  private function checkResources() {
     $dirs = array(THEMES_DIR => false, PLUGINS_DIR => false, LIB_DIR => false, FILES_DIR => true);
     $e = null;
     foreach($dirs as $dir => $checkSource) {
       try {
-        $this->doDeleteResources($dir, $checkSource);
+        $this->doCheckResources($dir, $checkSource);
       } catch(Exception $e) {}
     }
     if(!is_null($e)) throw new Exception($e->getMessage());
   }
 
-  private function doDeleteResources($folder, $checkSource) {
+  private function doCheckResources($folder, $checkSource) {
     $passed = true;
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $ff = "$folder/$f";
       if(is_dir($ff)) {
         try {
-          $this->doDeleteResources($ff, $checkSource);
+          $this->doCheckResources($ff, $checkSource);
         } catch(Exception $e) {
           $passed = false;
         }
@@ -69,9 +69,12 @@ class FileHandler extends Plugin implements SplObserver {
       if(is_null($filePath) && $checkSource) $filePath = getSourceFile($ff);
       if(is_file(RESOURCES_DIR."/$ff")) $mtime = filemtime(RESOURCES_DIR."/$ff");
       else $mtime = filemtime($ff);
-      if(is_null($filePath) || $mtime != filemtime($filePath)) {
+      if(!is_null($filePath) && $mtime >= filemtime($filePath)) continue;
+      if(isset($_GET[self::CLEAR_CACHE_PARAM])) {
         if(!unlink($ff)) $passed = false;
         if(is_file(RESOURCES_DIR."/$ff") && !unlink(RESOURCES_DIR."/$ff")) $passed = false;
+      } else {
+        Cms::addMessage(sprintf(_("File cache is outdated: %s"), stripDataFolder($filePath)), Cms::MSG_WARNING);
       }
     }
     if(!$passed) throw new Exception(_("Failed to remove outdated file(s)"));

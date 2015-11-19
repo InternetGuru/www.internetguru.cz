@@ -446,7 +446,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if($if)
       $parent->appendChild($parent->ownerDocument->createComment("[if $if]>".$e->ownerDocument->saveXML($e)."<![endif]"));
     else $parent->appendChild($e);
-    $this->checkResAge($file);
   }
 
   /**
@@ -540,15 +539,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         $parent->appendChild($parent->ownerDocument->createComment("[if $if]>".$e->ownerDocument->saveXML($e)."<![endif]"));
       } else
         $parent->appendChild($e);
-      $this->checkResAge($filePath);
     }
-  }
-
-  private function checkResAge($filePath) {
-    if(!file_exists($filePath)) return;
-    $srcFile = getSourceFile($filePath);
-    if(filemtime($filePath) >= filemtime($srcFile)) return;
-    Cms::addMessage(sprintf(_("File cache is outdated: %s"), $filePath), Cms::MSG_WARNING);
   }
 
   private function validateEmptyContent(DOMDocument $doc) {
