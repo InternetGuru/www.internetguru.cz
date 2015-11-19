@@ -446,6 +446,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if($if)
       $parent->appendChild($parent->ownerDocument->createComment("[if $if]>".$e->ownerDocument->saveXML($e)."<![endif]"));
     else $parent->appendChild($e);
+    $this->checkResAge($file);
   }
 
   /**
@@ -529,16 +530,25 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
-      $resRoot = ROOT_URL;
-      if(useGruntRes()) $resRoot .= RESOURCES_DIR."/";
-      if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", $resRoot.$this->jsFiles[$k]["file"]);
+      $filePath = "";
+      if(isGruntOff()) $filePath .= RESOURCES_DIR."/";
+      $filePath .= $this->jsFiles[$k]["file"];
+      if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", ROOT_URL.$filePath);
       $if = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : false;
       if($if) {
         $e->nodeValue = " ";
         $parent->appendChild($parent->ownerDocument->createComment("[if $if]>".$e->ownerDocument->saveXML($e)."<![endif]"));
       } else
         $parent->appendChild($e);
+      $this->checkResAge($filePath);
     }
+  }
+
+  private function checkResAge($filePath) {
+    if(!file_exists($filePath)) return;
+    $srcFile = getSourceFile($filePath);
+    if(filemtime($filePath) >= filemtime($srcFile)) return;
+    Cms::addMessage(sprintf(_("File cache is outdated: %s"), $filePath), Cms::MSG_WARNING);
   }
 
   private function validateEmptyContent(DOMDocument $doc) {
@@ -595,7 +605,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($this->cssFilesPriority as $k => $v) {
       $if = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : false;
       $filePath = $this->cssFiles[$k]["file"];
-      if(useGruntRes()) $filePath = RESOURCES_DIR."/$filePath";
+      if(isGruntOff()) $filePath = RESOURCES_DIR."/$filePath";
       $this->appendLinkElement($parent, $filePath, "stylesheet", "text/css",
         $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], true, $if);
     }

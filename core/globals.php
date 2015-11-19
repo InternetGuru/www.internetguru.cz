@@ -542,7 +542,21 @@ function getIP() {
   return $_SERVER['REMOTE_ADDR'];
 }
 
-function useGruntRes() {
+function getSourceFile($dest, &$mode=null) {
+  $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
+  $pLink = explode("/", $dest);
+  if(count($pLink) > 2) {
+    if(!is_null($mode)) $mode = $pLink[1];
+    if(is_null($src)) {
+      unset($pLink[1]);
+      $dest = implode("/", $pLink);
+      $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
+    }
+  }
+  return $src;
+}
+
+function isGruntOff() {
   if(IS_LOCALHOST) return false;
   if(is_null(Cms::getLoggedUser())) return false;
   return isset($_GET["Grunt"]) && $_GET["Grunt"] == "off";

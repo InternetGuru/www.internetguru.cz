@@ -66,7 +66,7 @@ class FileHandler extends Plugin implements SplObserver {
         continue;
       }
       $filePath = findFile($ff, true, true, false);
-      if(is_null($filePath) && $checkSource) $filePath = $this->getSourceFile($ff);
+      if(is_null($filePath) && $checkSource) $filePath = getSourceFile($ff);
       if(is_file(RESOURCES_DIR."/$ff")) $mtime = filemtime(RESOURCES_DIR."/$ff");
       else $mtime = filemtime($ff);
       if(is_null($filePath) || $mtime != filemtime($filePath)) {
@@ -77,23 +77,9 @@ class FileHandler extends Plugin implements SplObserver {
     if(!$passed) throw new Exception(_("Failed to remove outdated file(s)"));
   }
 
-  private function getSourceFile($dest, &$mode=null) {
-    $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
-    $pLink = explode("/", $dest);
-    if(count($pLink) > 2) {
-      if(!is_null($mode)) $mode = $pLink[1];
-      if(is_null($src)) {
-        unset($pLink[1]);
-        $dest = implode("/", $pLink);
-        $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
-      }
-    }
-    return $src;
-  }
-
   private function handleFile($dest) {
     $mode = "";
-    $src = $this->getSourceFile($dest, $mode);
+    $src = getSourceFile($dest, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
     $fp = lockFile("$src.lock");
     try {
