@@ -58,6 +58,16 @@
   <var id="cyear" fn="yearformat" var="cms-ctime"/>
   <var id="year" fn="yearformat">now</var>
   <var id="today" fn="dateformat">now</var>
+  <var id="ielt7">
+    <div class="ielte7" style="background: yellow; margin: 0; border: 0.3em solid red;">
+      <dl>
+        <dt>Používáte zastaralou verzi prohlížeče!</dt>
+        <dd><a href="http://windows.microsoft.com/cs-cz/internet-explorer/download-ie">Aktualizujte</a> na vyšší verzi,</dd>
+        <dd>nainstalujte <a href="https://www.google.com/chrome">alternativní prohlížeč</a> nebo</dd>
+        <dd>kontaktujte správce svého počítače.</dd>
+      </dl>
+    </div>
+  </var>
 
 
   <!--

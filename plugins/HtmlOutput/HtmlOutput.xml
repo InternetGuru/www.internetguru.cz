@@ -7,6 +7,7 @@
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/basicLayout.xsl</xslt>
       <xslt>themes/footer.xsl</xslt>
+      <xslt>themes/ielte7.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
       <stylesheet media="screen">themes/basic.css</stylesheet>
     </theme>
@@ -14,6 +15,7 @@
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/simpleLayout.xsl</xslt>
       <xslt>themes/footer.xsl</xslt>
+      <xslt>themes/ielte7.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
       <stylesheet media="screen">themes/simple.css</stylesheet>
     </theme>
