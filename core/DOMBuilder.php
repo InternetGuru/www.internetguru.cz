@@ -17,6 +17,11 @@ class DOMBuilder {
   private static $linkToId = array(); // link => id
   private static $linkToFile = array(); // link => filepath
   private static $defaultPrefix = null;
+  private static $newestCacheMtime = null;
+
+  public static function setCacheMtime($mTime) {
+    self::$newestCacheMtime = $mTime;
+  }
 
   public static function buildHTMLPlus($filePath, $user=true) {
     $doc = new HTMLPlus();
@@ -199,16 +204,47 @@ class DOMBuilder {
   }
 
   private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $included=false) {
-    $fShort = stripDataFolder($filePath);
-    if($doc instanceof HTMLPlus) {
-      if(array_key_exists($filePath, self::$included))
-        throw new Exception(sprintf(_("File '%s' already included"), $fShort));
-      self::$included[$filePath] = null;
-      Cms::addVariableItem("html", $fShort);
-    }
     if(is_file(dirname($filePath)."/.".basename($filePath)))
       throw new Exception(sprintf(_("File disabled")));
+    if($doc instanceof HTMLPlus)
+      $mTime = self::loadHTMLPlusDOM($filePath, $doc, $author, $included);
+    else $mTime = self::loadXMLDOM($filePath, $doc);
+    if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
+    Cms::addMessage(sprintf(_("Cache is older than %s"), stripDataFolder($filePath)), Cms::MSG_WARNING);
+  }
 
+  private static function loadXMLDOM($filePath, DOMDocumentPlus $doc) {
+    $fShort = stripDataFolder($filePath);
+    #todo: Cms::addVariableItem(file_extension, $fShort);
+    #Cms::addVariableItem("html", $fShort);
+    $fInfo = self::getCache(self::getCacheKey($filePath), $filePath);
+    if(!is_null($fInfo)) {
+      $doc->loadXML($fInfo["xml"]);
+      return $fInfo["mtime"];
+    }
+    if(!@$doc->load($filePath))
+      throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
+    $mTime = filemtime($filePath);
+    $fInfo = array(
+      "mtime" => $mTime,
+      "xml" => $doc->saveXML()
+    );
+    self::saveCache($filePath, $fInfo);
+    return $mTime;
+  }
+
+  private static function saveCache($filePath, $fInfo) {
+    $fShort = stripDataFolder($filePath);
+    $stored = apc_store(self::getCacheKey($filePath), $fInfo, rand(3600*24*30*3, 3600*24*30*6));
+    if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
+  }
+
+  private static function loadHTMLPlusDOM($filePath, DOMDocumentPlus $doc, $author=null, $included=false) {
+    $fShort = stripDataFolder($filePath);
+    if(array_key_exists($filePath, self::$included))
+      throw new Exception(sprintf(_("File '%s' already included"), $fShort));
+    self::$included[$filePath] = null;
+    Cms::addVariableItem("html", $fShort);
     $fInfo = self::getCache(self::getCacheKey($filePath), $filePath);
     if(!is_null($fInfo)) {
       if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
@@ -222,13 +258,12 @@ class DOMBuilder {
       self::$linkToDesc = array_merge(self::$linkToDesc, $fInfo["linktodesc"]);
       self::$linkToTitle = array_merge(self::$linkToTitle, $fInfo["linktotitle"]);
       self::$linkToFile = array_merge(self::$linkToFile, $fInfo["linktofile"]);
-      return;
+      return $fInfo["mtime"];
     }
 
     // load
     if(!@$doc->load($filePath))
-      throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
-    if(!($doc instanceof HTMLPlus)) return;
+      throw new Exception(sprintf(_("Invalid HTMLPlus file %s"), $fShort));
     // validate, save if repaired
     $c = new DateTime();
     $c->setTimeStamp(filectime($filePath));
@@ -246,7 +281,8 @@ class DOMBuilder {
       }
     }
     // generate ctime/mtime from file if not set
-    self::setMtime($doc, $filePath);
+    $mTime = filemtime($filePath);
+    self::setMtime($doc, $mTime);
 
     // HTML+ include
     $inclDom = array();
@@ -265,7 +301,7 @@ class DOMBuilder {
       }
     } else $storeCache = false;
     // register links/ids; repair if duplicit
-    if($included) return;
+    if($included) return $mTime;
     if(!self::setIdentifiers($doc, $filePath, $fShort)) $storeCache = false;
     foreach($toStrip as $include) $include->stripTag();
     #var_dump(self::$idToLink);
@@ -273,9 +309,9 @@ class DOMBuilder {
     #var_dump(self::$linkToId);
     #var_dump(self::$linkToDesc);
     #var_dump(self::$linkToTitle);
-    if(!$storeCache) return;
+    if(!$storeCache) return $mTime;
     $fInfo = array(
-      "mtime" => filemtime($filePath),
+      "mtime" => $mTime,
       "includes" => $inclSrc,
       "idtolink" => end(self::$idToLink),
       "prefix" => key(self::$idToLink),
@@ -285,8 +321,8 @@ class DOMBuilder {
       "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
       "xml" => $doc->saveXML()
     );
-    $stored = apc_store(self::getCacheKey($filePath), $fInfo, rand(3600*24*30*3, 3600*24*30*6));
-    if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
+    self::saveCache($filePath, $fInfo);
+    return $mTime;
   }
 
   private static function getCacheKey($filePath) {
@@ -297,6 +333,7 @@ class DOMBuilder {
     if(!apc_exists($cacheKey)) return null;
     $fInfo = apc_fetch($cacheKey);
     if($fInfo["mtime"] != filemtime($filePath)) return null;
+    if(!array_key_exists("includes", $fInfo)) return $fInfo;
     foreach($fInfo["includes"] as $file => $mtime) {
       if($mtime != filemtime($file)) return null;
       if(isset(self::$included[$file])) return null;
@@ -400,12 +437,12 @@ class DOMBuilder {
     return $val.$i;
   }
 
-  private static function setMtime(HTMLPlus $doc, $filePath) {
+  private static function setMtime(HTMLPlus $doc, $mTime) {
     $h = $doc->documentElement->firstElement;
     if($h->hasAttribute("mtime")) return;
     if(!$h->hasAttribute("ctime")) return;
     $m = new DateTime();
-    $m->setTimeStamp(filemtime($filePath));
+    $m->setTimeStamp($mTime);
     $c = new DateTime($h->getAttribute("ctime"));
     if($c > $m) return;
     $h->setAttribute("mtime", $m->format(DateTime::W3C));

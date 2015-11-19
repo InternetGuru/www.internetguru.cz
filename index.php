@@ -144,6 +144,8 @@ try {
   }
 
   $start_time = microtime(true);
+  if(!IS_LOCALHOST && Cms::isSuperUser()) DOMBuilder::setCacheMtime(getNewestCacheMtime());
+
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();

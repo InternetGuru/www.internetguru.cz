@@ -501,7 +501,7 @@ if(!function_exists("apc_store")) {
 function apc_get_path($key) {
   $apcDir = getcwd()."/../tmp_apc/";
   mkdir_plus($apcDir);
-  return $apcDir.normalize($key, null, "+");
+  return $apcDir.normalize($key, "a-zA-Z0-9_.-", "+");
 }
 
 function clearNginxCache($folder = null) {
@@ -524,6 +524,16 @@ function getNginxCacheFiles($folder = null, $link = "") {
     $fPaths[] = $ff;
   }
   return $fPaths;
+}
+
+function getNewestCacheMtime() {
+  $newestCacheMtime = null;
+  foreach(getNginxCacheFiles() as $cacheFilePath) {
+    $cacheMtime = filemtime($cacheFilePath);
+    if($cacheMtime < $newestCacheMtime) continue;
+    $newestCacheMtime = $cacheMtime;
+  }
+  return $newestCacheMtime;
 }
 
 function getIP() {
