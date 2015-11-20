@@ -224,6 +224,16 @@ function file_put_contents_plus($dest, $string) {
   copy_plus("$dest.new", $dest, false);
 }
 
+function removeResourceFileCache($filePath) {
+  $resFile = RESOURCES_DIR."/".$filePath;
+  try {
+    if(is_file($resFile) && !unlink($resFile)) throw new Exception($resFile);
+    if(is_file($filePath) && !unlink($filePath)) throw new Exception($filePath);
+  } catch(Exception $e) {
+    throw new Exception(sprintf(_("Unable to remove cache file %s"), $e->getMessage()));
+  }
+}
+
 function copy_plus($src, $dest, $keepSrc = true) {
   if(is_link($src)) throw new Exception(_("Source file is a link"));
   if(!is_file($src)) throw new Exception(_("Source file not found"));
@@ -540,20 +550,6 @@ function getIP() {
   if(!empty($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
   if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
   return $_SERVER['REMOTE_ADDR'];
-}
-
-function getSourceFile($dest, &$mode=null) {
-  $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
-  $pLink = explode("/", $dest);
-  if(count($pLink) > 2) {
-    if(!is_null($mode)) $mode = $pLink[1];
-    if(is_null($src)) {
-      unset($pLink[1]);
-      $dest = implode("/", $pLink);
-      $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
-    }
-  }
-  return $src;
 }
 
 function isGruntOff() {

@@ -1,6 +1,7 @@
 <?php
 
 class FileHandler extends Plugin implements SplObserver {
+  const DEBUG = false;
   const CLEAR_CACHE_PARAM = "clearfilecache";
 
   public function __construct(SplSubject $s) {
@@ -10,8 +11,7 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_PREINIT) return;
-    if(Cms::isSuperUser()) {
+    if($subject->getStatus() == STATUS_PROCESS && Cms::isSuperUser()) {
       try {
         $this->checkResources();
         if(isset($_GET[self::CLEAR_CACHE_PARAM]))
@@ -20,6 +20,7 @@ class FileHandler extends Plugin implements SplObserver {
         Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
       }
     }
+    if($subject->getStatus() != STATUS_PREINIT) return;
     $filePath = getCurLink();
     if(!preg_match("/".FILEPATH_PATTERN."/", $filePath)) {
       Cms::setVariable("cfcurl", "$filePath?".self::CLEAR_CACHE_PARAM);
@@ -53,36 +54,54 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function doCheckResources($folder, $checkSource) {
-    $passed = true;
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $ff = "$folder/$f";
       if(is_dir($ff)) {
-        try {
-          $this->doCheckResources($ff, $checkSource);
-        } catch(Exception $e) {
-          $passed = false;
-        }
+        $this->doCheckResources($ff, $checkSource);
+        if(count(scandir($ff)) == 2) rmdir($ff);
         continue;
       }
       $filePath = findFile($ff, true, true, false);
-      if(is_null($filePath) && $checkSource) $filePath = getSourceFile($ff);
+      if(is_null($filePath) && $checkSource) $filePath = $this->getSourceFile($ff);
       if(is_file(RESOURCES_DIR."/$ff")) $mtime = filemtime(RESOURCES_DIR."/$ff");
       else $mtime = filemtime($ff);
-      if(!is_null($filePath) && $mtime >= filemtime($filePath)) continue;
+      if(!is_null($filePath) && $mtime == filemtime($filePath)) continue;
       if(isset($_GET[self::CLEAR_CACHE_PARAM])) {
-        if(!unlink($ff)) $passed = false;
-        if(is_file(RESOURCES_DIR."/$ff") && !unlink(RESOURCES_DIR."/$ff")) $passed = false;
+        try {
+          removeResourceFileCache($ff);
+        } catch(Exception $e) {
+          Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+        }
       } else {
-        Cms::addMessage(sprintf(_("File cache is outdated: %s"), stripDataFolder($filePath)), Cms::MSG_WARNING);
+        if(self::DEBUG && !is_null($filePath)) {
+          Cms::addMessage(sprintf("%s:%s | %s:%s", $ff, $mtime, $filePath, filemtime($filePath)), Cms::MSG_WARNING);
+        } elseif(is_null($filePath)) {
+          Cms::addMessage(sprintf(_("Redundant cache file: %s"), $ff), Cms::MSG_WARNING);
+        } else {
+          Cms::addMessage(sprintf(_("File cache is outdated: %s"), $ff), Cms::MSG_WARNING);
+        }
       }
     }
-    if(!$passed) throw new Exception(_("Failed to remove outdated file(s)"));
+  }
+
+  private function getSourceFile($dest, &$mode=null) {
+    $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
+    $pLink = explode("/", $dest);
+    if(count($pLink) > 2) {
+      if(!is_null($mode)) $mode = $pLink[1];
+      if(is_null($src)) {
+        unset($pLink[1]);
+        $dest = implode("/", $pLink);
+        $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
+      }
+    }
+    return $src;
   }
 
   private function handleFile($dest) {
     $mode = "";
-    $src = getSourceFile($dest, $mode);
+    $src = $this->getSourceFile($dest, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
     $fp = lockFile("$src.lock");
     try {
@@ -119,7 +138,9 @@ class FileHandler extends Plugin implements SplObserver {
       if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
       if(IS_LOCALHOST || !$this->isResource($src)) {
-        $this->copy_mtime($src, $dest);
+        if(is_file($dest)) return;
+        copy_plus($src, $dest);
+        touch($dest, filemtime($src));
         return;
       }
       $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
@@ -137,7 +158,10 @@ class FileHandler extends Plugin implements SplObserver {
         unlink(RESOURCES_DIR."/$dest");
       }
       unlockFile($rfp);
-      $this->copy_mtime($src, RESOURCES_DIR."/$dest");
+      if(!is_file(RESOURCES_DIR."/$dest")) {
+        copy_plus($src, RESOURCES_DIR."/$dest");
+        touch(RESOURCES_DIR."/$dest", filemtime($src));
+      }
       usleep(rand(5,15)*100000);
     } catch(Exception $e) {
       throw $e;
@@ -145,14 +169,6 @@ class FileHandler extends Plugin implements SplObserver {
       unlockFile($fp);
       unlink("$src.lock");
     }
-  }
-
-  private function copy_mtime($src, $dest) {
-    if(!is_link($dest) && is_file($dest) &&
-      filemtime($src) == filemtime($dest)) return;
-    copy_plus($src, $dest);
-    if(!touch($dest, filemtime($src)))
-      throw new Exception(_("Unable to touch destination file"));
   }
 
   private function isResource($src) {
@@ -167,10 +183,12 @@ class FileHandler extends Plugin implements SplObserver {
       if($fileSize > $mode[2])
         throw new Exception(sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($mode[2])));
       copy_plus($src, $dest);
+      touch($dest, filemtime($src));
       return;
     }
     if($mode[0] == 0 && $mode[1] == 0) {
       copy_plus($src, $dest);
+      touch($dest, filemtime($src));
       return;
     }
     $im = new Imagick($src);

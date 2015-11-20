@@ -13,6 +13,7 @@ class Cms {
   private static $warning = false;
   private static $info = false;
   private static $success = false;
+  private static $requestToken = null;
   const DEBUG = false;
   const MSG_ERROR = "Error";
   const MSG_WARNING = "Warning";
@@ -76,7 +77,12 @@ class Cms {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
     if(is_null(self::$flashList)) self::createFlashList();
     foreach($_SESSION["cms"]["flash"] as $type => $item) {
-      foreach($item as $i) self::addFlashItem($i, $type);
+      foreach($item as $token => $messages) {
+        foreach($messages as $message) {
+          if($token != self::$requestToken) $message = "$message (session)";
+          self::addFlashItem($message, $type);
+        }
+      }
     }
     $_SESSION["cms"]["flash"] = array();
   }
@@ -182,8 +188,9 @@ class Cms {
   }
 
   public static function addMessage($message, $type) {
+    if(is_null(self::$requestToken)) self::$requestToken = rand();
     if(Cms::isSuperUser()) {
-      $_SESSION["cms"]["flash"][$type][] = $message;
+      $_SESSION["cms"]["flash"][$type][self::$requestToken][] = $message;
       return;
     }
     if(is_null(self::$flashList)) self::createFlashList();
