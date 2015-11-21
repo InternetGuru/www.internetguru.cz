@@ -43,10 +43,11 @@ form dt, form dt+dd+dd {
 
 form dd > input[type="text"],
 form dd > input[type="email"] {
-  border: none;
+  border-top: none;
+  border-right: none;
+  border-left: none;
   width: 100%;
   max-width: 25em;
-  border-bottom: 0.1em solid;
 }
 
 form fieldset {
@@ -268,6 +269,7 @@ input[type="checkbox"],
 input[type="radio"] {
   box-sizing: border-box; /* 1 */
   padding: 0; /* 2 */
+  margin-right: 0.3em;
 }
 
 /**
