@@ -10,7 +10,7 @@ version="$(basename "$PWD")"
 domains="$(find /var/www/domains -type f -name VERSION.$version)"
 echo
 echo -e "${BWhite}Running .git/hooks/post-merge$NC"
-[[ -z $changed_files ]] && echo "There are no resources to delete"
+[ -z "$changed_files" ] && echo "There are no resources to delete" && exit
 echo "Removing changed resources from domains"
 
 for domain in $domains; do
