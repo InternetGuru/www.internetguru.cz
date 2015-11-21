@@ -9,7 +9,7 @@ changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | gr
 version="$(basename "$PWD")"
 domains="$(find /var/www/domains -type f -name VERSION.$version)"
 echo
-echo -e "Running .git/hooks/post-merge"
+echo "Running .git/hooks/post-merge"
 [ -z "$changed_files" ] && echo "There are no resources to delete" && exit
 echo "Removing changed resources from domains"
 
