@@ -343,7 +343,7 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function storeCache($key, $value, $name) {
-    $stored = apc_store($key, $value, rand(3600*24*30*3, 3600*24*30*6));
+    $stored = apc_store("1/$key", $value, rand(3600*24*30*3, 3600*24*30*6));
     if(!$stored) Logger::log(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
   }
 

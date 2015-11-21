@@ -326,7 +326,7 @@ class DOMBuilder {
   }
 
   private static function getCacheKey($filePath) {
-    return HOST."/$filePath";
+    return "1/".HOST."$filePath";
   }
 
   private static function getCache($cacheKey, $filePath) {
