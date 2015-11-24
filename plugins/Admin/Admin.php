@@ -103,10 +103,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $files = array();
     foreach(scandir($folder) as $f) {
       if($f == "." || $f == "..") continue;
-      if(is_dir($folder."/".$f))
+      if(is_dir($folder."/".$f)) {
+        if(substr($f, 0, 1) == ".") continue;
         $files = array_merge($files, $this->getFilesRecursive($folder."/$f", $prefix."$f/"));
-      else
-        $files[$prefix.$f] = $prefix.$f;
+        continue;
+      }
+      if(!in_array(pathinfo($f, PATHINFO_EXTENSION), array("html", "xml", "xsl", "js", "css"))) continue;
+      if(substr($f, 0, 1) == ".") $f = substr($f, 1);
+      $files[$prefix.$f] = $prefix.$f;
     }
     return $files;
   }
@@ -118,32 +122,20 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       PLUGINS_FOLDER => PLUGINS_DIR."/",
     );
     $files= array();
-    foreach ($paths as $path => $prefix) $files = array_unique(array_merge($files, $this->getFilesRecursive($path, $prefix)));
-    foreach ($files as $k => $f) {
-      if(!preg_match("/(\.html|\.xml|\.xsl)$/", $f)) unset($files[$k]);
-      if(isset($files[".$f"])) unset($files[$k]);
+    foreach ($paths as $path => $prefix) {
+      $files = array_unique(array_merge($files, $this->getFilesRecursive($path, $prefix)));
     }
-    $files = array_merge($files, Cms::getVariable("htmloutput-javascripts"));
-    $files = array_merge($files, Cms::getVariable("htmloutput-styles"));
-
     $dom = new DOMDocumentPlus();
     $var = $dom->createElement("var");
     usort($files, "strnatcmp");
     foreach($files as $f) {
       $option = $dom->createElement("option");
-      $disabled = false;
-      $fName = $f;
-      if(strpos(basename($f), ".") === 0) {
-        $disabled = true;
-        $dirname = dirname($f) == "." ? "" : dirname($f)."/";
-        $fName = $dirname.substr(basename($f), 1);
-      }
-      $option->setAttribute("value", $fName);
-      $v = basename($fName)." $fName";
+      $option->setAttribute("value", $f);
+      $v = basename($f)." $f";
       if(is_file(CMS_FOLDER."/$f")) $v .= " #default";
       if(is_file(ADMIN_FOLDER."/$f")) $v .= " #admin";
       if(is_file(USER_FOLDER."/$f")) $v .= " #user";
-      if($disabled) $v .= " #disabled";
+      if(is_file(USER_FOLDER."/".dirname($f)."/.".basename($f))) $v .= " #user #disabled";
       $option->nodeValue = $v;
       $var->appendChild($option);
     }
