@@ -10,6 +10,7 @@ class Agregator extends Plugin implements SplObserver {
   private $edit;
   private $cfg;
   private static $sortKey;
+  const APC_PREFIX = "1";
   const DEBUG = false;
 
   public function __construct(SplSubject $s) {
@@ -250,7 +251,7 @@ class Agregator extends Plugin implements SplObserver {
 
   private function getFileVars($subDir, Array $files) {
     $vars = array();
-    $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$subDir";
+    $cacheKey = apc_get_key($subDir);
     if(!$this->isValidCache($cacheKey, count($files))) {
       $this->storeCache($cacheKey, count($files), $subDir);
       $this->useCache = false;
@@ -275,7 +276,7 @@ class Agregator extends Plugin implements SplObserver {
         $this->currentSubdir = $subDir;
         $this->currentFilepath = $file;
       }
-      $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$filePath";
+      $cacheKey = apc_get_key($filePath);
       if(!$this->isValidCache($cacheKey, filemtime($filePath))) {
         $this->storeCache($cacheKey, filemtime($filePath), $file);
         $this->useCache = false;
@@ -286,7 +287,7 @@ class Agregator extends Plugin implements SplObserver {
 
   private function createCmsVars($subDir, Array $vars) {
     $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
-    $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$filePath";
+    $cacheKey = apc_get_key($filePath);
     if(!$this->isValidCache($cacheKey, filemtime($filePath))) {
       $this->storeCache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
       $this->useCache = false;
@@ -298,7 +299,7 @@ class Agregator extends Plugin implements SplObserver {
         continue;
       }
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-      $cacheKey = HOST."/".get_class($this)."/".Cms::isSuperUser()."/$vName";
+      $cacheKey = apc_get_key($vName);
       // use cache
       if($this->useCache && !self::DEBUG) {
         $sCache = $this->getSubDirCache($cacheKey);
@@ -342,14 +343,14 @@ class Agregator extends Plugin implements SplObserver {
     return $vars;
   }
 
-  private function storeCache($key, $value, $name) {
-    $stored = apc_store("1/$key", $value, rand(3600*24*30*3, 3600*24*30*6));
+  private function storeCache($cacheKey, $value, $name) {
+    $stored = apc_store($cacheKey, $value, rand(3600*24*30*3, 3600*24*30*6));
     if(!$stored) Logger::log(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
   }
 
-  private function isValidCache($key, $value) {
-    if(!apc_exists($key)) return false;
-    if(apc_fetch($key) != $value) return false;
+  private function isValidCache($cacheKey, $value) {
+    if(!apc_exists($cacheKey)) return false;
+    if(apc_fetch($cacheKey) != $value) return false;
     return true;
   }
 

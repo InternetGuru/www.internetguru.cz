@@ -217,7 +217,7 @@ class DOMBuilder {
     $fShort = stripDataFolder($filePath);
     #todo: Cms::addVariableItem(file_extension, $fShort);
     #Cms::addVariableItem("html", $fShort);
-    $fInfo = self::getCache(self::getCacheKey($filePath), $filePath);
+    $fInfo = self::getCache(apc_get_key($filePath), $filePath);
     if(!is_null($fInfo)) {
       $doc->loadXML($fInfo["xml"]);
       return $fInfo["mtime"];
@@ -235,7 +235,7 @@ class DOMBuilder {
 
   private static function saveCache($filePath, $fInfo) {
     $fShort = stripDataFolder($filePath);
-    $stored = apc_store(self::getCacheKey($filePath), $fInfo, rand(3600*24*30*3, 3600*24*30*6));
+    $stored = apc_store(apc_get_key($filePath), $fInfo, rand(3600*24*30*3, 3600*24*30*6));
     if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
   }
 
@@ -245,7 +245,7 @@ class DOMBuilder {
       throw new Exception(sprintf(_("File '%s' already included"), $fShort));
     self::$included[$filePath] = null;
     Cms::addVariableItem("html", $fShort);
-    $fInfo = self::getCache(self::getCacheKey($filePath), $filePath);
+    $fInfo = self::getCache(apc_get_key($filePath), $filePath);
     if(!is_null($fInfo)) {
       if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
       foreach($fInfo["includes"] as $file => $mtime) {
@@ -323,10 +323,6 @@ class DOMBuilder {
     );
     self::saveCache($filePath, $fInfo);
     return $mTime;
-  }
-
-  private static function getCacheKey($filePath) {
-    return "1/".HOST."$filePath";
   }
 
   private static function getCache($cacheKey, $filePath) {

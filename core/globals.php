@@ -514,6 +514,13 @@ function apc_get_path($key) {
   return $apcDir.normalize($key, "a-zA-Z0-9_.-", "+");
 }
 
+function apc_get_key($key) {
+  $class = "core";
+  $callers = debug_backtrace();
+  if(isset($callers[1]['class'])) $class = $callers[1]['class'];
+  return APC_PREFIX."/".HOST."/".$class."/".Cms::isSuperUser()."/".$key;
+}
+
 function clearNginxCache($folder = null) {
   foreach(getNginxCacheFiles() as $fPath) {
     if(!unlink($fPath)) throw new Exception(_("Failed to purge cache"));
