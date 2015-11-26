@@ -68,10 +68,12 @@
       var cursor = c.getCursor();
       var line = cursor.line;
       var char = cursor.ch;
+      var range = getSelectedRange(c);
       c.setCursor({line:line,ch:char});
       var myHeight = c.getScrollInfo().clientHeight;
       var coords = c.charCoords({line: line, ch: char}, "global");
       win.scrollTo(0, (coords.top + coords.bottom - myHeight) / 2);
+      c.setSelection(range.from, range.to);
     },
     toggleFullScreen = function(c, off) {
       if(typeof off === "undefined") off = false;
@@ -238,12 +240,14 @@
         _init();
         initActivateButton();
         fireEvents();
-      }
+      },
+      scrollToCursor: scrollToCursor
     }
   };
 
   var textareas = document.querySelectorAll('textarea.codemirror');
   var cm = new SyntaxCodeMirror();
   cm.init(textareas[0], cm);
+  win.IGCMS.CodeMirror = cm;
 
 })(window);
