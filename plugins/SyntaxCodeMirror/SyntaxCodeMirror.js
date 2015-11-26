@@ -48,12 +48,11 @@
       }
       active = !active;
     },
-    getSelectedRange = function(c) {
+    getSelectedRange = function(c, all) {
       var start = c.getCursor(true),
           end = c.getCursor(false);
-      if(start == end) { // all
-        return { from: {line: 0, ch: 0}, to: {line: c.lineCount()} }
-      }
+      if(typeof all === "undefined") all = true;
+      if(all && start == end) return { from: {line: 0, ch: 0}, to: {line: c.lineCount()} }
       return { from: c.getCursor(true), to: c.getCursor(false) };
     },
     autoFormatSelection = function(c) {
@@ -68,7 +67,7 @@
       var cursor = c.getCursor();
       var line = cursor.line;
       var char = cursor.ch;
-      var range = getSelectedRange(c);
+      var range = getSelectedRange(c, false);
       c.setCursor({line:line,ch:char});
       var myHeight = c.getScrollInfo().clientHeight;
       var coords = c.charCoords({line: line, ch: char}, "global");
@@ -144,7 +143,7 @@
         mode: textarea.classList.item(1),
         width:"100%",
         lineWrapping: true,
-        matchTags: {bothTags: true},
+        matchTags: { bothTags: true },
         //tabSize: 2,
         styleActiveLine: true,
         styleSelectedText: true,
@@ -170,20 +169,10 @@
           "Ctrl-E": "deleteLine",
           "End": "goLineRight",
           "Home": "goLineLeftSmart",
-          "Ctrl-Shift-F": function(c) {
-            autoFormatSelection(c);
-          },
-          "Ctrl-Shift-I": function(c) {
-            autoIndentSelection(c);
-          },
-          "F3": function(c) {
-            c.execCommand("findNext");
-            scrollToCursor(c);
-          },
-          "Shift-F3": function(c) {
-            c.execCommand("findPrev");
-            scrollToCursor(c);
-          },
+          "Ctrl-Shift-F": function(c) { autoFormatSelection(c); },
+          "Ctrl-Shift-I": function(c) { autoIndentSelection(c); },
+          "F3": function(c) { c.execCommand("findNext"); },
+          "Shift-F3": function(c) { c.execCommand("findPrev"); },
         })
       });
     },
