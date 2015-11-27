@@ -99,8 +99,8 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $files = array();
     foreach(scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {
       if(!is_file("$dir/$f")) continue;
-      if(!is_null($ext) && pathinfo($f, PATHINFO_EXTENSION) != $ext) continue;
       $id = (substr($f, -4) == ".zip") ? substr($f, 0, -4) : $f;
+      if(!is_null($ext) && pathinfo($id, PATHINFO_EXTENSION) != $ext) continue;
       $files[$id] = "$dir/$f";
       if(count($files) == $limit) break;
     }
