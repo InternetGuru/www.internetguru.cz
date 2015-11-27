@@ -176,8 +176,9 @@
     }
     filter = function(arr, value) {
       var fs = [];
-      var testPatt = new RegExp(value, "gi");
-      var matchPatt = new RegExp("("+value+")", "gi");
+      var qvalue = IGCMS.preg_quote(value).replace(/\\\*/g, ".*"); // * => .*
+      var testPatt = new RegExp(qvalue, "gi");
+      var matchPatt = new RegExp("("+qvalue+")", "gi");
       for(var i = 0; i < arr.length; i++) {
         var r = doFilter(arr[i], value, testPatt, matchPatt);
         if(typeof r != "undefined") {

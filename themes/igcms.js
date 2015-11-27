@@ -54,6 +54,14 @@
         if(elem.styleSheet && !elem.sheet)elem.styleSheet.cssText=css;
         else elem.appendChild(document.createTextNode(css));
         document.getElementsByTagName('head')[0].appendChild(elem);
+      },
+      /**
+       * Escape string for use in regular expression
+       * @param  {String} str       String to escape
+       * @return {String}           Escaped string
+       */
+      preg_quote: function(str) {
+        return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\-]', 'g'), '\\$&');
       }
 
     }

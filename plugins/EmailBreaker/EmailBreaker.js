@@ -30,7 +30,7 @@
         var a = document.createElement("a");
         var email = addr.textContent;
         for(var i = 0; i < Config.rep.length; i++) {
-          email = email.replace(new RegExp(preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
+          email = email.replace(new RegExp(IGCMS.preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
         }
         a.href = "mailto:" + email.replace(" ", "");
         if(addr.classList.contains("del")) addr.parentNode.removeChild(addr);
@@ -39,9 +39,6 @@
         span.parentNode.removeChild(span);
         a.appendChild(span);
       },
-      preg_quote = function(str, delimiter) {
-        return (str + '').replace(new RegExp('[.\\\\+*?\\[\\^\\]$(){}=!<>|:\\' + (delimiter || '') + '-]', 'g'), '\\$&');
-      }
 
       // public
       return {
