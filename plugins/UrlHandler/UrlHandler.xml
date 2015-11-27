@@ -38,8 +38,8 @@
 
   <redir parName="Login">?login</redir>
   <redir parName="admin">?Admin</redir>
-  <redir parName="log">?LogViewer</redir>
-  <redir parName="ver">?LogViewer</redir>
+  <redir parName="log">?LogViewer=log</redir>
+  <redir parName="ver">?LogViewer=ver</redir>
   <redir parName="import">?Convertor</redir>
   <redir parName="subdom">?SubdomManager</redir>
 
