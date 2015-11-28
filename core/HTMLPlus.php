@@ -9,6 +9,7 @@ class HTMLPlus extends DOMDocumentPlus {
   private $defaultNs = null;
   private $defaultDesc = null;
   private $defaultKw = null;
+  private $errors = array();
   const RNG_FILE = "HTMLPlus.rng";
 
   function __construct($version="1.0", $encoding="utf-8") {
@@ -37,6 +38,10 @@ class HTMLPlus extends DOMDocumentPlus {
     $root = $doc->importNode($this->documentElement, true);
     $doc->appendChild($root);
     return $doc;
+  }
+
+  public function getErrors() {
+    return $this->errors;
   }
 
   public function processVariables(Array $variables) {
@@ -197,17 +202,22 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->relaxNGValidatePlus();
   }
 
+  private function errorHandler($message, $repair) {
+    if(!$repair) throw new Exception($message);
+    $this->errors[] = $message;
+  }
+
   private function validateMeta($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("link")) continue;
       if(!strlen(trim($h->nextElement->nodeValue))) {
-        if(!$repair || is_null($this->defaultDesc))
-          throw new Exception(sprintf(_("Empty element desc following heading with attribute link %s found"), $h->getAttribute("link")));
+        $message = sprintf(_("Empty element desc following heading with attribute link %s found"), $h->getAttribute("link"));
+        $this->errorHandler($message, $repair && !is_null($this->defaultDesc));
         $h->nextElement->nodeValue = $this->defaultDesc;
       }
       if(!$h->nextElement->hasAttribute("kw") || !strlen(trim($h->nextElement->getAttribute("kw")))) {
-        if(!$repair || is_null($this->defaultKw))
-          throw new Exception(sprintf(_("Attribute kw following heading with link %s not found or empty"), $h->getAttribute("link")));
+        $message = sprintf(_("Attribute kw following heading with link %s not found or empty"), $h->getAttribute("link"));
+        $this->errorHandler($message, $repair && !is_null($this->defaultKw));
         $h->nextElement->setAttribute("kw", $this->defaultKw);
       }
     }
@@ -221,32 +231,32 @@ class HTMLPlus extends DOMDocumentPlus {
       $this->defaultNs = $h->getAttribute("ns");
       $h->removeAttribute("ns");
     }
-    if(!$repair || is_null($this->defaultNs))
-      throw new Exception(_("Body attribude 'ns' missing"));
+    $message = _("Body attribude 'ns' missing");
+    $this->errorHandler($message, $repair && !is_null($this->defaultNs));
     $b->setAttribute("ns", $this->defaultNs);
   }
 
   private function validateFirstHeadingLink($repair) {
     $h = $this->headings->item(0);
     if($h->hasAttribute("link")) return;
-    if(!$repair || is_null($this->defaultLink))
-      throw new Exception(_("First heading attribude 'link' missing"));
+    $message = _("First heading attribude 'link' missing");
+    $this->errorHandler($message, $repair && !is_null($this->defaultLink));
     $h->setAttribute("link", $this->defaultLink);
   }
 
   private function validateFirstHeadingAuthor($repair) {
     $h = $this->headings->item(0);
     if($h->hasAttribute("author")) return;
-    if(!$repair || is_null($this->defaultAuthor))
-      throw new Exception(_("First heading attribute 'author' missing"));
+    $message = _("First heading attribute 'author' missing");
+    $this->errorHandler($message, $repair && !is_null($this->defaultAuthor));
     $h->setAttribute("author", $this->defaultAuthor);
   }
 
   private function validateFirstHeadingCtime($repair) {
     $h = $this->headings->item(0);
     if($h->hasAttribute("ctime")) return;
-    if(!$repair || is_null($this->defaultCtime))
-      throw new Exception(_("First heading attribute 'ctime' missing"));
+    $message = _("First heading attribute 'ctime' missing");
+    $this->errorHandler($message, $repair && !is_null($this->defaultCtime));
     $h->setAttribute("ctime", $this->defaultCtime);
   }
 
@@ -258,17 +268,20 @@ class HTMLPlus extends DOMDocumentPlus {
     if(is_null($this->documentElement))
       throw new Exception(_("Root element not found"));
     if($this->documentElement->nodeName != "body") {
-      if(!$repair) throw new Exception(_("Root element must be 'body'"));
+      $message = _("Root element must be 'body'");
+      $this->errorHandler($message, $repair);
       $this->documentElement->rename("body");
     }
     if(!$this->documentElement->hasAttribute("lang")
       && !$this->documentElement->hasAttribute("xml:lang")) {
-      if(!$repair) throw new Exception(_("Attribute 'xml:lang' is missing in element body"));
+      $message = _("Attribute 'xml:lang' is missing in element body");
+      $this->errorHandler($message, $repair);
       $this->documentElement->setAttribute("xml:lang", _("en"));
     }
     $fe = $this->documentElement->firstElement;
     if(!is_null($fe) && $fe->nodeName == "section") {
-      if(!$repair) throw new Exception(_("Element section cannot be empty"));
+      $message = _("Element section cannot be empty");
+      $this->errorHandler($message, $repair);
       $this->addTitleElements($this->documentElement);
       return;
     }
@@ -277,12 +290,14 @@ class HTMLPlus extends DOMDocumentPlus {
       if($e->nodeType != XML_ELEMENT_NODE) continue;
       if($e->nodeName != "h") continue;
       if($hRoot++ == 0) continue;
-      if(!$repair) throw new Exception(_("There must be exactly one heading in body element"));
+      $message = _("There must be exactly one heading in body element");
+      $this->errorHandler($message, $repair);
       break;
     }
     if($hRoot == 1) return;
     if($hRoot == 0) {
-      if(!$repair) throw new Exception(_("Missing heading in body element"));
+      $message = _("Missing heading in body element");
+      $this->errorHandler($message, $repair);
       $this->documentElement->appendChild($this->createElement("h"));
       return;
     }
@@ -310,16 +325,18 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->getElementsByTagName("section") as $s) {
       if(!count($s->childElementsArray)) $emptySect[] = $s;
     }
-    if(!$repair && count($emptySect)) throw new Exception(_("Empty section(s) found"));
     if(!count($emptySect)) return;
+    $message = _("Empty section(s) found");
+    $this->errorHandler($message, $repair);
     foreach($emptySect as $s) $s->stripTag(_("Empty section deleted"));
   }
 
   private function validateLang($repair) {
     $xpath = new DOMXPath($this);
     $langs = $xpath->query("//*[@lang]");
-    if($langs->length && !$repair)
-      throw new Exception(_("Lang attribute without xml namespace"));
+    if(!$langs->length) return;
+    $message = _("Lang attribute without xml namespace");
+    $this->errorHandler($message, $repair);
     foreach($langs as $n) {
       if(!$n->hasAttribute("xml:lang"))
         $n->setAttribute("xml:lang", $n->getAttribute("lang"));
@@ -330,13 +347,18 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHid($repair) {
     $hIds = array();
     foreach($this->headings as $h) {
-      $id = $h->hasAttribute("id") ? $h->getAttribute("id") : null;
-      if(!isValidId($id)) {
-        if(!$repair) throw new Exception(sprintf(_("Heading attribut id '%s' missing or invalid"), $id));
+      $id = $h->getAttribute("id");
+      if(!strlen($id)) {
+        $message = sprintf(_("Heading attribute id empty or missing: %s"), $h->nodeValue);
+        $this->errorHandler($message, $repair);
         $h->setUniqueId();
-      }
-      if(array_key_exists($id, $hIds)) {
-        if(!$repair) throw new Exception(sprintf(_("Duplicit heading attribut id '%s'"), $id));
+      } elseif(!isValidId($id)) {
+        $message = sprintf(_("Invalid heading attribute id '%s'"), $id);
+        $this->errorHandler($message, $repair);
+        $h->setUniqueId();
+      } elseif(array_key_exists($id, $hIds)) {
+        $message = sprintf(_("Duplicit heading attribute id '%s'"), $id);
+        $this->errorHandler($message, $repair);
         $h->setUniqueId();
       }
       $hIds[$h->getAttribute("id")] = null;
@@ -346,8 +368,8 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateHempty($repair) {
     foreach($this->headings as $h) {
       if(strlen(trim($h->nodeValue))) continue;
-      if(!$repair || is_null($this->defaultHeading))
-        throw new Exception(_("Heading content must not be empty"));
+      $message = _("Heading content must not be empty");
+      $this->errorHandler($message, $repair && !is_null($this->defaultHeading));
       $h->nodeValue = $this->defaultHeading;
     }
   }
@@ -356,7 +378,8 @@ class HTMLPlus extends DOMDocumentPlus {
     if($repair) $this->repairDesc();
     foreach($this->headings as $h) {
       if(is_null($h->nextElement) || $h->nextElement->nodeName != "desc") {
-        if(!$repair) throw new Exception(_("Missing element 'desc'"));
+        $message = _("Missing element 'desc'");
+        $this->errorHandler($message, $repair);
         $desc = $h->ownerDocument->createElement("desc");
         $h->parentNode->insertBefore($desc, $h->nextElement);
       }

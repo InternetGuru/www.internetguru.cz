@@ -11,7 +11,7 @@ class Cms {
   private static $flashList = null;
   private static $error = false;
   private static $warning = false;
-  private static $info = false;
+  private static $other = false;
   private static $success = false;
   private static $requestToken = null;
   const DEBUG = false;
@@ -54,16 +54,17 @@ class Cms {
   }
 
   private static function addFlashItem($message, $type) {
+    $class = $type;
     switch($type) {
       case self::MSG_ERROR: self::$error = true; break;
       case self::MSG_WARNING: self::$warning = true; break;
       case self::MSG_SUCCESS: self::$success = true; break;
-      case self::MSG_INFO: self::$info = true; break;
+      default: self::$other = true; $class = self::MSG_INFO;
     }
     if(!is_null(self::getLoggedUser())) $message = "$type: $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
-    $li->setAttribute("class", strtolower($type));
+    $li->setAttribute("class", strtolower($class));
     $doc = new DOMDocumentPlus();
     if(!@$doc->loadXML("<var>$message</var>")) {
       $li->nodeValue = htmlspecialchars($message);
@@ -229,10 +230,10 @@ class Cms {
     return $varId.(strlen($name) ? "-".normalize($name) : "");
   }
 
-  public static function getError() { return self::$error; }
-  public static function getWarning() { return self::$warning; }
-  public static function getInfo() { return self::$info; }
-  public static function getSuccess() { return self::$success; }
+  public static function hasErrorMessage() { return self::$error; }
+  public static function hasWarningMessage() { return self::$warning; }
+  public static function hasOtherMessage() { return self::$other; }
+  public static function hasSuccessMessage() { return self::$success; }
 
   public static function setFunction($name, $value) {
     if(!$value instanceof Closure) {

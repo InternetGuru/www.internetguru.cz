@@ -347,7 +347,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if($this->type == "html") $doc->validatePlus();
     } catch(Exception $e) {
       $doc->validatePlus(true);
-      #TODO: log autocorrected
+      foreach($doc->getErrors() as $error) {
+        Cms::addMessage($error, _("Autocorrected"));
+      }
       $this->contentValue = $doc->saveXML();
     }
     if($this->type != "xml" || $this->isPost()) return;

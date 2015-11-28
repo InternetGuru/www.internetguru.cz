@@ -142,10 +142,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   private function getFavIcon() {
-    if(Cms::getError()) return $this->cfg->getElementById("error")->nodeValue;
-    if(Cms::getWarning()) return $this->cfg->getElementById("warning")->nodeValue;
-    if(Cms::getSuccess()) return $this->cfg->getElementById("success")->nodeValue;
-    if(Cms::getInfo()) return $this->cfg->getElementById("info")->nodeValue;
+    if(Cms::hasErrorMessage()) return $this->cfg->getElementById("error")->nodeValue;
+    if(Cms::hasWarningMessage()) return $this->cfg->getElementById("warning")->nodeValue;
+    if(Cms::hasOtherMessage()) return $this->cfg->getElementById("info")->nodeValue;
+    if(Cms::hasSuccessMessage()) return $this->cfg->getElementById("success")->nodeValue;
     return ROOT_URL.self::FAVICON;
   }
 
