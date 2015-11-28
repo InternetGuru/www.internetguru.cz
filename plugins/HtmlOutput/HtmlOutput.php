@@ -114,7 +114,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $robots = $this->cfg->getElementById("robots");
     $this->appendMeta($head, "robots", $robots->nodeValue);
     $this->copyToRoot($this->favIcon, self::FAVICON);
-    $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true, false);
+    $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true);
     $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
     $this->appendCssFiles($head);
     $html->appendChild($head);
@@ -384,14 +384,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           $priority = 10;
           if($n->hasAttribute("append")) $append = $n->getAttribute("append");
           if($n->hasAttribute("priority")) $priority = $n->getAttribute("priority");
-          $if = ($n->hasAttribute("if") ? $n->getAttribute("if") : false);
+          $ieIfComment = ($n->hasAttribute("if") ? $n->getAttribute("if") : null);
           $ifXpath = ($n->hasAttribute("if-xpath") ? $n->getAttribute("if-xpath") : false);
-          $this->addJsFile($n->nodeValue, $priority, $append, $user, $if, $ifXpath);
+          $this->addJsFile($n->nodeValue, $priority, $append, $user, $ieIfComment, $ifXpath);
           break;
           case "stylesheet":
           $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
-          $if = ($n->hasAttribute("if") ? $n->getAttribute("if") : false);
-          $this->addCssFile($n->nodeValue, $media, 10, true, $if);
+          $ieIfComment = ($n->hasAttribute("if") ? $n->getAttribute("if") : null);
+          $this->addCssFile($n->nodeValue, $media, 10, true, $ieIfComment);
           break;
           case "favicon":
           $this->favIcon = findFile($n->nodeValue);
@@ -437,15 +437,17 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $e->appendChild($meta);
   }
 
-  private function appendLinkElement(DOMElement $parent, $file, $rel, $type=false, $media=false, $user=true, $root=true, $if=false) {
+  private function appendLinkElement(DOMElement $parent, $filePath, $rel, $type=false, $media=false, $user=true, $ieIfComment=null) {
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
     if($media) $e->setAttribute("media", $media);
-    $e->setAttribute("href", ($root ? ROOT_URL : "").$file);
-    if($if)
-      $parent->appendChild($parent->ownerDocument->createComment("[if $if]>".$e->ownerDocument->saveXML($e)."<![endif]"));
-    else $parent->appendChild($e);
+    $e->setAttribute("href", $filePath);
+    if(!is_null($ieIfComment)) {
+      $parent->appendChild($parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]"));
+      return;
+    }
+    $parent->appendChild($e);
   }
 
   /**
@@ -453,7 +455,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string  $filePath JS file to be registered
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false, $if=false, $ifXpath=false) {
+  public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false, $ieIfComment=null, $ifXpath=false) {
     if(isset($this->jsFiles[$filePath])) return;
     Cms::addVariableItem("javascripts", $filePath);
     #if(findFile($filePath, $user) === false) throw new Exception();
@@ -463,7 +465,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       "content" => "",
       "user" => $user,
       "ifXpath" => $ifXpath,
-      "if" => $if);
+      "if" => $ieIfComment);
     $this->jsFilesPriority[$filePath] = $priority;
   }
 
@@ -486,7 +488,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string  $fileName JS file to be registered
    * @param integer $priority The higher priority the lower appearance
    */
-  public function addCssFile($filePath, $media = false, $priority = 10, $user = true, $if=false) {
+  public function addCssFile($filePath, $media = false, $priority = 10, $user = true, $ieIfComment=null) {
     if(isset($this->cssFiles[$filePath])) return;
     Cms::addVariableItem("styles", $filePath);
     #if(findFile($filePath, $user) === false) throw new Exception();
@@ -495,7 +497,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       "file" => $filePath,
       "media" => $media,
       "user" => $user,
-      "if" => $if);
+      "if" => $ieIfComment);
     $this->cssFilesPriority[$filePath] = $priority;
   }
 
@@ -529,16 +531,15 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
-      $filePath = "";
-      if(isGruntOff()) $filePath .= RESOURCES_DIR."/";
-      $filePath .= $this->jsFiles[$k]["file"];
-      if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", ROOT_URL.$filePath);
-      $if = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : false;
-      if($if) {
-        $e->nodeValue = " ";
-        $parent->appendChild($parent->ownerDocument->createComment("[if $if]>".$e->ownerDocument->saveXML($e)."<![endif]"));
-      } else
-        $parent->appendChild($e);
+      $filePath = ROOT_URL.getResourcePath($this->jsFiles[$k]["file"]);
+      if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", $filePath);
+      $ieIfComment = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : null;
+      if(!is_null($ieIfComment)) {
+        #$e->nodeValue = " ";
+        $parent->appendChild($parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]"));
+        return;
+      }
+      $parent->appendChild($e);
     }
   }
 
@@ -594,11 +595,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   private function appendCssFiles(DOMElement $parent) {
     foreach($this->cssFilesPriority as $k => $v) {
-      $if = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : false;
-      $filePath = $this->cssFiles[$k]["file"];
-      if(isGruntOff()) $filePath = RESOURCES_DIR."/$filePath";
+      $ieIfComment = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : null;
+      $filePath = ROOT_URL.getResourcePath($this->cssFiles[$k]["file"]);
       $this->appendLinkElement($parent, $filePath, "stylesheet", "text/css",
-        $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], true, $if);
+        $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], $ieIfComment);
     }
   }
 

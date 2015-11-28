@@ -240,6 +240,7 @@ function copy_plus($src, $dest, $keepSrc = true) {
   mkdir_plus(dirname($dest));
   if(!is_link($dest) && is_file($dest) && !copy($dest, "$dest.old"))
     throw new Exception(_("Unable to backup destination file"));
+  $srcMtime = filemtime($src);
   if($keepSrc) {
     if(!copy($src, "$dest.new"))
       throw new Exception(_("Unable to copy source file"));
@@ -247,8 +248,8 @@ function copy_plus($src, $dest, $keepSrc = true) {
   }
   if(!rename($src, $dest))
     throw new Exception(_("Unable to rename new file to destination"));
-  #if(is_file("$dest.old") && !unlink("$dest.old"))
-  #  throw new Exception(_("Unable to delete.old file"));
+  if(!touch($dest, $srcMtime))
+    throw new Exception(_("Unable to set new file modification time"));
 }
 
 function mkdir_plus($dir, $mode=0775, $recursive=true) {
@@ -275,17 +276,6 @@ function incrementalRename($src, $dest=null) {
   if(!rename($src, $dest.$i))
     throw new Exception(sprintf(_("Unable to rename directory '%s'"), basename($src)));
   return $dest.$i;
-}
-
-function duplicateDir($dir, $deep=true) {
-  if(!is_dir($dir))
-    throw new Exception(sprintf(_("Directory '%s' not found"), basename($dir)));
-  $info = pathinfo($dir);
-  $bakDir = $info["dirname"]."/~".$info["basename"];
-  copyFiles($dir, $bakDir, $deep);
-  deleteRedundantFiles($bakDir, $dir);
-  #Logger::log("Active data backup updated");
-  return $bakDir;
 }
 
 function initDirs() {
@@ -327,7 +317,6 @@ function initFiles() {
     return;
   }
   copy_plus($src, $f);
-  touch($f, filemtime($src));
   unlockFile($fp);
   redirTo($_SERVER["REQUEST_URI"], null, sprintf(_("Subdom file %s updated"), $f));
 }
@@ -366,30 +355,9 @@ function deleteRedundantFiles($in, $according) {
   }
 }
 
-function copyFiles($src, $dest, $deep=false) {
-  mkdir_plus($dest);
-  foreach(scandir($src) as $f) {
-    if(in_array($f, array(".", ".."))) continue;
-    if(is_dir("$src/$f") && !is_link("$src/$f")) {
-      if($deep) copyFiles("$src/$f", "$dest/$f", $deep);
-      continue;
-    }
-    #if(!empty($allowedExt) && !in_array(pathinfo($f, PATHINFO_EXTENSION), $allowedExt)) continue;
-    if(is_file("$dest/$f") && filemtime("$dest/$f") == filemtime("$src/$f")) continue;
-    $fp = lockFile("$src/$f");
-    if(is_file("$dest/$f") && filemtime("$dest/$f") == filemtime("$src/$f")) {
-      unlockFile($fp);
-      continue;
-    }
-    copy_plus("$src/$f", "$dest/$f");
-    unlockFile($fp);
-  }
-}
-
 function translateUtf8Entities($xmlSource, $reverse = FALSE) {
   static $literal2NumericEntity;
-
-  if (empty($literal2NumericEntity)) {
+  if(empty($literal2NumericEntity)) {
     $transTbl = get_html_translation_table(HTML_ENTITIES);
     foreach ($transTbl as $char => $entity) {
       if (strpos('&"<>', $char) !== FALSE) continue;
@@ -397,11 +365,8 @@ function translateUtf8Entities($xmlSource, $reverse = FALSE) {
       $literal2NumericEntity[$entity] = $char;
     }
   }
-  if ($reverse) {
-    return strtr($xmlSource, array_flip($literal2NumericEntity));
-  } else {
-    return strtr($xmlSource, $literal2NumericEntity);
-  }
+  if($reverse) return strtr($xmlSource, array_flip($literal2NumericEntity));
+  return strtr($xmlSource, $literal2NumericEntity);
 }
 
 function readZippedFile($archiveFile, $dataFile) {
@@ -559,10 +524,12 @@ function getIP() {
   return $_SERVER['REMOTE_ADDR'];
 }
 
-function isGruntOff() {
-  if(IS_LOCALHOST) return false;
-  if(is_null(Cms::getLoggedUser())) return false;
-  return isset($_GET["Grunt"]) && $_GET["Grunt"] == "off";
+function getResourcePath($fileName) {
+  if(IS_LOCALHOST || is_null(Cms::getLoggedUser()) || isGruntOn()) return $fileName; // always root resources
+  if(!isset($_GET["Grunt"]) || $_GET["Grunt"] != "off") return $fileName; // Grunt is on (aka Grunt is not off)
+  $resDir = RESOURCES_DIR;
+  if($_SERVER["script_file"] != "index.php") $resDir = pathinfo($_SERVER["script_file"], PATHINFO_FILENAME);
+  return $resDir."/$fileName";
 }
 
 // UNUSED

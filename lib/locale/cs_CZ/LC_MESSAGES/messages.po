@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-28 13:08+0100\n"
-"PO-Revision-Date: 2015-11-28 13:09+0100\n"
+"POT-Creation-Date: 2015-11-28 17:12+0100\n"
+"PO-Revision-Date: 2015-11-28 17:12+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -458,59 +458,58 @@ msgstr "Zdrojový soubor nebyl nalezen"
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: core/globals.php:245
+#: core/globals.php:246
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: core/globals.php:249
+#: core/globals.php:250
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: core/globals.php:257
+#: core/globals.php:252
+msgid "Unable to set new file modification time"
+msgstr "Nepodařilo se nastavit čas modifikace"
+
+#: core/globals.php:258
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: core/globals.php:271
+#: core/globals.php:272
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: core/globals.php:276
+#: core/globals.php:277
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: core/globals.php:282
-#, php-format
-msgid "Directory '%s' not found"
-msgstr "Složka '%s' nebyla nalezena"
-
-#: core/globals.php:332
+#: core/globals.php:321
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: core/globals.php:341 core/globals.php:412 core/globals.php:427
+#: core/globals.php:330 core/globals.php:377 core/globals.php:392
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: core/globals.php:347
+#: core/globals.php:336
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: core/globals.php:430
+#: core/globals.php:395
 msgid "Unable to read file"
 msgstr "Nepodařilo se přečíst soubor"
 
-#: core/globals.php:434
+#: core/globals.php:399
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: core/globals.php:490
+#: core/globals.php:455
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:526
+#: core/globals.php:491
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
@@ -938,7 +937,7 @@ msgstr "Požadovaná URL nebyla nalezena"
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:184
+#: plugins/FileHandler/FileHandler.php:186
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
@@ -1040,12 +1039,12 @@ msgstr "Neúspěšná kompilace transformace '%s'"
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:508
+#: plugins/HtmlOutput/HtmlOutput.php:510
 #, php-format
 msgid "File %s modification is disabled"
 msgstr "Modifikace souboru %s je vypnuta"
 
-#: plugins/HtmlOutput/HtmlOutput.php:564
+#: plugins/HtmlOutput/HtmlOutput.php:565
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1212,6 +1211,9 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:194
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Directory '%s' not found"
+#~ msgstr "Složka '%s' nebyla nalezena"
 
 #~ msgid "Heading attribut id '%s' missing or invalid"
 #~ msgstr "Identifikátor nadpisu '%s' chybí nebo je neplatný"

@@ -140,27 +140,13 @@ class FileHandler extends Plugin implements SplObserver {
       if(IS_LOCALHOST || !$this->isResource($src)) {
         if(is_file($dest)) return;
         copy_plus($src, $dest);
-        touch($dest, filemtime($src));
         return;
       }
-      $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
-      $rfp = lockFile("$restartFile.lock");
-      if(!is_dir(RESOURCES_DIR)) {
-        mkdir_plus(RESOURCES_DIR);
-        touch($restartFile);
-        exec('/etc/init.d/gruntwatch stop');
-      }
-      if(!is_dir(dirname($dest)) && (!is_file($restartFile) || (time() - filemtime($restartFile)) >= 35 )) {
-        touch($restartFile);
-        exec('/etc/init.d/gruntwatch stop');
-      }
-      if(is_file(RESOURCES_DIR."/$dest")) {
-        unlink(RESOURCES_DIR."/$dest");
-      }
-      unlockFile($rfp);
-      if(!is_file(RESOURCES_DIR."/$dest")) {
-        copy_plus($src, RESOURCES_DIR."/$dest");
-        touch(RESOURCES_DIR."/$dest", filemtime($src));
+      $dest = getResourcePath($dest);
+      $destDir = dirname($dest);
+      if($destDir == RESOURCES_DIR) $this->restartGrunt($dest);
+      if(!is_file($dest)) {
+        copy_plus($src, $dest);
       }
       usleep(rand(5,15)*100000);
     } catch(Exception $e) {
@@ -169,6 +155,22 @@ class FileHandler extends Plugin implements SplObserver {
       unlockFile($fp);
       unlink("$src.lock");
     }
+  }
+
+  private function restartGrunt($filePath) {
+    $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
+    $rfp = lockFile("$restartFile.lock");
+    if(!is_dir(RESOURCES_DIR)) {
+      mkdir_plus(RESOURCES_DIR);
+      touch($restartFile);
+      exec('/etc/init.d/gruntwatch stop');
+    }
+    if(!is_dir(RESOURCES_DIR) && (!is_file($restartFile) || (time() - filemtime($restartFile)) >= 35 )) {
+      touch($restartFile);
+      exec('/etc/init.d/gruntwatch stop');
+    }
+    if(is_file($filePath)) unlink($filePath);
+    unlockFile($rfp);
   }
 
   private function isResource($src) {
@@ -183,12 +185,10 @@ class FileHandler extends Plugin implements SplObserver {
       if($fileSize > $mode[2])
         throw new Exception(sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($mode[2])));
       copy_plus($src, $dest);
-      touch($dest, filemtime($src));
       return;
     }
     if($mode[0] == 0 && $mode[1] == 0) {
       copy_plus($src, $dest);
-      touch($dest, filemtime($src));
       return;
     }
     $im = new Imagick($src);
