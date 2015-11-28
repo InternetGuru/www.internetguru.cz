@@ -176,11 +176,10 @@
     }
     filter = function(arr, value) {
       var fs = [];
-      var qvalue = IGCMS.preg_quote(value).replace(/\\\*/g, ".*"); // * => .*
-      var testPatt = new RegExp(qvalue, "gi");
-      var matchPatt = new RegExp("("+qvalue+")", "gi");
+      var qvalue = IGCMS.preg_quote(value).replace(/\\\*/g, "[^/ ]*");
+      var pattern = new RegExp("(^|[^a-z])("+qvalue+")", "gi");
       for(var i = 0; i < arr.length; i++) {
-        var r = doFilter(arr[i], value, testPatt, matchPatt);
+        var r = doFilter(arr[i], value, pattern);
         if(typeof r != "undefined") {
          fs.push(r);
         }
@@ -188,11 +187,10 @@
       fs = fileMergeSort(fs);
       return fs;
     },
-    doFilter = function(f, value, testPatt, matchPatt) {
+    doFilter = function(f, value, pattern) {
       try {
-        if(!f.val.match(testPatt)) return;
+        if(!f.val.match(pattern)) return;
         r = {};
-        //var priority = f.val.search(matchPatt);
         var priority = 3;
         if(f.path.replace(/^.*[\\\/]/, '').indexOf(value) === 0) priority = 1;
         else {
@@ -202,7 +200,7 @@
             priority = 2;
           }
         }
-        r.val = f.val.replace(matchPatt, "<strong>$1</strong>");
+        r.val = f.val.replace(pattern, "$1<strong>$2</strong>");
         r.priority = priority;
         r.defaultVal = f.defaultVal;
         r.path = f.path;
