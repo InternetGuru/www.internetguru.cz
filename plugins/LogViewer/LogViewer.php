@@ -15,14 +15,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_PREINIT) {
-      if(!Cms::isSuperUser()) $subject->detach($this);
-      return;
-    }
-    if(!isset($_GET[get_class($this)])) {
-      $subject->detach($this);
-      return;
-    }
+    if(!Cms::isSuperUser() || !isset($_GET[get_class($this)])) $subject->detach($this);
     if($subject->getStatus() != STATUS_INIT) return;
     $this->logFiles = $this->getFiles(LOG_FOLDER, 15, "log");
     $this->mailFiles = $this->getFiles(LOG_FOLDER, 15, "mail");
