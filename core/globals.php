@@ -225,7 +225,7 @@ function file_put_contents_plus($dest, $string) {
 }
 
 function removeResourceFileCache($filePath) {
-  $resFile = RESOURCES_DIR."/".$filePath;
+  $resFile = getResDir($filePath, true);
   try {
     if(is_file($resFile) && !unlink($resFile)) throw new Exception($resFile);
     if(is_file($filePath) && !unlink($filePath)) throw new Exception($filePath);
@@ -524,12 +524,13 @@ function getIP() {
   return $_SERVER['REMOTE_ADDR'];
 }
 
-function getResourcePath($fileName) {
-  if(IS_LOCALHOST || is_null(Cms::getLoggedUser()) || isGruntOn()) return $fileName; // always root resources
-  if(!isset($_GET["Grunt"]) || $_GET["Grunt"] != "off") return $fileName; // Grunt is on (aka Grunt is not off)
+function getResDir($file="", $forceRes=false) {
+  if(IS_LOCALHOST || is_null(Cms::getLoggedUser())) return $file; // always root resources
   $resDir = RESOURCES_DIR;
-  if($_SERVER["script_file"] != "index.php") $resDir = pathinfo($_SERVER["script_file"], PATHINFO_FILENAME);
-  return $resDir."/$fileName";
+  $scriptName = $_SERVER["SCRIPT_FILENAME"];
+  if(basename($scriptName) != "index.php") $resDir = pathinfo($scriptName, PATHINFO_FILENAME);
+  elseif(!$forceRes && !isset($_GET["Grunt"]) || $_GET["Grunt"] != "off") return $file; // Grunt is on (aka Grunt is not off)
+  return $resDir.(strlen($file) ? "/$file" : "");
 }
 
 // UNUSED

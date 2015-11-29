@@ -1,6 +1,33 @@
 <?php
 
 class FileHandler extends Plugin implements SplObserver {
+  private $resourceExt = array("css", "js");
+  private $imageExt = array("jpg", "png", "gif", "jpeg");
+  private $registeredMime = array(
+    "inode/x-empty" => array("css", "js"),
+    "text/plain" => array("css", "js"),
+    "text/x-c" => array("js"),
+    "application/x-elc" => array("js"),
+    "application/x-empty" => array("css", "js"),
+    "application/octet-stream" => array("woff", "js"),
+    "image/svg+xml" => array("svg"),
+    "image/png" => array("png"),
+    "image/jpeg" => array("jpg", "jpeg"),
+    "image/gif" => array("gif"),
+    "application/pdf" => array("pdf"),
+    "application/vnd.ms-fontobject" => array("eot"),
+    "application/x-font-ttf" => array("ttf"),
+    "application/vnd.ms-opentype" => array("otf"),
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx"),
+  );
+  private $imageModes = array(
+    "" => array(1000, 1000, 300*1024, 85), // default, e.g. resources like icons
+    "images" => array(1000, 1000, 300*1024, 85),
+    "preview" => array(500, 500, 200*1024, 85),
+    "thumbs" => array(200, 200, 70*1024, 85),
+    "big" => array(1500, 1500, 450*1024, 75),
+    "full" => array(0, 0, 0, 0)
+  );
   const DEBUG = false;
   const CLEAR_CACHE_PARAM = "clearfilecache";
 
@@ -34,7 +61,6 @@ class FileHandler extends Plugin implements SplObserver {
       }
       if(!$legal) throw new Exception(_("File illegal path"), 404);
       $this->handleFile($filePath);
-      redirTo(ROOT_URL.getCurLink());
     } catch(Exception $e) {
       $errno = 500;
       if($e->getCode() != 0) $errno = $e->getCode();
@@ -47,7 +73,7 @@ class FileHandler extends Plugin implements SplObserver {
     $e = null;
     foreach($dirs as $dir => $checkSource) {
       try {
-        $this->doCheckResources($dir, $checkSource);
+        $this->doCheckResources(getResDir($dir, true), $checkSource);
       } catch(Exception $e) {}
     }
     if(!is_null($e)) throw new Exception($e->getMessage());
@@ -56,30 +82,30 @@ class FileHandler extends Plugin implements SplObserver {
   private function doCheckResources($folder, $checkSource) {
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
-      $ff = "$folder/$f";
-      if(is_dir($ff)) {
-        $this->doCheckResources($ff, $checkSource);
-        if(count(scandir($ff)) == 2) rmdir($ff);
+      $cacheFilePath = "$folder/$f";
+      if(is_dir($cacheFilePath)) {
+        $this->doCheckResources($cacheFilePath, $checkSource);
+        if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
-      $filePath = findFile($ff, true, true, false);
-      if(is_null($filePath) && $checkSource) $filePath = $this->getSourceFile($ff);
-      if(is_file(RESOURCES_DIR."/$ff")) $mtime = filemtime(RESOURCES_DIR."/$ff");
-      else $mtime = filemtime($ff);
-      if(!is_null($filePath) && $mtime == filemtime($filePath)) continue;
+      $rawSourceFilePath = substr($cacheFilePath, strpos($cacheFilePath, "/")+1);
+      $sourceFilePath = findFile($rawSourceFilePath, true, true, false);
+      if(is_null($sourceFilePath) && $checkSource) $sourceFilePath = $this->getSourceFile($rawSourceFilePath);
+      $cacheFileMtime = filemtime($cacheFilePath);
+      if(!is_null($sourceFilePath) && $cacheFileMtime == filemtime($sourceFilePath)) continue;
       if(isset($_GET[self::CLEAR_CACHE_PARAM])) {
         try {
-          removeResourceFileCache($ff);
+          removeResourceFileCache($rawSourceFilePath);
         } catch(Exception $e) {
           Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
         }
       } else {
-        if(self::DEBUG && !is_null($filePath)) {
-          Cms::addMessage(sprintf("%s:%s | %s:%s", $ff, $mtime, $filePath, filemtime($filePath)), Cms::MSG_WARNING);
-        } elseif(is_null($filePath)) {
-          Cms::addMessage(sprintf(_("Redundant cache file: %s"), $ff), Cms::MSG_WARNING);
+        if(self::DEBUG && !is_null($sourceFilePath)) {
+          Cms::addMessage(sprintf("%s:%s | %s:%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+        } elseif(is_null($sourceFilePath)) {
+          Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
         } else {
-          Cms::addMessage(sprintf(_("File cache is outdated: %s"), $ff), Cms::MSG_WARNING);
+          Cms::addMessage(sprintf(_("File cache is outdated: %s"), $cacheFilePath), Cms::MSG_WARNING);
         }
       }
     }
@@ -99,56 +125,29 @@ class FileHandler extends Plugin implements SplObserver {
     return $src;
   }
 
-  private function handleFile($dest) {
-    $mode = "";
-    $src = $this->getSourceFile($dest, $mode);
+  private function handleFile($filePath) {
+    $src = $this->getSourceFile($filePath, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
     $fp = lockFile("$src.lock");
     try {
-      if(is_file($dest)) return;
+      $extension = strtolower(pathinfo($src, PATHINFO_EXTENSION));
+      if(in_array($extension, $this->resourceExt)) $filePath = getResDir($filePath, true);
+      if(is_file($filePath)) redirTo(ROOT_URL.$filePath);
       $mimeType = getFileMime($src);
-      if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") === 0) {
-        $modes = array(
-          "" => array(1000, 1000, 300*1024, 85), // default, e.g. resources like icons
-          "images" => array(1000, 1000, 300*1024, 85),
-          "preview" => array(500, 500, 200*1024, 85),
-          "thumbs" => array(200, 200, 70*1024, 85),
-          "big" => array(1500, 1500, 450*1024, 75),
-          "full" => array(0, 0, 0, 0)
-        );
-        if(!isset($modes[$mode])) $mode = "";
-        $this->handleImage(realpath($src), $dest, $modes[$mode]);
-        return;
-      }
-      $registeredMime = array(
-        "inode/x-empty" => array(), // empty file with any ext
-        "text/plain" => array("css", "js"),
-        "text/x-c" => array("js"),
-        "application/x-elc" => array("js"),
-        "application/x-empty" => array("css", "js"),
-        "application/octet-stream" => array("woff", "js"),
-        "image/svg+xml" => array("svg"),
-        "application/pdf" => array("pdf"),
-        "application/vnd.ms-fontobject" => array("eot"),
-        "application/x-font-ttf" => array("ttf"),
-        "application/vnd.ms-opentype" => array("otf"),
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx"),
-      );
-      $ext = pathinfo($src, PATHINFO_EXTENSION);
-      if(!isset($registeredMime[$mimeType]) || (!empty($registeredMime[$mimeType]) && !in_array($ext, $registeredMime[$mimeType])))
+      if(!isset($this->registeredMime[$mimeType]) || !in_array($extension, $this->registeredMime[$mimeType]))
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
-      if(IS_LOCALHOST || !$this->isResource($src)) {
-        if(is_file($dest)) return;
-        copy_plus($src, $dest);
-        return;
+      if(in_array($extension, $this->imageExt)) {
+        if(!isset($this->imageModes[$mode])) $mode = "";
+        $this->handleImage(realpath($src), $filePath, $this->imageModes[$mode]);
+      } elseif(!IS_LOCALHOST && in_array($extension, $this->resourceExt)) {
+        if(getResDir("", true) == RESOURCES_DIR) $this->restartGrunt($filePath);
+        if(is_file($filePath)) throw new Exception("Destination file $filePath already exists!", 555);
+        copy_plus($src, $filePath);
+        usleep(rand(5,15)*100000);
+      } else {
+        copy_plus($src, $filePath);
       }
-      $dest = getResourcePath($dest);
-      $destDir = dirname($dest);
-      if($destDir == RESOURCES_DIR) $this->restartGrunt($dest);
-      if(!is_file($dest)) {
-        copy_plus($src, $dest);
-      }
-      usleep(rand(5,15)*100000);
+      redirTo(ROOT_URL.$filePath);
     } catch(Exception $e) {
       throw $e;
     } finally {
@@ -171,11 +170,6 @@ class FileHandler extends Plugin implements SplObserver {
     }
     if(is_file($filePath)) unlink($filePath);
     unlockFile($rfp);
-  }
-
-  private function isResource($src) {
-    //return in_array(pathinfo($src, PATHINFO_EXTENSION), array("scss", "less", "css", "js", "coffee"));
-    return in_array(pathinfo($src, PATHINFO_EXTENSION), array("css", "js"));
   }
 
   private function handleImage($src, $dest, $mode) {

@@ -24,6 +24,7 @@ try {
   define('EMAIL_PATTERN', "([_a-zA-Z0-9-]+(?:\.[_a-zA-Z0-9-]+)*)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)\.([a-zA-Z]{2,})");
   define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
   define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z_]+');
+  #define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-][a-zA-Z0-9._-]*\/)*[a-zA-Z0-9_-][a-zA-Z0-9._-]*\.[a-zA-Z0-9]{2,4}");
   define('FILEPATH_PATTERN', "(?:[.a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}");
   define('FILE_HASH_ALGO', 'crc32b');
   define('SCRIPT_NAME', basename($_SERVER["SCRIPT_NAME"]));

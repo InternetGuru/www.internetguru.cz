@@ -531,13 +531,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $e = $parent->ownerDocument->createElement("script");
       $this->appendCdata($e, $this->jsFiles[$k]["content"]);
       $e->setAttribute("type", "text/javascript");
-      $filePath = ROOT_URL.getResourcePath($this->jsFiles[$k]["file"]);
+      $filePath = ROOT_URL.getResDir($this->jsFiles[$k]["file"]);
       if(!is_null($this->jsFiles[$k]["file"])) $e->setAttribute("src", $filePath);
       $ieIfComment = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : null;
       if(!is_null($ieIfComment)) {
         #$e->nodeValue = " ";
         $parent->appendChild($parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]"));
-        return;
+        continue;
       }
       $parent->appendChild($e);
     }
@@ -596,7 +596,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function appendCssFiles(DOMElement $parent) {
     foreach($this->cssFilesPriority as $k => $v) {
       $ieIfComment = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : null;
-      $filePath = ROOT_URL.getResourcePath($this->cssFiles[$k]["file"]);
+      $filePath = ROOT_URL.getResDir($this->cssFiles[$k]["file"]);
       $this->appendLinkElement($parent, $filePath, "stylesheet", "text/css",
         $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], $ieIfComment);
     }
