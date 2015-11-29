@@ -177,7 +177,7 @@
     filter = function(arr, value) {
       var fs = [];
       var qvalue = IGCMS.preg_quote(value).replace(/\\\*/g, "[^/ ]*");
-      var pattern = new RegExp("(^|[^a-z])("+qvalue+")", "gi");
+      var pattern = new RegExp("(^|[^a-z0-9])("+qvalue+")", "gi");
       for(var i = 0; i < arr.length; i++) {
         var r = doFilter(arr[i], value, pattern);
         if(typeof r != "undefined") {
