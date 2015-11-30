@@ -23,13 +23,13 @@ class GlobalMenu extends Plugin implements SplObserver {
     $root = $doc->appendChild($doc->createElement("root"));
     $root->appendChild($menu);
     $menu->setAttribute("class", "globalmenu");
-    $this->trimList($menu);
+    $this->trimList($menu, true);
     if(!is_null($this->current)) $this->setCurrentClass($this->current);
     #var_dump($doc->saveXML());
     Cms::setVariable("globalmenu", $root);
   }
 
-  private function trimList(DOMElement $ul) {
+  private function trimList(DOMElement $ul, $root=false) {
     $currentLink = false;
     $deepLink = false;
     foreach($ul->childElementsArray as $li) {
@@ -40,7 +40,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     }
     if($currentLink || $deepLink) return true;
     if($ul->isSameNode($ul->ownerDocument->documentElement)) return true;
-    $ul->parentNode->removeChild($ul);
+    if(!$root) $ul->parentNode->removeChild($ul);
     return false;
   }
 
