@@ -383,7 +383,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function savePost($filePath) {
     mkdir_plus(dirname($filePath));
-    $fp = lockFile("$filePath.lock");
+    $fp = lockFile($filePath);
     try {
       try {
         if($_POST["filename"] != $_GET[get_class($this)] && is_file($filePath) && !isset($_POST["overwrite"]))
@@ -403,8 +403,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } catch(Exception $e) {
       throw $e;
     } finally {
-      unlockFile($fp);
-      unlink("$filePath.lock");
+      unlockFile($fp, $filePath);
     }
   }
 

@@ -109,7 +109,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
     $this->file = "$f.html";
     $dest = $this->tmpFolder."/".$this->file;
-    $fp = lockFile("$dest.lock");
+    $fp = lockFile($dest);
     try {
       try {
         file_put_contents_plus($dest, $this->html);
@@ -124,8 +124,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
     } finally {
-      unlockFile($fp);
-      unlink("$dest.lock");
+      unlockFile($fp, $dest);
     }
   }
 

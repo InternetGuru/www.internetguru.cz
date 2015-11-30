@@ -360,7 +360,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   private function copyToRoot($src, $dest) {
     if(is_file($dest) && getFileHash($src) == getFileHash($dest)) return;
-    $fp = lockFile($src);
+    $fp = lockFile($src, null);
     if(is_file($dest) && getFileHash($src) == getFileHash($dest)) {
       unlockFile($fp);
       return;

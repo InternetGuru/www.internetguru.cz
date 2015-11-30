@@ -311,7 +311,7 @@ function initFiles() {
   if(SCRIPT_NAME != $f) return;
   $src = CMS_FOLDER."/".SERVER_FILES_DIR."/$f";
   if(filemtime($src) == filemtime($f)) return;
-  $fp = lockFile($src);
+  $fp = lockFile($src, null);
   if(filemtime($src) == filemtime($f)) {
     unlockFile($fp);
     return;
@@ -325,21 +325,23 @@ function smartCopy($src, $dest) {
   throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
 }
 
-function lockFile($filePath) {
-  $fp = @fopen($filePath, "c+");
-  if(!$fp) throw new Exception(_("Unable to open file"));
+function lockFile($filePath, $ext="lock") {
+  if(strlen($ext)) $filePath = "$filePath.$ext";
+  $fpr = @fopen($filePath, "c+");
+  if(!$fpr) throw new Exception(_("Unable to open file"));
   $start_time = microtime(true);
   do {
-    if(flock($fp, LOCK_EX|LOCK_NB)) return $fp;
+    if(flock($fpr, LOCK_EX|LOCK_NB)) return $fpr;
     usleep(rand(10, 500));
   } while(microtime(true) < $start_time+FILE_LOCK_WAIT_SEC);
   throw new Exception(_("Unable to acquire file lock"));
 }
 
-function unlockFile($fp) {
-  if(is_null($fp)) return;
-  flock($fp, LOCK_UN);
-  fclose($fp);
+function unlockFile($fpr, $fileName=null, $ext="lock") {
+  if(strlen($fileName) && strlen($ext)) unlink("$fileName.$ext");
+  if(is_null($fpr)) return;
+  flock($fpr, LOCK_UN);
+  fclose($fpr);
 }
 
 function deleteRedundantFiles($in, $according) {

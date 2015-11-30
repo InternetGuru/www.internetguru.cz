@@ -136,10 +136,10 @@ class FileHandler extends Plugin implements SplObserver {
   private function handleFile($filePath) {
     $src = $this->getSourceFile($filePath, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
-    $fp = lockFile("$src.lock");
+    $extension = strtolower(pathinfo($src, PATHINFO_EXTENSION));
+    if(in_array($extension, $this->resourceExt)) $filePath = getResDir($filePath, true);
+    $fp = lockFile($filePath);
     try {
-      $extension = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-      if(in_array($extension, $this->resourceExt)) $filePath = getResDir($filePath, true);
       if(is_file($filePath)) return $filePath;
       $mimeType = getFileMime($src);
       if(!isset($this->registeredMime[$mimeType]) || !in_array($extension, $this->registeredMime[$mimeType]))
@@ -159,14 +159,13 @@ class FileHandler extends Plugin implements SplObserver {
     } catch(Exception $e) {
       throw $e;
     } finally {
-      unlockFile($fp);
-      unlink("$src.lock");
+      unlockFile($fp, $filePath);
     }
   }
 
   private function restartGrunt($filePath) {
     $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
-    $rfp = lockFile("$restartFile.lock");
+    $rfp = lockFile($restartFile);
     if(!is_dir(RESOURCES_DIR)) {
       mkdir_plus(RESOURCES_DIR);
       touch($restartFile);
@@ -177,7 +176,7 @@ class FileHandler extends Plugin implements SplObserver {
       exec('/etc/init.d/gruntwatch stop');
     }
     if(is_file($filePath)) unlink($filePath);
-    unlockFile($rfp);
+    unlockFile($rfp, $restartFile);
   }
 
   private function handleImage($src, $dest, $mode) {
