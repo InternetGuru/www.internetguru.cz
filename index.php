@@ -130,7 +130,7 @@ try {
     redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
-  if(Cms::isSuperUser() && !is_null(Cms::getLoggedUser()) && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
+  if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
     try {
       clearNginxCache();
       new Logger(_("Cache successfully purged"), Logger::LOGGER_SUCCESS);
@@ -153,7 +153,7 @@ try {
   }
 
   $start_time = microtime(true);
-  if(!IS_LOCALHOST && Cms::isSuperUser()) DOMBuilder::setCacheMtime(getNewestCacheMtime());
+  DOMBuilder::setCacheMtime();
 
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);

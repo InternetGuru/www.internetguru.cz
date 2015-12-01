@@ -19,8 +19,10 @@ class DOMBuilder {
   private static $defaultPrefix = null;
   private static $newestCacheMtime = null;
 
-  public static function setCacheMtime($mTime) {
-    self::$newestCacheMtime = $mTime;
+  public static function setCacheMtime() {
+    if(IS_LOCALHOST || !Cms::isSuperUser()) return;
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    self::$newestCacheMtime = getNewestCacheMtime();
   }
 
   public static function buildHTMLPlus($filePath, $user=true) {
