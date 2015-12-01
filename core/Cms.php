@@ -85,7 +85,7 @@ class Cms {
     foreach($_SESSION["cms"]["flash"] as $type => $item) {
       foreach($item as $token => $messages) {
         foreach($messages as $message) {
-          if($token != self::$requestToken) $message = "$message (session)";
+          if($token != self::$requestToken) $message = sprintf(_("%s (previous requests)"), $message);
           self::addFlashItem($message, $type);
         }
       }
