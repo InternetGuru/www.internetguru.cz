@@ -147,11 +147,6 @@ class FileHandler extends Plugin implements SplObserver {
         if($fileType == self::FILE_TYPE_RESOURCE && $reqFilePath != $filePath) {
           // evoke grunt by touching the file (keep mtime)
           touch($filePath, filemtime($filePath));
-          #if(self::DEBUG) throw new Exception("TOUCHING RES...", 555);
-          // does it have to sleep? or how long?
-          usleep(200000);
-          // if it helps, return the requested file
-          if(is_file($reqFilePath)) return $reqFilePath;
         }
         return $filePath;
       }
@@ -166,7 +161,6 @@ class FileHandler extends Plugin implements SplObserver {
         case self::FILE_TYPE_RESOURCE:
         if($restartGrunt && !$this->gruntRestarted()) $this->restartGrunt($filePath);
         copy_plus($src, $filePath);
-        usleep(200000);
         if(is_file($reqFilePath)) return $reqFilePath;
         break;
         case self::FILE_TYPE_OTHER:
@@ -191,7 +185,6 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function restartGrunt($filePath) {
-    #if(self::DEBUG) throw new Exception("RESTARTING GRUNT", 555);
     $rfp = lockFile($this->restartFile);
     try {
       if($this->gruntRestarted()) return;
