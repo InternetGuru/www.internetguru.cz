@@ -75,16 +75,17 @@ class FileHandler extends Plugin implements SplObserver {
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
     $dirs = array(THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, FILES_DIR => false);
     foreach($dirs as $dir => $resDir) {
-      $this->doCheckResources(($resDir ? getRealResDir($dir) : $dir), $resDir);
+      $passed = $this->doCheckResources(($resDir ? getRealResDir($dir) : $dir), $resDir);
     }
+    if($passed) Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
   }
 
-  private function doCheckResources($folder, $resDir) {
+  private function doCheckResources($folder, $resDir, $passed=true) {
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $cacheFilePath = "$folder/$f";
       if(is_dir($cacheFilePath)) {
-        $this->doCheckResources($cacheFilePath, $resDir);
+        $passed = $this->doCheckResources($cacheFilePath, $resDir, $passed);
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
@@ -95,15 +96,13 @@ class FileHandler extends Plugin implements SplObserver {
       $cacheFileMtime = filemtime($cacheFilePath);
       if(!is_null($sourceFilePath) && $cacheFileMtime == filemtime($sourceFilePath)) continue;
       if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE) {
-        $passed = true;
         try {
           removeResourceFileCache($rawSourceFilePath);
         } catch(Exception $e) {
           $passed = false;
           Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
         }
-        if($passed) Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
-        return;
+        return $passed;
       }
       if(self::DEBUG) {
         Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawSourceFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
