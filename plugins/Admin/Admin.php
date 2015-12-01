@@ -53,7 +53,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         if($this->dataFile == $fileName && $_POST["userfilehash"] != getFileHash($this->dataFile))
           throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
         $this->processPost();
-        $_SESSION["clearcache"] = isset($_POST["clearcache"]) ? true : false;
       } else $this->setContent();
 
       if(!$this->isResource($this->type)) $this->processXml();
@@ -76,23 +75,24 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     if(!$this->isPost()) return;
-
-    if(isset($_POST["clearcache"])) {
-      try {
-        if($this->isResource($this->type)) {
-          removeResourceFileCache($this->defaultFile);
-        } elseif(!IS_LOCALHOST) {
-          clearNginxCache();
-        }
-      } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-      }
-    }
-
+    $this->updateCache();
     if(!$this->redir) return;
     $pLink["path"] = getCurLink();
     if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
+  }
+
+  private function updateCache() {
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    try {
+      if($this->isResource($this->type)) {
+        removeResourceFileCache($this->defaultFile);
+      } else {
+        clearNginxCache();
+      }
+    } catch(Exception $e) {
+      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+    }
   }
 
   private function isPost() {
@@ -201,13 +201,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["userfilehash"] = $usrDestHash;
     if((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED)
       || isset($_POST["disabled"])) $vars["checked"] = "checked";
-
-    $cachechecked = "checked";
-    if(isset($_SESSION["clearcache"])) {
-      $cachechecked = $_SESSION["clearcache"] ? "checked" : null;
-    }
-    $vars["cachechecked"] = $cachechecked;
-
     if($this->dataFileStatus == self::STATUS_NEW) {
       $vars["warning"] = "warning";
       $vars["nohide"] = "nohide";

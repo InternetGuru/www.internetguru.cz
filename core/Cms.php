@@ -41,9 +41,14 @@ class Cms {
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
     self::setVariable("uri", URI);
-    self::setVariable("clearcacheurl", getCurLink()."?clearcache");
+    self::setVariable("nginx_cache_update", getCurLink()."?".CACHE_PARAM."=".CACHE_NGINX);
     self::setVariable("link", getCurLink());
-    if(isset($_GET["PageSpeed"])) self::setVariable("pagespeed", $_GET["PageSpeed"]);
+    self::setVariable("url_debug_on", getCurLink()."/?".PAGESPEED_PARAM."=".PAGESPEED_OFF
+      ."&".GRUNT_PARAM."=".GRUNT_ON."&".CACHE_PARAM."=".CACHE_IGNORE);
+    if(isset($_GET[PAGESPEED_PARAM]) || isset($_GET[GRUNT_PARAM]) || isset($_GET[CACHE_PARAM]))
+      self::setVariable("url_debug_off", getCurLink()."/?".PAGESPEED_PARAM."&".GRUNT_PARAM."&".CACHE_PARAM);
+    else self::setVariable("url_debug_off", strlen(getCurLink()) ? getCurLink() : "/");
+    if(isset($_GET[PAGESPEED_PARAM])) self::setVariable(PAGESPEED_PARAM, $_GET[PAGESPEED_PARAM]);
   }
 
   private static function createFlashList() {

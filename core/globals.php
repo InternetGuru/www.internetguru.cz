@@ -127,8 +127,9 @@ function parseLocalLink($link, $host=null) {
 }
 
 function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
-  addPermParam($pLink, "PageSpeed");
-  addPermParam($pLink, "Grunt");
+  addPermParam($pLink, PAGESPEED_PARAM);
+  addPermParam($pLink, GRUNT_PARAM);
+  addPermParam($pLink, CACHE_PARAM);
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
@@ -158,7 +159,18 @@ function isCyclicLink(Array $pLink) {
   return true;
 }
 
-function addPermParam(Array &$pLink, $parName, $off="off", $on="on") {
+function addPermParam(Array &$pLink, $parName) {
+  if(!isset($_GET[$parName])) return;
+  $parAndVal = "$parName=".$_GET[$parName];
+  if(isset($pLink["query"])) {
+    if(strpos($pLink["query"], $parName) !== false) return;
+    $pLink["query"] = $pLink["query"]."&".$parAndVal;
+    return;
+  }
+  $pLink["query"] = $parAndVal;
+}
+
+function OLD_addPermParam(Array &$pLink, $parName, $off="off", $on="on") {
   if(!isset($_GET[$parName]) || $_GET[$parName] != $off) return;
   $parOn = "$parName=$on";
   $parOff = "$parName=$off";
@@ -339,10 +351,10 @@ function lockFile($filePath, $ext="lock") {
 }
 
 function unlockFile($fpr, $fileName=null, $ext="lock") {
-  if(strlen($fileName) && strlen($ext)) unlink("$fileName.$ext");
   if(is_null($fpr)) return;
   flock($fpr, LOCK_UN);
   fclose($fpr);
+  if(strlen($fileName) && strlen($ext)) unlink("$fileName.$ext");
 }
 
 function deleteRedundantFiles($in, $according) {
@@ -490,6 +502,7 @@ function apc_get_key($key) {
 }
 
 function clearNginxCache($folder = null) {
+  if(IS_LOCALHOST) return;
   foreach(getNginxCacheFiles() as $fPath) {
     if(!unlink($fPath)) throw new Exception(_("Failed to purge cache"));
   }

@@ -4,12 +4,13 @@
   <xsl:param name="cms-admin_id" select="''"/>
   <xsl:param name="cms-logged_user" select="''"/>
   <xsl:param name="cms-super_user" select="''"/>
-  <xsl:param name="cms-pagespeed" select="''"/>
-  <xsl:param name="cms-clearcacheurl" select="''"/>
+  <xsl:param name="cms-nginx_cache_update" select="''"/>
   <xsl:param name="cms-name" select="''"/>
   <xsl:param name="cms-link" select="''"/>
+  <xsl:param name="cms-url_debug_on" select="''"/>
+  <xsl:param name="cms-url_debug_off" select="''"/>
   <xsl:param name="inputvar-reportbug" select="''"/>
-  <xsl:param name="filehandler-cfcurl" select="''"/>
+  <xsl:param name="filehandler-file_cache_update" select="''"/>
 
   <xsl:template match="/">
     <xsl:apply-templates/>
@@ -26,41 +27,34 @@
       </ul>
       <ul class="adminmenu">
         <li>
-          <xsl:choose>
-            <xsl:when test="$cms-pagespeed = 'off'">
-              <xsl:element name="a">
-                <xsl:attribute name="href">
-                  <xsl:choose>
-                    <xsl:when test="$cms-link">
-                      <xsl:value-of select="$cms-link"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:text>/</xsl:text>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                  <xsl:text>?PageSpeed=on&amp;Grunt=on</xsl:text>
-                </xsl:attribute>
-                <xsl:text>Vypnout režim ladění</xsl:text>
-              </xsl:element>
-            </xsl:when>
-            <xsl:otherwise>
-              <a href="?PageSpeed=off&amp;Grunt=off">Zapnout režim ladění</a>
-            </xsl:otherwise>
-          </xsl:choose>
+          <xsl:element name="a">
+            <xsl:attribute name="href">
+              <xsl:value-of select="$cms-url_debug_off"/>
+            </xsl:attribute>
+            <xsl:text>Provozní režim</xsl:text>
+          </xsl:element>
         </li>
         <li>
           <xsl:element name="a">
             <xsl:attribute name="href">
-              <xsl:value-of select="$cms-clearcacheurl"/>
+              <xsl:value-of select="$cms-url_debug_on"/>
+            </xsl:attribute>
+            <xsl:text>Režim ladění</xsl:text>
+          </xsl:element>
+        </li>
+        <li>
+          <xsl:element name="a">
+            <xsl:attribute name="href">
+              <xsl:value-of select="$cms-nginx_cache_update"/>
             </xsl:attribute>
             <xsl:text>Smazat mezipaměť</xsl:text>
           </xsl:element>
         </li>
-        <xsl:if test="$filehandler-cfcurl">
+        <xsl:if test="$filehandler-file_cache_update">
           <li>
             <xsl:element name="a">
               <xsl:attribute name="href">
-                <xsl:value-of select="$filehandler-cfcurl"/>
+                <xsl:value-of select="$filehandler-file_cache_update"/>
               </xsl:attribute>
               <xsl:text>Smazat dočasné soubory</xsl:text>
             </xsl:element>

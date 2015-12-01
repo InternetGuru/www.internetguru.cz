@@ -16,6 +16,14 @@ try {
   define("SERVER_FILES_DIR", "_server");
   define("LOG_DIR", "log");
   define("DEBUG_FILE", "DEBUG");
+  define('CACHE_PARAM', "Cache");
+  define('CACHE_IGNORE', "ignore");
+  define('CACHE_FILE', "file");
+  define('CACHE_NGINX', "nginx");
+  define('PAGESPEED_PARAM', "PageSpeed");
+  define('PAGESPEED_OFF', "off");
+  define('GRUNT_PARAM', "Grunt");
+  define('GRUNT_ON', "on");
   define("FORBIDDEN_FILE", "FORBIDDEN");
   define("ADMIN_ROOT_DIR", "admin");
   define("USER_ROOT_DIR", "user");
@@ -122,8 +130,7 @@ try {
     redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
-  if(!IS_LOCALHOST && !is_null(Cms::getLoggedUser()) && isset($_GET["clearcache"])) {
-    if(!Cms::isSuperUser()) new Logger(_("Insufficient rights to purge cache"), Logger::LOGGER_WARNING);
+  if(Cms::isSuperUser() && !is_null(Cms::getLoggedUser()) && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
     try {
       clearNginxCache();
       new Logger(_("Cache successfully purged"), Logger::LOGGER_SUCCESS);

@@ -226,7 +226,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     if(@$var->ownerDocument->save($this->userCfgPath) === false)
       throw new Exception(_("Unabe to save user config"));
-    if(!IS_LOCALHOST) clearNginxCache();
+    if(!isset($_GET[CACHE_PARAM]) || !$_GET[CACHE_PARAM] == CACHE_IGNORE) clearNginxCache();
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => get_class($this)."&".$this->getOk), true));
   }
 

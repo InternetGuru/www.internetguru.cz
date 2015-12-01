@@ -7,7 +7,6 @@ class FileHandler extends Plugin implements SplObserver {
   const FILE_TYPE_RESOURCE = 1;
   const FILE_TYPE_IMAGE = 2;
   const FILE_TYPE_OTHER = 3;
-  const CLEAR_CACHE_PARAM = "clearfilecache";
   const DEBUG = false;
 
   public function __construct(SplSubject $s) {
@@ -18,19 +17,11 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_PROCESS && Cms::isSuperUser()) {
-      try {
-        $this->checkResources();
-        if(isset($_GET[self::CLEAR_CACHE_PARAM]))
-          Logger::log(_("Outdated files successfully removed"), Logger::LOGGER_SUCCESS);
-      } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-      }
-    }
+    if($subject->getStatus() == STATUS_PROCESS) $this->checkResources();
     if($subject->getStatus() != STATUS_PREINIT) return;
     $filePath = getCurLink();
     if(!preg_match("/".FILEPATH_PATTERN."/", $filePath)) {
-      Cms::setVariable("cfcurl", "$filePath?".self::CLEAR_CACHE_PARAM);
+      Cms::setVariable("file_cache_update", "$filePath?".CACHE_PARAM."=".CACHE_FILE);
       return;
     }
     try {
@@ -80,46 +71,46 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function checkResources() {
-    $dirs = array(THEMES_DIR => false, PLUGINS_DIR => false, LIB_DIR => false, FILES_DIR => true);
-    $e = null;
-    foreach($dirs as $dir => $checkSource) {
-      try {
-        $this->doCheckResources(getRealResDir($dir), $checkSource);
-      } catch(Exception $e) {}
+    if(!Cms::isSuperUser()) return;
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    $dirs = array(THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, FILES_DIR => false);
+    foreach($dirs as $dir => $resDir) {
+      $this->doCheckResources(($resDir ? getRealResDir($dir) : $dir), $resDir);
     }
-    if(!is_null($e)) throw new Exception($e->getMessage());
   }
 
-  private function doCheckResources($folder, $checkSource) {
-    #fixme: Invalid argument supplied for foreach()
+  private function doCheckResources($folder, $resDir) {
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $cacheFilePath = "$folder/$f";
       if(is_dir($cacheFilePath)) {
-        $this->doCheckResources($cacheFilePath, $checkSource);
+        $this->doCheckResources($cacheFilePath, $resDir);
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
       $rawSourceFilePath = $cacheFilePath;
-      if(!IS_LOCALHOST) $rawSourceFilePath = substr($cacheFilePath, strlen(getRealResDir())+1);
+      if(!IS_LOCALHOST && $resDir) $rawSourceFilePath = substr($cacheFilePath, strlen(getRealResDir())+1);
       $sourceFilePath = findFile($rawSourceFilePath, true, true, false);
-      if(is_null($sourceFilePath) && $checkSource) $sourceFilePath = $this->getSourceFile($rawSourceFilePath);
+      if(is_null($sourceFilePath) && !$resDir) $sourceFilePath = $this->getSourceFile($rawSourceFilePath);
       $cacheFileMtime = filemtime($cacheFilePath);
       if(!is_null($sourceFilePath) && $cacheFileMtime == filemtime($sourceFilePath)) continue;
-      if(isset($_GET[self::CLEAR_CACHE_PARAM])) {
+      if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE) {
+        $passed = true;
         try {
           removeResourceFileCache($rawSourceFilePath);
         } catch(Exception $e) {
+          $passed = false;
           Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
         }
+        if($passed) Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
+        return;
+      }
+      if(self::DEBUG) {
+        Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawSourceFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+      } elseif(is_null($sourceFilePath)) {
+        Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
       } else {
-        if(self::DEBUG) {
-          Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawSourceFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
-        } elseif(is_null($sourceFilePath)) {
-          Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
-        } else {
-          Cms::addMessage(sprintf(_("File cache is outdated: %s"), $cacheFilePath), Cms::MSG_WARNING);
-        }
+        Cms::addMessage(sprintf(_("File cache is outdated: %s"), $cacheFilePath), Cms::MSG_WARNING);
       }
     }
   }
