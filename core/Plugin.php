@@ -10,6 +10,10 @@ class Plugin {
     $this->pluginDir = PLUGINS_DIR."/".get_class($this);
   }
 
+  public function isDebug() {
+    return defined('static::DEBUG') ? static::DEBUG : false;
+  }
+
   protected function detachIfNotAttached($pluginName) {
     if(!is_array($pluginName)) $pluginName = array($pluginName);
     foreach($pluginName as $p) {

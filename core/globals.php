@@ -225,7 +225,7 @@ function file_put_contents_plus($dest, $string) {
 }
 
 function removeResourceFileCache($filePath) {
-  $resFile = getResDir($filePath, true);
+  $resFile = getRealResDir($filePath);
   try {
     if(is_file($resFile) && !unlink($resFile)) throw new Exception($resFile);
     if(is_file($filePath) && !unlink($filePath)) throw new Exception($filePath);
@@ -327,8 +327,9 @@ function smartCopy($src, $dest) {
 
 function lockFile($filePath, $ext="lock") {
   if(strlen($ext)) $filePath = "$filePath.$ext";
+  mkdir_plus(dirname($filePath));
   $fpr = @fopen($filePath, "c+");
-  if(!$fpr) throw new Exception(_("Unable to open file"));
+  if(!$fpr) throw new Exception(_("Unable to open file $filePath"));
   $start_time = microtime(true);
   do {
     if(flock($fpr, LOCK_EX|LOCK_NB)) return $fpr;
@@ -526,13 +527,19 @@ function getIP() {
   return $_SERVER['REMOTE_ADDR'];
 }
 
-function getResDir($file="", $forceRes=false) {
-  if(IS_LOCALHOST || is_null(Cms::getLoggedUser())) return $file; // always root resources
+function getRealResDir($file="") {
+  if(IS_LOCALHOST) return $file; // always root resources
   $resDir = RESOURCES_DIR;
   $scriptName = $_SERVER["SCRIPT_FILENAME"];
   if(basename($scriptName) != "index.php") $resDir = pathinfo($scriptName, PATHINFO_FILENAME);
-  elseif(!$forceRes && !isset($_GET["Grunt"]) || $_GET["Grunt"] != "off") return $file; // Grunt is on (aka Grunt is not off)
   return $resDir.(strlen($file) ? "/$file" : "");
+}
+
+function getResDir($file="") {
+  if(is_null(Cms::getLoggedUser())) return $file;
+  if(getRealResDir() != RESOURCES_DIR) return getRealResDir($file);
+  if(!isset($_GET["Grunt"]) || $_GET["Grunt"] != "off") return $file; // Grunt is on (aka Grunt is not off)
+  return getRealResDir($file);
 }
 
 // UNUSED

@@ -5,6 +5,7 @@ class FileHandler extends Plugin implements SplObserver {
   private $imageExt = array("jpg", "png", "gif", "jpeg");
   private $registeredMime;
   private $imageModes;
+  private $restartFile;
   const DEBUG = false;
   const CLEAR_CACHE_PARAM = "clearfilecache";
 
@@ -31,6 +32,7 @@ class FileHandler extends Plugin implements SplObserver {
       Cms::setVariable("cfcurl", "$filePath?".self::CLEAR_CACHE_PARAM);
       return;
     }
+    $origPath = $filePath;
     if(strpos($filePath, RESOURCES_DIR) === 0) $filePath = substr($filePath, strlen(RESOURCES_DIR)+1);
     try {
       $legal = false;
@@ -38,8 +40,9 @@ class FileHandler extends Plugin implements SplObserver {
         if(strpos($filePath, "$dir/") === 0) $legal = true;
       }
       if(!$legal) throw new Exception(_("File illegal path"), 404);
-      $destFilePath = $this->handleFile($filePath);
-      redirTo(ROOT_URL.$destFilePath);
+      $this->handleFile($filePath);
+      if(getRealResDir() == RESOURCES_DIR) redirTo(ROOT_URL.$origPath);
+      redirTo(ROOT_URL.getRealResDir($filePath));
     } catch(Exception $e) {
       $errno = 500;
       if($e->getCode() != 0) $errno = $e->getCode();
@@ -48,6 +51,7 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function setVariables() {
+    $this->restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
     $this->registeredMime = array(
       "inode/x-empty" => array("css", "js"),
       "text/plain" => array("css", "js"),
@@ -80,7 +84,7 @@ class FileHandler extends Plugin implements SplObserver {
     $e = null;
     foreach($dirs as $dir => $checkSource) {
       try {
-        $this->doCheckResources(getResDir($dir, true), $checkSource);
+        $this->doCheckResources(getRealResDir($dir), $checkSource);
       } catch(Exception $e) {}
     }
     if(!is_null($e)) throw new Exception($e->getMessage());
@@ -96,7 +100,7 @@ class FileHandler extends Plugin implements SplObserver {
         continue;
       }
       $rawSourceFilePath = $cacheFilePath;
-      if(!IS_LOCALHOST) $rawSourceFilePath = substr($cacheFilePath, strpos($cacheFilePath, "/")+1);
+      if(!IS_LOCALHOST) $rawSourceFilePath = substr($cacheFilePath, strlen(getRealResDir())+1);
       $sourceFilePath = findFile($rawSourceFilePath, true, true, false);
       if(is_null($sourceFilePath) && $checkSource) $sourceFilePath = $this->getSourceFile($rawSourceFilePath);
       $cacheFileMtime = filemtime($cacheFilePath);
@@ -108,8 +112,8 @@ class FileHandler extends Plugin implements SplObserver {
           Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
         }
       } else {
-        if(self::DEBUG && !is_null($sourceFilePath)) {
-          Cms::addMessage(sprintf("%s:%s | %s:%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+        if(self::DEBUG) {
+          Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawSourceFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
         } elseif(is_null($sourceFilePath)) {
           Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
         } else {
@@ -137,25 +141,36 @@ class FileHandler extends Plugin implements SplObserver {
     $src = $this->getSourceFile($filePath, $mode);
     if(!$src) throw new Exception(_("Requested URL not found on this server"), 404);
     $extension = strtolower(pathinfo($src, PATHINFO_EXTENSION));
-    if(in_array($extension, $this->resourceExt)) $filePath = getResDir($filePath, true);
+    if(in_array($extension, $this->resourceExt)) $filePath = getRealResDir($filePath);
+    $restartGrunt = !is_dir(dirname($filePath));
     $fp = lockFile($filePath);
     try {
-      if(is_file($filePath)) return $filePath;
+      if(is_file($filePath)) return;
       $mimeType = getFileMime($src);
       if(!isset($this->registeredMime[$mimeType]) || !in_array($extension, $this->registeredMime[$mimeType]))
         throw new Exception(sprintf(_("Unsupported mime type %s"), $mimeType), 415);
+      // images
       if(in_array($extension, $this->imageExt)) {
         if(!isset($this->imageModes[$mode])) $mode = "";
         $this->handleImage(realpath($src), $filePath, $this->imageModes[$mode]);
-      } elseif(!IS_LOCALHOST && in_array($extension, $this->resourceExt)) {
-        if(getResDir("", true) == RESOURCES_DIR) $this->restartGrunt($filePath);
-        if(is_file($filePath)) throw new Exception("Destination file $filePath already exists!", 555);
-        copy_plus($src, $filePath);
-        usleep(rand(5,15)*100000);
-      } else {
-        copy_plus($src, $filePath);
+        return;
       }
-      return $filePath;
+      // resources
+      if(!IS_LOCALHOST && in_array($extension, $this->resourceExt) && getResDir() == "") {
+        if($restartGrunt && !$this->gruntRestarted()) $this->restartGrunt($filePath);
+        copy_plus($src, $filePath);
+        $mtime = filemtime($filePath);
+        $destFile = substr($filePath, strlen(RESOURCES_DIR)+1);
+        for($i=0; $i<30; $i++) {
+          if(file_exists($destFile)) return;
+          touch($filePath, $mtime);
+          usleep(500000);
+        }
+        unlink($filePath);
+        throw new Exception(_("Waiting time for Grunt restart exceeded"));
+      }
+      // other
+      copy_plus($src, $filePath);
     } catch(Exception $e) {
       throw $e;
     } finally {
@@ -163,20 +178,22 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
+  private function gruntRestarted() {
+    return is_file($this->restartFile) && (time() - filemtime($this->restartFile)) < 35;
+  }
+
   private function restartGrunt($filePath) {
-    $restartFile = USER_FOLDER."/".$this->pluginDir."/restart.touch";
-    $rfp = lockFile($restartFile);
-    if(!is_dir(RESOURCES_DIR)) {
-      mkdir_plus(RESOURCES_DIR);
-      touch($restartFile);
+    $rfp = lockFile($this->restartFile);
+    try {
+      if($this->gruntRestarted()) return;
+      mkdir_plus(dirname($filePath));
+      touch($this->restartFile);
       exec('/etc/init.d/gruntwatch stop');
+    } catch(Exception $e) {
+      throw $e;
+    } finally {
+      unlockFile($rfp, $this->restartFile);
     }
-    if(!is_dir(RESOURCES_DIR) && (!is_file($restartFile) || (time() - filemtime($restartFile)) >= 35 )) {
-      touch($restartFile);
-      exec('/etc/init.d/gruntwatch stop');
-    }
-    if(is_file($filePath)) unlink($filePath);
-    unlockFile($rfp, $restartFile);
   }
 
   private function handleImage($src, $dest, $mode) {
