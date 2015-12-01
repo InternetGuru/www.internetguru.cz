@@ -24,6 +24,7 @@ class UrlHandler extends Plugin implements SplObserver {
 
   private function httpsRedir() {
     $https = true;
+    $urlMatch = false;
     foreach($this->cfg->documentElement->childNodes as $redir) {
       if($redir->nodeName != "https") continue;
       $https = false;
@@ -35,7 +36,6 @@ class UrlHandler extends Plugin implements SplObserver {
     }
     Cms::setVariable("default_protocol", ($https ? "https" : "http"));
     if(SCHEME == "https") {
-      #fixme: Undefined variable: urlMatch
       if(is_null(Cms::getLoggedUser()) && !$urlMatch && !$https) {
         redirTo("http://".HOST.$_SERVER["REQUEST_URI"]);
       }
