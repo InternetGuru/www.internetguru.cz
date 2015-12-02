@@ -15,8 +15,7 @@ try {
     $version = substr($_GET["q"], 0, $slashPos);
     $cmsIndex = "$version.php";
     if(is_link($cmsIndex)) {
-      $srcPath = substr($_GET["q"], $slashPos+1);
-      $url = "http".($_SERVER["HTTPS"] == "on" ? "s" : "")."://".$_SERVER["SERVER_NAME"]."/$cmsIndex?q=$srcPath";
+      $url = "http".($_SERVER["HTTPS"] == "on" ? "s" : "")."://".$_SERVER["SERVER_NAME"]."/$cmsIndex?q=".$_GET["q"];
       header("Location: $url");
       exit;
     }
