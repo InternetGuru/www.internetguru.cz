@@ -40,7 +40,9 @@ class FileHandler extends Plugin implements SplObserver {
       }
       if(is_null($rawFilePath)) throw new Exception(_("File illegal path"), 404);
       $this->handleFile($rawFilePath, $cacheFilePath);
-      redirTo(ROOT_URL.$destFile);
+      if(is_file($reqFilePath)) redirTo(ROOT_URL.$reqFilePath);
+      if(is_file($cacheFilePath)) redirTo(ROOT_URL.$cacheFilePath);
+      throw new Exception(_("Unable to handle file request"));
     } catch(Exception $e) {
       $errno = 500;
       if($e->getCode() != 0) $errno = $e->getCode();
