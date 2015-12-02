@@ -23,7 +23,7 @@ try {
   define('PAGESPEED_PARAM', "PageSpeed");
   define('PAGESPEED_OFF', "off");
   define('GRUNT_PARAM', "Grunt");
-  define('GRUNT_ON', "on");
+  define('GRUNT_OFF', "off");
   define("FORBIDDEN_FILE", "FORBIDDEN");
   define("ADMIN_ROOT_DIR", "admin");
   define("USER_ROOT_DIR", "user");

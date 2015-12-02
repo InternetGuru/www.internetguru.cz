@@ -170,21 +170,6 @@ function addPermParam(Array &$pLink, $parName) {
   $pLink["query"] = $parAndVal;
 }
 
-function OLD_addPermParam(Array &$pLink, $parName, $off="off", $on="on") {
-  if(!isset($_GET[$parName]) || $_GET[$parName] != $off) return;
-  $parOn = "$parName=$on";
-  $parOff = "$parName=$off";
-  if(isset($pLink["query"])) {
-    if(strpos($pLink["query"], $parOn) !== false) {
-      $pLink["query"] = str_replace("&$parOn", "", $pLink["query"]);
-      $pLink["query"] = str_replace("$parOn&", "", $pLink["query"]);
-      $pLink["query"] = str_replace($parOn, "", $pLink["query"]);
-      return;
-    }
-    $pLink["query"] = $pLink["query"]."&$parOff";
-  } else $pLink["query"] = $parOff;
-}
-
 function __toString($o) {
   echo "|";
   if(is_array($o)) return implode(", ", $o);
@@ -551,7 +536,7 @@ function getRealResDir($file="") {
 function getResDir($file="") {
   if(is_null(Cms::getLoggedUser())) return $file;
   if(getRealResDir() != RESOURCES_DIR) return getRealResDir($file);
-  if(!isset($_GET["Grunt"]) || $_GET["Grunt"] != "off") return $file; // Grunt is on (aka Grunt is not off)
+  if(!isset($_GET[GRUNT_PARAM]) || $_GET[GRUNT_PARAM] != GRUNT_OFF) return $file; // Grunt is on (aka Grunt is not off)
   return getRealResDir($file);
 }
 
