@@ -89,8 +89,7 @@ class FileHandler extends Plugin implements SplObserver {
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
-      $rawSourceFilePath = $cacheFilePath;
-      if(!IS_LOCALHOST && $resDir) $rawSourceFilePath = substr($cacheFilePath, strlen(getRealResDir())+1);
+      $rawSourceFilePath = $this->getRawSourcePath($cacheFilePath, $resDir);
       $sourceFilePath = findFile($rawSourceFilePath, true, true, false);
       if(is_null($sourceFilePath) && !$resDir) $sourceFilePath = $this->getSourceFile($rawSourceFilePath);
       $cacheFileMtime = filemtime($cacheFilePath);
@@ -114,6 +113,11 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
+  private function getRawSourcePath($filePath, $resDir=true) {
+    if(!IS_LOCALHOST && $resDir) return substr($filePath, strlen(getRealResDir())+1);
+    return $filePath;
+  }
+
   private function getSourceFile($dest, &$mode=null) {
     $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
     $pLink = explode("/", $dest);
@@ -129,7 +133,7 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function handleFile($reqFilePath) {
-    $src = $this->getSourceFile($reqFilePath, $mode);
+    $src = $this->getSourceFile($this->getRawSourcePath($reqFilePath), $mode);
     if(!$src) throw new Exception(_("File not found"), 404);
     $extension = strtolower(pathinfo($reqFilePath, PATHINFO_EXTENSION));
     $fileType = $this->getFileType($extension);
