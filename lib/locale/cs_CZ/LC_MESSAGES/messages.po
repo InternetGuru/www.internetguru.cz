@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-01 17:45+0100\n"
-"PO-Revision-Date: 2015-12-01 17:46+0100\n"
+"POT-Creation-Date: 2015-12-03 13:27+0100\n"
+"PO-Revision-Date: 2015-12-03 13:27+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.4\n"
+"X-Generator: Poedit 1.8.6\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -71,101 +71,101 @@ msgstr "Obsah není nastaven"
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
 
-#: core/DOMBuilder.php:74
+#: core/DOMBuilder.php:76
 msgid "Link not found"
 msgstr "Odkaz nebyl nalezen"
 
-#: core/DOMBuilder.php:156
+#: core/DOMBuilder.php:158
 #, php-format
 msgid "Unable to admin-update XML: %s"
 msgstr "Nepodařilo se aplikovat administrátorské XML: %s"
 
-#: core/DOMBuilder.php:167
+#: core/DOMBuilder.php:169
 #, php-format
 msgid "Unable to user-update XML: %s"
 msgstr "Nepodařilo se aplikovat uživatelské XML: %s"
 
-#: core/DOMBuilder.php:174
+#: core/DOMBuilder.php:176
 #, php-format
 msgid "File '%s' not found"
 msgstr "Soubor '%s' nebyl nalezen"
 
-#: core/DOMBuilder.php:194
+#: core/DOMBuilder.php:196
 #, php-format
 msgid "Unable to load '%s': %s"
 msgstr "Nepodařilo se načíst soubor '%s': %s"
 
-#: core/DOMBuilder.php:202
+#: core/DOMBuilder.php:204
 #, php-format
 msgid "Failed to load user/admin/default file %s: %s"
 msgstr "Nepodařilo se načíst uživatelský/admin/výchozí soubor %s: %s"
 
-#: core/DOMBuilder.php:208
+#: core/DOMBuilder.php:210
 #, php-format
 msgid "File disabled"
 msgstr "Soubor je neaktivní"
 
-#: core/DOMBuilder.php:213
+#: core/DOMBuilder.php:215
 #, php-format
 msgid "Cache is older than %s"
 msgstr "Mezipaměť je starší než %s"
 
-#: core/DOMBuilder.php:226
+#: core/DOMBuilder.php:228
 #, php-format
 msgid "Invalid XML file %s"
 msgstr "Chybný XML soubor %s"
 
-#: core/DOMBuilder.php:239
+#: core/DOMBuilder.php:241
 #, php-format
 msgid "Unable to cache file %s"
 msgstr "Nepodařilo se uložit soubor %s do mezipaměti"
 
-#: core/DOMBuilder.php:245
+#: core/DOMBuilder.php:247
 #, php-format
 msgid "File '%s' already included"
 msgstr "Soubor '%s' byl již vložen"
 
-#: core/DOMBuilder.php:266
+#: core/DOMBuilder.php:268
 #, php-format
 msgid "Invalid HTMLPlus file %s"
 msgstr "Neplatný soubor HTMLPlus %s"
 
-#: core/DOMBuilder.php:280
+#: core/DOMBuilder.php:282
 #, php-format
 msgid "HTML+ file %s autocorrected: %s"
 msgstr "HTML+ soubor %s byl automaticky opraven: %s"
 
-#: core/DOMBuilder.php:347
+#: core/DOMBuilder.php:349
 #, php-format
 msgid "Duplicit prefix %s in %s renamed to %s"
 msgstr "Duplicitní prefix %s v %s přejmenován na %s"
 
-#: core/DOMBuilder.php:397
+#: core/DOMBuilder.php:399
 #, php-format
 msgid "Duplicit link %s skipped"
 msgstr "Byl vynechán duplicitní link %s"
 
-#: core/DOMBuilder.php:466
+#: core/DOMBuilder.php:468
 #, php-format
 msgid "Included file '%s' not found"
 msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
 
-#: core/DOMBuilder.php:469
+#: core/DOMBuilder.php:471
 #, php-format
 msgid "Included file extension '%s' must be .html"
 msgstr "Přípona vkládaného souboru '%s' musí být .html"
 
-#: core/DOMBuilder.php:471
+#: core/DOMBuilder.php:473
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
 
-#: core/DOMBuilder.php:477
+#: core/DOMBuilder.php:479
 #, php-format
 msgid "Unable to import '%s': %s"
 msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: core/DOMBuilder.php:485
+#: core/DOMBuilder.php:487
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -173,12 +173,12 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: core/DOMBuilder.php:498
+#: core/DOMBuilder.php:500
 #, php-format
 msgid "HTML+ autocorrected after inserting '%s': %s"
 msgstr "HTML+ automaticky opraven po vložení souboru '%s': %s"
 
-#: core/DOMBuilder.php:549
+#: core/DOMBuilder.php:551
 #, php-format
 msgid "ID '%s' conflicts with element '%s'"
 msgstr "Atribut ID '%s' koliduje s elementem '%s'"
@@ -443,83 +443,83 @@ msgstr "Nelze zpracovat atribut href '%s'"
 msgid "Link is cyclic"
 msgstr "Odkaz je cycklický"
 
-#: core/globals.php:229
+#: core/globals.php:214
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: core/globals.php:235
+#: core/globals.php:220
 msgid "Unable to save content"
 msgstr "Nepodařilo se uložit obsah"
 
-#: core/globals.php:245
+#: core/globals.php:230
 #, php-format
 msgid "Unable to remove cache file %s"
 msgstr "Nepodařilo se odstranit dočasný soubor %s"
 
-#: core/globals.php:250
+#: core/globals.php:235
 msgid "Source file is a link"
 msgstr "Zdrojový soubor je symbolický odkaz (link)"
 
-#: core/globals.php:251
+#: core/globals.php:236
 msgid "Source file not found"
 msgstr "Zdrojový soubor nebyl nalezen"
 
-#: core/globals.php:254
+#: core/globals.php:239
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: core/globals.php:258
+#: core/globals.php:243
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: core/globals.php:262
+#: core/globals.php:247
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: core/globals.php:264
+#: core/globals.php:249
 msgid "Unable to set new file modification time"
 msgstr "Nepodařilo se nastavit čas modifikace"
 
-#: core/globals.php:270
+#: core/globals.php:255
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: core/globals.php:284
+#: core/globals.php:269
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: core/globals.php:289
+#: core/globals.php:274
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: core/globals.php:333
+#: core/globals.php:318
 #, php-format
 msgid "Subdom file %s updated"
 msgstr "Byl aktualizován soubor %s na poddoméně"
 
-#: core/globals.php:350
+#: core/globals.php:335
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: core/globals.php:392 core/globals.php:407
+#: core/globals.php:377 core/globals.php:392
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: core/globals.php:410
+#: core/globals.php:395
 msgid "Unable to read file"
 msgstr "Nepodařilo se přečíst soubor"
 
-#: core/globals.php:414
+#: core/globals.php:399
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: core/globals.php:470
+#: core/globals.php:455
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:507
+#: core/globals.php:492
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
@@ -911,57 +911,61 @@ msgstr "Element replace postrádá atribut pattern"
 msgid "Element replace missing value"
 msgstr "Element replace postrádá hodnotu"
 
-#: plugins/FileHandler/FileHandler.php:34
+#: plugins/FileHandler/FileHandler.php:41
 msgid "File illegal path"
 msgstr "Neplatná cesta souboru"
 
-#: plugins/FileHandler/FileHandler.php:40
+#: plugins/FileHandler/FileHandler.php:50
+msgid "Server error"
+msgstr "Chyba serveru"
+
+#: plugins/FileHandler/FileHandler.php:54
 #, php-format
 msgid "Unable to handle file request: %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 
-#: plugins/FileHandler/FileHandler.php:105
+#: plugins/FileHandler/FileHandler.php:94
 msgid "Outdated cache files successfully removed"
 msgstr "Neaktuální soubory byly úspěšně odstraněny"
 
-#: plugins/FileHandler/FileHandler.php:111
+#: plugins/FileHandler/FileHandler.php:123
 #, php-format
 msgid "Redundant cache file: %s"
 msgstr "Redundantní dočasný soubor %s"
 
-#: plugins/FileHandler/FileHandler.php:113
+#: plugins/FileHandler/FileHandler.php:125
 #, php-format
 msgid "File cache is outdated: %s"
 msgstr "Dočasný soubor %s je zastaralý"
 
-#: plugins/FileHandler/FileHandler.php:134
+#: plugins/FileHandler/FileHandler.php:159
 msgid "File not found"
 msgstr "Soubor nenalezen"
 
-#: plugins/FileHandler/FileHandler.php:160
+#: plugins/FileHandler/FileHandler.php:175
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:213
+#: plugins/FileHandler/FileHandler.php:223
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:228
+#: plugins/FileHandler/FileHandler.php:238
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:230
+#: plugins/FileHandler/FileHandler.php:240
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:233
+#: plugins/FileHandler/FileHandler.php:243
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:239
+#: plugins/FileHandler/FileHandler.php:249
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 

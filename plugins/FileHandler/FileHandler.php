@@ -26,23 +26,36 @@ class FileHandler extends Plugin implements SplObserver {
       return;
     }
     try {
-      $rawFilePath = $cacheFilePath = null;
+      $extension = strtolower(pathinfo($reqFilePath, PATHINFO_EXTENSION));
+      $fileType = $this->getFileType($extension);
+      $srcFilePath = $cacheFilePath = null;
       foreach($this->fileFolders as $dir => $resDir) {
         if(strpos($reqFilePath, "$dir/") === 0) {
-          if($resDir && getRealResDir() != RESOURCES_DIR) break;
-          $rawFilePath = $reqFilePath;
-          if($resDir && !IS_LOCALHOST) $cacheFilePath = getRealResDir($reqFilePath);
-        } elseif($resDir && strpos($reqFilePath, getRealResDir($dir)) === 0) {
-          $rawFilePath = substr($reqFilePath, strlen(getRealResDir())+1);
+          if(getRealResDir() != RESOURCES_DIR) break;
+          $srcFilePath = $reqFilePath;
+          if(!IS_LOCALHOST) $cacheFilePath = RESOURCES_DIR."/$reqFilePath";
+        } elseif(strpos($reqFilePath, getRealResDir($dir)) === 0) {
+          $srcFilePath = substr($reqFilePath, strlen(getRealResDir())+1);
           $cacheFilePath = $reqFilePath;
         }
-        if(!is_null($rawFilePath)) break;
+        if(!is_null($srcFilePath)) break;
       }
-      if(is_null($rawFilePath)) throw new Exception(_("File illegal path"), 404);
-      $this->handleFile($rawFilePath, $cacheFilePath);
+      if(is_null($srcFilePath)) throw new Exception(_("File illegal path"), 404);
+      $mode = getImageMode($srcFilePath);
+      if($fileType == self::FILE_TYPE_IMAGE && strlen($mode)) {
+        $srcFilePath = FILES_DIR."/".substr($srcFilePath, strlen(FILES_DIR."/$mode/"));
+      }
+      if(is_null($srcFilePath)) throw new Exception(_("File not found"), 404);
+      #todo: switch
+      $this->handleFile($srcFilePath, $cacheFilePath);
+      if(self::DEBUG) {
+        var_dump($reqFilePath); var_dump(is_file($reqFilePath));
+        var_dump($cacheFilePath); var_dump(is_file($cacheFilePath));
+        die();
+      }
       if(is_file($reqFilePath)) redirTo(ROOT_URL.$reqFilePath);
       if(is_file($cacheFilePath)) redirTo(ROOT_URL.$cacheFilePath);
-      throw new Exception(_("Unable to handle file request"));
+      throw new Exception(_("Server error"));
     } catch(Exception $e) {
       $errno = 500;
       if($e->getCode() != 0) $errno = $e->getCode();
@@ -127,11 +140,19 @@ class FileHandler extends Plugin implements SplObserver {
     return $filePath;
   }
 
-  private function getSourceFile($dest, &$mode=null) {
+
+  private function getImageMode($filePath) {
+    foreach($this->imageModes as $mode => $null) {
+      if(strpos($filePath, FILES_DIR."/$mode/") === 0) return $mode;
+    }
+    return "";
+  }
+
+  private function OLD_getSourceFile($dest, &$mode=null) {
     $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
     $pLink = explode("/", $dest);
     if(count($pLink) > 2) {
-      if(!is_null($mode)) $mode = $pLink[1];
+      if(is_null($mode)) $mode = $pLink[1];
       if(is_null($src)) {
         unset($pLink[1]);
         $dest = implode("/", $pLink);
@@ -148,12 +169,8 @@ class FileHandler extends Plugin implements SplObserver {
    * @param  [type] $reqFilePath [description]
    * @return [type]              [description]
    */
-  private function handleFile($rawFilePath, $destFilePath) {
-    if(is_null($destFilePath)) $destFilePath = $rawFilePath;
-    $srcFilePath = $this->getSourceFile($rawFilePath, $mode);
-    if(!$srcFilePath) throw new Exception(_("File not found"), 404);
-    $extension = strtolower(pathinfo($srcFilePath, PATHINFO_EXTENSION));
-    $fileType = $this->getFileType($extension);
+  private function handleFile($srcFilePath, $destFilePath) {
+    if(is_null($destFilePath)) $destFilePath = $srcFilePath;
     $restartGrunt = !is_dir(dirname($destFilePath)) && getRealResDir() == RESOURCES_DIR;
     $fp = lockFile($destFilePath);
     try {
