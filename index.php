@@ -1,6 +1,5 @@
 <?php
 try {
-
   $start_time = microtime(true);
   session_cache_limiter("");
   define("INDEX_HTML", "index.html");

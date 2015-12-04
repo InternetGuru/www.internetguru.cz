@@ -16,6 +16,22 @@ class FileHandler extends Plugin implements SplObserver {
     if(!is_dir(USER_FOLDER."/".$this->pluginDir)) mkdir_plus(USER_FOLDER."/".$this->pluginDir);
   }
 
+  /**
+   * SOURCE FILES
+   * ------------
+   * themes/igcms.js ... copy to res/themes/igcms.js, Grunt (restart/touch)
+   * res/themes/igcms.js ... copy, Grunt (restart/touch)
+   * beta/themes/igcms.js ... copy, no Grunt
+   * else/themes/igcms.js ... 403 illegal
+   *
+   * IMAGES files/mfkh2015_80pr.png
+   * ------
+   * files/logo.jpg ... create default mode from files/logo.jpg
+   * files/full/logo.jpg ... copy files/logo.jpg
+   * files/thumb/logo.jpg ... create thumb from files/logo.jpg
+   * files/else/logo.jpg ... 404 not found
+   *
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PROCESS) $this->checkResources();
     if($subject->getStatus() != STATUS_PREINIT) return;
@@ -27,27 +43,36 @@ class FileHandler extends Plugin implements SplObserver {
     try {
       $fInfo = $this->getFileInfo($reqFilePath);
       $this->handleFile($fInfo["src"], $fInfo["dest"], $fInfo["ext"], $fInfo["type"], $fInfo["mode"]);
-      if(self::DEBUG) {
-        var_dump($reqFilePath); var_dump(is_file($reqFilePath));
-        var_dump($destFilePath); var_dump(is_file($destFilePath));
-        die();
+      if(self::DEBUG) var_dump($fInfo);
+      if($fInfo["type"] == self::FILE_TYPE_RESOURCE) {
+        if(!is_file($fInfo["dest"])) throw new Exception();
+        if(self::DEBUG) var_dump("OUTPUTTING FILE...");
+        else $this->outputFile($fInfo["dest"], $fInfo["mime"]);
+      } else {
+        if(!is_file($reqFilePath)) throw new Exception();
+        if(self::DEBUG) var_dump("REDIRECTING TO REQUEST");
+        else redirTo(ROOT_URL.$reqFilePath);
       }
-      if(is_file($reqFilePath)) redirTo(ROOT_URL.$reqFilePath);
-      if(is_file($destFilePath)) redirTo(ROOT_URL.$destFilePath);
-      throw new Exception(_("Server error"));
+      exit();
     } catch(Exception $e) {
-      $errno = 500;
-      if($e->getCode() != 0) $errno = $e->getCode();
-      new ErrorPage(sprintf(_("Unable to handle file request: %s"), $e->getMessage()), $errno);
+      $errno = $e->getCode() ? $e->getCode() : 500;
+      $msg = strlen($e->getMessage()) ? $e->getMessage() : _("Server error");
+      new ErrorPage(sprintf(_("Unable to handle file request: %s"), $msg), $errno);
     }
+  }
+
+  private function outputFile($file, $mime) {
+    header("Content-type: $mime");
+    echo file_get_contents($file);
+    exit;
   }
 
   private function getFileInfo($reqFilePath) {
     $fInfo["src"] = null;
     $fInfo["dest"] = null;
     $fInfo["ext"] = strtolower(pathinfo($reqFilePath, PATHINFO_EXTENSION));
-    $fInfo["type"] = getFileType($fInfo["ext"]);
-    $fInfo["mode"] = $this->getImageMode($srcFilePath);
+    $fInfo["type"] = $this->getFileType($fInfo["ext"]);
+    $fInfo["mode"] = $this->getImageMode($reqFilePath);
     foreach($this->fileFolders as $dir => $resDir) {
       if(strpos($reqFilePath, "$dir/") === 0) {
         if($resDir && getRealResDir() != RESOURCES_DIR) break;
@@ -60,14 +85,19 @@ class FileHandler extends Plugin implements SplObserver {
       }
       if(!is_null($fInfo["src"])) break;
     }
-    if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 404);
+    if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
     if($fInfo["type"] == self::FILE_TYPE_IMAGE) {
-      if(strlen($fInfo["mode"])) $fInfo["src"] = FILES_DIR.substr($fInfo["src"], strlen(FILES_DIR."/".$fInfo["mode"]));
+      $fInfo["src"] = $this->getImageSource($fInfo["src"], $fInfo["mode"]);
       $fInfo["dest"] = $reqFilePath;
     }
     $fInfo["src"] = findFile($fInfo["src"]);
     if(is_null($fInfo["src"])) throw new Exception(_("File not found"), 404);
     return $fInfo;
+  }
+
+  private function getImageSource($src, $mode) {
+    if(!strlen($mode) || !is_null(findFile($src, true, true, false))) return $src;
+    return FILES_DIR.substr($src, strlen(FILES_DIR."/".$mode));
   }
 
   private function setVariables() {
@@ -77,7 +107,7 @@ class FileHandler extends Plugin implements SplObserver {
       "" => array(1000, 1000, 300*1024, 85), // default, e.g. resources like icons
       "images" => array(1000, 1000, 300*1024, 85),
       "preview" => array(500, 500, 200*1024, 85),
-      "thumbs" => array(200, 200, 70*1024, 85),
+      "thumb" => array(200, 200, 70*1024, 85),
       "big" => array(1500, 1500, 450*1024, 75),
       "full" => array(0, 0, 0, 0)
     );
@@ -101,15 +131,14 @@ class FileHandler extends Plugin implements SplObserver {
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
-      $rawSourceFilePath = $this->getRawSourcePath($cacheFilePath, $resDir);
-      $sourceFilePath = findFile($rawSourceFilePath, true, true, false);
-      #todo: fix mode...
-      #if(is_null($sourceFilePath) && !$resDir) $sourceFilePath = $this->getSourceFile($rawSourceFilePath);
+      $rawFilePath = $cacheFilePath;
+      if(!IS_LOCALHOST && $resDir) return substr($cacheFilePath, strlen(getRealResDir())+1);
+      $sourceFilePath = findFile($this->getImageSource($rawFilePath, $this->getImageMode($rawFilePath)), true, true, false);
       $cacheFileMtime = filemtime($cacheFilePath);
       if(!is_null($sourceFilePath) && $cacheFileMtime == filemtime($sourceFilePath)) continue;
       if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE) {
         try {
-          removeResourceFileCache($rawSourceFilePath);
+          removeResourceFileCache($rawFilePath);
         } catch(Exception $e) {
           $passed = false;
           Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
@@ -117,18 +146,13 @@ class FileHandler extends Plugin implements SplObserver {
         return $passed;
       }
       if(self::DEBUG) {
-        Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawSourceFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+        Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
       } elseif(is_null($sourceFilePath)) {
         Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
       } else {
         Cms::addMessage(sprintf(_("File cache is outdated: %s"), $cacheFilePath), Cms::MSG_WARNING);
       }
     }
-  }
-
-  private function getRawSourcePath($filePath, $resDir=true) {
-    if(!IS_LOCALHOST && $resDir) return substr($filePath, strlen(getRealResDir())+1);
-    return $filePath;
   }
 
   private function getImageMode($filePath) {
@@ -138,40 +162,25 @@ class FileHandler extends Plugin implements SplObserver {
     return "";
   }
 
-  private function OLD_getSourceFile($dest, &$mode=null) {
-    $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
-    $pLink = explode("/", $dest);
-    if(count($pLink) > 2) {
-      if(is_null($mode)) $mode = $pLink[1];
-      if(is_null($src)) {
-        unset($pLink[1]);
-        $dest = implode("/", $pLink);
-        $src = !is_null($mode) ? findFile($dest) : findFile($dest, true, true, false);
-      }
-    }
-    return $src;
-  }
-
   private function handleFile($src, $dest, $ext, $type, $mode) {
+    $gruntAware = $type == self::FILE_TYPE_RESOURCE && getRealResDir() == RESOURCES_DIR;
     $isDestDir = is_dir(dirname($dest));
     $fp = lockFile($dest);
     try {
       if(is_file($dest)) {
-        if(!$type == self::FILE_TYPE_RESOURCE || getRealResDir() != RESOURCES_DIR) return;
+        if(!$gruntAware || $dest == getCurLink()) return;
         // evoke grunt by touching the file (keep mtime)
-        touch($dest, filemtime($dest));
+        if(!touch($dest, filemtime($dest))) throw new Exception("Unable to touch Grunt cache file");
         if(self::DEBUG) var_dump("cache file touched");
         return;
       }
-      $this->checkMime($src);
+      $this->checkMime($src, $ext);
       switch($type) {
         case self::FILE_TYPE_IMAGE:
         $this->handleImage($src, $dest, $mode);
         break;
-        case self::FILE_TYPE_RESOURCE:
-        #todo: compare destDir to grunt restart file mtimes
-        if(!$isDestDir && !$this->gruntRestarted()) $this->restartGrunt($dest);
-        case self::FILE_TYPE_OTHER:
+        default:
+        if($gruntAware && !$isDestDir) $this->restartGrunt($dest);
         copy_plus($src, $dest);
       }
     } catch(Exception $e) {
@@ -181,7 +190,7 @@ class FileHandler extends Plugin implements SplObserver {
     }
   }
 
-  private function checkMime($src) {
+  private function checkMime($src, $ext) {
     $mime = getFileMime($src);
     $legalMime = array(
       "inode/x-empty" => array("css", "js"),
@@ -205,9 +214,9 @@ class FileHandler extends Plugin implements SplObserver {
     throw new Exception(sprintf(_("Unsupported mime type %s"), $mime), 415);
   }
 
-  private function getFileType($extension) {
-    if(!IS_LOCALHOST && in_array($extension, array("css", "js"))) return self::FILE_TYPE_RESOURCE;
-    if(in_array($extension, array("jpg", "png", "gif", "jpeg"))) return self::FILE_TYPE_IMAGE;
+  private function getFileType($ext) {
+    if(!IS_LOCALHOST && in_array($ext, array("css", "js"))) return self::FILE_TYPE_RESOURCE;
+    if(in_array($ext, array("jpg", "png", "gif", "jpeg"))) return self::FILE_TYPE_IMAGE;
     return self::FILE_TYPE_OTHER;
   }
 
@@ -216,12 +225,12 @@ class FileHandler extends Plugin implements SplObserver {
   }
 
   private function restartGrunt($filePath) {
-    if(getRealResDir() != RESOURCES_DIR) return; // no grunt for no-index.php
+    if($this->gruntRestarted()) return;
     $rfp = lockFile($this->restartFile);
     try {
       if($this->gruntRestarted()) return;
       mkdir_plus(dirname($filePath));
-      touch($this->restartFile);
+      if(!touch($this->restartFile)) throw new Exception("Unable to touch Grunt restart file");
       exec('/etc/init.d/gruntwatch stop');
     } catch(Exception $e) {
       throw $e;
