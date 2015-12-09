@@ -34,7 +34,7 @@ class ErrorPage {
       $tt["@ROOT@"] = ROOT_URL;
     }
     echo str_replace(array_keys($tt), $tt, $html);
-    die();
+    exit();
   }
 
   private function getImages($dir) {

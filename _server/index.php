@@ -9,18 +9,6 @@ try {
     exit;
   }
 
-  // source file (js, css)
-  if(strlen($_GET["q"]) && in_array(pathinfo($_GET["q"], PATHINFO_EXTENSION), array("css", "js"))) {
-    $slashPos = strpos($_GET["q"], "/");
-    $version = substr($_GET["q"], 0, $slashPos);
-    $cmsIndex = "$version.php";
-    if(is_link($cmsIndex)) {
-      $url = "http".($_SERVER["HTTPS"] == "on" ? "s" : "")."://".$_SERVER["SERVER_NAME"]."/$cmsIndex?q=".$_GET["q"];
-      header("Location: $url");
-      exit;
-    }
-  }
-
   // find version file and best release
   $cmsIndex = null;
   $cmsVersion = null;
@@ -28,7 +16,7 @@ try {
   foreach(scandir(getcwd()) as $f) {
     if(is_dir($f)) continue;
     if(strpos($f, "REDIR.") === 0) { // eg. REDIR.www.internetguru.cz
-      header("Location: http://".substr($f, 6)."/".$_GET["q"]);
+      header("Location: //".substr($f, 6)."/".$_GET["q"]);
       exit;
     }
     if(strpos($f, "VERSION.") === 0) { // eg. VERSION.1.0

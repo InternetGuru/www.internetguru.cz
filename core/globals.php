@@ -128,7 +128,7 @@ function parseLocalLink($link, $host=null) {
 
 function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
   addPermParam($pLink, PAGESPEED_PARAM);
-  addPermParam($pLink, GRUNT_PARAM);
+  addPermParam($pLink, OPTIMIZE_PARAM);
   addPermParam($pLink, CACHE_PARAM);
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
@@ -301,21 +301,17 @@ function initLinks() {
   }
 }
 
-function initFiles() {
-  if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
-  if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
-  $f = "index.php";
-  if(SCRIPT_NAME != $f) return;
-  $src = CMS_FOLDER."/".SERVER_FILES_DIR."/$f";
-  if(filemtime($src) == filemtime($f)) return;
+function updateScriptFile() {
+  $src = CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME;
+  if(filemtime($src) == filemtime(SCRIPT_NAME)) return false;
   $fp = lockFile($src, null);
-  if(filemtime($src) == filemtime($f)) {
+  if(filemtime($src) == filemtime(SCRIPT_NAME)) {
     unlockFile($fp);
-    return;
+    return false;
   }
-  copy_plus($src, $f);
+  copy_plus($src, SCRIPT_NAME);
   unlockFile($fp);
-  redirTo($_SERVER["REQUEST_URI"], null, sprintf(_("Subdom file %s updated"), $f));
+  return true;
 }
 
 function smartCopy($src, $dest) {
@@ -526,17 +522,15 @@ function getIP() {
 }
 
 function getRealResDir($file="") {
-  if(IS_LOCALHOST) return $file; // always root resources
   $resDir = RESOURCES_DIR;
-  $scriptName = $_SERVER["SCRIPT_FILENAME"];
-  if(basename($scriptName) != "index.php") $resDir = pathinfo($scriptName, PATHINFO_FILENAME);
+  if(basename(SCRIPT_NAME) != "index.php") $resDir = pathinfo(SCRIPT_NAME, PATHINFO_FILENAME);
   return $resDir.(strlen($file) ? "/$file" : "");
 }
 
 function getResDir($file="") {
   if(is_null(Cms::getLoggedUser())) return $file;
   if(getRealResDir() != RESOURCES_DIR) return getRealResDir($file);
-  if(!isset($_GET[GRUNT_PARAM]) || $_GET[GRUNT_PARAM] != GRUNT_OFF) return $file; // Grunt is on (aka Grunt is not off)
+  if(!isset($_GET[OPTIMIZE_PARAM]) || $_GET[OPTIMIZE_PARAM] != OPTIMIZE_OFF) return $file; // Optimize is on (is not off)
   return getRealResDir($file);
 }
 

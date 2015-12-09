@@ -38,7 +38,7 @@
         span.parentNode.insertBefore(a, span);
         span.parentNode.removeChild(span);
         a.appendChild(span);
-      },
+      }
 
       // public
       return {
