@@ -51,21 +51,13 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     try {
       $fInfo = self::getFileInfo(getCurLink());
       if(self::DEBUG) var_dump($fInfo);
-      if(!is_file($fInfo["dest"])) self::createFile($fInfo["src"], $fInfo["dest"], $fInfo["ext"], $fInfo["mode"], $fInfo["res"]);
-      if($fInfo["ext"] == "css" || $fInfo["ext"] == "js") {
-        self::outputFile($fInfo["dest"], "text/".$fInfo["ext"]);
-        #if($fInfo["dest"] != getCurLink())
-        #todo: build css|js to root
-      } elseif($fInfo["dest"] != getCurLink()) {
-        #todo: check, lock and copy src to root
-        #copy_plus($fInfo["src"], getCurLink());
-      }
-      redirTo(ROOT_URL.getCurLink());
+      if(!is_file(getCurLink())) self::createFile($fInfo["src"], getCurLink(), $fInfo["ext"], $fInfo["imgmode"], $fInfo["rootdir"]);
     } catch(Exception $e) {
       $errno = $e->getCode() ? $e->getCode() : 500;
       $msg = strlen($e->getMessage()) ? $e->getMessage() : _("Server error");
       throw new Exception(sprintf(_("Unable to handle file request: %s"), $msg), $errno);
     }
+    exit;
   }
 
   public function update(SplSubject $subject) {
@@ -83,27 +75,26 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
 
   private static function getFileInfo($reqFilePath) {
     $fInfo["src"] = null;
-    $fInfo["dest"] = null;
+    $fInfo["imgmode"] = null;
     $fInfo["ext"] = strtolower(pathinfo($reqFilePath, PATHINFO_EXTENSION));
-    $fInfo["mode"] = self::getImageMode($reqFilePath);
     $slashPos = strpos($reqFilePath, "/");
-    $rootDir = substr($reqFilePath, 0, $slashPos);
+    $fInfo["rootdir"] = substr($reqFilePath, 0, $slashPos);
     $srcFilePath = $reqFilePath;
-    if($rootDir == RESOURCES_DIR || is_link("$rootDir.php")) {
+    if($fInfo["rootdir"] == RESOURCES_DIR || is_link($fInfo["rootdir"].".php")) {
       $srcFilePath = substr($reqFilePath, $slashPos+1);
     }
+    $resDir = null;
     foreach(self::$fileFolders as $dir => $resDir) {
       if(strpos($srcFilePath, "$dir/") !== 0) continue;
-      if(!$resDir && $rootDir == RESOURCES_DIR) break; // eg. res/files/*
+      if(!$resDir && $fInfo["rootdir"] == RESOURCES_DIR) break; // eg. res/files/*
       $fInfo["src"] = $srcFilePath;
-      $fInfo["dest"] = $reqFilePath;
-      if(!$resDir || $srcFilePath != $reqFilePath) break;
-      $fInfo["dest"] = RESOURCES_DIR."/$reqFilePath";
+
       break;
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
-    if(self::isImage($fInfo["ext"])) {
-      $fInfo["src"] = self::getImageSource($fInfo["src"], $fInfo["mode"]);
+    if(!$resDir && self::isImage($fInfo["ext"])) {
+      $fInfo["imgmode"] = self::getImageMode($reqFilePath);
+      $fInfo["src"] = self::getImageSource($fInfo["src"], $fInfo["imgmode"]);
     }
     $fInfo["src"] = findFile($fInfo["src"]);
     if(is_null($fInfo["src"])) throw new Exception(_("File not found"), 404);
@@ -164,18 +155,43 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return "";
   }
 
-  private static function createFile($src, $dest, $ext, $mode, $resDir) {
+  private static function createFile($src, $dest, $ext, $imgmode, $rootdir) {
     $fp = lockFile($dest);
     try {
       if(is_file($dest)) return;
       self::checkMime($src, $ext);
-      if(self::isImage($ext) && !$resDir) self::handleImage($src, $dest, $mode); // img extensions in files dir only
-      else copy_plus($src, $dest);
+      $isRoot = array_key_exists($rootdir, self::$fileFolders);
+      if($isRoot && !self::$fileFolders[$rootdir]) { // not resDir
+        if(self::isImage($ext)) self::handleImage($src, $dest, $imgmode);
+        else copy_plus($src, $dest);
+      } else { // resDir
+        if(self::isOutputtable($ext)) self::outputFile($src, "text/$ext");
+        self::handleResource($src, $dest, $ext, $isRoot);
+        if(self::isOutputtable($ext)) return;
+      }
     } catch(Exception $e) {
       throw $e;
     } finally {
       unlockFile($fp, $dest);
     }
+    redirTo(ROOT_URL.$dest);
+  }
+
+  private static function isOutputtable($ext) {
+    return in_array($ext, array("css", "js"));
+  }
+
+  private static function handleResource($src, $dest, $ext) {
+    $
+    switch($ext) {
+      case "css":
+      break;
+      case "js":
+      break;
+      default:
+
+    }
+    copy_plus($src, $dest);
   }
 
   private static function checkMime($src, $ext) {
