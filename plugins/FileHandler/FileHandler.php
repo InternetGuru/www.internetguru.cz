@@ -52,9 +52,16 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
 
   public static function handleRequest() {
     try {
-      $fInfo = self::getFileInfo(getCurLink());
+      $dest = getCurLink();
+      $fInfo = self::getFileInfo($dest);
       #if(self::DEBUG) var_dump($fInfo);
-      if(!is_file(getCurLink())) self::createFile($fInfo["src"], getCurLink(), $fInfo["ext"], $fInfo["imgmode"], $fInfo["rootdir"]);
+      if(!is_file($dest)) self::createFile($fInfo["src"], $dest, $fInfo["ext"], $fInfo["imgmode"], $fInfo["rootdir"]);
+      if(in_array($fInfo["ext"], array("css", "js"))) {
+        self::outputFile($dest, "text/".$fInfo["ext"]);
+        if(self::DEBUG) unlink($dest);
+        exit;
+      }
+      redirTo(ROOT_URL.$dest);
     } catch(Exception $e) {
       $errno = $e->getCode() ? $e->getCode() : 500;
       $msg = strlen($e->getMessage()) ? $e->getMessage() : _("Server error");
@@ -166,17 +173,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         self::handleResource($src, $dest, $ext, $isRoot);
       }
       touch($dest, filemtime($src));
-      if(in_array($ext, array("css", "js"))) {
-        self::outputFile($dest, "text/$ext");
-        if(self::DEBUG) unlink($dest);
-        return;
-      }
     } catch(Exception $e) {
       throw $e;
     } finally {
       unlockFile($fp, $dest);
     }
-    redirTo(ROOT_URL.$dest);
   }
 
   private static function handleResource($src, $dest, $ext, $isRoot) {

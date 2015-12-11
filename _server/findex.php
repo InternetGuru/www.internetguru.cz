@@ -18,14 +18,14 @@ try {
   if(is_null($cmsVersion) || !is_link("$cmsVersion.php")) {
     foreach(scandir(getcwd()) as $f) {
       if(strpos($f, "VERSION.") !== 0) continue;
-      $cmsVersion = substr($f, 8).".php";
+      $cmsVersion = substr($f, 8);
     }
   }
   if(is_null($cmsVersion)) throw new Exception("Unable to detect version");
 
   $cmsFindex = dirname(readlink("$cmsVersion.php"))."/findex.php";
   if(!is_file($cmsFindex)) {
-    header("Location: //".$_SERVER["HTTP_HOST"]."/index.php?q=$query");
+    header("Location: /index.php?q=$query");
     exit;
   }
   include($cmsFindex);
