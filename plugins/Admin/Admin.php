@@ -83,11 +83,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function updateCache() {
-    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    $ignore = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE;
     try {
       if($this->isResource($this->type)) {
-        removeResourceFileCache($this->defaultFile);
-      } else {
+        $resFile = getRealResDir($this->defaultFile);
+        if(is_file($resFile)) unlink($resFile);
+        if(!$ignore && is_file($this->defaultFile)) unlink($this->defaultFile);
+      } elseif(!$ignore) {
         clearNginxCache();
       }
     } catch(Exception $e) {

@@ -221,16 +221,6 @@ function file_put_contents_plus($dest, $string) {
   copy_plus("$dest.new", $dest, false);
 }
 
-function removeResourceFileCache($filePath) {
-  $resFile = getRealResDir($filePath);
-  try {
-    if(is_file($resFile) && !unlink($resFile)) throw new Exception($resFile);
-    if(is_file($filePath) && !unlink($filePath)) throw new Exception($filePath);
-  } catch(Exception $e) {
-    throw new Exception(sprintf(_("Unable to remove cache file %s"), $e->getMessage()));
-  }
-}
-
 function copy_plus($src, $dest, $keepSrc = true) {
   if(is_link($src)) throw new Exception(_("Source file is a link"));
   if(!is_file($src)) throw new Exception(_("Source file not found"));
@@ -322,7 +312,7 @@ function lockFile($filePath, $ext="lock") {
   if(strlen($ext)) $filePath = "$filePath.$ext";
   mkdir_plus(dirname($filePath));
   $fpr = @fopen($filePath, "c+");
-  if(!$fpr) throw new Exception(_("Unable to open file $filePath"));
+  if(!$fpr) throw new Exception(sprintf(_("Unable to open file %s"), $filePath));
   $start_time = microtime(true);
   do {
     if(flock($fpr, LOCK_EX|LOCK_NB)) return $fpr;
@@ -335,7 +325,11 @@ function unlockFile($fpr, $fileName=null, $ext="lock") {
   if(is_null($fpr)) return;
   flock($fpr, LOCK_UN);
   fclose($fpr);
-  if(strlen($fileName) && strlen($ext)) unlink("$fileName.$ext");
+  if(!strlen($fileName) || !strlen($ext)) return;
+  for($i=0; $i<20; $i++) {
+    if(@unlink("$fileName.$ext")) return;
+    usleep(100000);
+  }
 }
 
 function deleteRedundantFiles($in, $according) {

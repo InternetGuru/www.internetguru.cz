@@ -30,11 +30,14 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private static $fileFolders = array(
     THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, FILES_DIR => false
   );
+  private $deleteCache;
+  private $error = array();
   const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1);
+    $this->deleteCache = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE;
     #if(!is_dir(USER_FOLDER."/".$this->pluginDir)) mkdir_plus(USER_FOLDER."/".$this->pluginDir);
   }
 
@@ -50,7 +53,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   public static function handleRequest() {
     try {
       $fInfo = self::getFileInfo(getCurLink());
-      if(self::DEBUG) var_dump($fInfo);
+      #if(self::DEBUG) var_dump($fInfo);
       if(!is_file(getCurLink())) self::createFile($fInfo["src"], getCurLink(), $fInfo["ext"], $fInfo["imgmode"], $fInfo["rootdir"]);
     } catch(Exception $e) {
       $errno = $e->getCode() ? $e->getCode() : 500;
@@ -67,10 +70,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function outputFile($file, $mime) {
-    #todo: lock?
     header("Content-type: $mime");
     echo file_get_contents($file);
-    exit;
   }
 
   private static function getFileInfo($reqFilePath) {
@@ -88,7 +89,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       if(strpos($srcFilePath, "$dir/") !== 0) continue;
       if(!$resDir && $fInfo["rootdir"] == RESOURCES_DIR) break; // eg. res/files/*
       $fInfo["src"] = $srcFilePath;
-
       break;
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
@@ -108,19 +108,24 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
 
   private function checkResources() {
     if(!Cms::isSuperUser()) return;
-    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    $ignore = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE;
     foreach(self::$fileFolders as $dir => $resDir) {
-      $passed = $this->doCheckResources(($resDir ? getRealResDir($dir) : $dir), $resDir);
+      $folder = $resDir ? getRealResDir($dir) : $dir;
+      if(!$ignore && getRealResDir() == RESOURCES_DIR) $folder = $dir;
+      if(!is_dir($folder)) continue;
+      $this->doCheckResources($folder, $resDir);
     }
-    if($passed) Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
+    if(!$this->deleteCache) return;
+    if(count($this->error)) Logger::log(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
+    else Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
   }
 
-  private function doCheckResources($folder, $resDir, $passed=true) {
+  private function doCheckResources($folder, $resDir) {
     foreach(scandir($folder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $cacheFilePath = "$folder/$f";
       if(is_dir($cacheFilePath)) {
-        $passed = $this->doCheckResources($cacheFilePath, $resDir, $passed);
+        $this->doCheckResources($cacheFilePath, $resDir);
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
@@ -129,16 +134,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       $sourceFilePath = findFile($this->getImageSource($rawFilePath, self::getImageMode($rawFilePath)), true, true, false);
       $cacheFileMtime = filemtime($cacheFilePath);
       if(!is_null($sourceFilePath) && $cacheFileMtime == filemtime($sourceFilePath)) continue;
-      if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE) {
-        try {
-          removeResourceFileCache($rawFilePath);
-        } catch(Exception $e) {
-          $passed = false;
-          Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
-        }
-        return $passed;
-      }
-      if(self::DEBUG) {
+      if($this->deleteCache) {
+        if(!unlink($rawFilePath)) $this->error[] = $rawFilePath;
+      } elseif(self::DEBUG) {
         Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
       } elseif(is_null($sourceFilePath)) {
         Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
@@ -165,9 +163,13 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         if(self::isImage($ext)) self::handleImage($src, $dest, $imgmode);
         else copy_plus($src, $dest);
       } else { // resDir
-        if(self::isOutputtable($ext)) self::outputFile($src, "text/$ext");
         self::handleResource($src, $dest, $ext, $isRoot);
-        if(self::isOutputtable($ext)) return;
+      }
+      touch($dest, filemtime($src));
+      if(in_array($ext, array("css", "js"))) {
+        self::outputFile($dest, "text/$ext");
+        if(self::DEBUG) unlink($dest);
+        return;
       }
     } catch(Exception $e) {
       throw $e;
@@ -177,21 +179,35 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     redirTo(ROOT_URL.$dest);
   }
 
-  private static function isOutputtable($ext) {
-    return in_array($ext, array("css", "js"));
-  }
-
-  private static function handleResource($src, $dest, $ext) {
-    $
-    switch($ext) {
+  private static function handleResource($src, $dest, $ext, $isRoot) {
+    if($isRoot) switch($ext) {
       case "css":
-      break;
+      self::buildCss($src, $dest);
+      return;
       case "js":
-      break;
-      default:
-
+      self::buildJs($src, $dest);
+      return;
     }
     copy_plus($src, $dest);
+  }
+
+  private static function buildCss($src, $dest) {
+    require LIB_FOLDER.'/autoprefixer-php/lib/Autoprefixer.php';
+    require LIB_FOLDER.'/autoprefixer-php/lib/AutoprefixerException.php';
+    $data = file_get_contents($src);
+    $autoprefixer = new Autoprefixer(['last 2 version']);
+    $data = $autoprefixer->compile($data);
+    file_put_contents($dest, $data);
+  }
+
+  private static function buildJs($src, $dest) {
+    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/Uglify.php';
+    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/JS.php';
+    if(!UglifyPHP\JS::installed())
+      throw new Exception(_("UglifyJS not installed"));
+    $js = new UglifyPHP\JS($src);
+    if($js->minify($dest)) return;
+    throw new Exception(_("Unable to minify JS"));
   }
 
   private static function checkMime($src, $ext) {
