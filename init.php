@@ -9,6 +9,7 @@ define("PLUGINS_DIR", "plugins");
 define("THEMES_DIR", "themes");
 define("RESOURCES_DIR", "res");
 define("CMS_DIR", "cms");
+define("CMSRES_DIR", "cmsres");
 define("VER_DIR", "ver");
 define("LIB_DIR", "lib");
 define("CORE_DIR", "core");
@@ -71,6 +72,7 @@ if(IS_LOCALHOST) {
   define("WWW_FOLDER", "/var/www");
   define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
   define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
+  define("CMSRES_FOLDER", WWW_FOLDER."/".CMSRES_DIR."/".CMS_RELEASE);
   $userId = null;
   foreach(scandir(getcwd()) as $f) {
     $varName = substr($f, 0, 6);
