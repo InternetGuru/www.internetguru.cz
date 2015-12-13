@@ -1,23 +1,6 @@
 #/usr/bin/env bash
 # git hook to run a command after `git pull` if a specified file was changed
 
-BWhite='\e[1;37m'
-NC="\e[m"
-
-#get only resources: .js, .css
-changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD | grep "\(.*\.js$\)\|\(.*\.css\)")"
-version="$(basename "$PWD")"
-domains="$(find /var/www/domains -type f -name VERSION.$version)"
 echo
 echo "Running .git/hooks/post-merge"
-[ -z "$changed_files" ] && echo "There are no resources to delete" && exit
-echo "Removing changed resources from domains"
-
-for domain in $domains; do
-  dir="$(dirname $domain)"
-  echo "$dir"
-  for file in $changed_files; do
-    [ -f "$dir/$file" ] && rm "$dir/$file"
-    [ -f "$dir/res/$file" ] && rm "$dir/res/$file"
-  done
-done
+/var/scripts/resbuilder "$PWD"
