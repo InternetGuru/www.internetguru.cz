@@ -5,7 +5,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "" => array(1000, 1000, 307200, 85), // default, e.g. resources like icons
     "images" => array(1000, 1000, 307200, 85), // 300 kB
     "preview" => array(500, 500, 204800, 85), // 200 kB
-    "thumb" => array(200, 200, 71680, 85), // 70 kB
+    "thumbs" => array(200, 200, 71680, 85), // 70 kB
     "big" => array(1500, 1500, 460800, 75), // 450 kB
     "full" => array(0, 0, 0, 0)
   );
