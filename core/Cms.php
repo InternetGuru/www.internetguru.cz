@@ -44,9 +44,9 @@ class Cms {
     self::setVariable("nginx_cache_update", getCurLink()."?".CACHE_PARAM."=".CACHE_NGINX);
     self::setVariable("link", getCurLink());
     self::setVariable("url_debug_on", getCurLink()."/?".PAGESPEED_PARAM."=".PAGESPEED_OFF
-      ."&".OPTIMIZE_PARAM."=".OPTIMIZE_OFF."&".CACHE_PARAM."=".CACHE_IGNORE);
-    if(isset($_GET[PAGESPEED_PARAM]) || isset($_GET[OPTIMIZE_PARAM]) || isset($_GET[CACHE_PARAM]))
-      self::setVariable("url_debug_off", getCurLink()."/?".PAGESPEED_PARAM."&".OPTIMIZE_PARAM."&".CACHE_PARAM);
+      ."&".DEBUG_PARAM."=".DEBUG_ON);
+    if(isset($_GET[PAGESPEED_PARAM]) || isset($_GET[DEBUG_PARAM]))
+      self::setVariable("url_debug_off", getCurLink()."/?".PAGESPEED_PARAM."&".DEBUG_PARAM);
     else self::setVariable("url_debug_off", strlen(getCurLink()) ? getCurLink() : "/");
     if(isset($_GET[PAGESPEED_PARAM])) self::setVariable(PAGESPEED_PARAM, $_GET[PAGESPEED_PARAM]);
   }

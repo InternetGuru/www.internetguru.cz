@@ -32,9 +32,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_POSTPROCESS) {
-      $this->createFilepicker();
-    }
     if($subject->getStatus() == STATUS_PROCESS) {
       $os = Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Admin.xsl");
       return;
@@ -83,13 +80,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function updateCache() {
-    $ignore = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE;
     try {
       if($this->isResource($this->type)) {
-        $resFile = getRealResDir($this->defaultFile);
+        $resFile = getResDir($this->defaultFile);
         if(is_file($resFile)) unlink($resFile);
-        if(!$ignore && is_file($this->defaultFile)) unlink($this->defaultFile);
-      } elseif(!$ignore) {
+      } elseif(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON) {
         clearNginxCache();
       }
     } catch(Exception $e) {
@@ -141,7 +136,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $option->nodeValue = $v;
       $var->appendChild($option);
     }
-    Cms::setVariable("navigfiles", $var);
+    return $var;
   }
 
   public function getContent(HTMLPlus $content) {
@@ -207,6 +202,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $vars["warning"] = "warning";
       $vars["nohide"] = "nohide";
     }
+    $ps = isset($_GET[PAGESPEED_PARAM]) && $_GET[PAGESPEED_PARAM] == PAGESPEED_OFF;
+    $vars["pagespeed"] = $ps ? null : "";
+    $debug = isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON;
+    $vars["debug"] = $debug ? null : "";
+    $vars["filepicker_options"] = $this->createFilepicker();
     $newContent->processVariables($vars);
     if(is_null($this->defaultFile)) Cms::setVariable("title", $vars["heading"]);
     else Cms::setVariable("title", sprintf(_("%s (%s) - Administration"),

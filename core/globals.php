@@ -128,8 +128,7 @@ function parseLocalLink($link, $host=null) {
 
 function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
   addPermParam($pLink, PAGESPEED_PARAM);
-  addPermParam($pLink, OPTIMIZE_PARAM);
-  addPermParam($pLink, CACHE_PARAM);
+  addPermParam($pLink, DEBUG_PARAM);
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
@@ -524,7 +523,7 @@ function getRealResDir($file="") {
 function getResDir($file="") {
   if(is_null(Cms::getLoggedUser())) return $file;
   if(getRealResDir() != RESOURCES_DIR) return getRealResDir($file);
-  if(!isset($_GET[OPTIMIZE_PARAM]) || $_GET[OPTIMIZE_PARAM] != OPTIMIZE_OFF) return $file; // Optimize is on (is not off)
+  if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON) return $file; // Debug is off
   return getRealResDir($file);
 }
 

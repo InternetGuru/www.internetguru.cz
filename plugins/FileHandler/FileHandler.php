@@ -1,6 +1,7 @@
 <?php
 
 class FileHandler extends Plugin implements SplObserver, ResourceInterface {
+  const DEBUG = false;
   private static $imageModes = array(
     "" => array(1000, 1000, 307200, 85), // default, e.g. resources like icons
     "images" => array(1000, 1000, 307200, 85), // 300 kB
@@ -32,7 +33,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   );
   private $deleteCache;
   private $error = array();
-  const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -99,26 +99,24 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       break;
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
+    $fInfo["src"] = findFile($fInfo["src"], true, true, false);
     if(!$resDir && self::isImage($fInfo["ext"])) {
       $fInfo["imgmode"] = self::getImageMode($reqFilePath);
-      $fInfo["src"] = self::getImageSource($fInfo["src"], $fInfo["imgmode"]);
+      if(is_null($fInfo["src"])) $fInfo["src"] = self::getImageSource($fInfo["src"], $fInfo["imgmode"]);
     }
-    $fInfo["src"] = findFile($fInfo["src"]);
     if(is_null($fInfo["src"])) throw new Exception(_("File not found"), 404);
     return $fInfo;
   }
 
   private static function getImageSource($src, $mode) {
-    if(!strlen($mode) || !is_null(findFile($src, true, true, false))) return $src;
+    if(!strlen($mode)) return $src;
     return FILES_DIR.substr($src, strlen(FILES_DIR."/".$mode));
   }
 
   private function checkResources() {
     if(!Cms::isSuperUser()) return;
-    $ignore = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE;
     foreach(self::$fileFolders as $dir => $resDir) {
-      $folder = $resDir ? getRealResDir($dir) : $dir;
-      if(!$ignore && getRealResDir() == RESOURCES_DIR) $folder = $dir;
+      $folder = $resDir ? getResDir($dir) : $dir;
       if(!is_dir($folder)) continue;
       $this->doCheckResources($folder, $resDir);
     }
@@ -136,15 +134,19 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
-      $rawFilePath = $cacheFilePath;
-      if($resDir) return substr($cacheFilePath, strlen(getRealResDir())+1);
-      $sourceFilePath = findFile($this->getImageSource($rawFilePath, self::getImageMode($rawFilePath)), true, true, false);
+      $sourceFilePath = $cacheFilePath;
+      if($resDir && strlen(getResDir())) $sourceFilePath = substr($cacheFilePath, strlen(getRealResDir())+1);
+      $sourceFilePath = findFile($sourceFilePath, true, true, false);
+      if(is_null($sourceFilePath) && !$resDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
+        $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
+        $sourceFilePath = findFile($sourceFilePath, true, true, false);
+      }
       $cacheFileMtime = filemtime($cacheFilePath);
       if(!is_null($sourceFilePath) && $cacheFileMtime == filemtime($sourceFilePath)) continue;
       if($this->deleteCache) {
-        if(!unlink($rawFilePath)) $this->error[] = $rawFilePath;
+        if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
       } elseif(self::DEBUG) {
-        Cms::addMessage(sprintf("%s@%s | %s:%s@%s", $cacheFilePath, $cacheFileMtime, $rawFilePath, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+        Cms::addMessage(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
       } elseif(is_null($sourceFilePath)) {
         Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
       } else {

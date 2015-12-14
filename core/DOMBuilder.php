@@ -21,7 +21,7 @@ class DOMBuilder {
 
   public static function setCacheMtime() {
     if(IS_LOCALHOST || !Cms::isSuperUser()) return;
-    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     self::$newestCacheMtime = getNewestCacheMtime();
   }
 

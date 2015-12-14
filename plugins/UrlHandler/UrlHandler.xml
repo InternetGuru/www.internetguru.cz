@@ -34,7 +34,7 @@
   <redir parName="log" parValue="">?LogViewer=log</redir>
 
   <redir parName="PageSpeed" parValue="">/</redir>
-  <redir parName="Optimize" parValue="">/</redir>
+  <redir parName="Debug" parValue="">/</redir>
   <redir parName="Cache" parValue="">/</redir>
 
   <redir parName="Login">?login</redir>
