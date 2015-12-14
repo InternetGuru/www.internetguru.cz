@@ -115,6 +115,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
 
   private function checkResources() {
     if(!Cms::isSuperUser()) return;
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
     foreach(self::$fileFolders as $dir => $resDir) {
       $folder = $resDir ? getResDir($dir) : $dir;
       if(!is_dir($folder)) continue;

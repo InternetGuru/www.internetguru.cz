@@ -18,6 +18,7 @@ define("SERVER_FILES_DIR", "_server");
 define("LOG_DIR", "log");
 define("DEBUG_FILE", "DEBUG");
 define('CACHE_PARAM', "Cache");
+define('CACHE_IGNORE', "ignore");
 define('CACHE_FILE', "file");
 define('CACHE_NGINX', "nginx");
 define('PAGESPEED_PARAM', "PageSpeed");
