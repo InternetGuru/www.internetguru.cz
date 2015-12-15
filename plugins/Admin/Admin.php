@@ -206,6 +206,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["pagespeed"] = $ps ? null : "";
     $debug = isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON;
     $vars["debug"] = $debug ? null : "";
+    $cache = isset($_GET[CACHE_PARAM]);
+    $vars["cache"] = $cache ? null : "";
+    $vars["cache_value"] = $cache ? $_GET[CACHE_PARAM] : "";
     $vars["filepicker_options"] = $this->createFilepicker();
     $newContent->processVariables($vars);
     if(is_null($this->defaultFile)) Cms::setVariable("title", $vars["heading"]);
