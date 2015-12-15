@@ -13,6 +13,12 @@ try {
     redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
+  initDirs();
+  if(!IS_LOCALHOST) initLinks();
+  if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
+  if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
+
+  Cms::checkAuth();
   if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
     try {
       clearNginxCache();
@@ -22,12 +28,6 @@ try {
     }
   }
 
-  initDirs();
-  if(!IS_LOCALHOST) initLinks();
-  if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
-  if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
-
-  Cms::checkAuth();
   // remove ?login form url
   if(isset($_GET["login"])) {
     parse_str($_SERVER['QUERY_STRING'], $query);
