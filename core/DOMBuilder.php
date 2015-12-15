@@ -212,7 +212,7 @@ class DOMBuilder {
       $mTime = self::loadHTMLPlusDOM($filePath, $doc, $author, $included);
     else $mTime = self::loadXMLDOM($filePath, $doc);
     if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
-    Cms::addMessage(sprintf(_("Cache is older than %s"), stripDataFolder($filePath)), Cms::MSG_WARNING);
+    Cms::addMessage(sprintf(_("Outdated server cache: %s"), stripDataFolder($filePath)), Cms::MSG_WARNING);
   }
 
   private static function loadXMLDOM($filePath, DOMDocumentPlus $doc) {

@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-12-03 13:27+0100\n"
-"PO-Revision-Date: 2015-12-03 13:27+0100\n"
+"POT-Creation-Date: 2015-12-15 18:32+0100\n"
+"PO-Revision-Date: 2015-12-15 18:34+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -107,8 +107,8 @@ msgstr "Soubor je neaktivní"
 
 #: core/DOMBuilder.php:215
 #, php-format
-msgid "Cache is older than %s"
-msgstr "Mezipaměť je starší než %s"
+msgid "Outdated server cache: %s"
+msgstr "Neaktuální serverová mezipaměť: %s"
 
 #: core/DOMBuilder.php:228
 #, php-format
@@ -451,109 +451,112 @@ msgstr "Chybný parametr 'keep'"
 msgid "Unable to save content"
 msgstr "Nepodařilo se uložit obsah"
 
-#: core/globals.php:230
-#, php-format
-msgid "Unable to remove cache file %s"
-msgstr "Nepodařilo se odstranit dočasný soubor %s"
-
-#: core/globals.php:235
+#: core/globals.php:225
 msgid "Source file is a link"
 msgstr "Zdrojový soubor je symbolický odkaz (link)"
 
-#: core/globals.php:236
+#: core/globals.php:226
 msgid "Source file not found"
 msgstr "Zdrojový soubor nebyl nalezen"
 
-#: core/globals.php:239
+#: core/globals.php:229
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: core/globals.php:243
+#: core/globals.php:233
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zakopírovat zdrojový soubor"
 
-#: core/globals.php:247
+#: core/globals.php:237
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepdařilo přejmenovat"
 
-#: core/globals.php:249
+#: core/globals.php:239
 msgid "Unable to set new file modification time"
 msgstr "Nepodařilo se nastavit čas modifikace"
 
-#: core/globals.php:255
+#: core/globals.php:245
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: core/globals.php:269
+#: core/globals.php:259
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: core/globals.php:274
+#: core/globals.php:264
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: core/globals.php:318
+#: core/globals.php:316
 #, php-format
-msgid "Subdom file %s updated"
-msgstr "Byl aktualizován soubor %s na poddoméně"
+msgid "Unable to open file %s"
+msgstr "Nepodařilo se otevřít soubor %s"
 
-#: core/globals.php:335
+#: core/globals.php:322
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: core/globals.php:377 core/globals.php:392
+#: core/globals.php:368 core/globals.php:383
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: core/globals.php:395
+#: core/globals.php:386
 msgid "Unable to read file"
 msgstr "Nepodařilo se přečíst soubor"
 
-#: core/globals.php:399
+#: core/globals.php:390
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: core/globals.php:455
+#: core/globals.php:446
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:492
+#: core/globals.php:483
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
-#: index.php:116
-#, php-format
-msgid "Method %s is no longer available"
-msgstr "Metoda %s již není k dispozici"
+#: findex.php:14
+msgid "Unsupported request"
+msgstr "Nepodporovaný požadavek"
 
-#: index.php:117
-msgid "Domain is ready to be acquired"
-msgstr "Doména je připravená k převzetí"
-
-#: index.php:130
+#: index.php:13
 msgid "Invalid session cookies removed"
 msgstr "Odstraněna neplatná proměnná session z cookies"
 
-#: index.php:136
+#: index.php:19
 msgid "Cache successfully purged"
 msgstr "Mezipaměť (cache) byla úspěšně vymazána"
 
-#: index.php:177
+#: index.php:61
 #, php-format
 msgid "IGCMS successfully finished"
 msgstr "IGCMS standardně ukončen"
 
-#: index.php:182
+#: index.php:67
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: index.php:183
+#: index.php:68
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
+
+#: init.php:118
+#, php-format
+msgid "Method %s is no longer available"
+msgstr "Metoda %s již není k dispozici"
+
+#: init.php:119
+msgid "Domain is ready to be acquired"
+msgstr "Doména je připravená k převzetí"
+
+#: init.php:123
+msgid "Root file(s) updated"
+msgstr "Došlo k aktualizaci kořenových souborů"
 
 #: plugins/Admin/Admin.php:29
 msgid "new file"
@@ -575,115 +578,115 @@ msgstr "neplatný soubor"
 msgid "unknown status"
 msgstr "neznámý stav"
 
-#: plugins/Admin/Admin.php:54
+#: plugins/Admin/Admin.php:51
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: plugins/Admin/Admin.php:59
+#: plugins/Admin/Admin.php:56
 msgid "Insufficient right to save changes"
 msgstr "Nedostatečná práva pro uložení změn"
 
-#: plugins/Admin/Admin.php:64
+#: plugins/Admin/Admin.php:61
 msgid "No changes made"
 msgstr "Nebyly provedeny žádné změny"
 
-#: plugins/Admin/Admin.php:69
+#: plugins/Admin/Admin.php:66
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: plugins/Admin/Admin.php:150
+#: plugins/Admin/Admin.php:147
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:166
+#: plugins/Admin/Admin.php:163
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:166
+#: plugins/Admin/Admin.php:163
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:185
+#: plugins/Admin/Admin.php:182
 msgid "Administration"
 msgstr "Administrace"
 
-#: plugins/Admin/Admin.php:187
+#: plugins/Admin/Admin.php:184
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:210
+#: plugins/Admin/Admin.php:215
 #, php-format
 msgid "%s (%s) - Administration"
 msgstr "%s (%s) - Administrace"
 
-#: plugins/Admin/Admin.php:275
+#: plugins/Admin/Admin.php:280
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: plugins/Admin/Admin.php:328
+#: plugins/Admin/Admin.php:333
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:331
+#: plugins/Admin/Admin.php:336
 msgid "My Heading"
 msgstr "Můj nadpis"
 
-#: plugins/Admin/Admin.php:332
+#: plugins/Admin/Admin.php:337
 msgid "My Content Description"
 msgstr "Můj popis obsahu"
 
-#: plugins/Admin/Admin.php:333
+#: plugins/Admin/Admin.php:338
 msgid "my, comma, separated, keywords"
 msgstr "moje, klíčová, slova, oddělená, čárkou"
 
-#: plugins/Admin/Admin.php:337
+#: plugins/Admin/Admin.php:342
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: plugins/Admin/Admin.php:344
+#: plugins/Admin/Admin.php:349
 msgid "Autocorrected"
 msgstr "Autoopraveno"
 
-#: plugins/Admin/Admin.php:374
+#: plugins/Admin/Admin.php:379
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:383
+#: plugins/Admin/Admin.php:388
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:386
+#: plugins/Admin/Admin.php:391
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:392
+#: plugins/Admin/Admin.php:397
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:395 plugins/InputVar/InputVar.php:23
+#: plugins/Admin/Admin.php:400 plugins/InputVar/InputVar.php:23
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:408
+#: plugins/Admin/Admin.php:413
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:414
+#: plugins/Admin/Admin.php:419
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:425
+#: plugins/Admin/Admin.php:430
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:437
+#: plugins/Admin/Admin.php:442
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -911,61 +914,74 @@ msgstr "Element replace postrádá atribut pattern"
 msgid "Element replace missing value"
 msgstr "Element replace postrádá hodnotu"
 
-#: plugins/FileHandler/FileHandler.php:41
-msgid "File illegal path"
-msgstr "Neplatná cesta souboru"
-
-#: plugins/FileHandler/FileHandler.php:50
+#: plugins/FileHandler/FileHandler.php:67
 msgid "Server error"
 msgstr "Chyba serveru"
 
-#: plugins/FileHandler/FileHandler.php:54
+#: plugins/FileHandler/FileHandler.php:68
 #, php-format
 msgid "Unable to handle file request: %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 
-#: plugins/FileHandler/FileHandler.php:94
+#: plugins/FileHandler/FileHandler.php:101
+msgid "File illegal path"
+msgstr "Neplatná cesta souboru"
+
+#: plugins/FileHandler/FileHandler.php:107
+msgid "File not found"
+msgstr "Soubor nenalezen"
+
+#: plugins/FileHandler/FileHandler.php:125
+#, php-format
+msgid "Failed to delete cache files: %s"
+msgstr "Nepodařilo se smazat dočasný soubor: %s"
+
+#: plugins/FileHandler/FileHandler.php:126
 msgid "Outdated cache files successfully removed"
 msgstr "Neaktuální soubory byly úspěšně odstraněny"
 
-#: plugins/FileHandler/FileHandler.php:123
+#: plugins/FileHandler/FileHandler.php:152
 #, php-format
 msgid "Redundant cache file: %s"
 msgstr "Redundantní dočasný soubor %s"
 
-#: plugins/FileHandler/FileHandler.php:125
+#: plugins/FileHandler/FileHandler.php:154
 #, php-format
 msgid "File cache is outdated: %s"
 msgstr "Dočasný soubor %s je zastaralý"
 
-#: plugins/FileHandler/FileHandler.php:159
-msgid "File not found"
-msgstr "Soubor nenalezen"
+#: plugins/FileHandler/FileHandler.php:215
+msgid "UglifyJS not installed"
+msgstr "UglifyJS není nainstalovaný"
 
-#: plugins/FileHandler/FileHandler.php:175
+#: plugins/FileHandler/FileHandler.php:218
+msgid "Unable to minify JS"
+msgstr "Nepodařilo se minifikovat JS"
+
+#: plugins/FileHandler/FileHandler.php:224
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:223
+#: plugins/FileHandler/FileHandler.php:238
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:238
+#: plugins/FileHandler/FileHandler.php:253
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:240
+#: plugins/FileHandler/FileHandler.php:255
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:243
+#: plugins/FileHandler/FileHandler.php:258
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:249
+#: plugins/FileHandler/FileHandler.php:264
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
@@ -1221,6 +1237,15 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:194
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Cache is older than %s"
+#~ msgstr "Mezipaměť je starší než %s"
+
+#~ msgid "Unable to remove cache file %s"
+#~ msgstr "Nepodařilo se odstranit dočasný soubor %s"
+
+#~ msgid "Subdom file %s updated"
+#~ msgstr "Byl aktualizován soubor %s na poddoméně"
 
 #~ msgid "Insufficient rights to purge cache"
 #~ msgstr "Nedostatečná práva pro smazání mezipaměti (cache)"
@@ -1514,9 +1539,6 @@ msgstr "Položka musí být zaškrtnutá"
 
 #~ msgid "Failed to load user/admin/default file %s"
 #~ msgstr "Nepodařilo se načíst uživatelský/administrátorský/výchozí soubor %s"
-
-#~ msgid "Root file(s) updated"
-#~ msgstr "Došlo k aktualizaci kořenových souborů"
 
 #~ msgid "Unable to read file '%s'"
 #~ msgstr "Nepodařilo se přečíst soubor '%s'"
