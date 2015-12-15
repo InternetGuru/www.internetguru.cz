@@ -4,13 +4,14 @@
   <xsl:param name="cms-admin_id" select="''"/>
   <xsl:param name="cms-logged_user" select="''"/>
   <xsl:param name="cms-super_user" select="''"/>
-  <xsl:param name="cms-nginx_cache_update" select="''"/>
+  <xsl:param name="cms-cache_nginx" select="''"/>
+  <xsl:param name="cms-cache_ignore" select="''"/>
   <xsl:param name="cms-name" select="''"/>
   <xsl:param name="cms-link" select="''"/>
   <xsl:param name="cms-url_debug_on" select="''"/>
   <xsl:param name="cms-url_debug_off" select="''"/>
   <xsl:param name="inputvar-reportbug" select="''"/>
-  <xsl:param name="filehandler-file_cache_update" select="''"/>
+  <xsl:param name="filehandler-cache_file" select="''"/>
 
   <xsl:template match="/">
     <xsl:apply-templates/>
@@ -28,9 +29,11 @@
       <ul class="adminmenu">
         <li>
           <xsl:element name="a">
-            <xsl:attribute name="href">
-              <xsl:value-of select="$cms-url_debug_off"/>
-            </xsl:attribute>
+            <xsl:if test="$cms-url_debug_off">
+              <xsl:attribute name="href">
+                <xsl:value-of select="$cms-url_debug_off"/>
+              </xsl:attribute>
+            </xsl:if>
             <xsl:text>Provozní režim</xsl:text>
           </xsl:element>
         </li>
@@ -45,18 +48,26 @@
         <li>
           <xsl:element name="a">
             <xsl:attribute name="href">
-              <xsl:value-of select="$cms-nginx_cache_update"/>
+              <xsl:value-of select="$cms-cache_ignore"/>
             </xsl:attribute>
-            <xsl:text>Smazat mezipaměť</xsl:text>
+            <xsl:text>Ignorovat mezipaměť</xsl:text>
           </xsl:element>
         </li>
-        <xsl:if test="$filehandler-file_cache_update">
+        <li>
+          <xsl:element name="a">
+            <xsl:attribute name="href">
+              <xsl:value-of select="$cms-cache_nginx"/>
+            </xsl:attribute>
+            <xsl:text>Vyčistit serverovou mezipaměť</xsl:text>
+          </xsl:element>
+        </li>
+        <xsl:if test="$filehandler-cache_file">
           <li>
             <xsl:element name="a">
               <xsl:attribute name="href">
-                <xsl:value-of select="$filehandler-file_cache_update"/>
+                <xsl:value-of select="$filehandler-cache_file"/>
               </xsl:attribute>
-              <xsl:text>Smazat dočasné soubory</xsl:text>
+              <xsl:text>Vyčistit souborovou mezipaměť</xsl:text>
             </xsl:element>
           </li>
         </xsl:if>

@@ -73,7 +73,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PROCESS) $this->checkResources();
     if($subject->getStatus() != STATUS_PREINIT) return;
-    Cms::setVariable("file_cache_update", getCurLink()."?".CACHE_PARAM."=".CACHE_FILE);
+    Cms::setVariable("cache_file", getCurLink()."?".CACHE_PARAM."=".CACHE_FILE);
   }
 
   private static function outputFile($file, $mime) {
