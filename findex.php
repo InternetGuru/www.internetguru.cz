@@ -18,7 +18,7 @@ try {
   $errno = $e->getCode() ? $e->getCode() : 500;
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf("%s in %s on line %s", $m, $e->getFile(), $e->getLine());
-  new Logger($m, Logger::LOGGER_FATAL, null, false);
+  Logger::log($m, Logger::LOGGER_FATAL, null, false);
   if(class_exists("ErrorPage")) new ErrorPage($m, $errno);
 
   http_response_code($errno);

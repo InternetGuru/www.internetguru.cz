@@ -477,7 +477,7 @@ function apc_get_key($key) {
   return APC_PREFIX."/".HOST."/".$class."/".Cms::isSuperUser()."/".$key;
 }
 
-function clearNginxCache($folder = null) {
+function clearNginxCache() {
   if(IS_LOCALHOST) return;
   foreach(getNginxCacheFiles() as $fPath) {
     if(!unlink($fPath)) throw new Exception(_("Failed to purge cache"));

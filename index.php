@@ -16,9 +16,9 @@ try {
   if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
     try {
       clearNginxCache();
-      new Logger(_("Cache successfully purged"), Logger::LOGGER_SUCCESS);
+      Logger::log(_("Cache successfully purged"), Logger::LOGGER_SUCCESS);
     } catch(Exception $e) {
-      new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
     }
   }
 
@@ -58,7 +58,7 @@ try {
   Cms::getMessages();
   Cms::contentProcessVariables();
   echo Cms::getOutput();
-  new Logger(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time, false);
+  Logger::log(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time, false);
 
 } catch(Exception $e) {
 
@@ -66,7 +66,7 @@ try {
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf(_("%s in %s on line %s"), $m, $e->getFile(), $e->getLine());
   $m = sprintf(_("IGCMS failed to finish: %s"), $m);
-  new Logger($m, Logger::LOGGER_FATAL, null, false);
+  Logger::log($m, Logger::LOGGER_FATAL, null, false);
   if(class_exists("ErrorPage")) new ErrorPage($m, $errno, true);
 
   http_response_code($errno);
