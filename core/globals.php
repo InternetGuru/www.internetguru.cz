@@ -292,6 +292,7 @@ function initLinks() {
 }
 
 function updateScriptFile() {
+  if(is_link(SCRIPT_NAME)) return false;
   $src = CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME;
   if(filemtime($src) == filemtime(SCRIPT_NAME)) return false;
   $fp = lockFile($src, null);

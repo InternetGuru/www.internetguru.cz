@@ -45,8 +45,8 @@ class Cms {
     self::setVariable("link", getCurLink());
     self::setVariable("url_debug_on", getCurLink()."/?".PAGESPEED_PARAM."=".PAGESPEED_OFF
       ."&".DEBUG_PARAM."=".DEBUG_ON);
-    if(isset($_GET[PAGESPEED_PARAM]) || isset($_GET[DEBUG_PARAM]))
-      self::setVariable("url_debug_off", getCurLink()."/?".PAGESPEED_PARAM."&".DEBUG_PARAM);
+    if(isset($_GET[PAGESPEED_PARAM]) || isset($_GET[DEBUG_PARAM]) || isset($_GET[CACHE_PARAM]))
+      self::setVariable("url_debug_off", getCurLink()."/?".PAGESPEED_PARAM."&".DEBUG_PARAM."&".CACHE_PARAM);
     else self::setVariable("url_debug_off", strlen(getCurLink()) ? getCurLink() : "/");
     if(isset($_GET[PAGESPEED_PARAM])) self::setVariable(PAGESPEED_PARAM, $_GET[PAGESPEED_PARAM]);
   }
