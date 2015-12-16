@@ -54,7 +54,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       $dest = getCurLink();
       $fInfo = self::getFileInfo($dest);
       #if(self::DEBUG) var_dump($fInfo);
-      if(!is_file($dest)) self::createFile($fInfo["src"], $dest, $fInfo["ext"], $fInfo["imgmode"], $fInfo["rootdir"]);
+      if(!is_file($dest)) self::createFile($fInfo["src"], $dest, $fInfo["ext"], $fInfo["imgmode"], $fInfo["isroot"]);
       if(in_array($fInfo["ext"], array("css", "js"))) {
         self::outputFile($dest, "text/".$fInfo["ext"]);
         if(self::DEBUG) unlink($dest);
@@ -85,24 +85,29 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     $fInfo["imgmode"] = null;
     $fInfo["ext"] = strtolower(pathinfo($reqFilePath, PATHINFO_EXTENSION));
     $slashPos = strpos($reqFilePath, "/");
-    $fInfo["rootdir"] = substr($reqFilePath, 0, $slashPos);
+    $rootDir = substr($reqFilePath, 0, $slashPos);
+    $fInfo["isroot"] = array_key_exists($rootDir, self::$fileFolders);
     $srcFilePath = $reqFilePath;
-    if($fInfo["rootdir"] == RESOURCES_DIR || is_link($fInfo["rootdir"].".php")) {
+    if(!$fInfo["isroot"]) {
       $srcFilePath = substr($reqFilePath, $slashPos+1);
     }
+    // check path
     $resDir = null;
     foreach(self::$fileFolders as $dir => $resDir) {
       if(strpos($srcFilePath, "$dir/") !== 0) continue;
-      if(!$resDir && $fInfo["rootdir"] == RESOURCES_DIR) break; // eg. res/files/*
+      if(!$resDir && !$fInfo["isroot"]) break; // eg. beta/files, res/files/*
       $fInfo["src"] = $srcFilePath;
       break;
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
+    // search for sorce
     $fInfo["src"] = findFile($fInfo["src"], true, true, false);
     if(!$resDir && is_null($fInfo["src"]) && self::isImage($fInfo["ext"])) {
-      $fInfo["imgmode"] = self::getImageMode($reqFilePath);
-      $imgFilePath = self::getImageSource($srcFilePath, $fInfo["imgmode"]);
-      if(is_null($fInfo["src"])) $fInfo["src"] = findFile($imgFilePath, true, true, false);
+      $fInfo["imgmode"] = self::getImageMode($srcFilePath);
+      if(strlen($fInfo["imgmode"])) {
+        $imgFilePath = self::getImageSource($srcFilePath, $fInfo["imgmode"]);
+        $fInfo["src"] = findFile($imgFilePath, true, true, false);
+      }
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File not found"), 404);
     return $fInfo;
@@ -163,12 +168,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return "";
   }
 
-  private static function createFile($src, $dest, $ext, $imgmode, $rootdir) {
+  private static function createFile($src, $dest, $ext, $imgmode, $isRoot) {
     $fp = lockFile($dest);
     try {
       if(is_file($dest)) return;
       self::checkMime($src, $ext);
-      $isRoot = array_key_exists($rootdir, self::$fileFolders);
       if($isRoot && !self::$fileFolders[$rootdir]) { // not resDir
         if(self::isImage($ext)) self::handleImage($src, $dest, $imgmode);
         else copy_plus($src, $dest);
