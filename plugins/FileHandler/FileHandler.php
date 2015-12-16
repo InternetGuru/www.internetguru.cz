@@ -42,10 +42,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   public static function isSupportedRequest() {
-    $ext = pathinfo(getCurLink(), PATHINFO_EXTENSION);
+    $ext = strtolower(pathinfo(getCurLink(), PATHINFO_EXTENSION));
     foreach(self::$legalMime as $extensions) {
-      if(!in_array($ext, $extensions)) continue;
-      return true;
+      if(in_array($ext, $extensions)) return true;
     }
     return false;
   }
@@ -100,9 +99,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
     $fInfo["src"] = findFile($fInfo["src"], true, true, false);
-    if(!$resDir && self::isImage($fInfo["ext"])) {
+    if(!$resDir && is_null($fInfo["src"]) && self::isImage($fInfo["ext"])) {
       $fInfo["imgmode"] = self::getImageMode($reqFilePath);
-      if(is_null($fInfo["src"])) $fInfo["src"] = self::getImageSource($fInfo["src"], $fInfo["imgmode"]);
+      $imgFilePath = self::getImageSource($srcFilePath, $fInfo["imgmode"]);
+      if(is_null($fInfo["src"])) $fInfo["src"] = findFile($imgFilePath, true, true, false);
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File not found"), 404);
     return $fInfo;
