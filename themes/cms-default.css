@@ -48,6 +48,7 @@ form dd > input[type="email"] {
   border-left: none;
   width: 100%;
   max-width: 25em;
+  box-sizing: border-box;
 }
 
 form fieldset {
@@ -58,7 +59,7 @@ form dd > textarea {
   width: 100%;
   max-width: 25em;
   font: inherit;
-  box-sizing: content-box;
+  box-sizing: border-box;
 }
 
 @media all and (min-width: 32em) {
