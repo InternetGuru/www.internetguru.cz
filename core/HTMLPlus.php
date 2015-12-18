@@ -109,6 +109,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $pat = "/<code(?: [a-z]+)?>((?:.|\n)+?)<\/code>/m";
     $p = preg_split($pat, $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
+    $defaultValue = $n->nodeValue;
     $n->nodeValue = "";
     foreach($p as $i => $v) {
       if($i % 2 == 0) $n->appendChild($n->ownerDocument->createTextNode($v));
@@ -117,7 +118,7 @@ class HTMLPlus extends DOMDocumentPlus {
         $r = array('"', '"', '"', "'", "'");
         $v = str_replace($s, $r, translateUtf8Entities($v, true));
         $newNode = $this->createElement("code", translateUtf8Entities($v));
-        if(preg_match("/<code ([a-z]+)>/", $n->nodeValue, $match)) {
+        if(preg_match("/<code ([a-z]+)>/", $defaultValue, $match)) {
           $newNode->setAttribute("class", $match[1]);
         }
         $n->appendChild($newNode);
@@ -189,6 +190,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHempty($repair);
     $this->validateDesc($repair);
     $this->validateHLink($repair);
+    $this->validateDl($repair);
     #$this->validateLinks("a", "href", $repair);
     #$this->validateLinks("form", "action", $repair);
     #$this->validateLinks("object", "data", $repair);
@@ -406,12 +408,25 @@ class HTMLPlus extends DOMDocumentPlus {
         throw new Exception(_("Empty attribute link found"));
       }
       if($link != $h->getAttribute("link")) {
-        if(!$repair) throw new Exception(sprintf(_("Invalid link value found '%s'"), $h->getAttribute("link")));
+        $this->errorHandler(sprintf(_("Invalid link value found '%s'"), $h->getAttribute("link")), $repair);
         if(!is_null($this->getElementById($link, "link"))) {
           throw new Exception(sprintf(_("Normalize link leads to duplicit value '%s'"), $h->getAttribute("link")));
         }
         $h->setAttribute("link", $link);
       }
+    }
+  }
+
+  private function validateDl($repair) {
+    $dts = array();
+    foreach($this->getElementsByTagName("dt") as $dt) $dts[] = $dt;
+    foreach($dts as $dt) {
+      if(!is_null($dt->nextElement) && $dt->nextElement->tagName == "dd") continue;
+      $this->errorHandler(_("Element dt next element is not dd"), $repair);
+      $dd = $this->createElement("dd");
+      $dd->appendChild(new DOMComment(_(" missing element dd ")));
+      if(is_null($dt->nextElement)) $dt->parentNode->appendChild($dd);
+      else $dt->parentNode->insertBefore($dd, $dt->nextElement);
     }
   }
 
@@ -423,7 +438,7 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("author")) continue;
       if(strlen(trim($h->getAttribute("author")))) continue;
-      if(!$repair) throw new Exception(_("Attr 'author' cannot be empty"));
+      $this->errorHandler(_("Attr 'author' cannot be empty"), $repair);
       $h->parentNode->insertBefore(new DOMComment(" empty attr 'author' removed "), $h);
       $h->removeAttribute("author");
     }
@@ -438,25 +453,25 @@ class HTMLPlus extends DOMDocumentPlus {
       if(is_null($ctime) && is_null($mtime)) continue;
       if(is_null($ctime)) $ctime = $h->getAncestorValue("ctime", "h");
       if(is_null($ctime)) {
-        if(!$repair) throw new Exception(_("Attribute 'mtime' requires 'ctime'"));
+        $this->errorHandler(_("Attribute 'mtime' requires 'ctime'"), $repair);
         $ctime = $mtime;
         $h->setAttribute("ctime", $ctime);
       }
       $ctime_date = $this->createDate($ctime);
       if(is_null($ctime_date)) {
-        if(!$repair) throw new Exception(_("Invalid 'ctime' attribute format"));
+        $this->errorHandler(_("Invalid 'ctime' attribute format"), $repair);
         $h->parentNode->insertBefore(new DOMComment(" invalid ctime='$ctime' "), $h);
         $h->removeAttribute("ctime");
       }
       if(is_null($mtime)) return;
       $mtime_date = $this->createDate($mtime);
       if(is_null($mtime_date)) {
-        if(!$repair) throw new Exception(_("Invalid 'mtime' attribute format"));
+        $this->errorHandler(_("Invalid 'mtime' attribute format"), $repair);
         $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "), $h);
         $h->removeAttribute("mtime");
       }
       if($mtime_date < $ctime_date) {
-        if(!$repair) throw new Exception(_("'mtime' cannot be lower than 'ctime'"));
+        $this->errorHandler(_("'mtime' cannot be lower than 'ctime'"), $repair);
         $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "), $h);
         $h->removeAttribute("mtime");
       }

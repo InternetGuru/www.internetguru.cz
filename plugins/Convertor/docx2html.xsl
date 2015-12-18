@@ -225,6 +225,7 @@
 
   <xsl:template match="t" priority="1">
     <xsl:param name="nostrong" select="''"/>
+    <xsl:param name="nosamp" select="''"/>
     <xsl:variable name="b" select="preceding-sibling::rPr[1]/b/@val = 1"/>
     <xsl:variable name="i" select="preceding-sibling::rPr[1]/i/@val = 1"/>
     <xsl:variable name="u" select="preceding-sibling::rPr[1]/u/@val = 'single'"/>
@@ -234,7 +235,7 @@
 
     <xsl:if test="$b and not($nostrong)"><xsl:text disable-output-escaping="yes">&lt;strong></xsl:text></xsl:if>
     <xsl:if test="$i"><xsl:text disable-output-escaping="yes">&lt;em></xsl:text></xsl:if>
-    <xsl:if test="$u"><xsl:text disable-output-escaping="yes">&lt;samp></xsl:text></xsl:if>
+    <xsl:if test="$u and not($nosamp)"><xsl:text disable-output-escaping="yes">&lt;samp></xsl:text></xsl:if>
     <xsl:if test="$del"><xsl:text disable-output-escaping="yes">&lt;del></xsl:text></xsl:if>
     <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;sub></xsl:text></xsl:if>
     <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;sup></xsl:text></xsl:if>
@@ -244,7 +245,7 @@
     <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;/sup></xsl:text></xsl:if>
     <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;/sub></xsl:text></xsl:if>
     <xsl:if test="$del"><xsl:text disable-output-escaping="yes">&lt;/del></xsl:text></xsl:if>
-    <xsl:if test="$u"><xsl:text disable-output-escaping="yes">&lt;/samp></xsl:text></xsl:if>
+    <xsl:if test="$u and not($nosamp)"><xsl:text disable-output-escaping="yes">&lt;/samp></xsl:text></xsl:if>
     <xsl:if test="$i"><xsl:text disable-output-escaping="yes">&lt;/em></xsl:text></xsl:if>
     <xsl:if test="$b and not($nostrong)"><xsl:text disable-output-escaping="yes">&lt;/strong></xsl:text></xsl:if>
 
@@ -478,8 +479,10 @@
                   <xsl:otherwise><xsl:apply-templates select="node()"/></xsl:otherwise>
               </xsl:choose>
             </xsl:attribute>
-            <!-- <xsl:apply-templates select="node()"/> -->
-            <xsl:copy-of select="node()//t/text()"/>
+            <xsl:apply-templates select="node()">
+              <xsl:with-param name="nosamp" select="1"/>
+            </xsl:apply-templates>
+            <!-- <xsl:copy-of select="node()//t/text()"/> -->
       </xsl:element>
     </xsl:template>
 

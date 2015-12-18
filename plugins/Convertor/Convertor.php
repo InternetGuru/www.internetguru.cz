@@ -3,7 +3,6 @@
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $error = false;
   private $html = null;
   private $file = null;
   private $docName = null;
@@ -27,9 +26,10 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $subject->detach($this);
       return;
     }
-    if(strlen($_GET[get_class($this)])) $this->processImport($_GET[get_class($this)]);
-    elseif(substr($_SERVER['QUERY_STRING'], -1) == "=") {
-      Cms::addMessage(_("File URL cannot be empty"), Cms::MSG_ERROR);
+    try {
+      $this->processImport($_GET[get_class($this)]);
+    } catch(Exception $e) {
+      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
     }
     $this->getImportedFiles();
   }
@@ -42,13 +42,10 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function processImport($fileUrl) {
-    try {
-      $f = $this->getFile($fileUrl);
-    } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
-      $this->error = true;
-      return;
+    if(!strlen($_GET[get_class($this)]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
+      throw new Exception(_("File URL cannot be empty"));
     }
+    $f = $this->getFile($fileUrl);
     $mime = getFileMime($this->tmpFolder."/$f");
     switch($mime) {
       case "application/zip":
@@ -60,8 +57,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->file = $f;
       break;
       default:
-      Cms::addMessage(sprintf(_("Unsupported file MIME type '%s'"), $mime), Cms::MSG_ERROR);
-      $this->error = true;
+      throw new Exception(sprintf(_("Unsupported file MIME type '%s'"), $mime));
     }
   }
 
@@ -83,9 +79,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       Cms::addMessage(_("Unable to import document; probably missing heading"), Cms::MSG_ERROR);
       return;
     }
-    try {
-      $doc->validatePlus(true);
-    } catch(Exception $e) {}
     $this->parseContent($doc, "h", "short");
     $firstHeading = $doc->documentElement->firstElement;
     if(!$firstHeading->hasAttribute("short") && !is_null($this->docName))
@@ -93,20 +86,25 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
     try {
-      $doc->validatePlus(true);
+      $doc->validatePlus();
     } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
-      Cms::addMessage(_("Use @ to specify short/link attributes for heading"), Cms::MSG_INFO);
-      Cms::addMessage(_("Eg. This Is Long Heading @ Short Heading"), Cms::MSG_INFO);
-      Cms::addMessage(_("Use @ to specify kw attribute for description"), Cms::MSG_INFO);
-      Cms::addMessage(_("Eg. This is description @ these, are, some, keywords"), Cms::MSG_INFO);
+      try {
+        $doc->validatePlus(true);
+        foreach($doc->getErrors() as $error) {
+          Cms::addMessage($error, _("Autocorrected"));
+        }
+      } catch(Exception $e) {
+        Cms::addMessage(_("Use @ to specify short/link attributes for heading"), Cms::MSG_INFO);
+        Cms::addMessage(_("Eg. This Is Long Heading @ Short Heading"), Cms::MSG_INFO);
+        Cms::addMessage(_("Use @ to specify kw attribute for description"), Cms::MSG_INFO);
+        Cms::addMessage(_("Eg. This is description @ these, are, some, keywords"), Cms::MSG_INFO);
+        throw $e;
+      }
     }
     $doc->applySyntax();
-
-    $ids = $this->regenerateIds($doc);
     $this->html = $doc->saveXML();
-    $this->html = str_replace(array_keys($ids), $ids, $this->html);
-    if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
+    Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
+
     $this->file = "$f.html";
     $dest = $this->tmpFolder."/".$this->file;
     $fp = lockFile($dest);
