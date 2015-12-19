@@ -1,26 +1,24 @@
 <?php
 
-require_once('core/global_func.php');
-require_once('core/global_const.php');
+require_once('core/globals.php');
 require_once('core/Logger.php');
 require_once('core/DOMElementPlus.php');
+require_once('core/Cms.php');
 require_once('core/DOMBuilder.php');
 require_once('core/DOMDocumentPlus.php');
 require_once('core/HTMLPlus.php');
 
-class DOMBuilderTest extends \Codeception\TestCase\Test
+class DOMBuilderTest extends \PHPUnit_Framework_TestCase
 {
-   /**
-    * @var \UnitTester
-    */
-    protected $tester;
     private $xml = array();
     private $html = array();
 
-    protected function _before()
+    protected function setUp()
     {
 
       $xml = "testXml.xml";
+      mkdir_plus(USER_FOLDER);
+      mkdir_plus(ADMIN_FOLDER);
       $this->xml = array($xml, ADMIN_FOLDER."/$xml", USER_FOLDER."/$xml");
       foreach($this->xml as $xml) if(file_exists($xml)) {
         $this->xml = array();
@@ -43,19 +41,21 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
       }
 
       $doc = new HTMLPlus();
-      $doc->loadXML('<body xml:lang="en"><h id="h.abc">1</h><desc/></body>');
+      $doc->loadXML('<body xml:lang="en" ns="localhost/test"><h id="h.abc" author="test" link="test" ctime="2015">1</h><desc kw="kw">desc</desc></body>');
       $doc->save($this->html[0]);
-      $doc->loadXML('<body xml:lang="en"><h id="h.abc"></h><desc/></body>');
+      $doc->loadXML('<body xml:lang="en" ns="localhost/test"><h id="h.abc" author="test" link="test" ctime="2015"></h><desc kw="kw">desc</desc></body>');
       $doc->save($this->html[1]);
-      $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="3">Three</h><desc/></body>');
+      $doc->loadXML('<body xml:lang="en" ns="localhost/test"><h id="h.abc" author="test" link="test" ctime="2015" short="3">Three</h><desc kw="kw">desc</desc></body>');
       $doc->save($this->html[2]);
 
     }
 
-    protected function _after()
+    protected function tearDown()
     {
       foreach($this->xml as $xml) unlink($xml);
       foreach($this->html as $html) unlink($html);
+      rmdir(ADMIN_FOLDER);
+      rmdir(USER_FOLDER);
     }
 
     // tests
@@ -76,7 +76,7 @@ class DOMBuilderTest extends \Codeception\TestCase\Test
       $doc = DOMBuilder::buildHTMLPlus($this->html[0]);
       $s1 = $doc->C14N(true, false);
       $doc = new HTMLPlus();
-      $doc->loadXML('<body xml:lang="en"><h id="h.abc" short="3">Three</h><desc/></body>');
+      $doc->loadXML('<body xml:lang="en" ns="localhost/test"><h id="h.abc" author="test" link="test" ctime="2015" short="3">Three</h><desc kw="kw">desc</desc></body>');
       $s2 = $doc->C14N(true, false);
       #echo "\n$s1\n$s2"; die();
       $this->assertTrue($s1 == $s2);

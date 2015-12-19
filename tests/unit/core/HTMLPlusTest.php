@@ -1,31 +1,35 @@
 <?php
 
-require_once('core/global_func.php');
-require_once('core/global_const.php');
+require_once('core/globals.php');
 require_once('core/Logger.php');
 require_once('core/DOMElementPlus.php');
 require_once('core/DOMBuilder.php');
 require_once('core/DOMDocumentPlus.php');
 require_once('core/HTMLPlus.php');
 
-class HTMLPlusTest extends \Codeception\TestCase\Test
+class HTMLPlusTest extends \PHPUnit_Framework_TestCase
 {
-   /**
-    * @var \UnitTester
-    */
-    protected $tester;
     private $doc;
 
-    protected function _before()
+    const DEFAULT_CTIME = "2015";
+    const DEFAULT_LINK = "test";
+    const DEFAULT_AUTHOR = "test";
+    const DEFAULT_DESC= "desc";
+    const DEFAULT_KW = "kw, kw2";
+
+    protected function setUp()
     {
       $this->doc = new HTMLPlus();
+      $this->doc->defaultCtime = self::DEFAULT_CTIME;
+      $this->doc->defaultLink = self::DEFAULT_LINK;
+      $this->doc->defaultAuthor = self::DEFAULT_AUTHOR;
+      $this->doc->defaultDesc= self::DEFAULT_DESC;
+      $this->doc->defaultKw= self::DEFAULT_KW;
     }
 
-    protected function _after()
+    protected function tearDown()
     {
     }
-
-    // tests
 
     public function testEmptyXml()
     {
@@ -64,7 +68,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
     public function testDuplicitLink()
     {
-      $this->doc->loadXML('<body xml:lang="en"><h id="a" link="x/x">x</h><desc/>'
+      $this->doc->loadXML('<body xml:lang="en"><h author="test" id="a" link="x/x">x</h><desc/>'
        .'<section><h id="b" link="x/x">x</h><desc/></section></body>');
 
       $e = null;
@@ -173,7 +177,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testValidXML()
     {
       $e = null;
-      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" link="x" short="x">xx xx</h><desc/></body>');
+      $this->doc->loadXML('<body xml:lang="en" ns="localhost/b"><h author="test" id="h.abc" link="x" short="x" ctime="2015">xx xx</h><desc kw="kw">desc</desc></body>');
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {
@@ -202,7 +206,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
     public function testListInPar()
     {
       $e = null;
-      $this->doc->loadXML('<body xml:lang="en"><h id="hx">x</h><desc/><p>a<dl><dt/></dl>b<ul><li/></ul>c</p></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h id="hx">x</h><desc/><p>a<dl><dt/><dd/></dl>b<ul><li/></ul>c</p></body>');
       try {
         $this->doc->validatePlus();
       } catch (Exception $e) {
@@ -230,7 +234,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
     public function testHEmptyTrim()
     {
-      $this->doc->loadXML("<body xml:lang='en'><h id='h.abc'>  \t\r\n</h><desc/></body>");
+      $this->doc->loadXML("<body lang='en'><h id='h.abc'>  \t\r\n</h><desc/></body>");
 
       $e = null;
       try {
@@ -264,7 +268,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
     public function testHLinkEmpty()
     {
-      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" link="">x</h><desc/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h author="test" id="h.abc" link="">x</h><desc/></body>');
 
       $e = null;
       try {
@@ -281,7 +285,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
     public function testHLinkInvalid()
     {
-      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" link="á bé">x</h><desc/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h author="test" id="h.abc" link="á bé">x</h><desc/></body>');
 
       $e = null;
       try {
@@ -298,16 +302,17 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
     public function testHLinkInvalidRepair()
     {
-      $this->doc->loadXML('<body xml:lang="en"><h id="h.abc" link="á bé">x</h><desc/></body>');
+      $this->doc->loadXML('<body xml:lang="en"><h author="test" id="h.abc" link="á bé">x</h><desc kw="a">desc</desc></body>');
       $e = null;
       try {
         $this->doc->validatePlus(true);
       } catch (Exception $e) {
+        echo $this->doc->saveXML();
         echo $e->getMessage();die();
       }
       $s1 = $this->doc->C14N(true, false);
       $doc = new HTMLPlus();
-      $doc->loadXML('<body xml:lang="en"><h id="h.abc" link="a_be">x</h><desc/></body>');
+      $doc->loadXML('<body xml:lang="en"><h author="test" id="h.abc" link="a_be">x</h><desc/></body>');
       $s2 = $doc->C14N(true, false);
       #echo "\n$s1\n$s2";die();
       $this->assertTrue($s1 == $s2, 'Link is not repaired as expected');
@@ -315,7 +320,7 @@ class HTMLPlusTest extends \Codeception\TestCase\Test
 
     public function testHLinkInvalidRepairUnable()
     {
-      $this->doc->loadXML('<body xml:lang="en"><h id="a" link="á bé">x</h><desc/>'
+      $this->doc->loadXML('<body xml:lang="en"><h author="test" id="a" link="á bé">x</h><desc/>'
        .'<section><h id="a" link="a_be">x</h><desc/></section></body>');
 
       $e = null;

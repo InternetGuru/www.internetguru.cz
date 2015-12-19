@@ -4,12 +4,10 @@
  * Create DOM from XML file and update elements from adm/usr directories.
  * Add by default; empty element to delete all elements with same nodeName.
  * Preserve values with readonly attribute.
- * Elements with attribute domain will be applied only when matched.
  */
 class DOMBuilder {
 
   const DEBUG = false;
-  #const USE_CACHE = true;
   private static $included = array();
   private static $idToLink = array(); // id => closest or self link
   private static $linkToDesc = array(); // link => shorted description
