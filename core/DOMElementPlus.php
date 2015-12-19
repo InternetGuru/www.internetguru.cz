@@ -65,7 +65,7 @@ class DOMElementPlus extends DOMElement {
     if(is_null($p)) return;
     $p->removeChild($this);
     if($p->nodeType != XML_ELEMENT_NODE) return;
-    if(count($p->childNodes)) return;
+    if($p->childNodes->length) return;
     $p->emptyRecursive();
   }
 
