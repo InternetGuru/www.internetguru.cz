@@ -27,7 +27,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       return;
     }
     try {
-      $this->processImport($_GET[get_class($this)]);
+      if(strlen($_GET[get_class($this)]))
+        $this->processImport($_GET[get_class($this)]);
     } catch(Exception $e) {
       Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
     }
@@ -46,6 +47,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       throw new Exception(_("File URL cannot be empty"));
     }
     $f = $this->getFile($fileUrl);
+    $this->docName = pathinfo($f, PATHINFO_FILENAME);
     $mime = getFileMime($this->tmpFolder."/$f");
     switch($mime) {
       case "application/zip":
@@ -225,7 +227,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
         if(!isset($tmp_name[1]))
           $tmp_name = explode('filename="', $header);
         if(isset($tmp_name[1])) {
-          $this->docName = pathinfo(urldecode($tmp_name[1]), PATHINFO_FILENAME);
           return normalize(trim(urldecode($tmp_name[1]), '";\''), "a-zA-Z0-9/_.-", "", false);
         }
       }
