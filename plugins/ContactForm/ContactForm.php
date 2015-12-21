@@ -238,6 +238,14 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
       $name = $this->processFormItem($this->formNames, $e, "name", "", $id, true);
     }
+    $tmp = $e->parentNode;
+    while(!is_null($tmp) && $tmp->nodeName != "form") {
+      if($tmp->nodeName == "label") {
+        $e = $tmp;
+        break;
+      }
+      $tmp = $tmp->parentNode;
+    }
     $e->parentNode->appendChild($idInput);
     foreach($xpath->query("//label") as $e) {
       if($e->hasAttribute("for")) {
