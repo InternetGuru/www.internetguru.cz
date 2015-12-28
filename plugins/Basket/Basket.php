@@ -153,7 +153,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function useApcCache($cacheKey) {
-    return $this->useCache && !is_null(apc_exists($cacheKey));
+    return $this->useCache && apc_exists($cacheKey);
   }
 
   private function createProductVars() {
