@@ -477,6 +477,18 @@ function apc_get_key($key) {
   return APC_PREFIX."/".HOST."/".$class."/".Cms::isSuperUser()."/".$key;
 }
 
+function apc_store_cache($cacheKey, $value, $name) {
+  $stored = apc_store($cacheKey, $value, rand(3600*24*30*3, 3600*24*30*6));
+  if(!$stored) Logger::log(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
+}
+
+function apc_is_valid_cache($cacheKey, $value) {
+  if(!apc_exists($cacheKey)) return false;
+  if(apc_fetch($cacheKey) != $value) return false;
+  return true;
+}
+
+
 function clearNginxCache() {
   if(IS_LOCALHOST) return;
   foreach(getNginxCacheFiles() as $fPath) {
