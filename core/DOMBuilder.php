@@ -516,6 +516,7 @@ class DOMBuilder {
    */
   private static function updateDOM(DOMDocumentPlus $doc, $filePath, $ignoreReadonly=false) {
     $newDoc = new DOMDocumentPlus();
+    $docId = null;
     self::loadDOM($filePath, $newDoc);
     // create root element if not exists
     if(is_null($doc->documentElement)) {
@@ -540,11 +541,12 @@ class DOMBuilder {
         #}
         foreach($remove as $d) $d->parentNode->removeChild($d);
       } elseif($n->hasAttribute("id")) {
-        $sameIdElement = $doc->getElementById($n->getAttribute("id"));
-        if(is_null($sameIdElement)) {
+        if(is_null($docId)) $docId = self::getIds($doc);
+        if(!array_key_exists($n->getAttribute("id"), $docId)) {
           $doc->documentElement->appendChild($doc->importNode($n, true));
           continue;
         }
+        $sameIdElement = $docId[$n->getAttribute("id")];
         if($sameIdElement->nodeName != $n->nodeName)
           throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $n->getAttribute("id"), $n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
@@ -553,6 +555,15 @@ class DOMBuilder {
         $doc->documentElement->appendChild($doc->importNode($n, true));
       }
     }
+  }
+
+  private static function getIds(DOMDocumentPlus $doc) {
+    $ids = array();
+    foreach($doc->documentElement->childElementsArray as $n) {
+      if(!$n->hasAttribute("id")) continue;
+      $ids[$n->getAttribute("id")] = $n;
+    }
+    return $ids;
   }
 
   private static function doRemove(DOMElement $n) {
