@@ -179,9 +179,10 @@ class Agregator extends Plugin implements SplObserver {
 
   private function createImgVar($root, $subDir, Array $files) {
     $cacheKey = apc_get_key($subDir);
+    $useCache = true;
     if(!apc_is_valid_cache($cacheKey, count($files))) {
       apc_store_cache($cacheKey, count($files), $subDir);
-      $this->useCache = false;
+      $useCache = false;
     }
     $alts = $this->buildImgAlts();
     $vars = $this->buildImgVars($files, $alts, $root, $subDir);
@@ -195,7 +196,7 @@ class Agregator extends Plugin implements SplObserver {
       $vName = $image->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       self::$sortKey = "name";
       $cacheKey = apc_get_key($vName);
-      if($this->useCache && apc_exists($cacheKey)) {
+      if($useCache && apc_exists($cacheKey)) {
         $doc = new DOMDocumentPlus();
         $doc->loadXML(apc_fetch($cacheKey));
         Cms::setVariable($vName, $doc->documentElement);
