@@ -80,13 +80,16 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function updateCache() {
+    if($this->isResource($this->type)) {
+      $resFile = getRealResDir($this->defaultFile);
+      if(is_file($resFile)) unlink($resFile);
+      if(getRealResDir() != RESOURCES_DIR) return;
+      if(is_file($this->defaultFile)) unlink($this->defaultFile);
+      return;
+    }
+    #if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     try {
-      if($this->isResource($this->type)) {
-        $resFile = getResDir($this->defaultFile);
-        if(is_file($resFile)) unlink($resFile);
-      } elseif(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON) {
-        clearNginxCache();
-      }
+      clearNginxCache();
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
     }
