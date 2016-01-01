@@ -94,6 +94,7 @@ class ErrorPage {
       424 => 'Failed Dependency',
       425 => 'No code',
       426 => 'Upgrade Required',
+      451 => 'Unavailable For Legal Reasons',
       500 => 'Internal Server Error',
       501 => 'Method Not Implemented',
       502 => 'Bad Gateway',
