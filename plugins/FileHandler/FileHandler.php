@@ -122,28 +122,29 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if(!Cms::isSuperUser()) return;
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
     foreach(self::$fileFolders as $dir => $resDir) {
-      $folder = $resDir ? getResDir($dir) : $dir;
-      if(!is_dir($folder)) continue;
-      $this->doCheckResources($folder, $resDir);
+      $folder = $resDir ? getRealResDir($dir) : $dir;
+      $this->doCheckResources($folder, $dir, $resDir);
+      if(getRealResDir() != RESOURCES_DIR) continue;
+      $this->doCheckResources($dir, $dir, $resDir);
     }
     if(!$this->deleteCache) return;
     if(count($this->error)) Logger::log(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
     else Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
   }
 
-  private function doCheckResources($folder, $resDir) {
-    foreach(scandir($folder) as $f) {
+  private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
+    if(!is_dir($cacheFolder)) return;
+    foreach(scandir($cacheFolder) as $f) {
       if(strpos($f, ".") === 0) continue;
-      $cacheFilePath = "$folder/$f";
+      $cacheFilePath = "$cacheFolder/$f";
+      $sourceFilePath = "$sourceFolder/$f";
       if(is_dir($cacheFilePath)) {
-        $this->doCheckResources($cacheFilePath, $resDir);
+        $this->doCheckResources($cacheFilePath, $sourceFilePath, $isResDir);
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
-      $sourceFilePath = $cacheFilePath;
-      if($resDir && strlen(getResDir())) $sourceFilePath = substr($cacheFilePath, strlen(getRealResDir())+1);
       $sourceFilePath = findFile($sourceFilePath, true, true, false);
-      if(is_null($sourceFilePath) && !$resDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
+      if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
         $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
         $sourceFilePath = findFile($sourceFilePath, true, true, false);
       }
