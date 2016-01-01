@@ -42,7 +42,7 @@
             <xsl:attribute name="href">
               <xsl:value-of select="$cms-url_debug_on"/>
             </xsl:attribute>
-            <xsl:text>Režim ladění</xsl:text>
+            <xsl:text>Ladící režim</xsl:text>
           </xsl:element>
         </li>
         <li>
