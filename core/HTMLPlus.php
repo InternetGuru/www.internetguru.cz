@@ -420,12 +420,13 @@ class HTMLPlus extends DOMDocumentPlus {
     $dts = array();
     foreach($this->getElementsByTagName("dt") as $dt) $dts[] = $dt;
     foreach($dts as $dt) {
-      if(!is_null($dt->nextElement) && $dt->nextElement->tagName == "dd") continue;
+      $nextElement = $dt->nextElement;
+      if(!is_null($nextElement) && $nextElement->tagName == "dd") continue;
       $this->errorHandler(_("Element dt following sibling must be dd"), $repair);
       $dd = $this->createElement("dd");
       $dd->appendChild($this->newDOMComment(_("created empty element dd")));
-      if(is_null($dt->nextElement)) $dt->parentNode->appendChild($dd);
-      else $dt->parentNode->insertBefore($dd, $dt->nextElement);
+      if(is_null($nextElement)) $dt->parentNode->appendChild($dd);
+      else $dt->parentNode->insertBefore($dd, $nextElement);
     }
   }
 

@@ -7,7 +7,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   private $products = array();
   private $productVars = array();
   private $cookieProducts = array();
-
+  private $useCache = true;
 
   public function getContent(HTMLPlus $content) {
     $content->processVariables($this->productVars);
@@ -30,6 +30,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       // load config
       $this->cfg = $this->getDOMPlus();
+      $this->validateConfigCache();
       $this->loadVariables();
       // after submitting form delete cookies
       if(getCurLink(true) == $this->vars['formpage']."?cfok=".$this->vars['formid'])
@@ -44,11 +45,10 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
         $this->subject->detach($this);
         return;
       }
-      $templates = $this->loadTemplates();
       // load product from cookie;
       $this->cookieProducts = $this->getCookieProducts();
       // create product variables
-      $this->createProductVars($templates);
+      $this->createProductVars();
       // fill order form
       if(getCurLink() == $this->vars['formpage']) $this->createFormVar();
       // create basket var
@@ -57,6 +57,15 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       Cms::setVariable('empty', (count($this->cookieProducts) ? null : ''));
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+    }
+  }
+
+  private function validateConfigCache() {
+    $configFilePath = findFile($this->pluginDir."/".get_class($this).".xml");
+    $cacheKey = apc_get_key($configFilePath);
+    if(!apc_is_valid_cache($cacheKey, filemtime($configFilePath))) {
+      apc_store_cache($cacheKey, filemtime($configFilePath), $this->pluginDir."/".get_class($this).".xml");
+      $this->useCache = false;
     }
   }
 
@@ -143,30 +152,51 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     return isset($_POST['id']) && !is_null(Cms::getVariable('validateform-'.$_POST['id']));
   }
 
-  private function createProductVars(Array $templates) {
+  private function useApcCache($cacheKey) {
+    return $this->useCache && apc_exists($cacheKey);
+  }
+
+  private function createProductVars() {
+    $templates = $this->loadTemplates();
     foreach($templates as $tplName => $tpl) {
       foreach($this->products as $product) {
+        $keyName = "basket-$tplName-".$product['product-id'];
+        $cacheKey = apc_get_key($keyName);
+        if($this->useApcCache($cacheKey)) {
+          $doc = new DOMDocumentPlus();
+          $doc->loadXML(apc_fetch($cacheKey));
+          $this->productVars[$keyName] = $doc;
+          continue;
+        }
         $var = $this->modifyTemplate($tpl, $product);
-        $id = "basket-$tplName-".$product['product-id'];
-        $this->productVars[$id] = $var;
+        $this->productVars[$keyName] = $var;
+        apc_store_cache($cacheKey, $var->saveXML(), $keyName);
       }
     }
   }
 
   private function loadVariables() {
+    $keyName = "variables";
+    $cacheKey = apc_get_key($keyName);
+    if($this->useApcCache($cacheKey)) {
+      $this->vars = apc_fetch($cacheKey);
+      return;
+    }
     foreach($this->cfg->getElementsByTagName("var") as $var) {
       if(!$var->hasAttribute("id"))
         throw new Exception(_("Element var missing attribute id"));
       $value = null;
+      $id = $var->getAttribute('id');
       if(count($var->childElementsArray)) {
-          $doc = new DOMDocumentPlus();
-          $doc->appendChild($doc->importNode($var, true));
-          $value = $doc;
-        } else {
-          $value = $var->nodeValue;
-        }
-      $this->vars[$var->getAttribute('id')] = $value;
+        $doc = new DOMDocumentPlus();
+        $doc->appendChild($doc->importNode($var, true));
+        $value = $doc;
+      } else {
+        $value = $var->nodeValue;
+      }
+      $this->vars[$id] = $value;
     }
+    apc_store_cache($cacheKey, $this->vars, $keyName);
   }
 
   private function loadTemplates() {
@@ -182,6 +212,11 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function loadProducts() {
     $products = array();
+    $keyName = "products";
+    $cacheKey = apc_get_key($keyName);
+    if($this->useApcCache($cacheKey)) {
+      return apc_fetch($cacheKey);
+    }
     foreach($this->cfg->getElementsByTagName("product") as $product) {
       if(!$product->hasAttribute("id"))
         throw new Exception(_("Element product missing attribute id"));
@@ -211,6 +246,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       */
       $products[$attrs['product-id']] = $attrs;
     }
+    apc_store_cache($cacheKey, $products, $keyName);
     return $products;
   }
 
