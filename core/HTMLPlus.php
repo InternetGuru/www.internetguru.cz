@@ -167,7 +167,6 @@ class HTMLPlus extends DOMDocumentPlus {
           }
         }
       }
-
     }
   }
 
@@ -422,9 +421,9 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->getElementsByTagName("dt") as $dt) $dts[] = $dt;
     foreach($dts as $dt) {
       if(!is_null($dt->nextElement) && $dt->nextElement->tagName == "dd") continue;
-      $this->errorHandler(_("Element dt next element is not dd"), $repair);
+      $this->errorHandler(_("Element dt following sibling must be dd"), $repair);
       $dd = $this->createElement("dd");
-      $dd->appendChild(new DOMComment(_(" missing element dd ")));
+      $dd->appendChild($this->newDOMComment(_("created empty element dd")));
       if(is_null($dt->nextElement)) $dt->parentNode->appendChild($dd);
       else $dt->parentNode->insertBefore($dd, $dt->nextElement);
     }
@@ -439,7 +438,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!$h->hasAttribute("author")) continue;
       if(strlen(trim($h->getAttribute("author")))) continue;
       $this->errorHandler(_("Attr 'author' cannot be empty"), $repair);
-      $h->parentNode->insertBefore(new DOMComment(" empty attr 'author' removed "), $h);
+      $h->parentNode->insertBefore($this->newDOMComment(_("removed empty attr 'author'")), $h);
       $h->removeAttribute("author");
     }
   }
@@ -460,22 +459,26 @@ class HTMLPlus extends DOMDocumentPlus {
       $ctime_date = $this->createDate($ctime);
       if(is_null($ctime_date)) {
         $this->errorHandler(_("Invalid 'ctime' attribute format"), $repair);
-        $h->parentNode->insertBefore(new DOMComment(" invalid ctime='$ctime' "), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("removed ctime='%s'")), $ctime), $h);
         $h->removeAttribute("ctime");
       }
       if(is_null($mtime)) return;
       $mtime_date = $this->createDate($mtime);
       if(is_null($mtime_date)) {
         $this->errorHandler(_("Invalid 'mtime' attribute format"), $repair);
-        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("removed mtime='%s'")), $mtime), $h);
         $h->removeAttribute("mtime");
       }
       if($mtime_date < $ctime_date) {
         $this->errorHandler(_("'mtime' cannot be lower than 'ctime'"), $repair);
-        $h->parentNode->insertBefore(new DOMComment(" invalid mtime='$mtime' "), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("removed mtime='%s'")), $mtime), $h);
         $h->removeAttribute("mtime");
       }
     }
+  }
+
+  private function newDOMComment($comment) {
+    return new DOMComment(" $comment ");
   }
 
   private function createDate($d) {
