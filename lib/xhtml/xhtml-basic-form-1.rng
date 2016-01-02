@@ -69,20 +69,46 @@
 <define name="input">
   <element name="input">
     <choice>
-      <ref name="input.attlist"/>
+      <ref name="input.value.attlist"/>
+      <ref name="input.optvalue.attlist"/>
       <ref name="input.number.attlist"/>
       <ref name="input.text.attlist"/>
     </choice>
   </element>
 </define>
 
-<define name="input.attlist">
-  <ref name="Common.attrib"/>
+<define name="input.value.attlist">
+  <ref name="input.attlist"/>
   <optional>
     <attribute name="type">
-      <ref name="InputType.class"/>
+      <choice>
+        <value>checkbox</value>
+        <value>radio</value>
+      </choice>
     </attribute>
   </optional>
+  <attribute name="value"/>
+</define>
+
+<define name="input.optvalue.attlist">
+  <ref name="input.attlist"/>
+  <optional>
+    <attribute name="type">
+      <choice>
+        <value>password</value>
+        <value>submit</value>
+        <value>reset</value>
+        <value>hidden</value>
+      </choice>
+    </attribute>
+  </optional>
+  <optional>
+    <attribute name="value"/>
+  </optional>
+</define>
+
+<define name="input.attlist">
+  <ref name="Common.attrib"/>
   <optional>
     <attribute name="name"/>
   </optional>
@@ -90,9 +116,6 @@
     <attribute name="required">
       <value>required</value>
     </attribute>
-  </optional>
-  <optional>
-    <attribute name="value"/>
   </optional>
   <optional>
     <attribute name="checked">
@@ -221,17 +244,6 @@
       <ref name="Character.datatype"/>
     </attribute>
   </optional>
-</define>
-
-<define name="InputType.class">
-  <choice>
-    <value>password</value>
-    <value>checkbox</value>
-    <value>radio</value>
-    <value>submit</value>
-    <value>reset</value>
-    <value>hidden</value>
-  </choice>
 </define>
 
 <define name="select">
