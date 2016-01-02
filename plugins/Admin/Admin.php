@@ -62,20 +62,20 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if(!$this->isResource($this->type)) $this->processXml();
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->isToEnable()) $this->enableDataFile();
-      if($this->isPost() && ($this->contentChanged || $_GET[get_class($this)] != $fileName)) {
-        $this->savePost($this->dataFile);
-      } elseif(!$this->isToDisable() && !$this->isToEnable() && $this->isPost()) {
-        throw new Exception(_("No changes made"), 1);
+      if($this->isPost()) {
+        if($this->contentChanged) {
+          $this->savePost($this->dataFile);
+        } elseif(!$this->isToDisable() && !$this->statusChanged) {
+          Cms::addMessage(_("No changes made"), Cms::MSG_INFO);
+        }
       }
       if($this->isToDisable()) $this->disableDataFile();
-      if(!$this->contentChanged && $this->statusChanged) {
+      if($this->statusChanged) {
         $this->redir = true;
         Cms::addMessage(_("File status successfully changed"), Cms::MSG_SUCCESS);
       }
     } catch (Exception $e) {
-      if($e->getCode() === 1) $type = Cms::MSG_INFO;
-      else $type = Cms::MSG_ERROR;
-      Cms::addMessage($e->getMessage(), $type);
+      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
       return;
     }
     if(!$this->isPost()) return;
@@ -169,7 +169,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $vars["warning"] = "warning";
       $statusChanged = self::FILE_ENABLE;
     }
-    $usrDestHash = getFileHash($this->dataFile);
+    if(is_file($this->dataFile)) $usrDestHash = getFileHash($this->dataFile);
+    else $usrDestHash = getFileHash($this->dataFileDisabled);
     $mode = $this->replace ? _("replace") : _("modify");
     switch($this->type) {
       case "html":
