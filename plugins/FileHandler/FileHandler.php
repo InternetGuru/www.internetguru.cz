@@ -149,7 +149,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       }
       try {
         checkFileCache($sourceFilePath, $cacheFilePath);
-        if(getRealResDir() != RESOURCES_DIR) return;
+        if(getRealResDir() != RESOURCES_DIR) continue;
         $cacheFilePath = getRealResDir($cacheFilePath);
         checkFileCache($sourceFilePath, $cacheFilePath);
       } catch(Exception $e) {
