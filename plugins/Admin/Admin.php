@@ -16,6 +16,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private $replace = true;
   private $error = false;
   private $dataFile = null;
+  private $destFile = null;
   private $dataFileDisabled = null;
   private $dataFileStatus;
   private $defaultFile = null;
@@ -42,12 +43,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     try {
-      $fileName = $_GET[get_class($this)];
-      if($this->isPost()) $fileName = $_POST["filename"];
-      $this->setDefaultFile($fileName);
+      $this->setDefaultFile();
       $this->setDataFiles();
       if($this->isPost()) {
-        if($this->dataFile == $fileName && $_POST["userfilehash"] != getFileHash($this->dataFile))
+        if($_POST["userfilehash"] != $this->getDataFileHash())
           throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
         $this->processPost();
       } else {
@@ -63,8 +62,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->isToEnable()) $this->enableDataFile();
       if($this->isPost()) {
-        if($this->contentChanged) {
-          $this->savePost($this->dataFile);
+        $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
+        if($this->contentChanged || $this->dataFile != $this->destFile) {
+          $this->savePost();
         } elseif(!$this->isToDisable() && !$this->statusChanged) {
           Cms::addMessage(_("No changes made"), Cms::MSG_INFO);
         }
@@ -169,8 +169,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $vars["warning"] = "warning";
       $statusChanged = self::FILE_ENABLE;
     }
-    if(is_file($this->dataFile)) $usrDestHash = getFileHash($this->dataFile);
-    else $usrDestHash = getFileHash($this->dataFileDisabled);
+    $usrDestHash = $this->getDataFileHash();
     $mode = $this->replace ? _("replace") : _("modify");
     switch($this->type) {
       case "html":
@@ -207,8 +206,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["resultcontent"] = $this->showContent(true);
     $vars["status"] = $this->dataFileStatuses[$this->dataFileStatus];
     $vars["userfilehash"] = $usrDestHash;
-    if((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED)
-      || isset($_POST["disabled"])) $vars["checked"] = "checked";
+    if((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED))
+      $vars["checked"] = "checked";
     if($this->dataFileStatus == self::STATUS_NEW) {
       $vars["warning"] = "warning";
       $vars["nohide"] = "nohide";
@@ -226,6 +225,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     else Cms::setVariable("title", sprintf(_("%s (%s) - Administration"),
       basename($this->defaultFile), ROOT_URL.$this->defaultFile));
     return $newContent;
+  }
+
+  private function getDataFileHash() {
+    if(is_file($this->dataFile)) return getFileHash($this->dataFile);
+    return getFileHash($this->dataFileDisabled);
   }
 
   private function showContent($user) {
@@ -258,13 +262,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    * themes/simpleLayout.css -> themes/simpleLayout.css (dir/F.ext direct)
    * themes/userFile.css -> usr/themes/userFile.css (dir/F.ext user)
    */
-  private function setDefaultFile($fileName) {
+  private function setDefaultFile() {
+    $fileName = $_GET[get_class($this)];
     $this->defaultFile = $this->getFilepath($fileName);
-    $redirPath = null;
     $fLink = DOMBuilder::getLink(findFile($fileName));
-    if($this->defaultFile != $fileName) { $redirPath = getCurLink(); }
-    else if(getCurLink() != $fLink) { $redirPath = $fLink; }
-    if(!is_null($redirPath)) redirTo(buildLocalUrl(array("path" => $redirPath, "query" => get_class($this)."=".$this->defaultFile)));
+    if(is_null($fLink)) $fLink = getCurLink();
+    if($this->defaultFile != $fileName || $fLink != getCurLink()) {
+      redirTo(buildLocalUrl(array("path" => $fLink, "query" => get_class($this)."=".$this->defaultFile)));
+    }
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
   }
 
@@ -276,21 +281,25 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       return INDEX_HTML;
     }
     if(strpos($f, USER_FOLDER."/") === 0) {
-      return substr($f, strlen(USER_FOLDER)+1);
+      $f = substr($f, strlen(USER_FOLDER)+1);
     }
     if(strpos($f, ADMIN_FOLDER."/") === 0) {
-      return substr($f, strlen(ADMIN_FOLDER)+1);
+      $f = substr($f, strlen(ADMIN_FOLDER)+1);
     }
     if(preg_match("~^[\w-]+$~", $f)) {
       $pluginFile = PLUGINS_DIR."/$f/$f.xml";
-      if(is_null(findFile($pluginFile))) return "$f.xml";
-      return $pluginFile;
+      if(!is_null(findFile($pluginFile))) return $pluginFile;
     }
-    if(!preg_match("/^".FILEPATH_PATTERN."$/", $f)) {
+    if(!preg_match("/^".FILEPATH_PATTERN."$/", $f) || strpos($f, "..") !== false) {
       $this->dataFileStatus = self::STATUS_INVALID;
       throw new Exception(sprintf(_("Unsupported file name format '%s'"), $f));
     }
-    if(!is_null(findFile(PLUGINS_DIR."/$f", false))) PLUGINS_DIR."/$f";
+    if(strpos(basename($f), ".") === 0) {
+      $f = dirname($f)."/".substr(basename($f), 1);
+    }
+    if(!is_null(findFile(PLUGINS_DIR."/$f", false))) {
+      $f = PLUGINS_DIR."/$f";
+    }
     return $f;
   }
 
@@ -307,14 +316,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function isToDisable() {
     if(!is_file($this->dataFile)) return false;
     if(isset($_GET[self::FILE_DISABLE])) return true;
-    if(count($_POST) && isset($_POST["disabled"])) return true;
+    if(count($_POST) && isset($_POST["disable"])) return true;
     return false;
   }
 
   private function isToEnable() {
     if(!is_file($this->dataFileDisabled)) return false;
     if(isset($_GET[self::FILE_ENABLE])) return true;
-    if(count($_POST) && !isset($_POST["disabled"])) return true;
+    if(count($_POST) && !isset($_POST["disable"])) return true;
     return false;
   }
 
@@ -384,26 +393,32 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function setContent() {
     $f = $this->dataFile;
-    if(!file_exists($f)) $f = $this->dataFileDisabled;
-    if(!file_exists($f)) return;
+    if(!file_exists($f)) {
+      $f = $this->dataFileDisabled;
+      if(!file_exists($f)) return;
+    }
     if(($this->contentValue = file_get_contents($f)) === false)
       throw new Exception(sprintf(_("Unable to get contents from '%s'"), $this->dataFile));
   }
 
-  private function savePost($filePath) {
-    mkdir_plus(dirname($filePath));
-    $fp = lockFile($filePath);
+  private function savePost() {
+    mkdir_plus(dirname($this->destFile));
+    $fp = lockFile($this->destFile);
     try {
       try {
-        if($_POST["filename"] != $_GET[get_class($this)] && is_file($filePath) && !isset($_POST["overwrite"]))
+        $destFileDisabled = dirname($this->destFile)."/.".basename($this->destFile);
+        if($this->destFile != $this->dataFile && !isset($_POST["overwrite"])
+          && (is_file($this->destFile) || is_file($destFileDisabled))) {
           throw new Exception(_("Destination file already exists"));
-        file_put_contents_plus($filePath, $this->contentValue);
+        }
+        if(is_file($destFileDisabled)) if(!unlink($destFileDisabled)) throw new Exception(_("Unable to enable destination file"));
+        file_put_contents_plus($this->destFile, $this->contentValue);
       } catch(Exception $e) {
         throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $e->getMessage()));
       }
       try {
-        if(is_file("$filePath.old"))
-          incrementalRename("$filePath.old", "$filePath.");
+        if(is_file($this->destFile.".old"))
+          incrementalRename($this->destFile.".old", $this->destFile.".");
       } catch(Exception $e) {
         throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $e->getMessage()));
       }
@@ -412,16 +427,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } catch(Exception $e) {
       throw $e;
     } finally {
-      unlockFile($fp, $filePath);
+      unlockFile($fp, $this->destFile);
     }
   }
 
   private function enableDataFile() {
-    #if(($this->dataFile == $this->dataFileDisabled
-    #  && !rename($this->dataFileDisabled, $this->dataFile))
-    #  || !unlink($this->dataFileDisabled))
-    if(!rename($this->dataFileDisabled, $this->dataFile))
-      throw new Excepiton(_("Unable to enable file"));
+    if(is_file($this->dataFile)) $status = unlink($this->dataFileDisabled);
+    else $status = rename($this->dataFileDisabled, $this->dataFile);
+    if(!$status) throw new Excepiton(_("Unable to enable file"));
     $this->statusChanged = true;
   }
 
