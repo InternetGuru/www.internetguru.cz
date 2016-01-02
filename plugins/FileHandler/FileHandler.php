@@ -121,11 +121,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private function checkResources() {
     if(!Cms::isSuperUser()) return;
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
-    foreach(self::$fileFolders as $dir => $resDir) {
-      $folder = $resDir ? getRealResDir($dir) : $dir;
-      $this->doCheckResources($folder, $dir, $resDir);
-      if(getRealResDir() != RESOURCES_DIR) continue;
-      $this->doCheckResources($dir, $dir, $resDir);
+    foreach(self::$fileFolders as $sourceFolder => $isResDir) {
+      $cacheFolder = $sourceFolder;
+      if($isResDir && getRealResDir() != RESOURCES_DIR) $cacheFolder = getRealResDir($sourceFolder);
+      if(!is_dir($cacheFolder)) return;
+      $this->doCheckResources($cacheFolder, $sourceFolder, $isResDir);
     }
     if(!$this->deleteCache) return;
     if(count($this->error)) Logger::log(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
@@ -133,7 +133,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
-    if(!is_dir($cacheFolder)) return;
     foreach(scandir($cacheFolder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $cacheFilePath = "$cacheFolder/$f";
@@ -148,16 +147,19 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
         $sourceFilePath = findFile($sourceFilePath, true, true, false);
       }
-      $cacheFileMtime = filemtime($cacheFilePath);
-      if(!is_null($sourceFilePath) && $cacheFileMtime == filemtime($sourceFilePath)) continue;
-      if($this->deleteCache) {
-        if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
-      } elseif(self::DEBUG) {
-        Cms::addMessage(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
-      } elseif(is_null($sourceFilePath)) {
-        Cms::addMessage(sprintf(_("Redundant cache file: %s"), $cacheFilePath), Cms::MSG_WARNING);
-      } else {
-        Cms::addMessage(sprintf(_("File cache is outdated: %s"), $cacheFilePath), Cms::MSG_WARNING);
+      try {
+        checkFileCache($sourceFilePath, $cacheFilePath);
+        if(getRealResDir() != RESOURCES_DIR) return;
+        $cacheFilePath = getRealResDir($cacheFilePath);
+        checkFileCache($sourceFilePath, $cacheFilePath);
+      } catch(Exception $e) {
+        if($this->deleteCache) {
+          if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
+        } elseif(self::DEBUG) {
+          Cms::addMessage(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+        } else {
+          Cms::addMessage(sprintf("%s: %s", $e->getMessage(), $cacheFilePath), Cms::MSG_WARNING);
+        }
       }
     }
   }

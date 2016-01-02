@@ -529,6 +529,12 @@ function getResDir($file="") {
   return getRealResDir($file);
 }
 
+function checkFileCache($sourceFile, $cacheFile) {
+  if(!is_file($cacheFile)) return;
+  if(!is_file($sourceFile)) throw new Exception(_("Cache file is redundant"));
+  if(filemtime($cacheFile) != filemtime($sourceFile)) throw new Exception(_("Cache file is outdated"));
+}
+
 // UNUSED
 function clearApcCache() {
   $cache_info = apc_cache_info();

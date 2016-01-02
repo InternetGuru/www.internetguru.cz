@@ -50,8 +50,15 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         if($this->dataFile == $fileName && $_POST["userfilehash"] != getFileHash($this->dataFile))
           throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
         $this->processPost();
-      } else $this->setContent();
-
+      } else {
+        try {
+          checkFileCache($this->dataFile, $this->defaultFile);
+          if(getRealResDir() != RESOURCES_DIR) checkFileCache($this->dataFile, getRealResDir($this->defaultFile));
+        } catch(Exception $e) {
+          Cms::addMessage(_("Edited file cache will be updated"), Cms::MSG_INFO);
+        }
+        $this->setContent();
+      }
       if(!$this->isResource($this->type)) $this->processXml();
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->isToEnable()) $this->enableDataFile();
