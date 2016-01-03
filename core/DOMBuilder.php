@@ -18,7 +18,7 @@ class DOMBuilder {
   private static $newestCacheMtime = null;
 
   public static function setCacheMtime() {
-    if(IS_LOCALHOST || !Cms::isSuperUser()) return;
+    if(!Cms::isSuperUser()) return;
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
     self::$newestCacheMtime = getNewestCacheMtime();
   }

@@ -501,6 +501,7 @@ function getNginxCacheFiles($folder = null, $link = "") {
 }
 
 function getNewestCacheMtime() {
+  if(IS_LOCALHOST) return null;
   $newestCacheMtime = null;
   foreach(getNginxCacheFiles() as $cacheFilePath) {
     $cacheMtime = filemtime($cacheFilePath);
