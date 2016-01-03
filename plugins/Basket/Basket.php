@@ -165,15 +165,23 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
         if($this->useApcCache($cacheKey)) {
           $doc = new DOMDocumentPlus();
           $doc->loadXML(apc_fetch($cacheKey));
+          $this->insertAction($doc);
           $this->productVars[$keyName] = $doc;
           continue;
         }
         $var = $this->modifyTemplate($tpl, $product);
-        $this->productVars[$keyName] = $var;
         apc_store_cache($cacheKey, $var->saveXML(), $keyName);
+        $this->insertAction($var);
+        $this->productVars[$keyName] = $var;
       }
     }
   }
+
+  private function insertAction(DOMDocumentPlus $doc) {
+    $var = array("action" => getCurLink(true) == "" ? "/" : getCurLink(true));
+    $doc->processVariables($var, array(), true);
+  }
+
 
   private function loadVariables() {
     $keyName = "variables";
@@ -212,11 +220,6 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function loadProducts() {
     $products = array();
-    $keyName = "products";
-    $cacheKey = apc_get_key($keyName);
-    if($this->useApcCache($cacheKey)) {
-      return apc_fetch($cacheKey);
-    }
     foreach($this->cfg->getElementsByTagName("product") as $product) {
       if(!$product->hasAttribute("id"))
         throw new Exception(_("Element product missing attribute id"));
@@ -246,14 +249,12 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       */
       $products[$attrs['product-id']] = $attrs;
     }
-    apc_store_cache($cacheKey, $products, $keyName);
     return $products;
   }
 
   private function modifyTemplate($template, $product) {
     $tmptpl = clone $template;
     $vars = array_merge($product, array(
-      "action" => getCurLink(true) == "" ? "/" : getCurLink(true),
       "currency" => $this->vars['currency'],
     ));
     $tmptpl->processVariables($vars, array(), true);
