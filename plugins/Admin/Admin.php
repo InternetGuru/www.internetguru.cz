@@ -54,8 +54,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       }
       if($this->isResource($this->type)) {
         try {
-          checkFileCache($this->dataFile, $this->defaultFile);
-          if(getRealResDir() != RESOURCES_DIR) checkFileCache($this->dataFile, RESOURCES_DIR."/".$this->defaultFile);
+          if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
+          checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
         } catch(Exception $e) {
           Cms::addMessage(_("Edited file cache will be updated"), Cms::MSG_INFO);
         }
