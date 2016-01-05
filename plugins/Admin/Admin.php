@@ -57,12 +57,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
           if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
           checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
         } catch(Exception $e) {
-          Cms::addMessage(_("Edited file cache will be updated"), Cms::MSG_INFO);
+          Cms::addMessage(_("Saving changes will update edited file cache"), Cms::MSG_INFO); // "deleted"
         }
       } else {
-        $newestCacheMtime = getNewestCacheMtime();
-        if(is_file($this->destFile) && (is_null($newestCacheMtime) || $newestCacheMtime < filemtime($this->destFile))) {
-          Cms::addMessage(_("Server cache will be updated"), Cms::MSG_INFO);
+        if(DOMBuilder::getNewestFileMtime() > getNewestCacheMtime()) {
+          Cms::addMessage(_("Saving changes will update server cache"), Cms::MSG_INFO); // "delete"
         }
         $this->processXml();
       }
