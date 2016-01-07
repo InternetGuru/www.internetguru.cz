@@ -516,6 +516,7 @@ function getNginxCacheFiles($folder = null, $link = "") {
 }
 
 function getNewestCacheMtime() {
+  if(IS_LOCALHOST) return null;
   $newestCacheMtime = null;
   foreach(getNginxCacheFiles() as $cacheFilePath) {
     $cacheMtime = filemtime($cacheFilePath);
@@ -547,7 +548,9 @@ function getResDir($file="") {
 function checkFileCache($sourceFile, $cacheFile) {
   if(!is_file($cacheFile)) return;
   if(!is_file($sourceFile)) throw new Exception(_("Cache file is redundant"));
-  if(filemtime($cacheFile) != filemtime($sourceFile)) throw new Exception(_("Cache file is outdated"));
+  if(filemtime($cacheFile) == filemtime($sourceFile)) return;
+  if(getFileHash($cacheFile) != getFileHash($sourceFile)) throw new Exception(_("Cache file is outdated"));
+  touch($cacheFile, filemtime($sourceFile));
 }
 
 // UNUSED

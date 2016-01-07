@@ -50,15 +50,22 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
           throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
         $this->processPost();
       } else {
-        try {
-          checkFileCache($this->dataFile, $this->defaultFile);
-          if(getRealResDir() != RESOURCES_DIR) checkFileCache($this->dataFile, RESOURCES_DIR."/".$this->defaultFile);
-        } catch(Exception $e) {
-          Cms::addMessage(_("Edited file cache will be updated"), Cms::MSG_INFO);
-        }
         $this->setContent();
       }
-      if(!$this->isResource($this->type)) $this->processXml();
+      if($this->isResource($this->type)) {
+        try {
+          if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
+          checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
+        } catch(Exception $e) {
+          Cms::addMessage(_("Saving changes will update edited file cache"), Cms::MSG_INFO); // "deleted"
+        }
+      } else {
+        $newestCacheMtime = getNewestCacheMtime();
+        if(!is_null($newestCacheMtime) && DOMBuilder::getNewestFileMtime() > $newestCacheMtime) {
+          Cms::addMessage(_("Saving changes will update server cache"), Cms::MSG_INFO); // "delete"
+        }
+        $this->processXml();
+      }
       if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
       if($this->isToEnable()) $this->enableDataFile();
       if($this->isPost()) {

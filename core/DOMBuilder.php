@@ -15,10 +15,11 @@ class DOMBuilder {
   private static $linkToId = array(); // link => id
   private static $linkToFile = array(); // link => filepath
   private static $defaultPrefix = null;
+  private static $newestFileMtime = null;
   private static $newestCacheMtime = null;
 
   public static function setCacheMtime() {
-    if(IS_LOCALHOST || !Cms::isSuperUser()) return;
+    if(!Cms::isSuperUser()) return;
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
     self::$newestCacheMtime = getNewestCacheMtime();
   }
@@ -72,6 +73,10 @@ class DOMBuilder {
       #return implodeLink($pUrl);
     #}
     throw new Exception(_("Link not found"));
+  }
+
+  public static function getNewestFileMtime() {
+    return self::$newestFileMtime;
   }
 
   public static function getDesc($link) {
@@ -209,6 +214,7 @@ class DOMBuilder {
     if($doc instanceof HTMLPlus)
       $mTime = self::loadHTMLPlusDOM($filePath, $doc, $author, $included);
     else $mTime = self::loadXMLDOM($filePath, $doc);
+    if($mTime > self::$newestFileMtime) self::$newestFileMtime = $mTime;
     if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
     Cms::addMessage(sprintf(_("Outdated server cache: %s"), stripDataFolder($filePath)), Cms::MSG_WARNING);
   }
