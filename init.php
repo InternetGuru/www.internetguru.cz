@@ -41,7 +41,7 @@ define('STATUS_PREINIT', 'preinit');
 define('STATUS_INIT', 'init');
 define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
-define('APC_PREFIX', 1); // change if APC structure changes
+define('APC_PREFIX', 2); // change if APC structure changes
 define("IS_LOCALHOST", (!isset($_SERVER["REMOTE_ADDR"])
   || $_SERVER["REMOTE_ADDR"] == "127.0.0.1"
   || strpos($_SERVER["REMOTE_ADDR"], "192.168.") === 0
