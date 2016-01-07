@@ -30,8 +30,8 @@ class Agregator extends Plugin implements SplObserver {
       mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
       mkdir_plus(USER_FOLDER."/".$this->pluginDir);
       $list = array();
-      $this->createList(USER_FOLDER, $list, "html");
-      $this->createList(ADMIN_FOLDER, $list, "html");
+      $this->createList(USER_FOLDER."/".$this->pluginDir, $list, "html");
+      $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list, "html");
       foreach($list as $subDir => $files) {
         $vars = $this->getFileVars($subDir, $files);
         #if(!count($vars)) continue;
@@ -41,7 +41,7 @@ class Agregator extends Plugin implements SplObserver {
       $this->createList(FILES_FOLDER, $list);
       #$this->createFilesVar(FILES_FOLDER);
       foreach($list as $subDir => $files) {
-        $this->createImgVar(FILES_DIR, $subDir, $files);
+        $this->createImgVar($subDir, $files);
       }
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
@@ -164,7 +164,7 @@ class Agregator extends Plugin implements SplObserver {
 
   private function createList($rootDir, Array &$list, $ext=null, $subDir=null) {
     if(isset($list[$subDir])) return; // user dir (with at least one file) beats admin dir
-    $workingDir = "$rootDir/".$this->pluginDir.(strlen($subDir) ? "/$subDir" : "");
+    $workingDir = "$rootDir".(strlen($subDir) ? "/$subDir" : "");
     if(!is_dir($workingDir)) return;
     foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
@@ -178,15 +178,18 @@ class Agregator extends Plugin implements SplObserver {
     }
   }
 
-  private function createImgVar($root, $subDir, Array $files) {
+  private function createImgVar($subDir, Array $files) {
     $cacheKey = apc_get_key($subDir);
     $useCache = true;
-    if(!apc_is_valid_cache($cacheKey, count($files))) {
-      apc_store_cache($cacheKey, count($files), $subDir);
+    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").self::INOTIFY;
+    if(is_file($inotify)) $checkSum = filemtime($inotify);
+    else $checkSum = count($files);
+    if(!apc_is_valid_cache($cacheKey, $checkSum)) {
+      apc_store_cache($cacheKey, $checkSum, $subDir);
       $useCache = false;
     }
     $alts = $this->buildImgAlts();
-    $vars = $this->buildImgVars($files, $alts, $root, $subDir);
+    $vars = $this->buildImgVars($files, $alts, $subDir);
     if(empty($vars)) return;
     foreach($this->cfg->documentElement->childElementsArray as $image) {
       if($image->nodeName != "image") continue;
@@ -223,24 +226,23 @@ class Agregator extends Plugin implements SplObserver {
     return $alts;
   }
 
-  private function buildImgVars(Array $files, Array $alts, $root, $subDir) {
+  private function buildImgVars(Array $files, Array $alts, $subDir) {
     $vars = array();
-    foreach($files as $fileName) {
-      $sd = $subDir;
-      if(strlen($subDir)) $sd.= "/";
-      $filePath = USER_FOLDER."/$root/$sd$fileName";
+    foreach($files as $fileName => $rootDir) {
+      if(strlen($subDir)) $fileName = "$subDir/$fileName";
+      $filePath = "$rootDir/$fileName";
       $mimeType = getFileMime($filePath);
       if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") !== 0) continue;
       $v = array();
       $v["name"] = $fileName;
       $v["type"] = $mimeType;
       $v["mtime"] = filemtime($filePath);
-      $v["url"] = $filePath;
-      $v["url-images"] = $filePath;
-      $v["url-thumbs"] = "$root/thumbs/$sd$fileName";
-      $v["url-preview"] = "$root/preview/$sd$fileName";
-      $v["url-big"] = "$root/big/$sd$fileName";
-      $v["url-full"] = "$root/full/$sd$fileName";
+      $v["url"] = FILES_DIR."/$fileName"; // $filePath ???
+      $v["url-images"] = $v["url"]; // alias for $v["url"]
+      $v["url-thumbs"] = FILES_DIR."/thumbs/$fileName";
+      $v["url-preview"] = FILES_DIR."/preview/$fileName";
+      $v["url-big"] = FILES_DIR."/big/$fileName";
+      $v["url-full"] = FILES_DIR."/full/$fileName";
       if(isset($alts[$fileName])) $v["alt"] = $alts[$fileName];
       $vars[$filePath] = $v;
     }
@@ -267,8 +269,7 @@ class Agregator extends Plugin implements SplObserver {
   private function getFileVars($subDir, Array $files) {
     $vars = array();
     $cacheKey = apc_get_key($subDir);
-    $path = $this->pluginDir.(strlen($subDir) ? "/$subDir" : "");
-    $inotify = current($files)."/$path/".self::INOTIFY;
+    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").self::INOTIFY;
     if(is_file($inotify)) $checkSum = filemtime($inotify);
     else $checkSum = count($files);
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
@@ -276,8 +277,8 @@ class Agregator extends Plugin implements SplObserver {
       $this->useCache = false;
     }
     foreach($files as $fileName => $rootDir) {
-      $file = "$path/$fileName";
-      $filePath = "$rootDir/$file";
+      $filePath = "$rootDir/".(strlen($subDir) ? "$subDir/" : "").$fileName;
+      $file = stripDataFolder($filePath);
       try {
         $doc = DOMBuilder::buildHTMLPlus($file);
         $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
