@@ -223,7 +223,8 @@ class DOMBuilder {
     $fShort = stripDataFolder($filePath);
     #todo: Cms::addVariableItem(file_extension, $fShort);
     #Cms::addVariableItem("html", $fShort);
-    $fInfo = self::getCache(apc_get_key($filePath), $filePath);
+    $cacheKey = apc_get_key($filePath);
+    $fInfo = self::getCache($cacheKey, $filePath);
     if(!is_null($fInfo)) {
       $doc->loadXML($fInfo["xml"]);
       return $fInfo["mtime"];
@@ -235,7 +236,7 @@ class DOMBuilder {
       "mtime" => $mTime,
       "xml" => $doc->saveXML()
     );
-    apc_store_cache($filePath, $fInfo, stripDataFolder($filePath));
+    apc_store_cache($cacheKey, $fInfo, stripDataFolder($filePath));
     return $mTime;
   }
 
@@ -245,7 +246,8 @@ class DOMBuilder {
       throw new Exception(sprintf(_("File '%s' already included"), $fShort));
     self::$included[$filePath] = null;
     Cms::addVariableItem("html", $fShort);
-    $fInfo = self::getCache(apc_get_key($filePath), $filePath);
+    $cacheKey = apc_get_key($filePath);
+    $fInfo = self::getCache($cacheKey, $filePath);
     if(!is_null($fInfo)) {
       if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
       foreach($fInfo["includes"] as $file => $mtime) {
@@ -321,7 +323,7 @@ class DOMBuilder {
       "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
       "xml" => $doc->saveXML()
     );
-    apc_store_cache($filePath, $fInfo, stripDataFolder($filePath));
+    apc_store_cache($cacheKey, $fInfo, stripDataFolder($filePath));
     return $mTime;
   }
 
