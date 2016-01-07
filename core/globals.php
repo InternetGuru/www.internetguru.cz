@@ -488,7 +488,6 @@ function apc_is_valid_cache($cacheKey, $value) {
   return true;
 }
 
-
 function clearNginxCache() {
   if(IS_LOCALHOST) return;
   foreach(getNginxCacheFiles() as $fPath) {

@@ -10,6 +10,7 @@ class Agregator extends Plugin implements SplObserver {
   private $edit;
   private $cfg;
   private static $sortKey;
+  const INOTIFY = ".inotify";
   const APC_PREFIX = "1";
   const DEBUG = false;
 
@@ -29,11 +30,11 @@ class Agregator extends Plugin implements SplObserver {
       mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
       mkdir_plus(USER_FOLDER."/".$this->pluginDir);
       $list = array();
-      $this->createList(USER_FOLDER."/".$this->pluginDir, $list, "html");
-      $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list, "html");
+      $this->createList(USER_FOLDER, $list, "html");
+      $this->createList(ADMIN_FOLDER, $list, "html");
       foreach($list as $subDir => $files) {
         $vars = $this->getFileVars($subDir, $files);
-        if(!count($vars)) continue;
+        #if(!count($vars)) continue;
         $this->createCmsVars($subDir, $vars);
       }
       $list = array();
@@ -162,9 +163,9 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function createList($rootDir, Array &$list, $ext=null, $subDir=null) {
-    if(!is_dir($rootDir)) return;
-    if(!is_null($subDir) && isset($list[$subDir])) return;
-    $workingDir = is_null($subDir) ? $rootDir : "$rootDir/$subDir";
+    if(isset($list[$subDir])) return; // user dir (with at least one file) beats admin dir
+    $workingDir = "$rootDir/".$this->pluginDir.(strlen($subDir) ? "/$subDir" : "");
+    if(!is_dir($workingDir)) return;
     foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
       if(is_dir("$workingDir/$f")) {
@@ -173,7 +174,7 @@ class Agregator extends Plugin implements SplObserver {
       }
       if(!is_null($ext) && pathinfo($f, PATHINFO_EXTENSION) != $ext) continue;
       if(is_file("$workingDir/.$f")) continue;
-      $list[$subDir][] = $f;
+      $list[$subDir][$f] = $rootDir;
     }
   }
 
@@ -266,35 +267,35 @@ class Agregator extends Plugin implements SplObserver {
   private function getFileVars($subDir, Array $files) {
     $vars = array();
     $cacheKey = apc_get_key($subDir);
-    if(!apc_is_valid_cache($cacheKey, count($files))) {
-      apc_store_cache($cacheKey, count($files), $subDir);
+    $path = $this->pluginDir.(strlen($subDir) ? "/$subDir" : "");
+    $inotify = current($files)."/$path/".self::INOTIFY;
+    if(is_file($inotify)) $checkSum = filemtime($inotify);
+    else $checkSum = count($files);
+    if(!apc_is_valid_cache($cacheKey, $checkSum)) {
+      apc_store_cache($cacheKey, $checkSum, $subDir);
       $this->useCache = false;
     }
-    foreach($files as $fileName) {
-      if(strlen($subDir)) $fileName = "$subDir/$fileName";
-      $file = $this->pluginDir."/$fileName";
-      $filePath = USER_FOLDER."/".$file;
-      if(!is_file($filePath)) $filePath = ADMIN_FOLDER."/".$file;
+    foreach($files as $fileName => $rootDir) {
+      $file = "$path/$fileName";
+      $filePath = "$rootDir/$file";
       try {
-        $doc = DOMBuilder::buildHTMLPlus($filePath);
+        $doc = DOMBuilder::buildHTMLPlus($file);
+        $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
       } catch(Exception $e) {
         Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
         continue;
       }
-      $vars[$filePath] = $this->getHTMLVariables($doc, $file);
-      foreach($doc->getElementsByTagName("h") as $h) {
-        if(!$h->hasAttribute("link")) continue;
-        if($h->getAttribute("link") != getCurLink()) continue;
+      if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
         $this->docinfo = $vars[$filePath];
-        $this->currentDoc = $doc;
         $this->currentSubdir = $subDir;
         $this->currentFilepath = $file;
+        $this->currentDoc = $doc;
       }
+      if(is_file($inotify)) continue;
       $cacheKey = apc_get_key($filePath);
-      if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-        apc_store_cache($cacheKey, filemtime($filePath), $file);
-        $this->useCache = false;
-      }
+      if(apc_is_valid_cache($cacheKey, filemtime($filePath))) continue;
+      apc_store_cache($cacheKey, filemtime($filePath), $file);
+      $this->useCache = false;
     }
     return $vars;
   }
@@ -402,14 +403,21 @@ class Agregator extends Plugin implements SplObserver {
     return $doc;
   }
 
-  private function getHTMLVariables(HTMLPlus $doc, $filePath) {
+  private function getHTMLVariables(HTMLPlus $doc, $filePath, $file) {
+    $cacheKey = apc_get_key("vars/$filePath");
+    $mTime = filemtime($filePath);
+    if($this->useCache && apc_exists($cacheKey)) {
+      $vars = apc_fetch($cacheKey);
+      if($vars["filemtime"] == $mTime) return $vars;
+    }
     $vars = array();
     $h = $doc->documentElement->firstElement;
     $desc = $h->nextElement;
     $vars['editlink'] = "";
     if(Cms::isSuperUser()) {
-      $vars['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";
+      $vars['editlink'] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>".$this->edit."</a>";
     }
+    $vars['filemtime'] = $mTime;
     $vars['heading'] = $h->nodeValue;
     $vars['link'] = $h->getAttribute("link");
     $vars['author'] = $h->getAttribute("author");
@@ -421,7 +429,20 @@ class Agregator extends Plugin implements SplObserver {
     $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
     $vars['desc'] = $desc->nodeValue;
     $vars['kw'] = $desc->getAttribute("kw");
+    $vars['links'] = array();
+    foreach($doc->getElementsByTagName("h") as $h) {
+      if(!$h->hasAttribute("link")) continue;
+      $vars['links'][] = $h->getAttribute("link");
+    }
+    apc_store_cache($cacheKey, $vars, $file);
     return $vars;
+  }
+
+  private function isCurrentDoc(Array $links) {
+    foreach($links as $link) {
+      if($link == getCurLink()) return true;
+    }
+    return false;
   }
 
 }

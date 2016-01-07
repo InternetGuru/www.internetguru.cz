@@ -229,14 +229,8 @@ class DOMBuilder {
       "mtime" => $mTime,
       "xml" => $doc->saveXML()
     );
-    self::saveCache($filePath, $fInfo);
+    apc_store_cache($filePath, $fInfo, stripDataFolder($filePath));
     return $mTime;
-  }
-
-  private static function saveCache($filePath, $fInfo) {
-    $fShort = stripDataFolder($filePath);
-    $stored = apc_store(apc_get_key($filePath), $fInfo, rand(3600*24*30*3, 3600*24*30*6));
-    if(!$stored) Logger::log(sprintf(_("Unable to cache file %s"), $fShort), Logger::LOGGER_WARNING);
   }
 
   private static function loadHTMLPlusDOM($filePath, DOMDocumentPlus $doc, $author=null, $included=false) {
@@ -321,7 +315,7 @@ class DOMBuilder {
       "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
       "xml" => $doc->saveXML()
     );
-    self::saveCache($filePath, $fInfo);
+    apc_store_cache($filePath, $fInfo, stripDataFolder($filePath));
     return $mTime;
   }
 
