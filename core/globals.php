@@ -421,8 +421,12 @@ function getDirHash($dirPath) {
 }
 
 function stripDataFolder($filePath) {
-  $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
-  return str_replace($remove, array(), "?$filePath");
+  $folders = array(USER_FOLDER, ADMIN_FOLDER, CMS_FOLDER);
+  foreach($folders as $folder) {
+    if(strpos($filePath, "$folder/") !== 0) continue;
+    return substr($filePath, strlen($folder)+1);
+  }
+  return $filePath;
 }
 
 function getShortString($str, $lLimit=60, $hLimit=80, $delim=" ") {
