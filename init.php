@@ -4,6 +4,7 @@ $start_time = microtime(true);
 session_cache_limiter("");
 
 define("INDEX_HTML", "index.html");
+define("INOTIFY", ".inotify");
 define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
 define("PLUGINS_DIR", "plugins");
 define("THEMES_DIR", "themes");

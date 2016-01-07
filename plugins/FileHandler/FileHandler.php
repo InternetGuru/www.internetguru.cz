@@ -133,6 +133,13 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
+    $inotifyCache = $cacheFolder."/".INOTIFY."+".str_replace("/", "+", $sourceFolder);
+    $inotifySource = $sourceFolder."/".INOTIFY;
+    $folderUptodate = true;
+    $skipFolder = false;
+    if(is_file($inotifyCache) && is_file($inotifySource)) {
+      $skipFolder = filemtime($inotifyCache) == filemtime($inotifySource);
+    }
     foreach(scandir($cacheFolder) as $f) {
       if(strpos($f, ".") === 0) continue;
       $cacheFilePath = "$cacheFolder/$f";
@@ -142,6 +149,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         if(count(scandir($cacheFilePath)) == 2) rmdir($cacheFilePath);
         continue;
       }
+      if($skipFolder) continue;
       $sourceFilePath = findFile($sourceFilePath, true, true, false);
       if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
         $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
@@ -153,6 +161,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         $cacheFilePath = getRealResDir($cacheFilePath);
         checkFileCache($sourceFilePath, $cacheFilePath);
       } catch(Exception $e) {
+        $folderUptodate = false;
         if($this->deleteCache) {
           if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
         } elseif(self::DEBUG) {
@@ -162,6 +171,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         }
       }
     }
+    if(!$folderUptodate || !is_file($inotifySource)) return;
+    touch($inotifyCache, filemtime($inotifySource));
   }
 
   private static function getImageMode($filePath) {

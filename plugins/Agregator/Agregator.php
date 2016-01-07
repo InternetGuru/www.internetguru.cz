@@ -10,7 +10,6 @@ class Agregator extends Plugin implements SplObserver {
   private $edit;
   private $cfg;
   private static $sortKey;
-  const INOTIFY = ".inotify";
   const APC_PREFIX = "1";
   const DEBUG = false;
 
@@ -181,7 +180,7 @@ class Agregator extends Plugin implements SplObserver {
   private function createImgVar($subDir, Array $files) {
     $cacheKey = apc_get_key($subDir);
     $useCache = true;
-    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").self::INOTIFY;
+    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
     if(is_file($inotify)) $checkSum = filemtime($inotify);
     else $checkSum = count($files);
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
@@ -269,7 +268,7 @@ class Agregator extends Plugin implements SplObserver {
   private function getFileVars($subDir, Array $files) {
     $vars = array();
     $cacheKey = apc_get_key($subDir);
-    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").self::INOTIFY;
+    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
     if(is_file($inotify)) $checkSum = filemtime($inotify);
     else $checkSum = count($files);
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
