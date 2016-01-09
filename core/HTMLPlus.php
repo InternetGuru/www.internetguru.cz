@@ -10,10 +10,18 @@ class HTMLPlus extends DOMDocumentPlus {
   private $defaultDesc = null;
   private $defaultKw = null;
   private $errors = array();
+  private $status = 0;
+  private $statuses;
+  const STATUS_UNKNOWN = 0;
+  const STATUS_VALID = 1;
+  const STATUS_INVALID = 2;
+  const STATUS_AUTOCORRECTED = 3;
   const RNG_FILE = "HTMLPlus.rng";
 
   function __construct($version="1.0", $encoding="utf-8") {
     parent::__construct($version, $encoding);
+    $this->statuses = array(_("Unknown"), _("Valid"), _("Invalid"), _("Autocorrected"));
+    $this->status = self::STATUS_UNKNOWN;
     $c = new DateTime("now");
     $this->defaultCtime = $c->format(DateTime::W3C);
     $this->defaultNs = HOST;
@@ -38,6 +46,10 @@ class HTMLPlus extends DOMDocumentPlus {
     $root = $doc->importNode($this->documentElement, true);
     $doc->appendChild($root);
     return $doc;
+  }
+
+  public function getStatus() {
+    return $this->statuses[$this->status];
   }
 
   public function getErrors() {
@@ -181,26 +193,37 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   public function validatePlus($repair = false) {
+    $skip = $i = 0;
+    $hash = hash(FILE_HASH_ALGO, $this->saveXML());
+    $version = 2; // increment if validatePlus changes
+    $cacheKey = apc_get_key("HTMLPlus/validatePlus/$hash/$version");
+    #if(apc_exists($cacheKey)) $skip = apc_fetch($cacheKey);
+    $this->status = self::STATUS_INVALID;
     $this->headings = $this->getElementsByTagName("h");
-    $this->validateRoot($repair);
-    $this->validateSections($repair);
-    $this->validateLang($repair);
-    $this->validateHid($repair);
-    $this->validateHempty($repair);
-    $this->validateDesc($repair);
-    $this->validateHLink($repair);
-    $this->validateDl($repair);
-    #$this->validateLinks("a", "href", $repair);
-    #$this->validateLinks("form", "action", $repair);
-    #$this->validateLinks("object", "data", $repair);
-    $this->validateDates($repair);
-    $this->validateAuthor($repair);
-    $this->validateFirstHeadingAuthor($repair);
-    $this->validateFirstHeadingLink($repair);
-    $this->validateFirstHeadingCtime($repair);
-    $this->validateBodyNs($repair);
-    $this->validateMeta($repair);
-    $this->relaxNGValidatePlus();
+    switch($skip) {
+      case 0: $this->validateRoot($repair); $i++;
+      case 1: $this->validateSections($repair); $i++;
+      case 2: $this->validateLang($repair); $i++;
+      case 3: $this->validateHid($repair); $i++;
+      case 4: $this->validateHempty($repair); $i++;
+      case 5: $this->validateDesc($repair); $i++;
+      case 6: $this->validateHLink($repair); $i++;
+      case 7: $this->validateDl($repair); $i++;
+      case 8: $this->validateDates($repair); $i++;
+      case 9: $this->validateAuthor($repair); $i++;
+      case 10: $this->validateFirstHeadingAuthor($repair); $i++;
+      case 11: $this->validateFirstHeadingLink($repair); $i++;
+      case 12: $this->validateFirstHeadingCtime($repair); $i++;
+      case 13: $this->validateBodyNs($repair); $i++;
+      case 14: $this->validateMeta($repair); $i++;
+      case 15: $this->relaxNGValidatePlus(); $i++;
+    }
+    if(count($this->errors)) {
+      $this->status = self::STATUS_AUTOCORRECTED;
+      return;
+    }
+    $this->status = self::STATUS_VALID;
+    #apc_store_cache($cacheKey, $skip, "validatePlus");
   }
 
   private function errorHandler($message, $repair) {

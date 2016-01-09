@@ -278,8 +278,8 @@ class DOMBuilder {
     } catch(Exception $e) {
       $doc->validatePlus(true);
       $storeCache = false;
-      if(strpos($filePath, CMS_FOLDER) !== 0) {
-        Logger::log(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+      foreach($doc->getErrors() as $error) {
+        Cms::addMessage($error, $doc->getStatus());
       }
     }
     // generate ctime/mtime from file if not set
