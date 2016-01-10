@@ -1,4 +1,81 @@
 ----------------
+1.9.5 2016-01-07
+----------------
+
+ContactForm: přihlášenému uživateli odeslanou zprávu jen zobrazí (1b251a8)
+Admin: upozornění na aktualizaci souborové mezipaměti (a37a91c)
+Admin: upozornění na aktualizaci serverové mezipaměti (ff6c400)
+Htmlplus: povinný atribut value pro checkbox a radio (0d7b6ac)
+Admin: oprava práce s různými soubory, issue #28 (5f92e2f)
+admin: oprava hlášení o úspěšném uložení, issue #30 (80322cd)
+fileHandler: efektivní kontrola mezipaměti (820efaa)
+
+----------------
+1.9.3 2015-12-21
+----------------
+
+contactForm: oprava umístění skryté položky formuláře, issue #39 (2e20aac)
+Convertor: oprava názvu lokálního importu (ca91686)
+Convertor: oprava importu, issue #35 (4cb6270)
+BasicLayout.css: oprava pravé mezery vedle form input (97cb334)
+
+----------------
+1.9.2 2015-12-15
+----------------
+
+Admin: přidán odkaz pro ignorování mezipaměti (0d4b7d9)
+Admin: zachování parametrů při volbě souboru (90012d4)
+Admin: možnost ignorování serverové mezipaměti (f06fc5e)
+perzistentní URL parametr cache (0e45dae)
+FileHandler: změna adresáře náhledu z thumb na thumbs (dfbe8eb)
+Vlastní knihovny pro optimalizaci zdrojů CSS/JS (c35e9ae)
+global: zrušení technologie Grunt, zdrojové soubory pomocí findex.php (477ca6a)
+
+----------------
+1.9.1 2015-12-02
+----------------
+
+fileHandler: opraveno mazání souborové mezipaměti (0e7b7b0)
+
+----------------
+1.9.0 2015-12-01
+----------------
+
+FileHandler: vylepšení práce se zdrojovými soubory (78d455b)
+global: uživatelské mazání serverové mezipaměti (298f754)
+global: ladící režim (2bfaf46)
+GlobalMenu: minimálně jedna úroveň (545293f)
+global: zvláštní souborová mezipaměť pro různé verze systému (7fbd29a)
+
+----------------
+1.9.0 2015-11-28
+----------------
+
+global: cesta ke zdrojovým souborům podle verze systému (8e10ee7)
+Admin: zobrazení automatických oprav (efa7ef6)
+completable.js: podpora zástupnéh znaku * (0e15436)
+CodeMirror: oprava vyhledávání vzhledem k pozici kurzoru (9e73988)
+LogViewer: oprava počtu zobrazených výsledků (0d80108)
+UrlHandler: oprava konfiguračního souboru (5717cf2)
+SyntaxCodeMirror: oprava označení nalezeného textu, issue #36 (3854cc9)
+cms-default.css vylepšení stylů (3c30fb3)
+fileHandler: kontrola souborové mezipaměti (087cc3f)
+domBuilder: cache xml files, check cache mtime (0c70f2c)
+
+----------------
+1.8.8 2015-11-19
+----------------
+
+ielte7.xsl: hláška pro starý prohlížeč IE7- (a63cc95)
+completable.js: přidána podpora pro deaktivované soubory #disabled (7a00965)
+Admin: deaktivované soubory do nabídky, issue #29 (cd4ec34)
+Admin: varování o neaktuální mezipaměti (d2d3378)
+adminmenu.xsl: přidán odkaz na zpětnou vazbu (48c865c)
+InputVar: odkaz na zpštnou vazbud jako nová proměnná (458c652)
+EmailBreaker: oprava složeného zápisu, issue #32 (8b80a67)
+ContentLink: oprava řeči (4cdbe6e)
+
+----------------
 1.8.6 2015-11-11
 ----------------
 
