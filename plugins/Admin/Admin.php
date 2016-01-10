@@ -347,22 +347,17 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->scheme = $this->getScheme($this->dataFile);
     }
     if($this->type == "html") {
-      $doc = new HTMLPlus();
-      $doc->defaultLink = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME), "a-zA-Z0-9/_-");
-      $doc->defaultAuthor = Cms::getVariable("cms-author");
+      $doc = $this->getHTMLPlus(INDEX_HTML, false);
+      $link = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME), "a-zA-Z0-9/_-");
+      $doc->documentElement->firstElement->setAttribute("link", $link);
     } else $doc = new DOMDocumentPlus();
     $doc->formatOutput = true;
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
-      $rootName = "body";
       if($this->type != "html") {
-        $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
+        if($this->type == "xsl") $rootName = "xslt";
+        else $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
         $root = $doc->appendChild($doc->createElement($rootName));
         $root->appendChild($doc->createComment(" "._("user content")." "));
-      } else {
-        $doc->appendChild($doc->createElement("body"));
-        $doc->defaultHeading = _("My Heading");
-        $doc->defaultDesc = _("My Content Description");
-        $doc->defaultKw = _("my, comma, separated, keywords");
       }
       $this->contentValue = $doc->saveXML();
     } elseif(!@$doc->loadXml($this->contentValue)) {
