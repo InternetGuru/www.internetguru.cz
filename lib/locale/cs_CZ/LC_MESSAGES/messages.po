@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-09 20:49+0100\n"
-"PO-Revision-Date: 2016-01-09 20:51+0100\n"
+"POT-Creation-Date: 2016-01-10 11:11+0100\n"
+"PO-Revision-Date: 2016-01-10 11:11+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -243,170 +243,170 @@ msgstr "Validní"
 msgid "Invalid"
 msgstr "Nevalidní"
 
-#: core/HTMLPlus.php:23 plugins/Convertor/Convertor.php:96
-msgid "Autocorrected"
-msgstr "Autoopraveno"
+#: core/HTMLPlus.php:23
+msgid "Repaired"
+msgstr "Opraveno"
 
 #: core/HTMLPlus.php:32
 msgid "Variable value must be non-empty string or null"
 msgstr "Hodnota proměnné musí být neprázdný řetězec nebo null"
 
-#: core/HTMLPlus.php:238
+#: core/HTMLPlus.php:244
 #, php-format
 msgid "Empty element desc following heading with attribute link %s found"
 msgstr "Nalezen prázdný element desc následující nadpis s atributem link %s"
 
-#: core/HTMLPlus.php:243
+#: core/HTMLPlus.php:249
 #, php-format
 msgid "Attribute kw following heading with link %s not found or empty"
 msgstr "Nebyl nalezen platný atribut kw následující nadpis s atributem link %s"
 
-#: core/HTMLPlus.php:258
+#: core/HTMLPlus.php:264
 msgid "Body attribude 'ns' missing"
 msgstr "V elementu body chybí atribut 'ns'"
 
-#: core/HTMLPlus.php:266
+#: core/HTMLPlus.php:272
 msgid "First heading attribude 'link' missing"
 msgstr "V prvním nadpisu chybí atribut 'link'"
 
-#: core/HTMLPlus.php:274
+#: core/HTMLPlus.php:280
 msgid "First heading attribute 'author' missing"
 msgstr "V prvním nadpisu chybí atribut 'author'"
 
-#: core/HTMLPlus.php:282
+#: core/HTMLPlus.php:288
 msgid "First heading attribute 'ctime' missing"
 msgstr "V prvním nadpisu chybí atribut 'ctime'"
 
-#: core/HTMLPlus.php:293
+#: core/HTMLPlus.php:299
 msgid "Root element not found"
 msgstr "Nebyl nalezen kořenový element"
 
-#: core/HTMLPlus.php:295
+#: core/HTMLPlus.php:301
 msgid "Root element must be 'body'"
 msgstr "Kořenový element musí být 'body'"
 
-#: core/HTMLPlus.php:301
+#: core/HTMLPlus.php:307
 msgid "Attribute 'xml:lang' is missing in element body"
 msgstr "V elementu body chybí atribut 'xml:lang'"
 
 # Hodnota atributu xml:lang v elementu body nového HTML+ dokumentu
-#: core/HTMLPlus.php:303
+#: core/HTMLPlus.php:309
 msgid "en"
 msgstr "cs"
 
-#: core/HTMLPlus.php:307
+#: core/HTMLPlus.php:313
 msgid "Element section cannot be empty"
 msgstr "Element section nesmí být prázdný"
 
-#: core/HTMLPlus.php:317
+#: core/HTMLPlus.php:323
 msgid "There must be exactly one heading in body element"
 msgstr "V elementu body musí být právě jeden nadpis"
 
-#: core/HTMLPlus.php:323
+#: core/HTMLPlus.php:329
 msgid "Missing heading in body element"
 msgstr "V elementu body chybí nadpis"
 
-#: core/HTMLPlus.php:341
+#: core/HTMLPlus.php:347
 msgid "Web title"
 msgstr "Titulek webu"
 
-#: core/HTMLPlus.php:343
+#: core/HTMLPlus.php:349
 msgid "Web description"
 msgstr "Popisek webu"
 
-#: core/HTMLPlus.php:353
+#: core/HTMLPlus.php:359
 msgid "Empty section(s) found"
 msgstr "Nalezen jeden nebo více prázdných elementů section"
 
-#: core/HTMLPlus.php:355
+#: core/HTMLPlus.php:361
 msgid "Empty section deleted"
 msgstr "Byl smazán prázdný element section"
 
-#: core/HTMLPlus.php:362
+#: core/HTMLPlus.php:368
 msgid "Lang attribute without xml namespace"
 msgstr "Atribut lang postrádá jmenný prostor xml"
 
-#: core/HTMLPlus.php:376
+#: core/HTMLPlus.php:382
 #, php-format
 msgid "Heading attribute id empty or missing: %s"
 msgstr "Prázdný nebo chybějící atribut id nadpisu: %s"
 
-#: core/HTMLPlus.php:380
+#: core/HTMLPlus.php:386
 #, php-format
 msgid "Invalid heading attribute id '%s'"
 msgstr "Neplatný atribut id '%s' nadpisu"
 
-#: core/HTMLPlus.php:384
+#: core/HTMLPlus.php:390
 #, php-format
 msgid "Duplicit heading attribute id '%s'"
 msgstr "Duplicitní atribut id '%s' nadpisu"
 
-#: core/HTMLPlus.php:395
+#: core/HTMLPlus.php:401
 msgid "Heading content must not be empty"
 msgstr "Nadpis nesmí být prázdný"
 
-#: core/HTMLPlus.php:405
+#: core/HTMLPlus.php:411
 msgid "Missing element 'desc'"
 msgstr "Chybí element 'desc'"
 
-#: core/HTMLPlus.php:429
+#: core/HTMLPlus.php:435
 #, php-format
 msgid "Normalize link leads to empty value '%s'"
 msgstr "Normalizace odkazu '%s' vede k prázné hodnotě"
 
-#: core/HTMLPlus.php:430
+#: core/HTMLPlus.php:436
 msgid "Empty attribute link found"
 msgstr "Nalezen prázdný atribut link"
 
-#: core/HTMLPlus.php:433
+#: core/HTMLPlus.php:439
 #, php-format
 msgid "Invalid link value found '%s'"
 msgstr "Odkaz '%s' má chybnoý formát"
 
-#: core/HTMLPlus.php:435
+#: core/HTMLPlus.php:441
 #, php-format
 msgid "Normalize link leads to duplicit value '%s'"
 msgstr "Normalizace odkazu '%s' způsobuje duplicitu"
 
-#: core/HTMLPlus.php:448
+#: core/HTMLPlus.php:454
 msgid "Element dt following sibling must be dd"
 msgstr "Element následující dt musí být dd"
 
-#: core/HTMLPlus.php:450
+#: core/HTMLPlus.php:456
 msgid "created empty element dd"
 msgstr "vytvořen prázdný element dd"
 
-#: core/HTMLPlus.php:464
+#: core/HTMLPlus.php:470
 msgid "Attr 'author' cannot be empty"
 msgstr "Atribut 'author' nemůže být prázdný"
 
-#: core/HTMLPlus.php:465
+#: core/HTMLPlus.php:471
 msgid "removed empty attr 'author'"
 msgstr "odstraněn prázdný atribut 'author'"
 
-#: core/HTMLPlus.php:479
+#: core/HTMLPlus.php:485
 msgid "Attribute 'mtime' requires 'ctime'"
 msgstr "Atribut 'mtime' vyžaduje 'ctime'"
 
-#: core/HTMLPlus.php:485
+#: core/HTMLPlus.php:491
 msgid "Invalid 'ctime' attribute format"
 msgstr "Neplatný formát atributu 'ctime'"
 
-#: core/HTMLPlus.php:486
+#: core/HTMLPlus.php:492
 #, php-format
 msgid "removed ctime='%s'"
 msgstr "odstraněn ctime='%s'"
 
-#: core/HTMLPlus.php:492
+#: core/HTMLPlus.php:498
 msgid "Invalid 'mtime' attribute format"
 msgstr "Neplatný formát atributu 'mtime'"
 
-#: core/HTMLPlus.php:493 core/HTMLPlus.php:498
+#: core/HTMLPlus.php:499 core/HTMLPlus.php:504
 #, php-format
 msgid "removed mtime='%s'"
 msgstr "odstraněn mtime='%s'"
 
-#: core/HTMLPlus.php:497
+#: core/HTMLPlus.php:503
 msgid "'mtime' cannot be lower than 'ctime'"
 msgstr "Atribut 'mtime' nemůže být menší než 'ctime'"
 
@@ -685,63 +685,51 @@ msgstr "Nepodporovaný formát souboru '%s'"
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:363
-msgid "My Heading"
-msgstr "Můj nadpis"
-
 #: plugins/Admin/Admin.php:364
-msgid "My Content Description"
-msgstr "Můj popis obsahu"
-
-#: plugins/Admin/Admin.php:365
-msgid "my, comma, separated, keywords"
-msgstr "moje, klíčová, slova, oddělená, čárkou"
-
-#: plugins/Admin/Admin.php:369
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: plugins/Admin/Admin.php:408
+#: plugins/Admin/Admin.php:403
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:419
+#: plugins/Admin/Admin.php:414
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:421
+#: plugins/Admin/Admin.php:416
 msgid "Unable to enable destination file"
 msgstr "Nepodařilo se aktivovat cílový soubor"
 
-#: plugins/Admin/Admin.php:424
+#: plugins/Admin/Admin.php:419
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:430
+#: plugins/Admin/Admin.php:425
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:433 plugins/InputVar/InputVar.php:23
+#: plugins/Admin/Admin.php:428 plugins/InputVar/InputVar.php:23
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:444
+#: plugins/Admin/Admin.php:439
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:450
+#: plugins/Admin/Admin.php:445
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:461
+#: plugins/Admin/Admin.php:456
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:473
+#: plugins/Admin/Admin.php:468
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -897,6 +885,10 @@ msgstr "Soubor '%s' má nepodporovaný MIME typ"
 #: plugins/Convertor/Convertor.php:81
 msgid "Unable to import document; probably missing heading"
 msgstr "Nepodařilo se importovat dokument; pravděpodobně v něm chybí nadpis"
+
+#: plugins/Convertor/Convertor.php:96
+msgid "Autocorrected"
+msgstr "Autoopraveno"
 
 #: plugins/Convertor/Convertor.php:99
 msgid "Use @ to specify short/link attributes for heading"
@@ -1277,6 +1269,15 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:194
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "My Heading"
+#~ msgstr "Můj nadpis"
+
+#~ msgid "My Content Description"
+#~ msgstr "Můj popis obsahu"
+
+#~ msgid "my, comma, separated, keywords"
+#~ msgstr "moje, klíčová, slova, oddělená, čárkou"
 
 #~ msgid "Content must be an instance of HTML+"
 #~ msgstr "Obsah musí být instancí HTML+"
