@@ -134,7 +134,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $adminname = "Jiří Pavelka";
       $bcc = "pavel@petrzela.eu";
     }
-    if(Cms::isSuperUser()) {
+    if(!is_null(Cms::getLoggedUser())) {
       Cms::addMessage("<pre><code>$msg</code></pre>", Cms::MSG_INFO);
       return;
     }
