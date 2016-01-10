@@ -346,22 +346,27 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(is_null($this->scheme) && file_exists($this->dataFile)) {
       $this->scheme = $this->getScheme($this->dataFile);
     }
-    if($this->type == "html") {
-      $doc = $this->getHTMLPlus(INDEX_HTML, false);
-      $link = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME), "a-zA-Z0-9/_-");
-      $doc->documentElement->firstElement->setAttribute("link", $link);
-    } else $doc = new DOMDocumentPlus();
-    $doc->formatOutput = true;
+    $defaultLink = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME), "a-zA-Z0-9/_-");
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
-      if($this->type != "html") {
+      if($this->type == "html") {
+        $doc = $this->getHTMLPlus(INDEX_HTML, false);
+        $doc->documentElement->firstElement->setAttribute("link", $defaultLink);
+      } else {
+        $doc = new DOMDocumentPlus();
+        $doc->formatOutput = true;
         if($this->type == "xsl") $rootName = "xslt";
         else $rootName = pathinfo($this->defaultFile, PATHINFO_FILENAME);
         $root = $doc->appendChild($doc->createElement($rootName));
         $root->appendChild($doc->createComment(" "._("user content")." "));
       }
       $this->contentValue = $doc->saveXML();
-    } elseif(!@$doc->loadXml($this->contentValue)) {
-      throw new Exception(_("Invalid XML syntax"));
+    } else {
+      if($this->type == "html") {
+        $doc = new HTMLPlus();
+        $doc->defaultLink = $defaultLink;
+        $doc->defaultAuthor = Cms::getVariable("cms-author");
+      } else $doc = new DOMDocumentPlus();
+      if(!@$doc->loadXml($this->contentValue)) throw new Exception(_("Invalid XML syntax"));
     }
     try {
       if($this->type == "html") $doc->validatePlus();
