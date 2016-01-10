@@ -3,9 +3,10 @@
 
   <!-- Globální proměnné -->
   <var id="adminaddr" modifyonly="modifyonly">[e-mail kontaktní osoby]</var> <!-- povinný údaj -->
-  <var id="adminname" modifyonly="modifyonly"></var> <!-- nepovinné jméno kontaktní osoby -->
-  <var id="servername" modifyonly="modifyonly"></var> <!-- nepovinný název společnosti zobrazený jako jméno odesílatele -->
-  <var id="bcc" modifyonly="modifyonly"></var> <!-- nepovinná adresa skryté kopie zprávy -->
+  <var id="adminname" modifyonly="modifyonly"/> <!-- nepovinné jméno kontaktní osoby -->
+  <var id="servername" modifyonly="modifyonly"/> <!-- nepovinný název společnosti zobrazený jako jméno odesílatele -->
+  <var id="bcc" modifyonly="modifyonly"/> <!-- nepovinná adresa skryté kopie zprávy -->
+
   <var id="success" modifyonly="modifyonly">Děkujeme, zpráva byla úspěšně odeslána!</var>
   <var id="subject" modifyonly="modifyonly">Nová zpráva z $cms-host</var>
   <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z $cms-host:</var>

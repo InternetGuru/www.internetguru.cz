@@ -80,9 +80,11 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       if(array_key_exists($formIdToSend, $this->messages)) {
         $msg = replaceVariables($this->messages[$formIdToSend], $variables);
       } else $msg = $this->createMessage($this->cfg, $formIdToSend);
-      if(IS_LOCALHOST) throw new Exception("Not sending (at localhost)");
-      $this->sendForm($formToSend, $msg);
-      redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$formIdToSend)));
+      $this->sendForm($formIdToSend, $formToSend, $msg);
+      if(self::DEBUG) {
+        var_dump($this->formVars);
+        var_dump($this->formValues);
+      }
     } catch(Exception $e) {
       $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$formIdToSend."'>"
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
@@ -114,7 +116,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     return $doc;
   }
 
-  private function sendForm(DOMElementPlus $form, $msg) {
+  private function sendForm($formIdToSend, DOMElementPlus $form, $msg) {
     if(!strlen($this->formVars["adminaddr"])) throw new Exception(_("Missing admin address"));
     if(!preg_match("/".EMAIL_PATTERN."/", $this->formVars["adminaddr"]))
       throw new Exception(sprintf(_("Invalid admin email address: '%s'"), $this->formVars["adminaddr"]));
@@ -132,6 +134,10 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $adminname = "Jiří Pavelka";
       $bcc = "pavel@petrzela.eu";
     }
+    if(Cms::isSuperUser()) {
+      Cms::addMessage("<pre><code>$msg</code></pre>", Cms::MSG_INFO);
+      return;
+    }
     $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
     Logger::log(sprintf(_("Sending e-mail: %s"),
       "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"),
@@ -143,10 +149,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $bcc = "";
       $this->sendMail($email, $name, $adminaddr, $adminname, $msg, $bcc);
     }
-    if(self::DEBUG) {
-      var_dump($this->formVars);
-      var_dump($this->formValues);
-    }
+    redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$formIdToSend)));
   }
 
   private function sendMail($mailto, $mailtoname, $replyto, $replytoname, $msg, $bcc) {
