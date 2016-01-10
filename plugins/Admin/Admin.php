@@ -60,8 +60,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
           Cms::addMessage(_("Saving changes will update edited file cache"), Cms::MSG_INFO); // "deleted"
         }
       } else {
-        $newestCacheMtime = getNewestCacheMtime();
-        if(!is_null($newestCacheMtime) && DOMBuilder::getNewestFileMtime() > $newestCacheMtime) {
+        if(DOMBuilder::isNginxOutdated()) {
           Cms::addMessage(_("Saving changes will update server cache"), Cms::MSG_INFO); // "delete"
         }
         $this->processXml();
