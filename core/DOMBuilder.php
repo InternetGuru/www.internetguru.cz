@@ -219,7 +219,7 @@ class DOMBuilder {
     if(self::$nginxOutdated) return;
     if($mTime > self::$newestFileMtime) self::$newestFileMtime = $mTime;
     if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
-    Cms::addMessage(_("Server cache is outdated"), Cms::MSG_WARNING);
+    Cms::addMessage(_("Outdated server cache"), Cms::MSG_WARNING);
     self::$nginxOutdated = true;
   }
 
