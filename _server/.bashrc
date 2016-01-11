@@ -61,8 +61,39 @@ ps | grep -q ssh-agent || start=1 # start ssh if not running
 source ~/ssh-agent.sh # register saved variables
 ((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
+# GIT version increment
+function gvi {
+  CURBRANCH=$(gcb)
+  [[ $? != 0 ]] && return $?
+  CURVER=$(cat VERSION)
+  MAJOR=$(echo $CURVER | cut -d"." -f1)
+  MINOR=$(echo $CURVER | cut -d"." -f2)
+  PATCH=$(echo $CURVER | cut -d"." -f3)
+  case $CURBRANCH in
+    ${MAJOR}.$MINOR)
+      ((PATCH++))
+      BRANCH="hotfix-${MAJOR}.${MINOR}.$PATCH" ;;
+    dev)
+      ((MINOR++)) && PATCH=0
+      BRANCH="release-${MAJOR}.${MINOR}" ;;
+    *)
+      echo "Unsupported branch $CURBRANCH" && return 1
+  esac
+  git checkout -b $BRANCH
+  [[ $? == 128 ]] && git checkout $BRANCH && return $?
+  [[ $? != 0 ]] && return $?
+  NEXTVER=${MAJOR}.${MINOR}.$PATCH
+  echo $NEXTVER > VERSION
+  git commit -am "Version incremented to $BRANCH"
+}
+
 # GIT
-alias gaas='git add -A; gs'
+alias ghotfix='gvi'
+alias grelease='gvi'
+alias gcb='git rev-parse --abbrev-ref HEAD' # git current branch
+alias gm='git merge --no-ff'
+alias gmd='GCB=$(gcb); git checkout dev; gm $GCB' # git merge into dev
+alias gaas='git add -A; gs' # git add all and show status
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
 alias gdc='_(){ git log $1^..$1 -p $2; }; _' # git diff commit [param HASH] of a [param file] (optional)
