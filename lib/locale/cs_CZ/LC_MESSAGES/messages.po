@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-01-10 11:11+0100\n"
-"PO-Revision-Date: 2016-01-10 11:35+0100\n"
+"POT-Creation-Date: 2016-01-11 01:17+0100\n"
+"PO-Revision-Date: 2016-01-11 01:18+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -77,91 +77,90 @@ msgstr "Obsah není nastaven"
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
 
-#: core/DOMBuilder.php:75
+#: core/DOMBuilder.php:76
 msgid "Link not found"
 msgstr "Odkaz nebyl nalezen"
 
-#: core/DOMBuilder.php:161
+#: core/DOMBuilder.php:162
 #, php-format
 msgid "Unable to admin-update XML: %s"
 msgstr "Nepodařilo se aplikovat administrátorské XML: %s"
 
-#: core/DOMBuilder.php:172
+#: core/DOMBuilder.php:173
 #, php-format
 msgid "Unable to user-update XML: %s"
 msgstr "Nepodařilo se aplikovat uživatelské XML: %s"
 
-#: core/DOMBuilder.php:179
+#: core/DOMBuilder.php:180
 #, php-format
 msgid "File '%s' not found"
 msgstr "Soubor '%s' nebyl nalezen"
 
-#: core/DOMBuilder.php:199
+#: core/DOMBuilder.php:200
 #, php-format
 msgid "Unable to load '%s': %s"
 msgstr "Nepodařilo se načíst soubor '%s': %s"
 
-#: core/DOMBuilder.php:207
+#: core/DOMBuilder.php:208
 #, php-format
 msgid "Failed to load user/admin/default file %s: %s"
 msgstr "Nepodařilo se načíst uživatelský/admin/výchozí soubor %s: %s"
 
-#: core/DOMBuilder.php:213
+#: core/DOMBuilder.php:214
 #, php-format
 msgid "File disabled"
 msgstr "Soubor je neaktivní"
 
-#: core/DOMBuilder.php:219
-#, php-format
-msgid "Outdated server cache: %s"
-msgstr "Neaktuální serverová mezipaměť: %s"
+#: core/DOMBuilder.php:222
+msgid "Outdated server cache"
+msgstr "Zastaralá mezipaměť serveru"
 
-#: core/DOMBuilder.php:233
+#: core/DOMBuilder.php:237
 #, php-format
 msgid "Invalid XML file %s"
 msgstr "Chybný XML soubor %s"
 
-#: core/DOMBuilder.php:246
+#: core/DOMBuilder.php:250
 #, php-format
 msgid "File '%s' already included"
 msgstr "Soubor '%s' byl již vložen"
 
-#: core/DOMBuilder.php:268
+#: core/DOMBuilder.php:272
 #, php-format
 msgid "Invalid HTMLPlus file %s"
 msgstr "Neplatný soubor HTMLPlus %s"
 
-#: core/DOMBuilder.php:349
+#: core/DOMBuilder.php:353
 #, php-format
 msgid "Duplicit prefix %s in %s renamed to %s"
 msgstr "Duplicitní prefix %s v %s přejmenován na %s"
 
-#: core/DOMBuilder.php:399
+#: core/DOMBuilder.php:403
 #, php-format
 msgid "Duplicit link %s skipped"
 msgstr "Byl vynechán duplicitní link %s"
 
-#: core/DOMBuilder.php:468
+#: core/DOMBuilder.php:472
 #, php-format
 msgid "Included file '%s' not found"
 msgstr "Nepodařilo se nalézt vkládaný soubor '%s'"
 
-#: core/DOMBuilder.php:471
+#: core/DOMBuilder.php:475
 #, php-format
 msgid "Included file extension '%s' must be .html"
 msgstr "Přípona vkládaného souboru '%s' musí být .html"
 
-#: core/DOMBuilder.php:473
+#: core/DOMBuilder.php:477
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
 
-#: core/DOMBuilder.php:479
+#: core/DOMBuilder.php:483
 #, php-format
 msgid "Unable to import '%s': %s"
 msgstr "Soubor '%s' se nepodařilo importovat: '%s'"
 
-#: core/DOMBuilder.php:487
+#: core/DOMBuilder.php:491
 #, php-format
 msgid ""
 "Imported file language '%s' does not match section language '%s' in '%s'"
@@ -169,12 +168,12 @@ msgstr ""
 "Jazyk '%s' importovaného souboru se neshoduje s jazykem '%s' v elementu "
 "section v souboru '%s'"
 
-#: core/DOMBuilder.php:500
+#: core/DOMBuilder.php:504
 #, php-format
 msgid "HTML+ autocorrected after inserting '%s': %s"
 msgstr "HTML+ automaticky opraven po vložení souboru '%s': %s"
 
-#: core/DOMBuilder.php:553
+#: core/DOMBuilder.php:557
 #, php-format
 msgid "ID '%s' conflicts with element '%s'"
 msgstr "Atribut ID '%s' koliduje s elementem '%s'"
@@ -625,111 +624,111 @@ msgstr "neplatný soubor"
 msgid "unknown status"
 msgstr "neznámý stav"
 
-#: plugins/Admin/Admin.php:50
+#: plugins/Admin/Admin.php:65
 #, php-format
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: plugins/Admin/Admin.php:60
-msgid "Saving changes will update edited file cache"
-msgstr "Uložením dojde k aktualizaci mezipaměti editovaného souboru"
-
-#: plugins/Admin/Admin.php:65
-msgid "Saving changes will update server cache"
-msgstr "Uložením dojde k aktualizaci serverové mezipaměti"
-
-#: plugins/Admin/Admin.php:69
+#: plugins/Admin/Admin.php:71
 msgid "Insufficient right to save changes"
 msgstr "Nedostatečná práva pro uložení změn"
 
-#: plugins/Admin/Admin.php:76
+#: plugins/Admin/Admin.php:78
 msgid "No changes made"
 msgstr "Nebyly provedeny žádné změny"
 
-#: plugins/Admin/Admin.php:82
+#: plugins/Admin/Admin.php:84
 msgid "File status successfully changed"
 msgstr "Stav souboru byl úspěšně změněn"
 
-#: plugins/Admin/Admin.php:164
+#: plugins/Admin/Admin.php:91
+msgid "Saving changes will clear server cache"
+msgstr "Uložení změn vyčistí serverovou mezipaměť"
+
+#: plugins/Admin/Admin.php:99
+msgid "Saving changes will remove outdated file cache"
+msgstr "Uložení změn odstraní neaktuální soubor z mezipaměti"
+
+#: plugins/Admin/Admin.php:171
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:180
+#: plugins/Admin/Admin.php:187
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:180
+#: plugins/Admin/Admin.php:187
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:199
+#: plugins/Admin/Admin.php:206
 msgid "Administration"
 msgstr "Administrace"
 
-#: plugins/Admin/Admin.php:201
+#: plugins/Admin/Admin.php:208
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:232
+#: plugins/Admin/Admin.php:239
 #, php-format
 msgid "%s (%s) - Administration"
 msgstr "%s (%s) - Administrace"
 
-#: plugins/Admin/Admin.php:302
+#: plugins/Admin/Admin.php:309
 #, php-format
 msgid "Unsupported file name format '%s'"
 msgstr "Nepodporovaný formát souboru '%s'"
 
-#: plugins/Admin/Admin.php:360
+#: plugins/Admin/Admin.php:367
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:364
+#: plugins/Admin/Admin.php:376
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: plugins/Admin/Admin.php:403
+#: plugins/Admin/Admin.php:415
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:414
+#: plugins/Admin/Admin.php:426
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:416
+#: plugins/Admin/Admin.php:428
 msgid "Unable to enable destination file"
 msgstr "Nepodařilo se aktivovat cílový soubor"
 
-#: plugins/Admin/Admin.php:419
+#: plugins/Admin/Admin.php:431
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:425
+#: plugins/Admin/Admin.php:437
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:428 plugins/InputVar/InputVar.php:23
+#: plugins/Admin/Admin.php:440 plugins/InputVar/InputVar.php:23
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:439
+#: plugins/Admin/Admin.php:451
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:445
+#: plugins/Admin/Admin.php:457
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:456
+#: plugins/Admin/Admin.php:468
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:468
+#: plugins/Admin/Admin.php:480
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -784,60 +783,60 @@ msgstr "Element template postrádá obsah"
 msgid "Element product missing attribute id"
 msgstr "Element product postrádá atribut id"
 
-#: plugins/ContactForm/ContactForm.php:87
+#: plugins/ContactForm/ContactForm.php:89
 #, php-format
 msgid "Unable to send form %s: %s"
 msgstr "Nepodařilo se odeslat formulář %s: %s"
 
-#: plugins/ContactForm/ContactForm.php:97
+#: plugins/ContactForm/ContactForm.php:99
 msgid "Admin address is not set or invalid"
 msgstr "Adresa administrátora chybí nebo je neplatná"
 
-#: plugins/ContactForm/ContactForm.php:118
+#: plugins/ContactForm/ContactForm.php:120
 msgid "Missing admin address"
 msgstr "Chybí adresa administrátora"
 
-#: plugins/ContactForm/ContactForm.php:120
+#: plugins/ContactForm/ContactForm.php:122
 #, php-format
 msgid "Invalid admin email address: '%s'"
 msgstr "Neplatná adresa administrátora: '%s'"
 
-#: plugins/ContactForm/ContactForm.php:122
+#: plugins/ContactForm/ContactForm.php:124
 #, php-format
 msgid "Invalid client email address: '%s'"
 msgstr "Neplatná adresa odesílatele: %s"
 
-#: plugins/ContactForm/ContactForm.php:136
+#: plugins/ContactForm/ContactForm.php:142
 #, php-format
 msgid "Sending e-mail: %s"
 msgstr "Odesílání e-mailu: %s"
 
-#: plugins/ContactForm/ContactForm.php:141
+#: plugins/ContactForm/ContactForm.php:147
 msgid "Unable to send copy to empty client address"
 msgstr "Není možné odeslat kopii zprávy na prázdnou adresu"
 
-#: plugins/ContactForm/ContactForm.php:162
+#: plugins/ContactForm/ContactForm.php:165
 #, php-format
 msgid "New massage from %s"
 msgstr "Nová zpráva z %s"
 
-#: plugins/ContactForm/ContactForm.php:170
+#: plugins/ContactForm/ContactForm.php:173
 #, php-format
 msgid "E-mail successfully sent to %s"
 msgstr "Zpráva byla úspěšně odeslána na adresu %s"
 
-#: plugins/ContactForm/ContactForm.php:191
+#: plugins/ContactForm/ContactForm.php:194
 #: plugins/ContentBalancer/ContentBalancer.php:49
 #, php-format
 msgid "Skipped element %s: %s"
 msgstr "Element %s byl vynechán: %s"
 
-#: plugins/ContactForm/ContactForm.php:199
+#: plugins/ContactForm/ContactForm.php:202
 #, php-format
 msgid "Missing attribute %s"
 msgstr "Chybí atribut %s"
 
-#: plugins/ContactForm/ContactForm.php:233
+#: plugins/ContactForm/ContactForm.php:236
 msgid "Element input missing attribute type skipped"
 msgstr "Byl vynechán element input, neboť postrádá atribut type"
 
@@ -1144,45 +1143,45 @@ msgstr "Chybné heslo"
 msgid "Unabe to save user config"
 msgstr "Nepodařilo se uložit uživatelské nastavení"
 
-#: plugins/InputVar/InputVar.php:264
+#: plugins/InputVar/InputVar.php:265
 #, php-format
 msgid "Unable to apply function: %s"
 msgstr "Nepodařilo se aplikovat funkci: %s"
 
-#: plugins/InputVar/InputVar.php:275
+#: plugins/InputVar/InputVar.php:276
 #, php-format
 msgid "Unable to register function %s: %s"
 msgstr "Nepodařilo se zaregistrovat funkci %s: %s"
 
-#: plugins/InputVar/InputVar.php:307
+#: plugins/InputVar/InputVar.php:308
 msgid "Element data missing attribute name"
 msgstr "Element data postrádá atribut name"
 
-#: plugins/InputVar/InputVar.php:319
+#: plugins/InputVar/InputVar.php:320
 msgid "Element call missing content"
 msgstr "Element call postrádá obsah"
 
-#: plugins/InputVar/InputVar.php:327
+#: plugins/InputVar/InputVar.php:328
 msgid "Unknown function name"
 msgstr "Neznámá funkce"
 
-#: plugins/InputVar/InputVar.php:354
+#: plugins/InputVar/InputVar.php:355
 msgid "No pattern found"
 msgstr "Nebyl nalezen atribut pattern"
 
-#: plugins/InputVar/InputVar.php:355
+#: plugins/InputVar/InputVar.php:356
 msgid "No replacement found"
 msgstr "Nebyl nalezen atribut replacement"
 
-#: plugins/InputVar/InputVar.php:362 plugins/InputVar/InputVar.php:385
+#: plugins/InputVar/InputVar.php:363 plugins/InputVar/InputVar.php:386
 msgid "No data found"
 msgstr "Nebyla nalezena data"
 
-#: plugins/InputVar/InputVar.php:370
+#: plugins/InputVar/InputVar.php:371
 msgid "No content found"
 msgstr "Nebyl nalezen obsah"
 
-#: plugins/InputVar/InputVar.php:392
+#: plugins/InputVar/InputVar.php:393
 #, php-format
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"
@@ -1269,6 +1268,15 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:194
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Outdated server cache: %s"
+#~ msgstr "Neaktuální serverová mezipaměť: %s"
+
+#~ msgid "Saving changes will update edited file cache"
+#~ msgstr "Uložením dojde k aktualizaci mezipaměti editovaného souboru"
+
+#~ msgid "Saving changes will update server cache"
+#~ msgstr "Uložením dojde k aktualizaci serverové mezipaměti"
 
 #~ msgid "My Heading"
 #~ msgstr "Můj nadpis"

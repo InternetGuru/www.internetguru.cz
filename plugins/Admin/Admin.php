@@ -35,6 +35,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PROCESS) {
       $os = Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Admin.xsl");
+      $this->checkCache();
       return;
     }
     if($subject->getStatus() != STATUS_INIT) return;
@@ -43,44 +44,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     try {
-      $this->setDefaultFile();
-      $this->setDataFiles();
-      if($this->isPost()) {
-        if($_POST["userfilehash"] != $this->getDataFileHash())
-          throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
-        $this->processPost();
-      } else {
-        $this->setContent();
-      }
-      if($this->isResource($this->type)) {
-        try {
-          if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
-          checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
-        } catch(Exception $e) {
-          Cms::addMessage(_("Saving changes will update edited file cache"), Cms::MSG_INFO); // "deleted"
-        }
-      } else {
-        $newestCacheMtime = getNewestCacheMtime();
-        if(!is_null($newestCacheMtime) && DOMBuilder::getNewestFileMtime() > $newestCacheMtime) {
-          Cms::addMessage(_("Saving changes will update server cache"), Cms::MSG_INFO); // "delete"
-        }
-        $this->processXml();
-      }
-      if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
-      if($this->isToEnable()) $this->enableDataFile();
-      if($this->isPost()) {
-        $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
-        if($this->contentChanged || $this->dataFile != $this->destFile) {
-          $this->savePost();
-        } elseif(!$this->isToDisable() && !$this->statusChanged) {
-          Cms::addMessage(_("No changes made"), Cms::MSG_INFO);
-        }
-      }
-      if($this->isToDisable()) $this->disableDataFile();
-      if($this->statusChanged) {
-        $this->redir = true;
-        Cms::addMessage(_("File status successfully changed"), Cms::MSG_SUCCESS);
-      }
+      $this->init();
     } catch (Exception $e) {
       Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
       return;
@@ -91,6 +55,49 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $pLink["path"] = getCurLink();
     if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
+  }
+
+  private function init() {
+    $this->setDefaultFile();
+    $this->setDataFiles();
+    if($this->isPost()) {
+      if($_POST["userfilehash"] != $this->getDataFileHash())
+        throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
+      $this->processPost();
+    } else {
+      $this->setContent();
+    }
+    if(!$this->isResource($this->type)) $this->processXml();
+    if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
+    if($this->isToEnable()) $this->enableDataFile();
+    if($this->isPost()) {
+      $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
+      if($this->contentChanged || $this->dataFile != $this->destFile) {
+        $this->savePost();
+      } elseif(!$this->isToDisable() && !$this->statusChanged) {
+        Cms::addMessage(_("No changes made"), Cms::MSG_INFO);
+      }
+    }
+    if($this->isToDisable()) $this->disableDataFile();
+    if($this->statusChanged) {
+      $this->redir = true;
+      Cms::addMessage(_("File status successfully changed"), Cms::MSG_SUCCESS);
+    }
+  }
+
+  private function checkCache() {
+    if(!$this->isResource($this->type)) {
+      if(DOMBuilder::isNginxOutdated()) {
+        Cms::addMessage(_("Saving changes will clear server cache"), Cms::MSG_INFO);
+      }
+      return;
+    }
+    try {
+      if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
+      checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
+    } catch(Exception $e) {
+      Cms::addMessage(_("Saving changes will remove outdated file cache"), Cms::MSG_INFO);
+    }
   }
 
   private function updateCache() {

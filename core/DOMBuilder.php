@@ -17,6 +17,7 @@ class DOMBuilder {
   private static $defaultPrefix = null;
   private static $newestFileMtime = null;
   private static $newestCacheMtime = null;
+  private static $nginxOutdated = false;
 
   public static function setCacheMtime() {
     if(!Cms::isSuperUser()) return;
@@ -75,8 +76,8 @@ class DOMBuilder {
     throw new Exception(_("Link not found"));
   }
 
-  public static function getNewestFileMtime() {
-    return self::$newestFileMtime;
+  public static function isNginxOutdated() {
+    return self::$nginxOutdated;
   }
 
   public static function getDesc($link) {
@@ -214,9 +215,12 @@ class DOMBuilder {
     if($doc instanceof HTMLPlus)
       $mTime = self::loadHTMLPlusDOM($filePath, $doc, $author, $included);
     else $mTime = self::loadXMLDOM($filePath, $doc);
+    #Cms::addMessage($filePath, Cms::MSG_INFO);
+    if(self::$nginxOutdated) return;
     if($mTime > self::$newestFileMtime) self::$newestFileMtime = $mTime;
     if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
-    Cms::addMessage(sprintf(_("Outdated server cache: %s"), stripDataFolder($filePath)), Cms::MSG_WARNING);
+    Cms::addMessage(_("Outdated server cache"), Cms::MSG_WARNING);
+    self::$nginxOutdated = true;
   }
 
   private static function loadXMLDOM($filePath, DOMDocumentPlus $doc) {
