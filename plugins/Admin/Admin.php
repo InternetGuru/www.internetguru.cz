@@ -44,20 +44,19 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     try {
-      $this->init();
+      $this->process();
     } catch (Exception $e) {
       Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
       return;
     }
     if(!$this->isPost()) return;
-    $this->updateCache();
     if(!$this->redir) return;
     $pLink["path"] = getCurLink();
     if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
   }
 
-  private function init() {
+  private function process() {
     $this->setDefaultFile();
     $this->setDataFiles();
     if($this->isPost()) {
@@ -74,6 +73,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
       if($this->contentChanged || $this->dataFile != $this->destFile) {
         $this->savePost();
+        $this->updateCache();
       } elseif(!$this->isToDisable() && !$this->statusChanged) {
         Cms::addMessage(_("No changes made"), Cms::MSG_INFO);
       }
