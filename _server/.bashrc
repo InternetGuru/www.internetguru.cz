@@ -63,7 +63,7 @@ source ~/ssh-agent.sh # register saved variables
 
 # GIT version increment
 function gvi {
-  CURBRANCH=$(git rev-parse --abbrev-ref HEAD)
+  CURBRANCH=$(gcb)
   [[ $? != 0 ]] && return $?
   CURVER=$(cat VERSION)
   MAJOR=$(echo $CURVER | cut -d"." -f1)
@@ -90,7 +90,10 @@ function gvi {
 # GIT
 alias ghotfix='gvi'
 alias grelease='gvi'
-alias gaas='git add -A; gs'
+alias gcb='git rev-parse --abbrev-ref HEAD' # git current branch
+alias gm='git merge --no-ff'
+alias gmd='GCB=$(gcb); git checkout dev; gm $GCB' # git merge into dev
+alias gaas='git add -A; gs' # git add all and show status
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
 alias gdc='_(){ git log $1^..$1 -p $2; }; _' # git diff commit [param HASH] of a [param file] (optional)
