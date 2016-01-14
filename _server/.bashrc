@@ -61,6 +61,33 @@ ps | grep -q ssh-agent || start=1 # start ssh if not running
 source ~/ssh-agent.sh # register saved variables
 ((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
+function sure {
+  read -p "${1:-"Are you sure?"} [y/n] " -n 1 -r
+  echo    # (optional) move to a new line
+  [[ $REPLY =~ [YyAaZz] ]] || return 1
+}
+
+# GIT merge current branch into appropriate branche/s
+function gm {
+  CURBRANCH=$(gcb)
+  [[ $? != 0 ]] && return $?
+  MASTER=$(cat VERSION | awk -F. '{ print $1 "." $2 }')
+  FF="--no-ff"
+  CB=${CURBRANCH%-*}
+  case $CB in
+    dev)
+      echo "Branch dev shall not be merged (use gvi)" && return 1 ;;
+    hotfix)
+      sure "Merge $CURBRANCH into $MASTER?"
+      [[ $? == 0 ]] && git checkout $MASTER && git merge $CURBRANCH ;&
+    release|$MASTER)
+      FF="" ;&
+    *)
+      sure "Merge $CURBRANCH into dev?"
+      [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH
+  esac
+}
+
 # GIT version increment
 function gvi {
   CURBRANCH=$(gcb)
@@ -91,8 +118,6 @@ function gvi {
 alias ghotfix='gvi'
 alias grelease='gvi'
 alias gcb='git rev-parse --abbrev-ref HEAD' # git current branch
-alias gm='git merge --no-ff'
-alias gmd='GCB=$(gcb); git checkout dev; gm $GCB' # git merge into dev
 alias gaas='git add -A; gs' # git add all and show status
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
