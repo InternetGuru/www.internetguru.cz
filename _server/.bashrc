@@ -62,8 +62,7 @@ source ~/ssh-agent.sh # register saved variables
 ((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
 function sure {
-  read -p "${1:-"Are you sure?"} [y/n] " -n 1 -r
-  echo    # (optional) move to a new line
+  read -p "${1:-"Are you sure?"} [y/n] " -n 1 -r && echo
   [[ $REPLY =~ [YyAaZz] ]] || return 1
 }
 
@@ -78,12 +77,12 @@ function gm {
     dev)
       echo "Branch dev shall not be merged (use gvi)" && return 1 ;;
     hotfix)
-      sure "Merge $CURBRANCH into $MASTER?"
+      sure "Merge branch '$CURBRANCH' into $MASTER?"
       [[ $? == 0 ]] && git checkout $MASTER && git merge $CURBRANCH ;&
     release|$MASTER)
       FF="" ;&
     *)
-      sure "Merge $CURBRANCH into dev?"
+      sure "Merge branch '$CURBRANCH' into dev?"
       [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH
   esac
 }
