@@ -54,7 +54,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       $dest = getCurLink();
       $fInfo = self::getFileInfo($dest);
       #if(self::DEBUG) var_dump($fInfo);
-      if(!is_file($dest)) self::createFile($fInfo["src"], $dest, $fInfo["ext"], $fInfo["imgmode"], $fInfo["isroot"]);
+      if(!is_file($dest)) self::createFile($fInfo["src"], $dest, $fInfo["ext"], $fInfo["imgmode"], $fInfo["isroot"], $fInfo["resdir"]);
       if(in_array($fInfo["ext"], array("css", "js"))) {
         self::outputFile($dest, "text/".$fInfo["ext"]);
         if(self::DEBUG) unlink($dest);
@@ -97,6 +97,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       if(strpos($srcFilePath, "$dir/") !== 0) continue;
       if(!$resDir && !$fInfo["isroot"]) break; // eg. beta/files, res/files/*
       $fInfo["src"] = $srcFilePath;
+      $fInfo["resdir"] = $resDir;
       break;
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
@@ -186,12 +187,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return "";
   }
 
-  private static function createFile($src, $dest, $ext, $imgmode, $isRoot) {
+  private static function createFile($src, $dest, $ext, $imgmode, $isRoot, $resDir) {
     $fp = lockFile($dest);
     try {
       if(is_file($dest)) return;
       self::checkMime($src, $ext);
-      if($isRoot && !self::$fileFolders[$rootdir]) { // not resDir
+      if($isRoot && !$resDir) {
         if(self::isImage($ext)) self::handleImage($src, $dest, $imgmode);
         else copy_plus($src, $dest);
       } else { // resDir
