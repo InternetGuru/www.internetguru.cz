@@ -13,7 +13,6 @@ try {
     redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
-  initDirs();
   if(!IS_LOCALHOST) initLinks();
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
