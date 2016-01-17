@@ -120,6 +120,7 @@ define('METHOD_NA', _("Method %s is no longer available"));
 if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 require_once(CORE_FOLDER.'/globals.php');
 if(updateScriptFile()) redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
+initDirs();
 Logger::log(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 
 ?>
