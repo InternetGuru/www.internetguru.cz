@@ -106,8 +106,9 @@ function gvi {
       echo "Unsupported branch $CURBRANCH" && return 1
   esac
   git checkout -b $BRANCH
-  [[ $? == 128 ]] && git checkout $BRANCH && return $?
-  [[ $? != 0 ]] && return $?
+  CODE=$?
+  [[ $CODE == 128 ]] && git checkout $BRANCH && return $CODE
+  [[ $CODE != 0 ]] && return $CODE
   NEXTVER=${MAJOR}.${MINOR}.$PATCH
   echo $NEXTVER > VERSION
   git commit -am "Version incremented to $BRANCH"
