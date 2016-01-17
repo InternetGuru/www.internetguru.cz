@@ -11,6 +11,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $formItems = array();
   private $messages;
   private $errors = array();
+  private $forms = array();
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
