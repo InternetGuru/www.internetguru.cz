@@ -102,12 +102,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
     // search for sorce
-    $fInfo["src"] = findFile($fInfo["src"], true, true, false);
+    $fInfo["src"] = findFile($fInfo["src"], true, true);
     if(!$resDir && is_null($fInfo["src"]) && self::isImage($fInfo["ext"])) {
       $fInfo["imgmode"] = self::getImageMode($srcFilePath);
       if(strlen($fInfo["imgmode"])) {
         $imgFilePath = self::getImageSource($srcFilePath, $fInfo["imgmode"]);
-        $fInfo["src"] = findFile($imgFilePath, true, true, false);
+        $fInfo["src"] = findFile($imgFilePath, true, true);
       }
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File not found"), 404);
@@ -151,10 +151,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         continue;
       }
       if($skipFolder) continue;
-      $sourceFilePath = findFile($sourceFilePath, true, true, false);
+      $sourceFilePath = findFile($sourceFilePath, true, true);
       if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
         $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
-        $sourceFilePath = findFile($sourceFilePath, true, true, false);
+        $sourceFilePath = findFile($sourceFilePath, true, true);
       }
       try {
         checkFileCache($sourceFilePath, $cacheFilePath);

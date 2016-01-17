@@ -12,10 +12,9 @@ function isValidId($id) {
   return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
 }
 
-function findFile($filePath, $user=true, $admin=true, $res=true) {
+function findFile($filePath, $user=true, $admin=true) {
   if($user && is_file(USER_FOLDER."/$filePath")) return USER_FOLDER."/$filePath";
   if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
-  if($res && is_file($filePath)) return $filePath;
   if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
   return null;
 }
