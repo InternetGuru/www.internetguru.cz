@@ -164,6 +164,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         $folderUptodate = false;
         if($this->deleteCache) {
           if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
+          if(getRealResDir() != RESOURCES_DIR) continue;
+          $cacheFilePath = getRealResDir($cacheFilePath);
+          if(!is_file($cacheFilePath)) continue;
+          if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
         } elseif(self::DEBUG) {
           Cms::addMessage(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
         } else {
