@@ -19,14 +19,14 @@
 
   <xsl:template match="div[contains(@id, 'footer')]/*[1]">
     <xsl:if test="$cms-logged_user">
-      <ul class="adminmenu">
+      <ul class="adminmenu noprint">
         <li><a href="?admin">Administrace</a></li>
         <li><a href="?log">Logy</a></li>
         <li><a href="?ver">Verze</a></li>
         <li><a href="?import">Import</a></li>
         <li><a href="?subdom">Poddomény</a></li>
       </ul>
-      <ul class="adminmenu">
+      <ul class="adminmenu noprint">
         <li>
           <xsl:element name="a">
             <xsl:if test="$cms-url_debug_off">

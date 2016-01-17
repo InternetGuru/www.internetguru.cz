@@ -53,10 +53,3 @@ body.doc label > span {
   display: inline-block;
   min-width: 13em;
 }
-@media print {
-  body.doc.sml p.creation,
-  body.doc.sml ul.docinfo,
-  body.doc.sml #footer {
-    display: none;
-  }
-}

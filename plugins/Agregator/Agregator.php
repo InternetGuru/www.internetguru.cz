@@ -107,7 +107,7 @@ class Agregator extends Plugin implements SplObserver {
       // edit link
       if(Cms::isSuperUser()) {
         $li = $ul->appendChild($doc->createElement("li"));
-        $li->setAttribute("class", "edit");
+        $li->setAttribute("class", "edit noprint");
         $a = $li->appendChild($doc->createElement("a", $this->edit));
         $a->setAttribute("href", "?Admin=".$this->currentFilepath);
         $a->setAttribute("title", $this->currentFilepath);

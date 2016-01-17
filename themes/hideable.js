@@ -4,7 +4,7 @@
 
   if(IGCMS.Hideable) return;
 
-  var Config = {}
+  var Config = {};
 
   Config.expand = "[+]";
   Config.collapse = "[–]";
@@ -12,6 +12,8 @@
   Config.hideClass = "hide";
   Config.noHideClass = "nohide";
   Config.hiddenClass = "hidden";
+  Config.switchClass = "switch";
+  Config.noprintClass = "noprint";
 
    var Hideable = function() {
 
@@ -33,10 +35,11 @@
         var link = document.createElement("a");
         link.href = "Javascript:void(0);";
         link.innerHTML = Config.collapse;
-        link.classList.add("switch")
-        link.addEventListener("click",toggle,false);
+        link.classList.add(Config.switchClass);
+        link.classList.add(Config.noprintClass);
+        link.addEventListener("click", toggle, false);
         firstElement.innerHTML = " " + firstElement.innerHTML;
-        firstElement.insertBefore(link,firstElement.firstChild);
+        firstElement.insertBefore(link, firstElement.firstChild);
         if(hideables[i].classList.contains(Config.noHideClass)) continue;
         hideables[i].classList.add(Config.noHideClass);
         toggleElement(link);
@@ -80,7 +83,7 @@
         IGCMS.initCfg(Config, cfg);
         var css = '/* hideables.js */'
           + ' .hide { display: none !important; }'
-          + ' a.switch { text-decoration: none;'
+          + ' a.' + Config.switchClass + ' { text-decoration: none;'
           + ' border: none !important;'
           + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
           + ' font-weight: bold }';

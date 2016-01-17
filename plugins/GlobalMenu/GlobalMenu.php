@@ -22,7 +22,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     $menu = $this->getMenu($doc, $sect);
     $root = $doc->appendChild($doc->createElement("root"));
     $root->appendChild($menu);
-    $menu->setAttribute("class", "globalmenu");
+    $menu->setAttribute("class", "globalmenu noprint");
     $this->trimList($menu, true);
     if(!is_null($this->current)) $this->setCurrentClass($this->current);
     #var_dump($doc->saveXML());
