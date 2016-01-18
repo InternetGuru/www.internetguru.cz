@@ -68,7 +68,9 @@ function confirm {
 }
 
 function gitchanges {
-  [[ $(git status --porcelain | wc -l) != 0 ]] && echo "Error: Uncommited changes" && return 1
+  [[ $(git status --porcelain | wc -l) == 0 ]] && return 0
+  echo "Error: Uncommited changes"
+  return 1
 }
 
 # GIT merge current branch into appropriate branche/s
