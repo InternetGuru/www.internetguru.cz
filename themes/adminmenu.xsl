@@ -11,6 +11,13 @@
   <xsl:param name="cms-url_debug_on" select="''"/>
   <xsl:param name="cms-url_debug_off" select="''"/>
   <xsl:param name="inputvar-reportbug" select="''"/>
+  <xsl:param name="inputvar-nodebug" select="''"/>
+  <xsl:param name="inputvar-debug" select="''"/>
+  <xsl:param name="inputvar-servercache" select="''"/>
+  <xsl:param name="inputvar-filecache" select="''"/>
+  <xsl:param name="inputvar-admin" select="''"/>
+  <xsl:param name="inputvar-igcms" select="''"/>
+  <xsl:param name="inputvar-version_link" select="''"/>
   <xsl:param name="filehandler-cache_file" select="''"/>
 
   <xsl:template match="/">
@@ -34,7 +41,7 @@
                 <xsl:value-of select="$cms-url_debug_off"/>
               </xsl:attribute>
             </xsl:if>
-            <xsl:text>Provozní režim</xsl:text>
+            <xsl:value-of disable-output-escaping="yes" select="$inputvar-nodebug"/>
           </xsl:element>
         </li>
         <li>
@@ -42,23 +49,18 @@
             <xsl:attribute name="href">
               <xsl:value-of select="$cms-url_debug_on"/>
             </xsl:attribute>
-            <xsl:text>Ladící režim</xsl:text>
+            <xsl:value-of disable-output-escaping="yes" select="$inputvar-debug"/>
           </xsl:element>
         </li>
-        <li>
-          <xsl:element name="a">
-            <xsl:attribute name="href">
-              <xsl:value-of select="$cms-cache_ignore"/>
-            </xsl:attribute>
-            <xsl:text>Ignorovat mezipaměť</xsl:text>
-          </xsl:element>
-        </li>
+        <xsl:if test="$inputvar-version_link">
+          <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-version_link"/></li>
+        </xsl:if>
         <li>
           <xsl:element name="a">
             <xsl:attribute name="href">
               <xsl:value-of select="$cms-cache_nginx"/>
             </xsl:attribute>
-            <xsl:text>Vyčistit serverovou mezipaměť</xsl:text>
+            <xsl:value-of disable-output-escaping="yes" select="$inputvar-servercache"/>
           </xsl:element>
         </li>
         <xsl:if test="$filehandler-cache_file">
@@ -67,14 +69,19 @@
               <xsl:attribute name="href">
                 <xsl:value-of select="$filehandler-cache_file"/>
               </xsl:attribute>
-              <xsl:text>Vyčistit souborovou mezipaměť</xsl:text>
+              <xsl:value-of disable-output-escaping="yes" select="$inputvar-filecache"/>
             </xsl:element>
           </li>
         </xsl:if>
+      </ul>
+      <ul class="adminmenu noprint">
         <xsl:if test="$inputvar-reportbug">
           <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-reportbug"/></li>
         </xsl:if>
-        <li class="admin">Admin: <xsl:value-of select="$cms-admin_id"/></li>
+        <xsl:if test="$inputvar-igcms">
+          <li><xsl:value-of disable-output-escaping="yes" select="$inputvar-igcms"/></li>
+        </xsl:if>
+        <li class="admin"><xsl:value-of disable-output-escaping="yes" select="$inputvar-admin"/></li>
         <li><xsl:value-of select="$cms-name"/></li>
       </ul>
     </xsl:if>
