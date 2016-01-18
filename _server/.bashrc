@@ -96,7 +96,7 @@ function gm {
       [[ FF != "" ]] \
         && HISTORY=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r") \
         && vim -c "s/^/$HISTORY/" -c "nohl" +1 "ver/$MAJOR.ver" \
-        && gc -am "Version history updated"
+        && git commit -am "Version history updated"
       confirm "Merge branch '$CURBRANCH' into dev?"
       [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH
   esac
@@ -130,9 +130,9 @@ function gvi {
   [[ $CODE != 0 ]] && return $CODE
   NEXTVER=${MAJOR}.${MINOR}.$PATCH
   echo $NEXTVER > VERSION
-  [[ $CURBRANCH != dev ]] && gc -am $MESSAGE && return $?
+  [[ $CURBRANCH != dev ]] && git commit -am $MESSAGE && return $?
   sed -i "1i\nIGCMS ${MAJOR}.${MINOR} ($(date "+%Y-%m-%d"))\n" "ver/${MAJOR}.ver"
-  gc -am $MESSAGE && gm && git checkout $BRANCH
+  git commit -am $MESSAGE && gm && git checkout $BRANCH
 }
 
 # GIT
