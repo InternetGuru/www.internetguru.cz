@@ -24,6 +24,7 @@ class Cms {
     global $plugins;
     if(self::DEBUG) Logger::log("DEBUG");
     self::setVariable("messages", self::$flashList);
+    self::setVariable("release", CMS_RELEASE);
     self::setVariable("version", CMS_VERSION);
     self::setVariable("name", CMS_NAME);
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
