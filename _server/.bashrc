@@ -1,5 +1,5 @@
 # VERSION
-BASHRC="IG .bashrc, ver. 1.0.0 (version)"
+BASHRC="IG .bashrc, ver. 1.1.0 (version)"
 echo $BASHRC
 
 # Normal Colors
@@ -39,6 +39,7 @@ NC="\e[m"
 
 PS1="$MYPS1"
 export PATH=$PATH:/var/scripts
+
 # don't put duplicate lines in the history. See bash(1) for more options
 # don't overwrite GNU Midnight Commander's setting of `ignorespace'.
 HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
@@ -61,28 +62,42 @@ ps | grep -q ssh-agent || start=1 # start ssh if not running
 source ~/ssh-agent.sh # register saved variables
 ((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
-function sure {
+function confirm {
   read -p "${1:-"Are you sure?"} [y/n] " -n 1 -r && echo
   [[ $REPLY =~ [YyAaZz] ]] || return 1
+}
+
+function gitchanges {
+  [[ $(git status --porcelain | wc -l) == 0 ]] && return 0
+  echo "Error: Uncommited changes"
+  return 1
 }
 
 # GIT merge current branch into appropriate branche/s
 function gm {
   CURBRANCH=$(gcb)
   [[ $? != 0 ]] && return $?
-  MASTER=$(cat VERSION | awk -F. '{ print $1 "." $2 }')
+  gitchanges
+  [[ $? != 0 ]] && return $?
+  CURVER=$(cat VERSION)
+  MAJOR=$(echo $CURVER | cut -d"." -f1)
+  MASTER=$(echo $CURVER | cut -d"." -f1,2)
   FF="--no-ff"
   CB=${CURBRANCH%-*}
   case $CB in
     dev)
       echo "Branch dev shall not be merged (use gvi)" && return 1 ;;
     hotfix)
-      sure "Merge branch '$CURBRANCH' into $MASTER?"
+      confirm "Merge branch '$CURBRANCH' into $MASTER?"
       [[ $? == 0 ]] && git checkout $MASTER && git merge $CURBRANCH ;&
     release|$MASTER)
       FF="" ;&
     *)
-      sure "Merge branch '$CURBRANCH' into dev?"
+      [[ FF != "" ]] \
+        && HISTORY=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r") \
+        && vim -c "s/^/$HISTORY/" -c "nohl" +1 "ver/$MAJOR.ver" \
+        && git commit -am "Version history updated"
+      confirm "Merge branch '$CURBRANCH' into dev?"
       [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH
   esac
 }
@@ -91,6 +106,8 @@ function gm {
 function gvi {
   CURBRANCH=$(gcb)
   [[ $? != 0 ]] && return $?
+  gitchanges
+  [[ $? != 0 ]] && return $?
   CURVER=$(cat VERSION)
   MAJOR=$(echo $CURVER | cut -d"." -f1)
   MINOR=$(echo $CURVER | cut -d"." -f2)
@@ -98,10 +115,12 @@ function gvi {
   case $CURBRANCH in
     ${MAJOR}.$MINOR)
       ((PATCH++))
-      BRANCH="hotfix-${MAJOR}.${MINOR}.$PATCH" ;;
+      BRANCH="hotfix-${MAJOR}.${MINOR}.$PATCH"
+      MESSAGE="Patch version incremented to ${MAJOR}.${MINOR}.$PATCH" ;;
     dev)
       ((MINOR++)) && PATCH=0
-      BRANCH="release-${MAJOR}.${MINOR}" ;;
+      BRANCH="release-${MAJOR}.${MINOR}"
+      MESSAGE="Minor version incremented to ${MAJOR}.${MINOR}" ;;
     *)
       echo "Unsupported branch $CURBRANCH" && return 1
   esac
@@ -111,14 +130,16 @@ function gvi {
   [[ $CODE != 0 ]] && return $CODE
   NEXTVER=${MAJOR}.${MINOR}.$PATCH
   echo $NEXTVER > VERSION
-  git commit -am "Version incremented to $BRANCH"
+  [[ $CURBRANCH != dev ]] && git commit -am $MESSAGE && return $?
+  sed -i "1i\nIGCMS ${MAJOR}.${MINOR} ($(date "+%Y-%m-%d"))\n" "ver/${MAJOR}.ver"
+  git commit -am $MESSAGE && gm && git checkout $BRANCH
 }
 
 # GIT
 alias ghotfix='gvi'
 alias grelease='gvi'
 alias gcb='git rev-parse --abbrev-ref HEAD' # git current branch
-alias gaas='git add -A; gs' # git add all and show status
+alias gaas='git add -A; gs'
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
 alias gdc='_(){ git log $1^..$1 -p $2; }; _' # git diff commit [param HASH] of a [param file] (optional)
