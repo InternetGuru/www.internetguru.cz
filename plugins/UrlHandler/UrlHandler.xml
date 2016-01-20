@@ -26,11 +26,15 @@
   <redir link="Admin">/?Admin</redir>
   <redir link="admin">/?Admin</redir>
   <redir link="log">/?LogViewer=log</redir>
-  <redir link="ver">/?LogViewer=ver</redir>
+  <redir link="ver">/?LogViewer=HISTORY</redir>
+  <redir link="history">/?LogViewer=HISTORY</redir>
+  <redir link="HISTORY">/?LogViewer=HISTORY</redir>
   <redir link="import">/?Convertor</redir>
   <redir link="subdom">/?SubdomManager</redir>
 
-  <redir parName="ver" parValue="">?LogViewer=ver</redir>
+  <redir parName="ver" parValue="">?LogViewer=HISTORY</redir>
+  <redir parName="history" parValue="">?LogViewer=HISTORY</redir>
+  <redir parName="HISTORY" parValue="">?LogViewer=HISTORY</redir>
   <redir parName="log" parValue="">?LogViewer=log</redir>
 
   <redir parName="PageSpeed" parValue="">/</redir>
@@ -40,7 +44,9 @@
   <redir parName="Login">?login</redir>
   <redir parName="admin">?Admin</redir>
   <redir parName="log">?LogViewer=log</redir>
-  <redir parName="ver">?LogViewer=ver</redir>
+  <redir parName="ver">?LogViewer=HISTORY</redir>
+  <redir parName="history">?LogViewer=HISTORY</redir>
+  <redir parName="HISTORY">?LogViewer=HISTORY</redir>
   <redir parName="import">?Convertor</redir>
   <redir parName="subdom">?SubdomManager</redir>
 

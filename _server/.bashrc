@@ -90,12 +90,12 @@ function gm {
     hotfix)
       confirm "Merge branch '$CURBRANCH' into $MASTER?"
       [[ $? == 0 ]] && git checkout $MASTER && git merge $CURBRANCH ;&
-    release|$MASTER)
+    release|master|$MASTER)
       FF="" ;&
     *)
       [[ FF != "" ]] \
-        && HISTORY=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r") \
-        && vim -c "s/^/$HISTORY/" -c "nohl" +1 "ver/$MAJOR.ver" \
+        && COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r") \
+        && vim -c "s/^/$COMMITS/" -c "nohl" +1 HISTORY \
         && git commit -am "Version history updated"
       confirm "Merge branch '$CURBRANCH' into dev?"
       [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH
@@ -113,14 +113,12 @@ function gvi {
   MINOR=$(echo $CURVER | cut -d"." -f2)
   PATCH=$(echo $CURVER | cut -d"." -f3)
   case $CURBRANCH in
-    ${MAJOR}.$MINOR)
+    master|${MAJOR}.$MINOR)
       ((PATCH++))
-      BRANCH="hotfix-${MAJOR}.${MINOR}.$PATCH"
-      MESSAGE="Patch version incremented to ${MAJOR}.${MINOR}.$PATCH" ;;
+      BRANCH="hotfix-${MAJOR}.${MINOR}.$PATCH" ;;
     dev)
       ((MINOR++)) && PATCH=0
-      BRANCH="release-${MAJOR}.${MINOR}"
-      MESSAGE="Minor version incremented to ${MAJOR}.${MINOR}" ;;
+      BRANCH="release-${MAJOR}.${MINOR}" ;;
     *)
       echo "Unsupported branch $CURBRANCH" && return 1
   esac
@@ -130,9 +128,9 @@ function gvi {
   [[ $CODE != 0 ]] && return $CODE
   NEXTVER=${MAJOR}.${MINOR}.$PATCH
   echo $NEXTVER > VERSION
-  [[ $CURBRANCH != dev ]] && git commit -am $MESSAGE && return $?
-  sed -i "1i\nIGCMS ${MAJOR}.${MINOR} ($(date "+%Y-%m-%d"))\n" "ver/${MAJOR}.ver"
-  git commit -am $MESSAGE && gm && git checkout $BRANCH
+  [[ $CURBRANCH != dev ]] && git commit -am $BRANCH && return $?
+  sed -i "1i\nIGCMS ${MAJOR}.${MINOR} ($(date "+%Y-%m-%d"))\n" HISTORY
+  git commit -am $BRANCH && gm && git checkout $BRANCH
 }
 
 # GIT

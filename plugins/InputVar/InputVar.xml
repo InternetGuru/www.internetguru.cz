@@ -66,6 +66,14 @@
   <var id="cyear" fn="yearformat" var="cms-ctime"/>
   <var id="year" fn="yearformat">now</var>
   <var id="today" fn="dateformat">now</var>
+  <var id="adminmenu">
+    <ul class="adminmenu noprint">
+      <li><a href="?admin">Administrace</a></li>
+      <li><a href="?log">Logy</a></li>
+      <li><a href="?history">Historie verzí</a></li>
+      <li><a href="?import">Import</a></li>
+    </ul>
+  </var>
   <var id="ielt7">
     <div class="ielte7" style="background: yellow; margin: 0; border: 0.3em solid red;">
       <dl>
