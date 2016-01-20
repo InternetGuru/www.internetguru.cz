@@ -243,7 +243,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $name = $this->processFormItem($this->formNames, $e, "name", "", $id, true);
       if(is_null(Cms::getLoggedUser()) || $e->getAttribute("type") != "submit") continue;
       $e->setAttribute("value", _("Show message"));
-      $e->setAttribute("title", _("Not sending form if logged user."));
+      $e->setAttribute("title", _("Not sending form if logged user"));
     }
     $tmp = $e->parentNode;
     while(!is_null($tmp) && $tmp->nodeName != "form") {
