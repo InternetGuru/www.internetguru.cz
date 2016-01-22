@@ -1,5 +1,5 @@
 # VERSION
-BASHRC="IG .bashrc, ver. 1.1.0 (version)"
+BASHRC="IG .bashrc, ver. 1.1.1 (version)"
 echo $BASHRC
 
 # Normal Colors
@@ -95,7 +95,7 @@ function gm {
     *)
       [[ FF != "" ]] \
         && COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r") \
-        && vim -c "s/^/$COMMITS/" -c "nohl" +1 HISTORY \
+        && vim -c "s/^/$COMMITS/" -c "nohl" +1 CHANGELOG \
         && git commit -am "Version history updated"
       confirm "Merge branch '$CURBRANCH' into dev?"
       [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH

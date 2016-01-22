@@ -70,7 +70,7 @@
     <ul class="adminmenu noprint">
       <li><a href="?admin">Administrace</a></li>
       <li><a href="?log">Logy</a></li>
-      <li><a href="?history">Historie verzí</a></li>
+      <li><a href="?changelog">Historie verzí</a></li>
       <li><a href="?import">Import</a></li>
     </ul>
   </var>

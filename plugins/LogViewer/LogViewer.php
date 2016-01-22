@@ -18,7 +18,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     if($subject->getStatus() != STATUS_INIT) return;
     $this->logFiles = $this->getFiles(LOG_FOLDER, 15, "log");
     $this->mailFiles = $this->getFiles(LOG_FOLDER, 15, "mail");
-    $this->histFiles = array(CMS_HISTORY_FILENAME => CMS_FOLDER."/".CMS_HISTORY_FILENAME);
+    $this->histFiles = array(CMS_CHANGELOG_FILENAME => CMS_FOLDER."/".CMS_CHANGELOG_FILENAME);
   }
 
   public function getContent(HTMLPlus $content) {
@@ -42,7 +42,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function getCurFilePath($fName) {
     switch($fName) {
-      case CMS_HISTORY_FILENAME:
+      case CMS_CHANGELOG_FILENAME:
       return $this->histFiles[$fName];
       case "":
       case "log":
