@@ -82,24 +82,27 @@ function gm {
   CURVER=$(cat VERSION)
   MAJOR=$(echo $CURVER | cut -d"." -f1)
   MASTER=$(echo $CURVER | cut -d"." -f1,2)
-  FF="--no-ff"
   CB=${CURBRANCH%-*}
   case $CB in
-    dev)
-      echo "Branch dev shall not be merged (use gvi)" && return 1 ;;
+    dev|master|$MASTER)
+      echo "Branch '$CURBRANCH' shall not be merged (use gvi)" && return 1 ;;
     hotfix)
       confirm "Merge branch '$CURBRANCH' into $MASTER?"
-      [[ $? == 0 ]] && git checkout $MASTER && git merge $CURBRANCH ;&
-    release|master|$MASTER)
-      FF="" ;&
+      [[ $? == 0 ]] && git checkout $MASTER && git merge --no-ff $CURBRANCH
+      confirm "Merge branch '$CURBRANCH' into master?"
+      [[ $? == 0 ]] && git checkout master && git merge --no-ff $CURBRANCH && git tag $CURBRANCH ;;
+    release)
+      confirm "Merge branch '$CURBRANCH' into $MASTER?"
+      [[ $? == 0 ]] && git checkout $MASTER && git merge --no-ff $CURBRANCH
+      confirm "Merge branch '$CURBRANCH' into master?"
+      [[ $? == 0 ]] && git checkout master && git merge --no-ff $CURBRANCH && git tag $CURBRANCH ;;
     *)
-      [[ FF != "" ]] \
-        && COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r") \
-        && vim -c "s/^/$COMMITS/" -c "nohl" +1 CHANGELOG \
-        && git commit -am "Version history updated"
-      confirm "Merge branch '$CURBRANCH' into dev?"
-      [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH && git branch -d $CURBRANCH
+      COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r")
+      vim -c "s/^/$COMMITS/" -c "nohl" +1 CHANGELOG
+      git commit -am "Version history updated"
   esac
+  confirm "Merge branch '$CURBRANCH' into dev?"
+  [[ $? == 0 ]] && git checkout dev && git merge --no-ff $CURBRANCH && git branch -d $CURBRANCH
 }
 
 # GIT version increment
