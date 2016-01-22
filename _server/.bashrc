@@ -98,7 +98,7 @@ function gm {
         && vim -c "s/^/$COMMITS/" -c "nohl" +1 CHANGELOG \
         && git commit -am "Version history updated"
       confirm "Merge branch '$CURBRANCH' into dev?"
-      [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH
+      [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH && git branch -d $CURBRANCH
   esac
 }
 
