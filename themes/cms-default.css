@@ -59,7 +59,7 @@ form dd > textarea {
   box-sizing: border-box;
 }
 
-@media all and (min-width: 32em) {
+@media screen and (min-width: 32em) {
   form dd > input[type="text"],
   form dd > input[type="email"],
   form dd > textarea {
@@ -67,6 +67,12 @@ form dd > textarea {
   }
   form dt, form dt+dd {
     float: left;
+  }
+}
+
+@media screen {
+  form dd {
+      margin-left: 0;
   }
 }
 
