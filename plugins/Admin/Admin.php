@@ -417,7 +417,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function savePost() {
     mkdir_plus(dirname($this->destFile));
-    $fp = lockFile($this->destFile);
+    $fp = lock_file($this->destFile);
     try {
       try {
         $destFileDisabled = dirname($this->destFile)."/.".basename($this->destFile);
@@ -438,10 +438,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       }
       $this->redir = true;
       Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS);
-    } catch(Exception $e) {
-      throw $e;
     } finally {
-      unlockFile($fp, $this->destFile);
+      unlock_file($fp, $this->destFile);
     }
   }
 
