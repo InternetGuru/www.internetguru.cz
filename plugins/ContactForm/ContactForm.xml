@@ -54,9 +54,9 @@ $inputvar-service_plain
       <dd><label for="telephone">Nechte prázdné nebo napište aspoň 9 číslic.</label></dd>
       <dt><label for="msg">Zpráva <em>(povinné)</em></label></dt>
       <dd><textarea id="msg" required="required"/></dd>
-      <dt>Odeslání formuláře</dt>
-      <dd><label><input type="checkbox" id="sendcopy"/> Poslat kopii této zprávy na uvedený e-mail</label></dd>
-      <dd><input type="submit" id="submit" value="Odeslat"/></dd>
+      <dt class="noprint">Odeslání formuláře</dt>
+      <dd class="noprint"><label><input type="checkbox" id="sendcopy"/> Poslat kopii této zprávy na uvedený e-mail</label></dd>
+      <dd class="noprint"><input type="submit" id="submit" value="Odeslat"/></dd>
     </dl>
   </form>
 
