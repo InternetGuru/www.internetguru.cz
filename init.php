@@ -120,7 +120,9 @@ if(CMS_DEBUG) {
 define('METHOD_NA', _("Method %s is no longer available"));
 if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 require_once(CORE_FOLDER.'/globals.php');
-if(updateScriptFile()) redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
+if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)) {
+  redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
+}
 initDirs();
 Logger::log(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 

@@ -290,17 +290,18 @@ function initLinks() {
   }
 }
 
-function updateScriptFile() {
-  if(is_link(SCRIPT_NAME)) return false;
-  $src = CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME;
-  if(filemtime($src) == filemtime(SCRIPT_NAME)) return false;
-  $fp = lockFile($src, null);
-  if(filemtime($src) == filemtime(SCRIPT_NAME)) {
-    unlockFile($fp);
-    return false;
+function update_file($src, $dest, $hash=false) {
+  if(!is_file($src)) throw new Exception("Source file not found");
+  if(is_file($dest)) {
+    if($hash && getFileHash($src) == getFileHash($dest)) return false;
+    if(!$hash && filemtime($src) == filemtime($dest)) return false;
   }
-  copy_plus($src, SCRIPT_NAME);
-  unlockFile($fp);
+  $fp = lock_file($dest);
+  try {
+    copy_plus($src, $dest);
+  } finally {
+    unlock_file($fp);
+  }
   return true;
 }
 
@@ -308,7 +309,7 @@ function smartCopy($src, $dest) {
   throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
 }
 
-function lockFile($filePath, $ext="lock") {
+function lock_file($filePath, $ext="lock") {
   if(strlen($ext)) $filePath = "$filePath.$ext";
   mkdir_plus(dirname($filePath));
   $fpr = @fopen($filePath, "c+");
@@ -321,7 +322,7 @@ function lockFile($filePath, $ext="lock") {
   throw new Exception(_("Unable to acquire file lock"));
 }
 
-function unlockFile($fpr, $fileName=null, $ext="lock") {
+function unlock_file($fpr, $fileName=null, $ext="lock") {
   if(is_null($fpr)) return;
   flock($fpr, LOCK_UN);
   fclose($fpr);
@@ -391,8 +392,6 @@ function getFileMime($filePath) {
     $mime = finfo_file($finfo, $filePath); // avg. 2ms
     finfo_close($finfo);
     return $mime;
-  } catch(Exception $e) {
-    throw $e;
   } finally {
     fclose($fh);
   }

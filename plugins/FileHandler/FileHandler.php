@@ -188,7 +188,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function createFile($src, $dest, $ext, $imgmode, $isRoot, $resDir) {
-    $fp = lockFile($dest);
+    $fp = lock_file($dest);
     try {
       if(is_file($dest)) return;
       self::checkMime($src, $ext);
@@ -199,10 +199,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         self::handleResource($src, $dest, $ext, $isRoot);
       }
       touch($dest, filemtime($src));
-    } catch(Exception $e) {
-      throw $e;
     } finally {
-      unlockFile($fp, $dest);
+      unlock_file($fp, $dest);
     }
   }
 
