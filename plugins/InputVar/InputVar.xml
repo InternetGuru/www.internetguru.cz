@@ -1,6 +1,32 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <InputVar>
 
+  <!--
+
+    Element var:
+      - identifikátor (atribut id="neco")
+      - funkce (nepovinný atribut fn="název funkce")
+      - proměnná (nepovinný atribut var="název proměnné")
+
+    Element fn:
+      - identifikátor (atribut id="neco")
+      - funkce (atribut fn="název funkce")
+
+    Dostupné funkce:
+      - hash ... vrací otisk textu dle (nepovinného) atributu algo
+        Formát podle http://php.net/manual/en/function.hash-algos.php
+        Výchozím algoritmem je crc32b
+      - strftime ... formátuje datum podle (nepovinného) atributu format
+        Formát podle http://php.net/manual/en/function.strftime.php
+        Výchozím formátem je %m/%d/%Y
+      - sprintf ... formátuje obsah resp. elementy podle obsahu
+        Formát podle http://php.net/manual/en/function.sprintf.php
+      - replace ... nahrazuje obsah elementu podle obsažených elementů data
+        Např. <data name="a">b</data> nahradí všechny "a" v textu za "b"
+      - sequence ... řetězí volání funkcí uvedených v elementech call
+
+  -->
+
   <fn id="monthcs" fn="replace">
     <data name="leden">ledna</data>
     <data name="únor">února</data>
@@ -15,26 +41,84 @@
     <data name="listopad">listopadu</data>
     <data name="prosinec">prosince</data>
   </fn>
-  <fn id="dateformat" fn="strftime" format="%e. %B %Y"/>
-  <fn id="dateformatcs" fn="sequence">
-    <call fn="dateformat"/>
-    <call fn="monthcs"/>
+  <fn id="yearformat" fn="strftime" format="%Y"/>
+  <fn id="tmpdateformat" fn="strftime" format="%e. %B %Y"/>
+  <fn id="dateformat" fn="sequence">
+    <call>tmpdateformat</call>
+    <call>monthcs</call>
   </fn>
-  <var id="cyear" fn="strftime" format="%Y" data="$cms-ctime"/>
-  <var id="year" fn="strftime" format="%Y" data="now"/>
 
-  <var id="today" fn="dateformatcs" data="now"/>
-  <var id="myctime" fn="dateformatcs" data="$cms-ctime"/>
-  <var id="mymtime" fn="dateformatcs" data="$cms-mtime"/>
-  <var id="myauthor" fn="link" href="#@$cms-authorid" data="$cms-author"/>
+  <var id="nodebug">Provozní režim</var>
+  <var id="debug">Ladící režim</var>
+  <var id="servercache">Smazat mezipaměť serveru</var>
+  <var id="filecache">Smazat dočasné soubory</var>
+  <var id="reportbug"><a href="https://bitbucket.org/igwr/cms/issues?status=new&amp;status=open">Odeslat zpětnou vazbu</a></var>
+  <var id="igcms"><a href="https://dokumenty.internetguru.cz/igcms">Specifikace IGCMS</a></var>
+  <var id="codemirror"><a href="https://dokumenty.internetguru.cz/zkratky">Klávesové zkratky CodeMirror</a></var>
+  <var id="version_link"><a href="/%s.php" var="cms-release@href" title="Pro nezávislé ladění zdrojových souborů (CSS/JS)">Samostatná větev</a></var>
+  <var id="service_plain">E-Základna, www.e-zakladna.cz</var>
+  <var id="service">Na službě: <a href="https://www.e-zakladna.cz">E-Základna</a></var>
+  <!-- <var id="service_plain">Nestárnoucí weby, www.nestarnouciweby.cz</var> -->
+  <!-- <var id="service">Na službě: <a href="http://www.nestarnouciweby.cz">Nestárnoucí weby</a></var> -->
+  <var id="resp">Webmaster: <span var="cms-resp">n/a</span></var>
+  <var id="mtime">Úpravy webu: <span var="cms-mtime" fn="inputvar-dateformat">n/a</span></var>
+  <var id="admin">Admin: <span var="cms-admin_id">n/a</span></var>
+  <var id="cyear" fn="yearformat" var="cms-ctime"/>
+  <var id="year" fn="yearformat">now</var>
+  <var id="today" fn="dateformat">now</var>
+  <var id="ielt7">
+    <div class="ielte7" style="background: yellow; margin: 0; border: 0.3em solid red;">
+      <dl>
+        <dt>Používáte zastaralou verzi prohlížeče!</dt>
+        <dd><a href="http://windows.microsoft.com/cs-cz/internet-explorer/download-ie">Aktualizujte</a> na vyšší verzi,</dd>
+        <dd>nainstalujte <a href="https://www.google.com/chrome">alternativní prohlížeč</a> nebo</dd>
+        <dd>kontaktujte správce svého počítače.</dd>
+      </dl>
+    </div>
+  </var>
 
-  <var id="linkctime" fn="dateformatcs" data="@$contentlink-ctime"/>
-  <var id="linkmtime" fn="dateformatcs" data="@$contentlink-mtime"/>
-  <var id="linkauthor" fn="link" href="#@$contentlink-authorid" data="@$contentlink-author"/>
-  <var id="creation" data="Autorem následujícího obsahu je $linkauthor ze dne $linkctime"/>
 
-  <var id="linkresp" fn="link" href="#@$contentlink-respid" data="@$contentlink-resp"/>
-  <var id="resp" data="Za obsah této stránky zodpovídá $linkresp."/>
-  <var id="modified" data="Obsah této stránky byl naposledy upraven dne $linkmtime."/>
+  <!--
+
+    Uživatelská editace
+
+    1) Element set
+      - atribut type: typ pole "select" nebo "text" (níže)
+      - atribut for: jaké proměnné se mají editovat
+        - jeden nebo více regulárních výrazů oddělených mezerou
+      - hodnota elementu: název skupiny
+
+    a) Typ select
+      - atribut datalist: proměnné, jejichž hodnoty mohou editované proměnné nabývat
+        - jeden nebo více regulárních výrazů oddělených mezerou
+
+    Například: 2 akce mohou nabývat hodnot a1, a2, a3 nebo empty
+
+      <var id="empty"/>
+      <var id="a1">K nákupu káva zdarma</var>
+      <var id="a2">Sleva na vybrané zboží 50 %</var>
+      <var id="a3">Rozvoz po Praza zdarma</var>
+
+      <var id="akce1" var="empty">Akce 1</var>
+      <var id="akce2" var="empty">Akce 2</var>
+      <set type="select" for="akce\d " datalist="a\d+ empty">Akce</set>
+
+    b) Typ text
+      - atribut placeholder (nepovinný)
+      - atribut pattern (nepovinný)
+
+    Například:
+
+      <var id="akce1">Nanuk Míša, 12 Kč (sleva 15 %)</var>
+      <var id="akce2">Sušenky BeBe, 19 Kč (sleva 25 %)</var>
+      <set type="text" for="akce\d+"
+        pattern=".[5,20], \d\d Kč \(sleva \d\d %\)"
+        placeholder="Čokoláda Orion, 22 Kč (sleva 20 %)">Akce</set>
+
+    2) Element passwd (volitelný)
+      - zabezpečení formuláře pomocí vlastního hesla
+        - otisk hesla vytvořený funkcí crypt (například příkazem "openssl passwd -1")
+
+   -->
 
 </InputVar>

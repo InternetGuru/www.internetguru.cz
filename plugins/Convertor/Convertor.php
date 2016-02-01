@@ -1,15 +1,11 @@
 <?php
 
-#todo: export
-#todo: support file upload
-#todo: js copy content to clipboard
-#todo: get real creation date?
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $error = false;
   private $html = null;
   private $file = null;
+  private $docName = null;
   private $tmpFolder;
   private $importedFiles = array();
 
@@ -17,19 +13,24 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     parent::__construct($s);
     $s->setPriority($this, 5);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
-    if(is_dir($this->tmpFolder) || mkdir($this->tmpFolder, 0755, true)) return;
-    throw new Exception(_("Unable to create convertor tmp folder"));
+    mkdir_plus($this->tmpFolder);
   }
 
   public function update(SplSubject $subject) {
+    if($subject->getStatus() == STATUS_PREINIT) {
+      if(!Cms::isSuperUser()) $subject->detach($this);
+      return;
+    }
     if($subject->getStatus() != STATUS_INIT) return;
     if(!isset($_GET[get_class($this)])) {
       $subject->detach($this);
       return;
     }
-    if(strlen($_GET[get_class($this)])) $this->processImport($_GET[get_class($this)]);
-    elseif(substr(getCurLink(true), -1) == "=") {
-      Cms::addMessage(_("File URL cannot be empty"), Cms::MSG_ERROR);
+    try {
+      if(strlen($_GET[get_class($this)]))
+        $this->processImport($_GET[get_class($this)]);
+    } catch(Exception $e) {
+      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
     }
     $this->getImportedFiles();
   }
@@ -42,13 +43,11 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function processImport($fileUrl) {
-    try {
-      $f = $this->getFile($fileUrl);
-    } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
-      $this->error = true;
-      return;
+    if(!strlen($_GET[get_class($this)]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
+      throw new Exception(_("File URL cannot be empty"));
     }
+    $f = $this->getFile($fileUrl);
+    $this->docName = pathinfo($f, PATHINFO_FILENAME);
     $mime = getFileMime($this->tmpFolder."/$f");
     switch($mime) {
       case "application/zip":
@@ -60,8 +59,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->file = $f;
       break;
       default:
-      Cms::addMessage(sprintf(_("Unsupported file MIME type '%s'"), $mime), Cms::MSG_ERROR);
-      $this->error = true;
+      throw new Exception(sprintf(_("Unsupported file MIME type '%s'"), $mime));
     }
   }
 
@@ -83,53 +81,81 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       Cms::addMessage(_("Unable to import document; probably missing heading"), Cms::MSG_ERROR);
       return;
     }
-    try {
-      $doc->validatePlus(true);
-    } catch(Exception $e) {}
     $this->parseContent($doc, "h", "short");
+    $firstHeading = $doc->documentElement->firstElement;
+    if(!$firstHeading->hasAttribute("short") && !is_null($this->docName))
+      $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
     $this->addLinks($doc);
     try {
-      $doc->validatePlus(true);
+      $doc->validatePlus();
     } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
-      Cms::addMessage(_("Use @ to specify short/link attributes for heading"), Cms::MSG_INFO);
-      Cms::addMessage(_("Eg. This Is Long Heading @ Short Heading"), Cms::MSG_INFO);
-      Cms::addMessage(_("Use @ to specify kw attribute for description"), Cms::MSG_INFO);
-      Cms::addMessage(_("Eg. This is description @ these, are, some, keywords"), Cms::MSG_INFO);
+      try {
+        $doc->validatePlus(true);
+        foreach($doc->getErrors() as $error) {
+          Cms::addMessage($error, _("Autocorrected"));
+        }
+      } catch(Exception $e) {
+        Cms::addMessage(_("Use @ to specify short/link attributes for heading"), Cms::MSG_INFO);
+        Cms::addMessage(_("Eg. This Is Long Heading @ Short Heading"), Cms::MSG_INFO);
+        Cms::addMessage(_("Use @ to specify kw attribute for description"), Cms::MSG_INFO);
+        Cms::addMessage(_("Eg. This is description @ these, are, some, keywords"), Cms::MSG_INFO);
+        throw $e;
+      }
     }
     $doc->applySyntax();
-
-    $ids = $this->regenerateIds($doc);
     $this->html = $doc->saveXML();
-    $this->html = str_replace(array_keys($ids), $ids, $this->html);
-    if(!$this->error) Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
+    Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
+
     $this->file = "$f.html";
-    if(@file_put_contents($this->tmpFolder."/$f.html", $this->html) !== false) return;
-    new Logger(sprintf(_("Unable to save imported file '%s.html' into temp folder"), $f), "error");
+    $dest = $this->tmpFolder."/".$this->file;
+    $fp = lockFile($dest);
+    try {
+      try {
+        file_put_contents_plus($dest, $this->html);
+      } catch(Exception $e) {
+        throw new Exception(sprintf(_("Unable to save file %s: %s"), $this->file, $e->getMessage()));
+      }
+      try {
+        if(is_file("$dest.old")) incrementalRename("$dest.old", "$dest.");
+      } catch(Exception $e) {
+        throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $e->getMessage()));
+      }
+    } catch(Exception $e) {
+      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+    } finally {
+      unlockFile($fp, $dest);
+    }
   }
 
   private function parseContent(HTMLPlus $doc, $eName, $aName) {
     foreach($doc->getElementsByTagName($eName) as $e) {
-      $var = explode("@", $e->nodeValue);
+      $lastText = null;
+      foreach($e->childNodes as $ch) {
+        if($ch->nodeType != XML_TEXT_NODE) continue;
+        $lastText = $ch;
+      }
+      if(is_null($lastText)) continue;
+      $var = explode("@", $lastText->nodeValue);
       if(count($var) < 2) continue;
       $aVal = trim(array_pop($var));
       if(!strlen($aVal)) continue;
+      $lastText->nodeValue = trim(implode("@", $var));
       $e->setAttribute($aName, $aVal);
-      $e->nodeValue = trim(implode("@", $var));
     }
   }
 
   private function addLinks(HTMLPlus $doc) {
     foreach($doc->getElementsByTagName("h") as $e) {
       if(!$e->hasAttribute("short")) continue;
-      $e->setAttribute("link", normalize($e->getAttribute("short"), "a-zA-Z0-9/_-"));
+      $e->setAttribute("link", normalize($e->getAttribute("short"), "a-zA-Z0-9/_-", ""));
     }
   }
 
   public function getContent(HTMLPlus $c) {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $newContent = $this->getHTMLPlus();
+    $vars["action"] = "?".get_class($this);
     $vars["link"] = $_GET[get_class($this)];
     $vars["path"] = $this->pluginDir;
     if(!empty($this->importedFiles)) $vars["importedhtml"] = $this->importedFiles;
@@ -146,7 +172,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $ids = array();
     foreach($doc->getElementsByTagName("h") as $h) {
       $oldId = $h->getAttribute("id");
-      $doc->setUniqueId($h);
+      $h->setUniqueId();
       $ids[$oldId] = $h->getAttribute("id");
     }
     return $ids;
@@ -164,6 +190,16 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $purl = parse_url($url);
     if($purl === false) throw new Exception(_("Unable to parse link"));
     if(!isset($purl["scheme"])) return null;
+    $defaultContext = array('http' => array('method' => '', 'header' => ''));
+    stream_context_get_default($defaultContext);
+    stream_context_set_default(
+      array(
+        'http' => array(
+          'method' => 'HEAD',
+          'header' => "User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/43.0.2357.132 Safari/537.36"
+        )
+      )
+    );
     if($purl["host"] == "docs.google.com") {
       $url = $purl["scheme"]."://".$purl["host"].$purl["path"]."/export?format=doc";
       $headers = @get_headers($url);
@@ -172,21 +208,27 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
         $headers = @get_headers($url);
       }
     } else $headers = @get_headers($url);
+    $rh = $http_response_header;
     if(strpos($headers[0], '302') !== false)
       throw new Exception(_("Destination URL is unaccessible; must be shared publically"));
     elseif(strpos($headers[0], '200') === false)
       throw new Exception(sprintf(_("Destination URL error: %s"), $headers[0]));
+    stream_context_set_default($defaultContext);
     $data = file_get_contents($url);
-    $filename = $this->get_real_filename($http_response_header, $url);
+    $filename = $this->get_real_filename($rh, $url);
     file_put_contents($this->tmpFolder."/$filename", $data);
     return $filename;
   }
 
   private function get_real_filename($headers, $url) {
     foreach($headers as $header) {
-      if (strpos(strtolower($header), 'content-disposition') !== false) {
-        $tmp_name = explode('=', $header);
-        if($tmp_name[1]) return normalize(trim($tmp_name[1], '";\''), "a-zA-Z0-9/_.-", false, true);
+      if(strpos(strtolower($header), 'content-disposition') !== false) {
+        $tmp_name = explode('\'\'', $header);
+        if(!isset($tmp_name[1]))
+          $tmp_name = explode('filename="', $header);
+        if(isset($tmp_name[1])) {
+          return normalize(trim(urldecode($tmp_name[1]), '";\''), "a-zA-Z0-9/_.-", "", false);
+        }
       }
     }
     $stripped_url = preg_replace('/\\?.*/', '', $url);

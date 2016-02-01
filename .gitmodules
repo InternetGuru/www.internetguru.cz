@@ -7,3 +7,9 @@
 [submodule "lib/highlight.js"]
 	path = lib/highlight.js
 	url = https://github.com/isagalaev/highlight.js.git
+[submodule "lib/autoprefixer-php"]
+	path = lib/autoprefixer-php
+	url = https://github.com/vladkens/autoprefixer-php.git
+[submodule "lib/uglify-php"]
+	path = lib/uglify-php
+	url = https://github.com/smallhadroncollider/uglify-php.git

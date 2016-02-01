@@ -2,13 +2,9 @@ h2 {
   color: #008627;
 }
 
-div.contentbalancer a,
+div.contentbalancer-simple:not(.section) a,
 #content > div:first-child {
   background: #3CC563;
-}
-
-ol.contentlink-bc li a[href] {
-  color: #008627;
 }
 
 a:link {

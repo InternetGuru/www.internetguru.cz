@@ -1,43 +1,70 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Agregator>
+
+  <var modifyonly="modifyonly" id="creation">Autorem obsahu je <a href="" var="authorid@href author">n/a</a> ze dne <span var="ctime" fn="inputvar-dateformat">n/a</span></var>
+  <var modifyonly="modifyonly" id="modified">Obsah dokumentu byl naposledy změněn dne <span fn="inputvar-dateformat" var="mtime">n/a</span></var>
+  <var modifyonly="modifyonly" id="responsible">Za obsah zodpovídá <a href="" var="respid@href resp">n/a</a></var>
+  <var modifyonly="modifyonly" id="part_created">Tato část byla vytvořena dne <span fn="inputvar-dateformat" var="ctime">n/a</span></var>
+  <var modifyonly="modifyonly" id="part_modified">Tato část byla upravena dne <span fn="inputvar-dateformat" var="mtime">n/a</span></var>
+
   <!--
 
+    HTML sestavy
+
     Dostupné proměnné:
-      heading, link, ns, author, authorid, resp, respid, ctime, mtime, short, desc, kw
+      editlink, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
 
     Atributy elementu html:
       id (povinné)
-      sort | rsort (reverzní) s hodnotou dostupné proměnné
+      class (nepovinné)
+      sort | rsort (reverzní) s hodnotou dostupné proměnné (výchozí rsort="ctime")
 
   -->
-  <html id="html">
-    <item><li><a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformatcs" var="ctime">n/a</em></li></item>
+  <html id="ul" wrapper="ul">
+    <item><li><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li></item>
   </html>
-  <html id="htmltop">
+  <html id="dl" wrapper="dl">
     <item>
-      <dt><a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt>
-      <dd var="kw">n/a</dd>
-      <dd var="desc">n/a</dd>
-    </item>
-    <item><dt><a title="Autor: %s" var="link@href author@title heading">n/a</a> (<em fn="inputvar-dateformatcs" var="ctime">n/a</em>)</dt></item>
-    <item since="4"/>
-  </html>
-  <html id="htmldetail">
-    <item>
-      <dt><a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
-      <dd>Poslední změna: <strong fn="inputvar-dateformatcs" var="mtime">n/a</strong></dd>
+      <dt><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
+      <dd>Poslední změna: <strong fn="inputvar-dateformat" var="mtime">n/a</strong></dd>
       <dd>Klíčová slova: <em var="kw">n/a</em></dd>
       <dd var="desc">n/a</dd>
     </item>
   </html>
+  <html id="dd" sort="mtime">
+    <item><dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd></item>
+  </html>
 
-  <!-- XSLT (todo)
-  <xslt htmldir="article" file="article.xsl"/>
-  <xslt htmldir="dokumenty" file="dokumenty.xsl"/>
+  <!--
+
+    Obrázkové sestavy
+
+    Dostupné proměnné:
+      name, type, mtime, url, url-thumbs, url-preview, url-big, alt (pokud je definován)
+
+    Atributy elementu html:
+      id (povinné)
+      class (nepovinné)
+      sort | rsort (reverzní) s hodnotou dostupné proměnné (výchozí sort="name")
+
   -->
+  <image id="gallery" wrapper="ul" class="gallery">
+    <item>
+      <li><a var="url-big@href"><object var="type@type url-thumbs@data alt@title name@title alt name"></object></a></li>
+    </item>
+  </image>
 
-  <!-- IMG (todo) -->
+  <!--
 
-  <!-- FILE (todo) -->
+    Zástupný text obrázku
+
+    Element alt:
+      atribut for (povinné) s hodnotou jména obrázku
+      hodnota elementu (nepovinné) jako zástupný text obrázku
+
+    Například:
+      <alt for="sample320.jpg">Příklad zástupného textu obrázku</alt>
+
+  -->
 
 </Agregator>

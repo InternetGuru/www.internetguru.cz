@@ -1,6 +1,7 @@
 <?php
 
 class GlobalMenu extends Plugin implements SplObserver {
+  private $current = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -9,7 +10,7 @@ class GlobalMenu extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached("Xhtml11")) return;
+    if($this->detachIfNotAttached("HtmlOutput")) return;
     $this->setVariables();
   }
 
@@ -21,23 +22,25 @@ class GlobalMenu extends Plugin implements SplObserver {
     $menu = $this->getMenu($doc, $sect);
     $root = $doc->appendChild($doc->createElement("root"));
     $root->appendChild($menu);
-    $menu->setAttribute("class", "globalmenu");
-    $this->trimList($menu);
+    $menu->setAttribute("class", "globalmenu noprint");
+    $this->trimList($menu, true);
+    if(!is_null($this->current)) $this->setCurrentClass($this->current);
+    #var_dump($doc->saveXML());
     Cms::setVariable("globalmenu", $root);
   }
 
-  private function trimList(DOMElement $ul) {
+  private function trimList(DOMElement $ul, $root=false) {
     $currentLink = false;
     $deepLink = false;
-    foreach($ul->childElements as $li) {
-      foreach($li->childElements as $n) {
+    foreach($ul->childElementsArray as $li) {
+      foreach($li->childElementsArray as $n) {
         if($this->isProperLink($n)) $currentLink = true;
         if($n->nodeName == "ul") $deepLink = $this->trimList($n);
       }
     }
     if($currentLink || $deepLink) return true;
     if($ul->isSameNode($ul->ownerDocument->documentElement)) return true;
-    $ul->parentNode->removeChild($ul);
+    if(!$root) $ul->parentNode->removeChild($ul);
     return false;
   }
 
@@ -47,16 +50,21 @@ class GlobalMenu extends Plugin implements SplObserver {
     return true;
   }
 
-  private function getMenu(DOMDocumentPlus $doc, DOMElement $section) {
+  private function getMenu(DOMDocumentPlus $doc, DOMElement $section, $lang=null) {
     $ul = $doc->createElement("ul");
+    if(is_null($lang)) {
+      $lang = Cms::getVariable("cms-lang");
+      $ul->setAttribute("lang", $lang); //?
+    }
     $li = null;
-    foreach($section->childElements as $n) {
+    $prefix = Cms::getContentFull()->documentElement->firstElement->getAttribute("link");
+    foreach($section->childElementsArray as $n) {
       if($n->nodeName == "section") {
-        $menu = $this->getMenu($doc, $n);
-        if(!is_null($menu)) {
-          $li->appendChild($menu);
-        }
-        continue;
+        $menu = $this->getMenu($doc, $n, $lang);
+        if(is_null($menu)) continue;
+        $curLang = $n->firstElement->getParentValue("xml:lang");
+        if($curLang != $lang) $menu->setAttribute("lang", $curLang);
+        $li->appendChild($menu);
       }
       if($n->nodeName != "h") continue;
       $li = $doc->createElement("li");
@@ -65,17 +73,24 @@ class GlobalMenu extends Plugin implements SplObserver {
       $a = $doc->createElement("a", $n->nodeValue);
       if($n->hasAttribute("short")) {
         $a->nodeValue = htmlspecialchars($n->getAttribute("short"));
-        $a->setAttribute("title", $n->nodeValue);
+        #$a->setAttribute("title", $n->nodeValue);
       }
-      if(getCurLink() === $link) $a->setAttribute("class", "current");
+      if(getCurLink() === $link) $this->current = $a;
       if(!is_null($link)) $a->setAttribute("href", $link);
-      else $a->setAttribute("href", "#".$n->getAttribute("id"));
+      else $a->setAttribute("href", "$prefix#".$n->getAttribute("id"));
       if(is_null($link)) $a->setAttribute("class", "fragment");
       $li->appendChild($a);
       $ul->appendChild($li);
     }
     if(is_null($li)) return null;
     return $ul;
+  }
+
+  private function setCurrentClass(DOMElementPlus $a) {
+    $a->setAttribute("class", $a->getAttribute("class")." current");
+    $parentLi = $a->parentNode->parentNode->parentNode;
+    if(is_null($parentLi) || $parentLi->nodeName != "li") return;
+    $this->setCurrentClass($parentLi->firstElement);
   }
 
 }

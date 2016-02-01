@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<EmailBreaker>
+
+  <replace pattern="@"> zavináč </replace>
+  <replace pattern="-"> pomlčka </replace>
+  <replace pattern="_"> podtržítko </replace>
+  <replace pattern="."> tečka </replace>
+
+</EmailBreaker>

@@ -5,22 +5,19 @@ class Auth extends Plugin implements SplObserver {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
+    if(Cms::isSuperUser()) return;
     $cfg = $this->getDOMPlus();
     $url = ROOT_URL.getCurLink(true);
     $access = null;
     foreach($cfg->getElementsByTagName('url') as $e) {
       if(strpos($url, $e->nodeValue) === false) continue;
       if($e->getAttribute("access") == "allow") $access = true;
-      else $access = false;
+      elseif($e->getAttribute("access") == "denyall") $access = false;
+      else $access = !is_null(Cms::getLoggedUser()); // default = deny for anonymous users
     }
-    if(is_null($access)) return;
-    if($access && !file_exists(FORBIDDEN_FILE)) {
-      Cms::setLoggedUser("anonymous");
-      return;
-    }
-    // url is restricted
-    if(Cms::getLoggedUser() == ADMIN_ID || Cms::isSuperUser()) return;
-    loginRedir();
+    if($access !== false) return;
+    if(is_null(Cms::getLoggedUser())) loginRedir();
+    new ErrorPage(_("Insufficient rights to view this content"), 403);
   }
 
   public function update(SplSubject $subject) {}

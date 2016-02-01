@@ -1,63 +1,75 @@
+(function(win) {
 
-(function(window){
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  var CHANGE = "* ";
-  var UNLOAD_MSG = "Changes have not been saved.";
-  var modified = false;
+  var Config = {}
+  Config.saveInactive = "Data file is inactive. Are you sure?";
 
-  function setEvents() {
-    var forms = document.getElementsByTagName("form");
-    if(forms.length != 1) return; // multiple forms not supported
-    forms[0].onsubmit = function(){
-      modified = false;
-    }
-    setSaveEvents(forms[0]);
-  }
+   var Admin = function() {
 
-  function setSaveEvents(form) {
-    form.onkeydown=function(){
-
-      // letter s and ctrl or meta
-      if(event.keyCode != 83) return true;
-      if(!event.ctrlKey && !event.metaKey) return true;
-
-      // save and exit if shift
-      if(event.shiftKey) {
-        form['saveandgo'].click();
+      // private
+      var
+      confirmInactive = function(e, form) {
+        if(!form.classList.contains("disabled")) return true;
+        if(!form["disabled"].checked) return true;
+        if(confirm(Config.saveInactive)) return true;
+        e.preventDefault();
         return false;
+      },
+      setEvents = function() {
+        var forms = document.getElementsByTagName("form");
+        for(var i = 0; i < forms.length; i++) {
+          if(!forms[i].classList.contains(IGCMS.Editable.getEditableClass())) continue;
+          setSaveEvents(forms[i]);
+        }
+      },
+      setSaveEvents = function(form) {
+        form.onkeydown = function(e) {
+          var key = (window.event) ? window.event.keyCode : key = e.which;
+          var isCtrl;
+          var isShift;
+          if (window.event) {
+            key = window.event.keyCode;
+            isShift = !!window.event.shiftKey; // typecast to boolean
+            isCtrl = !!window.event.ctrlKey; // typecast to boolean
+          } else {
+            key = e.which;
+            isShift = !!e.shiftKey;
+            isCtrl = !!e.ctrlKey;
+          }
+          // letter s and ctrl or meta
+          if(!e.ctrlKey && !e.metaKey) return true;
+          switch(key) {
+            // S
+            case 83:
+            // save and exit if shift
+            if(isShift) {
+              form['saveandgo'].click();
+              return false;
+            }
+            // save and stay
+            form['saveandstay'].click();
+            return false;
+            break;
+
+            default: return true;
+          }
+
+        }
+
+        form['saveandgo'].onclick = function(e) { confirmInactive(e, form); }
+        form['saveandstay'].onclick = function(e) { confirmInactive(e, form); }
       }
 
-      // save and stay
-      form['saveandstay'].click();
-      return false;
-    }
-  }
+      // public
+      return {
+        init : function(cfg) {
+          IGCMS.initCfg(Config, cfg);
+          setEvents();
+        }
+      }
+   };
 
-  function indicateChange(){
-    var areas = document.getElementsByTagName("textarea");
-    for(var i=0; i < areas.length; i++) {
-      areas[i].addEventListener('input', setModified, false);
-    }
-  }
-
-  window.onbeforeunload = function(e) {
-    if(!modified) return;
-    e = e || window.event;
-    // For IE and Firefox
-    if (e) {
-      e.returnValue = UNLOAD_MSG;
-    }
-    // For Safari
-    return UNLOAD_MSG;
-  }
-
-  window.setModified = function() {
-    if(modified) return;
-    modified = true;
-    document.title = CHANGE + document.title;
-  }
-
-  setEvents();
-  indicateChange();
+   IGCMS.Admin = new Admin();
 
 })(window);

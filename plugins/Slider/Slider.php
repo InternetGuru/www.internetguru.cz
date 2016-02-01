@@ -6,7 +6,7 @@ class Slider extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
-    if($this->detachIfNotAttached("Xhtml11")) return;
+    if($this->detachIfNotAttached("HtmlOutput")) return;
     if(is_null($this->cms->getOutputStrategy())) {
       $subject->detach($this);
       return;
@@ -30,7 +30,7 @@ class Slider extends Plugin implements SplObserver {
     #$fileName = getLocalLink("").$fileName;
     #$setters["setCss"] = "Slider.setCss('$fileName');";
     // get parameters
-    foreach($cfg->getElementsByTagName("parameters")->item(0)->childElements as $r) {
+    foreach($cfg->getElementsByTagName("parameters")->item(0)->childElementsArray as $r) {
       $setters[$r->nodeName] = "Slider.".$r->nodeName."('".$r->nodeValue."');";
     }
     $f = PLUGINS_FOLDER."/".get_class($this)."/Slider.js";

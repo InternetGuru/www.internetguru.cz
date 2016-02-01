@@ -1,121 +1,62 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContactForm>
 
-  <!-- povinné proměnné rozšíření ContactForm -->
-  <var id="secret" modifyonly="modifyonly">SECRET_PHRASE</var> <!-- zabezpečení formulářů -->
+  <!-- Globální proměnné -->
   <var id="adminaddr" modifyonly="modifyonly">[e-mail kontaktní osoby]</var> <!-- povinný údaj -->
+  <var id="adminname" modifyonly="modifyonly"/> <!-- nepovinné jméno kontaktní osoby -->
+  <var id="servername" modifyonly="modifyonly"/> <!-- nepovinný název společnosti zobrazený jako jméno odesílatele -->
+  <var id="bcc" modifyonly="modifyonly"/> <!-- nepovinná adresa skryté kopie zprávy -->
 
-  <!-- nepovinné proměnné rozšíření ContactForm -->
-  <var id="adminname" modifyonly="modifyonly"></var> <!-- nepovinné jméno kontaktní osoby -->
-  <var id="servername" modifyonly="modifyonly"></var> <!-- nepovinný název společnosti -->
-  <var id="bcc" modifyonly="modifyonly"></var> <!-- nepovinná adresa skryté kopie zprávy -->
-  <var id="success" modifyonly="modifyonly">Zpráva byla úspěšně odeslána!</var>
-  <var id="subject" modifyonly="modifyonly">Zpráva z $cms-domain od $email (formulář $form_id)</var>
-  <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z $cms-domain:</var>
+  <var id="success" modifyonly="modifyonly">Děkujeme, zpráva byla úspěšně odeslána!</var>
+  <var id="subject" modifyonly="modifyonly">Nová zpráva z $cms-host</var>
+  <var id="copymsg" modifyonly="modifyonly">Toto je kopie zprávy, kterou jste poslal/a z $cms-host:</var>
   <var id="nothing" modifyonly="modifyonly">[nevyplněno]</var>
 
   <!--
-    Pravidla kontrol textových prvků formuláře regulárním výrazem (v obsahu elementu),
-    podporované atributy
-      id    : identifikátor pro asociaci pravidla k formulářovému prvku (povinný)
-      title : popis pravidla zobrazený při chybě (nepovinné)
-    Popis je možné zobrazit pomocí globální proměnné.
-  -->
-  <rule id="rule-telephone" title="Hodnota musí obsahovat aspoň 9 čísel">(\d\D*){9,}</rule>
-  <rule id="rule-email" title="Hodnota musí mít formát e-mailové adresy">^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$</rule>
 
-  <!--
-    Specifické proměnné konkrétního formuláře upravující výchozí hodnoty elementů var
-    ^^^^
-    Volitelné atributy elementu form
-      secret
-      adminaddr
-      adminname
-      servername
-      success
-      subject
-      copymsg
+    Specifické proměnné konkrétního formuláře
+      - přepisují hodnoty elementů var
+      - uvádí se jako (volitelné) atributy elementu form
+      - adminaddr, adminname, servername, success, subject, copymsg
 
+    Odpověď na vygenerovanou zprávu (reply-to) a poslání kopie zprávy uživateli vyžaduje
+      - element vstup (text) s atributem name="email"
+      - volitelně element vstup (text) s atributem name="name"
+      - vstup (checkbox) s atributem name="sendcopy" (pro poslání kopie)
 
-    Použití proměnných
-      (1) pro odpověď na zprávu (reply-to),
-      (2) poslání kopie zprávy uživateli,
-      (3) použití kdekoli v textu zápisem $[globální_proměnná], $[atribut_name] nebo $form_id
-    ^^^^
-    Hodnoty atritubu name elementu input:
-      email    : e-mailová adresa uživatele (povinné pro (1) a (2), jinak volitelné)
-      name     : jméno uživatele (volitelné)
-      sendcopy : možnost odeslání kopie na adresu uživatele (povinné pro (2), jinak volitelné)
+    Použití proměnných v obsahu zprávy nebo v jiném generovaném textu
+      - $[globální_proměnná], $[atribut_name] nebo $form_id
 
-    Pravidla kontroly vstupů
-    ^^^^
-    input[type='text'].rule [rule.id value]
-    input.required [text or empty] pole, které má být povinné
-    textarea.rule [rule.id value]
-    textarea.required [text or empty] pole, které má být povinné
+    Pravidla kontroly uživatelských vstupů se řídí podle specifikace HTML5
+      - http://www.w3.org/TR/2010/WD-html5-20100304/forms.html#forms
+
   -->
   <message for="basic">
-Jméno: $name, $email
+Jméno: $name
 Telefonní kontakt: $telephone
 
 Zpráva:
 $msg
 
 --
-Posláno $inputvar-today z IP adresy $cms-ip
-Ze systému $cms-name
+Odesláno z IP adresy $cms-ip
+Formulář $form_id
+$inputvar-service_plain
   </message>
   <form id="basic">
     <dl>
-      <dt><label for="name">Celé jméno</label></dt>
-      <dd><input type="text" id="name" required="Jméno je povinné"/></dd>
-      <dd><label class="error" for="name">Jméno nesmí zůstat prázdné</label></dd>
-      <dt><label for="email">E-mailová adresa</label></dt>
-      <dd><input type="text" rule="rule-email" id="email" required="E-mailová adresa odesílatele je povinná"/></dd>
-      <dd><label class="error" for="email" var="rule-email">n/a</label></dd>
-      <dt><label for="telephone">Telefon (nepovinné)</label></dt>
-      <dd><input type="text" rule="rule-telephone" id="telephone"/></dd>
-      <dd><label class="error" for="telephone">Telefonní číslo může zůstat prázdné; jinak musí obsahovat aspoň 9 čísel</label></dd>
-      <dt><label for="msg">Zpráva</label></dt>
-      <dd><textarea id="msg" required="Zpráva je povinná"></textarea></dd>
-      <dd><label class="error" for="msg">Nezapomeňte napsat zprávu</label></dd>
-      <dt>Odeslání formuláře</dt>
-      <dd><label><input type="checkbox" id="sendcopy"/> Poslat kopii této zprávy na uvedený e-mail</label></dd>
-      <dd><input type="submit" id="submit"/></dd>
-    </dl>
-  </form>
-
-  <!-- prázdný element message vygeneruje seznam všech polí -->
-  <form id="demo">
-    <dl>
-      <dt><label for="name">Celé jméno</label></dt>
-      <dd><input type="text" id="name" required="Jméno je povinné"/></dd>
-      <dd><label class="error" for="name">Jméno nesmí zůstat prázdné</label></dd>
-      <dt><label for="email">E-mailová adresa</label></dt>
-      <dd><input type="text" rule="rule-email" id="email" required="E-mailová adresa odesílatele je povinná"/></dd>
-      <dd><label class="error" for="email" var="rule-email">n/a</label></dd>
-      <dt><label for="telephone">Telefon (nepovinné)</label></dt>
-      <dd><input type="text" rule="rule-telephone" id="telephone"/></dd>
-      <dd><label class="error" for="telephone">Telefonní číslo může zůstat prázdné; jinak musí obsahovat aspoň 9 čísel</label></dd>
-      <dt><label for="msg">Zpráva</label></dt>
-      <dd><textarea id="msg" required="Zpráva je povinná"></textarea></dd>
-      <dt>Zájem o odebírání témat</dt>
-      <dd><label><input type="checkbox" name="t"/> téma1</label></dd>
-      <dd><label><input type="checkbox" name="t"/> téma2</label></dd>
-      <dd><label><input type="checkbox" name="t"/> téma3</label></dd>
-      <dt>Pohlaví</dt>
-      <dd><label><input type="radio" name="gender" /> žena</label></dd>
-      <dd><label><input type="radio" name="gender" value="m" checked="checked"/> muž</label></dd>
-      <dt><label for="country">Země</label></dt>
-      <dd><select id="country">
-        <option>Česká republika</option>
-        <option value="england" selected="selected">Anglie</option>
-        <option>Německo</option>
-      </select></dd>
-      <dt>Odeslání formuláře</dt>
-      <dd><label><input type="checkbox" checked="checked" required="Musíte souhlasit s obchodními podmínkami"/> Souhlas s podmínkami</label></dd>
-      <dd><label><input type="checkbox" id="sendcopy"/> Poslat kopii uvedený e-mail</label></dd>
-      <dd><input type="submit" id="submit"/></dd>
+      <dt><label for="name">Celé jméno <em>(povinné)</em></label></dt>
+      <dd><input type="text" pattern=".*\S+.*" id="name" required="required" placeholder="Josef Novák"/></dd>
+      <dt><label for="email">E-mailová adresa <em>(povinné)</em></label></dt>
+      <dd><input type="email" id="email" required="required" placeholder="josef.novak@seznam.cz"/></dd>
+      <dt><label for="telephone">Telefon</label></dt>
+      <dd><input type="text" pattern=".*(\d\D*){9,}" id="telephone" placeholder="+420 777123456"/></dd>
+      <dd><label for="telephone">Nechte prázdné nebo napište aspoň 9 číslic.</label></dd>
+      <dt><label for="msg">Zpráva <em>(povinné)</em></label></dt>
+      <dd><textarea id="msg" required="required"/></dd>
+      <dt class="noprint">Odeslání formuláře</dt>
+      <dd class="noprint"><label><input type="checkbox" id="sendcopy"/> Poslat kopii této zprávy na uvedený e-mail</label></dd>
+      <dd class="noprint"><input type="submit" id="submit" value="Odeslat"/></dd>
     </dl>
   </form>
 

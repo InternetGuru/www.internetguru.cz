@@ -1,86 +1,100 @@
+(function(win) {
 
-(function(window){
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  var EXPAND = "[+]";
-  var COLLAPSE = "[–]";
-  var HIDEABLE_CLASS = "hideable";
-  var HIDE_CLASS = "hide";
-  var NO_HIDE_CLASS = "nohide";
-  var HIDDEN_CLASS = "hidden";
+  if(IGCMS.Hideable) return;
 
-  function getHideables() {
-    if (document.querySelectorAll) return document.querySelectorAll("." + HIDEABLE_CLASS);
-    var hideables = [];
-    var allElements = document.getElementsByTagName("*");
-    for(var i = 0; i < allElements.length; i++) {
-      if(allElements[i].classList.contains(HIDEABLE_CLASS)) hideables.push(allElements[i]);
-    }
-    return hideables;
-  }
+  var Config = {};
 
-  function appendStyle() {
-    var css = '/* hideables.js */'
-      + ' .hide {display: none;}'
-      + ' .switch {text-decoration: none;'
-      + ' font-family: "Emilbus Mono","Lucida Console",monospace;'
-      + ' font-weight: bold; color: black; }';
-    var style = document.getElementsByTagName('style')[0];
-    if(style == undefined) {
-      var head = document.head || document.getElementsByTagName('head')[0];
-      style = document.createElement('style');
-      style.type = 'text/css';
-      head.appendChild(style);
-    }
-    style.appendChild(document.createTextNode(css));
-  }
+  Config.expand = "[+]";
+  Config.collapse = "[–]";
+  Config.hideableClass = "hideable";
+  Config.hideClass = "hide";
+  Config.noHideClass = "nohide";
+  Config.hiddenClass = "hidden";
+  Config.switchClass = "switch";
+  Config.noprintClass = "noprint";
 
-  function toggleHideables() {
-    var hideables = getHideables();
-    for(var i = 0; i < hideables.length; i++) {
-      var firstElement = hideables[i].children[0];
-      var link = document.createElement("a");
-      link.href = "Javascript:void(0);";
-      link.innerHTML = COLLAPSE;
-      link.classList.add("switch")
-      link.addEventListener("click",toggle,false);
-      firstElement.innerHTML = " " + firstElement.innerHTML;
-      firstElement.insertBefore(link,firstElement.firstChild);
-      if(hideables[i].classList.contains(NO_HIDE_CLASS)) continue;
-      hideables[i].classList.add(NO_HIDE_CLASS);
-      toggleElement(link);
-    }
-  }
+   var Hideable = function() {
 
-  function toggle(e) {
-    toggleElement(e.target);
-    e.preventDefault();
-  }
-
-  function toggleElement(link) {
-    var e = link.parentNode.parentNode;
-    if(e.classList.contains(NO_HIDE_CLASS)) {
-      e.classList.remove(NO_HIDE_CLASS);
-      e.classList.add(HIDDEN_CLASS);
-    } else {
-      e.classList.remove(HIDDEN_CLASS);
-      e.classList.add(NO_HIDE_CLASS);
-    }
-    for(var i = 0; i < e.childNodes.length; i++) {
-      var ch = e.childNodes[i];
-      if(ch.nodeType != 1) continue;
-      if(ch == link.parentNode) continue;
-      if(ch.classList.contains(HIDE_CLASS)) {
-        ch.classList.remove(HIDE_CLASS);
-        link.innerHTML = COLLAPSE;
+    var
+    inited = false,
+    getHideables = function() {
+      if (document.querySelectorAll) return document.querySelectorAll("." + Config.hideableClass);
+      var hideables = [];
+      var allElements = document.getElementsByTagName("*");
+      for(var i = 0; i < allElements.length; i++) {
+        if(allElements[i].classList.contains(Config.hideableClass)) hideables.push(allElements[i]);
       }
-      else {
-        ch.classList.add(HIDE_CLASS);
-        link.innerHTML = EXPAND;
+      return hideables;
+    },
+    toggleHideables = function() {
+      var hideables = getHideables();
+      for(var i = 0; i < hideables.length; i++) {
+        var firstElement = hideables[i].children[0];
+        var link = document.createElement("a");
+        link.href = "Javascript:void(0);";
+        link.innerHTML = Config.collapse;
+        link.classList.add(Config.switchClass);
+        link.classList.add(Config.noprintClass);
+        link.addEventListener("click", toggle, false);
+        firstElement.innerHTML = " " + firstElement.innerHTML;
+        firstElement.insertBefore(link, firstElement.firstChild);
+        if(hideables[i].classList.contains(Config.noHideClass)) continue;
+        hideables[i].classList.add(Config.noHideClass);
+        toggleElement(link);
+      }
+    },
+
+    toggle = function(e) {
+      var target = e.target || e.srcElement;
+      toggleElement(target);
+      e.preventDefault();
+    },
+
+    toggleElement = function(link) {
+      var e = link.parentNode.parentNode;
+      if(e.classList.contains(Config.noHideClass)) {
+        e.classList.remove(Config.noHideClass);
+        e.classList.add(Config.hiddenClass);
+      } else {
+        e.classList.remove(Config.hiddenClass);
+        e.classList.add(Config.noHideClass);
+      }
+      for(var i = 0; i < e.childNodes.length; i++) {
+        var ch = e.childNodes[i];
+        if(ch.nodeType != 1) continue;
+        if(ch == link.parentNode) continue;
+        if(ch.classList.contains(Config.hideClass)) {
+          ch.classList.remove(Config.hideClass);
+          link.innerHTML = Config.collapse;
+        }
+        else {
+          ch.classList.add(Config.hideClass);
+          link.innerHTML = Config.expand;
+        }
       }
     }
-  }
 
-  appendStyle();
-  toggleHideables();
+    // public
+    return {
+      init : function(cfg) {
+        if(inited) return;
+        IGCMS.initCfg(Config, cfg);
+        var css = '/* hideables.js */'
+          + ' .hide { display: none !important; }'
+          + ' a.' + Config.switchClass + ' { text-decoration: none;'
+          + ' border: none !important;'
+          + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
+          + ' font-weight: bold }';
+        IGCMS.appendStyle(css);
+        toggleHideables();
+        inited = true;
+      },
+      isInit : function() { return inited; }
+    }
+  };
+
+   IGCMS.Hideable = new Hideable();
 
 })(window);

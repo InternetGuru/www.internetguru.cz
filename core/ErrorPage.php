@@ -10,12 +10,13 @@ class ErrorPage {
 
   public function __construct($message, $code, $extended=false) {
     http_response_code($code);
-    new Logger($message, Logger::LOGGER_FATAL);
+    Logger::log($message, Logger::LOGGER_FATAL, null, false);
     $dir = LIB_FOLDER."/".$this->relDir;
     $tt = array(
       "@CODE@" => $code,
       "@STATUS@" => $this->getStatusMessage($code),
-      "@ERROR@" => $message
+      "@ERROR@" => $message,
+      "@VERSION@" => CMS_NAME
     );
     if(!$extended) {
       $html = file_get_contents($dir."/".$this->errSimpleFile);
@@ -33,7 +34,7 @@ class ErrorPage {
       $tt["@ROOT@"] = ROOT_URL;
     }
     echo str_replace(array_keys($tt), $tt, $html);
-    die();
+    exit();
   }
 
   private function getImages($dir) {
@@ -41,11 +42,7 @@ class ErrorPage {
     // http://xkcd.com/1350/#p:10e7f9b6-b9b8-11e3-8003-002590d77bdd
     foreach(scandir($dir) as $img) {
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
-      $imgPath = LIB_FOLDER."/".$this->relDir."/$img";
-      if(IS_LOCALHOST)
-        $i[] = ROOT_URL.$imgPath;
-      else
-        $i[] = getRes("$dir/$img", $imgPath, CMSRES_ROOT_DIR."/".CMS_RELEASE);
+      $i[] = ROOT_URL.LIB_DIR."/".$this->relDir."/$img";
     }
     return $i;
   }
@@ -97,6 +94,7 @@ class ErrorPage {
       424 => 'Failed Dependency',
       425 => 'No code',
       426 => 'Upgrade Required',
+      451 => 'Unavailable For Legal Reasons',
       500 => 'Internal Server Error',
       501 => 'Method Not Implemented',
       502 => 'Bad Gateway',

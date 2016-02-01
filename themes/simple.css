@@ -1,5 +1,3 @@
-@import url('//fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600,700&subset=latin,latin-ext');
-
 * {
   margin: 0;
   padding: 0;
@@ -20,9 +18,7 @@ div.paragraph {
 div.list.multiple div {
   max-width: 62rem;
   margin: 0 auto;
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
   padding-left: 0;
   padding-right: 0;
@@ -106,7 +102,7 @@ ul.docinfo {
   font-style: italic;
 }
 
-p.creation {
+p.creation, p.edit {
   margin-top: 0;
   margin-bottom: -1rem;
   position: relative;
@@ -114,8 +110,13 @@ p.creation {
   font-weight: 100;
 }
 
-p.creation a {
+p.creation a, p.edit a {
   color: white;
+}
+
+p.edit {
+  float: right;
+  z-index: 1;
 }
 
 /* breadcrumb navigation */
@@ -130,56 +131,30 @@ ol.contentlink-bc {
   max-width: 61rem;
 }
 
-ol.contentlink-bc li:not(:first-child) {
-  margin-left: 1.5rem;
-}
-
 ol.contentlink-bc li {
-  position: relative;
   display: inline-block;
   margin: 0;
 }
 
-ol.contentlink-bc li a[href] {
+ol.contentlink-bc > li+li:before {
+  content: "›";
+  font-family: "Times New Roman", sans-serif;
+  font-size: 1.5em;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+ol.contentlink-bc li a {
   display: inline-block;
-  padding: 0.5rem 0.3rem 0.5rem 0.4rem;
-  background: #EAF2F5;
-  color: #551A8B;
-  text-decoration: none;
+  color: #fff;
 }
 
-ol.contentlink-bc li:first-child a[href] {
-  padding-left: 0.8rem;
-}
-
-ol.contentlink-bc li:last-child a:not([href]) {
-  padding-left: 0.2rem;
-}
-
-ol.contentlink-bc li:not(:first-child) a:not(.logo)[href]:before,
-ol.contentlink-bc li a:not(.logo)[href]:after {
-  border-width: 1.2rem 0 1.2rem 1.25rem;
-  content: '';
-  position: absolute;
-  height: 0;
-  width: 0;
-  border-style: solid;
-  top: 0;
-}
-
-ol.contentlink-bc li a[href]:after {
-  border-color: transparent #EAF2F5;
-  z-index: 1;
-  right: -1.25rem;
-}
-
-ol.contentlink-bc li:not(:first-child) a[href]:before {
-  border-color: #EAF2F5 transparent;
-  left: -1.25rem;
+ol.contentlink-bc li a:first-child {
+  padding-left: 0;
 }
 
 #content > div:first-child + div,
-div.list, div.contentbalancer,
+div.list, div.contentbalancer-simple:not(.section),
 fieldset > dl {
   background: #EAF2F5;
   padding-top: 1.5em;
@@ -205,26 +180,22 @@ li, dd {
   margin-left: 2em;
 }
 
-dd {
-  /*font-style: italic;*/
-}
-
 dt {
   font-size: 1.15em;
   font-weight: normal;
 }
 
-div.contentbalancer ul {
+div.contentbalancer-simple:not(.section) ul {
   list-style: none;
   text-align: center;
 }
 
-div.contentbalancer li {
+div.contentbalancer-simple:not(.section) li {
   display: inline-block;
   margin: 0;
 }
 
-div.contentbalancer a {
+div.contentbalancer-simple:not(.section) a {
   text-transform: uppercase;
   padding: 1em;
   font-weight: 100;
@@ -248,11 +219,8 @@ div.contentbalancer a {
 }
 
 #footer > ul {
-  display: -webkit-flex;
   display: flex;
-  -webkit-flex-wrap: wrap;
   flex-wrap: wrap;
-  -webkit-justify-content: center;
   justify-content: center;
   list-style: none;
 }
@@ -308,6 +276,34 @@ div.contentbalancer a {
   color: #551A8B;
 }
 
-#footer li.link {
-  display: none;
+
+/* Browser compatibility */
+
+.no-cssremunit ol.contentlink-bc {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.no-cssremunit #content > div:first-child > div {
+  max-width: 60em;
+  margin: 0 auto;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.no-cssremunit #content > div:first-child > div h1 {
+  padding-left: 0;
+}
+
+.no-flexbox div.list.multiple div dl {
+  display: inline-block;
+}
+
+.no-flexbox #footer > ul {
+  display: table;
+}
+
+.no-flexbox #footer > ul li {
+  display: inline-block;
+  padding: 0 0.5em;
 }

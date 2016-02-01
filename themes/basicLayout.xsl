@@ -2,10 +2,14 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
   <xsl:param name="contentlink-bc" select="''"/>
+  <xsl:param name="cms-lang" select="''"/>
 
   <xsl:template match="/body">
     <body>
       <xsl:copy-of select="@*"/>
+      <xsl:attribute name="class">
+         <xsl:value-of select="concat(@class,' fragmentable scrolltopable')"/>
+      </xsl:attribute>
       <div id="header">
         <xsl:value-of disable-output-escaping="yes" select="$contentlink-bc"/>
       </div>

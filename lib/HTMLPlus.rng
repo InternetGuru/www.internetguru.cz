@@ -9,6 +9,11 @@
       <attribute name="xml:lang">
         <ref name="LanguageCode.datatype"/>
       </attribute>
+      <attribute name="ns">
+        <data type="string">
+          <param name="pattern">(localhost/[a-z0-9-]+)|(([a-z0-9-]+\.)+[a-z]+)</param>
+        </data>
+      </attribute>
       <ref name="contentBlock"/>
     </element>
   </start>
@@ -17,7 +22,12 @@
     <ref name="htmlplus.h"/>
     <ref name="desc"/>
     <optional>
-      <ref name="contentElements"/>
+      <interleave>
+        <ref name="contentElements"/>
+        <zeroOrMore>
+          <ref name="form"/>
+        </zeroOrMore>
+      </interleave>
     </optional>
     <optional>
       <element name="section">
@@ -29,6 +39,14 @@
           </choice>
         </oneOrMore>
       </element>
+    </optional>
+    <optional>
+      <interleave>
+        <ref name="contentElements"/>
+        <zeroOrMore>
+          <ref name="form"/>
+        </zeroOrMore>
+      </interleave>
     </optional>
   </define>
 
@@ -59,13 +77,6 @@
         <attribute name="link">
           <data type="string">
             <param name="pattern">[a-z][a-z0-9_/-]*</param>
-          </data>
-        </attribute>
-      </optional>
-      <optional>
-        <attribute name="ns">
-          <data type="string">
-            <param name="pattern">(localhost/[a-z0-9]+)|([a-z0-9]+\.[a-z0-9-]+\.[a-z]+)</param>
           </data>
         </attribute>
       </optional>
@@ -157,10 +168,6 @@
       <zeroOrMore>
         <ref name="htmlplus.dl"/>
       </zeroOrMore>
-      <zeroOrMore>
-        <ref name="form"/>
-      </zeroOrMore>
-
     </interleave>
   </define>
 
@@ -188,7 +195,7 @@
     </element>
   </define>
 
-  <define name="htmlplus.list">
+  <define name="xhtmlplus.list">
     <zeroOrMore>
       <choice>
         <ref name="htmlplus.ul"/>
@@ -198,7 +205,7 @@
     </zeroOrMore>
   </define>
 
-  <define name="xhtmlplus.list">
+  <define name="htmlplus.list">
     <choice>
       <zeroOrMore>
         <ref name="htmlplus.ul"/>
@@ -235,9 +242,9 @@
       <ref name="dl.attlist"/>
       <oneOrMore>
         <ref name="htmlplus.dt"/>
-        <zeroOrMore>
+        <oneOrMore>
           <ref name="htmlplus.dd"/>
-        </zeroOrMore>
+        </oneOrMore>
       </oneOrMore>
     </element>
   </define>
@@ -254,7 +261,7 @@
     <element name="dt">
       <ref name="dt.attlist"/>
       <ref name="Inline.model"/>
-      <ref name="htmlplus.list"/>
+      <!-- <ref name="htmlplus.list"/> -->
     </element>
   </define>
 
@@ -262,7 +269,7 @@
     <element name="dd">
       <ref name="dd.attlist"/>
       <ref name="Inline.model"/>
-      <!-- <ref name="htmlplus.list"/> really? -->
+      <ref name="htmlplus.list"/>
     </element>
   </define>
 

@@ -1,10 +1,8 @@
 <?php
 
-#TODO: keep missing url_parts from var->nodeValue
-#TODO: user redir in preinit
-
 class UrlHandler extends Plugin implements SplObserver {
   const DEBUG = false;
+  private $cfg = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -13,7 +11,9 @@ class UrlHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached(array("Xhtml11", "ContentLink"))) return;
+    if($this->detachIfNotAttached(array("HtmlOutput", "ContentLink"))) return;
+    $this->cfg = $this->getDOMPlus();
+    if(!IS_LOCALHOST) $this->httpsRedir();
     $this->cfgRedir();
     if(getCurLink() == "") {
       $subject->detach($this);
@@ -22,25 +22,53 @@ class UrlHandler extends Plugin implements SplObserver {
     $this->proceed();
   }
 
-  private function cfgRedir() {
-    $cfg = $this->getDOMPlus();
-    foreach($cfg->documentElement->childNodes as $var) {
-      if($var->nodeName != "var") continue;
-      if($var->hasAttribute("link") && $var->getAttribute("link") != getCurLink()) continue;
-      $pNam = $var->hasAttribute("parName") ? $var->getAttribute("parName") : null;
-      $pVal = $var->hasAttribute("parValue") ? $var->getAttribute("parValue") : null;
-      if(!$this->queryMatch($pNam, $pVal)) continue;
-      $code = $var->hasAttribute("code") && $var->getAttribute("code") == "permanent" ? 301 : 302;
-      $path = parse_url($var->nodeValue, PHP_URL_PATH);
-      if(!strlen($path)) $path = getCurLink(); // current link if empty string
-      while(strpos($path, "/") === 0) $path = substr($path, 1); // empty string if root
-      if($path != getCurLink() && strlen($path) && !DOMBuilder::isLink($path)) {
-        new Logger(sprintf(_("Redirection link '%s' not found"), $path), "warning");
-        continue;
+  private function httpsRedir() {
+    $https = true;
+    $urlMatch = false;
+    foreach($this->cfg->documentElement->childNodes as $redir) {
+      if($redir->nodeName != "https") continue;
+      $https = false;
+      $urlMatch = true;
+      $pRedir = parseLocalLink($redir->nodeValue);
+      if(isset($pRedir["path"]) && $pRedir["path"] != getCurLink()) $urlMatch = false;
+      if(isset($pRedir["query"]) && $pRedir["query"] != getCurQuery()) $urlMatch = false;
+      if($urlMatch) break;
+    }
+    Cms::setVariable("default_protocol", ($https ? "https" : "http"));
+    if(SCHEME == "https") {
+      if(is_null(Cms::getLoggedUser()) && !$urlMatch && !$https) {
+        redirTo("http://".HOST.$_SERVER["REQUEST_URI"]);
       }
-      $query = parse_url($var->nodeValue, PHP_URL_QUERY);
-      if(strlen($query)) $query = $this->alterQuery($query, $pNam);
-      redirTo(ROOT_URL.$path.(strlen($query) ? "?$query" : ""), $code);
+     return;
+    }
+    if($urlMatch || $https) redirTo("https://".HOST.$_SERVER["REQUEST_URI"]);
+  }
+
+  private function cfgRedir() {
+    foreach($this->cfg->documentElement->childNodes as $redir) {
+      if($redir->nodeName != "redir") continue;
+      if($redir->hasAttribute("link") && $redir->getAttribute("link") != getCurLink()) continue;
+      $pNam = $redir->hasAttribute("parName") ? $redir->getAttribute("parName") : null;
+      $pVal = $redir->hasAttribute("parValue") ? $redir->getAttribute("parValue") : null;
+      if(!$this->queryMatch($pNam, $pVal)) continue;
+      try {
+        if($redir->nodeValue == "/" || $redir->nodeValue == "") redirTo(array("path" => ""));
+        $pLink = parseLocalLink($redir->nodeValue);
+        if(is_null($pLink)) redirTo($redir->nodeValue); // external redir
+        $silent = !isset($pLink["path"]);
+        if($silent) $pLink["path"] = getCurLink(); // no path = keep current path
+        if(strpos($redir->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
+        #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
+        try {
+          $pLink = DOMBuilder::normalizeLink($pLink);
+          #todo: configurable status code
+          redirTo(buildLocalUrl($pLink));
+        } catch(Exception $e) {
+          if(!$silent) throw $e;
+        }
+      } catch(Exception $e) {
+        Logger::log(sprintf(_("Unable to redir to %s: %s"), implodeLink($pLink), $e->getMessage()), Logger::LOGGER_WARNING);
+      }
     }
   }
 
@@ -57,49 +85,48 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function queryMatch($pNam, $pVal) {
-    foreach(explode("&", parse_url(getCurLink(true), PHP_URL_QUERY)) as $q) {
-      if(is_null($pVal) && strpos("$q=", "$pNam=$pVal") === 0) return true;
-      if(!is_null($pVal) && "$q=" == "$pNam=$pVal") return true;
+    foreach(explode("&", getCurQuery()) as $q) {
+      if(is_null($pVal) && strpos("$q=", "$pNam=") === 0) return true;
+      if(!is_null($pVal) && "$q" == "$pNam=$pVal") return true;
     }
     return false;
   }
 
   private function proceed() {
     $links = DOMBuilder::getLinks();
-    if(DOMBuilder::isLink(getCurLink())) {
-      if(getCurLink() != $links[0]) return;
-      $link = ROOT_URL; // link to root heading permanent redir to root
-      $code = 301;
-    } else {
-      $newLink = normalize(getCurLink(), "a-zA-Z0-9/_-");
-      if(self::DEBUG) print_r($links);
-      $linkId = $this->findSimilarLinkId($links, $newLink);
-      if(is_null($linkId) || $linkId == $links[0]) $newLink = ""; // nothing found, redir to root
-      else $newLink = $links[$linkId];
-      $link = ROOT_URL.$newLink;
-      $code = 404;
+    $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
+    if(!DOMBuilder::isLink($path)) {
+      if(self::DEBUG) var_dump($links);
+      $linkId = $this->findSimilarLinkId($links, $path);
+      if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    if(self::DEBUG) die("Redirecting to $link");
-    redirTo($link, $code);
+    if(!DOMBuilder::isLink($path) || $path == $links[0]) $path = "";
+    if($path == getCurLink()) return;
+    $code = 404;
+    if(self::DEBUG) die("Redirecting to '$path'");
+    redirTo(buildLocalUrl(Array("path" => $path, "query" => getCurQuery())), $code);
   }
 
   private function getBestId(Array $links, Array $found) {
     if(count($found) == 1) return key($found);
+    $minVal = PHP_INT_MAX;
     $minLvl = PHP_INT_MAX;
-    foreach($found as $id => $null) {
+    $foundLvl = array();
+    foreach($found as $id => $val) {
       $lvl = substr_count($links[$id], "/");
+      if($val < $minVal) $minVal = $val;
       if($lvl < $minLvl) $minLvl = $lvl;
-      $found[$id] = $lvl;
+      $foundLvl[$id] = $lvl;
     }
-    $keys = array_keys($found, $minLvl);
-    if(count($keys) == 1) return $keys[0];
     $minLen = PHP_INT_MAX;
-    foreach($keys as $id) {
+    foreach($found as $id => $val) {
+      if($foundLvl[$id] != $minLvl) continue;
+      if($val != $minVal) continue;
       $len = strlen($links[$id]);
       if($len < $minLen) $minLen = $len;
       $short[$id] = $len;
     }
-    $keys = array_keys($short, $minLen);
+    $keys = array_keys($short, $minLen); // filter result to minlength
     return $keys[0];
   }
 
@@ -122,14 +149,13 @@ class UrlHandler extends Plugin implements SplObserver {
    */
   private function findSimilarLinkId(Array $links, $link) {
     if(!strlen($link)) return null;
-    if(self::DEBUG) echo "findSimilarLinkId(links, $link)";
     // zero pos substring
     $found = $this->minPos($links, $link);
-    if(self::DEBUG) print_r($found);
+    if(self::DEBUG) var_dump($found);
     if(count($found)) return $this->getBestId($links, $found);
     // low levenstein first
     $found = $this->minLev($links, $link, 2);
-    if(self::DEBUG) print_r($found);
+    if(self::DEBUG) var_dump($found);
     if(count($found)) return $this->getBestId($links, $found);
     // first "directory" search
     $parts = explode("/", $link);
@@ -149,7 +175,7 @@ class UrlHandler extends Plugin implements SplObserver {
     foreach ($links as $k => $l) {
       $pos = strpos($l, $link);
       if($pos === false || (!is_null($max) && $pos > $max)) continue;
-      $linkpos[$k] = $pos;
+      $linkpos[$k] = strpos($l, "#") === 0 ? $pos-1 : $pos;
     }
     asort($linkpos);
     if(count($linkpos)) return $linkpos;
@@ -185,3 +211,4 @@ class UrlHandler extends Plugin implements SplObserver {
 }
 
 ?>
+

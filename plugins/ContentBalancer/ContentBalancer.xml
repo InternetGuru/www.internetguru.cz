@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentBalancer>
+  <var id="default" modifyonly="modifyonly">simple</var>
+  <!--
+
+    Dostupné proměnné:
+      headingplus ... proměnná short pokud existuje, jinak heading
+      heading, link, headingplus, short, desc, kw
+
+    Atributy elementu item:
+      id (povinné)
+
+  -->
+  <item id="simple" wrapper="ul" modifyonly="modifyonly">
+    <li><a var="link@href headingplus">n/a</a></li>
+  </item>
+  <item id="long" wrapper="dl" modifyonly="modifyonly">
+    <dt><a var="link@href heading">n/a</a></dt>
+    <dd var="kw">Bez klíčových slov</dd>
+    <dd var="desc">Bez popisu</dd>
+  </item>
+
+</ContentBalancer>

@@ -4,7 +4,7 @@ class DOMDocumentPlus extends DOMDocument {
   const DEBUG = false;
 
   function __construct($version="1.0", $encoding="utf-8") {
-    if(self::DEBUG) new Logger("DEBUG");
+    if(self::DEBUG) Logger::log("DEBUG");
     parent::__construct($version, $encoding);
     $r = $this->registerNodeClass("DOMElement", "DOMElementPlus");
   }
@@ -38,55 +38,85 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function insertVar($varName, $varValue, $element=null) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 
   public function insertFn($varName, $varValue, $element=null) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 
   public function processVariables(Array $variables, $ignore = array()) {
-    $xpath = new DOMXPath($this);
-    $elements = array();
-    foreach($xpath->query("//*[@var]") as $e) $elements[] = $e;
-    foreach(array_reverse($elements) as $e) {
-      if(array_key_exists($e->nodeName, $ignore))
-        $e->processVariables($variables, $ignore[$e->nodeName]);
-      else $e->processVariables($variables);
+    return $this->elementProcessVariables($variables, $ignore, $this->documentElement, true);
+  }
+
+  public function elementProcessVariables(Array $variables, $ignore = array(), DOMElementPlus $element, $deep = false) {
+    $toRemove = array();
+    $res = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
+    if(is_null($res) || !$res->isSameNode($element)) $toRemove[] = $element;
+    foreach($toRemove as $e) $e->emptyRecursive();
+    return $res;
+  }
+
+  private function doProcessVariables(Array $variables, $ignore, DOMElementPlus $element, $deep, Array &$toRemove) {
+    $res = $element;
+    $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
+    foreach($element->getVariables("var", $ignoreAttr) as list($vName, $aName, $var)) {
+      if(!isset($variables[$vName])) continue;
+      try {
+        $element->removeAttrVal("var", $var);
+        if(!is_null($variables[$vName]) && !count($variables[$vName])) {
+          if(!is_null($aName)) $this->removeAttribute($aName);
+          else return null;
+        }
+        $res = $this->insertVariable($element, $variables[$vName], $aName);
+      } catch(Exception $e) {
+        Logger::log(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
+      }
+    }
+    if($deep) foreach($element->childNodes as $e) {
+      if($e->nodeType != XML_ELEMENT_NODE) continue;
+      $r = $this->doProcessVariables($variables, $ignore, $e, $deep, $toRemove);
+      if(is_null($r) || !$e->isSameNode($r)) $toRemove[] = $e;
+    }
+    return $res;
+  }
+
+  public function insertVariable(DOMElementPlus $element, $value, $aName=null) {
+    if(is_null($element->parentNode)) return $element;
+    switch(gettype($value)) {
+      case "NULL":
+      return $element;
+      case "integer":
+      case "boolean":
+      $value = (string) $value;
+      case "string":
+      if(!strlen($value) && is_null($aName)) return null;
+      return $element->insertVarString($value, $aName);
+      case "array":
+      #$this = $this->prepareIfDl($this, $varName);
+      return $element->insertVarArray($value, $aName);
+      default:
+      if($value instanceof DOMDocumentPlus) {
+        return $element->insertVarDOMElement($value->documentElement, $aName);
+      }
+      if($value instanceof DOMElement) {
+        return $element->insertVarDOMElement($value, $aName);
+      }
+      throw new Exception(sprintf(_("Unsupported variable type %s"), get_class($value)));
     }
   }
 
-  public function processFunctions(Array $functions, $ignore = array()) {
+  public function processFunctions(Array $functions, Array $variables = Array(), $ignore = array()) {
     $xpath = new DOMXPath($this);
     $elements = array();
     foreach($xpath->query("//*[@fn]") as $e) $elements[] = $e;
     foreach(array_reverse($elements) as $e) {
-      if(array_key_exists($e->nodeName, $ignore))
-        $e->processFunctions($functions, $ignore[$e->nodeName]);
-      else $e->processFunctions($functions);
+      if(isset($ignore[$e->nodeName]))
+        $e->processFunctions($functions, $variables, $ignore[$e->nodeName]);
+      else $e->processFunctions($functions, $variables, array());
     }
-  }
-
-  public function validateLinks($elName, $attName, $repair) {
-    $toStrip = array();
-    foreach($this->getElementsByTagName($elName) as $e) {
-      if(!$e->hasAttribute($attName)) continue;
-      try {
-        $link = trimLink($e->getAttribute($attName));
-        if($link == "") $link = "/";
-        if($link === $e->getAttribute($attName)) continue;
-        if(!$repair)
-          throw new Exception(sprintf(_("Invalid repairable link '%s'"), $e->getAttribute($attName)));
-        $e->setAttribute($attName, $link);
-      } catch(Exception $ex) {
-        if(!$repair) throw $ex;
-        $toStrip[] = array($e, $ex->getMessage());
-      }
-    }
-    foreach($toStrip as $a) $a[0]->stripAttr($attName, $a[1]);
-    return count($toStrip);
   }
 
   public function removeNodes($query) {
@@ -100,7 +130,7 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   public function validatePlus($repair = false) {
-    new Logger(sprintf(METHOD_NA, __FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
     return;
   }
 
@@ -109,6 +139,7 @@ class DOMDocumentPlus extends DOMDocument {
       throw new Exception(sprintf(_("Unable to find HTML+ RNG schema '%s'"), $f));
     try {
       libxml_use_internal_errors(true);
+      libxml_clear_errors();
       if(!$this->relaxNGValidate($f))
         throw new Exception(_("relaxNGValidate() internal error occured"));
     } catch (Exception $e) {
@@ -116,25 +147,14 @@ class DOMDocumentPlus extends DOMDocument {
       if(count($internal_errors)) {
         $note = " ["._("Caution: this message may be misleading")."]";
         if(self::DEBUG) die($this->saveXML());
-        $e = new Exception(current($internal_errors)->message.$note);
+        throw new Exception(current($internal_errors)->message.$note);
       }
+      throw $e;
+    } finally {
+      libxml_clear_errors();
+      libxml_use_internal_errors(false);
     }
-    // finally
-    libxml_clear_errors();
-    libxml_use_internal_errors(false);
-    if(isset($e)) throw $e;
     return true;
-  }
-
-  public function setUniqueId(DOMElement $e) {
-    $id = $e->nodeName.".".substr(md5(microtime().rand()), 0, 3);
-    if(!$this->isValidId($id)) $this->setUniqueId($e);
-    if(!is_null($this->getElementById($id))) $this->setUniqueId($e);
-    $e->setAttribute("id", $id);
-  }
-
-  protected function isValidId($id) {
-    return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_:\.-]*$/", $id);
   }
 
   private function removeVar($e, $attr) {

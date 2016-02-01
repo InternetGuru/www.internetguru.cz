@@ -1,43 +1,40 @@
 <?php
 
 class Logger {
-  private $message;
-  private $type;
-  private $duration = null;
   const LOGGER_FATAL = "Fatal";
   const LOGGER_ERROR = "Error";
   const LOGGER_WARNING = "Warning";
   const LOGGER_INFO = "Info";
+  const LOGGER_SUCCESS = "Success";
 
-  function __construct($message, $type=null, $start_time=null, $cmsMsg = true) {
+  public static function log($message, $type=null, $start_time=null, $cmsMsg = true, $ext="log") {
+    $duration = null;
     if(!is_null($start_time))
-      $this->duration = round((microtime(true) - $start_time)*1000)."ms";
-    if(!is_dir(LOG_FOLDER) && !mkdir(LOG_FOLDER, 0755, true))
-      throw new Exception(sprintf(_("Unable to create log dir '%s'"), LOG_FOLDER));
+      $duration = round((microtime(true) - $start_time)*1000)."ms";
     if(!in_array($type, array(
       self::LOGGER_FATAL,
       self::LOGGER_ERROR,
       self::LOGGER_WARNING,
-      self::LOGGER_INFO))) $type = self::LOGGER_INFO;
-    if($cmsMsg && !is_null(Cms::getLoggedUser())) {
-      Cms::addMessage("$message [".$this->getCaller()."]", $type, Cms::isForceFlash());
+      self::LOGGER_SUCCESS))) $type = self::LOGGER_INFO;
+    if($cmsMsg && Cms::isSuperUser()) {
+      Cms::addMessage("$message [".self::getCaller()."]", $type);
     }
-    $this->message = $message;
-    $this->type = $type;
-    $this->log();
+    if(Cms::getLoggedUser() == "server") return;
+    self::doLog($ext, $duration, $message, $type);
   }
 
-  private function getCaller() {
+  private static function getCaller() {
+    $i = 2;
     $callers = debug_backtrace();
     $c = array();
-    if(isset($callers[3]['class'])) $c[] = $callers[3]['class'];
-    if(CMS_DEBUG && isset($callers[3]['function'])) $c[] = $callers[3]['function'];
+    if(isset($callers[$i]['class'])) $c[] = $callers[$i]['class'];
+    if(CMS_DEBUG && isset($callers[$i]['function'])) $c[] = $callers[$i]['function'];
     if(empty($c)) return "core";
     return implode(".", $c);
   }
 
-  private function log() {
-    $logFile = LOG_FOLDER."/".date("Ymd").".log";
+  private static function doLog($ext, $duration, $message, $type) {
+    $logFile = LOG_FOLDER."/".date("Ymd").".$ext";
     if(isset($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_PORT"]))
       $msg[] = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
     else
@@ -50,10 +47,10 @@ class Logger {
       $msg[] = '"UNKNOWN UNKNOWN UNKNOWN"';
     }
     $msg[] = http_response_code();
-    $msg[] = $this->type;
-    $msg[] = '"'.$this->message.'"';
-    $msg[] = '['.$this->getCaller().']';
-    $msg[] = $this->duration;
+    $msg[] = $type;
+    $msg[] = '"'.$message.'"';
+    $msg[] = '['.self::getCaller().']';
+    $msg[] = $duration;
     error_log(implode(" ", $msg)."\n", 3, $logFile);
   }
 

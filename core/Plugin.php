@@ -10,13 +10,17 @@ class Plugin {
     $this->pluginDir = PLUGINS_DIR."/".get_class($this);
   }
 
+  public function isDebug() {
+    return defined('static::DEBUG') ? static::DEBUG : false;
+  }
+
   protected function detachIfNotAttached($pluginName) {
     if(!is_array($pluginName)) $pluginName = array($pluginName);
     foreach($pluginName as $p) {
       global $plugins;
       if($plugins->isAttachedPlugin($p)) continue;
       $this->subject->detach($this);
-      new Logger(sprintf(_("Detaching '%s' due to '%s' dependancy"), get_class($this), $p), "warning");
+      Logger::log(sprintf(_("Detaching '%s' due to '%s' dependancy"), get_class($this), $p), "warning");
       return true;
     }
     return false;

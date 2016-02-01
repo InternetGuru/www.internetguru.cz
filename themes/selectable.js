@@ -1,25 +1,19 @@
 (function(win) {
 
+  if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+
   var Config = {}
   Config.selectTitle = "Select all";
-  Config.selectableClass = "selectable";
+  Config.ns = "selectable";
 
    var Selectable = function() {
 
-      var initCfg = function(cfg) {
-        if(typeof cfg === 'undefined') return;
-        for(var attr in cfg) {
-          if(!Config.hasOwnProperty(attr)) continue;
-          Config[attr] = cfg[attr];
-        }
-      },
-
       getElements = function() {
-        if (document.querySelectorAll) return document.querySelectorAll("." + Config.selectableClass);
+        if (document.querySelectorAll) return document.querySelectorAll("." + Config.ns);
         var selectables = [];
         var allElements = document.getElementsByTagName("*");
         for(var i = 0; i < allElements.length; i++) {
-          if(allElements[i].classList.contains(Config.selectableClass)) selectables.push(allElements[i]);
+          if(allElements[i].classList.contains(Config.ns)) selectables.push(allElements[i]);
         }
         return selectables;
       },
@@ -75,14 +69,13 @@
       return {
         init : function(cfg) {
           // create toc
-          initCfg(cfg);
+          IGCMS.initCfg(Config, cfg);
           var e = getElements();
           createButton(e);
         }
       }
    };
 
-   var selectable = new Selectable();
-   win.Selectable = selectable;
+   IGCMS.Selectable = new Selectable();
 
 })(window);

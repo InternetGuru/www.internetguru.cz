@@ -1,48 +1,25 @@
-RewriteEngine On
+RewriteEngine  on
 
-#redirect to https only on www.internetguru.cz
-#RewriteCond %{HTTPS} off
-#RewriteCond %{HTTP_HOST} ^(www|dokumenty|partner|private)\.internetguru\.cz$ [NC]
-#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+##
+# set rewrite base
+RewriteRule   .                      - [E=RB:/]
+RewriteCond   %{HTTP_HOST}           ^localhost$
+RewriteCond   %{SCRIPT_FILENAME}     www/([^/]+)
+RewriteRule   .                      - [E=RB:/%1/]
 
-#redir to www
-RewriteCond %{HTTP_HOST} ^([^\.]*)\.([^\.]*)$
-RewriteRule .* http://www.%0/$0 [R=301,L,QSA]
+##
+# remove trailing slash, eg. /mivepo/ -> /mivepo
+RewriteCond   %{REQUEST_FILENAME}    !-f
+RewriteRule   ^(.+)\/$               %{ENV:RB}$1  [R=301,L]
 
-#redir www.a.b.cz to a.b.cz
-RewriteCond %{HTTP_HOST} ^www\.([^.]+\.[^.]+\.[^.]+)$
-RewriteRule .* http://%1/$0 [R=301,L,QSA]
+##
+# run findex.php iff file request
+RewriteRule   .                      - [E=SCRIPT:index.php]
+RewriteCond   %{REQUEST_URI}         \.[a-z0-9]{2,4}$ [NC]
+RewriteRule   .                      - [E=SCRIPT:findex.php]
 
-# subdomeny
-RewriteCond %{REQUEST_URI} !^/error/
-RewriteCond %{REQUEST_URI} !^subdom/
-RewriteCond %{REQUEST_URI} !^/subdom/
-RewriteCond %{HTTP_HOST} ^(.+)\.[^.]+\.[^.]+$
-RewriteCond %{DOCUMENT_ROOT}/subdom/%1 -d
-RewriteRule .* subdom/%1/$0 [DPI]
-
-AuthUserFile /var/www/.htpasswd
-AuthGroupFile /var/www/.htgroup
-AuthType Basic
-AuthName "restricted"
-
-# CMS ?admin
-<If "%{QUERY_STRING} =~ /(SubdomManager|login|Admin|LogViewer|Convertor)/ && %{REMOTE_ADDR} != '46.28.109.142'">
-  Require user admin
-  Require group partner
-</If>
-
-# CRM & SML
-<If "%{REQUEST_FILENAME} =~ m#/subdom/(crm|doc|private)/# && %{REMOTE_ADDR} != '46.28.109.142'">
-  Require user admin
-</If>
-
-# dokumenty & ig##
-<If "%{REQUEST_FILENAME} =~ m#/subdom/(dokumenty|ig[0-9]+)/# && %{REMOTE_ADDR} != '46.28.109.142'">
-  Require user admin
-  Require group partner
-</If>
-
-<FilesMatch "\.(ico|pdf|flv|jpg|jpeg|png|gif|js|css|swf)$">
-  Header set Cache-Control "max-age=290304000, public"
-</FilesMatch>
+##
+# create _GET parameters
+#RewriteCond   %{REQUEST_URI}         !\.[a-z0-9]{2,4}$ [NC]
+RewriteCond   %{REQUEST_FILENAME}    !-f
+RewriteRule   .*                     %{ENV:RB}%{ENV:SCRIPT}?q=$0 [QSA]

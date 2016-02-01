@@ -1,26 +1,55 @@
-div.section.doc {
-  counter-reset: section;
+body.doc {
+  counter-reset: par section;
 }
-div.section.doc h2 {
-  counter-reset: par;
+body.doc h2 {
+  counter-reset: par subsection;
+  text-align: left;
 }
-div.section.doc h2:before {
+body.doc h3 {
+  counter-reset: par subsubsection;
+}
+body.doc h2:before {
   counter-increment: section;
-  content: "§ " counter(section) ": ";
+  content: counter(section) ") ";
 }
-div.section.doc.kap h2:before {
+body.doc.par h2:before {
   counter-increment: section;
-  content: "Kap. " counter(section) ": ";
+  content: "§ " counter(section) ", ";
 }
-div.section.doc.chapter h2:before {
+body.doc.kap h2:before {
+  counter-increment: section;
+  content: "Kapitola " counter(section) ": ";
+}
+body.doc.chapter h2:before {
   counter-increment: section;
   content: "Chapter " counter(section) ": ";
 }
-div.section.doc p:before {
+body.doc h3:before {
+  counter-increment: subsection;
+  content: counter(section) "." counter(subsection) " ";
+}
+body.doc h4:before {
+  counter-increment: subsubsection;
+  content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+}
+body.doc div.section p:before {
   counter-increment: par;
-  content: counter(par) ") ";
+  content: counter(par, lower-alpha) ") ";
   font-size: 1.1em;
 }
-div.section.doc div.paragraph ol {
-  list-style-type: lower-alpha;
+body.doc div.paragraph > ol,
+body.doc div.list > ol {
+  list-style-type: lower-roman;
+}
+body.doc label > input[type="text"] {
+  border: none;
+  background: #EAF2F5;
+  width: 55%;
+  min-width: 25em;
+  border-bottom: 0.1em solid rgb(165, 165, 165);
+}
+body.doc label > span {
+  width: 27%;
+  display: inline-block;
+  min-width: 13em;
 }

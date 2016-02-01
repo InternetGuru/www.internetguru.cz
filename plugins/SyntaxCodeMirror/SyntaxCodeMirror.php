@@ -1,14 +1,5 @@
 <?php
 
-#TODO: more textarea support (js)
-#TODO: alt+.to end an element
-#TODO: search result jump to first occurence
-#TODO: search zero match found message!
-#TODO: replace (ctrl+h) buttons color
-
-#fixme: moving up/down changes word wrapping (issue 13)
-#https://bitbucket.org/igwr/cms/issue/13/codemirror-changing-word-wrap
-
 class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
   const CM_DIR = "CodeMirror";
@@ -20,40 +11,46 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
-      $this->detachIfNotAttached("Xhtml11");
+      $this->detachIfNotAttached("HtmlOutput");
       return;
     }
   }
 
   public function getContent(HTMLPlus $content) {
 
-    // detach and return if no textarea or blockcode
-    $ta = $content->getElementsByTagName("textarea");
-    if($ta->length == 0) {
-      $this->subject->detach($this);
-      return $content;
-    }
-
     // supported syntax only
+    $xml = LIB_DIR."/".self::CM_DIR."/mode/xml/xml.js";
+    $css = LIB_DIR."/".self::CM_DIR."/mode/css/css.js";
+    $js = LIB_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
+    $html = LIB_DIR."/".self::CM_DIR."/mode/htmlmixed/htmlmixed.js";
     $modes = array(
-      "xml" => LIB_DIR."/".self::CM_DIR."/mode/xml/xml.js",
-      "css" => LIB_DIR."/".self::CM_DIR."/mode/css/css.js",
-      "javascript" => LIB_DIR."/".self::CM_DIR."/mode/javascript/javascript.js",
+      "xml" => array($xml),
+      "css" => array($css),
+      "javascript" => array($js),
+      "htmlmixed" => array($xml, $css, $js, $html),
       );
+
+    // return if no textarea containing class "codemirror"
     $libs = array();
-    foreach($ta as $t) {
-      if(!$t->hasAttribute("class")) continue;
-      foreach(explode(" ", $t->getAttribute("class")) as $c) {
+    $codemirror = false;
+    foreach($content->getElementsByTagName("textarea") as $t) {
+      $classes = explode(" ", $t->getAttribute("class"));
+      if(!in_array("codemirror", $classes)) continue;
+      $codemirror = true;
+      foreach($classes as $c) {
         if(array_key_exists($c, $modes)) {
-          $libs[] = $modes[$c];
+          $libs = array_merge($libs, $modes[$c]);
           break;
         }
       }
     }
-    if(empty($libs)) {
-      $this->subject->detach($this);
-      return $content;
-    }
+
+    // add sources and return
+    if($codemirror) $this->addSources($libs);
+    return $content;
+  }
+
+  private function addSources(Array $libs) {
     $os = Cms::getOutputStrategy();
 
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.css");
@@ -66,6 +63,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/search.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/goto-line.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
     $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
 
@@ -73,12 +71,15 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/selection/mark-selection.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/comment/comment.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
     $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/xml-fold.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/matchtags.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/format/formatting.js");
+    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
+    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
 
     $os->addJsFile($this->pluginDir.'/SyntaxCodeMirror.js', 10, "body");
-
-    return $content;
   }
 
 }

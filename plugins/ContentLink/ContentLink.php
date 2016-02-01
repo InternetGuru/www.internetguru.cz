@@ -15,7 +15,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->isRoot = getCurLink() == "";
     if($this->isRoot) return;
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached("Xhtml11")) return;
+    if($this->detachIfNotAttached("HtmlOutput")) return;
   }
 
   public function getContent(HTMLPlus $c) {
@@ -27,7 +27,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
     $cfg = $this->getDOMPlus();
-    foreach($cfg->documentElement->childElements as $e) {
+    foreach($cfg->documentElement->childElementsArray as $e) {
       if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
       $this->vars[$e->getAttribute("id")] = $e;
     }
@@ -37,9 +37,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     if($this->isRoot) return $c;
 
     $desc = $h1->nextElement;
-    if(!$h1->hasAttribute("ns")) $h1->setAttribute("ns", $h1->getAncestorValue("ns"));
-    if(!strlen($desc->nodeValue)) $desc->nodeValue = $desc->getAncestorValue();
-    if(!$desc->hasAttribute("kw")) $desc->setAttribute("kw", $desc->getAncestorValue("kw"));
+    if(!strlen($desc->nodeValue)) $desc->nodeValue = $desc->getAncestorValue(null, "desc");
+    if(!$desc->hasAttribute("kw")) $desc->setAttribute("kw", $desc->getAncestorValue("kw", "desc"));
 
     $this->handleAttribute($h1, "ctime");
     $this->handleAttribute($h1, "mtime");
@@ -47,11 +46,12 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $this->handleAttribute($h1, "authorid");
     $this->handleAttribute($h1, "resp");
     $this->handleAttribute($h1, "respid");
-    $this->handleAttribute($h1->parentNode, "xml:lang", "lang", Cms::getVariable("cms-lang"));
+    $this->handleAttribute($h1->parentNode, "xml:lang", "lang", true);
 
     $content = new HTMLPlus();
     $content->formatOutput = true;
     $body = $content->appendChild($content->createElement("body"));
+    $body->setAttribute("ns", $cf->documentElement->getAttribute("ns"));
     foreach($h1->parentNode->attributes as $attName => $attNode) {
       $body->setAttributeNode($content->importNode($attNode));
     }
@@ -60,17 +60,15 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     return $content;
   }
 
-  private function handleAttribute(DOMElement $e, $aName, $vName=null, $def=null) {
+  private function handleAttribute(DOMElement $e, $aName, $vName=null, $anyElement=false) {
     if(is_null($vName)) $vName = $aName;
     if($e->hasAttribute($aName)) {
       Cms::setVariable($vName, $e->getAttribute($aName));
       return;
     }
-    $value = $e->getAncestorValue($aName);
-    if(is_null($value)) {
-      if(is_null($def)) return;
-      $value = $def;
-    }
+    $eName = $anyElement ? null : $e->nodeName;
+    $value = $e->getAncestorValue($aName, $eName);
+    if(is_null($value)) return;
     $e->setAttribute($aName, $value);
     if($value == Cms::getVariable("cms-$vName")) return;
     Cms::setVariable($vName, $value);
@@ -78,7 +76,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function setPath(DOMElement $h) {
     while(!is_null($h)) {
-      if($h->hasAttribute("link")) $this->hPath[$h->getAttribute("id")] = $h;
+      if($h->hasAttribute("link")) $this->hPath[$h->getAttribute("link")] = $h;
       $h = $h->parentNode->getPreviousElement("h");
     }
   }
@@ -88,46 +86,43 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $root = $bc->appendChild($bc->createElement("root"));
     $ol = $root->appendChild($bc->createElement("ol"));
     $ol->setAttribute("class", "contentlink-bc");
+    $cmsLang = Cms::getVariable("cms-lang");
+    $ol->setAttribute("lang", $cmsLang);
     $subtitles = array();
+    $lastA = null;
     $a = null;
     $li = null;
     $h = null;
-    $aFirst = null;
-    $hFirst = null;
-    foreach(array_reverse($this->hPath) as $h) {
-      #$h->processVariables(Cms::getAllVariables());
-      $li = $ol->appendChild($bc->createElement("li"));
+    foreach($this->hPath as $link => $h) {
+      $li = $ol->insertBefore($bc->createElement("li"), $ol->firstElement);
+      $lang = $h->getParentValue("xml:lang");
+      if($lang != $cmsLang) $li->setAttribute("lang", $lang);
       $a = $li->appendChild($bc->createElement("a", $h->nodeValue));
-      $a->setAttribute("href", "#".$h->getAttribute("id"));
-      if($h->hasAttribute("title")) $a->setAttribute("title", $h->getAttribute("title"));
+      if(is_null($lastA)) $lastA = $a;
+      if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
+      $a->setAttribute("href", $link);
       if(empty($subtitles)) {
-        $aFirst = $a;
-        $hFirst = $h;
+        if($h->hasAttribute("title")) $a->nodeValue = $h->getAttribute("title");
         $subtitles[] = $h->nodeValue;
-        if(!$this->isRoot && !$h->hasAttribute("title") && $h->hasAttribute("short"))
-          $a->setAttribute("title", $h->getAttribute("short"));
-      } else {
-        $subtitles[] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
-      }
+      } else $subtitles[] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
     }
-    if($h->hasAttribute("short")) $a->nodeValue = $h->getAttribute("short");
     if(array_key_exists("logo", $this->vars)) {
-      if(!is_file(FILES_FOLDER."/".$this->vars["logo"]->nodeValue)) {
-        new Logger(sprintf(_("Logo file %s not found"), $this->vars["logo"]), Logger::LOGGER_WARNING);
-      } else {
-        $o = $bc->createElement("object");
-        $o->setAttribute("data", $this->vars["logo"]->nodeValue);
-        $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
-        $o->nodeValue = $hFirst->nodeValue;
-        $aFirst->nodeValue = null;
-        $aFirst->addClass("logo");
-        $aFirst->appendChild($o);
-        if($this->isRoot && $hFirst->hasAttribute("short"))
-          $aFirst->parentNode->appendChild($bc->createElement("span", $hFirst->getAttribute("short")));
-      }
+      $o = $bc->createElement("object");
+      $o->setAttribute("data", $this->vars["logo"]->nodeValue);
+      if(!$this->vars["logo"]->hasAttribute("type"))
+        Logger::log(_("Element logo missing attribute type"), Logger::LOGGER_WARNING);
+      else $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
+      $o->nodeValue = $h->nodeValue;
+      $a->nodeValue = null;
+      $a->addClass("logo");
+      $a->appendChild($o);
+      if($this->isRoot && $h->hasAttribute("short"))
+        $a->parentNode->appendChild($bc->createElement("span", $h->getAttribute("short")));
     }
+    if(getCurLink(true) != "" && $lastA->getAttribute("href") != getCurLink(true))
+      $lastA->setAttribute("title", $this->vars["reset"]->nodeValue);
     Cms::setVariable("bc", $bc->documentElement);
-    Cms::setVariable("title", implode(" - ", array_reverse($subtitles)));
+    Cms::setVariable("title", implode(" - ", $subtitles));
   }
 
   private function appendUntilSame(DOMElement $e, DOMElement $into) {

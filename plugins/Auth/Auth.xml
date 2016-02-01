@@ -1,9 +1,13 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Auth>
   <!--
-    <url [access="allow"]>controlled url</url>
-    default acces="deny"
-    controlled url: [path][?parname[=parvalue]]
+    Obsah elementu url
+      [cesta][?název_parametru[=hodnota_parametru]]
+
+    Hodnoty atributu access elementu url
+      allow   ... pustí všechny
+      deny    ... pustí jen přihlášené (výchozí, netřeba uvádět)
+      denyall ... pustí jen vlastníka
   -->
   <url>?SubdomManager</url>
   <url>?Admin</url>

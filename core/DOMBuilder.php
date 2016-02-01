@@ -4,19 +4,30 @@
  * Create DOM from XML file and update elements from adm/usr directories.
  * Add by default; empty element to delete all elements with same nodeName.
  * Preserve values with readonly attribute.
- * Elements with attribute domain will be applied only when matched.
  */
 class DOMBuilder {
 
   const DEBUG = false;
-  #const USE_CACHE = true;
   private static $included = array();
   private static $idToLink = array(); // id => closest or self link
-  private static $linkToId = array(); // link => self id
+  private static $linkToDesc = array(); // link => shorted description
+  private static $linkToTitle = array(); // link => self title or shorted content
+  private static $linkToId = array(); // link => id
+  private static $linkToFile = array(); // link => filepath
+  private static $defaultPrefix = null;
+  private static $newestFileMtime = null;
+  private static $newestCacheMtime = null;
+  private static $nginxOutdated = false;
 
-  public static function buildHTMLPlus($filePath, $user=true, $linkPrefix=null) {
+  public static function setCacheMtime() {
+    if(!Cms::isSuperUser()) return;
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    self::$newestCacheMtime = getNewestCacheMtime();
+  }
+
+  public static function buildHTMLPlus($filePath, $user=true) {
     $doc = new HTMLPlus();
-    self::build($doc, $filePath, true, $user, $linkPrefix);
+    self::build($doc, $filePath, true, $user);
     return $doc;
   }
 
@@ -28,14 +39,62 @@ class DOMBuilder {
     return $doc;
   }
 
-  public static function getLink($frag) {
-    if(!array_key_exists($frag, self::$idToLink)) return null;
-    reset(self::$idToLink);
-    if($frag == key(self::$idToLink)) return ROOT_URL;
-    $link = self::$idToLink[$frag];
-    if($link == current(self::$idToLink)) return ROOT_URL."#$frag";
-    if(self::$linkToId[$link] != $frag) $link .= "#$frag";
-    return ROOT_URL.$link;
+  public static function getId($link="") {
+    throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
+  }
+
+  public static function normalizeLink(Array $pUrl) {
+    #var_dump($pUrl);
+    #if(empty($pUrl)) return "";
+    if(empty($pUrl)) return array("path" => "");
+    #if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return "";
+    if(count($pUrl) == 1 && isset($pUrl["path"]) && $pUrl["path"] == self::$defaultPrefix) return array("path" => "");
+    #if(!isset($pUrl["path"])) return null; // no prefix
+    if(!isset($pUrl["path"])) {
+      if(isset($pUrl["fragment"]) && isset(self::$idToLink[self::$defaultPrefix][$pUrl["fragment"]]))
+        $pUrl["path"] = self::$defaultPrefix;
+      else return $pUrl; // no prefix
+    }
+    #var_dump($pUrl);
+    #var_dump(self::$linkToId);
+    #var_dump(self::$idToLink);
+    #if(!isset($pUrl["fragment"])) $pUrl["fragment"] = $pUrl["path"];
+    if(isset($pUrl["fragment"]) && isset(self::$idToLink[$pUrl["path"]][$pUrl["fragment"]])) {
+      if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
+      elseif(strlen(self::$idToLink[$pUrl["path"]][$pUrl["fragment"]])) $pUrl["path"] = $pUrl["path"]."/".self::$idToLink[$pUrl["path"]][$pUrl["fragment"]];
+      if(!isset(self::$linkToId[implodeLink($pUrl)])) unset($pUrl["fragment"]);
+      #return implodeLink($pUrl);
+      return $pUrl;
+    }
+    #if($pUrl["path"] == "") $pUrl["path"] = self::$defaultPrefix;
+    #if(isset(self::$linkToId[implodeLink($pUrl, false)])) return implodeLink($pUrl);
+    if(isset(self::$linkToId[implodeLink($pUrl, false)])) return $pUrl;
+    #if(isset(self::$linkToId[$pUrl["path"]]) && !isset($pUrl["fragment"])) {
+      #if($pUrl["path"] == self::$defaultPrefix) $pUrl["path"] = "";
+      #return implodeLink($pUrl);
+    #}
+    throw new Exception(_("Link not found"));
+  }
+
+  public static function isNginxOutdated() {
+    return self::$nginxOutdated;
+  }
+
+  public static function getDesc($link) {
+    if(array_key_exists($link, self::$linkToDesc)) return self::$linkToDesc[$link];
+    reset(self::$linkToDesc);
+    $link = key(self::$linkToDesc).$link;
+    if(array_key_exists($link, self::$linkToDesc)) return self::$linkToDesc[$link];
+    return null;
+  }
+
+  public static function getTitle($link) {
+    #var_dump(self::$linkToTitle); die();
+    if(array_key_exists($link, self::$linkToTitle)) return self::$linkToTitle[$link];
+    reset(self::$linkToTitle);
+    $link = key(self::$linkToTitle).$link;
+    if(array_key_exists($link, self::$linkToTitle)) return self::$linkToTitle[$link];
+    return null;
   }
 
   public static function getRootHeadingId() {
@@ -43,8 +102,24 @@ class DOMBuilder {
     return key(self::$idToLink);
   }
 
-  public static function getLinks() {
-    return array_keys(self::$linkToId);
+  public static function getLinks($fragments = true) {
+    if($fragments) return array_keys(self::$linkToId);
+    $links = array();
+    foreach(array_keys(self::$linkToId) as $link) {
+      if(strpos($link, "#") === false) $links[] = $link;
+    }
+    return $links;
+  }
+
+  public static function getLink($file) {
+    $k = array_search($file, self::$linkToFile);
+    if($k !== false) return $k;
+    return null;
+  }
+
+  public static function getFile($link) {
+    if(array_key_exists($link, self::$linkToFile)) return self::$linkToFile[$link];
+    return null;
   }
 
   public static function isLink($link) {
@@ -53,7 +128,7 @@ class DOMBuilder {
 
   private static function globalReadonly(DOMDocumentPlus $doc) {
     $nodes = array();
-    foreach($doc->documentElement->childElements as $n) {
+    foreach($doc->documentElement->childElementsArray as $n) {
       if($n->nodeValue == "" && $n->hasAttribute("readonly")) $nodes[] = $n;
     }
     foreach($nodes as $n) {
@@ -64,24 +139,17 @@ class DOMBuilder {
     }
   }
 
-  private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user, $linkPrefix) {
-    /*
-    $dc = new DOMCache(hash(FILE_HASH_ALGO, "$fileName, $replace, $user"));
-    if($dc->isValid()) return $dc->getCache();
-    $dc->addSurceFile($fileName);
-    $dc->addSurceFile(ADMIN_FOLDER."/$fileName");
-    $dc->addSurceFile(USER_FOLDER."/$fileName");
-    */
+  private static function build(DOMDocumentPlus $doc, $fileName, $replace, $user) {
     if(self::DEBUG) $doc->formatOutput = true;
 
     if($replace) {
-      self::safeLoadDOM($fileName, $doc, $user, true, $linkPrefix);
+      self::safeLoadDOM($fileName, $doc, $user, true);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
       return;
     }
 
     $f = findFile($fileName, false, false);
-    if($f) {
+    if(!is_null($f)) {
       self::loadDOM($f, $doc);
       if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
     }
@@ -91,7 +159,7 @@ class DOMBuilder {
       if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
         self::updateDOM($doc, $f, true);
     } catch(Exception $e) {
-      new Logger(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      Logger::log(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
@@ -102,18 +170,18 @@ class DOMBuilder {
       if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
         self::updateDOM($doc, $f);
     } catch(Exception $e) {
-      new Logger(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      Logger::log(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
   }
 
   private static function findFile($fileName, $user=true, $admin=true) {
     $f = findFile($fileName, $user, $admin);
-    if($f === false) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
+    if(is_null($f)) throw new Exception(sprintf(_("File '%s' not found"), $fileName));
     return $f;
   }
 
-  private static function safeLoadDOM($filePath, DOMDocumentPlus $doc, $user, $admin, $linkPrefix) {
+  private static function safeLoadDOM($filePath, DOMDocumentPlus $doc, $user, $admin) {
     $files = array();
     try {
       $files[self::findFile($filePath, $user, $admin)] = null;
@@ -127,9 +195,9 @@ class DOMBuilder {
     foreach($files as $f => $void) {
       if(file_exists(dirname($f)."/.".basename($f))) continue;
       try {
-        self::loadDOM($f, $doc, null, $linkPrefix);
+        self::loadDOM($f, $doc, null);
       } catch(Exception $e) {
-        new Logger(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()), Logger::LOGGER_ERROR);
+        Logger::log(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()), Logger::LOGGER_ERROR);
         continue;
       }
       $success = true;
@@ -137,96 +205,232 @@ class DOMBuilder {
     }
     if($success) return;
     $doc = null;
-    if(!is_null($e))
-      throw new Exception(sprintf(_("Failed to load user/admin/default file %s"), basename($filePath)));
+    if(!is_null($e)) throw new Exception(sprintf(_("Failed to load user/admin/default file %s: %s"),
+      basename($filePath), $e->getMessage()));
   }
 
-  private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $linkPrefix=null) {
-    $remove = array("?".USER_FOLDER."/", "?".ADMIN_FOLDER."/", "?".CMS_FOLDER."/");
-    $fShort = str_replace($remove, array(), "?$filePath");
-    if($doc instanceof HTMLPlus) {
-      if(array_key_exists(realpath($filePath), self::$included))
-        throw new Exception(sprintf(_("File '%s' already included"), $fShort));
-      self::$included[realpath($filePath)] = null;
-      Cms::addVariableItem("html", $fShort);
-    }
+  private static function loadDOM($filePath, DOMDocumentPlus $doc, $author=null, $included=false) {
     if(is_file(dirname($filePath)."/.".basename($filePath)))
       throw new Exception(sprintf(_("File disabled")));
+    if($doc instanceof HTMLPlus)
+      $mTime = self::loadHTMLPlusDOM($filePath, $doc, $author, $included);
+    else $mTime = self::loadXMLDOM($filePath, $doc);
+    #Cms::addMessage($filePath, Cms::MSG_INFO);
+    if(self::$nginxOutdated) return;
+    if($mTime > self::$newestFileMtime) self::$newestFileMtime = $mTime;
+    if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
+    Cms::addMessage(_("Outdated server cache"), Cms::MSG_WARNING);
+    self::$nginxOutdated = true;
+  }
+
+  private static function loadXMLDOM($filePath, DOMDocumentPlus $doc) {
+    $fShort = stripDataFolder($filePath);
+    #todo: Cms::addVariableItem(file_extension, $fShort);
+    #Cms::addVariableItem("html", $fShort);
+    $cacheKey = apc_get_key($filePath);
+    $fInfo = self::getCache($cacheKey, $filePath);
+    if(!is_null($fInfo)) {
+      $doc->loadXML($fInfo["xml"]);
+      return $fInfo["mtime"];
+    }
+    if(!@$doc->load($filePath))
+      throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
+    $mTime = filemtime($filePath);
+    $fInfo = array(
+      "mtime" => $mTime,
+      "xml" => $doc->saveXML()
+    );
+    apc_store_cache($cacheKey, $fInfo, stripDataFolder($filePath));
+    return $mTime;
+  }
+
+  private static function loadHTMLPlusDOM($filePath, DOMDocumentPlus $doc, $author=null, $included=false) {
+    $fShort = stripDataFolder($filePath);
+    if(array_key_exists($filePath, self::$included))
+      throw new Exception(sprintf(_("File '%s' already included"), $fShort));
+    self::$included[$filePath] = null;
+    Cms::addVariableItem("html", $fShort);
+    $cacheKey = apc_get_key($filePath);
+    $fInfo = self::getCache($cacheKey, $filePath);
+    if(!is_null($fInfo)) {
+      if(is_null(self::$defaultPrefix)) self::$defaultPrefix = $fInfo["prefix"];
+      foreach($fInfo["includes"] as $file => $mtime) {
+        self::$included[$file] = null;
+        Cms::addVariableItem("html", stripDataFolder($file));
+      }
+      $doc->loadXML($fInfo["xml"]);
+      self::$idToLink[$fInfo["prefix"]] = $fInfo["idtolink"];
+      self::$linkToId = array_merge(self::$linkToId, $fInfo["linktoid"]);
+      self::$linkToDesc = array_merge(self::$linkToDesc, $fInfo["linktodesc"]);
+      self::$linkToTitle = array_merge(self::$linkToTitle, $fInfo["linktotitle"]);
+      self::$linkToFile = array_merge(self::$linkToFile, $fInfo["linktofile"]);
+      return $fInfo["mtime"];
+    }
 
     // load
     if(!@$doc->load($filePath))
-      throw new Exception(sprintf(_("Invalid XML file %s"), $fShort));
-    if(!($doc instanceof HTMLPlus)) return;
-
+      throw new Exception(sprintf(_("Invalid HTMLPlus file %s"), $fShort));
     // validate, save if repaired
     $c = new DateTime();
     $c->setTimeStamp(filectime($filePath));
     $doc->defaultCtime = $c->format(DateTime::W3C);
     $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
     $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
-    if(!is_null($linkPrefix)) self::prefixLinks($linkPrefix, $doc);
+    $storeCache = true;
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
       $doc->validatePlus(true);
-      if(strpos($filePath, CMS_FOLDER) !== 0) {
-        #if(!safeRewrite($doc->saveXML(), $filePath))
-        #  throw new Exception(sprintf(_("Unable to save autocorrected file: %s"), $e->getMessage()));
-        new Logger(sprintf(_("HTML+ file %s autocorrected: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
+      $storeCache = false;
+      foreach($doc->getErrors() as $error) {
+        Cms::addMessage($error, $doc->getStatus());
       }
     }
     // generate ctime/mtime from file if not set
-    self::setMtime($doc, $filePath);
-    try {
-      // register links/ids; repair if duplicit
-      self::registerKeys($doc);
-    } catch(Exception $e) {
-      new Logger(sprintf(_("Duplicit id/link found in %s: %s"), $fShort, $e->getMessage()), Logger::LOGGER_WARNING);
-    }
+    $mTime = filemtime($filePath);
+    self::setMtime($doc, $mTime);
+
     // HTML+ include
-    self::insertIncludes($doc, $filePath);
-    #print_r(self::$idToLink);
-    #print_r(self::$linkToId);
+    $inclDom = array();
+    $inclSrc = array();
+    foreach($doc->getElementsByTagName("include") as $include) $inclDom[] = $include;
+    $offId = count(self::$linkToId);
+    $offDesc = count(self::$linkToDesc);
+    $offTitle = count(self::$linkToTitle);
+    $offFile = count(self::$linkToFile);
+    $toStrip = array();
+    if(self::insertIncludes($inclDom, dirname($filePath))) {
+      foreach($inclDom as $include) {
+        $inclPath = dirname($filePath)."/".$include->getAttribute("src");
+        $inclSrc[$inclPath] = filemtime($inclPath);
+        $toStrip[] = $include;
+      }
+    } else $storeCache = false;
+    // register links/ids; repair if duplicit
+    if($included) return $mTime;
+    if(!self::setIdentifiers($doc, $filePath, $fShort)) $storeCache = false;
+    foreach($toStrip as $include) $include->stripTag();
+    #var_dump(self::$idToLink);
+    #var_dump(self::$linkToFile);
+    #var_dump(self::$linkToId);
+    #var_dump(self::$linkToDesc);
+    #var_dump(self::$linkToTitle);
+    if(!$storeCache) return $mTime;
+    $fInfo = array(
+      "mtime" => $mTime,
+      "includes" => $inclSrc,
+      "idtolink" => end(self::$idToLink),
+      "prefix" => key(self::$idToLink),
+      "linktoid" => array_slice(self::$linkToId, $offId, null, true),
+      "linktofile" => array_slice(self::$linkToFile, $offFile, null, true),
+      "linktodesc" => array_slice(self::$linkToDesc, $offDesc, null, true),
+      "linktotitle" => array_slice(self::$linkToTitle, $offTitle, null, true),
+      "xml" => $doc->saveXML()
+    );
+    apc_store_cache($cacheKey, $fInfo, stripDataFolder($filePath));
+    return $mTime;
   }
 
-  private static function prefixLinks($prefix, HTMLPlus $doc) {
-    foreach($doc->getElementsByTagName("h") as $h) {
-      if(!$h->hasAttribute("link")) continue;
-      $h->setAttribute("link", "$prefix/".$h->getAttribute("link"));
+  private static function getCache($cacheKey, $filePath) {
+    if(!apc_exists($cacheKey)) return null;
+    $fInfo = apc_fetch($cacheKey);
+    if($fInfo["mtime"] != filemtime($filePath)) return null;
+    if(!array_key_exists("includes", $fInfo)) return $fInfo;
+    foreach($fInfo["includes"] as $file => $mtime) {
+      if($mtime != filemtime($file)) return null;
+      if(isset(self::$included[$file])) return null;
+    }
+    return $fInfo;
+  }
+
+  private static function setIdentifiers(HTMLPlus $doc, $filePath, $fShort) {
+    $storeCache = true;
+    $h1 = $doc->documentElement->firstElement;
+    $prefix = trim($h1->getAttribute("link"), "/");
+    #if(empty(self::$idToLink)) $prefix = "";
+    if(array_key_exists($prefix, self::$idToLink)) {
+      $prefix = self::generateUniqueVal($prefix, self::$idToLink);
+      Logger::log(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
+        $fShort, $prefix), Logger::LOGGER_WARNING);
+      $h1->setAttribute("link", $prefix);
+      $storeCache = false;
+    }
+    self::$idToLink[$prefix] = array();
+    #self::$linkToId[$prefix] = array();
+    if(!self::registerKeys($doc, $prefix, $filePath)) $storeCache = false;
+    self::addLocalPrefix($doc, $prefix, "a", "href");
+    self::addLocalPrefix($doc, $prefix, "form", "action");
+    #var_dump(self::$idToLink); var_dump(self::$linkToId);
+    return $storeCache;
+  }
+
+  private static function addLocalPrefix(HTMLPlus $doc, $prefix, $eName, $aName) {
+    foreach($doc->getElementsByTagName($eName) as $e) {
+      if(!$e->hasAttribute($aName)) continue;
+      $pLink = parseLocalLink($e->getAttribute($aName));
+      if(is_null($pLink)) continue; // link is external
+      if(isset($pLink["path"]) && strlen($pLink["path"])) {
+        if(!isset(self::$linkToId[$prefix."/".$pLink["path"]])) continue;
+        $pLink["path"] = $prefix."/".$pLink["path"];
+      } elseif(isset($pLink["fragment"])) {
+        if(!isset(self::$linkToId[$prefix."#".$pLink["fragment"]])) continue;
+        $pLink["path"] = $prefix;
+      } else continue;
+      $e->setAttribute($aName, implodeLink($pLink));
+      #var_dump(implodeLink($pLink));
     }
   }
 
-  private static function registerKeys(HTMLPlus $doc) {
-    $duplicit = array();
-    foreach(self::getIdentifiers($doc) as $e) {
+  private static function registerKeys(HTMLPlus $doc, $prefix, $filePath) {
+    $newLinks = array();
+    $storeCache = true;
+    if(empty(self::$linkToId)) self::$defaultPrefix = $prefix;
+    $xpath = new DOMXPath($doc);
+    foreach($xpath->query("//*[@id]") as $e) {
       $id = $e->getAttribute("id");
-      if(array_key_exists($id, self::$idToLink)) {
-        $duplicit[] = $id;
-        $id = self::generateUniqueVal($id, self::$idToLink);
-        $e->setAttribute("id", $id);
-      }
       if($e->hasAttribute("link")) {
-        $link = $e->getAttribute("link");
-        if(array_key_exists($link, self::$linkToId)) {
-          $duplicit[] = $link;
-          $link = self::generateUniqueVal($link, self::$linkToId);
-          $e->setAttribute("link", $link);
-        }
-        self::$linkToId[$link] = $id;
+        $link = ($e->getAttribute("link") != $prefix ? $e->getAttribute("link") : "");
+        $linkId = self::getLinkFull($prefix, $e->getAttribute("link"), null);
+        $newLinks[$linkId] = $e;
       } else {
         $link = $e->getAncestorValue("link", "h");
+        if($link == $prefix) $link = "";
+        $linkId = self::getLinkFull($prefix, $link, $id);
       }
-      self::$idToLink[$id] = $link;
+      $curFilePath = $e->getParentValue("src", "include");
+      if(empty(self::$linkToId)) $linkId = "";
+      if(array_key_exists($linkId, self::$linkToId)) {
+        Logger::log(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
+        $storeCache = false;
+        continue;
+      }
+      self::$idToLink[$prefix][$id] = $link;
+      self::$linkToId[$linkId] = $id;
+      self::$linkToFile[$linkId] = is_null($curFilePath) ? $filePath : dirname($filePath)."/$curFilePath";
+      #self::$idToLink[$prefix][$id] = $pLink;
+      if($e->nodeName == "h") {
+        $desc = getShortString($e->nextElement->nodeValue);
+        if(strlen($desc)) self::$linkToDesc[$linkId] = $desc;
+      }
+      if(strlen($e->getAttribute("title")))
+        self::$linkToTitle[$linkId] = $e->getAttribute("title");
+      else
+        self::$linkToTitle[$linkId] = getShortString($e->nodeValue);
     }
-    if(empty($duplicit)) return;
-    throw new Exception(implode(", ", $duplicit));
+    foreach($newLinks as $link => $e) {
+      #if(!strlen($link)) $link = self::$defaultPrefix;
+      $e->setAttribute("link", $link);
+    }
+    return $storeCache;
+    #var_dump($link);
   }
 
-  private static function getIdentifiers(HTMLPlus $doc) {
-    $ids = array();
-    $xpath = new DOMXPath($doc);
-    foreach($xpath->query("//*[@id]") as $e) $ids[] = $e;
-    return $ids;
+  private static function getLinkFull($prefix, $link, $frag) {
+    $linkId = array();
+    if($prefix != self::$defaultPrefix) $linkId[] = $prefix;
+    if($link != $prefix && strlen($link)) $linkId[] = $link;
+    if(empty($linkId) && !strlen($frag)) $linkId[] = self::$defaultPrefix;
+    return implode("/", $linkId).(strlen($frag) ? "#$frag" : "");
   }
 
   private static function generateUniqueVal($val, Array $reg) {
@@ -235,37 +439,29 @@ class DOMBuilder {
     return $val.$i;
   }
 
-  private static function setMtime(HTMLPlus $doc, $filePath) {
+  private static function setMtime(HTMLPlus $doc, $mTime) {
     $h = $doc->documentElement->firstElement;
     if($h->hasAttribute("mtime")) return;
     if(!$h->hasAttribute("ctime")) return;
     $m = new DateTime();
-    $m->setTimeStamp(filemtime($filePath));
+    $m->setTimeStamp($mTime);
     $c = new DateTime($h->getAttribute("ctime"));
     if($c > $m) return;
     $h->setAttribute("mtime", $m->format(DateTime::W3C));
   }
 
-  private static function insertIncludes(HTMLPlus $doc, $filePath) {
-    $includes = array();
-    foreach($doc->getElementsByTagName("include") as $include) $includes[] = $include;
-    if(!count($includes)) return;
-    $start_time = microtime(true);
-    $toStripElement = array();
-    $toStripTag = array();
+  private static function insertIncludes(Array $includes, $homeDir) {
+    $success = true;
     foreach($includes as $include) {
       try {
-        self::insertHtmlPlus($include, dirname($filePath));
-        $toStripElement[] = $include;
+        self::insertHtmlPlus($include, $homeDir);
       } catch(Exception $e) {
-        $toStripTag[] = $include;
-        new Logger($e->getMessage(), Logger::LOGGER_ERROR);
+        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+        $success = false;
+        $include->stripTag();
       }
     }
-    foreach($toStripTag as $include) $include->stripTag();
-    foreach($toStripElement as $include) $include->stripElement();
-    new Logger(sprintf(_("Inserted %s of %s HTML+ file(s)"),
-      count($toStripElement), count($includes)), null, $start_time);
+    return $success;
   }
 
   private static function insertHtmlPlus(DOMElement $include, $homeDir) {
@@ -282,7 +478,7 @@ class DOMBuilder {
     try {
       $doc = new HTMLPlus();
       $author = $include->getAncestorValue("author", "h");
-      self::loadDOM("$homeDir/$val", $doc, $author);
+      self::loadDOM("$homeDir/$val", $doc, $author, true);
     } catch(Exception $e) {
       $msg = sprintf(_("Unable to import '%s': %s"), $val, $e->getMessage());
       $c = new DOMComment(" $msg ");
@@ -292,19 +488,20 @@ class DOMBuilder {
     $sectLang = self::getSectionLang($include->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      new Logger(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
+      Logger::log(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
         $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
     $impAuthor = $doc->documentElement->firstElement->getAttribute("author");
     if($impAuthor == $author)
       $doc->documentElement->firstElement->removeAttribute("author"); // prevent "creation" info
-    foreach($doc->documentElement->childElements as $n) {
-      $include->parentNode->insertBefore($include->ownerDocument->importNode($n, true), $include);
+    $include->removeChildNodes();
+    foreach($doc->documentElement->childElementsArray as $n) {
+      $include->appendChild($include->ownerDocument->importNode($n, true));
     }
     try {
       $include->ownerDocument->validatePlus();
     } catch(Exception $e) {
       $include->ownerDocument->validatePlus(true);
-      new Logger(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
+      Logger::log(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
     }
   }
 
@@ -325,12 +522,13 @@ class DOMBuilder {
    */
   private static function updateDOM(DOMDocumentPlus $doc, $filePath, $ignoreReadonly=false) {
     $newDoc = new DOMDocumentPlus();
+    $docId = null;
     self::loadDOM($filePath, $newDoc);
     // create root element if not exists
     if(is_null($doc->documentElement)) {
       $doc->appendChild($doc->importNode($newDoc->documentElement));
     }
-    foreach($newDoc->documentElement->childElements as $n) {
+    foreach($newDoc->documentElement->childElementsArray as $n) {
       // if empty && readonly => user cannot modify
       foreach($doc->getElementsByTagName($n->nodeName) as $d) {
         if(!$ignoreReadonly && $d->hasAttribute("readonly") && $d->nodeValue == "") return;
@@ -338,7 +536,7 @@ class DOMBuilder {
       if(!$n instanceof DOMElement) continue;
       if(self::doRemove($n)) {
         $remove = array();
-        foreach($doc->documentElement->childElements as $d) {
+        foreach($doc->documentElement->childElementsArray as $d) {
           if($d->nodeName != $n->nodeName) continue;
           if($d->hasAttribute("modifyonly")) continue;
           if($ignoreReadonly || !$d->hasAttribute("readonly")) $remove[] = $d;
@@ -349,11 +547,12 @@ class DOMBuilder {
         #}
         foreach($remove as $d) $d->parentNode->removeChild($d);
       } elseif($n->hasAttribute("id")) {
-        $sameIdElement = $doc->getElementById($n->getAttribute("id"));
-        if(is_null($sameIdElement)) {
+        if(is_null($docId)) $docId = self::getIds($doc);
+        if(!array_key_exists($n->getAttribute("id"), $docId)) {
           $doc->documentElement->appendChild($doc->importNode($n, true));
           continue;
         }
+        $sameIdElement = $docId[$n->getAttribute("id")];
         if($sameIdElement->nodeName != $n->nodeName)
           throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $n->getAttribute("id"), $n->nodeName));
         if(!$ignoreReadonly && $sameIdElement->hasAttribute("readonly")) continue;
@@ -362,6 +561,15 @@ class DOMBuilder {
         $doc->documentElement->appendChild($doc->importNode($n, true));
       }
     }
+  }
+
+  private static function getIds(DOMDocumentPlus $doc) {
+    $ids = array();
+    foreach($doc->documentElement->childElementsArray as $n) {
+      if(!$n->hasAttribute("id")) continue;
+      $ids[$n->getAttribute("id")] = $n;
+    }
+    return $ids;
   }
 
   private static function doRemove(DOMElement $n) {

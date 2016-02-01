@@ -1,38 +1,48 @@
-<?xml version="1.0" encoding="utf-8" ?>
 <UrlHandler>
 
   <!--
-    ATTRIBUTES
-    - link
-    - parName
-    - parValue
-    - code = "permanent" (default is "temporary")
-
-    DESTINATION (element content)
-    - path part
-     - if keeps current path if empty
-     - / goes to root
-    - parameter name
-    - parameter value
-     - keeps current parameter value if empty
+    Adresy běžící na https (prázné pro celý web)
   -->
 
-  <var link="login">/</var>
-  <var link="Admin">/?Admin</var>
-  <var link="admin">/?Admin</var>
-  <var link="log">/?LogViewer=log</var>
-  <var link="ver">/?LogViewer=ver</var>
-  <var link="import">/?Convertor</var>
-  <var link="subdom">/?SubdomManager</var>
+  <https>?login</https>
 
-  <var parName="ver" parValue="">?LogViewer=ver</var>
-  <var parName="log" parValue="">?LogViewer=log</var>
 
-  <var parName="login">/</var>
-  <var parName="admin">?Admin</var>
-  <var parName="log">?LogViewer</var>
-  <var parName="ver">?LogViewer</var>
-  <var parName="import">?Convertor</var>
-  <var parName="subdom">/?SubdomManager</var>
+  <!--
+    ATRIBUTY elementu redir
+    - link     ... cesta
+    - parName  ... název parametru
+    - parValue ... hodnota parametru
+
+    CÍLOVÁ ADRESA (obsah elementu redir)
+      / nebo ""     ... domovská stránka
+      bez cesty     ... zachová aktuální cestu, např. "?Admin"
+      prázdná cesta ... smaže aktuální cestu, např. "/?Admin"
+      bez parametru ... zachová aktuální parametry, např. "/"
+      prázdný param ... smaže aktuální parametry, např. "/?"
+  -->
+
+  <redir link="login">?login</redir>
+  <redir link="Login">?login</redir>
+  <redir link="Admin">/?Admin</redir>
+  <redir link="admin">/?Admin</redir>
+  <redir link="log">/?LogViewer=log</redir>
+  <redir link="ver">/?LogViewer=ver</redir>
+  <redir link="import">/?Convertor</redir>
+  <redir link="subdom">/?SubdomManager</redir>
+
+  <redir parName="ver" parValue="">?LogViewer=ver</redir>
+  <redir parName="log" parValue="">?LogViewer=log</redir>
+
+  <redir parName="PageSpeed" parValue="">/</redir>
+  <redir parName="Debug" parValue="">/</redir>
+  <redir parName="Cache" parValue="">/</redir>
+
+  <redir parName="Login">?login</redir>
+  <redir parName="admin">?Admin</redir>
+  <redir parName="log">?LogViewer=log</redir>
+  <redir parName="ver">?LogViewer=ver</redir>
+  <redir parName="import">?Convertor</redir>
+  <redir parName="subdom">?SubdomManager</redir>
 
 </UrlHandler>
+
