@@ -21,18 +21,18 @@
 
   -->
   <html id="ul" wrapper="ul">
-    <item><li><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li></item>
+    <item><li><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li></item>
   </html>
   <html id="dl" wrapper="dl">
     <item>
-      <dt><em var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
+      <dt><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
       <dd>Poslední změna: <strong fn="inputvar-dateformat" var="mtime">n/a</strong></dd>
       <dd>Klíčová slova: <em var="kw">n/a</em></dd>
       <dd var="desc">n/a</dd>
     </item>
   </html>
   <html id="dd" sort="mtime">
-    <item><dd><em var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd></item>
+    <item><dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd></item>
   </html>
 
   <!--
