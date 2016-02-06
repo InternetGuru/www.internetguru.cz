@@ -1,5 +1,5 @@
 # VERSION
-BASHRC="IG .bashrc, ver. 1.1.1 (version)"
+BASHRC="IG .bashrc, ver. 1.1.2 (version)"
 echo $BASHRC
 
 # Normal Colors
@@ -77,35 +77,28 @@ function gitchanges {
 
 # GIT merge current branch into appropriate branche/s
 function gm {
-  CURBRANCH=$(gcb)
-  [[ $? != 0 ]] && return $?
-  gitchanges
-  [[ $? != 0 ]] && return $?
+  CURBRANCH=$(gcb) || return $?
+  gitchanges || return $?
   CURVER=$(cat $VERSION)
-  MAJOR=$(echo $CURVER | cut -d"." -f1)
   MASTER=$(echo $CURVER | cut -d"." -f1,2)
-  CB=${CURBRANCH%-*}
-  case $CB in
+  case ${CURBRANCH%-*} in
     dev|master|$MASTER)
       echo "Branch '$CURBRANCH' shall not be merged (use gvi)" && return 1 ;;
     hotfix)
-      confirm "Merge branch '$CURBRANCH' into $MASTER?" \
-      && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag -a $CURVER \
-      && confirm "Merge branch '$MASTER' into master?" \
-      && git checkout master && git merge $MASTER ;;
+      TAG=$CURVER ;;
     release)
-      confirm "Merge branch '$CURBRANCH' into $MASTER?" \
-      && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag -a $MASTER \
-      && confirm "Merge branch '$MASTER' into master?" \
-      && git checkout master && git merge $MASTER ;;
+      TAG=$MASTER ;;
     *)
       COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r")
       vim -c "s/^/$COMMITS/" -c "nohl" +1 $CHANGELOG
       git commit -am "Version history updated"
   esac
-  confirm "Merge branch '$CURBRANCH' into dev?" \
-  && git checkout dev && git merge --no-ff $CURBRANCH \
-  && confirm "Delete branch '$CURBRANCH'?" && git branch -d $CURBRANCH
+  git checkout dev && git merge --no-ff $CURBRANCH || return $?
+  [[ -n $TAG ]] && confirm "Merge branch '$CURBRANCH' into $MASTER?" \
+    && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag -a $TAG \
+    && confirm "Merge branch '$MASTER' into master?" \
+    && git checkout master && git merge $MASTER
+  confirm "Delete branch '$CURBRANCH'?" && git branch -d $CURBRANCH
 }
 
 # GIT version increment
