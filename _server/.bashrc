@@ -166,6 +166,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias ll='ls -lah'
 alias less='less -rSX'
+alias cpr='cp -pr' # copy dir, preserve mode, ownership, timestamps
 alias cms='cd "$CMS_FOLDER"'
 alias sshcms='ssh cms@31.31.75.247'
 #alias sshcms='ssh -i ~/.ssh/id_rsa cms@31.31.75.247'
