@@ -246,7 +246,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function isImage($ext) {
-    return in_array($ext, array("jpg", "png", "gif", "jpeg"));
+    return in_array(strtolower($ext), array("jpg", "png", "gif", "jpeg"));
   }
 
   private static function handleImage($src, $dest, $mode) {
