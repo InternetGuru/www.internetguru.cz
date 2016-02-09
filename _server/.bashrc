@@ -95,7 +95,7 @@ function gm {
   esac
   git checkout dev && git merge --no-ff $CURBRANCH || return $?
   [[ -n $TAG ]] && confirm "Merge branch '$CURBRANCH' into $MASTER?" \
-    && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag -a $TAG \
+    && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag $TAG \
     && confirm "Merge branch '$MASTER' into master?" \
     && git checkout master && git merge $MASTER
   confirm "Delete branch '$CURBRANCH'?" && git branch -d $CURBRANCH
