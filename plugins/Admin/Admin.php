@@ -43,6 +43,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       $subject->detach($this);
       return;
     }
+    $this->requireActiveCms();
     try {
       $this->process();
     } catch (Exception $e) {

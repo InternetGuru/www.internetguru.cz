@@ -15,6 +15,10 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   public function update(SplSubject $subject) {
+    if(!Cms::isActive()) {
+      $subject->detach($this);
+      return;
+    }
     switch($subject->getStatus()) {
       case STATUS_INIT:
       $this->build();

@@ -26,6 +26,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $subject->detach($this);
       return;
     }
+    $this->requireActiveCms();
     try {
       if(strlen($_GET[get_class($this)]))
         $this->processImport($_GET[get_class($this)]);

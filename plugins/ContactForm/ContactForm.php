@@ -22,6 +22,10 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function update(SplSubject $subject) {
+    if(!Cms::isActive()) {
+      $subject->detach($this);
+      return;
+    }
     if($this->detachIfNotAttached("HtmlOutput")) return;
     if($this->detachIfNotAttached("ValidateForm")) return;
     switch($subject->getStatus()) {

@@ -3,6 +3,21 @@ try {
 
   include("init.php");
 
+  if(!Cms::isActive()) {
+    $error = null;
+    $errno = 0;
+    if (!empty($_POST)) {
+      $error = "POST";
+      $errno = 405;
+    }
+    if(is_null(Cms::getLoggedUser())) {
+      $error = "Login";
+      $errno = 403;
+    }
+    if(!is_null($error))
+      throw new Exception(sprintf(_("%s disallowed on inactve CMS version"), $error), $errno);
+  }
+
   // prevent unauthorized no-cached requests
   if(is_null(Cms::getLoggedUser()) && isset($_COOKIE[session_name()])) {
     $params = session_get_cookie_params();
