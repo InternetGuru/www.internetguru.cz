@@ -20,13 +20,13 @@ try {
       exit;
     }
     if(strpos($f, "VERSION.") === 0) { // eg. VERSION.1.0
-      $cmsVersion = substr($f, 8).".php";
+      $cmsVersion = substr($f, 8);
     }
     if(!preg_match("/^\d+\.\d+\.php$/", $f)) continue;
     if(version_compare(substr($cmsIndex, 0, -4), substr($f, 0, -4)) > 0) continue;
     $cmsIndex = $f;
   }
-  if(!is_null($cmsVersion) && is_file($cmsVersion)) $cmsIndex = $cmsVersion;
+  if(!is_null($cmsVersion)) $cmsIndex = "/var/www/cms/$cmsVersion/index.php";
 
   // else throw
   if(!is_file($cmsIndex)) throw new Exception("Unable to find stable CMS version");
