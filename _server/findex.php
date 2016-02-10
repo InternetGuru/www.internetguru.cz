@@ -23,7 +23,7 @@ try {
   }
   if(is_null($cmsVersion)) throw new Exception("Unable to detect version");
 
-  $cmsFindex = dirname(readlink("$cmsVersion.php"))."/findex.php";
+  $cmsFindex = "/var/www/cms/$cmsVersion/findex.php";
   if(!is_file($cmsFindex)) {
     header("Location: /index.php?q=$query");
     exit;
