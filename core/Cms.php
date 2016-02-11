@@ -166,7 +166,7 @@ class Cms {
 
   public static function isActive() {
     if(IS_LOCALHOST) return true;
-    return file_exists(CMS_RELEASE);
+    return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
   }
 
   public static function contentProcessVariables() {

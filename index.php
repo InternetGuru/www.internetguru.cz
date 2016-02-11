@@ -15,7 +15,7 @@ try {
       $errno = 403;
     }
     if(!is_null($error))
-      throw new Exception(sprintf(_("%s disallowed on inactve CMS version"), $error), $errno);
+      new ErrorPage(sprintf(_("%s disallowed on inactve CMS version"), $error), $errno);
   }
 
   // prevent unauthorized no-cached requests

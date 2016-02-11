@@ -27,8 +27,8 @@ class Plugin {
   }
 
   protected function requireActiveCms() {
-    if(!Cms::isActive())
-      throw new Exception(sprintf(_("Active CMS version required for plugin %s"), get_class($this)), 403);
+    if(Cms::isActive()) return;
+    new ErrorPage(sprintf(_("Active CMS version required for plugin %s"), get_class($this)), 403);
   }
 
   protected function getHTMLPlus($filePath=null, $user=true) {
