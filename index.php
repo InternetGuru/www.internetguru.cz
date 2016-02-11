@@ -10,7 +10,7 @@ try {
       $error = "POST";
       $errno = 405;
     }
-    if(is_null(Cms::getLoggedUser())) {
+    if(!is_null(Cms::getLoggedUser())) {
       $error = "Login";
       $errno = 403;
     }
