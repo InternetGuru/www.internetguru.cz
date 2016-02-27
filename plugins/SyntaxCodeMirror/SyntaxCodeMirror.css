@@ -103,7 +103,7 @@ ul.codemirror-user-controll li {
 }
 
 ul.codemirror-user-controll li button,
-ul.codemirror-user-controll li a {
+ul.codemirror-user-controll li a[href] {
     padding: 0.5em 0.8em;
     background-color: transparent;
     border: 0;
