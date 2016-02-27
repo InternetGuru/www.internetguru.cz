@@ -1,6 +1,9 @@
 (function(win){
 
   var Config = {};
+  Config.help = "?";
+  Config.helpTitle = "Klávesové zkratky";
+  Config.helpHref = "https://dokumenty.internetguru.cz/zkratky";
   Config.appDisable = "×";
   Config.appDisableTitle = "Deaktivovat CodeMirror (F4)";
   Config.appEnable = "Aktivovat CodeMirror";
@@ -26,10 +29,16 @@
     visible = true,
     active = true,
     activateUl = null,
-    appendButton = function(text, ul) {
+    appendButton = function(text, ul, href) {
       var li = document.createElement("li");
       ul.appendChild(li);
-      var b = document.createElement("button");
+      var b;
+      if(typeof href == "undefined") {
+        b = document.createElement("button");
+      } else {
+        b = document.createElement("a");
+        b.href = href;
+      }
       li.appendChild(b);
       b.type = "button";
       b.textContent = text;
@@ -194,6 +203,8 @@
       replaceButton.title = Config.replaceTitle;
       formatButton = appendButton(Config.format, ul);
       formatButton.title = Config.formatTitle;
+      helpButton = appendButton(Config.help, ul, Config.helpHref);
+      helpButton.title = Config.helpTitle;
       fullScreenButton = appendButton(Config.fullscreenEnable, ul);
       fullScreenButton.title = Config.fullScreenEnableTitle;
       disableButton = appendButton(Config.appDisable, ul);
