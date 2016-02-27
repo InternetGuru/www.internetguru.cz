@@ -291,6 +291,7 @@ function initLinks() {
 }
 
 function update_file($src, $dest, $hash=false) {
+  if(is_link($dest)) return false;
   if(!is_file($src)) throw new Exception("Source file not found");
   if(is_file($dest)) {
     if($hash && getFileHash($src) == getFileHash($dest)) return false;
