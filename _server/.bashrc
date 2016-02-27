@@ -1,5 +1,5 @@
 # VERSION
-BASHRC="IG .bashrc, ver. 1.1.2 (version)"
+BASHRC="IG .bashrc, ver. 1.1.3 (version)"
 echo $BASHRC
 
 # Normal Colors
@@ -89,7 +89,9 @@ function gm {
     release)
       TAG=$MASTER ;;
     *)
+      git rebase dev || return $?
       COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r")
+      COMMITS="${COMMITS/\//\\\/}"
       vim -c "s/^/$COMMITS/" -c "nohl" +1 $CHANGELOG
       git commit -am "Version history updated"
   esac
@@ -98,7 +100,10 @@ function gm {
     && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag $TAG \
     && confirm "Merge branch '$MASTER' into master?" \
     && git checkout master && git merge $MASTER
-  confirm "Delete branch '$CURBRANCH'?" && git branch -d $CURBRANCH
+  if confirm "Delete branch '$CURBRANCH'?"; then
+    git branch -r | grep origin/$CURBRANCH$ >/dev/null && git push origin :$CURBRANCH
+    git branch -d $CURBRANCH
+  fi
 }
 
 # GIT version increment
