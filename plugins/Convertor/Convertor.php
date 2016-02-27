@@ -26,6 +26,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $subject->detach($this);
       return;
     }
+    $this->requireActiveCms();
     try {
       if(strlen($_GET[get_class($this)]))
         $this->processImport($_GET[get_class($this)]);
@@ -109,7 +110,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
     $this->file = "$f.html";
     $dest = $this->tmpFolder."/".$this->file;
-    $fp = lockFile($dest);
+    $fp = lock_file($dest);
     try {
       try {
         file_put_contents_plus($dest, $this->html);
@@ -124,7 +125,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     } catch(Exception $e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
     } finally {
-      unlockFile($fp, $dest);
+      unlock_file($fp, $dest);
     }
   }
 

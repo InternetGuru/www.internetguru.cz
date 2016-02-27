@@ -98,6 +98,7 @@ define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
 define('THEMES_FOLDER', USER_FOLDER."/".THEMES_DIR);
 define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
 define('CMS_VERSION_FILENAME', "VERSION");
+define('CMS_CHANGELOG_FILENAME', "CHANGELOG");
 define('CMS_VERSION', trim(file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME)));
 define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
 #print_r(get_defined_constants(true)); die();
@@ -119,7 +120,9 @@ if(CMS_DEBUG) {
 define('METHOD_NA', _("Method %s is no longer available"));
 if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 require_once(CORE_FOLDER.'/globals.php');
-if(updateScriptFile()) redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
+if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)) {
+  redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
+}
 initDirs();
 Logger::log(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 

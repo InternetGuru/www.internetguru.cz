@@ -22,6 +22,10 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function update(SplSubject $subject) {
+    if(!Cms::isActive()) {
+      $subject->detach($this);
+      return;
+    }
     if($this->detachIfNotAttached("HtmlOutput")) return;
     if($this->detachIfNotAttached("ValidateForm")) return;
     switch($subject->getStatus()) {
@@ -241,6 +245,9 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
       $name = $this->processFormItem($this->formNames, $e, "name", "", $id, true);
+      if(is_null(Cms::getLoggedUser()) || $e->getAttribute("type") != "submit") continue;
+      $e->setAttribute("value", _("Show message"));
+      $e->setAttribute("title", _("Not sending form if logged user"));
     }
     $tmp = $e->parentNode;
     while(!is_null($tmp) && $tmp->nodeName != "form") {

@@ -3,7 +3,7 @@ RewriteEngine  on
 ##
 # set rewrite base
 RewriteRule   .                      - [E=RB:/]
-RewriteCond   %{HTTP_HOST}           ^localhost$
+RewriteCond   %{HTTP_HOST}           ^localhost(:\d+)?$
 RewriteCond   %{SCRIPT_FILENAME}     www/([^/]+)
 RewriteRule   .                      - [E=RB:/%1/]
 

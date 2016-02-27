@@ -1,5 +1,5 @@
 # VERSION
-BASHRC="IG .bashrc, ver. 1.0.0 (version)"
+BASHRC="IG .bashrc, ver. 1.1.3 (version)"
 echo $BASHRC
 
 # Normal Colors
@@ -36,9 +36,12 @@ NC="\e[m"
 [ -z "$CMS_FOLDER" ] && CMS_FOLDER="$HOME/cms"
 [ -z "$SU" ] && SU=$BCyan
 [ -z "$MYPS1" ] && MYPS1="\[$SU\]\u\[$NC\]@\h:\[$BWhite\]\w\[$NC\]\\$ \[\e]0;\u@\h:\w\a\]"
+[ -z "$CHANGELOG" ] && CHANGELOG=CHANGELOG
+[ -z "$VERSION" ] && VERSION=VERSION
 
 PS1="$MYPS1"
 export PATH=$PATH:/var/scripts
+
 # don't put duplicate lines in the history. See bash(1) for more options
 # don't overwrite GNU Midnight Commander's setting of `ignorespace'.
 HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
@@ -61,42 +64,60 @@ ps | grep -q ssh-agent || start=1 # start ssh if not running
 source ~/ssh-agent.sh # register saved variables
 ((start)) && ssh-add ~/.ssh/id_rsa # add private key on start
 
-function sure {
+function confirm {
   read -p "${1:-"Are you sure?"} [y/n] " -n 1 -r && echo
   [[ $REPLY =~ [YyAaZz] ]] || return 1
 }
 
+function gitchanges {
+  [[ $(git status --porcelain | wc -l) == 0 ]] && return 0
+  echo "Error: Uncommited changes"
+  return 1
+}
+
 # GIT merge current branch into appropriate branche/s
 function gm {
-  CURBRANCH=$(gcb)
-  [[ $? != 0 ]] && return $?
-  MASTER=$(cat VERSION | awk -F. '{ print $1 "." $2 }')
-  FF="--no-ff"
-  CB=${CURBRANCH%-*}
-  case $CB in
-    dev)
-      echo "Branch dev shall not be merged (use gvi)" && return 1 ;;
+  CURBRANCH=$(gcb) || return $?
+  gitchanges || return $?
+  CURVER=$(cat $VERSION)
+  MASTER=$(echo $CURVER | cut -d"." -f1,2)
+  case ${CURBRANCH%-*} in
+    dev|master|$MASTER)
+      echo "Branch '$CURBRANCH' shall not be merged (use gvi)" && return 1 ;;
     hotfix)
-      sure "Merge branch '$CURBRANCH' into $MASTER?"
-      [[ $? == 0 ]] && git checkout $MASTER && git merge $CURBRANCH ;&
-    release|$MASTER)
-      FF="" ;&
+      TAG=$CURVER ;;
+    release)
+      TAG=$MASTER ;;
     *)
-      sure "Merge branch '$CURBRANCH' into dev?"
-      [[ $? == 0 ]] && git checkout dev && git merge $FF $CURBRANCH
+      git rebase dev || return $?
+      COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r")
+      COMMITS="${COMMITS/\//\\\/}"
+      vim -c "s/^/$COMMITS/" -c "nohl" +1 $CHANGELOG
+      git commit -am "Version history updated"
   esac
+  git checkout dev && git merge --no-ff $CURBRANCH || return $?
+  [[ -n "$TAG" ]] && confirm "Merge branch '$CURBRANCH' into $MASTER?" \
+    && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag $TAG \
+    && confirm "Merge branch '$MASTER' into master?" \
+    && git checkout master && git merge $MASTER
+  if confirm "Delete branch '$CURBRANCH'?"; then
+    git branch -r | grep origin/$CURBRANCH$ >/dev/null && git push origin :$CURBRANCH
+    git branch -d $CURBRANCH
+  fi
 }
 
 # GIT version increment
 function gvi {
   CURBRANCH=$(gcb)
   [[ $? != 0 ]] && return $?
-  CURVER=$(cat VERSION)
+  gitchanges
+  [[ $? != 0 ]] && return $?
+  CURVER=$(cat $VERSION)
   MAJOR=$(echo $CURVER | cut -d"." -f1)
   MINOR=$(echo $CURVER | cut -d"." -f2)
   PATCH=$(echo $CURVER | cut -d"." -f3)
   case $CURBRANCH in
-    ${MAJOR}.$MINOR)
+    master|${MAJOR}.$MINOR)
       ((PATCH++))
       BRANCH="hotfix-${MAJOR}.${MINOR}.$PATCH" ;;
     dev)
@@ -110,18 +131,21 @@ function gvi {
   [[ $CODE == 128 ]] && git checkout $BRANCH && return $CODE
   [[ $CODE != 0 ]] && return $CODE
   NEXTVER=${MAJOR}.${MINOR}.$PATCH
-  echo $NEXTVER > VERSION
-  git commit -am "Version incremented to $BRANCH"
+  echo $NEXTVER > $VERSION
+  [[ $CURBRANCH != dev ]] && git commit -am $BRANCH && return $?
+  sed -i "1i\nIGCMS ${MAJOR}.${MINOR} ($(date "+%Y-%m-%d"))\n" $CHANGELOG
+  git commit -am $BRANCH && gm && git checkout $BRANCH
 }
 
 # GIT
 alias ghotfix='gvi'
 alias grelease='gvi'
 alias gcb='git rev-parse --abbrev-ref HEAD' # git current branch
-alias gaas='git add -A; gs' # git add all and show status
+alias gaas='git add -A; gs'
 alias gclone='_(){ git clone --recursive ${1:-git@bitbucket.org:igwr/cms.git}; }; _'
 alias gd='git diff'
-alias gdc='_(){ git log $1^..$1 -p $2; }; _' # git diff commit [param HASH] of a [param file] (optional)
+alias gdc=gdi
+alias gdi='_(){ gd "$(echo $1 | cut -d. -f1)~1..$(echo $1 | cut -d. -f3)" $2; }; _' # git diff inclusive
 alias gdel='_(){ git branch -d $1; git push origin :$1; }; _' # git delete branch local & remote [param BRANCH]
 alias gc='git commit'
 alias gl='git log --decorate --all --oneline --graph' # git log all branches
@@ -140,6 +164,7 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 alias ll='ls -lah'
 alias less='less -rSX'
+alias cpr='cp -pr' # copy dir, preserve mode, ownership, timestamps
 alias cms='cd "$CMS_FOLDER"'
 alias sshcms='ssh cms@31.31.75.247'
 #alias sshcms='ssh -i ~/.ssh/id_rsa cms@31.31.75.247'

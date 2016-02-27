@@ -113,9 +113,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $robots = $this->cfg->getElementById("robots");
     $this->appendMeta($head, "robots", $robots->nodeValue);
-    $this->copyToRoot($this->favIcon, self::FAVICON);
+    update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true);
-    $this->copyToRoot(findFile($this->pluginDir."/robots.txt"), "robots.txt");
+    update_file(findFile($this->pluginDir."/robots.txt"), "robots.txt"); // hash?
     $this->appendCssFiles($head);
     $html->appendChild($head);
     return $head;
@@ -356,17 +356,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
-  }
-
-  private function copyToRoot($src, $dest) {
-    if(is_file($dest) && getFileHash($src) == getFileHash($dest)) return;
-    $fp = lockFile($src, null);
-    if(is_file($dest) && getFileHash($src) == getFileHash($dest)) {
-      unlockFile($fp);
-      return;
-    }
-    copy_plus($src, $dest);
-    unlockFile($fp);
   }
 
   private function addThemeFiles(DOMElement $e) {

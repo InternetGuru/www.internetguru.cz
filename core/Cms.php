@@ -164,6 +164,11 @@ class Cms {
     return null;
   }
 
+  public static function isActive() {
+    if(IS_LOCALHOST) return true;
+    return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
+  }
+
   public static function contentProcessVariables() {
     $oldContent = clone self::$content;
     try {

@@ -18,6 +18,7 @@
   <xsl:param name="inputvar-admin" select="''"/>
   <xsl:param name="inputvar-igcms" select="''"/>
   <xsl:param name="inputvar-version_link" select="''"/>
+  <xsl:param name="inputvar-adminmenu" select="''"/>
   <xsl:param name="filehandler-cache_file" select="''"/>
 
   <xsl:template match="/">
@@ -26,13 +27,9 @@
 
   <xsl:template match="div[contains(@id, 'footer')]/*[1]">
     <xsl:if test="$cms-logged_user">
-      <ul class="adminmenu noprint">
-        <li><a href="?admin">Administrace</a></li>
-        <li><a href="?log">Logy</a></li>
-        <li><a href="?ver">Verze</a></li>
-        <li><a href="?import">Import</a></li>
-        <li><a href="?subdom">Poddomény</a></li>
-      </ul>
+      <xsl:if test="$inputvar-adminmenu">
+        <xsl:value-of disable-output-escaping="yes" select="$inputvar-adminmenu"/>
+      </xsl:if>
       <ul class="adminmenu noprint">
         <li>
           <xsl:element name="a">
