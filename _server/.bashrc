@@ -1,5 +1,5 @@
 # VERSION
-BASHRC="IG .bashrc, ver. 1.1.3 (version)"
+BASHRC="IG .bashrc, ver. 1.1.4 (version)"
 echo $BASHRC
 
 # Normal Colors
@@ -87,19 +87,19 @@ function gm {
     hotfix)
       TAG=$CURVER ;;
     release)
-      TAG=$MASTER ;;
+      TAG=${MASTER}.0 ;;
     *)
       git rebase dev || return $?
-      COMMITS=$(git log dev..$CURBRANCH --oneline | tr "\n" "\r")
-      COMMITS="${COMMITS/\//\\\/}"
-      vim -c "s/^/$COMMITS/" -c "nohl" +1 $CHANGELOG
+      COMMITS=$(git log dev..$CURBRANCH --pretty=format:"%s" | tr "\n" "\r")
+      vim -c "s/^/${COMMITS/\//\\\/}/" -c "nohl" +1 $CHANGELOG
       git commit -am "Version history updated"
   esac
   git checkout dev && git merge --no-ff $CURBRANCH || return $?
   [[ -n "$TAG" ]] && confirm "Merge branch '$CURBRANCH' into $MASTER?" \
-    && git checkout $MASTER && git merge --no-ff $CURBRANCH && git tag $TAG \
+    && git checkout master && ( git checkout $MASTER || git checkout -b $MASTER ) \
+    && git merge --no-ff $CURBRANCH && git tag $TAG \
     && confirm "Merge branch '$MASTER' into master?" \
-    && git checkout master && git merge $MASTER
+    && git checkout master && git merge $MASTER && git checkout $MASTER
   if confirm "Delete branch '$CURBRANCH'?"; then
     git branch -r | grep origin/$CURBRANCH$ >/dev/null && git push origin :$CURBRANCH
     git branch -d $CURBRANCH
@@ -133,7 +133,8 @@ function gvi {
   NEXTVER=${MAJOR}.${MINOR}.$PATCH
   echo $NEXTVER > $VERSION
   [[ $CURBRANCH != dev ]] && git commit -am $BRANCH && return $?
-  sed -i "1i\nIGCMS ${MAJOR}.${MINOR} ($(date "+%Y-%m-%d"))\n" $CHANGELOG
+  HEADER="IGCMS ${MAJOR}.${MINOR} | $(date "+%Y-%m-%d")"
+  printf '\n%s\n\n%s\n' "$HEADER" "$(<$CHANGELOG)" > $CHANGELOG
   git commit -am $BRANCH && gm && git checkout $BRANCH
 }
 
