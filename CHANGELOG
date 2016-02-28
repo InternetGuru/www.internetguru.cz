@@ -8,297 +8,243 @@ ContactForm: zobrazení hlášky o neodeslání formuláře - přihlášenému u
 Přesunutí souboru s historií verzí na CHANGELOG
 Automatizace a změna formátu historie verzí
 
-----------------
-1.9.5 2016-01-07
-----------------
+IGCMS 1.10 | 2016-02-01
 
-ContactForm: přihlášenému uživateli odeslanou zprávu jen zobrazí (1b251a8)
-Admin: upozornění na aktualizaci souborové mezipaměti (a37a91c)
-Admin: upozornění na aktualizaci serverové mezipaměti (ff6c400)
-Htmlplus: povinný atribut value pro checkbox a radio (0d7b6ac)
-Admin: oprava práce s různými soubory, issue #28 (5f92e2f)
-admin: oprava hlášení o úspěšném uložení, issue #30 (80322cd)
-fileHandler: efektivní kontrola mezipaměti (820efaa)
+Globální vylepšení výchozích stylů pro tisk
+ContactForm: v administračním režimu zprávu zobrazí (neodesílá)
 
-----------------
-1.9.3 2015-12-21
-----------------
+IGCMS 1.9.5 | 2016-01-07
 
-contactForm: oprava umístění skryté položky formuláře, issue #39 (2e20aac)
-Convertor: oprava názvu lokálního importu (ca91686)
-Convertor: oprava importu, issue #35 (4cb6270)
-BasicLayout.css: oprava pravé mezery vedle form input (97cb334)
+ContactForm: přihlášenému uživateli odeslanou zprávu jen zobrazí
+Admin: upozornění na aktualizaci souborové mezipaměti
+Admin: upozornění na aktualizaci serverové mezipaměti
+Htmlplus: povinný atribut value pro checkbox a radio
+Admin: oprava práce s různými soubory, issue #28
+admin: oprava hlášení o úspěšném uložení, issue #30
+fileHandler: efektivní kontrola mezipaměti
 
-----------------
-1.9.2 2015-12-15
-----------------
+IGCMS 1.9.3 | 2015-12-21
 
-Admin: přidán odkaz pro ignorování mezipaměti (0d4b7d9)
-Admin: zachování parametrů při volbě souboru (90012d4)
-Admin: možnost ignorování serverové mezipaměti (f06fc5e)
-perzistentní URL parametr cache (0e45dae)
-FileHandler: změna adresáře náhledu z thumb na thumbs (dfbe8eb)
-Vlastní knihovny pro optimalizaci zdrojů CSS/JS (c35e9ae)
-global: zrušení technologie Grunt, zdrojové soubory pomocí findex.php (477ca6a)
+contactForm: oprava umístění skryté položky formuláře, issue #39
+Convertor: oprava názvu lokálního importu
+Convertor: oprava importu, issue #35
+BasicLayout.css: oprava pravé mezery vedle form input
 
-----------------
-1.9.1 2015-12-02
-----------------
+IGCMS 1.9.2 | 2015-12-15
 
-fileHandler: opraveno mazání souborové mezipaměti (0e7b7b0)
+Admin: přidán odkaz pro ignorování mezipaměti
+Admin: zachování parametrů při volbě souboru
+Admin: možnost ignorování serverové mezipaměti
+perzistentní URL parametr cache
+FileHandler: změna adresáře náhledu z thumb na thumbs
+Vlastní knihovny pro optimalizaci zdrojů CSS/JS
+global: zrušení technologie Grunt, zdrojové soubory pomocí findex.php
 
-----------------
-1.9.0 2015-12-01
-----------------
+IGCMS 1.9.1 | 2015-12-02
 
-FileHandler: vylepšení práce se zdrojovými soubory (78d455b)
-global: uživatelské mazání serverové mezipaměti (298f754)
-global: ladící režim (2bfaf46)
-GlobalMenu: minimálně jedna úroveň (545293f)
-global: zvláštní souborová mezipaměť pro různé verze systému (7fbd29a)
+fileHandler: opraveno mazání souborové mezipaměti
+FileHandler: vylepšení práce se zdrojovými soubory
+global: uživatelské mazání serverové mezipaměti
+global: ladící režim
+GlobalMenu: minimálně jedna úroveň
+global: zvláštní souborová mezipaměť pro různé verze systému
 
-----------------
-1.9.0 2015-11-28
-----------------
+IGCMS 1.9.0 | 2015-11-28
 
-global: cesta ke zdrojovým souborům podle verze systému (8e10ee7)
-Admin: zobrazení automatických oprav (efa7ef6)
-completable.js: podpora zástupnéh znaku * (0e15436)
-CodeMirror: oprava vyhledávání vzhledem k pozici kurzoru (9e73988)
-LogViewer: oprava počtu zobrazených výsledků (0d80108)
-UrlHandler: oprava konfiguračního souboru (5717cf2)
-SyntaxCodeMirror: oprava označení nalezeného textu, issue #36 (3854cc9)
-cms-default.css vylepšení stylů (3c30fb3)
-fileHandler: kontrola souborové mezipaměti (087cc3f)
-domBuilder: cache xml files, check cache mtime (0c70f2c)
+global: cesta ke zdrojovým souborům podle verze systému
+Admin: zobrazení automatických oprav
+completable.js: podpora zástupnéh znaku *
+CodeMirror: oprava vyhledávání vzhledem k pozici kurzoru
+LogViewer: oprava počtu zobrazených výsledků
+UrlHandler: oprava konfiguračního souboru
+SyntaxCodeMirror: oprava označení nalezeného textu, issue #36
+cms-default.css vylepšení stylů
+fileHandler: kontrola souborové mezipaměti
+domBuilder: cache xml files, check cache mtime
 
-----------------
-1.8.8 2015-11-19
-----------------
+IGCMS 1.8.8 | 2015-11-19
 
-ielte7.xsl: hláška pro starý prohlížeč IE7- (a63cc95)
-completable.js: přidána podpora pro deaktivované soubory #disabled (7a00965)
-Admin: deaktivované soubory do nabídky, issue #29 (cd4ec34)
-Admin: varování o neaktuální mezipaměti (d2d3378)
-adminmenu.xsl: přidán odkaz na zpětnou vazbu (48c865c)
-InputVar: odkaz na zpštnou vazbud jako nová proměnná (458c652)
-EmailBreaker: oprava složeného zápisu, issue #32 (8b80a67)
-ContentLink: oprava řeči (4cdbe6e)
+ielte7.xsl: hláška pro starý prohlížeč IE7-
+completable.js: přidána podpora pro deaktivované soubory #disabled
+Admin: deaktivované soubory do nabídky, issue #29
+Admin: varování o neaktuální mezipaměti
+adminmenu.xsl: přidán odkaz na zpětnou vazbu
+InputVar: odkaz na zpštnou vazbud jako nová proměnná
+EmailBreaker: oprava složeného zápisu, issue #32
+ContentLink: oprava řeči
 
-----------------
-1.8.6 2015-11-11
-----------------
+IGCMS 1.8.6 | 2015-11-11
 
-úprava výchozích stylů, issue #21 a issue #26 (ee9ba0b)
-Codemirror: chytré tlačítko [home] (af00ffa)
+úprava výchozích stylů, issue #21 a issue #26
+Codemirror: chytré tlačítko [home]
 addressable.js: opravy issue #25 a issue #27 (7af0b5f, 0d9c5ed)
-přidána podpora různých jazyků obsahu (4527d64)
-Convertor: oprava pro neexistující soubory, issue #22 (3849d83)
+přidána podpora různých jazyků obsahu
+Convertor: oprava pro neexistující soubory, issue #22
 rng: oprava definice elementu form, issue #1 (8e0bcd0, df8c0d2)
 
-----------------
-1.8.5 2015-10-01
-----------------
+IGCMS 1.8.5 | 2015-10-01
 
-completable.js: šipka dolů a kliknutí otevře nabídku (e72c79f)
-admin.js: podpora igcms.js (895ed6b)
-completable.js: podpora igcms.js (1062021)
-editable.js: podpora igcms.js (4633a45)
-addressable.js: podpora igcms.js (31e9a05)
-eventable.js: podpora igcms.js (50f8c33)
-hideable.js: podpora igcms.js (35ad621)
-selectable.js: podpora igcms.js (27ca328)
-filterable.js: podpora igcms.js (1777c8f)
-toc.js: přejmenováno na tocable.js (f2e98e5)
-scrolltop.js: přejmenováno na scrolltopable.js, omezení na body.scrolltopable (f5a75ea)
-global: výchozí třída body.fragmentable (d98b66c)
-fragmentable.js: omezení na body.fragmentable (93c393b)
-fragments.js: přejmenováno na fragmentable.js, přidán igcms.js (9b9c14c)
-completable.js: nezávislost na velikosti písmen při vyplňování (093156a)
+completable.js: šipka dolů a kliknutí otevře nabídku
+admin.js: podpora igcms.js
+completable.js: podpora igcms.js
+editable.js: podpora igcms.js
+addressable.js: podpora igcms.js
+eventable.js: podpora igcms.js
+hideable.js: podpora igcms.js
+selectable.js: podpora igcms.js
+filterable.js: podpora igcms.js
+toc.js: přejmenováno na tocable.js
+scrolltop.js: přejmenováno na scrolltopable.js, omezení na body.scrolltopable
+global: výchozí třída body.fragmentable
+fragmentable.js: omezení na body.fragmentable
+fragments.js: přejmenováno na fragmentable.js, přidán igcms.js
+completable.js: nezávislost na velikosti písmen při vyplňování
 filterable.js: třídy do elementů (124b32c, ff26946, 49d064a)
-filterable.js: oprava historie prohlížeče (addd6d5)
+filterable.js: oprava historie prohlížeče
 Sitemap: odstraněn parametr lastmod (296dde1, 7306a12)
-filterable.js: přidána podpora GA (a595a9d)
-filterable.js: vylepšení a opravy (f66b465)
+filterable.js: přidána podpora GA
+filterable.js: vylepšení a opravy
 
-----------------
-1.8.4 2015-08-24
-----------------
+IGCMS 1.8.4 | 2015-08-24
 
-global: drobné opravy souborů javascript (9d61b5c)
-EmailBreaker: element span místo a, přidáno podtržítko (05f268f)
-filterable.js: filtrování seznamů podle klíčových slov (06ffdbf)
+global: drobné opravy souborů javascript
+EmailBreaker: element span místo a, přidáno podtržítko
+filterable.js: filtrování seznamů podle klíčových slov
 
-----------------
-1.8.3 2015-08-23
-----------------
+IGCMS 1.8.3 | 2015-08-23
 
-Convertor: podpora víceřádkového elementu code (425a60c)
-ContactForm: varování, pokud není definovaný příjemce (6913fd5)
-Admin: přesměrování link editovaného HTML souboru (d6a39b0)
+Convertor: podpora víceřádkového elementu code
+ContactForm: varování, pokud není definovaný příjemce
+Admin: přesměrování link editovaného HTML souboru
 
-----------------
-1.8.2 2015-08-18
-----------------
+IGCMS 1.8.2 | 2015-08-18
 
-completable.js: vylepšení UX, filtrování, řazení (a6f2115)
-UrlHandler: přesměrování mezi http/https (911b37d)
-html+ přidána podpora atributu pattern pro select (cf80991)
+completable.js: vylepšení UX, filtrování, řazení
+UrlHandler: přesměrování mezi http/https
+html+ přidána podpora atributu pattern pro select
 
-----------------
-1.8.1 2015-08-07
-----------------
+IGCMS 1.8.1 | 2015-08-07
 
-Sitemap: nové rozšíření generující /sitemap.xml (09bfc62)
-Convertor: podpora řádkových elementů v definičních seznamech (c827591)
-Convertor: podpora řádkových elementů ve shrnutí (a97db26)
-Admin: přidána volba smazání mezipaměti (cache) při ukládání změn (a82b65f)
+Sitemap: nové rozšíření generující /sitemap.xml
+Convertor: podpora řádkových elementů v definičních seznamech
+Convertor: podpora řádkových elementů ve shrnutí
+Admin: přidána volba smazání mezipaměti (cache) při ukládání změn
 
-----------------
-1.8.0 2015-07-08
-----------------
+IGCMS 1.8.0 | 2015-07-08
 
-Agregator: přidána podpora hromadného vkládání obrázků (0202406)
-ValidateForm: vlastní prodleva mezi odesláním formuláře pomocí třídy (8750fe0)
-Admin: pole s výběrem souboru na první stisknutí tabulátoru (c85f0ae)
-SyntaxCodeMirrror.js: globální zkratka Shift+F11 s fokusem (817d886)
-cms-default.css: flexibilní šířka elementů input na malých obrazovkách (69c03a9)
-basic.css: podtržení odkazů v globální navigaci zápatí (01e499b)
-admin/convertor: ukládání záloh veškerých změn (d358b13)
-přidána podpora pro input type number (55e6049)
-Basket: nové rozšíření nákupní košík (13eabab)
-vypnutí PageSpeed rozšřeno o Grunt na Režim ladění (f3c0d00)
-cms-print.css: skrytí hodnot placeholder pro tisk (53330da)
-CodeMirror: přidány funkce a klávesové zkratky (1e3e5e3)
-ContactForm: změna výchozí konfigurace (2d04bd6)
+Agregator: přidána podpora hromadného vkládání obrázků
+ValidateForm: vlastní prodleva mezi odesláním formuláře pomocí třídy
+Admin: pole s výběrem souboru na první stisknutí tabulátoru
+SyntaxCodeMirrror.js: globální zkratka Shift+F11 s fokusem
+cms-default.css: flexibilní šířka elementů input na malých obrazovkách
+basic.css: podtržení odkazů v globální navigaci zápatí
+admin/convertor: ukládání záloh veškerých změn
+přidána podpora pro input type number
+Basket: nové rozšíření nákupní košík
+vypnutí PageSpeed rozšřeno o Grunt na Režim ladění
+cms-print.css: skrytí hodnot placeholder pro tisk
+CodeMirror: přidány funkce a klávesové zkratky
+ContactForm: změna výchozí konfigurace
 
-----------------
-1.7.0 2015-06-27
-----------------
+IGCMS 1.7.0 | 2015-06-27
 
-HtmlOutput: přidán browserdetect.js a iefixes.js (f90a807)
-FileHandler: podpora technologie Grunt (eb3bb4a)
-výchozí CSS: kompatibilita prohlížečů (51dcb84)
-HtmlOutput: přidán atribut 'if' pro elementy stylesheet a jsFile (2b9ce00)
-ValidateForm: 2 minuty prodleva pomocí souboru IP v názvu, možnost banu pomocí .IP souboru (75c551d)
-EmailBreaker: nové rozšíření na boření e-mailových adres (14d5dab)
+HtmlOutput: přidán browserdetect.js a iefixes.js
+FileHandler: podpora technologie Grunt
+výchozí CSS: kompatibilita prohlížečů
+HtmlOutput: přidán atribut 'if' pro elementy stylesheet a jsFile
+ValidateForm: 2 minuty prodleva pomocí souboru IP v názvu, možnost banu pomocí .IP souboru
+EmailBreaker: nové rozšíření na boření e-mailových adres
 
-----------------
-1.6.2 2015-06-05
-----------------
+IGCMS 1.6.2 | 2015-06-05
 
-HtmlOutput: systémové favicony jsou nastavitelné (4c35a97)
-LinkList: kontrola existence lokálních odkazů (a6fb154)
-LinkList: zobrazuje skutečné názvy lokálních odkazů (720b2f0)
-Indikace systémového hlášení zbarvením ikony prohlížeče (d14eac7)
-LinkList: nové rozšíření pro zobrazení seznamu odkazů (e401eff)
-Možnost zasílání událostí do GA, eventable.js (420977c)
-Přidání basic.css (718daa7)
-Admin: potvrzení uložení neaktivního souboru (c4dd1eb)
-InputVar: přidání nepovinného hesla (eeada85)
-HtmlOutput: přidání nastavení robots (913e06a)
-CodeMirror: klávesová zkratka ctrl+g (defeefd)
-SyntaxCodeMirror: tlačítko pro de/aktivaci (ccb64bb)
-InputVar: přidáno uživatelské rozhranní (0e0d7fd)
-ContactForm: logování poslaných zpráv (62f9c7f)
+HtmlOutput: systémové favicony jsou nastavitelné
+LinkList: kontrola existence lokálních odkazů
+LinkList: zobrazuje skutečné názvy lokálních odkazů
+Indikace systémového hlášení zbarvením ikony prohlížeče
+LinkList: nové rozšíření pro zobrazení seznamu odkazů
+Možnost zasílání událostí do GA, eventable.js
+Přidání basic.css
+Admin: potvrzení uložení neaktivního souboru
+InputVar: přidání nepovinného hesla
+HtmlOutput: přidání nastavení robots
+CodeMirror: klávesová zkratka ctrl+g
+SyntaxCodeMirror: tlačítko pro de/aktivaci
+InputVar: přidáno uživatelské rozhranní
+ContactForm: logování poslaných zpráv
 
-----------------
-1.6.1 2015-05-19
-----------------
+IGCMS 1.6.1 | 2015-05-19
 
-ValidateForm: nové rozšíření pro kontrolu formuláře (e91ea9e)
-FileHandler: přidán odkaz na smazání dočasných souborů (4d5f72a)
-addressable.js: podpora polí typu email a search (ae8340d)
-Administrátorské nabídka jako první prvek v zápatí (3e28b18)
-Admin: přidání pole pro výběr editovaného souboru (3fe98e8)
-Odkaz na smazání mezipaměti (fad53ca)
-DOMElementPlus: smazání elementu pomocí prázdné proměnné (5bd00f6)
-ContactForm: podpora formulářových prvků HTML5 (f27a811)
-HtmlOutput: výstupní kód stánek v HTML5 (46d860b)
-Agregator: přidání volitelného atributu wrapper (7e4a7af)
+ValidateForm: nové rozšíření pro kontrolu formuláře
+FileHandler: přidán odkaz na smazání dočasných souborů
+addressable.js: podpora polí typu email a search
+Administrátorské nabídka jako první prvek v zápatí
+Admin: přidání pole pro výběr editovaného souboru
+Odkaz na smazání mezipaměti
+DOMElementPlus: smazání elementu pomocí prázdné proměnné
+ContactForm: podpora formulářových prvků HTML5
+HtmlOutput: výstupní kód stánek v HTML5
+Agregator: přidání volitelného atributu wrapper
 
-----------------
-1.6.0 2015-05-15
-----------------
+IGCMS 1.6.0 | 2015-05-15
 
-InputVar: název systému v zápatí jako proměnná (34ba67c)
+InputVar: název systému v zápatí jako proměnná
 
-----------------
-1.5.3 2015-05-09
-----------------
+IGCMS 1.5.3 | 2015-05-09
 
-Vylepšené rozhraní administrace (2d3a682)
-Nová funkcionalita addressable pro odkázání vyplněného formuláře (bf7963a)
-Nové rozšíření FillForm vyplňující špatně vyplněné formuláře (415cc4d)
-FileHandler: nový formát obrázku "preview" (76a5208)
-Admin: uložit a přejít na editovaný soubor, pokud cesta existuje (83de136)
-ContentLink: hodnota drobečkové navigace na úvodní stránce podle atributu title hlavního nadpisu (1631084)
+Vylepšené rozhraní administrace
+Nová funkcionalita addressable pro odkázání vyplněného formuláře
+Nové rozšíření FillForm vyplňující špatně vyplněné formuláře
+FileHandler: nový formát obrázku "preview"
+Admin: uložit a přejít na editovaný soubor, pokud cesta existuje
+ContentLink: hodnota drobečkové navigace na úvodní stránce podle atributu title hlavního nadpisu
 
-----------------
-1.5.2 2015-04-18
-----------------
+IGCMS 1.5.2 | 2015-04-18
 
-TOC: přidání parametru maximální hloubky (bbc150e)
-Agregator: transformace pro umístění informací o dokumentu agregator.xsl (b9e9649)
-Agregator: konfigurovatelné informace o dokumentu (03e8868)
+TOC: přidání parametru maximální hloubky
+Agregator: transformace pro umístění informací o dokumentu agregator.xsl
+Agregator: konfigurovatelné informace o dokumentu
 
-----------------
-1.5.0 2015-04-12
-----------------
+IGCMS 1.5.0 | 2015-04-12
 
-Agregátor informace o dokumentu docinfo (64343ae)
-Odkaz na přesunutí stránky nahoru scrolltop.js (1a86664)
-Administrace dostupná pouze přes HTTPS (6e09dc0)
+Agregátor informace o dokumentu docinfo
+Odkaz na přesunutí stránky nahoru scrolltop.js
+Administrace dostupná pouze přes HTTPS
 
-----------------
-1.4.2 2015-03-31
-----------------
+IGCMS 1.4.2 | 2015-03-31
 
-Vylepšení globálních stylů (8ea587c)
-Odkaz na vypnutí PageSpeed (b147aa4)
+Vylepšení globálních stylů
+Odkaz na vypnutí PageSpeed
 
-----------------
-1.4.0 2015-03-15
-----------------
+IGCMS 1.4.0 | 2015-03-15
 
-Auth: přidána možnost zakázat všem kromě admina (d4f4c3e)
+Auth: přidána možnost zakázat všem kromě admina
 
-----------------
-1.3.0 2015-03-10
-----------------
+IGCMS 1.3.0 | 2015-03-10
 
-Komentáře v kódu se zobrazí pouze vlastníkovi webu (68d915a)
-InputVar: nová struktura uživatelských proměnných (5625bcc)
-GlobalMenu: přidává třídu current do všech položek v cestě (e8f29e0)
+Komentáře v kódu se zobrazí pouze vlastníkovi webu
+InputVar: nová struktura uživatelských proměnných
+GlobalMenu: přidává třídu current do všech položek v cestě
 
-----------------
-1.2.0 2015-03-06
-----------------
+IGCMS 1.2.0 | 2015-03-06
 
-Agregátor: přidány odkazy pro editaci (11f6094)
+Agregátor: přidány odkazy pro editaci
 
-----------------
-1.1.0 2015-02-21
-----------------
+IGCMS 1.1.0 | 2015-02-21
 
-ContentBalancer: přidána možnost nezobrazovat (1afbd2a)
-ContentBalancer: vlastní sestavy s odkazy (260343e)
-Agregátor: přidána podpora prefixů odkazů (1400bdf)
+ContentBalancer: přidána možnost nezobrazovat
+ContentBalancer: vlastní sestavy s odkazy
+Agregátor: přidána podpora prefixů odkazů
 
-----------------
-1.0.1 2015-02-15
-----------------
+IGCMS 1.0.1 | 2015-02-15
 
-Admin: vedle XML zobrazuje i HTML soubory rozšíření (7ddf982)
-Přidáno automatické generování titulků k odkazům (3c2087d)
+Admin: vedle XML zobrazuje i HTML soubory rozšíření
+Přidáno automatické generování titulků k odkazům
 
-----------------
-1.0.0 2015-02-13
-----------------
+IGCMS 1.0.0 | 2015-02-13
 
-cms-default.css: barvy a výchozí font systémových hlášení (64a3a5e)
-Explicitně zobrazená verze vyžaduje přihlášení (ca44b40)
-Podpora zobrazení webu na všech dostupných verzí přímo z URL (5215c13)
-Xhtml11: možnost vlastního souboru robots.txt (889e30e)
-Každá nová poddoména vyžaduje přihlášení (a712c74)
-Změna adresářové struktury (1c38432)
+cms-default.css: barvy a výchozí font systémových hlášení
+Explicitně zobrazená verze vyžaduje přihlášení
+Podpora zobrazení webu na všech dostupných verzí přímo z URL
+Xhtml11: možnost vlastního souboru robots.txt
+Každá nová poddoména vyžaduje přihlášení
+Změna adresářové struktury
