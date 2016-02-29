@@ -1,5 +1,11 @@
 <?php
 
+namespace IGCMS\Core;
+
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class Plugins implements SplSubject {
   private $status = null;
   private $observers = array(); // list of enabled observer (names => Observer)
@@ -30,6 +36,7 @@ class Plugins implements SplSubject {
       if(!is_dir(PLUGINS_FOLDER."/$p")) continue;
       if(file_exists(PLUGINS_FOLDER."/.$p")) continue;
       if(file_exists(".PLUGIN.$p")) continue;
+      $p = "IGCMS\Plugins\\$p";
       $this->attach(new $p($this));
     }
   }

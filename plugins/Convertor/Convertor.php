@@ -1,5 +1,16 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {

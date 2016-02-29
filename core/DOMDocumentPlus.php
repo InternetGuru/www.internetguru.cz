@@ -1,12 +1,20 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Logger;
+use DOMDocument;
+use DOMXPath;
+
 class DOMDocumentPlus extends DOMDocument {
   const DEBUG = false;
 
   function __construct($version="1.0", $encoding="utf-8") {
     if(self::DEBUG) Logger::log("DEBUG");
     parent::__construct($version, $encoding);
-    $r = $this->registerNodeClass("DOMElement", "DOMElementPlus");
+    $r = parent::registerNodeClass("DOMElement", "IGCMS\Core\DOMElementPlus");
   }
 
   public function createElement($name, $value=null) {

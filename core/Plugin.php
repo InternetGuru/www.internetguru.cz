@@ -1,5 +1,13 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\ErrorPage;
+use IGCMS\Core\Logger;
+use SplSubject;
+
 class Plugin {
   private $doms = array();
   protected $subject;

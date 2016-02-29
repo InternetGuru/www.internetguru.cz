@@ -1,5 +1,15 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use IGCMS\Core\ResourceInterface;
+use UglifyPHP\JS;
+use SplObserver;
+use SplSubject;
+
 class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   const DEBUG = false;
   private static $imageModes = array(
@@ -232,9 +242,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private static function buildJs($src, $dest) {
     require LIB_FOLDER.'/uglify-php/src/UglifyPHP/Uglify.php';
     require LIB_FOLDER.'/uglify-php/src/UglifyPHP/JS.php';
-    if(!UglifyPHP\JS::installed())
+    if(!JS::installed())
       throw new Exception(_("UglifyJS not installed"));
-    $js = new UglifyPHP\JS($src);
+    $js = new JS($src);
     if($js->minify($dest)) return;
     throw new Exception(_("Unable to minify JS"));
   }

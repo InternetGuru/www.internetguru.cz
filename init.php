@@ -1,5 +1,7 @@
 <?php
 
+use IGCMS\Core\Logger;
+
 $start_time = microtime(true);
 session_cache_limiter("");
 

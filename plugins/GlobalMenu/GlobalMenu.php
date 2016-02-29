@@ -1,5 +1,14 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class GlobalMenu extends Plugin implements SplObserver {
   private $current = null;
 

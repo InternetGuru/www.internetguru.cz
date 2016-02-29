@@ -1,12 +1,9 @@
 <?php
 
-function __autoload($className) {
-  $fp = PLUGINS_FOLDER."/$className/$className.php";
-  if(@include $fp) return;
-  $fc = CORE_FOLDER."/$className.php";
-  if(@include $fc) return;
-  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, PLUGINS_DIR, CORE_DIR));
-}
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\LoggerException;
 
 function isValidId($id) {
   return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);

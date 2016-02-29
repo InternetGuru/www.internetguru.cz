@@ -1,5 +1,14 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
   const CM_DIR = "CodeMirror";

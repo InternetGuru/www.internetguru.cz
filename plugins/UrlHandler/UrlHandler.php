@@ -1,5 +1,14 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class UrlHandler extends Plugin implements SplObserver {
   const DEBUG = false;
   private $cfg = null;

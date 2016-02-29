@@ -1,5 +1,17 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private $userCfgPath = null;
   private $contentXPath;

@@ -1,5 +1,16 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
   private $sets = array();

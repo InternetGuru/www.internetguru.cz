@@ -1,5 +1,15 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
   const DEBUG = false;
   private $logFiles;

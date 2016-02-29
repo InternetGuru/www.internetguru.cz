@@ -1,5 +1,11 @@
 <?php
 
+namespace IGCMS\Core;
+
+use Closure;
+use DOMNode;
+use Exception;
+
 class Cms {
 
   private static $contentFull = null; // HTMLPlus

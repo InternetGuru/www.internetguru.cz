@@ -1,7 +1,15 @@
 <?php
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\Logger;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\ErrorPage;
+use IGCMS\Core\Plugins;
+
 try {
 
-  include("init.php");
+  require __DIR__.'/vendor/autoload.php';
+  require 'init.php';
 
   if(!Cms::isActive()) {
     $error = null;

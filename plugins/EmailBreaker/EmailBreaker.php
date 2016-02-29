@@ -1,5 +1,15 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\FinalContentStrategyInterface;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyInterface {
 
   public function update(SplSubject $subject) {

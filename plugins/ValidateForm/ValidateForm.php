@@ -1,5 +1,16 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterface {
   private $labels = array();
   const CSS_WARNING = "validateform-warning";

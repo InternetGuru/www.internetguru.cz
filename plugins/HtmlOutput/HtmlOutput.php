@@ -1,5 +1,22 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\OutputStrategyInterface;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+use DOMElement;
+use XSLTProcessor;
+use DOMDocument;
+
+
 class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
   private $jsFiles = array(); // String filename => Int priority
   private $jsFilesPriority = array(); // String filename => Int priority
@@ -358,7 +375,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->addThemeFiles($cfg->documentElement);
   }
 
-  private function addThemeFiles(DOMElement $e) {
+  private function addThemeFiles(DOMElement $e = null) {
     foreach($e->childElementsArray as $n) {
       if($n->nodeValue == "" || in_array($n->nodeName, array("var", "themes"))) continue;
       try {

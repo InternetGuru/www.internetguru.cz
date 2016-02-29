@@ -1,5 +1,12 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\Logger;
+use DOMElement;
+
 class DOMElementPlus extends DOMElement {
 
   public function rename($name) {

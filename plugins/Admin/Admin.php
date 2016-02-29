@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use Exception;
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const STATUS_NEW = 0;
   const STATUS_ENABLED = 1;
@@ -46,7 +59,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->requireActiveCms();
     try {
       $this->process();
-    } catch (Exception $e) {
+    } catch (Exception$e) {
       Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
       return;
     }
@@ -96,7 +109,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
       checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
-    } catch(Exception $e) {
+    } catch(Exception$e) {
       Cms::addMessage(_("Saving changes will remove outdated file cache"), Cms::MSG_INFO);
     }
   }
@@ -112,7 +125,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     #if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     try {
       clearNginxCache();
-    } catch(Exception $e) {
+    } catch(Exception$e) {
       Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
     }
   }
@@ -378,7 +391,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     }
     try {
       if($this->type == "html") $doc->validatePlus();
-    } catch(Exception $e) {
+    } catch(Exception$e) {
       $doc->validatePlus(true);
       foreach($doc->getErrors() as $error) {
         Cms::addMessage($error, $doc->getStatus());
@@ -447,7 +460,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function enableDataFile() {
     if(is_file($this->dataFile)) $status = unlink($this->dataFileDisabled);
     else $status = rename($this->dataFileDisabled, $this->dataFile);
-    if(!$status) throw new Excepiton(_("Unable to enable file"));
+    if(!$status) throw new Exception(_("Unable to enable file"));
     $this->statusChanged = true;
   }
 

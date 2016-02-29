@@ -1,5 +1,16 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cssClass = "linklist";

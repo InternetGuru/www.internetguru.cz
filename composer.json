@@ -1,0 +1,11 @@
+{
+    "require": {
+        "monolog/monolog": "^1.17"
+    },
+    "autoload": {
+        "psr-4": {
+            "IGCMS\\Core\\" : "core/",
+            "IGCMS\\Plugins\\" : "plugins/"
+        }
+     }
+}
