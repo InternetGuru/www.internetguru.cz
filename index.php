@@ -8,7 +8,6 @@ use IGCMS\Core\Plugins;
 
 try {
 
-  require __DIR__.'/vendor/autoload.php';
   require 'init.php';
 
   if(!Cms::isActive()) {

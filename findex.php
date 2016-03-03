@@ -1,5 +1,7 @@
 <?php
 
+use IGCMS\Core\Logger;
+
 try {
   include("init.php");
 
@@ -7,9 +9,10 @@ try {
     if(strpos($plugin, ".") === 0) continue;
     if(!is_dir(PLUGINS_FOLDER."/$plugin")) continue;
     if(is_dir(PLUGINS_FOLDER."/.$plugin")) continue;
-    if(!in_array("ResourceInterface", class_implements($plugin))) continue;
-    if(!$plugin::isSupportedRequest()) continue;
-    $plugin::handleRequest();
+    $pluginClass = "IGCMS\Plugins\\$plugin";
+    if(!in_array("IGCMS\Core\ResourceInterface", class_implements($pluginClass))) continue;
+    if(!$pluginClass::isSupportedRequest()) continue;
+    $pluginClass::handleRequest();
   }
   throw new Exception(_("Unsupported request"), 415);
 
