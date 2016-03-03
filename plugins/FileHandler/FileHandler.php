@@ -42,7 +42,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx")
   );
   private static $fileFolders = array(
-    THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, FILES_DIR => false
+    THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, VENDOR_DIR => true, FILES_DIR => false
   );
   private $deleteCache;
   private $error = array();
