@@ -9,9 +9,10 @@ use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use Exception;
 use DOMElement;
 use DOMNode;
-use Exception;
+use DOMText;
 use SplObserver;
 use SplSubject;
 
@@ -66,7 +67,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function loadVars() {
-    if(!is_file(USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml")) return;
+    if(!is_file($this->userCfgPath)) return;
     $userCfg = new DOMDocumentPlus();
     if(!@$userCfg->load($this->userCfgPath))
       throw new Exception(sprintf(_("Unable to load content from user config")));
@@ -225,7 +226,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function processPost() {
-    if(!is_file(USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml")) return;
+    if(!is_file($this->userCfgPath)) return;
     $req = Cms::getVariable("validateform-".$this->formId);
     if(is_null($req)) return;
     if(isset($req["passwd"]) && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {

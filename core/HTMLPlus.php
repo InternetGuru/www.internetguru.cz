@@ -6,7 +6,10 @@ use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
+use Exception;
+use DOMComment;
 use DOMXPath;
+use DateTime;
 
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
@@ -30,8 +33,8 @@ class HTMLPlus extends DOMDocumentPlus {
     parent::__construct($version, $encoding);
     $this->statuses = array(_("Unknown"), _("Valid"), _("Invalid"), _("Repaired"));
     $this->status = self::STATUS_UNKNOWN;
-    $c = new \DateTime("now");
-    $this->defaultCtime = $c->format(\DateTime::W3C);
+    $c = new DateTime("now");
+    $this->defaultCtime = $c->format(DateTime::W3C);
     $this->defaultNs = HOST;
   }
 
@@ -518,9 +521,9 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function createDate($d) {
-    $date = new \DateTime();
+    $date = new DateTime();
     $date->setTimestamp(strtotime($d));
-    $date_errors = \DateTime::getLastErrors();
+    $date_errors = DateTime::getLastErrors();
     if($date_errors['warning_count'] + $date_errors['error_count'] > 0) {
       return null;
     }

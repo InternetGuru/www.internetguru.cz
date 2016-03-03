@@ -7,6 +7,7 @@ use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use Exception;
 use SplObserver;
 use SplSubject;
 

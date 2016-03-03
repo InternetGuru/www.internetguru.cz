@@ -2,7 +2,6 @@
 
 namespace IGCMS\Plugins;
 
-use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\ContentStrategyInterface;
 use IGCMS\Core\DOMBuilder;
@@ -10,6 +9,7 @@ use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use Exception;
 use SplObserver;
 use SplSubject;
 

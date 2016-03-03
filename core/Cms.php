@@ -3,9 +3,9 @@
 namespace IGCMS\Core;
 
 use IGCMS\Core\ContentStrategyInterface;
+use Exception;
 use Closure;
 use DOMNode;
-use Exception;
 
 class Cms {
 

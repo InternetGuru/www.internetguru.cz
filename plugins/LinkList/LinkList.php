@@ -8,6 +8,7 @@ use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Plugin;
+use Exception;
 use SplObserver;
 use SplSubject;
 

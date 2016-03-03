@@ -6,10 +6,10 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\ResourceInterface;
+use Autoprefixer;
 use UglifyPHP\JS;
 use Imagick;
 use Exception;
-use Autoprefixer;
 use SplObserver;
 use SplSubject;
 

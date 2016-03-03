@@ -6,6 +6,7 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Logger;
+use Exception;
 use SplSubject;
 
 class Plugin {
