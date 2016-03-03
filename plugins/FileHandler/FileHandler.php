@@ -241,8 +241,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function buildJs($src, $dest) {
-    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/Uglify.php';
-    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/JS.php';
     if(!JS::installed())
       throw new Exception(_("UglifyJS not installed"));
     $js = new JS($src);

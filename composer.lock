@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dbca15afab93899fe0234f5bbe84cfba",
-    "content-hash": "e7c6b95ad6a80403155f9df22c3bdd4c",
+    "hash": "16dd70a17c04151a5c5aa253841631e2",
+    "content-hash": "9ee511659696bd43d853cdd8acc2a2f9",
     "packages": [
         {
             "name": "components/highlightjs",
@@ -164,6 +164,56 @@
                 "psr-3"
             ],
             "time": "2012-12-21 11:40:51"
+        },
+        {
+            "name": "smallhadroncollider/uglify-php",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smallhadroncollider/uglify-php.git",
+                "reference": "f30c7e656a1805e637256fcdff39bf0139a86656"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smallhadroncollider/uglify-php/zipball/f30c7e656a1805e637256fcdff39bf0139a86656",
+                "reference": "f30c7e656a1805e637256fcdff39bf0139a86656",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "UglifyPHP": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Small Hadron Collider",
+                    "email": "mark@smallhadroncollider.com",
+                    "homepage": "http://smallhadroncollider.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A simple PHP wrapper for Uglify JS and Uglify CSS",
+            "homepage": "https://github.com/smallhadroncollider/uglify-php",
+            "keywords": [
+                "JS",
+                "css",
+                "javascript",
+                "minification",
+                "minify",
+                "uglify",
+                "uglifycss",
+                "uglifyjs"
+            ],
+            "abandoned": true,
+            "time": "2013-07-15 12:41:45"
         },
         {
             "name": "vladkens/autoprefixer",
