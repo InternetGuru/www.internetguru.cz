@@ -11,7 +11,7 @@ use SplSubject;
 
 class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
-  const CM_DIR = "CodeMirror";
+  const CM_DIR = "poulik/CodeMirror";
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -28,10 +28,10 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
   public function getContent(HTMLPlus $content) {
 
     // supported syntax only
-    $xml = LIB_DIR."/".self::CM_DIR."/mode/xml/xml.js";
-    $css = LIB_DIR."/".self::CM_DIR."/mode/css/css.js";
-    $js = LIB_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
-    $html = LIB_DIR."/".self::CM_DIR."/mode/htmlmixed/htmlmixed.js";
+    $xml = VENDOR_DIR."/".self::CM_DIR."/mode/xml/xml.js";
+    $css = VENDOR_DIR."/".self::CM_DIR."/mode/css/css.js";
+    $js = VENDOR_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
+    $html = VENDOR_DIR."/".self::CM_DIR."/mode/htmlmixed/htmlmixed.js";
     $modes = array(
       "xml" => array($xml),
       "css" => array($css),
@@ -62,31 +62,31 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
   private function addSources(Array $libs) {
     $os = Cms::getOutputStrategy();
 
-    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.css");
-    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/theme/tomorrow-night-eighties.css");
+    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.css");
+    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/theme/tomorrow-night-eighties.css");
     $os->addCssFile($this->pluginDir.'/SyntaxCodeMirror.css');
 
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/lib/codemirror.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.js");
     foreach($libs as $l) $os->addJsFile($l);
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/keymap/sublime.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/keymap/sublime.js");
 
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/search.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/search/goto-line.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
-    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/search.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/goto-line.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
+    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
 
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/selection/active-line.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/selection/mark-selection.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/comment/comment.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/fold/xml-fold.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/edit/matchtags.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/format/formatting.js");
-    $os->addJsFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
-    $os->addCssFile(LIB_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/selection/active-line.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/selection/mark-selection.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/comment/comment.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/fold/xml-fold.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/edit/matchtags.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/format/formatting.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
+    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
 
     $os->addJsFile($this->pluginDir.'/SyntaxCodeMirror.js', 10, "body");
   }

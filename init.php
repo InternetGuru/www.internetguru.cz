@@ -17,6 +17,7 @@ define("CMS_DIR", "cms");
 define("CMSRES_DIR", "cmsres");
 define("VER_DIR", "ver");
 define("LIB_DIR", "lib");
+define("VENDOR_DIR", "vendor");
 define("CORE_DIR", "core");
 define("FILES_DIR", "files");
 define("SERVER_FILES_DIR", "_server");

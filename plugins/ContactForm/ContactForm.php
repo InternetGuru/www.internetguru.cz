@@ -9,6 +9,7 @@ use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use PHPMailer;
 use Exception;
 use DOMXPath;
 use SplObserver;
@@ -35,6 +36,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     parent::__construct($s);
     $s->setPriority($this, 20);
     $this->className = basename(get_class($this));
+    $mail = new PHPMailer;
   }
 
   public function update(SplSubject $subject) {
@@ -143,7 +145,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       throw new Exception(sprintf(_("Invalid admin email address: '%s'"), $this->formVars["adminaddr"]));
     if(strlen($this->formVars["email"]) && !preg_match("/".EMAIL_PATTERN."/", $this->formVars["email"]))
       throw new Exception(sprintf(_("Invalid client email address: '%s'"), $this->formVars["email"]));
-    require LIB_FOLDER.'/PHPMailer/PHPMailerAutoload.php';
     $adminaddr = $this->formVars["adminaddr"];
     $adminname = $this->formVars["adminname"];
     $email = $this->formVars["email"];

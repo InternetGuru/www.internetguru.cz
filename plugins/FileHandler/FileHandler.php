@@ -42,7 +42,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx")
   );
   private static $fileFolders = array(
-    THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, FILES_DIR => false
+    THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, VENDOR_DIR => true, FILES_DIR => false
   );
   private $deleteCache;
   private $error = array();
@@ -241,8 +241,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function buildJs($src, $dest) {
-    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/Uglify.php';
-    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/JS.php';
     if(!JS::installed())
       throw new Exception(_("UglifyJS not installed"));
     $js = new JS($src);
