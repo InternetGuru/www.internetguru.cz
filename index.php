@@ -1,7 +1,14 @@
 <?php
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\Logger;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\ErrorPage;
+use IGCMS\Core\Plugins;
+
 try {
 
-  include("init.php");
+  require 'init.php';
 
   if(!Cms::isActive()) {
     $error = null;
@@ -81,7 +88,7 @@ try {
   if(CMS_DEBUG) $m = sprintf(_("%s in %s on line %s"), $m, $e->getFile(), $e->getLine());
   $m = sprintf(_("IGCMS failed to finish: %s"), $m);
   Logger::log($m, Logger::LOGGER_FATAL, null, false);
-  if(class_exists("ErrorPage")) new ErrorPage($m, $errno, true);
+  if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno, true);
 
   http_response_code($errno);
   echo $m;

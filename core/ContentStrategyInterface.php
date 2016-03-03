@@ -1,5 +1,9 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\HTMLPlus;
+
 interface ContentStrategyInterface {
   /**
    * [getContent description]

@@ -1,5 +1,25 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\OutputStrategyInterface;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMImplementation;
+use DOMDocument;
+use DOMElement;
+use DOMXPath;
+use XSLTProcessor;
+use SplObserver;
+use SplSubject;
+
+
 class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
   private $jsFiles = array(); // String filename => Int priority
   private $jsFilesPriority = array(); // String filename => Int priority
@@ -47,7 +67,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
     // final plugin modification
     global $plugins;
-    foreach($plugins->getIsInterface("FinalContentStrategyInterface") as $fcs) {
+    foreach($plugins->getIsInterface("IGCMS\Core\FinalContentStrategyInterface") as $fcs) {
       $contentPlus = $fcs->getContent($contentPlus);
     }
 
@@ -298,7 +318,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   private function getTitle(DOMElementPlus $h1) {
     $title = $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
-    foreach($this->subject->getIsInterface("ContentStrategyInterface") as $clsName => $cls) {
+    foreach($this->subject->getIsInterface("IGCMS\Core\ContentStrategyInterface") as $clsName => $cls) {
       $tmp = Cms::getVariable(strtolower($clsName)."-title");
       if(!is_null($tmp)) $title = $tmp;
     }
@@ -343,7 +363,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->pluginDir."/".get_class($this).".xsl", 1, false);
+    $this->addTransformation($this->pluginDir."/".basename(get_class($this)).".xsl", 1, false);
 
     // add template files
     $theme = $cfg->getElementById("theme");
@@ -358,7 +378,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->addThemeFiles($cfg->documentElement);
   }
 
-  private function addThemeFiles(DOMElement $e) {
+  private function addThemeFiles(DOMElement $e = null) {
     foreach($e->childElementsArray as $n) {
       if($n->nodeValue == "" || in_array($n->nodeName, array("var", "themes"))) continue;
       try {

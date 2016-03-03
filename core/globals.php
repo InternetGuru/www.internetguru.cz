@@ -1,12 +1,9 @@
 <?php
 
-function __autoload($className) {
-  $fp = PLUGINS_FOLDER."/$className/$className.php";
-  if(@include $fp) return;
-  $fc = CORE_FOLDER."/$className.php";
-  if(@include $fc) return;
-  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, PLUGINS_DIR, CORE_DIR));
-}
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\LoggerException;
 
 function isValidId($id) {
   return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
@@ -82,10 +79,10 @@ function redirTo($link, $code=null, $msg=null) {
   http_response_code(is_null($code) ? 302 : $code);
   if(!strlen($link)) {
     $link = ROOT_URL;
-    if(class_exists("Logger"))
+    if(class_exists("IGCMS\Core\Logger"))
       Logger::log(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING, null, false);
   }
-  if(class_exists("Logger"))
+  if(class_exists("IGCMS\Core\Logger"))
     Logger::log(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""), Logger::LOGGER_INFO, null, false);
   #var_dump($link); die();
   if(is_null($code) || !is_numeric($code)) {

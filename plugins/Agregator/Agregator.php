@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class Agregator extends Plugin implements SplObserver {
   private $files = array();  // filePath => fileInfo(?)
   private $docinfo = array();
@@ -301,10 +314,11 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function createCmsVars($subDir, Array $vars) {
-    $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
+    $className = basename(get_class($this));
+    $filePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($filePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
+      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$className.".xml");
       $this->useCache = false;
     }
     foreach($this->cfg->documentElement->childElementsArray as $html) {
@@ -353,7 +367,7 @@ class Agregator extends Plugin implements SplObserver {
         self::$sortKey = $userKey;
       }
     }
-    uasort($vars, array("Agregator", "cmp"));
+    uasort($vars, array("IGCMS\Plugins\Agregator", "cmp"));
     if($reverse) $vars = array_reverse($vars);
     return $vars;
   }

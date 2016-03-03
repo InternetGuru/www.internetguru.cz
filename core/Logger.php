@@ -1,5 +1,9 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\Cms;
+
 class Logger {
   const LOGGER_FATAL = "Fatal";
   const LOGGER_ERROR = "Error";

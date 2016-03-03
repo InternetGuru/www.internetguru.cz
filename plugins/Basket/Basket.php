@@ -1,5 +1,17 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;
@@ -65,10 +77,11 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function validateConfigCache() {
-    $configFilePath = findFile($this->pluginDir."/".get_class($this).".xml");
+    $className = basename(get_class($this));
+    $configFilePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($configFilePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($configFilePath))) {
-      apc_store_cache($cacheKey, filemtime($configFilePath), $this->pluginDir."/".get_class($this).".xml");
+      apc_store_cache($cacheKey, filemtime($configFilePath), $this->pluginDir."/".$className.".xml");
       $this->useCache = false;
     }
   }

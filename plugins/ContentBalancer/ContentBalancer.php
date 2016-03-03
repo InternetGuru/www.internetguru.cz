@@ -1,5 +1,19 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMElement;
+use DOMXPath;
+use SplObserver;
+use SplSubject;
+
 class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
   private $sets = array();
@@ -57,7 +71,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $nodes = array();
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
     foreach($nodes as $section) {
-      $className = strtolower(get_class($this));
+      $className = strtolower(basename(get_class($this)));
       $setId = null;
       foreach(explode(" ", $section->getAttribute("class")) as $c) {
         if(strpos($c, "$className-") !== 0) continue;

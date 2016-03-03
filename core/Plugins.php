@@ -1,5 +1,11 @@
 <?php
 
+namespace IGCMS\Core;
+
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class Plugins implements SplSubject {
   private $status = null;
   private $observers = array(); // list of enabled observer (names => Observer)
@@ -30,6 +36,7 @@ class Plugins implements SplSubject {
       if(!is_dir(PLUGINS_FOLDER."/$p")) continue;
       if(file_exists(PLUGINS_FOLDER."/.$p")) continue;
       if(file_exists(".PLUGIN.$p")) continue;
+      $p = "IGCMS\Plugins\\$p";
       $this->attach(new $p($this));
     }
   }
@@ -43,18 +50,18 @@ class Plugins implements SplSubject {
   }
 
   public function attach(SplObserver $observer, $priority=10) {
-    $o = get_class($observer);
+    $o = basename(get_class($observer));
     $this->observers[$o] = $observer;
     if(!array_key_exists($o, $this->observerPriority)) $this->observerPriority[$o] = $priority;
     if($observer->isDebug()) Cms::addMessage(sprintf(_("Plugin %s debug mode is enabled"), $o), Cms::MSG_INFO);
   }
 
   public function setPriority(SplObserver $observer, $priority) {
-    $this->observerPriority[get_class($observer)] = $priority;
+    $this->observerPriority[basename(get_class($observer))] = $priority;
   }
 
   public function detach(SplObserver $observer) {
-    $o = get_class($observer);
+    $o = basename(get_class($observer));
     if(array_key_exists($o, $this->observers)) $this->observers[$o] = null;
     if(array_key_exists($o, $this->observerPriority)) unset($this->observerPriority[$o]);
   }

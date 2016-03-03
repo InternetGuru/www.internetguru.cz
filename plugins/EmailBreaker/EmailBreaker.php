@@ -1,5 +1,16 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\FinalContentStrategyInterface;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyInterface {
 
   public function update(SplSubject $subject) {
@@ -60,7 +71,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     foreach($pat as $k => $p) {
       $jsRep[] = "['$p','{$rep[$k]}']";
     }
-    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".get_class($this).".js");
+    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".basename(get_class($this)).".js");
     Cms::getOutputStrategy()->addJs("EmailBreaker.init({
       rep: [".implode(",", $jsRep)."]
     });");

@@ -1,5 +1,17 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
+
 /**
  * Unlogged user (on root url) generate sitemap.xml from all loaded files and save it to the root of current domain
  * @see http://www.sitemaps.org/protocol.html Sitemap definition

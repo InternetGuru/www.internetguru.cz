@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMXPath;
+use SplObserver;
+use SplSubject;
+
 class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterface {
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
@@ -18,7 +31,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != STATUS_PREINIT) return;
     $this->detachIfNotAttached("HtmlOutput");
-    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.get_class($this).'.css');
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.basename(get_class($this)).'.css');
   }
 
   public function getContent(HTMLPlus $content) {

@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use IGCMS\Core\ResourceInterface;
+use Autoprefixer;
+use UglifyPHP\JS;
+use Imagick;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   const DEBUG = false;
   private static $imageModes = array(
@@ -221,8 +234,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function buildCss($src, $dest) {
-    require LIB_FOLDER.'/autoprefixer-php/lib/Autoprefixer.php';
-    require LIB_FOLDER.'/autoprefixer-php/lib/AutoprefixerException.php';
     $data = file_get_contents($src);
     $autoprefixer = new Autoprefixer(['last 2 version']);
     $data = $autoprefixer->compile($data);
@@ -232,9 +243,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private static function buildJs($src, $dest) {
     require LIB_FOLDER.'/uglify-php/src/UglifyPHP/Uglify.php';
     require LIB_FOLDER.'/uglify-php/src/UglifyPHP/JS.php';
-    if(!UglifyPHP\JS::installed())
+    if(!JS::installed())
       throw new Exception(_("UglifyJS not installed"));
-    $js = new UglifyPHP\JS($src);
+    $js = new JS($src);
     if($js->minify($dest)) return;
     throw new Exception(_("Unable to minify JS"));
   }

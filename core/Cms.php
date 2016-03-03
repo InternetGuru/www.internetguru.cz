@@ -1,5 +1,12 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\ContentStrategyInterface;
+use Exception;
+use Closure;
+use DOMNode;
+
 class Cms {
 
   private static $contentFull = null; // HTMLPlus
@@ -105,7 +112,7 @@ class Cms {
     try {
       $cs = null;
       global $plugins;
-      foreach($plugins->getIsInterface("ContentStrategyInterface") as $cs) {
+      foreach($plugins->getIsInterface("IGCMS\Core\ContentStrategyInterface") as $cs) {
         $c = $cs->getContent(self::$content);
         $object = gettype($c) == "object";
         if(!($object && $c instanceof HTMLPlus)) {
@@ -236,7 +243,7 @@ class Cms {
   private static function getVarId($name) {
     $d = debug_backtrace();
     if(!isset($d[2]["class"])) throw new LoggerException(_("Unknown caller class"));
-    $varId = strtolower($d[2]["class"]);
+    $varId = basename(strtolower($d[2]["class"]));
     if($varId == $name) return $varId;
     return $varId.(strlen($name) ? "-".normalize($name) : "");
   }

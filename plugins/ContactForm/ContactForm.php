@@ -1,5 +1,19 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMXPath;
+use SplObserver;
+use SplSubject;
+
 class ContactForm extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;
@@ -12,6 +26,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $messages;
   private $errors = array();
   private $forms = array();
+  private $className = null;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -19,6 +34,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
+    $this->className = basename(get_class($this));
   }
 
   public function update(SplSubject $subject) {
@@ -45,7 +61,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $form->addClass("fillable");
       $form->addClass("validable");
       $formVar = $this->parseForm($form);
-      $this->formsElements[normalize(get_class($this))."-$formId"] = $formVar;
+      $this->formsElements[normalize($this->className)."-$formId"] = $formVar;
     }
   }
 
@@ -55,7 +71,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $formIdToSend = null;
 
     foreach($this->forms as $formId => $form) {
-      $prefixedFormId = normalize(get_class($this))."-$formId";
+      $prefixedFormId = normalize($this->className)."-$formId";
       $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
       $formValues = Cms::getVariable("validateform-$prefixedFormId");
       $fv = $this->createFormVars($htmlForm);
@@ -91,7 +107,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         var_dump($this->formValues);
       }
     } catch(Exception $e) {
-      $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$formIdToSend."'>"
+      $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower($this->className)."-".$formIdToSend."'>"
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
       Logger::log($message, Logger::LOGGER_ERROR);
     }
@@ -108,7 +124,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   private function parseForm(DOMElementPlus $form) {
-    $prefix = normalize(get_class($this));
+    $prefix = normalize($this->className);
     $doc = new DOMDocumentPlus();
     $var = $doc->appendChild($doc->createElement("var"));
     $htmlForm = $var->appendChild($doc->importNode($form, true));
@@ -221,14 +237,14 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private function registerFormItems(DOMElementPlus $form, $prefix) {
     $time = time();
     $idInput = $form->ownerDocument->createElement("input");
-    $idInput->setAttribute("name", get_class($this));
+    $idInput->setAttribute("name", $this->className);
     $idInput->setAttribute("type", "hidden");
     $idInput->setAttribute("value", $form->getAttribute("id"));
     $i = 1;
     $e = null;
     $this->formItems = array();
     $this->formValues = array();
-    $this->formNames = array(get_class($this));
+    $this->formNames = array($this->className);
     $this->formIds = array();
     $this->formGroupValues = array();
     $xpath = new DOMXPath($form->ownerDocument);

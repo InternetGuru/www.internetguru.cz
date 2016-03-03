@@ -1,5 +1,14 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class FillForm extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
