@@ -367,7 +367,7 @@ class Agregator extends Plugin implements SplObserver {
         self::$sortKey = $userKey;
       }
     }
-    uasort($vars, "IGCMS\Core\Agregator::cmp");
+    uasort($vars, array("IGCMS\Plugins\Agregator", "cmp"));
     if($reverse) $vars = array_reverse($vars);
     return $vars;
   }
