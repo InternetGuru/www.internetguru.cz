@@ -10,11 +10,13 @@ use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
+use DOMImplementation;
+use DOMDocument;
+use DOMElement;
+use DOMXPath;
+use XSLTProcessor;
 use SplObserver;
 use SplSubject;
-use DOMElement;
-use XSLTProcessor;
-use DOMDocument;
 
 
 class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
