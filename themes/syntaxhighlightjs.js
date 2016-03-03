@@ -34,12 +34,12 @@
   }
 
   if(found) {
-    appendStyleLink("lib/highlight.js/src/styles/tomorrow.css");
+    appendStyleLink("vendor/components/highlightjs/styles/tomorrow.css");
     appendStyle('code.hljs { display: inline; font-family: "Emilbus Mono","Lucida Console",monospace; padding: 0 0.3em; background: #f0f0f0; } pre code.hljs {display: block; padding: 0.5em; }');
     var head = document.head || document.getElementsByTagName('head')[0];
     script = document.createElement("script");
     script.type = "text/javascript";
-    script.src = "lib/highlight.pack.js";
+    script.src = "vendor/components/highlightjs/highlight.pack.min.js";
     script.onload = initHl;
     head.appendChild(script);
   }

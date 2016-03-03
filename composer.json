@@ -1,7 +1,8 @@
 {
     "require": {
         "monolog/monolog": "^1.17",
-        "vladkens/autoprefixer": "dev-master"
+        "vladkens/autoprefixer": "dev-master",
+        "components/highlightjs": "^9.1"
     },
     "autoload": {
         "psr-4": {
