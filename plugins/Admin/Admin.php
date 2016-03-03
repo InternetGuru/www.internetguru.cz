@@ -21,6 +21,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const STATUS_UNKNOWN = 4;
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
+  private $className = null;
   private $content = null;
   private $contentValue = null;
   private $scheme = null;
@@ -43,6 +44,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
     $this->dataFileStatus = self::STATUS_UNKNOWN;
+    $this->className = basename(get_class($this));
   }
 
   public function update(SplSubject $subject) {
@@ -52,7 +54,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     if($subject->getStatus() != STATUS_INIT) return;
-    if(!isset($_GET[get_class($this)])) {
+    if(!isset($_GET[$this->className])) {
       $subject->detach($this);
       return;
     }
@@ -66,7 +68,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(!$this->isPost()) return;
     if(!$this->redir) return;
     $pLink["path"] = getCurLink();
-    if(!isset($_POST["saveandgo"])) $pLink["query"] = get_class($this)."=".$_POST["filename"];
+    if(!isset($_POST["saveandgo"])) $pLink["query"] = $this->className."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
   }
 
@@ -191,7 +193,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
     $newContent = $this->getHTMLPlus();
 
-    $la = "?".get_class($this)."=".$_GET[get_class($this)];
+    $la = "?".$this->className."=".$_GET[$this->className];
     $statusChanged = self::FILE_DISABLE;
     if($this->dataFileStatus == self::STATUS_DISABLED) {
       $vars["warning"] = "warning";
@@ -223,7 +225,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["link"] = getCurLink();
     $vars["linkadmin"] = $la;
     if($this->contentValue !== "" ) $vars["content"] = $this->contentValue;
-    $vars["filename"] = $_GET[get_class($this)];
+    $vars["filename"] = $_GET[$this->className];
     $vars["filepathpattern"] = FILEPATH_PATTERN;
     $vars["schema"] = $format;
     $vars["mode"] = $mode;
@@ -291,12 +293,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
    * themes/userFile.css -> usr/themes/userFile.css (dir/F.ext user)
    */
   private function setDefaultFile() {
-    $fileName = $_GET[get_class($this)];
+    $fileName = $_GET[$this->className];
     $this->defaultFile = $this->getFilepath($fileName);
     $fLink = DOMBuilder::getLink(findFile($fileName));
     if(is_null($fLink)) $fLink = getCurLink();
     if($this->defaultFile != $fileName || $fLink != getCurLink()) {
-      redirTo(buildLocalUrl(array("path" => $fLink, "query" => get_class($this)."=".$this->defaultFile)));
+      redirTo(buildLocalUrl(array("path" => $fLink, "query" => $this->className."=".$this->defaultFile)));
     }
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
   }

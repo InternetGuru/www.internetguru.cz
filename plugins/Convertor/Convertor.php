@@ -19,12 +19,14 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private $docName = null;
   private $tmpFolder;
   private $importedFiles = array();
+  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
     mkdir_plus($this->tmpFolder);
+    $this->className = basename(get_class($this));
   }
 
   public function update(SplSubject $subject) {
@@ -33,14 +35,14 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       return;
     }
     if($subject->getStatus() != STATUS_INIT) return;
-    if(!isset($_GET[get_class($this)])) {
+    if(!isset($_GET[$this->className])) {
       $subject->detach($this);
       return;
     }
     $this->requireActiveCms();
     try {
-      if(strlen($_GET[get_class($this)]))
-        $this->processImport($_GET[get_class($this)]);
+      if(strlen($_GET[$this->className]))
+        $this->processImport($_GET[$this->className]);
     } catch(Exception $e) {
       Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
     }
@@ -55,7 +57,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function processImport($fileUrl) {
-    if(!strlen($_GET[get_class($this)]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
+    if(!strlen($_GET[$this->className]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
       throw new Exception(_("File URL cannot be empty"));
     }
     $f = $this->getFile($fileUrl);
@@ -167,8 +169,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   public function getContent(HTMLPlus $c) {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $newContent = $this->getHTMLPlus();
-    $vars["action"] = "?".get_class($this);
-    $vars["link"] = $_GET[get_class($this)];
+    $vars["action"] = "?".$this->className;
+    $vars["link"] = $_GET[$this->className];
     $vars["path"] = $this->pluginDir;
     if(!empty($this->importedFiles)) $vars["importedhtml"] = $this->importedFiles;
     $vars["filename"] = $this->file;

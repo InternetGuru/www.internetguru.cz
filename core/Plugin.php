@@ -15,7 +15,7 @@ class Plugin {
 
   public function __construct(SplSubject $s) {
     $this->subject = $s;
-    $this->pluginDir = PLUGINS_DIR."/".get_class($this);
+    $this->pluginDir = PLUGINS_DIR."/".basename(get_class($this));
   }
 
   public function isDebug() {
@@ -46,7 +46,7 @@ class Plugin {
 
   protected function getDOMExt($ext=null, $htmlPlus=false, $user=true) {
     if(is_null($ext)) $ext = "xml";
-    return $this->getDOMPlus($this->pluginDir."/".get_class($this).".$ext", $htmlPlus, $user);
+    return $this->getDOMPlus($this->pluginDir."/".basename(get_class($this)).".$ext", $htmlPlus, $user);
   }
 
   protected function getDOMPlus($filePath=null, $htmlPlus=false, $user=true) {

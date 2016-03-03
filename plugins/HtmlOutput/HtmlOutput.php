@@ -360,7 +360,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->pluginDir."/".get_class($this).".xsl", 1, false);
+    $this->addTransformation($this->pluginDir."/".basename(get_class($this)).".xsl", 1, false);
 
     // add template files
     $theme = $cfg->getElementById("theme");

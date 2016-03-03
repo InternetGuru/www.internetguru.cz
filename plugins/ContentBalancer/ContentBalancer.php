@@ -68,7 +68,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $nodes = array();
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
     foreach($nodes as $section) {
-      $className = strtolower(get_class($this));
+      $className = strtolower(basename(get_class($this)));
       $setId = null;
       foreach(explode(" ", $section->getAttribute("class")) as $c) {
         if(strpos($c, "$className-") !== 0) continue;
