@@ -3,7 +3,8 @@
         "monolog/monolog": "^1.17",
         "vladkens/autoprefixer": "dev-master",
         "components/highlightjs": "^9.1",
-        "smallhadroncollider/uglify-php": "^1.0"
+        "smallhadroncollider/uglify-php": "^1.0",
+        "phpmailer/phpmailer": "^5.2"
     },
     "autoload": {
         "psr-4": {
