@@ -7,6 +7,7 @@ use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\ResourceInterface;
 use UglifyPHP\JS;
+use Autoprefixer;
 use SplObserver;
 use SplSubject;
 
@@ -231,8 +232,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function buildCss($src, $dest) {
-    require LIB_FOLDER.'/autoprefixer-php/lib/Autoprefixer.php';
-    require LIB_FOLDER.'/autoprefixer-php/lib/AutoprefixerException.php';
     $data = file_get_contents($src);
     $autoprefixer = new Autoprefixer(['last 2 version']);
     $data = $autoprefixer->compile($data);
