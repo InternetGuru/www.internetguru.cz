@@ -7,6 +7,7 @@ use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\ResourceInterface;
 use UglifyPHP\JS;
+use Exception;
 use Autoprefixer;
 use SplObserver;
 use SplSubject;

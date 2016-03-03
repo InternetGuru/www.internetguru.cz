@@ -242,7 +242,7 @@ class Cms {
   private static function getVarId($name) {
     $d = debug_backtrace();
     if(!isset($d[2]["class"])) throw new LoggerException(_("Unknown caller class"));
-    $varId = strtolower($d[2]["class"]);
+    $varId = basename(strtolower($d[2]["class"]));
     if($varId == $name) return $varId;
     return $varId.(strlen($name) ? "-".normalize($name) : "");
   }

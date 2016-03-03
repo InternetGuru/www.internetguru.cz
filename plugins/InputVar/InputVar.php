@@ -10,6 +10,7 @@ use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use DOMElement;
+use DOMNode;
 use Exception;
 use SplObserver;
 use SplSubject;
@@ -26,9 +27,9 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".get_class($this).".xml";
-    $s->setPriority($this, 5);
     $this->className = basename(get_class($this));
+    $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml";
+    $s->setPriority($this, 5);
   }
 
   public function update(SplSubject $subject) {
@@ -258,7 +259,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $attributes = array();
     foreach($element->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     $el = $element->processVariables(Cms::getAllVariables(), array(), true); // pouze posledni node
-    if(is_null($el) || (gettype($el) == "object" && get_class($el) != "DOMElementPlus" && !$el->isSameNode($element))) {
+    if(is_null($el) || (gettype($el) == "object" && basename(get_class($el)) != "DOMElementPlus" && !$el->isSameNode($element))) {
       if(is_null($el)) $el = new DOMText("");
       $var = $element->ownerDocument->createElement("var");
       foreach($attributes as $aName => $aValue) {
