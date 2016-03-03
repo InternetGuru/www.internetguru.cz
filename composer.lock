@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "62d4524e8e1e13ffd3f4f9be6b7ad9b3",
-    "content-hash": "9387c35776685c143c140e1ff422343a",
+    "hash": "dadc767d2b93e9e245b618f896e87094",
+    "content-hash": "12cfc7f1bfbc96a7e49f795ff3804477",
     "packages": [
         {
             "name": "components/highlightjs",
@@ -189,6 +189,17 @@
             "time": "2015-11-01 10:15:28"
         },
         {
+            "name": "poulik/CodeMirror",
+            "version": "dev-ig",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/poulik/CodeMirror",
+                "reference": "ig"
+            },
+            "type": "library",
+            "time": "2016-02-11 15:17:27"
+        },
+        {
             "name": "psr/log",
             "version": "1.0.0",
             "source": {
@@ -323,7 +334,8 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "vladkens/autoprefixer": 20
+        "vladkens/autoprefixer": 20,
+        "poulik/codemirror": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

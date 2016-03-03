@@ -1,10 +1,25 @@
 {
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "poulik/CodeMirror",
+                "version": "dev-ig",
+                "source": {
+                    "url": "https://github.com/poulik/CodeMirror",
+                    "type": "git",
+                    "reference": "ig"
+                }
+            }
+        }
+    ],
     "require": {
         "monolog/monolog": "^1.17",
         "vladkens/autoprefixer": "dev-master",
         "components/highlightjs": "^9.1",
         "smallhadroncollider/uglify-php": "^1.0",
-        "phpmailer/phpmailer": "^5.2"
+        "phpmailer/phpmailer": "^5.2",
+        "poulik/CodeMirror": "dev-ig"
     },
     "autoload": {
         "psr-4": {
