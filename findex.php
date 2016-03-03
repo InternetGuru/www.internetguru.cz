@@ -1,6 +1,7 @@
 <?php
 
 use IGCMS\Core\Logger;
+use IGCMS\Core\ErrorPage;
 
 try {
   include("init.php");
@@ -22,7 +23,7 @@ try {
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf("%s in %s on line %s", $m, $e->getFile(), $e->getLine());
   Logger::log($m, Logger::LOGGER_FATAL, null, false);
-  if(class_exists("ErrorPage")) new ErrorPage($m, $errno);
+  if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno);
 
   http_response_code($errno);
   echo $m;

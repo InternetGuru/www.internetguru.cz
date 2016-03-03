@@ -5,7 +5,9 @@ namespace IGCMS\Core;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
+use Exception;
 use DOMDocument;
+use DOMElement;
 use DOMXPath;
 
 class DOMDocumentPlus extends DOMDocument {

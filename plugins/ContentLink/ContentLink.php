@@ -9,6 +9,7 @@ use IGCMS\Core\ErrorPage;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use DOMElement;
 use SplObserver;
 use SplSubject;
 

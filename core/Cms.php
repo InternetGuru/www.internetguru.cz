@@ -2,6 +2,7 @@
 
 namespace IGCMS\Core;
 
+use IGCMS\Core\ContentStrategyInterface;
 use Closure;
 use DOMNode;
 use Exception;
@@ -111,7 +112,7 @@ class Cms {
     try {
       $cs = null;
       global $plugins;
-      foreach($plugins->getIsInterface("ContentStrategyInterface") as $cs) {
+      foreach($plugins->getIsInterface("IGCMS\Core\ContentStrategyInterface") as $cs) {
         $c = $cs->getContent(self::$content);
         $object = gettype($c) == "object";
         if(!($object && $c instanceof HTMLPlus)) {

@@ -79,10 +79,10 @@ function redirTo($link, $code=null, $msg=null) {
   http_response_code(is_null($code) ? 302 : $code);
   if(!strlen($link)) {
     $link = ROOT_URL;
-    if(class_exists("Logger"))
+    if(class_exists("IGCMS\Core\Logger"))
       Logger::log(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING, null, false);
   }
-  if(class_exists("Logger"))
+  if(class_exists("IGCMS\Core\Logger"))
     Logger::log(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""), Logger::LOGGER_INFO, null, false);
   #var_dump($link); die();
   if(is_null($code) || !is_numeric($code)) {

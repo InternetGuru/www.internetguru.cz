@@ -64,14 +64,12 @@ class HTMLPlus extends DOMDocumentPlus {
     return $this->errors;
   }
 
-  public function processVariables(Array $variables) {
-    $ignore = array("h" => array("id", "link"));
+  public function processVariables(Array $variables, $ignore=array("h" => array("id", "link"))) {
     $newContent = parent::processVariables($variables, $ignore);
     return $newContent->ownerDocument;
   }
 
-  public function processFunctions(Array $functions, Array $variables) {
-    $ignore = array("h" => array("id", "link"));
+  public function processFunctions(Array $functions, Array $variables=array(), $ignore=array("h" => array("id", "link"))) {
     parent::processFunctions($functions, $variables, $ignore);
   }
 
