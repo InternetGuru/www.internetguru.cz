@@ -3,10 +3,10 @@
         {
             "type": "package",
             "package": {
-                "name": "poulik/CodeMirror",
+                "name": "InternetGuru/CodeMirror",
                 "version": "dev-ig",
                 "source": {
-                    "url": "https://github.com/poulik/CodeMirror",
+                    "url": "https://github.com/InternetGuru/CodeMirror",
                     "type": "git",
                     "reference": "ig"
                 }
@@ -19,7 +19,7 @@
         "components/highlightjs": "^9.1",
         "smallhadroncollider/uglify-php": "^1.0",
         "phpmailer/phpmailer": "^5.2",
-        "poulik/CodeMirror": "dev-ig"
+        "InternetGuru/CodeMirror": "dev-ig"
     },
     "autoload": {
         "psr-4": {
