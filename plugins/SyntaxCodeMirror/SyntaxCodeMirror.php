@@ -11,7 +11,7 @@ use SplSubject;
 
 class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
-  const CM_DIR = "poulik/CodeMirror";
+  const CM_DIR = "internetguru/CodeMirror";
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);

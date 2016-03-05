@@ -4,9 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "dadc767d2b93e9e245b618f896e87094",
-    "content-hash": "12cfc7f1bfbc96a7e49f795ff3804477",
+    "hash": "38d26453e5632353020937475c5529eb",
+    "content-hash": "1db737bf65dbd36cf9c5087ce2317d71",
     "packages": [
+        {
+            "name": "InternetGuru/CodeMirror",
+            "version": "dev-ig",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/InternetGuru/CodeMirror",
+                "reference": "ig"
+            },
+            "type": "library",
+            "time": "2016-02-11 15:17:27"
+        },
         {
             "name": "components/highlightjs",
             "version": "9.1.0",
@@ -189,17 +200,6 @@
             "time": "2015-11-01 10:15:28"
         },
         {
-            "name": "poulik/CodeMirror",
-            "version": "dev-ig",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/poulik/CodeMirror",
-                "reference": "ig"
-            },
-            "type": "library",
-            "time": "2016-02-11 15:17:27"
-        },
-        {
             "name": "psr/log",
             "version": "1.0.0",
             "source": {
@@ -335,7 +335,7 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "vladkens/autoprefixer": 20,
-        "poulik/codemirror": 20
+        "internetguru/codemirror": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,
