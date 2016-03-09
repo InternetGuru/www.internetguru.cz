@@ -59,7 +59,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       try {
         $this->securityCheck($time);
       } catch(Exception $e) {
-        Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
+        Logger::notice($e->getMessage());
         continue;
       }
       $this->getLabels($xpath, $form);
@@ -98,7 +98,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
         $error = $e->getMessage();
         if(isset($this->labels[$id][0])) $name = $this->labels[$id][0];
         if(isset($this->labels[$id][1])) $error = $this->labels[$id][1];
-        Cms::addMessage(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error), Cms::MSG_ERROR);
+        Logger::notice(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
         $item->parentNode->addClass(self::CSS_WARNING);
         $item->addClass(self::CSS_WARNING);
         $isValid = false;

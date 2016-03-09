@@ -78,7 +78,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $formValues = Cms::getVariable("validateform-$prefixedFormId");
       $fv = $this->createFormVars($htmlForm);
       if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-        Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
+        Cms::success($fv["success"]);
       }
       if(is_null($formValues)) continue;
       foreach(array("email", "name", "sendcopy") as $name) {
@@ -157,7 +157,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $bcc = "pavel@petrzela.eu";
     }
     if(!is_null(Cms::getLoggedUser())) {
-      Cms::addMessage("<pre><code>$msg</code></pre>", Cms::MSG_INFO);
+      Cms::notice("<pre><code>$msg</code></pre>");
       return;
     }
     $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);

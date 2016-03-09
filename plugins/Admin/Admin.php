@@ -62,7 +62,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       $this->process();
     } catch (Exception$e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
+      Logger::error($e->getMessage());
       return;
     }
     if(!$this->isPost()) return;
@@ -91,20 +91,20 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         $this->savePost();
         $this->updateCache();
       } elseif(!$this->isToDisable() && !$this->statusChanged) {
-        Cms::addMessage(_("No changes made"), Cms::MSG_INFO);
+        Logger::notice(_("No changes made"));
       }
     }
     if($this->isToDisable()) $this->disableDataFile();
     if($this->statusChanged) {
       $this->redir = true;
-      Cms::addMessage(_("File status successfully changed"), Cms::MSG_SUCCESS);
+      Cms::success(_("File status successfully changed"));
     }
   }
 
   private function checkCache() {
     if(!$this->isResource($this->type)) {
       if(DOMBuilder::isNginxOutdated()) {
-        Cms::addMessage(_("Saving changes will clear server cache"), Cms::MSG_INFO);
+        Cms::notice(_("Saving changes will clear server cache"));
       }
       return;
     }
@@ -112,7 +112,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
       checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
     } catch(Exception$e) {
-      Cms::addMessage(_("Saving changes will remove outdated file cache"), Cms::MSG_INFO);
+      Cms::notice(_("Saving changes will remove outdated file cache"));
     }
   }
 
@@ -396,7 +396,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } catch(Exception$e) {
       $doc->validatePlus(true);
       foreach($doc->getErrors() as $error) {
-        Cms::addMessage($error, $doc->getStatus());
+        Logger::notice($doc->getStatus().": $error");
       }
       $this->contentValue = $doc->saveXML();
     }
@@ -453,7 +453,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $e->getMessage()));
       }
       $this->redir = true;
-      Cms::addMessage(_("Changes successfully saved"), Cms::MSG_SUCCESS);
+      Cms::success(_("Changes successfully saved"));
     } finally {
       unlock_file($fp, $this->destFile);
     }

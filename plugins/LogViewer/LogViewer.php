@@ -39,7 +39,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
       $fPath = $this->getCurFilePath($fName);
       $vars["content"] = htmlspecialchars($this->file_get_contents($fPath));
     } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
+      Logger::notice($e->getMessage());
     }
     $newContent = $this->getHTMLPlus();
     $vars["cur_file"] = $fName;

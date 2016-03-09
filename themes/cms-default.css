@@ -158,7 +158,7 @@ p object {
 #messages a {
   color: #ccc;
 }
-#messages li.info {
+#messages li.notice {
   background: rgb(0, 66, 131);
 }
 #messages li.warning {

@@ -9,6 +9,7 @@ use DOMNode;
 
 class Cms {
 
+  private static $types = null;
   private static $contentFull = null; // HTMLPlus
   private static $content = null; // HTMLPlus
   private static $outputStrategy = null; // OutputStrategyInterface
@@ -18,13 +19,26 @@ class Cms {
   private static $flashList = null;
   private static $error = false;
   private static $warning = false;
-  private static $other = false;
+  private static $notice = false;
   private static $success = false;
   private static $requestToken = null;
-  const MSG_ERROR = "Error";
-  const MSG_WARNING = "Warning";
-  const MSG_INFO = "Info";
-  const MSG_SUCCESS = "Success";
+
+  public static function __callStatic($methodName, $arguments) {
+    if(array_key_exists($methodName, self::getTypes()))
+      return self::addMessage($methodName, $arguments[0]);
+    throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
+  }
+
+  private static function getTypes() {
+    if(!is_null(self::$types)) return self::$types;
+    self::$types = array(
+      'success'   => _("Success"),
+      'notice'    => _("Notice"),
+      'warning'   => _("Warning"),
+      'error'     => _("Error"),
+    );
+    return self::$types;
+  }
 
   public static function init() {
     global $plugins;
@@ -64,18 +78,14 @@ class Cms {
     self::setVariable("messages", self::$flashList);
   }
 
+
   private static function addFlashItem($message, $type) {
-    $class = $type;
-    switch($type) {
-      case self::MSG_ERROR: self::$error = true; break;
-      case self::MSG_WARNING: self::$warning = true; break;
-      case self::MSG_SUCCESS: self::$success = true; break;
-      default: self::$other = true; $class = self::MSG_INFO;
-    }
-    if(!is_null(self::getLoggedUser())) $message = "$type: $message";
+    $types = self::getTypes();
+    self::$$type = true;
+    if(!is_null(self::getLoggedUser())) $message = self::$types[$type].": $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
-    $li->setAttribute("class", strtolower($class));
+    $li->setAttribute("class", strtolower($type));
     $doc = new DOMDocumentPlus();
     if(!@$doc->loadXML("<var>$message</var>")) {
       $li->nodeValue = htmlspecialchars($message);
@@ -203,13 +213,14 @@ class Cms {
     self::$outputStrategy = $strategy;
   }
 
-  public static function addMessage($message, $type) {
+  private static function addMessage($type, $message) {
+    if(is_null(self::$flashList)) self::createFlashList();
+    if($type == 'success') Logger::info($message);
     if(is_null(self::$requestToken)) self::$requestToken = rand();
     if(Cms::isSuperUser()) {
       $_SESSION["cms"]["flash"][$type][self::$requestToken][] = $message;
       return;
     }
-    if(is_null(self::$flashList)) self::createFlashList();
     self::addFlashItem($message, $type);
   }
 
@@ -247,7 +258,7 @@ class Cms {
 
   public static function hasErrorMessage() { return self::$error; }
   public static function hasWarningMessage() { return self::$warning; }
-  public static function hasOtherMessage() { return self::$other; }
+  public static function hasNoticeMessage() { return self::$notice; }
   public static function hasSuccessMessage() { return self::$success; }
 
   public static function setFunction($name, $value) {

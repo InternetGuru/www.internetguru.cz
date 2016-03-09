@@ -228,11 +228,10 @@ class DOMBuilder {
     if($doc instanceof HTMLPlus)
       $mTime = self::loadHTMLPlusDOM($filePath, $doc, $author, $included);
     else $mTime = self::loadXMLDOM($filePath, $doc);
-    #Cms::addMessage($filePath, Cms::MSG_INFO);
     if(self::$nginxOutdated) return;
     if($mTime > self::$newestFileMtime) self::$newestFileMtime = $mTime;
     if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
-    Cms::addMessage(_("Outdated server cache"), Cms::MSG_WARNING);
+    Logger::notice(_("Outdated server cache"));
     self::$nginxOutdated = true;
   }
 
@@ -296,7 +295,7 @@ class DOMBuilder {
       $doc->validatePlus(true);
       $storeCache = false;
       foreach($doc->getErrors() as $error) {
-        Cms::addMessage($error, $doc->getStatus());
+        Logger::notice($doc->getStatus().": $error");
       }
     }
     // generate ctime/mtime from file if not set

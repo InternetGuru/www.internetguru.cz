@@ -43,9 +43,7 @@ try {
   if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
     try {
       clearNginxCache();
-      $msg = _("Cache successfully purged");
-      Logger::info($msg);
-      Cms::addMessage($msg, Cms::MSG_SUCCESS);
+      Logger::notice(_("Cache successfully purged"));
     } catch(Exception $e) {
       Logger::error($e->getMessage());
     }
@@ -80,7 +78,6 @@ try {
   Cms::getMessages();
   Cms::contentProcessVariables();
   echo Cms::getOutput();
-  Logger::info(sprintf(_("IGCMS successfully finished"), CMS_RELEASE));
 
 } catch(Exception $e) {
 

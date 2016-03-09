@@ -174,13 +174,11 @@ class Logger {
       case MonologLogger::INFO:
       return;
       case MonologLogger::NOTICE:
-      Cms::addMessage($message, Cms::MSG_INFO);
-      return;
       case MonologLogger::WARNING:
-      Cms::addMessage($message, Cms::MSG_WARNING);
+      Cms::{$level}($message);
       return;
       default:
-      Cms::addMessage($message, Cms::MSG_ERROR);
+      Cms::error($message);
     }
   }
 
@@ -214,20 +212,25 @@ class Logger {
   }
 
   // TODO doc
-  private static function pushHandlers(MonologLogger $logger, $type) {
-    $logFile = LOG_FOLDER."/".date("Ymd").".$type";
-    $formatter = $type == self::TYPE_LOG ? new LineFormatter(self::LOG_FORMAT) : new LineFormatter(self::EMAIL_FORMAT);
+  private static function pushHandlers(MonologLogger $logger, $logType) {
+    $logFile = LOG_FOLDER."/".date("Ymd").".$logType";
+    $formatter = $logType == self::TYPE_LOG ? new LineFormatter(self::LOG_FORMAT) : new LineFormatter(self::EMAIL_FORMAT);
+
     $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
     $streamHandler->setFormatter($formatter);
     $logger->pushHandler($streamHandler);
-    $mailHandler = new NativeMailerHandler(
-      self::EMAIL_ALERT_TO,
-      "IGCMS ".DOMAIN." error!",
-      self::EMAIL_ALERT_FROM,
-      MonologLogger::CRITICAL
-    , false);
-    $mailHandler->setFormatter($formatter);
-    $logger->pushHandler($mailHandler);
+
+    foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
+      $mailHandler = new NativeMailerHandler(
+        self::EMAIL_ALERT_TO,
+        "IGCMS $type at ".DOMAIN,
+        self::EMAIL_ALERT_FROM,
+        constant("Monolog\Logger::$type"),
+        false);
+      $mailHandler->setFormatter($formatter);
+      $logger->pushHandler($mailHandler);
+    }
+
     if(CMS_DEBUG) {
       $chromeHandler = new ChromePHPHandler(MonologLogger::DEBUG, false);
       $logger->pushHandler($chromeHandler);
