@@ -1,6 +1,9 @@
 <?php
 
 
+#TODO:
+# - CMS_DEBUG: save all to debug log file
+
 namespace IGCMS\Core;
 
 use IGCMS\Core\Cms;
@@ -165,6 +168,9 @@ class Logger {
     $logger = self::getMonolog($type);
     $monologLevel = self::parseLevel($level);
     $logger->{'add'.$level}($message);
+    if(!Cms::isSuperUser()) return;
+    if($monologLevel < MonologLogger::ERROR) return;
+    Cms::addMessage($message, Cms::MSG_ERROR);
   }
 
   /**

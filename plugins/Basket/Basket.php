@@ -72,7 +72,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       // create basket-empty var
       Cms::setVariable('empty', (count($this->cookieProducts) ? null : ''));
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::error($e->getMessage());
     }
   }
 
@@ -260,7 +260,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       }
       /*
       if(!isset($attrs["price"])) {
-        Logger::log(sprintf(_("Product id %s missing price"), $id), Logger::LOGGER_WARNING);
+        Logger::warning(sprintf(_("Product id %s missing price"), $id));
         continue;
       }
       */

@@ -4,7 +4,6 @@ require __DIR__.'/vendor/autoload.php';
 
 use IGCMS\Core\Logger;
 
-$start_time = microtime(true);
 session_cache_limiter("");
 
 define("INDEX_HTML", "index.html");
@@ -129,6 +128,5 @@ if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)) {
   redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
 initDirs();
-Logger::log(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 
 ?>

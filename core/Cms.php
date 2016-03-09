@@ -21,7 +21,6 @@ class Cms {
   private static $other = false;
   private static $success = false;
   private static $requestToken = null;
-  const DEBUG = false;
   const MSG_ERROR = "Error";
   const MSG_WARNING = "Warning";
   const MSG_INFO = "Info";
@@ -29,7 +28,6 @@ class Cms {
 
   public static function init() {
     global $plugins;
-    if(self::DEBUG) Logger::log("DEBUG");
     self::setVariable("messages", self::$flashList);
     self::setVariable("release", CMS_RELEASE);
     self::setVariable("version", CMS_VERSION);
@@ -126,7 +124,6 @@ class Cms {
         self::$content = $c;
       }
     } catch (Exception $e) {
-      if(self::DEBUG) echo $c->saveXML();
       throw new Exception(sprintf(_("Plugin %s exception: %s"), get_class($cs), $e->getMessage()));
     }
   }
@@ -183,18 +180,18 @@ class Cms {
       self::$content->validatePlus(true);
       #self::$content->processFunctions(self::$functions, self::$variables);
     } catch(Exception $e) {
-      Logger::log(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      Logger::error(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()));
       self::$content = $oldContent;
     }
   }
 
   public static function processVariables(DOMDocumentPlus $doc) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
     return $doc;
   }
 
   private static function insertVar(HTMLPlus $newContent, $varName, $varValue) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
     return;
     $tmpContent = clone $newContent;
     $tmpContent->insertVar($varName, $varValue);
@@ -255,7 +252,7 @@ class Cms {
 
   public static function setFunction($name, $value) {
     if(!$value instanceof Closure) {
-      Logger::log(sprintf(_("Unable to set function %s: not a function"), $name), Logger::LOGGER_WARNING);
+      Logger::warning(sprintf(_("Unable to set function %s: not a function"), $name));
       return null;
     }
     $varId = self::getVarId($name, "fn");

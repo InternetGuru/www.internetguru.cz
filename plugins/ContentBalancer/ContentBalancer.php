@@ -30,7 +30,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $this->createVars();
     // check sets
     if(empty($this->sets)) {
-      Logger::log(_("No sets found"), Logger::LOGGER_ERROR);
+      Logger::error(_("No sets found"));
       return $content;
     }
     // check default set
@@ -60,7 +60,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
           break;
         }
       } catch(Exception $ex) {
-        Logger::log(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
+        Logger::warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
       }
     }
   }
@@ -84,7 +84,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       $set = $this->sets[$this->defaultSet];
       if(!is_null($setId)) {
         if(isset($this->sets[$setId])) $set = $this->sets[$setId];
-        else Logger::log(sprintf(_("Item id %s not found, using default"), $setId), Logger::LOGGER_WARNING);
+        else Logger::warning(sprintf(_("Item id %s not found, using default"), $setId));
       }
       $hs = array();
       foreach($section->childElementsArray as $e) if($e->nodeName == "h") $hs[] = $e;

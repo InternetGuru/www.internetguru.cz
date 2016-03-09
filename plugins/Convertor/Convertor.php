@@ -138,7 +138,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
         throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $e->getMessage()));
       }
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::error($e->getMessage());
     } finally {
       unlock_file($fp, $dest);
     }

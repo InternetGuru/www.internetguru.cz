@@ -14,7 +14,7 @@ class ErrorPage {
 
   public function __construct($message, $code, $extended=false) {
     http_response_code($code);
-    Logger::log($message, Logger::LOGGER_FATAL, null, false);
+    Logger::error($message);
     $dir = LIB_FOLDER."/".$this->relDir;
     $tt = array(
       "@CODE@" => $code,

@@ -24,11 +24,9 @@ class Agregator extends Plugin implements SplObserver {
   private $cfg;
   private static $sortKey;
   const APC_PREFIX = "1";
-  const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    if(self::DEBUG) Logger::log("DEBUG");
     $s->setPriority($this, 2);
     $this->edit = _("Edit");
   }
@@ -56,7 +54,7 @@ class Agregator extends Plugin implements SplObserver {
         $this->createImgVar($subDir, $files);
       }
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
+      Logger::warning($e->getMessage());
       return;
     }
     if(is_null($this->currentDoc)) return;
@@ -206,7 +204,7 @@ class Agregator extends Plugin implements SplObserver {
     foreach($this->cfg->documentElement->childElementsArray as $image) {
       if($image->nodeName != "image") continue;
       if(!$image->hasAttribute("id")) {
-        Logger::log(_("Configuration element image missing attribute id"), Logger::LOGGER_WARNING);
+        Logger::warning(_("Configuration element image missing attribute id"));
         continue;
       }
       $vName = $image->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
@@ -230,7 +228,7 @@ class Agregator extends Plugin implements SplObserver {
     foreach($this->cfg->documentElement->childElementsArray as $alt) {
       if($alt->nodeName != "alt") continue;
       if(!$alt->hasAttribute("for")) {
-        Logger::log(_("Configuration element alt missing attribute for"), Logger::LOGGER_WARNING);
+        Logger::warning(_("Configuration element alt missing attribute for"));
         continue;
       }
       $alts[$alt->getAttribute("for")] = $alt->nodeValue;
@@ -295,7 +293,7 @@ class Agregator extends Plugin implements SplObserver {
         $doc = DOMBuilder::buildHTMLPlus($file);
         $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
       } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::warning($e->getMessage());
         continue;
       }
       if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
@@ -324,13 +322,13 @@ class Agregator extends Plugin implements SplObserver {
     foreach($this->cfg->documentElement->childElementsArray as $html) {
       if($html->nodeName != "html") continue;
       if(!$html->hasAttribute("id")) {
-        Logger::log(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
+        Logger::warning(_("Configuration element html missing attribute id"));
         continue;
       }
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       $cacheKey = apc_get_key($vName);
       // use cache
-      if($this->useCache && !self::DEBUG) {
+      if($this->useCache) {
         $sCache = $this->getSubDirCache($cacheKey);
         if(!is_null($sCache)) {
           $doc = new DOMDocumentPlus();
@@ -350,7 +348,7 @@ class Agregator extends Plugin implements SplObserver {
         );
         apc_store_cache($cacheKey, $var, $vName);
       } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::warning($e->getMessage());
         continue;
       }
     }
@@ -362,7 +360,7 @@ class Agregator extends Plugin implements SplObserver {
       $reverse = $e->hasAttribute("rsort");
       $userKey = $e->hasAttribute("sort") ? $e->getAttribute("sort") : $e->getAttribute("rsort");
       if(!array_key_exists($userKey, current($vars))) {
-        Logger::log(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
+        Logger::warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
       } else {
         self::$sortKey = $userKey;
       }
@@ -402,7 +400,7 @@ class Agregator extends Plugin implements SplObserver {
         $patterns[$item->getAttribute("since")-1] = $item;
       else $patterns[] = $item;
     }
-    if($nonItemElement) Logger::log(sprintf(_("Redundant element(s) found in %s"), $id), Logger::LOGGER_WARNING);
+    if($nonItemElement) Logger::warning(sprintf(_("Redundant element(s) found in %s"), $id));
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
     $pattern = null;
