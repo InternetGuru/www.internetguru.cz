@@ -1,9 +1,5 @@
 <?php
 
-#todo
-# - mail format
-# - backtrace: mail, debug
-# - debug: do konzole, neukladat, nemailovat
 
 namespace IGCMS\Core;
 
@@ -15,10 +11,14 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Processor\IntrospectionProcessor;
 
+// TODO doc
 class Logger {
 
   const TYPE_LOG  = "log";
-  const TYPE_MAIL = "mail";
+  const TYPE_EMAIL = "mail";
+
+  const EMAIL_ALERT_TO = "pavel.petrzela@internetguru.cz jiri.pavelka@internetguru.cz";
+  const EMAIL_ALERT_FROM = "no-reply@internetguru.cz";
 
   /**
    * Monolog logger name, e.g. IGCMS_log.
@@ -27,11 +27,11 @@ class Logger {
   const LOGGER_NAME = "IGCMS";
 
   /**
-   * Log format, for both TYPE_LOG and TYPE_MAIL.
+   * Log format, for both TYPE_LOG and TYPE_EMAIL.
    */
   const LOG_FORMAT = "[%datetime%] %level_name%: %message% %extra%\n";
 
-  const MAIL_FORMAT = "[%datetime%]: %message%\n";
+  const EMAIL_FORMAT = "[%datetime%]: %message%\n";
 
   /**
    * Monolog log logger instance.
@@ -151,7 +151,7 @@ class Logger {
    * @return void
    */
   public static function mail($message) {
-    return self::writeLog('info', $message, self::TYPE_MAIL);
+    return self::writeLog('info', $message, self::TYPE_EMAIL);
   }
 
   /**
@@ -183,47 +183,38 @@ class Logger {
   /**
    * Get or create (if not exists) monolog instance for given type.
    *
-   * @param  string         $type self::TYPE_LOG or self::TYPE_MAIL
+   * @param  string         $type self::TYPE_LOG or self::TYPE_EMAIL
    * @return Monolog\Logger
    */
   private static function getMonolog($type) {
     if(!is_null(self::${"monolog$type"})) return self::${"monolog$type"};
     $logger = new MonologLogger(self::LOGGER_NAME."_$type");
+    $logger->pushProcessor("IGCMS\Core\Logger::appendDebugTrace");
     self::pushHandlers($logger, $type);
-    $processorLevel = MonologLogger::CRITICAL;
-    if(CMS_DEBUG) $processorLevel = MonologLogger::DEBUG;
-    #  $logger->pushProcessor("IGCMS\Core\Logger::appendDebugTrace");
-    $logger->pushProcessor(new IntrospectionProcessor($processorLevel, array("Logger")));
     self::${"monolog$type"} = $logger;
     return $logger;
 
   }
 
+  // TODO doc
   private static function pushHandlers(MonologLogger $logger, $type) {
     $logFile = LOG_FOLDER."/".date("Ymd").".$type";
+    $formatter = $type == self::TYPE_LOG ? new LineFormatter(self::LOG_FORMAT) : new LineFormatter(self::EMAIL_FORMAT);
+    $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
+    $streamHandler->setFormatter($formatter);
+    $logger->pushHandler($streamHandler);
+    $mailHandler = new NativeMailerHandler(
+      self::EMAIL_ALERT_TO,
+      "IGCMS ".DOMAIN." error!",
+      self::EMAIL_ALERT_FROM,
+      MonologLogger::CRITICAL
+    , false);
+    $mailHandler->setFormatter($formatter);
+    $logger->pushHandler($mailHandler);
     if(CMS_DEBUG) {
       $chromeHandler = new ChromePHPHandler(MonologLogger::DEBUG, false);
       $logger->pushHandler($chromeHandler);
     }
-    switch($type) {
-      case self::TYPE_LOG:
-        $formatter = new LineFormatter(self::LOG_FORMAT);
-        $mailHandler = new NativeMailerHandler(
-          "pavel@petrzela.eu",
-          "IGCMS ".DOMAIN." error!",
-          "no-reply@internetguru.cz",
-          MonologLogger::CRITICAL
-        );
-        $mailHandler->setFormatter($formatter);
-        $logger->pushHandler($mailHandler);
-      break;
-      case self::TYPE_MAIL:
-        $formatter = new LineFormatter(self::MAIL_FORMAT);
-      break;
-    }
-    $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
-    $streamHandler->setFormatter($formatter);
-    $logger->pushHandler($streamHandler);
   }
 
   /**
@@ -233,6 +224,7 @@ class Logger {
    * @return Array
    */
   public static function appendDebugTrace(Array $record) {
+    if(!CMS_DEBUG && $record['level'] < MonologLogger::CRITICAL) return $record;
     $record["extra"]["backtrace"] = array_slice(debug_backtrace(), 6);
     return $record;
   }
