@@ -158,7 +158,7 @@ class Logger {
   }
 
   /**
-   * Write message to Monolog.
+   * Write message to Monolog and add Cms message.
    *
    * @param  string  $level
    * @param  string  $message
@@ -169,8 +169,19 @@ class Logger {
     $monologLevel = self::parseLevel($level);
     $logger->{'add'.$level}($message);
     if(!Cms::isSuperUser()) return;
-    if($monologLevel < MonologLogger::ERROR) return;
-    Cms::addMessage($message, Cms::MSG_ERROR);
+    switch($monologLevel) {
+      case MonologLogger::DEBUG:
+      case MonologLogger::INFO:
+      return;
+      case MonologLogger::NOTICE:
+      Cms::addMessage($message, Cms::MSG_INFO);
+      return;
+      case MonologLogger::WARNING:
+      Cms::addMessage($message, Cms::MSG_WARNING);
+      return;
+      default:
+      Cms::addMessage($message, Cms::MSG_ERROR);
+    }
   }
 
   /**
