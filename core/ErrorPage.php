@@ -12,9 +12,8 @@ class ErrorPage {
   private $errSimpleFile = "error-simple.html";
   private $whatnowFile = "whatnow.txt";
 
-  public function __construct($message, $code, $extended=false) {
+  public function __construct($message, $code) {
     http_response_code($code);
-    Logger::error($message);
     $dir = LIB_FOLDER."/".$this->relDir;
     $tt = array(
       "@CODE@" => $code,
@@ -22,9 +21,12 @@ class ErrorPage {
       "@ERROR@" => $message,
       "@VERSION@" => CMS_NAME
     );
-    if(!$extended) {
+    $msg = get_class($this).": $message ($code)";
+    if($code < 500) {
+      Logger::info($msg);
       $html = file_get_contents($dir."/".$this->errSimpleFile);
     } else {
+      Logger::alert($msg);
       $html = file_get_contents($dir."/".$this->errFile);
       $headings = file($dir."/".$this->headingFile, FILE_SKIP_EMPTY_LINES);
       $tt["@HEADING@"] = $headings[array_rand($headings)];

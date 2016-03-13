@@ -153,7 +153,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         #todo: validate HTML5 validity
         $content = $newContent;
       } catch(Exception $e) {
-        Logger::error($e->getMessage());
+        Logger::user_error($e->getMessage());
       }
     }
     return $content;
@@ -181,7 +181,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($toStrip as $e) {
       $m = sprintf(_("Removed duplicit id %s"), $e->getAttribute("id"));
       $e->stripAttr("id", $m);
-      Logger::warning($m);
+      Logger::user_warning($m);
     }
     return $ids;
   }
@@ -199,7 +199,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           if(Cms::isSuperUser() && $eName == "object" && is_file($pUrl["path"])) {
             $mimeType = getFileMime($pUrl["path"]);
             if($a->getAttribute("type") != $mimeType)
-              Logger::error(sprintf(_("Object %s attribute type invalid or missing: %s"), $pUrl["path"], $mimeType));
+              Logger::user_warning(sprintf(_("Object %s attribute type invalid or missing: %s"), $pUrl["path"], $mimeType));
           }
           $a->setAttribute($aName, ROOT_URL.$pUrl["path"]);
           continue;
@@ -273,18 +273,21 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       try {
         $mime = getFileMime($filePath);
         if(strpos($mime, "image/") !== 0)
-          throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $dataFile, $mime));
+          throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $dataFile, $mime), 1);
         if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
           $o->setAttribute("type", $mime);
-          Logger::warning(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime));
+          Logger::user_warning(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime));
         }
         if(array_key_exists("full", $query)) {
           unset($query["full"]);
           $o->setAttribute("data", $pUrl["path"].buildQuery($query));
-          Logger::warning(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile));
+          Logger::user_warning(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile));
         }
       } catch(Exception $e) {
-        Logger::error($e->getMessage());
+        if($e->getCode() === 1)
+          Logger::user_warning($e->getMessage());
+        else
+          Logger::critical($e->getMessage());
         $toStrip[] = array($o, $e->getMessage());
       }
     }
@@ -336,7 +339,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       } elseif(is_array($v)) {
         $s = implode(", ", $v);
       } elseif(is_object($v) && !method_exists($v, '__toString')) {
-        Logger::error(sprintf(_("Unable to convert variable '%s' to string"), $k));
+        Logger::critical(sprintf(_("Unable to convert variable '%s' to string"), $k));
         continue;
       } else {
         $s = (string) $v;
@@ -368,7 +371,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if(!is_null($theme)) {
       $themeId = $theme->nodeValue;
       $t = $cfg->getElementById($themeId);
-      if(is_null($t)) Logger::error(sprintf(_("Theme '%s' not found"), $themeId));
+      if(is_null($t)) Logger::user_warning(sprintf(_("Theme '%s' not found"), $themeId));
       else $this->addThemeFiles($t);
     }
 
@@ -404,7 +407,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           $this->favIcon = findFile($n->nodeValue);
         }
       } catch(Exception $e) {
-        Logger::warning(sprintf(_("File %s of type %s not found"), $n->nodeValue, $n->nodeName));
+        Logger::user_warning(sprintf(_("File %s of type %s not found"), $n->nodeValue, $n->nodeName));
       }
     }
   }
@@ -514,7 +517,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     Cms::addVariableItem("transformations", $filePath);
     #if(findFile($filePath, $user) === false) throw new Exception();
     if(!$user && is_file(USER_FOLDER."/".$filePath))
-      Logger::warning(sprintf(_("File %s modification is disabled"), $filePath));
+      Logger::user_warning(sprintf(_("File %s modification is disabled"), $filePath));
     $this->transformations[$filePath] = array(
       "priority" => $priority,
       "file" => $filePath,

@@ -80,7 +80,7 @@ class DOMDocumentPlus extends DOMDocument {
         }
         $res = $this->insertVariable($element, $variables[$vName], $aName);
       } catch(Exception $e) {
-        Logger::error(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()));
+        Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()));
       }
     }
     if($deep) foreach($element->childNodes as $e) {

@@ -29,7 +29,7 @@ class GA extends Plugin implements SplObserver {
     $ga_id = $ga_id->nodeValue;
     // ga_id validation
     if(!preg_match("/^UA-\d+-\d+$/", $ga_id)) {
-      Logger::warning(sprintf(_("Invalid ga_id format '%s'"), $ga_id));
+      Logger::user_warning(sprintf(_("Invalid ga_id format '%s'"), $ga_id));
       return;
     }
     // disable if superadmin

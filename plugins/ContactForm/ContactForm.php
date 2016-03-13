@@ -111,7 +111,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     } catch(Exception $e) {
       $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower($this->className)."-".$formIdToSend."'>"
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
-      Logger::error($message);
+      Logger::user_error($message);
     }
   }
 
@@ -119,7 +119,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $xpath = new DOMXPath($content);
     if(!$xpath->query("//*[contains(@var, 'contactform-')]")->length) return $content;
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
-      Logger::warning(_("Admin address is not set or invalid"));
+      Logger::user_warning(_("Admin address is not set or invalid"));
     }
     $content->processVariables($this->formsElements);
     return $content;
@@ -211,7 +211,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           break;
         }
       } catch(Exception $ex) {
-        Logger::warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
       }
     }
     if(self::DEBUG) $this->vars["adminaddr"] = "debug@somedomain.cz";
@@ -253,7 +253,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 7);
       }
       if($e->nodeName == "input" && !$e->hasAttribute("type")) {
-        Logger::warning(_("Element input missing attribute type skipped"));
+        Logger::user_warning(_("Element input missing attribute type skipped"));
         continue;
       }
       $this->formItems[] = $e;

@@ -39,7 +39,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     foreach($xpath->query("//form") as $form) {
       if(!$form->hasClass("validable")) continue;
       if(!$form->hasAttribute("id")) {
-        Logger::warning(_("Validable form missing attribute id"));
+        Logger::user_warning(_("Validable form missing attribute id"));
         continue;
       }
       $time = $this->getWaitTime($form);
@@ -59,7 +59,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       try {
         $this->securityCheck($time);
       } catch(Exception $e) {
-        Logger::notice($e->getMessage());
+        Logger::user_error($e->getMessage());
         continue;
       }
       $this->getLabels($xpath, $form);
@@ -98,7 +98,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
         $error = $e->getMessage();
         if(isset($this->labels[$id][0])) $name = $this->labels[$id][0];
         if(isset($this->labels[$id][1])) $error = $this->labels[$id][1];
-        Logger::notice(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
+        Logger::user_error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
         $item->parentNode->addClass(self::CSS_WARNING);
         $item->addClass(self::CSS_WARNING);
         $isValid = false;
@@ -199,7 +199,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     if(!strlen($pattern)) return;
     $res = @preg_match("/^(?:$pattern)$/", $value);
     if($res === false) {
-      Logger::warning(_("Invalid item pattern"));
+      Logger::user_warning(_("Invalid item pattern"));
       return;
     }
     if($res === 1) return;

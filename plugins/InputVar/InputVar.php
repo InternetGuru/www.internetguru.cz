@@ -46,7 +46,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
         if($e->nodeName == "set") continue;
         if($e->nodeName == "passwd") continue;
         if(!$e->hasAttribute("id")) {
-          Logger::warning(sprintf(_("Missing attribute id in element %s"), $e->nodeName));
+          Logger::user_warning(sprintf(_("Missing attribute id in element %s"), $e->nodeName));
           continue;
         }
         switch($e->nodeName) {
@@ -58,11 +58,12 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
           $this->processRule($e);
           break;
           default:
-          Logger::warning(sprintf(_("Unknown element name %s"), $e->nodeName));
+          Logger::user_warning(sprintf(_("Unknown element name %s"), $e->nodeName));
         }
       }
     } catch(Exception $ex) {
-      Logger::error($ex->getMessage());
+      if($ex->getCode() === 1) Logger::user_error($ex->getMessage());
+      else Logger::critical($ex->getMessage());
     }
   }
 
@@ -86,7 +87,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
     foreach($this->cfg->getElementsByTagName("set") as $e) {
       if(!$e->hasAttribute("type")) {
-        Logger::warning(_("Element set missing attribute type"));
+        Logger::user_warning(_("Element set missing attribute type"));
         continue;
       }
       $this->createFieldset($newContent, $fieldset, $e);
@@ -106,7 +107,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->createFs($content, $fieldset, $set, $set->getAttribute("type"));
       break;
       default:
-      Logger::warning(sprintf(_("Element set uknown type %s"), $set->getAttribute("type")));
+      Logger::user_warning(sprintf(_("Element set uknown type %s"), $set->getAttribute("type")));
     }
   }
 
@@ -130,7 +131,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
         return;
       }
       if(is_null($inputVar)) {
-        Logger::warning(sprintf(_("Cannot create fieldset for %s"), $rule)); // never happend?
+        Logger::user_warning(sprintf(_("Cannot create fieldset for %s"), $rule)); // never happend?
         continue;
       }
       $vars["group"] = strlen($set->nodeValue) ? $set->nodeValue : $rule;
@@ -153,7 +154,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       try {
         $select = $this->createSelect($inputDoc, $dataListArray, $v->getAttribute("id"));
       } catch(Exception $e) {
-        Logger::warning($e->getMessage());
+        Logger::critical($e->getMessage());
         continue;
       }
       $dt = $inputDoc->createElement("dt");
@@ -230,7 +231,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $req = Cms::getVariable("validateform-".$this->formId);
     if(is_null($req)) return;
     if(isset($req["passwd"]) && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {
-      throw new Exception(_("Incorrect password"));
+      throw new Exception(_("Incorrect password"), 1);
     }
     $var = null;
     foreach($req as $k => $v) {
@@ -280,7 +281,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       try {
         $result = Cms::applyUserFn($f, $el);
       } catch(Exception $e) {
-        Logger::warning(sprintf(_("Unable to apply function: %s"), $e->getMessage()));
+        Logger::user_warning(sprintf(_("Unable to apply function: %s"), $e->getMessage()));
         return;
       }
     }
@@ -291,7 +292,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       $fn = $this->register($el);
     } catch(Exception $e) {
-      Logger::warning(sprintf(_("Unable to register function %s: %s"), $el->getAttribute("fn"), $e->getMessage()));
+      Logger::user_warning(sprintf(_("Unable to register function %s: %s"), $el->getAttribute("fn"), $e->getMessage()));
       return;
     }
     if($el->nodeName == "fn") Cms::setFunction($id, $fn);
@@ -323,7 +324,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       foreach($el->childElementsArray as $d) {
         if($d->nodeName != "data") continue;
         if(!$d->hasAttribute("name")) {
-          Logger::warning(_("Element data missing attribute name"));
+          Logger::user_warning(_("Element data missing attribute name"));
           continue;
         }
         $tr["~(?<!\pL)".$d->getAttribute("name")."(?!\pL)~u"] = $this->parse($d->nodeValue);
@@ -335,7 +336,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       foreach($el->childElementsArray as $call) {
         if($call->nodeName != "call") continue;
         if(!strlen($call->nodeValue)) {
-          Logger::warning(_("Element call missing content"));
+          Logger::user_warning(_("Element call missing content"));
           continue;
         }
         $seq[] = $call->nodeValue;
@@ -408,7 +409,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
         try {
           $node = new DOMElement("any", Cms::applyUserFn($f, $node));
         } catch(Exception $e) {
-          Logger::warning(sprintf(_("Sequence call skipped: %s"), $e->getMessage()));
+          Logger::user_warning(sprintf(_("Sequence call skipped: %s"), $e->getMessage()));
         }
       }
       return $node->nodeValue;

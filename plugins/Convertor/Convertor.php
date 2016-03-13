@@ -46,7 +46,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       if(strlen($_GET[$this->className]))
         $this->processImport($_GET[$this->className]);
     } catch(Exception $e) {
-      Logger::error($e->getMessage());
+      Logger::user_error($e->getMessage());
     }
     $this->getImportedFiles();
   }
@@ -94,7 +94,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $doc->loadXML($xml);
     if(is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h") {
-      Logger::error(_("Unable to import document; probably missing heading"));
+      Logger::user_error(_("Unable to import document; probably missing heading"));
       return;
     }
     $this->parseContent($doc, "h", "short");
@@ -109,7 +109,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       try {
         $doc->validatePlus(true);
         foreach($doc->getErrors() as $error) {
-          Logger::notice(_("Autocorrected").":$error");
+          Logger::user_notice(_("Autocorrected").":$error");
         }
       } catch(Exception $e) {
         Cms::notice(_("Use @ to specify short/link attributes for heading"));
@@ -138,7 +138,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
         throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $e->getMessage()));
       }
     } catch(Exception $e) {
-      Logger::error($e->getMessage());
+      Logger::critical($e->getMessage());
     } finally {
       unlock_file($fp, $dest);
     }

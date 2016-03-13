@@ -62,7 +62,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       $this->process();
     } catch (Exception$e) {
-      Logger::error($e->getMessage());
+      Logger::user_error($e->getMessage());
       return;
     }
     if(!$this->isPost()) return;
@@ -91,7 +91,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         $this->savePost();
         $this->updateCache();
       } elseif(!$this->isToDisable() && !$this->statusChanged) {
-        Logger::notice(_("No changes made"));
+        Logger::user_notice(_("No changes made"));
       }
     }
     if($this->isToDisable()) $this->disableDataFile();
@@ -128,7 +128,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       clearNginxCache();
     } catch(Exception$e) {
-      Logger::error($e->getMessage());
+      Logger::critical($e->getMessage());
     }
   }
 
@@ -396,7 +396,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } catch(Exception$e) {
       $doc->validatePlus(true);
       foreach($doc->getErrors() as $error) {
-        Logger::notice($doc->getStatus().": $error");
+        Logger::user_notice($doc->getStatus().": $error");
       }
       $this->contentValue = $doc->saveXML();
     }

@@ -43,7 +43,7 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
       $vName = $varPrefix.$vName;
       if(!array_key_exists($vName, $variables)) {
         if(strpos($v, "@") !== 0)
-          Logger::warning(sprintf(_("Variable '%s' does not exist"), $vName));
+          Logger::user_warning(sprintf(_("Variable '%s' does not exist"), $vName));
         $newString .= $v;
         continue;
       }
@@ -53,7 +53,7 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
     elseif($value instanceof DOMElementPlus) $value = $value->nodeValue;
     elseif(!is_string($value)) {
       if(strpos($v, "@") !== 0)
-        Logger::warning(sprintf(_("Variable '%s' is not string"), $vName));
+        Logger::user_warning(sprintf(_("Variable '%s' is not string"), $vName));
       $newString .= $v;
       continue;
     }
@@ -80,10 +80,10 @@ function redirTo($link, $code=null, $msg=null) {
   if(!strlen($link)) {
     $link = ROOT_URL;
     if(class_exists("IGCMS\Core\Logger"))
-      Logger::notice(_("Redirecting to empty string changed to root"));
+      Logger::user_notice(_("Redirecting to empty string changed to root"));
   }
   if(class_exists("IGCMS\Core\Logger"))
-    Logger::info(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
+    Logger::user_info(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
   #var_dump($link); die();
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
@@ -479,7 +479,7 @@ function apc_get_key($key) {
 
 function apc_store_cache($cacheKey, $value, $name) {
   $stored = apc_store($cacheKey, $value, rand(3600*24*30*3, 3600*24*30*6));
-  if(!$stored) Logger::warning(sprintf(_("Unable to cache variable %s"), $name));
+  if(!$stored) Logger::critical(sprintf(_("Unable to cache variable %s"), $name));
 }
 
 function apc_is_valid_cache($cacheKey, $value) {

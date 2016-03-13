@@ -54,7 +54,7 @@ class Agregator extends Plugin implements SplObserver {
         $this->createImgVar($subDir, $files);
       }
     } catch(Exception $e) {
-      Logger::warning($e->getMessage());
+      Logger::critical($e->getMessage());
       return;
     }
     if(is_null($this->currentDoc)) return;
@@ -204,7 +204,7 @@ class Agregator extends Plugin implements SplObserver {
     foreach($this->cfg->documentElement->childElementsArray as $image) {
       if($image->nodeName != "image") continue;
       if(!$image->hasAttribute("id")) {
-        Logger::warning(_("Configuration element image missing attribute id"));
+        Logger::user_warning(_("Configuration element image missing attribute id"));
         continue;
       }
       $vName = $image->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
@@ -228,7 +228,7 @@ class Agregator extends Plugin implements SplObserver {
     foreach($this->cfg->documentElement->childElementsArray as $alt) {
       if($alt->nodeName != "alt") continue;
       if(!$alt->hasAttribute("for")) {
-        Logger::warning(_("Configuration element alt missing attribute for"));
+        Logger::user_warning(_("Configuration element alt missing attribute for"));
         continue;
       }
       $alts[$alt->getAttribute("for")] = $alt->nodeValue;
@@ -293,7 +293,7 @@ class Agregator extends Plugin implements SplObserver {
         $doc = DOMBuilder::buildHTMLPlus($file);
         $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
       } catch(Exception $e) {
-        Logger::warning($e->getMessage());
+        Logger::critical($e->getMessage());
         continue;
       }
       if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
@@ -322,7 +322,7 @@ class Agregator extends Plugin implements SplObserver {
     foreach($this->cfg->documentElement->childElementsArray as $html) {
       if($html->nodeName != "html") continue;
       if(!$html->hasAttribute("id")) {
-        Logger::warning(_("Configuration element html missing attribute id"));
+        Logger::user_warning(_("Configuration element html missing attribute id"));
         continue;
       }
       $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
@@ -348,7 +348,7 @@ class Agregator extends Plugin implements SplObserver {
         );
         apc_store_cache($cacheKey, $var, $vName);
       } catch(Exception $e) {
-        Logger::warning($e->getMessage());
+        Logger::critical($e->getMessage());
         continue;
       }
     }
@@ -360,7 +360,7 @@ class Agregator extends Plugin implements SplObserver {
       $reverse = $e->hasAttribute("rsort");
       $userKey = $e->hasAttribute("sort") ? $e->getAttribute("sort") : $e->getAttribute("rsort");
       if(!array_key_exists($userKey, current($vars))) {
-        Logger::warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
+        Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
       } else {
         self::$sortKey = $userKey;
       }
@@ -400,7 +400,7 @@ class Agregator extends Plugin implements SplObserver {
         $patterns[$item->getAttribute("since")-1] = $item;
       else $patterns[] = $item;
     }
-    if($nonItemElement) Logger::warning(sprintf(_("Redundant element(s) found in %s"), $id));
+    if($nonItemElement) Logger::user_warning(sprintf(_("Redundant element(s) found in %s"), $id));
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
     $pattern = null;

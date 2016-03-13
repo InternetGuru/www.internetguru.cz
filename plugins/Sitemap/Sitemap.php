@@ -62,7 +62,7 @@ class Sitemap extends Plugin implements SplObserver {
       $cfgDefaults = $this->getConfigDefaults();
       $this->createSitemap($links, $cfgLinks, $cfgDefaults);
     } catch(Exception $e) {
-      Logger::error($e->getMessage());
+      Logger::user_warning($e->getMessage());
     }
   }
 

@@ -62,7 +62,7 @@ class DOMElementPlus extends DOMElement {
         $res = $this->ownerDocument->insertVariable($this, $v, $aName);
         if(!$res->isSameNode($this)) $this->emptyRecursive();
       } catch(Exception $e) {
-        Logger::error(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()));
+        Logger::user_error(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()));
       }
       if(is_null($aName)) return;
     }
@@ -180,7 +180,7 @@ class DOMElementPlus extends DOMElement {
     foreach(explode(" ", $this->getAttribute($attr)) as $var) {
       list($vName, $aName) = array_pad(explode("@", $var), 2, null);
       if(in_array($aName, $ignore)) {
-        Logger::warning(sprintf(_("Cannot modify attribute %s in element %s"), $aName, $this->nodeName));
+        Logger::user_warning(sprintf(_("Cannot modify attribute %s in element %s"), $aName, $this->nodeName));
         continue;
       }
       if(is_null($aName)) $variables[] = array($vName, $aName, $var);
