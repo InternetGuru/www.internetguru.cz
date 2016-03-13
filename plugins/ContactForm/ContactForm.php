@@ -78,7 +78,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $formValues = Cms::getVariable("validateform-$prefixedFormId");
       $fv = $this->createFormVars($htmlForm);
       if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-        Cms::success($fv["success"]);
+        Logger::user_success($fv["success"]);
       }
       if(is_null($formValues)) continue;
       foreach(array("email", "name", "sendcopy") as $name) {

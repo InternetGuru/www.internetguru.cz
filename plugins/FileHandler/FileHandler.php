@@ -144,7 +144,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if(!$this->deleteCache) return;
     if(count($this->error)) Logger::notice(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
     else {
-      Cms::success(_("Outdated cache files successfully removed"));
+      Logger::user_success(_("Outdated cache files successfully removed"));
     }
   }
 

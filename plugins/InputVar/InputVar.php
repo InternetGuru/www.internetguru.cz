@@ -38,7 +38,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       if($subject->getStatus() == STATUS_POSTPROCESS) $this->processPost();
       if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
       if($subject->getStatus() == STATUS_INIT) {
-        if(isset($_GET[$this->getOk])) Cms::success(_("Changes successfully saved"));
+        if(isset($_GET[$this->getOk])) Logger::user_success(_("Changes successfully saved"));
         $this->loadVars();
       }
       $this->cfg = $this->getDOMPlus();

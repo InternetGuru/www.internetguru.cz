@@ -97,7 +97,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->isToDisable()) $this->disableDataFile();
     if($this->statusChanged) {
       $this->redir = true;
-      Cms::success(_("File status successfully changed"));
+      Logger::user_success(_("File status successfully changed"));
     }
   }
 
@@ -453,7 +453,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
         throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $e->getMessage()));
       }
       $this->redir = true;
-      Cms::success(_("Changes successfully saved"));
+      Logger::user_success(_("Changes successfully saved"));
     } finally {
       unlock_file($fp, $this->destFile);
     }

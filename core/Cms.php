@@ -190,7 +190,7 @@ class Cms {
       self::$content->validatePlus(true);
       #self::$content->processFunctions(self::$functions, self::$variables);
     } catch(Exception $e) {
-      Logger::error(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()));
+      Logger::user_error(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()));
       self::$content = $oldContent;
     }
   }
@@ -215,7 +215,6 @@ class Cms {
 
   private static function addMessage($type, $message) {
     if(is_null(self::$flashList)) self::createFlashList();
-    if($type == 'success') Logger::info($message);
     if(is_null(self::$requestToken)) self::$requestToken = rand();
     if(Cms::isSuperUser()) {
       $_SESSION["cms"]["flash"][$type][self::$requestToken][] = $message;
@@ -263,7 +262,7 @@ class Cms {
 
   public static function setFunction($name, $value) {
     if(!$value instanceof Closure) {
-      Logger::warning(sprintf(_("Unable to set function %s: not a function"), $name));
+      Logger::error(sprintf(_("Unable to set function %s: not a function"), $name));
       return null;
     }
     $varId = self::getVarId($name, "fn");

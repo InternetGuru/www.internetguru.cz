@@ -231,7 +231,7 @@ class DOMBuilder {
     if(self::$nginxOutdated) return;
     if($mTime > self::$newestFileMtime) self::$newestFileMtime = $mTime;
     if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
-    Logger::notice(_("Outdated server cache"));
+    Logger::user_notice(_("Outdated server cache"));
     self::$nginxOutdated = true;
   }
 
@@ -295,7 +295,7 @@ class DOMBuilder {
       $doc->validatePlus(true);
       $storeCache = false;
       foreach($doc->getErrors() as $error) {
-        Logger::notice($doc->getStatus().": $error");
+        Logger::user_notice($doc->getStatus().": $error");
       }
     }
     // generate ctime/mtime from file if not set
@@ -362,7 +362,7 @@ class DOMBuilder {
     #if(empty(self::$idToLink)) $prefix = "";
     if(array_key_exists($prefix, self::$idToLink)) {
       $prefix = self::generateUniqueVal($prefix, self::$idToLink);
-      Logger::warning(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
+      Logger::user_warning(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
         $fShort, $prefix));
       $h1->setAttribute("link", $prefix);
       $storeCache = false;
@@ -412,7 +412,7 @@ class DOMBuilder {
       $curFilePath = $e->getParentValue("src", "include");
       if(empty(self::$linkToId)) $linkId = "";
       if(array_key_exists($linkId, self::$linkToId)) {
-        Logger::warning(sprintf(_("Duplicit link %s skipped"), $link));
+        Logger::user_warning(sprintf(_("Duplicit link %s skipped"), $link));
         $storeCache = false;
         continue;
       }
@@ -468,7 +468,7 @@ class DOMBuilder {
       try {
         self::insertHtmlPlus($include, $homeDir);
       } catch(Exception $e) {
-        Logger::error($e->getMessage());
+        Logger::user_error($e->getMessage());
         $success = false;
         $include->stripTag();
       }
@@ -500,7 +500,7 @@ class DOMBuilder {
     $sectLang = self::getSectionLang($include->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      Logger::warning(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
+      Logger::user_warning(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
         $impLang, $sectLang, $val));
     $impAuthor = $doc->documentElement->firstElement->getAttribute("author");
     if($impAuthor == $author)
@@ -513,7 +513,7 @@ class DOMBuilder {
       $include->ownerDocument->validatePlus();
     } catch(Exception $e) {
       $include->ownerDocument->validatePlus(true);
-      Logger::warning(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()));
+      Logger::user_warning(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()));
     }
   }
 

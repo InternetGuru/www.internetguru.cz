@@ -91,11 +91,11 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->isPost()) $this->processPost();
     // show success message
     if(isset($_GET["btdelok"])) {
-      Cms::success($this->vars['deletesucess']);
+      Logger::user_success($this->vars['deletesucess']);
     }
     if(isset($_GET["btok"]) && isset($this->products[$_GET["btok"]])) {
       $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
-      Cms::success($this->vars['success']." – $gotoorder");
+      Logger::user_success($this->vars['success']." – $gotoorder");
     }
   }
 

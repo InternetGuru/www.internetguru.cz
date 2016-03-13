@@ -121,7 +121,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     }
     $doc->applySyntax();
     $this->html = $doc->saveXML();
-    Cms::success(_("File successfully imported"));
+    Logger::user_success(_("File successfully imported"));
 
     $this->file = "$f.html";
     $dest = $this->tmpFolder."/".$this->file;
