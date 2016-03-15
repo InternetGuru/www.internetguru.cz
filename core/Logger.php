@@ -13,14 +13,16 @@ use Monolog\Handler\ChromePHPHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Processor\IntrospectionProcessor;
+use Exception;
 
 // TODO doc
 class Logger {
 
-  const TYPE_LOG  = "log";
-  const TYPE_EMAIL = "mail";
+  const TYPE_SYS_LOG  = "sys";
+  const TYPE_USER_LOG = "user";
+  const TYPE_MAIL_LOG = "mail";
 
-  const EMAIL_ALERT_TO = "pavel.petrzela@internetguru.cz jiri.pavelka@internetguru.cz";
+  const EMAIL_ALERT_TO   = "pavel.petrzela@internetguru.cz jiri.pavelka@internetguru.cz";
   const EMAIL_ALERT_FROM = "no-reply@internetguru.cz";
 
   /**
@@ -30,18 +32,28 @@ class Logger {
   const LOGGER_NAME = "IGCMS";
 
   /**
-   * Log format, for both TYPE_LOG and TYPE_EMAIL.
+   * Log format for TYPE_SYS_LOG and TYPE_USER_LOG.
    */
-  const LOG_FORMAT = "[%datetime%] %level_name%: %message% %extra%\n";
+  const LOG_FORMAT   = "[%datetime%] %level_name%: %message% %extra%\n";
 
+  /**
+   * Log format for TYPE_MAIL_LOG.
+   */
   const EMAIL_FORMAT = "[%datetime%]: %message%\n";
 
   /**
-   * Monolog log logger instance.
+   * Monolog system logger instance.
    *
    * @var Monolog\Logger
    */
-  private static $monologlog = null;
+  private static $monologsys = null;
+
+  /**
+   * Monolog user logger instance.
+   *
+   * @var Monolog\Logger
+   */
+  private static $monologuser = null;
 
   /**
    * Monolog mail logger instance.
@@ -57,104 +69,44 @@ class Logger {
    * @var array
    */
   private static $levels = [
-    'debug'     => MonologLogger::DEBUG,
-    'info'      => MonologLogger::INFO,
-    'notice'    => MonologLogger::NOTICE,
-    'warning'   => MonologLogger::WARNING,
-    'error'     => MonologLogger::ERROR,
-    'critical'  => MonologLogger::CRITICAL,
-    'alert'     => MonologLogger::ALERT,
-    'emergency' => MonologLogger::EMERGENCY,
+    'debug'       => MonologLogger::DEBUG,
+    'info'        => MonologLogger::INFO,
+    'user_info'   => MonologLogger::INFO,
+    'user_success'=> MonologLogger::INFO,
+    'mail'        => MonologLogger::INFO,
+    'notice'      => MonologLogger::NOTICE,
+    'user_notice' => MonologLogger::NOTICE,
+    'warning'     => MonologLogger::WARNING,
+    'user_warning'=> MonologLogger::WARNING,
+    'error'       => MonologLogger::ERROR,
+    'user_error'  => MonologLogger::ERROR,
+    'critical'    => MonologLogger::CRITICAL,
+    'alert'       => MonologLogger::ALERT,
+    'emergency'   => MonologLogger::EMERGENCY,
   ];
 
-  /**
-   * Log an debug message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function debug($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
+  // TODO doc
+  public static function __callStatic($methodName, $arguments) {
+    if(!array_key_exists($methodName, self::$levels))
+      throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
+    if(!strlen($arguments[0]))
+      throw new Exception(sprintf(_("Method %s empty or missing message"), $methodName));
 
-  /**
-   * Log an info message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function info($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
-
-  /**
-   * Log an notice message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function notice($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
-
-  /**
-   * Log an warning message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function warning($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
-
-  /**
-   * Log an error message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function error($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
-
-  /**
-   * Log an critical message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function critical($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
-
-  /**
-   * Log an alert message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function alert($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
-
-  /**
-   * Log an emergency message to the log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function emergency($message) {
-    return self::writeLog(__FUNCTION__, $message);
-  }
-
-  /**
-   * Log an mail message to the mail log.
-   *
-   * @param  string $message
-   * @return void
-   */
-  public static function mail($message) {
-    return self::writeLog('info', $message, self::TYPE_EMAIL);
+    $type = self::TYPE_SYS_LOG;
+    if(strpos($methodName, "user_") === 0) {
+      $methodName = substr($methodName, strlen("user_"));
+      $type = self::TYPE_USER_LOG;
+    }
+    if($methodName == "success") {
+      Cms::success($arguments[0]);
+      $methodName = "info";
+      $type = self::TYPE_USER_LOG;
+    }
+    if($methodName == "mail") {
+      $methodName = "info";
+      $type = self::TYPE_MAIL_LOG;
+    }
+    self::writeLog($methodName, $arguments[0], $type);
   }
 
   /**
@@ -164,7 +116,7 @@ class Logger {
    * @param  string  $message
    * @return void
    */
-  private static function writeLog($level, $message, $type = self::TYPE_LOG) {
+  private static function writeLog($level, $message, $type = self::TYPE_SYS_LOG) {
     $logger = self::getMonolog($type);
     $monologLevel = self::parseLevel($level);
     $logger->{'add'.$level}($message);
@@ -198,7 +150,7 @@ class Logger {
   /**
    * Get or create (if not exists) monolog instance for given type.
    *
-   * @param  string         $type self::TYPE_LOG or self::TYPE_EMAIL
+   * @param  string         $type self::TYPE_SYS_LOG or self::TYPE_MAIL_LOG
    * @return Monolog\Logger
    */
   private static function getMonolog($type) {
@@ -213,8 +165,8 @@ class Logger {
 
   // TODO doc
   private static function pushHandlers(MonologLogger $logger, $logType) {
-    $logFile = LOG_FOLDER."/".date("Ymd").".$logType";
-    $formatter = $logType == self::TYPE_LOG ? new LineFormatter(self::LOG_FORMAT) : new LineFormatter(self::EMAIL_FORMAT);
+    $logFile = LOG_FOLDER."/".date("Ymd").".$logType.log";
+    $formatter = $logType != self::TYPE_MAIL_LOG ? new LineFormatter(self::LOG_FORMAT) : new LineFormatter(self::EMAIL_FORMAT);
 
     $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
     $streamHandler->setFormatter($formatter);
