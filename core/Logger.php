@@ -16,8 +16,8 @@ use Exception;
 class Logger {
 
   const TYPE_SYS_LOG  = "sys";
-  const TYPE_USER_LOG = "user";
-  const TYPE_MAIL_LOG = "mail";
+  const TYPE_USER_LOG = "usr";
+  const TYPE_MAIL_LOG = "eml";
 
   const EMAIL_ALERT_TO   = "pavel.petrzela@internetguru.cz jiri.pavelka@internetguru.cz";
   const EMAIL_ALERT_FROM = "no-reply@internetguru.cz";
@@ -50,14 +50,14 @@ class Logger {
    *
    * @var Monolog\Logger
    */
-  private static $monologuser = null;
+  private static $monologusr = null;
 
   /**
    * Monolog mail logger instance.
    *
    * @var Monolog\Logger
    */
-  private static $monologmail = null;
+  private static $monologeml = null;
 
   /**
    * The Log levels.
