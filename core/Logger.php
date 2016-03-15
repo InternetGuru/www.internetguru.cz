@@ -1,9 +1,6 @@
 <?php
 
 
-#TODO:
-# - CMS_DEBUG: save all to debug log file
-
 namespace IGCMS\Core;
 
 use IGCMS\Core\Cms;
