@@ -72,7 +72,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       // create basket-empty var
       Cms::setVariable('empty', (count($this->cookieProducts) ? null : ''));
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::user_warning($e->getMessage());
     }
   }
 
@@ -91,11 +91,11 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->isPost()) $this->processPost();
     // show success message
     if(isset($_GET["btdelok"])) {
-      Cms::addMessage($this->vars['deletesucess'], Cms::MSG_SUCCESS);
+      Logger::user_success($this->vars['deletesucess']);
     }
     if(isset($_GET["btok"]) && isset($this->products[$_GET["btok"]])) {
       $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
-      Cms::addMessage($this->vars['success']." – $gotoorder", Cms::MSG_SUCCESS);
+      Logger::user_success($this->vars['success']." – $gotoorder");
     }
   }
 
@@ -260,7 +260,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       }
       /*
       if(!isset($attrs["price"])) {
-        Logger::log(sprintf(_("Product id %s missing price"), $id), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Product id %s missing price"), $id));
         continue;
       }
       */

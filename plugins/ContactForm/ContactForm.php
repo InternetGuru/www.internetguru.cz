@@ -78,7 +78,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $formValues = Cms::getVariable("validateform-$prefixedFormId");
       $fv = $this->createFormVars($htmlForm);
       if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-        Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
+        Logger::user_success($fv["success"]);
       }
       if(is_null($formValues)) continue;
       foreach(array("email", "name", "sendcopy") as $name) {
@@ -111,7 +111,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     } catch(Exception $e) {
       $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower($this->className)."-".$formIdToSend."'>"
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
-      Logger::log($message, Logger::LOGGER_ERROR);
+      Logger::user_error($message);
     }
   }
 
@@ -119,7 +119,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $xpath = new DOMXPath($content);
     if(!$xpath->query("//*[contains(@var, 'contactform-')]")->length) return $content;
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
-      Logger::log(_("Admin address is not set or invalid"), Logger::LOGGER_WARNING);
+      Logger::user_warning(_("Admin address is not set or invalid"));
     }
     $content->processVariables($this->formsElements);
     return $content;
@@ -157,13 +157,12 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $bcc = "pavel@petrzela.eu";
     }
     if(!is_null(Cms::getLoggedUser())) {
-      Cms::addMessage("<pre><code>$msg</code></pre>", Cms::MSG_INFO);
+      Cms::notice("<pre><code>$msg</code></pre>");
       return;
     }
     $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
-    Logger::log(sprintf(_("Sending e-mail: %s"),
-      "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"),
-      null, null, null, "mail");
+    Logger::email(sprintf(_("Sending e-mail: %s"),
+      "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"));
     if(strlen($this->formVars["sendcopy"])) {
       if(!strlen($this->formVars["email"]))
         throw new Exception(_("Unable to send copy to empty client address"));
@@ -192,7 +191,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(strlen($bcc)) $mail->addBCC($bcc, '');
     if(!$mail->send()) throw new Exception($mail->ErrorInfo);
-    Logger::log(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }
 
   private function createGlobalVars() {
@@ -213,7 +211,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
           break;
         }
       } catch(Exception $ex) {
-        Logger::log(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
       }
     }
     if(self::DEBUG) $this->vars["adminaddr"] = "debug@somedomain.cz";
@@ -255,7 +253,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 7);
       }
       if($e->nodeName == "input" && !$e->hasAttribute("type")) {
-        Logger::log(_("Element input missing attribute type skipped"), Logger::LOGGER_WARNING);
+        Logger::user_warning(_("Element input missing attribute type skipped"));
         continue;
       }
       $this->formItems[] = $e;

@@ -142,8 +142,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       $this->doCheckResources($cacheFolder, $sourceFolder, $isResDir);
     }
     if(!$this->deleteCache) return;
-    if(count($this->error)) Logger::log(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
-    else Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
+    if(count($this->error)) Logger::critical(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
+    else {
+      Logger::user_success(_("Outdated cache files successfully removed"));
+    }
   }
 
   private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
@@ -183,9 +185,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
           if(!is_file($cacheFilePath)) continue;
           if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
         } elseif(self::DEBUG) {
-          Cms::addMessage(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+          Cms::notice(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)));
         } else {
-          Cms::addMessage(sprintf("%s: %s", $e->getMessage(), $cacheFilePath), Cms::MSG_WARNING);
+          Logger::user_warning(sprintf("%s: %s", $e->getMessage(), $cacheFilePath));
         }
       }
     }

@@ -62,7 +62,7 @@ class DOMElementPlus extends DOMElement {
         $res = $this->ownerDocument->insertVariable($this, $v, $aName);
         if(!$res->isSameNode($this)) $this->emptyRecursive();
       } catch(Exception $e) {
-        Logger::log(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
+        Logger::user_error(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()));
       }
       if(is_null($aName)) return;
     }
@@ -180,7 +180,7 @@ class DOMElementPlus extends DOMElement {
     foreach(explode(" ", $this->getAttribute($attr)) as $var) {
       list($vName, $aName) = array_pad(explode("@", $var), 2, null);
       if(in_array($aName, $ignore)) {
-        Logger::log(sprintf(_("Cannot modify attribute %s in element %s"), $aName, $this->nodeName), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Cannot modify attribute %s in element %s"), $aName, $this->nodeName));
         continue;
       }
       if(is_null($aName)) $variables[] = array($vName, $aName, $var);
@@ -190,13 +190,13 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function insertVar($varName, $varValue) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
     return;
     $this->ownerDocument->insertVar($varName, $varValue, $this);
   }
 
   public function insertFn($varName, $varValue) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
     return;
     $this->ownerDocument->insertFn($varName, $varValue, $this);
   }

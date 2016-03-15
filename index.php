@@ -43,9 +43,9 @@ try {
   if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
     try {
       clearNginxCache();
-      Logger::log(_("Cache successfully purged"), Logger::LOGGER_SUCCESS);
+      Logger::user_success(_("Cache successfully purged"));
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::critical($e->getMessage());
     }
   }
 
@@ -57,7 +57,6 @@ try {
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => buildQuery($query, false))));
   }
 
-  $start_time = microtime(true);
   DOMBuilder::setCacheMtime();
 
   $plugins = new Plugins();
@@ -79,7 +78,6 @@ try {
   Cms::getMessages();
   Cms::contentProcessVariables();
   echo Cms::getOutput();
-  Logger::log(sprintf(_("IGCMS successfully finished"), CMS_RELEASE), Logger::LOGGER_INFO, $start_time, false);
 
 } catch(Exception $e) {
 
@@ -87,9 +85,9 @@ try {
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf(_("%s in %s on line %s"), $m, $e->getFile(), $e->getLine());
   $m = sprintf(_("IGCMS failed to finish: %s"), $m);
-  Logger::log($m, Logger::LOGGER_FATAL, null, false);
-  if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno, true);
+  if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno);
 
+  Logger::alert($m);
   http_response_code($errno);
   echo $m;
 

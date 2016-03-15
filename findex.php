@@ -22,9 +22,9 @@ try {
   $errno = $e->getCode() ? $e->getCode() : 500;
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf("%s in %s on line %s", $m, $e->getFile(), $e->getLine());
-  Logger::log($m, Logger::LOGGER_FATAL, null, false);
   if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno);
 
+  Logger::alert($m);
   http_response_code($errno);
   echo $m;
 

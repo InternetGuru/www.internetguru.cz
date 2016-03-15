@@ -469,7 +469,7 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function validateLinks($elName, $attName, $repair) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
+    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
   }
 
   private function validateAuthor($repair) {

@@ -12,7 +12,6 @@ use SplObserver;
 use SplSubject;
 
 class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
-  const DEBUG = false;
   private $logFiles;
   private $mailFiles;
   private $curFilePath;
@@ -22,7 +21,6 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
-    if(self::DEBUG) Logger::log("DEBUG");
     $this->className = basename(get_class($this));
   }
 
@@ -41,7 +39,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
       $fPath = $this->getCurFilePath($fName);
       $vars["content"] = htmlspecialchars($this->file_get_contents($fPath));
     } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
+      Logger::user_warning($e->getMessage());
     }
     $newContent = $this->getHTMLPlus();
     $vars["cur_file"] = $fName;

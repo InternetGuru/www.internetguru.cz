@@ -25,11 +25,11 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     $rep = array();
     foreach($cfg->getElementsByTagName("replace") as $replace) {
       if(!$replace->hasAttribute("pattern")) {
-        Logger::log(_("Element replace missing attribute pattern"), Logger::LOGGER_WARNING);
+        Logger::user_warning(_("Element replace missing attribute pattern"));
         continue;
       }
       if(!strlen($replace->nodeValue)) {
-        Logger::log(_("Element replace missing value"), Logger::LOGGER_WARNING);
+        Logger::user_warning(_("Element replace missing value"));
         continue;
       }
       $pat[] = $replace->getAttribute("pattern");
