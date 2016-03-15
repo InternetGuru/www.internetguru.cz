@@ -1,4 +1,4 @@
-Logger: oddělení uživatelských a systémových hlášení
+LogViewer: rozdělení na uživatelské, systémové a mailové logy 
 Logger: nový formát logovacích souborů
 
 IGCMS 1.11 | 2016-02-27
