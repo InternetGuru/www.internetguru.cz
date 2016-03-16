@@ -77,7 +77,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function validateConfigCache() {
-    $className = basename(get_class($this));
+    $className = (new \ReflectionClass($this))->getShortName();
     $configFilePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($configFilePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($configFilePath))) {

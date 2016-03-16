@@ -316,7 +316,7 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function createCmsVars($subDir, Array $vars) {
-    $className = basename(get_class($this));
+    $className = (new \ReflectionClass($this))->getShortName();
     $filePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($filePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {

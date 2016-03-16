@@ -35,7 +35,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
-    $this->className = basename(get_class($this));
+    $this->className = (new \ReflectionClass($this))->getShortName();
     $mail = new PHPMailer;
   }
 

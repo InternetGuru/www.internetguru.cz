@@ -13,5 +13,5 @@
   <url>?Admin</url>
   <url>?LogViewer</url>
   <url>?Convertor</url>
-  <url access="allow">?LogViewer=ver</url>
+  <url access="allow">?LogViewer=usr</url>
 </Auth>

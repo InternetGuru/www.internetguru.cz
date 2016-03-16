@@ -50,18 +50,18 @@ class Plugins implements SplSubject {
   }
 
   public function attach(SplObserver $observer, $priority=10) {
-    $o = basename(get_class($observer));
+    $o = (new \ReflectionClass($observer))->getShortName();
     $this->observers[$o] = $observer;
     if(!array_key_exists($o, $this->observerPriority)) $this->observerPriority[$o] = $priority;
     if($observer->isDebug()) Logger::notice(sprintf(_("Plugin %s debug mode is enabled"), $o));
   }
 
   public function setPriority(SplObserver $observer, $priority) {
-    $this->observerPriority[basename(get_class($observer))] = $priority;
+    $this->observerPriority[(new \ReflectionClass($observer))->getShortName()] = $priority;
   }
 
   public function detach(SplObserver $observer) {
-    $o = basename(get_class($observer));
+    $o = (new \ReflectionClass($observer))->getShortName();
     if(array_key_exists($o, $this->observers)) $this->observers[$o] = null;
     if(array_key_exists($o, $this->observerPriority)) unset($this->observerPriority[$o]);
   }

@@ -28,7 +28,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $this->className = basename(get_class($this));
+    $this->className = (new \ReflectionClass($this))->getShortName();
     $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml";
     $s->setPriority($this, 5);
   }
@@ -265,7 +265,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $attributes = array();
     foreach($element->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     $el = $element->processVariables(Cms::getAllVariables(), array(), true); // pouze posledni node
-    if(is_null($el) || (gettype($el) == "object" && basename(get_class($el)) != "DOMElementPlus" && !$el->isSameNode($element))) {
+    if(is_null($el) || (gettype($el) == "object" && (new \ReflectionClass($el))->getShortName() != "DOMElementPlus" && !$el->isSameNode($element))) {
       if(is_null($el)) $el = new DOMText("");
       $var = $element->ownerDocument->createElement("var");
       foreach($attributes as $aName => $aValue) {

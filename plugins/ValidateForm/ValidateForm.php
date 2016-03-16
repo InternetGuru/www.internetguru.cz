@@ -31,7 +31,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != STATUS_PREINIT) return;
     $this->detachIfNotAttached("HtmlOutput");
-    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.basename(get_class($this)).'.css');
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.(new \ReflectionClass($this))->getShortName().'.css');
   }
 
   public function getContent(HTMLPlus $content) {

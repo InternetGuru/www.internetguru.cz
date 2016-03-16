@@ -28,7 +28,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $s->setPriority($this, 5);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
     mkdir_plus($this->tmpFolder);
-    $this->className = basename(get_class($this));
+    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {

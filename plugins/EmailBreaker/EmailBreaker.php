@@ -73,7 +73,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     foreach($pat as $k => $p) {
       $jsRep[] = "['$p','{$rep[$k]}']";
     }
-    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".basename(get_class($this)).".js");
+    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".js");
     Cms::getOutputStrategy()->addJs("EmailBreaker.init({
       rep: [".implode(",", $jsRep)."]
     });");
