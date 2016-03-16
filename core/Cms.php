@@ -195,20 +195,6 @@ class Cms {
     }
   }
 
-  public static function processVariables(DOMDocumentPlus $doc) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-    return $doc;
-  }
-
-  private static function insertVar(HTMLPlus $newContent, $varName, $varValue) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-    return;
-    $tmpContent = clone $newContent;
-    $tmpContent->insertVar($varName, $varValue);
-    $tmpContent->validatePlus();
-    $newContent = $tmpContent;
-  }
-
   public static function setOutputStrategy(OutputStrategyInterface $strategy) {
     self::$outputStrategy = $strategy;
   }

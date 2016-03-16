@@ -52,10 +52,6 @@ class DOMBuilder {
     return $doc;
   }
 
-  public static function getId($link="") {
-    throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-  }
-
   public static function normalizeLink(Array $pUrl) {
     #var_dump($pUrl);
     #if(empty($pUrl)) return "";
