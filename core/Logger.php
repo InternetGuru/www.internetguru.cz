@@ -163,7 +163,9 @@ class Logger {
   // TODO doc
   private static function pushHandlers(MonologLogger $logger, $logType) {
     $logFile = LOG_FOLDER."/".date("Ymd").".$logType.log";
-    $formatter = $logType != self::TYPE_MAIL_LOG ? new LineFormatter(self::LOG_FORMAT) : new LineFormatter(self::EMAIL_FORMAT);
+    $formatter = $logType != self::TYPE_MAIL_LOG
+      ? new LineFormatter(self::LOG_FORMAT)
+      : new LineFormatter(self::EMAIL_FORMAT);
 
     $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
     $streamHandler->setFormatter($formatter);
