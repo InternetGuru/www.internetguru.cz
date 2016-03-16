@@ -203,11 +203,13 @@ class Agregator extends Plugin implements SplObserver {
     if(empty($vars)) return;
     foreach($this->cfg->documentElement->childElementsArray as $image) {
       if($image->nodeName != "image") continue;
-      if(!$image->hasAttribute("id")) {
-        Logger::user_warning(_("Configuration element image missing attribute id"));
+      try {
+        $id = $image->getRequiredAttribute("id");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
-      $vName = $image->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       self::$sortKey = "name";
       $cacheKey = apc_get_key($vName);
       if($useCache && apc_exists($cacheKey)) {
@@ -227,11 +229,13 @@ class Agregator extends Plugin implements SplObserver {
     $alts = array();
     foreach($this->cfg->documentElement->childElementsArray as $alt) {
       if($alt->nodeName != "alt") continue;
-      if(!$alt->hasAttribute("for")) {
-        Logger::user_warning(_("Configuration element alt missing attribute for"));
+      try {
+        $for = $alt->getRequiredAttribute("for");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
-      $alts[$alt->getAttribute("for")] = $alt->nodeValue;
+      $alts[$for] = $alt->nodeValue;
     }
     return $alts;
   }
@@ -321,11 +325,13 @@ class Agregator extends Plugin implements SplObserver {
     }
     foreach($this->cfg->documentElement->childElementsArray as $html) {
       if($html->nodeName != "html") continue;
-      if(!$html->hasAttribute("id")) {
-        Logger::user_warning(_("Configuration element html missing attribute id"));
+      try {
+        $id = $html->getRequiredAttribute("id");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
-      $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       $cacheKey = apc_get_key($vName);
       // use cache
       if($this->useCache) {

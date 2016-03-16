@@ -45,8 +45,10 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       foreach($this->cfg->documentElement->childElementsArray as $e) {
         if($e->nodeName == "set") continue;
         if($e->nodeName == "passwd") continue;
-        if(!$e->hasAttribute("id")) {
-          Logger::user_warning(sprintf(_("Missing attribute id in element %s"), $e->nodeName));
+        try {
+          $id = $e->getRequiredAttribute("id"); // only check
+        } catch(Exception $ex) {
+          Logger::user_warning($ex->getMessage());
           continue;
         }
         switch($e->nodeName) {
@@ -86,8 +88,10 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->formId = $form->getAttribute("id");
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
     foreach($this->cfg->getElementsByTagName("set") as $e) {
-      if(!$e->hasAttribute("type")) {
-        Logger::user_warning(_("Element set missing attribute type"));
+      try {
+        $type = $e->getRequiredAttribute("type"); // only check
+      } catch(Exception $ex) {
+        Logger::user_warning($ex->getMessage());
         continue;
       }
       $this->createFieldset($newContent, $fieldset, $e);
@@ -323,11 +327,13 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       $tr = array();
       foreach($el->childElementsArray as $d) {
         if($d->nodeName != "data") continue;
-        if(!$d->hasAttribute("name")) {
-          Logger::user_warning(_("Element data missing attribute name"));
+        try {
+          $name = $d->getRequiredAttribute("name");
+        } catch(Exception $e) {
+          Logger::user_warning($e->getMessage());
           continue;
         }
-        $tr["~(?<!\pL)".$d->getAttribute("name")."(?!\pL)~u"] = $this->parse($d->nodeValue);
+        $tr["~(?<!\pL)".$name."(?!\pL)~u"] = $this->parse($d->nodeValue);
       }
       $fn = $this->createFnReplace($id, $tr);
       break;

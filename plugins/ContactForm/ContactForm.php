@@ -198,16 +198,16 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       try {
         switch($e->nodeName) {
           case "var":
-          $this->validateElement($e, "id");
-          $this->vars[$e->getAttribute("id")] = $e->nodeValue;
+          $id = $e->getRequiredAttribute("id");
+          $this->vars[$id] = $e->nodeValue;
           break;
           case "form":
-          $this->validateElement($e, "id");
-          $this->forms[$e->getAttribute("id")] = $e;
+          $id = $e->getRequiredAttribute("id");
+          $this->forms[$id] = $e;
           break;
           case "message":
-          $this->validateElement($e, "for");
-          $this->messages[$e->getAttribute("for")] = $e->nodeValue;
+          $id = $e->getRequiredAttribute("for");
+          $this->messages[$id] = $e->nodeValue;
           break;
         }
       } catch(Exception $ex) {
@@ -215,11 +215,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       }
     }
     if(self::DEBUG) $this->vars["adminaddr"] = "debug@somedomain.cz";
-  }
-
-  private function validateElement(DOMElementPlus $e, $aName) {
-    if($e->hasAttribute($aName)) return;
-    throw new Exception(sprintf(_("Missing attribute %s"), $aName));
   }
 
   private function createFormVars(DOMElementPlus $form) {
@@ -252,15 +247,19 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         if(!$e->hasAttribute("cols")) $e->setAttribute("cols", 40);
         if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 7);
       }
-      if($e->nodeName == "input" && !$e->hasAttribute("type")) {
-        Logger::user_warning(_("Element input missing attribute type skipped"));
-        continue;
+      if($e->nodeName == "input") {
+        try {
+          $type = $e->getRequiredAttribute("type");
+        } catch(Exception $ex) {
+          Logger::user_warning($ex->getMessage());
+          continue;
+        }
       }
       $this->formItems[] = $e;
       $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
       $name = $this->processFormItem($this->formNames, $e, "name", "", $id, true);
-      if(is_null(Cms::getLoggedUser()) || $e->getAttribute("type") != "submit") continue;
+      if(is_null(Cms::getLoggedUser()) || $type != "submit") continue;
       $e->setAttribute("value", _("Show message"));
       $e->setAttribute("title", _("Not sending form if logged user"));
     }
