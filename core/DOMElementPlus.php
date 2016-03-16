@@ -10,6 +10,12 @@ use DOMElement;
 
 class DOMElementPlus extends DOMElement {
 
+  public function getRequiredAttribute($aName) {
+    if(!$this->hasAttribute($aName))
+      throw new Exception(sprintf(_("Element %s missing attribute %s"), $this->nodeName, $aName));
+    return $this->getAttribute($aName);
+  }
+
   public function rename($name) {
     $newnode = $this->ownerDocument->createElement($name);
     $children = array();

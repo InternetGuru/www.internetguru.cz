@@ -38,13 +38,14 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     $xpath = new DOMXPath($content);
     foreach($xpath->query("//form") as $form) {
       if(!$form->hasClass("validable")) continue;
-      if(!$form->hasAttribute("id")) {
-        Logger::user_warning(_("Validable form missing attribute id"));
+      try {
+        $id = $form->getRequiredAttribute("id");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
       $time = $this->getWaitTime($form);
       if($form->hasClass("validateform-notime")) $time = 0;
-      $id = $form->getAttribute("id");
       $hInput = $content->createElement("input");
       $hInput->setAttribute("type", "hidden");
       $hInput->setAttribute("name", self::FORM_ID);

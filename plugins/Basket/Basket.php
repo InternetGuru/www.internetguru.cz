@@ -208,10 +208,8 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     foreach($this->cfg->getElementsByTagName("var") as $var) {
-      if(!$var->hasAttribute("id"))
-        throw new Exception(_("Element var missing attribute id"));
+      $id = $var->getRequiredAttribute('id');
       $value = null;
-      $id = $var->getAttribute('id');
       if(count($var->childElementsArray)) {
         $doc = new DOMDocumentPlus();
         $doc->appendChild($doc->importNode($var, true));
@@ -227,9 +225,8 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   private function loadTemplates() {
     $templates = array();
     foreach($this->cfg->getElementsByTagName("template") as $tpl) {
-      if(!$tpl->hasAttribute("id"))
-        throw new Exception(_("Element template missing attribute id"));
-      $templates[$tpl->getAttribute("id")] = $tpl;
+      $id = $tpl->getRequiredAttribute("id");
+      $templates[$id] = $tpl;
     }
     if(!count($templates)) throw new Exception(_("Template element(s) not found"));
     return $templates;
@@ -238,8 +235,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   private function loadProducts() {
     $products = array();
     foreach($this->cfg->getElementsByTagName("product") as $product) {
-      if(!$product->hasAttribute("id"))
-        throw new Exception(_("Element product missing attribute id"));
+      $id = $product->getRequiredAttribute("id"); // only check
       $attrs = array();
       foreach($product->attributes as $attrName => $attrNode) {
         $attrs["product-$attrName"] = $attrNode->nodeValue;

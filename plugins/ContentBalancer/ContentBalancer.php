@@ -54,8 +54,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
           break;
           case "item":
           if($id == "") throw new Exception(_("Element item missing id"));
-          if(!strlen($e->getAttribute("wrapper")))
-            throw new Exception(sprintf(_("Element item %s missing attribute wrapper"), $id));
+          $wrapper = $e->getRequiredAttribute("wrapper"); // only check
           $this->sets[$id] = $e;
           break;
         }

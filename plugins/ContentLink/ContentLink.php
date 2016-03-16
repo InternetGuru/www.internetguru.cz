@@ -123,9 +123,12 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     if(array_key_exists("logo", $this->vars)) {
       $o = $bc->createElement("object");
       $o->setAttribute("data", $this->vars["logo"]->nodeValue);
-      if(!$this->vars["logo"]->hasAttribute("type"))
-        Logger::user_warning(_("Element logo missing attribute type"));
-      else $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
+      try {
+        $type = $this->vars["logo"]->getRequiredAttribute("type");
+        $o->setAttribute("type", $type);
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
+      }
       $o->nodeValue = $h->nodeValue;
       $a->nodeValue = null;
       $a->addClass("logo");
