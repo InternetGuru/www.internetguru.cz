@@ -44,7 +44,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
     $this->dataFileStatus = self::STATUS_UNKNOWN;
-    $this->className = basename(get_class($this));
+    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {
