@@ -62,12 +62,15 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
       return $this->histFiles[$fName];
       case "":
       case "usr":
+      if(empty($this->usrFiles)) $this->redirTo(CMS_CHANGELOG_FILENAME);
       reset($this->usrFiles);
       $this->redirTo(key($this->usrFiles));
       case "sys":
+      if(empty($this->sysFiles)) $this->redirTo(CMS_CHANGELOG_FILENAME);
       reset($this->sysFiles);
       $this->redirTo(key($this->sysFiles));
       case "eml":
+      if(empty($this->emlFiles)) $this->redirTo(CMS_CHANGELOG_FILENAME);
       reset($this->emlFiles);
       $this->redirTo(key($this->emlFiles));
       default:
