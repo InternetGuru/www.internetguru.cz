@@ -303,10 +303,6 @@ function update_file($src, $dest, $hash=false) {
   return true;
 }
 
-function smartCopy($src, $dest) {
-  throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-}
-
 function lock_file($filePath, $ext="lock") {
   if(strlen($ext)) $filePath = "$filePath.$ext";
   mkdir_plus(dirname($filePath));

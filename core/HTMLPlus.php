@@ -468,10 +468,6 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  private function validateLinks($elName, $attName, $repair) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-  }
-
   private function validateAuthor($repair) {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("author")) continue;

@@ -189,18 +189,6 @@ class DOMElementPlus extends DOMElement {
     return $variables;
   }
 
-  public function insertVar($varName, $varValue) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-    return;
-    $this->ownerDocument->insertVar($varName, $varValue, $this);
-  }
-
-  public function insertFn($varName, $varValue) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-    return;
-    $this->ownerDocument->insertFn($varName, $varValue, $this);
-  }
-
   public function stripElement($comment = null) {
     $this->stripTag($comment, false);
   }

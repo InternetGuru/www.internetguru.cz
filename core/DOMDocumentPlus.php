@@ -45,16 +45,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function insertVar($varName, $varValue, $element=null) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-    return;
-  }
-
-  public function insertFn($varName, $varValue, $element=null) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-    return;
-  }
-
   public function processVariables(Array $variables, $ignore = array()) {
     return $this->elementProcessVariables($variables, $ignore, $this->documentElement, true);
   }
@@ -135,11 +125,6 @@ class DOMDocumentPlus extends DOMDocument {
       $n->stripElement(_("Readonly element hidden"));
     }
     return count($toRemove);
-  }
-
-  public function validatePlus($repair = false) {
-    Logger::error(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-    return;
   }
 
   public function relaxNGValidatePlus($f) {
