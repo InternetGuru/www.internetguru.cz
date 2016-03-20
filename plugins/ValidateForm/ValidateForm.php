@@ -128,9 +128,10 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     if(is_file($bannedIPFilePath)) {
       throw new Exception(sprintf(_("Your IP adress %s is banned"), $IP));
     }
-    if(is_file($IPFilePath)) {
+    if(!Cms::isSuperUser() && is_file($IPFilePath)) {
       if(time() - filemtime($IPFilePath) < $time) { // 2 min timeout
-        throw new Exception(sprintf(_("The form can not be sent in such quick succession, please try it again in %s seconds"), $time - (time() - filemtime($IPFilePath))));
+        $sec = $time - (time() - filemtime($IPFilePath));
+        throw new Exception(sprintf(_("Please wait %s second before next post"), $sec));
       }
     }
     mkdir_plus(dirname($IPFilePath));
