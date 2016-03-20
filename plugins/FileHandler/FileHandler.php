@@ -125,7 +125,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     foreach(self::$fileFolders as $sourceFolder => $isResDir) {
       $cacheFolder = $sourceFolder;
       if($isResDir && getRealResDir() != RESOURCES_DIR) $cacheFolder = getRealResDir($sourceFolder);
-      if(!is_dir($cacheFolder)) return;
+      if(!is_dir($cacheFolder)) continue;
       $this->doCheckResources($cacheFolder, $sourceFolder, $isResDir);
     }
     if(!$this->deleteCache) return;
