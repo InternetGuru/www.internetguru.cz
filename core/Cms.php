@@ -202,7 +202,7 @@ class Cms {
   private static function addMessage($type, $message) {
     if(is_null(self::$flashList)) self::createFlashList();
     if(is_null(self::$requestToken)) self::$requestToken = rand();
-    if(Cms::isSuperUser()) {
+    if(self::isSuperUser()) {
       $_SESSION["cms"]["flash"][$type][self::$requestToken][] = $message;
       return;
     }
