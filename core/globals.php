@@ -545,6 +545,15 @@ function checkFileCache($sourceFile, $cacheFile) {
   touch($cacheFile, filemtime($sourceFile));
 }
 
+function validate_callStatic($methodName, Array $arguments, Array $functions, $nonEmptyArgumentsCount=0) {
+  if(!array_key_exists($methodName, $functions))
+    throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
+  for($i=0; $i<$nonEmptyArgumentsCount; $i++) {
+    if(array_key_exists($i, $arguments) && strlen($arguments[$i])) continue;
+    throw new Exception(sprintf(_("Argument[%s] empty or missing"), $i));
+  }
+}
+
 // UNUSED
 function clearApcCache() {
   $cache_info = apc_cache_info();

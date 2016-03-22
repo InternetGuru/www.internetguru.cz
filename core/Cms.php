@@ -24,9 +24,8 @@ class Cms {
   private static $requestToken = null;
 
   public static function __callStatic($methodName, $arguments) {
-    if(array_key_exists($methodName, self::getTypes()))
-      return self::addMessage($methodName, $arguments[0]);
-    throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
+    validate_callStatic($methodName, $arguments, self::getTypes(), 1);
+    return self::addMessage($methodName, $arguments[0]);
   }
 
   private static function getTypes() {

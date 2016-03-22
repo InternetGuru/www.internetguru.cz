@@ -84,11 +84,7 @@ class Logger {
 
   // TODO doc
   public static function __callStatic($methodName, $arguments) {
-    if(!array_key_exists($methodName, self::$levels))
-      throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
-    if(!array_key_exists(0, $arguments) || !strlen($arguments[0]))
-      throw new Exception(_("Logger message empty or missing"));
-
+    validate_callStatic($methodName, $arguments, self::$levels, 1);
     $type = self::TYPE_SYS_LOG;
     if(strpos($methodName, "user_") === 0) {
       $methodName = substr($methodName, strlen("user_"));
