@@ -1,3 +1,7 @@
+ValidateForm: přidáno medové zabezpečení formuláře (honeypot)
+ValidateForm: odstraněno časové omezení formuláře pro admina
+ContactForm: vizuální zjednodušení náhledu zprávy
+ContactForm: přidána výchozí zpráva do základního formuláře
 LogViewer: rozdělení na uživatelské, systémové a mailové logy 
 Logger: nový formát logovacích souborů
 
