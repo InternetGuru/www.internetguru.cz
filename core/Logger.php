@@ -86,8 +86,8 @@ class Logger {
   public static function __callStatic($methodName, $arguments) {
     if(!array_key_exists($methodName, self::$levels))
       throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
-    if(!strlen($arguments[0]))
-      throw new Exception(sprintf(_("Method %s empty or missing message"), $methodName));
+    if(!array_key_exists(0, $arguments) || !strlen($arguments[0]))
+      throw new Exception(_("Logger message empty or missing"));
 
     $type = self::TYPE_SYS_LOG;
     if(strpos($methodName, "user_") === 0) {
@@ -167,15 +167,17 @@ class Logger {
       ? new LineFormatter(self::LOG_FORMAT)
       : new LineFormatter(self::EMAIL_FORMAT);
 
-    foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
-      $mailHandler = new NativeMailerHandler(
-        self::EMAIL_ALERT_TO,
-        "IGCMS $type at ".HOST,
-        self::EMAIL_ALERT_FROM,
-        constant("Monolog\Logger::$type"),
-        false);
-      $mailHandler->setFormatter($formatter);
-      $logger->pushHandler($mailHandler);
+    if(!IS_LOCALHOST) {
+      foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
+        $mailHandler = new NativeMailerHandler(
+          self::EMAIL_ALERT_TO,
+          "IGCMS $type at ".HOST,
+          self::EMAIL_ALERT_FROM,
+          constant("Monolog\Logger::$type"),
+          false);
+        $mailHandler->setFormatter($formatter);
+        $logger->pushHandler($mailHandler);
+      }
     }
 
     $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
