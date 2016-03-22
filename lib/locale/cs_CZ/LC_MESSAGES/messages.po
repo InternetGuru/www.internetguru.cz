@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-22 10:16+0100\n"
-"PO-Revision-Date: 2016-03-22 10:17+0100\n"
+"POT-Creation-Date: 2016-03-22 10:58+0100\n"
+"PO-Revision-Date: 2016-03-22 10:59+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -1196,49 +1196,53 @@ msgstr "Neplatná hodnota elementu lastmod: %s"
 msgid "Unable to redir to %s: %s"
 msgstr "Nepodařilo se přesměrovat na %s: %s"
 
-#: plugins/ValidateForm/ValidateForm.php:129
+#: plugins/ValidateForm/ValidateForm.php:71
+msgid "Honeypot check failed"
+msgstr "Neprošla kontrola medovníku"
+
+#: plugins/ValidateForm/ValidateForm.php:147
 #, php-format
 msgid "Your IP adress %s is banned"
 msgstr "Odesílání je z Vaší IP adresy %s zakázáno"
 
-#: plugins/ValidateForm/ValidateForm.php:134
+#: plugins/ValidateForm/ValidateForm.php:152
 #, php-format
 msgid "Please wait %s second before next post"
 msgstr "Počkejte %s sekund před dalším odesláním"
 
-#: plugins/ValidateForm/ValidateForm.php:138
+#: plugins/ValidateForm/ValidateForm.php:156
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
 
-#: plugins/ValidateForm/ValidateForm.php:187
+#: plugins/ValidateForm/ValidateForm.php:205
 msgid "Select value does not match any option"
 msgstr "Hodnota výběru neodpovídá žádné z možností"
 
-#: plugins/ValidateForm/ValidateForm.php:191
+#: plugins/ValidateForm/ValidateForm.php:209
 msgid "Item value is lower then allowed minimum"
 msgstr "Hodnota je menší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:192
+#: plugins/ValidateForm/ValidateForm.php:210
 msgid "Item value is greater then allowed maximum"
 msgstr "Hodnota je větší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:196
+#: plugins/ValidateForm/ValidateForm.php:214
 msgid "Value missing"
 msgstr "Chybí hodnota"
 
-#: plugins/ValidateForm/ValidateForm.php:199
+#: plugins/ValidateForm/ValidateForm.php:217
 msgid "Item is required"
 msgstr "Pložka je povinná"
 
-#: plugins/ValidateForm/ValidateForm.php:204
+#: plugins/ValidateForm/ValidateForm.php:222
 msgid "Invalid item pattern"
 msgstr "Neplatný formát předpisu (pattern)"
 
-#: plugins/ValidateForm/ValidateForm.php:208
+#: plugins/ValidateForm/ValidateForm.php:226
 msgid "Item value does not match required pattern"
 msgstr "Hodnota položky neodpovídá požadovanému formátu"
 
-#: plugins/ValidateForm/ValidateForm.php:213
+#: plugins/ValidateForm/ValidateForm.php:231
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
 

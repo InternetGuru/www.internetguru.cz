@@ -68,7 +68,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       if(empty($request)) continue;
       if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
       if(!$this->hpCheck($request)) {
-        Logger::info("Honeypot check failed");
+        Logger::info(_("Honeypot check failed"));
         continue;
       }
       try {
