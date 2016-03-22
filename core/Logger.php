@@ -31,12 +31,12 @@ class Logger {
   /**
    * Log format for TYPE_SYS_LOG and TYPE_USER_LOG.
    */
-  const LOG_FORMAT   = "[%datetime%] %level_name%: %message% %extra%\n";
+  const LOG_FORMAT = "[%datetime%] %extra.ip% %extra.request% %extra.user% %level_name%: %message% %extra.backtrace%\n";
 
   /**
    * Log format for TYPE_MAIL_LOG.
    */
-  const EMAIL_FORMAT = "[%datetime%]: %message%\n";
+  const EMAIL_FORMAT = "[%datetime%] %extra.ip% %extra_request% %extra.user%: %message%\n";
 
   /**
    * Monolog system logger instance.
@@ -149,6 +149,9 @@ class Logger {
   private static function getMonolog($type) {
     if(!is_null(self::${"monolog$type"})) return self::${"monolog$type"};
     $logger = new MonologLogger(self::LOGGER_NAME."_$type");
+    $logger->pushProcessor("IGCMS\Core\Logger::appendIP");
+    $logger->pushProcessor("IGCMS\Core\Logger::appendRequest");
+    $logger->pushProcessor("IGCMS\Core\Logger::appendUserID");
     $logger->pushProcessor("IGCMS\Core\Logger::appendDebugTrace");
     self::pushHandlers($logger, $type);
     self::${"monolog$type"} = $logger;
@@ -193,8 +196,38 @@ class Logger {
    * @return Array
    */
   public static function appendDebugTrace(Array $record) {
-    if(!CMS_DEBUG && $record['level'] < MonologLogger::CRITICAL) return $record;
-    $record["extra"]["backtrace"] = array_slice(debug_backtrace(), 6);
+    $backtrace = "";
+    if(CMS_DEBUG || $record['level'] >= MonologLogger::CRITICAL) {
+      $record["extra"]["backtrace"] = array_slice(debug_backtrace(), 6);
+    }
+    $record["extra"]["backtrace"] = $backtrace;
+    return $record;
+  }
+
+  // TODO doc
+  public static function appendRequest(Array $record) {
+    $request = "UNKNOWN";
+    if(isset($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], $_SERVER["SERVER_PROTOCOL"])) {
+      $request = $_SERVER["SERVER_PROTOCOL"]." ".$_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"];
+    }
+    $record["extra"]["request"] = $request;
+    return $record;
+  }
+
+  // TODO doc
+  public static function appendIP(Array $record) {
+    $ip = "0.0.0.0:0000";
+    if(isset($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_PORT"])) {
+      $ip = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
+    }
+    $record["extra"]["ip"] = $ip;
+    return $record;
+  }
+
+  // TODO doc
+  public static function appendUserID(Array $record) {
+    $user = is_null(Cms::getLoggedUser()) ? "unknown" : Cms::getLoggedUser();
+    $record["extra"]["user"] = $user;
     return $record;
   }
 }
