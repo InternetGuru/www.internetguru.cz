@@ -16,3 +16,6 @@ textarea.validateform-warning {
   border-color: #A13939;
   background-color: #FFE5E5;
 }
+input.validateform-hp {
+  display: none;
+}

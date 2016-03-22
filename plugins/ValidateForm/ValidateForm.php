@@ -17,6 +17,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
   const FORM_ID = "validateform-id";
+  const FORM_HP = "validateform-hp";
   const WAIT = 120;
 
   public function __construct(SplSubject $s) {
@@ -46,19 +47,32 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       }
       $time = $this->getWaitTime($form);
       if($form->hasClass("validateform-notime")) $time = 0;
-      $hInput = $content->createElement("input");
-      $hInput->setAttribute("type", "hidden");
-      $hInput->setAttribute("name", self::FORM_ID);
-      $hInput->setAttribute("value", $id);
+
       $div = $content->createElement("div");
-      $div->appendChild($hInput);
+
+      $input = $content->createElement("input");
+      $input->setAttribute("type", "email");
+      $input->setAttribute("name", self::FORM_HP);
+      $input->setAttribute("class", self::FORM_HP);
+      $div->appendChild($input);
+
+      $input = $content->createElement("input");
+      $input->setAttribute("type", "hidden");
+      $input->setAttribute("name", self::FORM_ID);
+      $input->setAttribute("value", $id);
+      $div->appendChild($input);
+
       $form->appendChild($div);
       $method = strtolower($form->getAttribute("method"));
       $request = $method == "post" ? $_POST : $_GET;
       if(empty($request)) continue;
       if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
+      if(!$this->hpCheck($request)) {
+        Logger::info("Honeypot check failed");
+        continue;
+      }
       try {
-        $this->securityCheck($time);
+        if(!Cms::isSuperUser()) $this->ipCheck($time);
       } catch(Exception $e) {
         Logger::user_error($e->getMessage());
         continue;
@@ -67,6 +81,10 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       Cms::setVariable($id, $this->verifyItems($xpath, $form, $request));
     }
     return $content;
+  }
+
+  private function hpCheck($request) {
+    return isset($request[self::FORM_HP]) && !strlen($request[self::FORM_HP]);
   }
 
   private function getLabels(DOMXPath $xpath, DOMElementPlus $form) {
@@ -119,7 +137,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     return $time;
   }
 
-  private function securityCheck($time) {
+  private function ipCheck($time) {
     if($time == 0) return;
     $IP = getIP();
     $IPFile = str_replace(":", "-", $IP);
@@ -128,7 +146,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     if(is_file($bannedIPFilePath)) {
       throw new Exception(sprintf(_("Your IP adress %s is banned"), $IP));
     }
-    if(!Cms::isSuperUser() && is_file($IPFilePath)) {
+    if(is_file($IPFilePath)) {
       if(time() - filemtime($IPFilePath) < $time) { // 2 min timeout
         $sec = $time - (time() - filemtime($IPFilePath));
         throw new Exception(sprintf(_("Please wait %s second before next post"), $sec));
