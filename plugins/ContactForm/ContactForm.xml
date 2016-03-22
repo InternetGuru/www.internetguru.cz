@@ -53,7 +53,7 @@ $inputvar-service_plain
       <dd><input type="text" pattern=".*(\d\D*){9,}" id="telephone" placeholder="+420 777123456"/></dd>
       <dd><label for="telephone">Nechte prázdné nebo napište aspoň 9 číslic.</label></dd>
       <dt><label for="msg">Zpráva <em>(povinné)</em></label></dt>
-      <dd><textarea id="msg" required="required"/></dd>
+      <dd><textarea id="msg" required="required">Kontaktujte mě prosím.</textarea></dd>
       <dt class="noprint">Odeslání formuláře</dt>
       <dd class="noprint"><label><input type="checkbox" id="sendcopy"/> Poslat kopii této zprávy na uvedený e-mail</label></dd>
       <dd class="noprint"><input type="submit" id="submit" value="Odeslat"/></dd>

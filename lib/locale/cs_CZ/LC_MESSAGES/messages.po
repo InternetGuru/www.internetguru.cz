@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-22 10:15+0100\n"
-"PO-Revision-Date: 2016-03-22 10:15+0100\n"
+"POT-Creation-Date: 2016-03-22 10:58+0100\n"
+"PO-Revision-Date: 2016-03-22 10:59+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -21,6 +21,7 @@ msgstr ""
 "X-Poedit-SourceCharset: UTF-8\n"
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPathExcluded-0: lib\n"
+"X-Poedit-SearchPathExcluded-1: vendor\n"
 
 #: core/Cms.php:34
 msgid "Success"
@@ -1195,55 +1196,62 @@ msgstr "Neplatná hodnota elementu lastmod: %s"
 msgid "Unable to redir to %s: %s"
 msgstr "Nepodařilo se přesměrovat na %s: %s"
 
-#: plugins/ValidateForm/ValidateForm.php:129
+#: plugins/ValidateForm/ValidateForm.php:71
+msgid "Honeypot check failed"
+msgstr "Neprošla kontrola medovníku"
+
+#: plugins/ValidateForm/ValidateForm.php:147
 #, php-format
 msgid "Your IP adress %s is banned"
 msgstr "Odesílání je z Vaší IP adresy %s zakázáno"
 
-#: plugins/ValidateForm/ValidateForm.php:133
+#: plugins/ValidateForm/ValidateForm.php:152
 #, php-format
-msgid ""
-"The form can not be sent in such quick succession, please try it again in %s "
-"seconds"
-msgstr ""
-"Formulář není možné odesílat takto rychle za sebou, zkuste to znuvu za %s "
-"vteřin"
+msgid "Please wait %s second before next post"
+msgstr "Počkejte %s sekund před dalším odesláním"
 
-#: plugins/ValidateForm/ValidateForm.php:137
+#: plugins/ValidateForm/ValidateForm.php:156
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
 
-#: plugins/ValidateForm/ValidateForm.php:186
+#: plugins/ValidateForm/ValidateForm.php:205
 msgid "Select value does not match any option"
 msgstr "Hodnota výběru neodpovídá žádné z možností"
 
-#: plugins/ValidateForm/ValidateForm.php:190
+#: plugins/ValidateForm/ValidateForm.php:209
 msgid "Item value is lower then allowed minimum"
 msgstr "Hodnota je menší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:191
+#: plugins/ValidateForm/ValidateForm.php:210
 msgid "Item value is greater then allowed maximum"
 msgstr "Hodnota je větší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:195
+#: plugins/ValidateForm/ValidateForm.php:214
 msgid "Value missing"
 msgstr "Chybí hodnota"
 
-#: plugins/ValidateForm/ValidateForm.php:198
+#: plugins/ValidateForm/ValidateForm.php:217
 msgid "Item is required"
 msgstr "Pložka je povinná"
 
-#: plugins/ValidateForm/ValidateForm.php:203
+#: plugins/ValidateForm/ValidateForm.php:222
 msgid "Invalid item pattern"
 msgstr "Neplatný formát předpisu (pattern)"
 
-#: plugins/ValidateForm/ValidateForm.php:207
+#: plugins/ValidateForm/ValidateForm.php:226
 msgid "Item value does not match required pattern"
 msgstr "Hodnota položky neodpovídá požadovanému formátu"
 
-#: plugins/ValidateForm/ValidateForm.php:212
+#: plugins/ValidateForm/ValidateForm.php:231
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid ""
+#~ "The form can not be sent in such quick succession, please try it again in "
+#~ "%s seconds"
+#~ msgstr ""
+#~ "Formulář není možné odesílat takto rychle za sebou, zkuste to znuvu za %s "
+#~ "vteřin"
 
 #~ msgid "Logger message empty or missing"
 #~ msgstr "Chybějící nebo prázdná zpráva Loggeru"
