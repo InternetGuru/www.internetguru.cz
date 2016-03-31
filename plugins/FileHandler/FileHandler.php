@@ -17,7 +17,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "text/x-c" => array("js"),
     "application/x-elc" => array("js"),
     "application/x-empty" => array("css", "js"),
-    "application/octet-stream" => array("woff", "js"),
+    "application/octet-stream" => array("woff", "eot", "js"),
     "image/svg+xml" => array("svg"),
     "image/png" => array("png"),
     "image/jpeg" => array("jpg", "jpeg"),
@@ -125,7 +125,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     foreach(self::$fileFolders as $sourceFolder => $isResDir) {
       $cacheFolder = $sourceFolder;
       if($isResDir && getRealResDir() != RESOURCES_DIR) $cacheFolder = getRealResDir($sourceFolder);
-      if(!is_dir($cacheFolder)) return;
+      if(!is_dir($cacheFolder)) continue;
       $this->doCheckResources($cacheFolder, $sourceFolder, $isResDir);
     }
     if(!$this->deleteCache) return;

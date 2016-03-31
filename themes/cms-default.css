@@ -220,6 +220,7 @@ button {
 button,
 select {
   text-transform: none;
+  max-width: 100%;
 }
 
 /**
