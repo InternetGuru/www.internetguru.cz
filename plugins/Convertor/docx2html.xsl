@@ -266,8 +266,8 @@
             <xsl:choose>
               <!-- definition list if first is bold -->
               <xsl:when test="count(r) = count(r/rPr/b[@val = 1])">·
-    <xsl:copy-of select="$pIndent"/><dl>·
-      <xsl:copy-of select="$pIndent"/><dt>
+  <xsl:copy-of select="$pIndent"/><dl>·
+    <xsl:copy-of select="$pIndent"/><dt>
                     <xsl:apply-templates select="node()">
                       <xsl:with-param name="nostrong" select="1"/>
                     </xsl:apply-templates>
@@ -277,7 +277,7 @@
                     <xsl:with-param name="i" select="1"/>
                     <xsl:with-param name="pIndent" select="$pIndent"/>
                   </xsl:call-template>·
-    <xsl:copy-of select="$pIndent"/></dl>
+  <xsl:copy-of select="$pIndent"/></dl>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:call-template name="buildList">
@@ -295,7 +295,7 @@
           <xsl:choose>
             <xsl:when test="$nop"><xsl:apply-templates select="node()"/></xsl:when>
             <xsl:otherwise>·
-    <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
+  <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
