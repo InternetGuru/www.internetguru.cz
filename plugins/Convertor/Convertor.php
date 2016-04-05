@@ -10,6 +10,7 @@ use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use Exception;
 use DOMDocument;
+use XSLTProcessor;
 use SplObserver;
 use SplSubject;
 
