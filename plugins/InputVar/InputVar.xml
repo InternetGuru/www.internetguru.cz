@@ -51,7 +51,7 @@
   <var id="nodebug">Provozní režim</var>
   <var id="debug">Ladící režim</var>
   <var id="servercache">Smazat mezipaměť serveru</var>
-  <var id="filecache">Smazat dočasné soubory</var>
+  <var id="filecache">Aktualizovat souborovou mezipaměť</var>
   <var id="reportbug"><a href="https://bitbucket.org/igwr/cms/issues?status=new&amp;status=open">Odeslat zpětnou vazbu</a></var>
   <var id="igcms"><a href="https://dokumenty.internetguru.cz/igcms">Specifikace IGCMS</a></var>
   <var id="codemirror"><a href="https://dokumenty.internetguru.cz/zkratky">Klávesové zkratky CodeMirror</a></var>
