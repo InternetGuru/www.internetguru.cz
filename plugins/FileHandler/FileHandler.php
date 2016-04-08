@@ -178,7 +178,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         checkFileCache($sourceFilePath, $cacheFilePath);
       } catch(Exception $e) {
         $folderUptodate = false;
-        if($this->deleteCache) {
+        if($e->getCode() == 1 || $this->deleteCache) { // pass if redundant file or deleteCache
           if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
           if(getRealResDir() != RESOURCES_DIR) continue;
           $cacheFilePath = getRealResDir($cacheFilePath);
@@ -223,12 +223,15 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if($isRoot) {
       if(!IS_LOCALHOST && strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
         $src = CMSRES_FOLDER."/".getCurLink();
-      } else switch($ext) {
-        case "css":
-        self::buildCss($src, $dest);
-        return;
-        case "js":
-        self::buildJs($src, $dest);
+      } else {
+        switch($ext) {
+          case "css":
+          self::buildCss($src, $dest);
+          break;
+          case "js":
+          self::buildJs($src, $dest);
+        }
+        Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
         return;
       }
     }

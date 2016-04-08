@@ -539,9 +539,9 @@ function getResDir($file="") {
 
 function checkFileCache($sourceFile, $cacheFile) {
   if(!is_file($cacheFile)) return;
-  if(!is_file($sourceFile)) throw new Exception(_("Cache file is redundant"));
+  if(!is_file($sourceFile)) throw new Exception(_("Cache file is redundant"), 1);
   if(filemtime($cacheFile) == filemtime($sourceFile)) return;
-  if(getFileHash($cacheFile) != getFileHash($sourceFile)) throw new Exception(_("Cache file is outdated"));
+  if(getFileHash($cacheFile) != getFileHash($sourceFile)) throw new Exception(_("Cache file is outdated"), 2);
   touch($cacheFile, filemtime($sourceFile));
 }
 
