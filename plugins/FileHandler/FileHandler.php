@@ -178,7 +178,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         checkFileCache($sourceFilePath, $cacheFilePath);
       } catch(Exception $e) {
         $folderUptodate = false;
-        if($this->deleteCache) {
+        if($e->getCode() == 1 || $this->deleteCache) { // pass if redundant file or deleteCache
           if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
           if(getRealResDir() != RESOURCES_DIR) continue;
           $cacheFilePath = getRealResDir($cacheFilePath);
