@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-22 10:58+0100\n"
-"PO-Revision-Date: 2016-03-22 10:59+0100\n"
+"POT-Creation-Date: 2016-04-08 16:49+0200\n"
+"PO-Revision-Date: 2016-04-08 16:50+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -870,77 +870,77 @@ msgstr "Nepodařilo se nelézt nadřazený nadpis pro '%s'"
 msgid "Page '%s' not found"
 msgstr "Stránka '%s' nebyla nalezena"
 
-#: plugins/Convertor/Convertor.php:63
+#: plugins/Convertor/Convertor.php:64
 msgid "File URL cannot be empty"
 msgstr "Vložte odkaz na soubor"
 
-#: plugins/Convertor/Convertor.php:78
+#: plugins/Convertor/Convertor.php:79
 #, php-format
 msgid "Unsupported file MIME type '%s'"
 msgstr "Soubor '%s' má nepodporovaný MIME typ"
 
-#: plugins/Convertor/Convertor.php:97
+#: plugins/Convertor/Convertor.php:98
 msgid "Unable to import document; probably missing heading"
 msgstr "Nepodařilo se importovat dokument; pravděpodobně v něm chybí nadpis"
 
-#: plugins/Convertor/Convertor.php:112
+#: plugins/Convertor/Convertor.php:113
 msgid "Autocorrected"
 msgstr "Autoopraveno"
 
-#: plugins/Convertor/Convertor.php:115
+#: plugins/Convertor/Convertor.php:116
 msgid "Use @ to specify short/link attributes for heading"
 msgstr "Pro specifikaci atributu short/link v nadpisu použijte @"
 
-#: plugins/Convertor/Convertor.php:116
+#: plugins/Convertor/Convertor.php:117
 msgid "Eg. This Is Long Heading @ Short Heading"
 msgstr "Například: Toto je dlouhý nadpis @ Krátký nadpis"
 
-#: plugins/Convertor/Convertor.php:117
+#: plugins/Convertor/Convertor.php:118
 msgid "Use @ to specify kw attribute for description"
 msgstr "Pro specifikaci atributu kw použijte @"
 
-#: plugins/Convertor/Convertor.php:118
+#: plugins/Convertor/Convertor.php:119
 msgid "Eg. This is description @ these, are, some, keywords"
 msgstr "Například: Toto je popisek @ toto, jsou, klíčová, slova"
 
-#: plugins/Convertor/Convertor.php:124
+#: plugins/Convertor/Convertor.php:125
 msgid "File successfully imported"
 msgstr "Soubor byl úspěšně importován"
 
-#: plugins/Convertor/Convertor.php:133
+#: plugins/Convertor/Convertor.php:134
 #, php-format
 msgid "Unable to save file %s: %s"
 msgstr "Nepodařilo se uložit soubor %s: %s"
 
-#: plugins/Convertor/Convertor.php:138
+#: plugins/Convertor/Convertor.php:139
 #, php-format
 msgid "Unable to backup file %s: %s"
 msgstr "Nepodařilo se zálohovat soubor %s: %s"
 
-#: plugins/Convertor/Convertor.php:201
+#: plugins/Convertor/Convertor.php:202
 #, php-format
 msgid "File '%s' not found in temp folder"
 msgstr "Soubor '%s' nebyl nalezen mezi dočasnými soubory"
 
-#: plugins/Convertor/Convertor.php:207
+#: plugins/Convertor/Convertor.php:208
 msgid "Unable to parse link"
 msgstr "Odkaz má neplatný formát"
 
-#: plugins/Convertor/Convertor.php:229
+#: plugins/Convertor/Convertor.php:230
 msgid "Destination URL is unaccessible; must be shared publically"
 msgstr "Cílový odkaz je nedostupný; dokument musí být veřejně sdílený"
 
-#: plugins/Convertor/Convertor.php:231
+#: plugins/Convertor/Convertor.php:232
 #, php-format
 msgid "Destination URL error: %s"
 msgstr "Chyba cílového odkazu: %s"
 
-#: plugins/Convertor/Convertor.php:278
+#: plugins/Convertor/Convertor.php:279
 #, php-format
 msgid "Unable to locate '%s' in '%s'"
 msgstr "Nepodařilo se nalézt soubor '%s' v archivu '%s'"
 
-#: plugins/Convertor/Convertor.php:293
+#: plugins/Convertor/Convertor.php:294
 #, php-format
 msgid "Failed to apply transformation '%s'"
 msgstr "Nepodařilo se aplikovat transformaci '%s'"
@@ -975,38 +975,43 @@ msgstr "Nepodařilo se smazat dočasný soubor: %s"
 msgid "Outdated cache files successfully removed"
 msgstr "Neaktuální soubory byly úspěšně odstraněny"
 
-#: plugins/FileHandler/FileHandler.php:247
+#: plugins/FileHandler/FileHandler.php:235
+#, php-format
+msgid "File %s was successfully built"
+msgstr "Soubor %s byl úspěšně postaven"
+
+#: plugins/FileHandler/FileHandler.php:250
 msgid "UglifyJS not installed"
 msgstr "UglifyJS není nainstalovaný"
 
-#: plugins/FileHandler/FileHandler.php:250
+#: plugins/FileHandler/FileHandler.php:253
 msgid "Unable to minify JS"
 msgstr "Nepodařilo se minifikovat JS"
 
-#: plugins/FileHandler/FileHandler.php:256
+#: plugins/FileHandler/FileHandler.php:259
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:270
+#: plugins/FileHandler/FileHandler.php:273
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:285
+#: plugins/FileHandler/FileHandler.php:288
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:287
+#: plugins/FileHandler/FileHandler.php:290
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:290
+#: plugins/FileHandler/FileHandler.php:293
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:296
+#: plugins/FileHandler/FileHandler.php:299
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
