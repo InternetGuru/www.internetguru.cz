@@ -287,7 +287,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if(!$result || !strlen($imBin))
       throw new Exception(_("Unable to resize image"));
     if(strlen($imBin) > $mode[2])
-      throw new Exception(_("Generated image size %s is over limit %s"), fileSizeConvert(strlen($imBin)), fileSizeConvert($mode[2]));
+      throw new Exception(sprintf(_("Generated image size %s is over limit %s"), fileSizeConvert(strlen($imBin)), fileSizeConvert($mode[2])));
     mkdir_plus(dirname($dest));
     $b = file_put_contents($dest, $imBin);
     if($b === false || !touch($dest, filemtime($src))) throw new Exception(_("Unable to create file"));
