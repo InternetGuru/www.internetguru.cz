@@ -224,15 +224,17 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       if(!IS_LOCALHOST && strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
         $src = CMSRES_FOLDER."/".getCurLink();
       } else {
+        $log = true;
         switch($ext) {
           case "css":
           self::buildCss($src, $dest);
-          break;
+          return;
           case "js":
           self::buildJs($src, $dest);
+          return;
+          default: $log=false;
         }
-        Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
-        return;
+        if($log) Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
       }
     }
     copy_plus($src, $dest);
