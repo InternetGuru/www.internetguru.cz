@@ -1,5 +1,17 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;
@@ -60,15 +72,16 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       // create basket-empty var
       Cms::setVariable('empty', (count($this->cookieProducts) ? null : ''));
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::user_warning($e->getMessage());
     }
   }
 
   private function validateConfigCache() {
-    $configFilePath = findFile($this->pluginDir."/".get_class($this).".xml");
+    $className = (new \ReflectionClass($this))->getShortName();
+    $configFilePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($configFilePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($configFilePath))) {
-      apc_store_cache($cacheKey, filemtime($configFilePath), $this->pluginDir."/".get_class($this).".xml");
+      apc_store_cache($cacheKey, filemtime($configFilePath), $this->pluginDir."/".$className.".xml");
       $this->useCache = false;
     }
   }
@@ -78,11 +91,11 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->isPost()) $this->processPost();
     // show success message
     if(isset($_GET["btdelok"])) {
-      Cms::addMessage($this->vars['deletesucess'], Cms::MSG_SUCCESS);
+      Logger::user_success($this->vars['deletesucess']);
     }
     if(isset($_GET["btok"]) && isset($this->products[$_GET["btok"]])) {
       $gotoorder = '<a href="'.$this->vars['formpage'].'">'.$this->vars['gotoorder'].'</a>';
-      Cms::addMessage($this->vars['success']." – $gotoorder", Cms::MSG_SUCCESS);
+      Logger::user_success($this->vars['success']." – $gotoorder");
     }
   }
 
@@ -195,10 +208,8 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       return;
     }
     foreach($this->cfg->getElementsByTagName("var") as $var) {
-      if(!$var->hasAttribute("id"))
-        throw new Exception(_("Element var missing attribute id"));
+      $id = $var->getRequiredAttribute('id');
       $value = null;
-      $id = $var->getAttribute('id');
       if(count($var->childElementsArray)) {
         $doc = new DOMDocumentPlus();
         $doc->appendChild($doc->importNode($var, true));
@@ -214,9 +225,8 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   private function loadTemplates() {
     $templates = array();
     foreach($this->cfg->getElementsByTagName("template") as $tpl) {
-      if(!$tpl->hasAttribute("id"))
-        throw new Exception(_("Element template missing attribute id"));
-      $templates[$tpl->getAttribute("id")] = $tpl;
+      $id = $tpl->getRequiredAttribute("id");
+      $templates[$id] = $tpl;
     }
     if(!count($templates)) throw new Exception(_("Template element(s) not found"));
     return $templates;
@@ -225,8 +235,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   private function loadProducts() {
     $products = array();
     foreach($this->cfg->getElementsByTagName("product") as $product) {
-      if(!$product->hasAttribute("id"))
-        throw new Exception(_("Element product missing attribute id"));
+      $id = $product->getRequiredAttribute("id"); // only check
       $attrs = array();
       foreach($product->attributes as $attrName => $attrNode) {
         $attrs["product-$attrName"] = $attrNode->nodeValue;
@@ -247,7 +256,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
       }
       /*
       if(!isset($attrs["price"])) {
-        Logger::log(sprintf(_("Product id %s missing price"), $id), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Product id %s missing price"), $id));
         continue;
       }
       */

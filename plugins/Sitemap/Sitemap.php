@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+use DateTime;
+
+
 /**
  * Unlogged user (on root url) generate sitemap.xml from all loaded files and save it to the root of current domain
  * @see http://www.sitemaps.org/protocol.html Sitemap definition
@@ -50,7 +63,7 @@ class Sitemap extends Plugin implements SplObserver {
       $cfgDefaults = $this->getConfigDefaults();
       $this->createSitemap($links, $cfgLinks, $cfgDefaults);
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::user_warning($e->getMessage());
     }
   }
 

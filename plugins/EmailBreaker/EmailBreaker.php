@@ -1,5 +1,16 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\FinalContentStrategyInterface;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyInterface {
 
   public function update(SplSubject $subject) {
@@ -13,15 +24,17 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     $pat = array();
     $rep = array();
     foreach($cfg->getElementsByTagName("replace") as $replace) {
-      if(!$replace->hasAttribute("pattern")) {
-        Logger::log(_("Element replace missing attribute pattern"), Logger::LOGGER_WARNING);
+      try {
+        $pattern = $replace->getRequiredAttribute("pattern");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
       if(!strlen($replace->nodeValue)) {
-        Logger::log(_("Element replace missing value"), Logger::LOGGER_WARNING);
+        Logger::user_warning(_("Element replace missing value"));
         continue;
       }
-      $pat[] = $replace->getAttribute("pattern");
+      $pat[] = $pattern;
       $rep[] = $replace->nodeValue;
     }
     $anchors = array();
@@ -60,7 +73,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     foreach($pat as $k => $p) {
       $jsRep[] = "['$p','{$rep[$k]}']";
     }
-    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".get_class($this).".js");
+    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".js");
     Cms::getOutputStrategy()->addJs("EmailBreaker.init({
       rep: [".implode(",", $jsRep)."]
     });");

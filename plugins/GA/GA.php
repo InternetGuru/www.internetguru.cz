@@ -1,5 +1,14 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
+
 class GA extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
@@ -20,7 +29,7 @@ class GA extends Plugin implements SplObserver {
     $ga_id = $ga_id->nodeValue;
     // ga_id validation
     if(!preg_match("/^UA-\d+-\d+$/", $ga_id)) {
-      Logger::log(sprintf(_("Invalid ga_id format '%s'"), $ga_id), Logger::LOGGER_WARNING);
+      Logger::user_warning(sprintf(_("Invalid ga_id format '%s'"), $ga_id));
       return;
     }
     // disable if superadmin

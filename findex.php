@@ -1,5 +1,8 @@
 <?php
 
+use IGCMS\Core\Logger;
+use IGCMS\Core\ErrorPage;
+
 try {
   include("init.php");
 
@@ -7,9 +10,10 @@ try {
     if(strpos($plugin, ".") === 0) continue;
     if(!is_dir(PLUGINS_FOLDER."/$plugin")) continue;
     if(is_dir(PLUGINS_FOLDER."/.$plugin")) continue;
-    if(!in_array("ResourceInterface", class_implements($plugin))) continue;
-    if(!$plugin::isSupportedRequest()) continue;
-    $plugin::handleRequest();
+    $pluginClass = "IGCMS\Plugins\\$plugin";
+    if(!in_array("IGCMS\Core\ResourceInterface", class_implements($pluginClass))) continue;
+    if(!$pluginClass::isSupportedRequest()) continue;
+    $pluginClass::handleRequest();
   }
   throw new Exception(_("Unsupported request"), 415);
 
@@ -18,9 +22,9 @@ try {
   $errno = $e->getCode() ? $e->getCode() : 500;
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf("%s in %s on line %s", $m, $e->getFile(), $e->getLine());
-  Logger::log($m, Logger::LOGGER_FATAL, null, false);
-  if(class_exists("ErrorPage")) new ErrorPage($m, $errno);
+  if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno);
 
+  Logger::alert($m);
   http_response_code($errno);
   echo $m;
 

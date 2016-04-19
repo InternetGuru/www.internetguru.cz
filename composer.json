@@ -1,0 +1,30 @@
+{
+    "repositories": [
+        {
+            "type": "package",
+            "package": {
+                "name": "InternetGuru/CodeMirror",
+                "version": "dev-ig",
+                "source": {
+                    "url": "https://github.com/InternetGuru/CodeMirror",
+                    "type": "git",
+                    "reference": "ig"
+                }
+            }
+        }
+    ],
+    "require": {
+        "monolog/monolog": "^1.17",
+        "vladkens/autoprefixer": "dev-master",
+        "components/highlightjs": "^9.1",
+        "smallhadroncollider/uglify-php": "^1.0",
+        "phpmailer/phpmailer": "^5.2",
+        "InternetGuru/CodeMirror": "dev-ig"
+    },
+    "autoload": {
+        "psr-4": {
+            "IGCMS\\Core\\" : "core/",
+            "IGCMS\\Plugins\\" : "plugins/"
+        }
+     }
+}

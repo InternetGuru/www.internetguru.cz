@@ -1,12 +1,20 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Logger;
+use Exception;
+use DOMDocument;
+use DOMElement;
+use DOMXPath;
+
 class DOMDocumentPlus extends DOMDocument {
-  const DEBUG = false;
 
   function __construct($version="1.0", $encoding="utf-8") {
-    if(self::DEBUG) Logger::log("DEBUG");
     parent::__construct($version, $encoding);
-    $r = $this->registerNodeClass("DOMElement", "DOMElementPlus");
+    $r = parent::registerNodeClass("DOMElement", "IGCMS\Core\DOMElementPlus");
   }
 
   public function createElement($name, $value=null) {
@@ -37,16 +45,6 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
-  public function insertVar($varName, $varValue, $element=null) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
-    return;
-  }
-
-  public function insertFn($varName, $varValue, $element=null) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
-    return;
-  }
-
   public function processVariables(Array $variables, $ignore = array()) {
     return $this->elementProcessVariables($variables, $ignore, $this->documentElement, true);
   }
@@ -72,7 +70,7 @@ class DOMDocumentPlus extends DOMDocument {
         }
         $res = $this->insertVariable($element, $variables[$vName], $aName);
       } catch(Exception $e) {
-        Logger::log(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
+        Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()));
       }
     }
     if($deep) foreach($element->childNodes as $e) {
@@ -129,11 +127,6 @@ class DOMDocumentPlus extends DOMDocument {
     return count($toRemove);
   }
 
-  public function validatePlus($repair = false) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
-    return;
-  }
-
   public function relaxNGValidatePlus($f) {
     if(!file_exists($f))
       throw new Exception(sprintf(_("Unable to find HTML+ RNG schema '%s'"), $f));
@@ -146,7 +139,6 @@ class DOMDocumentPlus extends DOMDocument {
       $internal_errors = libxml_get_errors();
       if(count($internal_errors)) {
         $note = " ["._("Caution: this message may be misleading")."]";
-        if(self::DEBUG) die($this->saveXML());
         throw new Exception(current($internal_errors)->message.$note);
       }
       throw $e;

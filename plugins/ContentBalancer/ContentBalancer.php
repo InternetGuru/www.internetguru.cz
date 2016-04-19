@@ -1,5 +1,19 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMElement;
+use DOMXPath;
+use SplObserver;
+use SplSubject;
+
 class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
   private $content = null;
   private $sets = array();
@@ -16,7 +30,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $this->createVars();
     // check sets
     if(empty($this->sets)) {
-      Logger::log(_("No sets found"), Logger::LOGGER_ERROR);
+      Logger::critical(_("No sets found"));
       return $content;
     }
     // check default set
@@ -40,13 +54,12 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
           break;
           case "item":
           if($id == "") throw new Exception(_("Element item missing id"));
-          if(!strlen($e->getAttribute("wrapper")))
-            throw new Exception(sprintf(_("Element item %s missing attribute wrapper"), $id));
+          $wrapper = $e->getRequiredAttribute("wrapper"); // only check
           $this->sets[$id] = $e;
           break;
         }
       } catch(Exception $ex) {
-        Logger::log(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
       }
     }
   }
@@ -57,7 +70,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     $nodes = array();
     foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
     foreach($nodes as $section) {
-      $className = strtolower(get_class($this));
+      $className = strtolower((new \ReflectionClass($this))->getShortName());
       $setId = null;
       foreach(explode(" ", $section->getAttribute("class")) as $c) {
         if(strpos($c, "$className-") !== 0) continue;
@@ -70,7 +83,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       $set = $this->sets[$this->defaultSet];
       if(!is_null($setId)) {
         if(isset($this->sets[$setId])) $set = $this->sets[$setId];
-        else Logger::log(sprintf(_("Item id %s not found, using default"), $setId), Logger::LOGGER_WARNING);
+        else Logger::user_warning(sprintf(_("Item id %s not found, using default"), $setId));
       }
       $hs = array();
       foreach($section->childElementsArray as $e) if($e->nodeName == "h") $hs[] = $e;

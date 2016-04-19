@@ -1,9 +1,23 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMXPath;
+use SplObserver;
+use SplSubject;
+
 class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterface {
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
   const FORM_ID = "validateform-id";
+  const FORM_HP = "validateform-hp";
   const WAIT = 120;
 
   public function __construct(SplSubject $s) {
@@ -18,41 +32,59 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if($subject->getStatus() != STATUS_PREINIT) return;
     $this->detachIfNotAttached("HtmlOutput");
-    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.get_class($this).'.css');
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.(new \ReflectionClass($this))->getShortName().'.css');
   }
 
   public function getContent(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     foreach($xpath->query("//form") as $form) {
       if(!$form->hasClass("validable")) continue;
-      if(!$form->hasAttribute("id")) {
-        Logger::log(_("Validable form missing attribute id"));
+      try {
+        $id = $form->getRequiredAttribute("id");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
       $time = $this->getWaitTime($form);
       if($form->hasClass("validateform-notime")) $time = 0;
-      $id = $form->getAttribute("id");
-      $hInput = $content->createElement("input");
-      $hInput->setAttribute("type", "hidden");
-      $hInput->setAttribute("name", self::FORM_ID);
-      $hInput->setAttribute("value", $id);
+
       $div = $content->createElement("div");
-      $div->appendChild($hInput);
+
+      $input = $content->createElement("input");
+      $input->setAttribute("type", "email");
+      $input->setAttribute("name", self::FORM_HP);
+      $input->setAttribute("class", self::FORM_HP);
+      $div->appendChild($input);
+
+      $input = $content->createElement("input");
+      $input->setAttribute("type", "hidden");
+      $input->setAttribute("name", self::FORM_ID);
+      $input->setAttribute("value", $id);
+      $div->appendChild($input);
+
       $form->appendChild($div);
       $method = strtolower($form->getAttribute("method"));
       $request = $method == "post" ? $_POST : $_GET;
       if(empty($request)) continue;
       if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
+      if(!$this->hpCheck($request)) {
+        Logger::info(_("Honeypot check failed"));
+        continue;
+      }
       try {
-        $this->securityCheck($time);
+        if(!Cms::isSuperUser()) $this->ipCheck($time);
       } catch(Exception $e) {
-        Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
+        Logger::user_error($e->getMessage());
         continue;
       }
       $this->getLabels($xpath, $form);
       Cms::setVariable($id, $this->verifyItems($xpath, $form, $request));
     }
     return $content;
+  }
+
+  private function hpCheck($request) {
+    return isset($request[self::FORM_HP]) && !strlen($request[self::FORM_HP]);
   }
 
   private function getLabels(DOMXPath $xpath, DOMElementPlus $form) {
@@ -85,7 +117,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
         $error = $e->getMessage();
         if(isset($this->labels[$id][0])) $name = $this->labels[$id][0];
         if(isset($this->labels[$id][1])) $error = $this->labels[$id][1];
-        Cms::addMessage(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error), Cms::MSG_ERROR);
+        Logger::user_error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
         $item->parentNode->addClass(self::CSS_WARNING);
         $item->addClass(self::CSS_WARNING);
         $isValid = false;
@@ -105,7 +137,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     return $time;
   }
 
-  private function securityCheck($time) {
+  private function ipCheck($time) {
     if($time == 0) return;
     $IP = getIP();
     $IPFile = str_replace(":", "-", $IP);
@@ -116,7 +148,8 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     }
     if(is_file($IPFilePath)) {
       if(time() - filemtime($IPFilePath) < $time) { // 2 min timeout
-        throw new Exception(sprintf(_("The form can not be sent in such quick succession, please try it again in %s seconds"), $time - (time() - filemtime($IPFilePath))));
+        $sec = $time - (time() - filemtime($IPFilePath));
+        throw new Exception(sprintf(_("Please wait %s second before next post"), $sec));
       }
     }
     mkdir_plus(dirname($IPFilePath));
@@ -186,7 +219,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     if(!strlen($pattern)) return;
     $res = @preg_match("/^(?:$pattern)$/", $value);
     if($res === false) {
-      Logger::log(_("Invalid item pattern"), Logger::LOGGER_WARNING);
+      Logger::user_warning(_("Invalid item pattern"));
       return;
     }
     if($res === 1) return;

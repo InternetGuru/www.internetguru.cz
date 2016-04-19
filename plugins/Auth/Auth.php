@@ -1,5 +1,13 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ErrorPage;
+use IGCMS\Core\Plugin;
+use SplObserver;
+use SplSubject;
+
 class Auth extends Plugin implements SplObserver {
   private $loggedUser = null;
 

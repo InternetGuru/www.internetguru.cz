@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class Agregator extends Plugin implements SplObserver {
   private $files = array();  // filePath => fileInfo(?)
   private $docinfo = array();
@@ -11,11 +24,9 @@ class Agregator extends Plugin implements SplObserver {
   private $cfg;
   private static $sortKey;
   const APC_PREFIX = "1";
-  const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    if(self::DEBUG) Logger::log("DEBUG");
     $s->setPriority($this, 2);
     $this->edit = _("Edit");
   }
@@ -43,7 +54,7 @@ class Agregator extends Plugin implements SplObserver {
         $this->createImgVar($subDir, $files);
       }
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
+      Logger::critical($e->getMessage());
       return;
     }
     if(is_null($this->currentDoc)) return;
@@ -192,11 +203,13 @@ class Agregator extends Plugin implements SplObserver {
     if(empty($vars)) return;
     foreach($this->cfg->documentElement->childElementsArray as $image) {
       if($image->nodeName != "image") continue;
-      if(!$image->hasAttribute("id")) {
-        Logger::log(_("Configuration element image missing attribute id"), Logger::LOGGER_WARNING);
+      try {
+        $id = $image->getRequiredAttribute("id");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
-      $vName = $image->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       self::$sortKey = "name";
       $cacheKey = apc_get_key($vName);
       if($useCache && apc_exists($cacheKey)) {
@@ -216,11 +229,13 @@ class Agregator extends Plugin implements SplObserver {
     $alts = array();
     foreach($this->cfg->documentElement->childElementsArray as $alt) {
       if($alt->nodeName != "alt") continue;
-      if(!$alt->hasAttribute("for")) {
-        Logger::log(_("Configuration element alt missing attribute for"), Logger::LOGGER_WARNING);
+      try {
+        $for = $alt->getRequiredAttribute("for");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
-      $alts[$alt->getAttribute("for")] = $alt->nodeValue;
+      $alts[$for] = $alt->nodeValue;
     }
     return $alts;
   }
@@ -282,7 +297,7 @@ class Agregator extends Plugin implements SplObserver {
         $doc = DOMBuilder::buildHTMLPlus($file);
         $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
       } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::critical($e->getMessage());
         continue;
       }
       if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
@@ -301,22 +316,25 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function createCmsVars($subDir, Array $vars) {
-    $filePath = findFile($this->pluginDir."/".get_class($this).".xml");
+    $className = (new \ReflectionClass($this))->getShortName();
+    $filePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($filePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".get_class($this).".xml");
+      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$className.".xml");
       $this->useCache = false;
     }
     foreach($this->cfg->documentElement->childElementsArray as $html) {
       if($html->nodeName != "html") continue;
-      if(!$html->hasAttribute("id")) {
-        Logger::log(_("Configuration element html missing attribute id"), Logger::LOGGER_WARNING);
+      try {
+        $id = $html->getRequiredAttribute("id");
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
         continue;
       }
-      $vName = $html->getAttribute("id").($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
+      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       $cacheKey = apc_get_key($vName);
       // use cache
-      if($this->useCache && !self::DEBUG) {
+      if($this->useCache) {
         $sCache = $this->getSubDirCache($cacheKey);
         if(!is_null($sCache)) {
           $doc = new DOMDocumentPlus();
@@ -336,7 +354,7 @@ class Agregator extends Plugin implements SplObserver {
         );
         apc_store_cache($cacheKey, $var, $vName);
       } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_WARNING);
+        Logger::critical($e->getMessage());
         continue;
       }
     }
@@ -348,12 +366,12 @@ class Agregator extends Plugin implements SplObserver {
       $reverse = $e->hasAttribute("rsort");
       $userKey = $e->hasAttribute("sort") ? $e->getAttribute("sort") : $e->getAttribute("rsort");
       if(!array_key_exists($userKey, current($vars))) {
-        Logger::log(sprintf(_("Sort variable %s not found; using default"), $userKey), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
       } else {
         self::$sortKey = $userKey;
       }
     }
-    uasort($vars, array("Agregator", "cmp"));
+    uasort($vars, array("IGCMS\Plugins\Agregator", "cmp"));
     if($reverse) $vars = array_reverse($vars);
     return $vars;
   }
@@ -388,7 +406,7 @@ class Agregator extends Plugin implements SplObserver {
         $patterns[$item->getAttribute("since")-1] = $item;
       else $patterns[] = $item;
     }
-    if($nonItemElement) Logger::log(sprintf(_("Redundant element(s) found in %s"), $id), Logger::LOGGER_WARNING);
+    if($nonItemElement) Logger::user_warning(sprintf(_("Redundant element(s) found in %s"), $id));
     if(empty($patterns)) throw new Exception(_("No item element found"));
     $i = -1;
     $pattern = null;

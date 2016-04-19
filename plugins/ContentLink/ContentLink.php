@@ -1,5 +1,19 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\ErrorPage;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMElement;
+use SplObserver;
+use SplSubject;
+
 class ContentLink extends Plugin implements SplObserver, ContentStrategyInterface {
   private $lang = null;
   private $isRoot;
@@ -109,9 +123,12 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     if(array_key_exists("logo", $this->vars)) {
       $o = $bc->createElement("object");
       $o->setAttribute("data", $this->vars["logo"]->nodeValue);
-      if(!$this->vars["logo"]->hasAttribute("type"))
-        Logger::log(_("Element logo missing attribute type"), Logger::LOGGER_WARNING);
-      else $o->setAttribute("type", $this->vars["logo"]->getAttribute("type"));
+      try {
+        $type = $this->vars["logo"]->getRequiredAttribute("type");
+        $o->setAttribute("type", $type);
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
+      }
       $o->nodeValue = $h->nodeValue;
       $a->nodeValue = null;
       $a->addClass("logo");

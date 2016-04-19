@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use Exception;
+use DOMXPath;
+use DOMDocument;
+use DOMElement;
+use DOMComment;
+use DateTime;
+
 /**
  * Create DOM from XML file and update elements from adm/usr directories.
  * Add by default; empty element to delete all elements with same nodeName.
@@ -37,10 +50,6 @@ class DOMBuilder {
     if($replace) return $doc;
     self::globalReadonly($doc);
     return $doc;
-  }
-
-  public static function getId($link="") {
-    throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
   }
 
   public static function normalizeLink(Array $pUrl) {
@@ -159,7 +168,7 @@ class DOMBuilder {
       if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
         self::updateDOM($doc, $f, true);
     } catch(Exception $e) {
-      Logger::log(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      Logger::error(sprintf(_("Unable to admin-update XML: %s"), $e->getMessage()));
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
 
@@ -170,7 +179,7 @@ class DOMBuilder {
       if(!file_exists(dirname($f)."/.".basename($f)) && is_file($f))
         self::updateDOM($doc, $f);
     } catch(Exception $e) {
-      Logger::log(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()), Logger::LOGGER_ERROR);
+      Logger::error(sprintf(_("Unable to user-update XML: %s"), $e->getMessage()));
     }
     if(self::DEBUG) echo "<pre>".htmlspecialchars($doc->saveXML())."</pre>";
   }
@@ -197,7 +206,7 @@ class DOMBuilder {
       try {
         self::loadDOM($f, $doc, null);
       } catch(Exception $e) {
-        Logger::log(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()), Logger::LOGGER_ERROR);
+        Logger::error(sprintf(_("Unable to load '%s': %s"), basename($filePath), $e->getMessage()));
         continue;
       }
       $success = true;
@@ -215,11 +224,10 @@ class DOMBuilder {
     if($doc instanceof HTMLPlus)
       $mTime = self::loadHTMLPlusDOM($filePath, $doc, $author, $included);
     else $mTime = self::loadXMLDOM($filePath, $doc);
-    #Cms::addMessage($filePath, Cms::MSG_INFO);
     if(self::$nginxOutdated) return;
     if($mTime > self::$newestFileMtime) self::$newestFileMtime = $mTime;
     if(is_null(self::$newestCacheMtime) || self::$newestCacheMtime >= $mTime) return;
-    Cms::addMessage(_("Outdated server cache"), Cms::MSG_WARNING);
+    Logger::user_notice(_("Outdated server cache"));
     self::$nginxOutdated = true;
   }
 
@@ -283,7 +291,7 @@ class DOMBuilder {
       $doc->validatePlus(true);
       $storeCache = false;
       foreach($doc->getErrors() as $error) {
-        Cms::addMessage($error, $doc->getStatus());
+        Logger::user_notice($doc->getStatus().": $error");
       }
     }
     // generate ctime/mtime from file if not set
@@ -350,8 +358,8 @@ class DOMBuilder {
     #if(empty(self::$idToLink)) $prefix = "";
     if(array_key_exists($prefix, self::$idToLink)) {
       $prefix = self::generateUniqueVal($prefix, self::$idToLink);
-      Logger::log(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
-        $fShort, $prefix), Logger::LOGGER_WARNING);
+      Logger::user_warning(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
+        $fShort, $prefix));
       $h1->setAttribute("link", $prefix);
       $storeCache = false;
     }
@@ -400,7 +408,7 @@ class DOMBuilder {
       $curFilePath = $e->getParentValue("src", "include");
       if(empty(self::$linkToId)) $linkId = "";
       if(array_key_exists($linkId, self::$linkToId)) {
-        Logger::log(sprintf(_("Duplicit link %s skipped"), $link), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Duplicit link %s skipped"), $link));
         $storeCache = false;
         continue;
       }
@@ -456,7 +464,7 @@ class DOMBuilder {
       try {
         self::insertHtmlPlus($include, $homeDir);
       } catch(Exception $e) {
-        Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+        Logger::user_error($e->getMessage());
         $success = false;
         $include->stripTag();
       }
@@ -488,8 +496,8 @@ class DOMBuilder {
     $sectLang = self::getSectionLang($include->parentNode);
     $impLang = $doc->documentElement->getAttribute("xml:lang");
     if($impLang != $sectLang)
-      Logger::log(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
-        $impLang, $sectLang, $val), Logger::LOGGER_WARNING);
+      Logger::user_warning(sprintf(_("Imported file language '%s' does not match section language '%s' in '%s'"),
+        $impLang, $sectLang, $val));
     $impAuthor = $doc->documentElement->firstElement->getAttribute("author");
     if($impAuthor == $author)
       $doc->documentElement->firstElement->removeAttribute("author"); // prevent "creation" info
@@ -501,7 +509,7 @@ class DOMBuilder {
       $include->ownerDocument->validatePlus();
     } catch(Exception $e) {
       $include->ownerDocument->validatePlus(true);
-      Logger::log(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()), Logger::LOGGER_WARNING);
+      Logger::user_warning(sprintf(_("HTML+ autocorrected after inserting '%s': %s"), $val, $e->getMessage()));
     }
   }
 

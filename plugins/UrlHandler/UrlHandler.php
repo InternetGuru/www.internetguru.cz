@@ -1,5 +1,15 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class UrlHandler extends Plugin implements SplObserver {
   const DEBUG = false;
   private $cfg = null;
@@ -67,7 +77,7 @@ class UrlHandler extends Plugin implements SplObserver {
           if(!$silent) throw $e;
         }
       } catch(Exception $e) {
-        Logger::log(sprintf(_("Unable to redir to %s: %s"), implodeLink($pLink), $e->getMessage()), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Unable to redir to %s: %s"), implodeLink($pLink), $e->getMessage()));
       }
     }
   }

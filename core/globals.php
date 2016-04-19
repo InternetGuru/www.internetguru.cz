@@ -1,12 +1,9 @@
 <?php
 
-function __autoload($className) {
-  $fp = PLUGINS_FOLDER."/$className/$className.php";
-  if(@include $fp) return;
-  $fc = CORE_FOLDER."/$className.php";
-  if(@include $fc) return;
-  throw new LoggerException(sprintf(_("Unable to find class '%s' in '%s' nor '%s'"), $className, PLUGINS_DIR, CORE_DIR));
-}
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\LoggerException;
 
 function isValidId($id) {
   return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
@@ -27,7 +24,7 @@ function createSymlink($link, $target) {
     throw new Exception(sprintf(_("Unable to create symlink '%s'"), $link));
   #if($restart && !touch(APACHE_RESTART_FILEPATH))
   if(!$restart) return;
-  Logger::log(_("Symlink changed; may take time to apply"), Logger::LOGGER_WARNING);
+  Logger::warning(_("Symlink changed; may take time to apply"));
 }
 
 function replaceVariables($string, Array $variables, $varPrefix=null) {
@@ -46,7 +43,7 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
       $vName = $varPrefix.$vName;
       if(!array_key_exists($vName, $variables)) {
         if(strpos($v, "@") !== 0)
-          Logger::log(sprintf(_("Variable '%s' does not exist"), $vName), Logger::LOGGER_WARNING);
+          Logger::user_warning(sprintf(_("Variable '%s' does not exist"), $vName));
         $newString .= $v;
         continue;
       }
@@ -56,7 +53,7 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
     elseif($value instanceof DOMElementPlus) $value = $value->nodeValue;
     elseif(!is_string($value)) {
       if(strpos($v, "@") !== 0)
-        Logger::log(sprintf(_("Variable '%s' is not string"), $vName), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Variable '%s' is not string"), $vName));
       $newString .= $v;
       continue;
     }
@@ -82,11 +79,11 @@ function redirTo($link, $code=null, $msg=null) {
   http_response_code(is_null($code) ? 302 : $code);
   if(!strlen($link)) {
     $link = ROOT_URL;
-    if(class_exists("Logger"))
-      Logger::log(_("Redirecting to empty string changed to root"), Logger::LOGGER_WARNING, null, false);
+    if(class_exists("IGCMS\Core\Logger"))
+      Logger::user_notice(_("Redirecting to empty string changed to root"));
   }
-  if(class_exists("Logger"))
-    Logger::log(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""), Logger::LOGGER_INFO, null, false);
+  if(class_exists("IGCMS\Core\Logger"))
+    Logger::user_info(sprintf(_("Redirecting to '%s'"), $link).(!is_null($msg) ? ": $msg" : ""));
   #var_dump($link); die();
   if(is_null($code) || !is_numeric($code)) {
     header("Location: $link");
@@ -306,10 +303,6 @@ function update_file($src, $dest, $hash=false) {
   return true;
 }
 
-function smartCopy($src, $dest) {
-  throw new Exception(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__));
-}
-
 function lock_file($filePath, $ext="lock") {
   if(strlen($ext)) $filePath = "$filePath.$ext";
   mkdir_plus(dirname($filePath));
@@ -482,7 +475,7 @@ function apc_get_key($key) {
 
 function apc_store_cache($cacheKey, $value, $name) {
   $stored = apc_store($cacheKey, $value, rand(3600*24*30*3, 3600*24*30*6));
-  if(!$stored) Logger::log(sprintf(_("Unable to cache variable %s"), $name), Logger::LOGGER_WARNING);
+  if(!$stored) Logger::critical(sprintf(_("Unable to cache variable %s"), $name));
 }
 
 function apc_is_valid_cache($cacheKey, $value) {
@@ -546,10 +539,19 @@ function getResDir($file="") {
 
 function checkFileCache($sourceFile, $cacheFile) {
   if(!is_file($cacheFile)) return;
-  if(!is_file($sourceFile)) throw new Exception(_("Cache file is redundant"));
+  if(!is_file($sourceFile)) throw new Exception(_("Cache file is redundant"), 1);
   if(filemtime($cacheFile) == filemtime($sourceFile)) return;
-  if(getFileHash($cacheFile) != getFileHash($sourceFile)) throw new Exception(_("Cache file is outdated"));
+  if(getFileHash($cacheFile) != getFileHash($sourceFile)) throw new Exception(_("Cache file is outdated"), 2);
   touch($cacheFile, filemtime($sourceFile));
+}
+
+function validate_callStatic($methodName, Array $arguments, Array $functions, $nonEmptyArgumentsCount=0) {
+  if(!array_key_exists($methodName, $functions))
+    throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
+  for($i=0; $i<$nonEmptyArgumentsCount; $i++) {
+    if(array_key_exists($i, $arguments) && strlen($arguments[$i])) continue;
+    throw new Exception(sprintf(_("Argument[%s] empty or missing"), $i));
+  }
 }
 
 // UNUSED

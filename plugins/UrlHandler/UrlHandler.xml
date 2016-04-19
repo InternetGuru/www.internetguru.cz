@@ -25,7 +25,7 @@
   <redir link="Login">?login</redir>
   <redir link="Admin">/?Admin</redir>
   <redir link="admin">/?Admin</redir>
-  <redir link="log">/?LogViewer=log</redir>
+  <redir link="log">/?LogViewer=usr</redir>
   <redir link="ver">/?LogViewer=CHANGELOG</redir>
   <redir link="changelog">/?LogViewer=CHANGELOG</redir>
   <redir link="CHANGELOG">/?LogViewer=CHANGELOG</redir>
@@ -35,7 +35,7 @@
   <redir parName="ver" parValue="">?LogViewer=CHANGELOG</redir>
   <redir parName="changelog" parValue="">?LogViewer=CHANGELOG</redir>
   <redir parName="CHANGELOG" parValue="">?LogViewer=CHANGELOG</redir>
-  <redir parName="log" parValue="">?LogViewer=log</redir>
+  <redir parName="log" parValue="">?LogViewer=usr</redir>
 
   <redir parName="PageSpeed" parValue="">/</redir>
   <redir parName="Debug" parValue="">/</redir>
@@ -43,7 +43,7 @@
 
   <redir parName="Login">?login</redir>
   <redir parName="admin">?Admin</redir>
-  <redir parName="log">?LogViewer=log</redir>
+  <redir parName="log">?LogViewer=usr</redir>
   <redir parName="ver">?LogViewer=CHANGELOG</redir>
   <redir parName="changelog">?LogViewer=CHANGELOG</redir>
   <redir parName="CHANGELOG">?LogViewer=CHANGELOG</redir>

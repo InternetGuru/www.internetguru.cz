@@ -1,5 +1,20 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use PHPMailer;
+use Exception;
+use DOMXPath;
+use SplObserver;
+use SplSubject;
+
 class ContactForm extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cfg;
@@ -12,6 +27,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $messages;
   private $errors = array();
   private $forms = array();
+  private $className = null;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -19,6 +35,8 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
+    $this->className = (new \ReflectionClass($this))->getShortName();
+    $mail = new PHPMailer;
   }
 
   public function update(SplSubject $subject) {
@@ -45,7 +63,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $form->addClass("fillable");
       $form->addClass("validable");
       $formVar = $this->parseForm($form);
-      $this->formsElements[normalize(get_class($this))."-$formId"] = $formVar;
+      $this->formsElements[normalize($this->className)."-$formId"] = $formVar;
     }
   }
 
@@ -55,12 +73,12 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $formIdToSend = null;
 
     foreach($this->forms as $formId => $form) {
-      $prefixedFormId = normalize(get_class($this))."-$formId";
+      $prefixedFormId = normalize($this->className)."-$formId";
       $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
       $formValues = Cms::getVariable("validateform-$prefixedFormId");
       $fv = $this->createFormVars($htmlForm);
       if(isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-        Cms::addMessage($fv["success"], Cms::MSG_SUCCESS);
+        Logger::user_success($fv["success"]);
       }
       if(is_null($formValues)) continue;
       foreach(array("email", "name", "sendcopy") as $name) {
@@ -91,9 +109,9 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         var_dump($this->formValues);
       }
     } catch(Exception $e) {
-      $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower(get_class($this))."-".$formIdToSend."'>"
+      $message = sprintf(_("Unable to send form %s: %s"), "<a href='#".strtolower($this->className)."-".$formIdToSend."'>"
           .$formToSend->getAttribute("id")."</a>", $e->getMessage());
-      Logger::log($message, Logger::LOGGER_ERROR);
+      Logger::user_error($message);
     }
   }
 
@@ -101,14 +119,14 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     $xpath = new DOMXPath($content);
     if(!$xpath->query("//*[contains(@var, 'contactform-')]")->length) return $content;
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
-      Logger::log(_("Admin address is not set or invalid"), Logger::LOGGER_WARNING);
+      Logger::user_warning(_("Admin address is not set or invalid"));
     }
     $content->processVariables($this->formsElements);
     return $content;
   }
 
   private function parseForm(DOMElementPlus $form) {
-    $prefix = normalize(get_class($this));
+    $prefix = normalize($this->className);
     $doc = new DOMDocumentPlus();
     $var = $doc->appendChild($doc->createElement("var"));
     $htmlForm = $var->appendChild($doc->importNode($form, true));
@@ -127,7 +145,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       throw new Exception(sprintf(_("Invalid admin email address: '%s'"), $this->formVars["adminaddr"]));
     if(strlen($this->formVars["email"]) && !preg_match("/".EMAIL_PATTERN."/", $this->formVars["email"]))
       throw new Exception(sprintf(_("Invalid client email address: '%s'"), $this->formVars["email"]));
-    require LIB_FOLDER.'/PHPMailer/PHPMailerAutoload.php';
     $adminaddr = $this->formVars["adminaddr"];
     $adminname = $this->formVars["adminname"];
     $email = $this->formVars["email"];
@@ -140,13 +157,12 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       $bcc = "pavel@petrzela.eu";
     }
     if(!is_null(Cms::getLoggedUser())) {
-      Cms::addMessage("<pre><code>$msg</code></pre>", Cms::MSG_INFO);
+      Cms::notice("<pre><code class='nohighlight'>$msg</code></pre>");
       return;
     }
     $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
-    Logger::log(sprintf(_("Sending e-mail: %s"),
-      "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"),
-      null, null, null, "mail");
+    Logger::email(sprintf(_("Sending e-mail: %s"),
+      "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"));
     if(strlen($this->formVars["sendcopy"])) {
       if(!strlen($this->formVars["email"]))
         throw new Exception(_("Unable to send copy to empty client address"));
@@ -175,7 +191,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     if(strlen($this->formVars["subject"])) $mail->Subject = $this->formVars["subject"];
     if(strlen($bcc)) $mail->addBCC($bcc, '');
     if(!$mail->send()) throw new Exception($mail->ErrorInfo);
-    Logger::log(sprintf(_("E-mail successfully sent to %s"), $mailto));
   }
 
   private function createGlobalVars() {
@@ -183,28 +198,23 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       try {
         switch($e->nodeName) {
           case "var":
-          $this->validateElement($e, "id");
-          $this->vars[$e->getAttribute("id")] = $e->nodeValue;
+          $id = $e->getRequiredAttribute("id");
+          $this->vars[$id] = $e->nodeValue;
           break;
           case "form":
-          $this->validateElement($e, "id");
-          $this->forms[$e->getAttribute("id")] = $e;
+          $id = $e->getRequiredAttribute("id");
+          $this->forms[$id] = $e;
           break;
           case "message":
-          $this->validateElement($e, "for");
-          $this->messages[$e->getAttribute("for")] = $e->nodeValue;
+          $id = $e->getRequiredAttribute("for");
+          $this->messages[$id] = $e->nodeValue;
           break;
         }
       } catch(Exception $ex) {
-        Logger::log(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
       }
     }
     if(self::DEBUG) $this->vars["adminaddr"] = "debug@somedomain.cz";
-  }
-
-  private function validateElement(DOMElementPlus $e, $aName) {
-    if($e->hasAttribute($aName)) return;
-    throw new Exception(sprintf(_("Missing attribute %s"), $aName));
   }
 
   private function createFormVars(DOMElementPlus $form) {
@@ -221,14 +231,14 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private function registerFormItems(DOMElementPlus $form, $prefix) {
     $time = time();
     $idInput = $form->ownerDocument->createElement("input");
-    $idInput->setAttribute("name", get_class($this));
+    $idInput->setAttribute("name", $this->className);
     $idInput->setAttribute("type", "hidden");
     $idInput->setAttribute("value", $form->getAttribute("id"));
     $i = 1;
     $e = null;
     $this->formItems = array();
     $this->formValues = array();
-    $this->formNames = array(get_class($this));
+    $this->formNames = array($this->className);
     $this->formIds = array();
     $this->formGroupValues = array();
     $xpath = new DOMXPath($form->ownerDocument);
@@ -237,15 +247,19 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
         if(!$e->hasAttribute("cols")) $e->setAttribute("cols", 40);
         if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 7);
       }
-      if($e->nodeName == "input" && !$e->hasAttribute("type")) {
-        Logger::log(_("Element input missing attribute type skipped"), Logger::LOGGER_WARNING);
-        continue;
+      if($e->nodeName == "input") {
+        try {
+          $type = $e->getRequiredAttribute("type");
+        } catch(Exception $ex) {
+          Logger::user_warning($ex->getMessage());
+          continue;
+        }
       }
       $this->formItems[] = $e;
       $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
       $name = $this->processFormItem($this->formNames, $e, "name", "", $id, true);
-      if(is_null(Cms::getLoggedUser()) || $e->getAttribute("type") != "submit") continue;
+      if(is_null(Cms::getLoggedUser()) || $type != "submit") continue;
       $e->setAttribute("value", _("Show message"));
       $e->setAttribute("title", _("Not sending form if logged user"));
     }

@@ -1,6 +1,20 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\Logger;
+use Exception;
+use DOMElement;
+
 class DOMElementPlus extends DOMElement {
+
+  public function getRequiredAttribute($aName) {
+    if(!$this->hasAttribute($aName))
+      throw new Exception(sprintf(_("Element %s missing attribute %s"), $this->nodeName, $aName));
+    return $this->getAttribute($aName);
+  }
 
   public function rename($name) {
     $newnode = $this->ownerDocument->createElement($name);
@@ -54,7 +68,7 @@ class DOMElementPlus extends DOMElement {
         $res = $this->ownerDocument->insertVariable($this, $v, $aName);
         if(!$res->isSameNode($this)) $this->emptyRecursive();
       } catch(Exception $e) {
-        Logger::log(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()), Logger::LOGGER_ERROR);
+        Logger::user_error(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()));
       }
       if(is_null($aName)) return;
     }
@@ -172,25 +186,13 @@ class DOMElementPlus extends DOMElement {
     foreach(explode(" ", $this->getAttribute($attr)) as $var) {
       list($vName, $aName) = array_pad(explode("@", $var), 2, null);
       if(in_array($aName, $ignore)) {
-        Logger::log(sprintf(_("Cannot modify attribute %s in element %s"), $aName, $this->nodeName), Logger::LOGGER_WARNING);
+        Logger::user_warning(sprintf(_("Cannot modify attribute %s in element %s"), $aName, $this->nodeName));
         continue;
       }
       if(is_null($aName)) $variables[] = array($vName, $aName, $var);
       else array_unshift($variables, array($vName, $aName, $var));
     }
     return $variables;
-  }
-
-  public function insertVar($varName, $varValue) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
-    return;
-    $this->ownerDocument->insertVar($varName, $varValue, $this);
-  }
-
-  public function insertFn($varName, $varValue) {
-    Logger::log(sprintf(METHOD_NA, __CLASS__.".".__FUNCTION__), Logger::LOGGER_ERROR);
-    return;
-    $this->ownerDocument->insertFn($varName, $varValue, $this);
   }
 
   public function stripElement($comment = null) {

@@ -1,5 +1,18 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use IGCMS\Core\ResourceInterface;
+use Autoprefixer;
+use UglifyPHP\JS;
+use Imagick;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   const DEBUG = false;
   private static $imageModes = array(
@@ -29,7 +42,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx")
   );
   private static $fileFolders = array(
-    THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, FILES_DIR => false
+    THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, VENDOR_DIR => true, FILES_DIR => false
   );
   private $deleteCache;
   private $error = array();
@@ -129,8 +142,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       $this->doCheckResources($cacheFolder, $sourceFolder, $isResDir);
     }
     if(!$this->deleteCache) return;
-    if(count($this->error)) Logger::log(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
-    else Logger::log(_("Outdated cache files successfully removed"), Logger::LOGGER_SUCCESS);
+    if(count($this->error)) Logger::critical(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
+    else {
+      Logger::user_success(_("Outdated cache files successfully removed"));
+    }
   }
 
   private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
@@ -163,16 +178,16 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         checkFileCache($sourceFilePath, $cacheFilePath);
       } catch(Exception $e) {
         $folderUptodate = false;
-        if($this->deleteCache) {
+        if($e->getCode() == 1 || $this->deleteCache) { // pass if redundant file or deleteCache
           if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
           if(getRealResDir() != RESOURCES_DIR) continue;
           $cacheFilePath = getRealResDir($cacheFilePath);
           if(!is_file($cacheFilePath)) continue;
           if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
         } elseif(self::DEBUG) {
-          Cms::addMessage(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)), Cms::MSG_WARNING);
+          Cms::notice(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)));
         } else {
-          Cms::addMessage(sprintf("%s: %s", $e->getMessage(), $cacheFilePath), Cms::MSG_WARNING);
+          Logger::user_warning(sprintf("%s: %s", $e->getMessage(), $cacheFilePath));
         }
       }
     }
@@ -208,12 +223,15 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if($isRoot) {
       if(!IS_LOCALHOST && strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
         $src = CMSRES_FOLDER."/".getCurLink();
-      } else switch($ext) {
-        case "css":
-        self::buildCss($src, $dest);
-        return;
-        case "js":
-        self::buildJs($src, $dest);
+      } else {
+        switch($ext) {
+          case "css":
+          self::buildCss($src, $dest);
+          break;
+          case "js":
+          self::buildJs($src, $dest);
+        }
+        Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
         return;
       }
     }
@@ -221,8 +239,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function buildCss($src, $dest) {
-    require LIB_FOLDER.'/autoprefixer-php/lib/Autoprefixer.php';
-    require LIB_FOLDER.'/autoprefixer-php/lib/AutoprefixerException.php';
     $data = file_get_contents($src);
     $autoprefixer = new Autoprefixer(['last 2 version']);
     $data = $autoprefixer->compile($data);
@@ -230,11 +246,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function buildJs($src, $dest) {
-    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/Uglify.php';
-    require LIB_FOLDER.'/uglify-php/src/UglifyPHP/JS.php';
-    if(!UglifyPHP\JS::installed())
+    if(!JS::installed())
       throw new Exception(_("UglifyJS not installed"));
-    $js = new UglifyPHP\JS($src);
+    $js = new JS($src);
     if($js->minify($dest)) return;
     throw new Exception(_("Unable to minify JS"));
   }
@@ -273,7 +287,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if(!$result || !strlen($imBin))
       throw new Exception(_("Unable to resize image"));
     if(strlen($imBin) > $mode[2])
-      throw new Exception(_("Generated image size %s is over limit %s"), fileSizeConvert(strlen($imBin)), fileSizeConvert($mode[2]));
+      throw new Exception(sprintf(_("Generated image size %s is over limit %s"), fileSizeConvert(strlen($imBin)), fileSizeConvert($mode[2])));
     mkdir_plus(dirname($dest));
     $b = file_put_contents($dest, $imBin);
     if($b === false || !touch($dest, filemtime($src))) throw new Exception(_("Unable to create file"));

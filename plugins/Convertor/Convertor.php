@@ -1,5 +1,19 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use Exception;
+use DOMDocument;
+use XSLTProcessor;
+use SplObserver;
+use SplSubject;
+
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 
 class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
@@ -8,12 +22,14 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private $docName = null;
   private $tmpFolder;
   private $importedFiles = array();
+  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
     mkdir_plus($this->tmpFolder);
+    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {
@@ -22,16 +38,16 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       return;
     }
     if($subject->getStatus() != STATUS_INIT) return;
-    if(!isset($_GET[get_class($this)])) {
+    if(!isset($_GET[$this->className])) {
       $subject->detach($this);
       return;
     }
     $this->requireActiveCms();
     try {
-      if(strlen($_GET[get_class($this)]))
-        $this->processImport($_GET[get_class($this)]);
+      if(strlen($_GET[$this->className]))
+        $this->processImport($_GET[$this->className]);
     } catch(Exception $e) {
-      Cms::addMessage($e->getMessage(), Cms::MSG_ERROR);
+      Logger::user_error($e->getMessage());
     }
     $this->getImportedFiles();
   }
@@ -44,7 +60,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function processImport($fileUrl) {
-    if(!strlen($_GET[get_class($this)]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
+    if(!strlen($_GET[$this->className]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
       throw new Exception(_("File URL cannot be empty"));
     }
     $f = $this->getFile($fileUrl);
@@ -79,7 +95,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     $doc->loadXML($xml);
     if(is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h") {
-      Cms::addMessage(_("Unable to import document; probably missing heading"), Cms::MSG_ERROR);
+      Logger::user_error(_("Unable to import document; probably missing heading"));
       return;
     }
     $this->parseContent($doc, "h", "short");
@@ -94,19 +110,19 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       try {
         $doc->validatePlus(true);
         foreach($doc->getErrors() as $error) {
-          Cms::addMessage($error, _("Autocorrected"));
+          Logger::user_notice(_("Autocorrected").":$error");
         }
       } catch(Exception $e) {
-        Cms::addMessage(_("Use @ to specify short/link attributes for heading"), Cms::MSG_INFO);
-        Cms::addMessage(_("Eg. This Is Long Heading @ Short Heading"), Cms::MSG_INFO);
-        Cms::addMessage(_("Use @ to specify kw attribute for description"), Cms::MSG_INFO);
-        Cms::addMessage(_("Eg. This is description @ these, are, some, keywords"), Cms::MSG_INFO);
+        Cms::notice(_("Use @ to specify short/link attributes for heading"));
+        Cms::notice(_("Eg. This Is Long Heading @ Short Heading"));
+        Cms::notice(_("Use @ to specify kw attribute for description"));
+        Cms::notice(_("Eg. This is description @ these, are, some, keywords"));
         throw $e;
       }
     }
     $doc->applySyntax();
     $this->html = $doc->saveXML();
-    Cms::addMessage(_("File successfully imported"), Cms::MSG_SUCCESS);
+    Logger::user_success(_("File successfully imported"));
 
     $this->file = "$f.html";
     $dest = $this->tmpFolder."/".$this->file;
@@ -123,7 +139,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
         throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $e->getMessage()));
       }
     } catch(Exception $e) {
-      Logger::log($e->getMessage(), Logger::LOGGER_ERROR);
+      Logger::critical($e->getMessage());
     } finally {
       unlock_file($fp, $dest);
     }
@@ -156,8 +172,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   public function getContent(HTMLPlus $c) {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $newContent = $this->getHTMLPlus();
-    $vars["action"] = "?".get_class($this);
-    $vars["link"] = $_GET[get_class($this)];
+    $vars["action"] = "?".$this->className;
+    $vars["link"] = $_GET[$this->className];
     $vars["path"] = $this->pluginDir;
     if(!empty($this->importedFiles)) $vars["importedhtml"] = $this->importedFiles;
     $vars["filename"] = $this->file;

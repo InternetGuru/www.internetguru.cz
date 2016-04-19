@@ -1,5 +1,17 @@
 <?php
 
+namespace IGCMS\Plugins;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Plugin;
+use Exception;
+use SplObserver;
+use SplSubject;
+
 class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private $cssClass = "linklist";
@@ -20,7 +32,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
     if($content->documentElement->hasClass($this->cssClass)) {
       $this->createLinkList($content->documentElement);
     }
-    Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".get_class($this).".css");
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".css");
     #echo $content->saveXML($content);
     #die();
     return $content;

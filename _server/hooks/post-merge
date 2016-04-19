@@ -4,3 +4,6 @@
 echo
 echo "Running .git/hooks/post-merge"
 /var/scripts/resbuilder "$PWD"
+
+echo
+php composer.phar install -o

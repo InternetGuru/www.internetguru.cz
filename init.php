@@ -1,6 +1,9 @@
 <?php
 
-$start_time = microtime(true);
+require __DIR__.'/vendor/autoload.php';
+
+use IGCMS\Core\Logger;
+
 session_cache_limiter("");
 
 define("INDEX_HTML", "index.html");
@@ -13,6 +16,7 @@ define("CMS_DIR", "cms");
 define("CMSRES_DIR", "cmsres");
 define("VER_DIR", "ver");
 define("LIB_DIR", "lib");
+define("VENDOR_DIR", "vendor");
 define("CORE_DIR", "core");
 define("FILES_DIR", "files");
 define("SERVER_FILES_DIR", "_server");
@@ -124,6 +128,5 @@ if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)) {
   redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
 initDirs();
-Logger::log(CMS_NAME, Logger::LOGGER_INFO, $start_time, false);
 
 ?>

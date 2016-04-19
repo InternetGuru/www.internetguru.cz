@@ -1,5 +1,14 @@
 <?php
 
+namespace IGCMS\Core;
+
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\ErrorPage;
+use IGCMS\Core\Logger;
+use Exception;
+use SplSubject;
+
 class Plugin {
   private $doms = array();
   protected $subject;
@@ -7,7 +16,7 @@ class Plugin {
 
   public function __construct(SplSubject $s) {
     $this->subject = $s;
-    $this->pluginDir = PLUGINS_DIR."/".get_class($this);
+    $this->pluginDir = PLUGINS_DIR."/".(new \ReflectionClass($this))->getShortName();
   }
 
   public function isDebug() {
@@ -20,7 +29,7 @@ class Plugin {
       global $plugins;
       if($plugins->isAttachedPlugin($p)) continue;
       $this->subject->detach($this);
-      Logger::log(sprintf(_("Detaching '%s' due to '%s' dependancy"), get_class($this), $p), "warning");
+      Logger::user_warning(sprintf(_("Detaching '%s' due to '%s' dependancy"), get_class($this), $p));
       return true;
     }
     return false;
@@ -38,7 +47,7 @@ class Plugin {
 
   protected function getDOMExt($ext=null, $htmlPlus=false, $user=true) {
     if(is_null($ext)) $ext = "xml";
-    return $this->getDOMPlus($this->pluginDir."/".get_class($this).".$ext", $htmlPlus, $user);
+    return $this->getDOMPlus($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".$ext", $htmlPlus, $user);
   }
 
   protected function getDOMPlus($filePath=null, $htmlPlus=false, $user=true) {
