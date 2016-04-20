@@ -161,7 +161,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
       return;
     }
     $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
-    Logger::email(sprintf(_("Sending e-mail: %s"),
+    Logger::mail(sprintf(_("Sending e-mail: %s"),
       "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"));
     if(strlen($this->formVars["sendcopy"])) {
       if(!strlen($this->formVars["email"]))
