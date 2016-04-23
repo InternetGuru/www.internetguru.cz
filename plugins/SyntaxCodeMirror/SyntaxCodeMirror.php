@@ -11,7 +11,7 @@ use SplSubject;
 
 class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
 
-  const CM_DIR = "InternetGuru/CodeMirror";
+  const CM_DIR = "internetguru/codemirror";
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -64,7 +64,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
     $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.css");
     $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/theme/tomorrow-night-eighties.css");
-    $os->addCssFile($this->pluginDir.'/SyntaxCodeMirror.css');
+    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/cminit.css");
 
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.js");
     foreach($libs as $l) $os->addJsFile($l);
@@ -72,7 +72,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
 
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/search.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/goto-line.js");
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/jump-to-line.js");
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
     $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
 
@@ -88,6 +88,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
     $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
 
+    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/cminit.js", 10, "body");
     $os->addJsFile($this->pluginDir.'/SyntaxCodeMirror.js', 10, "body");
   }
 

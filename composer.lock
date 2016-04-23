@@ -4,20 +4,9 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "38d26453e5632353020937475c5529eb",
-    "content-hash": "1db737bf65dbd36cf9c5087ce2317d71",
+    "hash": "d0749c82bc1d7528aa73338d688b38c7",
+    "content-hash": "5320d5b14cd821578c14f91d8521744c",
     "packages": [
-        {
-            "name": "InternetGuru/CodeMirror",
-            "version": "dev-ig",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/InternetGuru/CodeMirror",
-                "reference": "ig"
-            },
-            "type": "library",
-            "time": "2016-04-05 12:09:46"
-        },
         {
             "name": "components/highlightjs",
             "version": "9.2.0",
@@ -61,17 +50,43 @@
             "time": "2016-03-05 17:39:56"
         },
         {
-            "name": "monolog/monolog",
-            "version": "1.18.2",
+            "name": "internetguru/codemirror",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09"
+                "url": "https://github.com/InternetGuru/CodeMirror.git",
+                "reference": "4ecdb6d80c42bd8211ceab171c5804873d05d09b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/064b38c16790249488e7a8b987acf1c9d7383c09",
-                "reference": "064b38c16790249488e7a8b987acf1c9d7383c09",
+                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/4ecdb6d80c42bd8211ceab171c5804873d05d09b",
+                "reference": "4ecdb6d80c42bd8211ceab171c5804873d05d09b",
+                "shasum": ""
+            },
+            "type": "library",
+            "authors": [
+                {
+                    "name": "petrzpav",
+                    "email": "pavel@petrzela.eu"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/InternetGuru/CodeMirror/tree/0.1"
+            },
+            "time": "2016-04-23 15:44:45"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "1.19.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "5f56ed5212dc509c8dc8caeba2715732abb32dbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/5f56ed5212dc509c8dc8caeba2715732abb32dbf",
+                "reference": "5f56ed5212dc509c8dc8caeba2715732abb32dbf",
                 "shasum": ""
             },
             "require": {
@@ -136,7 +151,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-04-02 13:12:58"
+            "time": "2016-04-12 18:29:35"
         },
         {
             "name": "phpmailer/phpmailer",
