@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-08 16:49+0200\n"
-"PO-Revision-Date: 2016-04-08 16:50+0200\n"
+"POT-Creation-Date: 2016-04-23 14:49+0200\n"
+"PO-Revision-Date: 2016-04-23 14:50+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -666,7 +666,7 @@ msgstr "neznámý stav"
 msgid "User file '%s' changed during administration"
 msgstr "Uživatelský soubor '%s' se během úprav změnil"
 
-#: plugins/Admin/Admin.php:86
+#: plugins/Admin/Admin.php:85
 msgid "Insufficient right to save changes"
 msgstr "Nedostatečná práva pro uložení změn"
 
@@ -725,47 +725,51 @@ msgstr "uživatelský obsah"
 msgid "Invalid XML syntax"
 msgstr "Nevalidní syntaxe XML"
 
-#: plugins/Admin/Admin.php:431
+#: plugins/Admin/Admin.php:402
+msgid "Repairable error(s) occured"
+msgstr "Nastaly opravitelné chyby"
+
+#: plugins/Admin/Admin.php:433
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:442
+#: plugins/Admin/Admin.php:444
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:444
+#: plugins/Admin/Admin.php:446
 msgid "Unable to enable destination file"
 msgstr "Nepodařilo se aktivovat cílový soubor"
 
-#: plugins/Admin/Admin.php:447
+#: plugins/Admin/Admin.php:449
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:453
+#: plugins/Admin/Admin.php:455
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:456 plugins/InputVar/InputVar.php:41
+#: plugins/Admin/Admin.php:458 plugins/InputVar/InputVar.php:41
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:465
+#: plugins/Admin/Admin.php:467
 msgid "Unable to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:471
+#: plugins/Admin/Admin.php:473
 msgid "Unable to disable file"
 msgstr "Soubor se nepodařilo deaktivovat"
 
-#: plugins/Admin/Admin.php:482
+#: plugins/Admin/Admin.php:484
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:494
+#: plugins/Admin/Admin.php:496
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
@@ -975,43 +979,43 @@ msgstr "Nepodařilo se smazat dočasný soubor: %s"
 msgid "Outdated cache files successfully removed"
 msgstr "Neaktuální soubory byly úspěšně odstraněny"
 
-#: plugins/FileHandler/FileHandler.php:235
+#: plugins/FileHandler/FileHandler.php:237
 #, php-format
 msgid "File %s was successfully built"
 msgstr "Soubor %s byl úspěšně postaven"
 
-#: plugins/FileHandler/FileHandler.php:250
+#: plugins/FileHandler/FileHandler.php:252
 msgid "UglifyJS not installed"
 msgstr "UglifyJS není nainstalovaný"
 
-#: plugins/FileHandler/FileHandler.php:253
+#: plugins/FileHandler/FileHandler.php:255
 msgid "Unable to minify JS"
 msgstr "Nepodařilo se minifikovat JS"
 
-#: plugins/FileHandler/FileHandler.php:259
+#: plugins/FileHandler/FileHandler.php:261
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:273
+#: plugins/FileHandler/FileHandler.php:275
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:288
+#: plugins/FileHandler/FileHandler.php:290
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:290
+#: plugins/FileHandler/FileHandler.php:292
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:293
+#: plugins/FileHandler/FileHandler.php:295
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:299
+#: plugins/FileHandler/FileHandler.php:301
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
