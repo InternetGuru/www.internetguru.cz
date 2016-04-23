@@ -78,13 +78,13 @@ class Cms {
   }
 
 
-  private static function addFlashItem($message, $type) {
+  private static function addFlashItem($message, $type, $prevRequest=false) {
     $types = self::getTypes();
     self::$$type = true;
     if(!is_null(self::getLoggedUser())) $message = self::$types[$type].": $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
-    $li->setAttribute("class", strtolower($type));
+    $li->setAttribute("class", strtolower($type).($prevRequest ? " prev-request" : ""));
     $doc = new DOMDocumentPlus();
     if(!@$doc->loadXML("<var>$message</var>")) {
       $li->nodeValue = htmlspecialchars($message);
@@ -100,8 +100,7 @@ class Cms {
     foreach($_SESSION["cms"]["flash"] as $type => $item) {
       foreach($item as $token => $messages) {
         foreach($messages as $message) {
-          if($token != self::$requestToken) $message = sprintf(_("%s (previous requests)"), $message);
-          self::addFlashItem($message, $type);
+          self::addFlashItem($message, $type, $token != self::$requestToken);
         }
       }
     }
