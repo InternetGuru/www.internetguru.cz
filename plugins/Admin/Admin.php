@@ -82,8 +82,8 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } else {
       $this->setContent();
     }
-    if(!$this->isResource($this->type)) $this->processXml();
     if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
+    if(!$this->isResource($this->type)) $this->processXml();
     if($this->isToEnable()) $this->enableDataFile();
     if($this->isPost()) {
       $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
@@ -391,13 +391,15 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       } else $doc = new DOMDocumentPlus();
       if(!@$doc->loadXml($this->contentValue)) throw new Exception(_("Invalid XML syntax"));
     }
+    $repair = $this->isPost() && isset($_POST["repair"]);
     try {
       if($this->type == "html") $doc->validatePlus();
-    } catch(Exception$e) {
+    } catch(Exception $e) {
       $doc->validatePlus(true);
       foreach($doc->getErrors() as $error) {
-        Logger::user_notice($doc->getStatus().": $error");
+        Logger::user_notice("$error".($repair ? " (".$doc->getStatus().")" : ""));
       }
+      if(!$repair) throw new Exception(_("Repairable error(s) occured"));
       $this->contentValue = $doc->saveXML();
     }
     if($this->type != "xml" || $this->isPost()) return;
