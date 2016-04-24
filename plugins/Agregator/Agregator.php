@@ -44,7 +44,7 @@ class Agregator extends Plugin implements SplObserver {
       $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list, "html");
       foreach($list as $subDir => $files) {
         $vars = $this->getFileVars($subDir, $files);
-        #if(!count($vars)) continue;
+        if(!count($vars)) continue;
         $this->createCmsVars($subDir, $vars);
       }
       $list = array();
