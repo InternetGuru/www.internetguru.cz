@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-23 14:49+0200\n"
-"PO-Revision-Date: 2016-04-23 14:50+0200\n"
+"POT-Creation-Date: 2016-04-24 15:02+0200\n"
+"PO-Revision-Date: 2016-04-24 15:04+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 1.8.7\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -39,57 +39,52 @@ msgstr "Varování"
 msgid "Error"
 msgstr "Error"
 
-#: core/Cms.php:103
-#, php-format
-msgid "%s (previous requests)"
-msgstr "%s (předchozí požadavky)"
-
-#: core/Cms.php:116
+#: core/Cms.php:115
 msgid "Full content must be set to build content"
 msgstr "Obsah musí existovat, aby ho bylo možné zpracovat"
 
-#: core/Cms.php:117
+#: core/Cms.php:116
 msgid "Method cannot run twice"
 msgstr "Metoda nemůže být zavolána dvakrát"
 
-#: core/Cms.php:126
+#: core/Cms.php:125
 #, php-format
 msgid "Content must be an instance of HTMLPlus (%s given)"
 msgstr "Obsah musí být instancí HTMLPlus (obdrženo %s)"
 
-#: core/Cms.php:131
+#: core/Cms.php:130
 #, php-format
 msgid "HTMLPlus content is invalid: %s"
 msgstr "Nevalidní obsah HTMLPlus: %s"
 
-#: core/Cms.php:136
+#: core/Cms.php:135
 #, php-format
 msgid "Plugin %s exception: %s"
 msgstr "Chyba rozšíření %s: %s"
 
-#: core/Cms.php:156
+#: core/Cms.php:155
 msgid "Unable to re/generate session ID"
 msgstr "Nepodařilo se vygenerovat session ID"
 
-#: core/Cms.php:192
+#: core/Cms.php:191
 #, php-format
 msgid "Some variables are causing HTML+ error: %s"
 msgstr "Některé proměnné způsobují chybu HTML+: %s"
 
-#: core/Cms.php:237
+#: core/Cms.php:236
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: core/Cms.php:250
+#: core/Cms.php:249
 #, php-format
 msgid "Unable to set function %s: not a function"
 msgstr "Není možné vytvořit funkci %s: nejedná se o funkci"
 
-#: core/Cms.php:279
+#: core/Cms.php:278
 msgid "Content is not set"
 msgstr "Obsah není nastaven"
 
-#: core/Cms.php:291
+#: core/Cms.php:290
 #, php-format
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
@@ -583,20 +578,12 @@ msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
-#: core/globals.php:542
-msgid "Cache file is redundant"
-msgstr "Soubor mezipaměti je redundantní"
-
-#: core/globals.php:544
-msgid "Cache file is outdated"
-msgstr "Soubor mezipaměti je neaktuální"
-
-#: core/globals.php:550
+#: core/globals.php:549
 #, php-format
 msgid "Undefined method name %s"
 msgstr "Neznámý název metody %s"
 
-#: core/globals.php:553
+#: core/globals.php:552
 #, php-format
 msgid "Argument[%s] empty or missing"
 msgstr "Argument[%s] chybí nebo je prázdný"
@@ -682,7 +669,7 @@ msgstr "Stav souboru byl úspěšně změněn"
 msgid "Saving changes will clear server cache"
 msgstr "Uložení změn vyčistí serverovou mezipaměť"
 
-#: plugins/Admin/Admin.php:115
+#: plugins/Admin/Admin.php:116
 msgid "Saving changes will remove outdated file cache"
 msgstr "Uložení změn odstraní neaktuální soubor z mezipaměti"
 
@@ -953,69 +940,74 @@ msgstr "Nepodařilo se aplikovat transformaci '%s'"
 msgid "Element replace missing value"
 msgstr "Element replace postrádá hodnotu"
 
-#: plugins/FileHandler/FileHandler.php:79
+#: plugins/FileHandler/FileHandler.php:80
 msgid "Server error"
 msgstr "Chyba serveru"
 
-#: plugins/FileHandler/FileHandler.php:80
+#: plugins/FileHandler/FileHandler.php:81
 #, php-format
 msgid "Unable to handle file request: %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 
-#: plugins/FileHandler/FileHandler.php:116
+#: plugins/FileHandler/FileHandler.php:117
 msgid "File illegal path"
 msgstr "Neplatná cesta souboru"
 
-#: plugins/FileHandler/FileHandler.php:126
+#: plugins/FileHandler/FileHandler.php:127
 msgid "File not found"
 msgstr "Soubor nenalezen"
 
-#: plugins/FileHandler/FileHandler.php:145
+#: plugins/FileHandler/FileHandler.php:146
 #, php-format
 msgid "Failed to delete cache files: %s"
 msgstr "Nepodařilo se smazat dočasný soubor: %s"
 
-#: plugins/FileHandler/FileHandler.php:147
-msgid "Outdated cache files successfully removed"
-msgstr "Neaktuální soubory byly úspěšně odstraněny"
+#: plugins/FileHandler/FileHandler.php:149
+#, php-format
+msgid "Outdated file cache successfully removed: %s"
+msgstr "Odstraněna neaktuální souborová mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:237
+#: plugins/FileHandler/FileHandler.php:153
+msgid "File cache already uptodate"
+msgstr "Souborová mezipaměť je aktuální"
+
+#: plugins/FileHandler/FileHandler.php:252
 #, php-format
 msgid "File %s was successfully built"
 msgstr "Soubor %s byl úspěšně postaven"
 
-#: plugins/FileHandler/FileHandler.php:252
+#: plugins/FileHandler/FileHandler.php:267
 msgid "UglifyJS not installed"
 msgstr "UglifyJS není nainstalovaný"
 
-#: plugins/FileHandler/FileHandler.php:255
+#: plugins/FileHandler/FileHandler.php:270
 msgid "Unable to minify JS"
 msgstr "Nepodařilo se minifikovat JS"
 
-#: plugins/FileHandler/FileHandler.php:261
+#: plugins/FileHandler/FileHandler.php:276
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:275
+#: plugins/FileHandler/FileHandler.php:290
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:290
+#: plugins/FileHandler/FileHandler.php:305
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:292
+#: plugins/FileHandler/FileHandler.php:307
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:295
+#: plugins/FileHandler/FileHandler.php:310
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:301
+#: plugins/FileHandler/FileHandler.php:316
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
@@ -1254,6 +1246,18 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:231
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "%s (previous requests)"
+#~ msgstr "%s (předchozí požadavky)"
+
+#~ msgid "Cache file is redundant"
+#~ msgstr "Soubor mezipaměti je redundantní"
+
+#~ msgid "Cache file is outdated"
+#~ msgstr "Soubor mezipaměti je neaktuální"
+
+#~ msgid "Outdated cache files successfully removed"
+#~ msgstr "Neaktuální soubory byly úspěšně odstraněny"
 
 #~ msgid ""
 #~ "The form can not be sent in such quick succession, please try it again in "
