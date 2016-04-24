@@ -45,6 +45,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, VENDOR_DIR => true, FILES_DIR => false
   );
   private $deleteCache;
+  private $update = array();
   private $error = array();
 
   public function __construct(SplSubject $s) {
@@ -136,20 +137,24 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if(!Cms::isSuperUser()) return;
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
     foreach(self::$fileFolders as $sourceFolder => $isResDir) {
-      $cacheFolder = $sourceFolder;
-      if($isResDir && getRealResDir() != RESOURCES_DIR) $cacheFolder = getRealResDir($sourceFolder);
-      if(!is_dir($cacheFolder)) continue;
-      $this->doCheckResources($cacheFolder, $sourceFolder, $isResDir);
+      if($isResDir)
+        $this->doCheckResources(getRealResDir($sourceFolder), $sourceFolder, $isResDir);
+      if(!$isResDir || getRealResDir() == RESOURCES_DIR)
+        $this->doCheckResources($sourceFolder, $sourceFolder, $isResDir);
     }
     if(!$this->deleteCache) return;
-    if(count($this->error)) Logger::critical(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
-    else {
-      Logger::user_success(_("Outdated cache files successfully removed"));
+    if(count($this->error))
+      Logger::critical(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
+    elseif(count($this->update)) {
+      Logger::user_success(sprintf(_("Outdated cache files successfully removed: %s"), implode(", ", $this->update)));
+    } else {
+      Logger::user_notice(_("File cache already uptodate"));
     }
   }
 
   private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
-    $inotifyCache = $cacheFolder."/".INOTIFY."+".str_replace("/", "+", $sourceFolder);
+    if(!is_dir($cacheFolder)) return;
+    $inotifyCache = $cacheFolder."/".$sourceFolder."/".INOTIFY;
     $inotifySource = USER_FOLDER."/".$sourceFolder."/".INOTIFY;
     $folderUptodate = true;
     $skipFolder = false;
@@ -166,33 +171,33 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         continue;
       }
       if($skipFolder) continue;
-      $sourceFilePath = findFile($sourceFilePath, true, true);
-      if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
-        $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
-        $sourceFilePath = findFile($sourceFilePath, true, true);
-      }
-      try {
-        checkFileCache($sourceFilePath, $cacheFilePath);
-        if(getRealResDir() != RESOURCES_DIR) continue;
-        $cacheFilePath = getRealResDir($cacheFilePath);
-        checkFileCache($sourceFilePath, $cacheFilePath);
-      } catch(Exception $e) {
-        $folderUptodate = false;
-        if($e->getCode() == 1 || $this->deleteCache) { // pass if redundant file or deleteCache
-          if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
-          if(getRealResDir() != RESOURCES_DIR) continue;
-          $cacheFilePath = getRealResDir($cacheFilePath);
-          if(!is_file($cacheFilePath)) continue;
-          if(!unlink($cacheFilePath)) $this->error[] = $cacheFilePath;
-        } elseif(self::DEBUG) {
-          Cms::notice(sprintf("%s@%s | %s@%s", $cacheFilePath, $cacheFileMtime, $sourceFilePath, filemtime($sourceFilePath)));
-        } else {
-          Logger::user_warning(sprintf("%s: %s", $e->getMessage(), $cacheFilePath));
-        }
-      }
+      $fileUptodate = $this->updateCacheFile($sourceFilePath, $cacheFilePath);
+      if(!$fileUptodate) $folderUptodate = false;
     }
-    if(!$folderUptodate || !is_file($inotifySource)) return;
+    if($folderUptodate || !is_file($inotifySource)) return;
     touch($inotifyCache, filemtime($inotifySource));
+  }
+
+  private function updateCacheFile($sourceFilePath, $cacheFilePath) {
+    $sourceFilePath = findFile($sourceFilePath, true, true);
+    if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
+      $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
+      $sourceFilePath = findFile($sourceFilePath, true, true);
+    }
+    try {
+      checkFileCache($sourceFilePath, $cacheFilePath);
+    } catch(Exception $e) {
+      if($e->getCode() == 1 || $this->deleteCache) { // pass if redundant file or deleteCache
+        if(unlink($cacheFilePath)) $this->update[] = $cacheFilePath;
+        else $this->error[] = $cacheFilePath;
+      } elseif(self::DEBUG) {
+        Cms::notice(sprintf("%s@%s | %s@%s", $cacheFilePath, filemtime($cacheFilePath), $sourceFilePath, filemtime($sourceFilePath)));
+      } else {
+        Logger::user_warning(sprintf("%s: %s", $e->getMessage(), $cacheFilePath));
+      }
+      return false;
+    }
+    return true;
   }
 
   private static function getImageMode($filePath) {
