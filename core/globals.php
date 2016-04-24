@@ -10,9 +10,15 @@ function isValidId($id) {
 }
 
 function findFile($filePath, $user=true, $admin=true) {
-  if($user && is_file(USER_FOLDER."/$filePath")) return USER_FOLDER."/$filePath";
-  if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
-  if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
+  $inactiveFilePath = dirname($filePath)."/.".basename($filePath);
+  $dirs = array(CMS_FOLDER);
+  if($admin) array_unshift($dirs, ADMIN_FOLDER);
+  if($user) array_unshift($dirs, USER_FOLDER);
+  foreach($dirs as $dir) {
+    if(!is_file("$dir/$filePath")) continue;
+    if(is_file("$dir/$inactiveFilePath")) continue;
+    return "$dir/$filePath";
+  }
   return null;
 }
 
