@@ -41,15 +41,8 @@ body.doc div.paragraph > ol,
 body.doc div.list > ol {
   list-style-type: lower-roman;
 }
-body.doc label > input[type="text"] {
-  border: none;
-  background: #EAF2F5;
-  width: 55%;
-  min-width: 25em;
-  border-bottom: 0.1em solid rgb(165, 165, 165);
-}
 body.doc label > span {
-  width: 27%;
   display: inline-block;
-  min-width: 13em;
+  width: 14em;
+  max-width: 100%;
 }
