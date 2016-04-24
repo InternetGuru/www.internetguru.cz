@@ -74,13 +74,6 @@
         </attribute>
       </optional>
       <optional>
-        <attribute name="link">
-          <data type="string">
-            <param name="pattern">[a-z][a-z0-9_/-]*</param>
-          </data>
-        </attribute>
-      </optional>
-      <optional>
         <attribute name="author">
           <data type="string">
             <param name="pattern">.*\S.*</param>

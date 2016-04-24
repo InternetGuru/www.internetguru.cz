@@ -150,7 +150,7 @@ class Agregator extends Plugin implements SplObserver {
   }
 
   private function insertContent(HTMLPlus $doc, $subDir) {
-    $dest = Cms::getContentFull()->getElementById($subDir, "link");
+    $dest = Cms::getContentFull()->getElementById($subDir);
     if(is_null($dest)) $dest = Cms::getContentFull()->documentElement->firstElement->nextElement;
     while($dest->nodeName != "section") {
       if(is_null($dest->nextElement)) {
@@ -437,7 +437,7 @@ class Agregator extends Plugin implements SplObserver {
     }
     $vars['filemtime'] = $mTime;
     $vars['heading'] = $h->nodeValue;
-    $vars['link'] = $h->getAttribute("link");
+    $vars['link'] = $h->getAttribute("id");
     $vars['author'] = $h->getAttribute("author");
     $vars['authorid'] = $h->hasAttribute("authorid") ? $h->getAttribute("authorid") : "";
     $vars['resp'] = $h->hasAttribute("resp") ? $h->getAttribute("resp") : null;
@@ -449,8 +449,8 @@ class Agregator extends Plugin implements SplObserver {
     $vars['kw'] = $desc->getAttribute("kw");
     $vars['links'] = array();
     foreach($doc->getElementsByTagName("h") as $h) {
-      if(!$h->hasAttribute("link")) continue;
-      $vars['links'][] = $h->getAttribute("link");
+      #if(!$h->hasAttribute("link")) continue;
+      $vars['links'][] = $h->getAttribute("id");
     }
     apc_store_cache($cacheKey, $vars, $file);
     return $vars;

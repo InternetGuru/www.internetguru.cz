@@ -282,7 +282,6 @@ class DOMBuilder {
     $c = new DateTime();
     $c->setTimeStamp(filectime($filePath));
     $doc->defaultCtime = $c->format(DateTime::W3C);
-    $doc->defaultLink = strtolower(pathinfo($filePath, PATHINFO_FILENAME));
     $doc->defaultAuthor = is_null($author) ? Cms::getVariable("cms-author") : $author;
     $storeCache = true;
     try {
@@ -290,9 +289,7 @@ class DOMBuilder {
     } catch(Exception $e) {
       $doc->validatePlus(true);
       $storeCache = false;
-      foreach($doc->getErrors() as $error) {
-        Logger::user_notice($doc->getStatus().": $error");
-      }
+      Logger::user_notice(sprintf(_("Document %s syntax fixed (%s times)"), $fShort, count($doc->getErrors())));
     }
     // generate ctime/mtime from file if not set
     $mTime = filemtime($filePath);
@@ -354,13 +351,13 @@ class DOMBuilder {
   private static function setIdentifiers(HTMLPlus $doc, $filePath, $fShort) {
     $storeCache = true;
     $h1 = $doc->documentElement->firstElement;
-    $prefix = trim($h1->getAttribute("link"), "/");
+    $prefix = trim($h1->getAttribute("id"), "/");
     #if(empty(self::$idToLink)) $prefix = "";
     if(array_key_exists($prefix, self::$idToLink)) {
       $prefix = self::generateUniqueVal($prefix, self::$idToLink);
-      Logger::user_warning(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("link"),
+      Logger::user_warning(sprintf(_("Duplicit prefix %s in %s renamed to %s"), $h1->getAttribute("id"),
         $fShort, $prefix));
-      $h1->setAttribute("link", $prefix);
+      $h1->setAttribute("id", $prefix);
       $storeCache = false;
     }
     self::$idToLink[$prefix] = array();
@@ -396,12 +393,12 @@ class DOMBuilder {
     $xpath = new DOMXPath($doc);
     foreach($xpath->query("//*[@id]") as $e) {
       $id = $e->getAttribute("id");
-      if($e->hasAttribute("link")) {
-        $link = ($e->getAttribute("link") != $prefix ? $e->getAttribute("link") : "");
-        $linkId = self::getLinkFull($prefix, $e->getAttribute("link"), null);
+      if($e->hasAttribute("id")) {
+        $link = ($e->getAttribute("id") != $prefix ? $e->getAttribute("id") : "");
+        $linkId = self::getLinkFull($prefix, $e->getAttribute("id"), null);
         $newLinks[$linkId] = $e;
       } else {
-        $link = $e->getAncestorValue("link", "h");
+        $link = $e->getAncestorValue("id", "h");
         if($link == $prefix) $link = "";
         $linkId = self::getLinkFull($prefix, $link, $id);
       }
@@ -427,7 +424,7 @@ class DOMBuilder {
     }
     foreach($newLinks as $link => $e) {
       #if(!strlen($link)) $link = self::$defaultPrefix;
-      $e->setAttribute("link", $link);
+      $e->setAttribute("id", $link);
     }
     return $storeCache;
     #var_dump($link);

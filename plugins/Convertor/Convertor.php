@@ -91,7 +91,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
     $doc = new HTMLPlus();
     $doc->defaultAuthor = Cms::getVariable("cms-author");
-    $doc->defaultLink = pathinfo($f, PATHINFO_FILENAME);
     $doc->loadXML($xml);
     if(is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h") {
@@ -103,7 +102,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!$firstHeading->hasAttribute("short") && !is_null($this->docName))
       $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
-    $this->addLinks($doc);
+    $this->regenerateIds($doc);
     try {
       $doc->validatePlus();
     } catch(Exception $e) {
@@ -186,13 +185,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function regenerateIds(DOMDocumentPlus $doc) {
-    $ids = array();
     foreach($doc->getElementsByTagName("h") as $h) {
-      $oldId = $h->getAttribute("id");
-      $h->setUniqueId();
-      $ids[$oldId] = $h->getAttribute("id");
+      $h->setUniqueId($h->nodeValue);
     }
-    return $ids;
   }
 
   private function getFile($dest) {

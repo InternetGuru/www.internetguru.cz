@@ -201,6 +201,15 @@ function buildQuery($pQuery, $questionMark=true) {
   return ($questionMark ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
+function slugify($text) {
+  $text = str_replace(array(" ", " - "), array("_", "-"), trim($text));
+  $text = preg_replace('#[^\\pL\d_-]+#u', '', $text);
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+  $text = strtolower($text);
+  $text = preg_replace('#[^-\w]+#', '', $text);
+  return $text;
+}
+
 function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
   if($convertToUtf8) $s = utf8_encode($s);
   if($tolower) $s = mb_strtolower($s, "utf-8");

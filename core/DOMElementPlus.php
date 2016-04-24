@@ -310,11 +310,23 @@ class DOMElementPlus extends DOMElement {
     return $e;
   }
 
-  public function setUniqueId() {
-    $id = $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);
-    if(!isValidId($id)) $this->setUniqueId();
-    if(!is_null($this->ownerDocument->getElementById($id))) $this->setUniqueId();
-    $this->setAttribute("id", $id);
+  public function setUniqueId($i=0) {
+    $id = $this->getValidId();
+    if($i != 0) $id .= $i;
+    if(is_null($this->ownerDocument->getElementById($id)))
+      $this->setAttribute("id", $id);
+    else
+      $this->setUniqueId(++$i);
+  }
+
+  private function getValidId() {
+    $id = slugify($this->getAttribute("name"));
+    if(isValidId($id)) return $id;
+    $id = slugify($this->getAttribute("short"));
+    if(isValidId($id)) return $id;
+    $id = slugify($this->nodeValue);
+    if(isValidId($id)) return $id;
+    return $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);
   }
 
   private function getChildElementsArray() {

@@ -173,14 +173,14 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         continue;
       }
       if($skipFolder) continue;
-      $fileUptodate = $this->updateCacheFile($sourceFilePath, $cacheFilePath);
+      $fileUptodate = $this->updateCacheFile($sourceFilePath, $cacheFilePath, $isResDir);
       if(!$fileUptodate) $folderUptodate = false;
     }
     if(!$folderUptodate || !is_file($inotifySource)) return;
     touch($inotifyCache, filemtime($inotifySource)); // current folder is uptodate
   }
 
-  private function updateCacheFile($fileName, $cacheFilePath) {
+  private function updateCacheFile($fileName, $cacheFilePath, $isResDir) {
     $sourceFilePath = findFile($fileName, true, true);
     if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
       $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));

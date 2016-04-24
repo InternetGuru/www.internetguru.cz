@@ -69,7 +69,7 @@ class GlobalMenu extends Plugin implements SplObserver {
       $ul->setAttribute("lang", $lang); //?
     }
     $li = null;
-    $prefix = Cms::getContentFull()->documentElement->firstElement->getAttribute("link");
+    $prefix = Cms::getContentFull()->documentElement->firstElement->getAttribute("id");
     foreach($section->childElementsArray as $n) {
       if($n->nodeName == "section") {
         $menu = $this->getMenu($doc, $n, $lang);
@@ -80,8 +80,9 @@ class GlobalMenu extends Plugin implements SplObserver {
       }
       if($n->nodeName != "h") continue;
       $li = $doc->createElement("li");
-      $link = null;
-      if($n->hasAttribute("link")) $link = $n->getAttribute("link");
+      #$link = null;
+      #if($n->hasAttribute("link")) $link = $n->getAttribute("link");
+      $link = $n->getAttribute("id");
       $a = $doc->createElement("a", $n->nodeValue);
       if($n->hasAttribute("short")) {
         $a->nodeValue = htmlspecialchars($n->getAttribute("short"));

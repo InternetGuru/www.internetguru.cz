@@ -369,11 +369,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(is_null($this->scheme) && file_exists($this->dataFile)) {
       $this->scheme = $this->getScheme($this->dataFile);
     }
-    $defaultLink = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME), "a-zA-Z0-9/_-");
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
       if($this->type == "html") {
         $doc = $this->getHTMLPlus(INDEX_HTML, false);
-        $doc->documentElement->firstElement->setAttribute("link", $defaultLink);
       } else {
         $doc = new DOMDocumentPlus();
         $doc->formatOutput = true;
@@ -386,7 +384,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } else {
       if($this->type == "html") {
         $doc = new HTMLPlus();
-        $doc->defaultLink = $defaultLink;
         $doc->defaultAuthor = Cms::getVariable("cms-author");
       } else $doc = new DOMDocumentPlus();
       if(!@$doc->loadXml($this->contentValue)) throw new Exception(_("Invalid XML syntax"));

@@ -37,7 +37,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $link = getCurLink();
     if($this->isRoot) $h1 = $cf->documentElement->firstElement;
     else {
-      $h1 = $cf->getElementById($link, "link", "h");
+      $h1 = $cf->getElementById($link, "id", "h");
       if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
     $cfg = $this->getDOMPlus();
@@ -90,7 +90,8 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
 
   private function setPath(DOMElement $h) {
     while(!is_null($h)) {
-      if($h->hasAttribute("link")) $this->hPath[$h->getAttribute("link")] = $h;
+      $this->hPath[$h->getAttribute("id")] = $h;
+      #if($h->hasAttribute("link")) $this->hPath[$h->getAttribute("link")] = $h;
       $h = $h->parentNode->getPreviousElement("h");
     }
   }
