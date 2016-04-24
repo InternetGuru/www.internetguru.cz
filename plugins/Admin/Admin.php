@@ -61,7 +61,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->requireActiveCms();
     try {
       $this->process();
-    } catch (Exception$e) {
+    } catch (Exception $e) {
       Logger::user_error($e->getMessage());
       return;
     }
@@ -108,12 +108,12 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
       }
       return;
     }
-    try {
-      if(getRealResDir() == RESOURCES_DIR) checkFileCache($this->dataFile, $this->defaultFile); // check /file
-      checkFileCache($this->dataFile, getRealResDir($this->defaultFile)); // always check [resdir]/file
-    } catch(Exception$e) {
-      Cms::notice(_("Saving changes will remove outdated file cache"));
-    }
+    if(getRealResDir() == RESOURCES_DIR
+      && is_file($this->defaultFile)
+      && isUptodate($this->dataFile, $this->defaultFile)) return;
+    if(is_file(getRealResDir($this->defaultFile))
+      && isUptodate($this->dataFile, getRealResDir($this->defaultFile))) return;
+    Cms::notice(_("Saving changes will remove outdated file cache"));
   }
 
   private function updateCache() {
@@ -127,7 +127,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     #if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     try {
       clearNginxCache();
-    } catch(Exception$e) {
+    } catch(Exception $e) {
       Logger::critical($e->getMessage());
     }
   }
