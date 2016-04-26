@@ -49,7 +49,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   /**
-   * Create XHTML 1.1 output from HTML+ content and own registers (JS/CSS)
+   * Create HTML 5 output from HTML+ content and own registers (JS/CSS)
    * @return void
    */
   public function getOutput(HTMLPlus $content) {
@@ -75,17 +75,22 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $head = $this->addHead($doc, $html, $h1);
 
     // final validation
-    #$contentPlus->processVariables(Cms::getAllVariables());
     $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
     $xPath = new DOMXPath($contentPlus);
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
     foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
     foreach($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
-    $ids = $this->getIds($xPath);
-    $this->fragToLinks($contentPlus, $ids, "a", "href");
-    $this->fragToLinks($contentPlus, $ids, "form", "action");
-    $this->fragToLinks($contentPlus, $ids, "object", "data");
-    #$this->validateImages($contentPlus);
+    foreach($xPath->query("//*[@xml:lang]") as $a) {
+      if(!$a->hasAttribute("lang")) $a->setAttribute("lang", $a->getAttribute("xml:lang"));
+      $a->removeAttribute("xml:lang");
+    }
+    $this->consolidateLang($contentPlus->documentElement, $lang);
+
+    # TODO
+    #$ids = $this->getIds($xPath);
+    #$this->fragToLinks($contentPlus, $ids, "a", "href");
+    #$this->fragToLinks($contentPlus, $ids, "form", "action");
+    #$this->fragToLinks($contentPlus, $ids, "object", "data");
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement, true);
@@ -98,6 +103,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->validateEmptyContent($doc);
     $html = $doc->saveXML();
     return substr($html, strpos($html, "\n")+1);
+  }
+
+  private function consolidateLang(DOMElementPlus $parent, $lang) {
+    if($parent->getAttribute("lang") == $lang) $parent->removeAttribute("lang");
+    foreach($parent->childElementsArray as $e) {
+      $this->consolidateLang($e, $lang);
+    }
   }
 
   private function createDoc() {

@@ -16,16 +16,30 @@ use DateTime;
 
 class HTMLPlusBuilder {
 
-  private static $idToElement = array();
-  private static $idToParentId = array();
+  private static $uriToInt = array();
+  private static $intToElement = array();
+  private static $intToParentInt = array();
   private static $include;
 
-  public static function build($filePath, $rootId=null) {
-    if(!is_null($rootId))
+  public static function build($filePath, $parentUri=null, $prefixUri=null) {
+    $parentInt = 0;
+    if(!is_null($parentUri)) {
+      if(array_key_exists($parentUri, self::$uriToInt)) {
+        $parentInt = self::$uriToInt[$parentUri];
+      } else {
+        #Logger::user_warning(sprintf(_("File %s root URI '%s' not found"), $filePath, $parentUri));
+        $prefixUri = null;
+      }
+    }
     self::$include = false;
     $doc = self::load($filePath);
-    if(self::$include) $doc->validatePlus(true);
-    self::registerStructure($doc->documentElement, $rootId);
+    if(self::$include) {
+      $doc->repairIds();
+      if(count($doc->getErrors()))
+        Logger::user_notice(sprintf(_("Duplicit identifiers fixed %s times after includes in %s"),
+          count($doc->getErrors()), $filePath));
+    }
+    self::registerStructure($doc->documentElement, $parentInt, $prefixUri);
     return $doc;
   }
 
@@ -33,7 +47,10 @@ class HTMLPlusBuilder {
     $doc = new HTMLPlus();
     if(!@$doc->load($filePath))
       throw new Exception(sprintf(_("Unable to load '%s'"), $filePath));
-    self::validate($doc);
+    $doc->validatePlus(true);
+    if(count($doc->getErrors()))
+      Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
+        count($doc->getErrors()), $filePath));
     self::insertIncludes($doc, dirname($filePath));
     return $doc;
   }
@@ -79,26 +96,19 @@ class HTMLPlusBuilder {
     $include->parentNode->removeChild($include);
   }
 
-  private static function validate(HTMLPlus $doc) {
-    try {
-      $doc->validatePlus();
-    } catch(Exception $e) {
-      $doc->validatePlus(true);
-      Logger::user_notice(sprintf(_("Invalid syntax fixed (%s times)"), count($doc->getErrors())));
-    }
-  }
-
-  private static function registerStructure(DOMElementPlus $section, $rootId, $parentId) {
-    $id = null;
+  private static function registerStructure(DOMElementPlus $section, $parentInt, $prefix) {
+    $int = count(self::$uriToInt);
     foreach($section->childElementsArray as $e) {
       if($e->nodeName == "h") {
         $id = $e->getAttribute("id");
-        self::$idToParentId[$id] = $parentId;
-        self::$idToElement[$id] = $e;
+        if(empty(self::$uriToInt)) self::$uriToInt[""] = $int;
+        else self::$uriToInt["$prefix#$id"] = $int;
+        self::$intToParentInt[$int] = $parentInt;
+        self::$intToElement[$int] = $e;
         continue;
       }
       if($e->nodeName == "section") {
-        self::registerStructure($e, $id);
+        self::registerStructure($e, $parentInt, $prefix);
       }
     }
   }

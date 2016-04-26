@@ -60,10 +60,6 @@ try {
 
   DOMBuilder::setCacheMtime();
 
-  $doc = HTMLPlusBuilder::build(findFile(INDEX_HTML));
-  echo $doc->saveXML();
-
-  /*
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
@@ -83,7 +79,6 @@ try {
   Cms::getMessages();
   Cms::contentProcessVariables();
   echo Cms::getOutput();
-  */
 
 } catch(Exception $e) {
 

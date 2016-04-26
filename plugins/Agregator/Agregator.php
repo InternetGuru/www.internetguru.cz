@@ -5,6 +5,7 @@ namespace IGCMS\Plugins;
 use IGCMS\Core\Cms;
 use IGCMS\Core\ContentStrategyInterface;
 use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -299,7 +300,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       $filePath = "$rootDir/".(strlen($subDir) ? "$subDir/" : "").$fileName;
       $file = stripDataFolder($filePath);
       try {
-        $doc = DOMBuilder::buildHTMLPlus($file);
+        $doc = HTMLPlusBuilder::build($filePath, $subDir, $subDir);
         $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
       } catch(Exception $e) {
         Logger::critical($e->getMessage());

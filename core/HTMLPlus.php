@@ -368,6 +368,11 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  public function repairIds() {
+    $this->errors = array();
+    $this->validateHid(true);
+  }
+
   private function validateHid($repair) {
     $hIds = array();
     foreach($this->headings as $h) {
