@@ -313,10 +313,13 @@ class DOMElementPlus extends DOMElement {
   public function setUniqueId($i=0) {
     $id = $this->getValidId();
     if($i != 0) $id .= $i;
-    if(is_null($this->ownerDocument->getElementById($id)))
-      $this->setAttribute("id", $id);
-    else
-      $this->setUniqueId(++$i);
+    try {
+      if(is_null($this->ownerDocument->getElementById($id))) {
+        $this->setAttribute("id", $id);
+        return;
+      }
+    } catch(Exception $e) {}
+    $this->setUniqueId(++$i);
   }
 
   private function getValidId() {

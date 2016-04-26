@@ -19,7 +19,7 @@ function findFile($filePath, $user=true, $admin=true) {
     if(is_file("$dir/$inactiveFilePath")) continue;
     return "$dir/$filePath";
   }
-  return null;
+  throw new Exception(sprintf(_("File '%s' not found"), $filePath));
 }
 
 function createSymlink($link, $target) {

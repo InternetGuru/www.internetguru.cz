@@ -422,10 +422,10 @@ class DOMBuilder {
       else
         self::$linkToTitle[$linkId] = getShortString($e->nodeValue);
     }
-    foreach($newLinks as $link => $e) {
+    #foreach($newLinks as $link => $e) {
       #if(!strlen($link)) $link = self::$defaultPrefix;
-      $e->setAttribute("id", $link);
-    }
+    #  $e->setAttribute("id", $link);
+    #}
     return $storeCache;
     #var_dump($link);
   }

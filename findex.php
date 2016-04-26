@@ -6,7 +6,7 @@ use IGCMS\Core\ErrorPage;
 try {
   include("init.php");
 
-  foreach(scandir(PLUGINS_FOLDER) as $plugin) {
+  if(false) foreach(scandir(PLUGINS_FOLDER) as $plugin) {
     if(strpos($plugin, ".") === 0) continue;
     if(!is_dir(PLUGINS_FOLDER."/$plugin")) continue;
     if(is_dir(PLUGINS_FOLDER."/.$plugin")) continue;
@@ -22,7 +22,7 @@ try {
   $errno = $e->getCode() ? $e->getCode() : 500;
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf("%s in %s on line %s", $m, $e->getFile(), $e->getLine());
-  if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno);
+  #if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno);
 
   Logger::alert($m);
   http_response_code($errno);

@@ -3,6 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
+use IGCMS\Core\ContentStrategyInterface;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
@@ -13,7 +14,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class Agregator extends Plugin implements SplObserver {
+class Agregator extends Plugin implements SplObserver, ContentStrategyInterface {
   private $files = array();  // filePath => fileInfo(?)
   private $docinfo = array();
   private $currentDoc = null;
@@ -57,10 +58,14 @@ class Agregator extends Plugin implements SplObserver {
       Logger::critical($e->getMessage());
       return;
     }
-    if(is_null($this->currentDoc)) return;
+  }
+
+  public function getContent(HTMLPlus $c) {
+    if(is_null($this->currentDoc)) return $c;
     Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
     $this->insertDocInfo($this->currentDoc);
-    $this->insertContent($this->currentDoc, $this->currentSubdir);
+    #$this->insertContent($this->currentDoc, $this->currentSubdir);
+    return $this->currentDoc;
   }
 
   private function insertDocInfo(HTMLPlus $doc) {
