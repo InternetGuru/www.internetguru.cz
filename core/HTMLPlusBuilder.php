@@ -16,9 +16,9 @@ use DateTime;
 
 class HTMLPlusBuilder {
 
-  private static $uriToInt = array();
+  public static $uriToInt = array();
   private static $intToElement = array();
-  private static $intToParentInt = array();
+  public static $intToParentInt = array();
   private static $include;
 
   public static function build($filePath, $parentUri=null, $prefixUri=null) {
@@ -33,13 +33,20 @@ class HTMLPlusBuilder {
     }
     self::$include = false;
     $doc = self::load($filePath);
+    $prefix = null;
+    if(count(self::$uriToInt)) {
+      $prefix = $doc->documentElement->firstElement->getAttribute("id");
+      if(!is_null($prefixUri)) {
+        $prefix = "$prefixUri/$prefix";
+      }
+    }
     if(self::$include) {
       $doc->repairIds();
       if(count($doc->getErrors()))
         Logger::user_notice(sprintf(_("Duplicit identifiers fixed %s times after includes in %s"),
           count($doc->getErrors()), $filePath));
     }
-    self::registerStructure($doc->documentElement, $parentInt, $prefixUri);
+    self::registerStructure($doc->documentElement, $parentInt, $prefix);
     return $doc;
   }
 
@@ -97,18 +104,17 @@ class HTMLPlusBuilder {
   }
 
   private static function registerStructure(DOMElementPlus $section, $parentInt, $prefix) {
-    $int = count(self::$uriToInt);
     foreach($section->childElementsArray as $e) {
       if($e->nodeName == "h") {
+        $int = count(self::$uriToInt);
         $id = $e->getAttribute("id");
-        if(empty(self::$uriToInt)) self::$uriToInt[""] = $int;
-        else self::$uriToInt["$prefix#$id"] = $int;
+        self::$uriToInt["$prefix#$id"] = $int;
         self::$intToParentInt[$int] = $parentInt;
         self::$intToElement[$int] = $e;
         continue;
       }
       if($e->nodeName == "section") {
-        self::registerStructure($e, $parentInt, $prefix);
+        self::registerStructure($e, $int, $prefix);
       }
     }
   }
