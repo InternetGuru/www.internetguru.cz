@@ -90,8 +90,8 @@ class HTMLPlusBuilder {
         Logger::user_notice(sprintf(_("Duplicit identifiers fixed %s times after includes in %s"),
           count($doc->getErrors()), $filePath));
     }
-    $id = self::registerStructure($doc->documentElement, $parentId, $prefix, $filePath);
-    return self::getRegister($id);
+    self::registerStructure($doc->documentElement, $parentId, $prefix, $filePath);
+    return self::getRegister(self::$fileToId[$filePath]);
   }
 
   private static function load($filePath) {
@@ -150,10 +150,8 @@ class HTMLPlusBuilder {
   private static function registerStructure(DOMElementPlus $section, $parentId, $prefix, $filePath) {
     foreach($section->childElementsArray as $e) {
       if($e->nodeName == "h") {
-        $id = "#".$e->getAttribute("id");
-        if($id == "#".$prefix) $id = $prefix;
-        elseif(strlen($prefix)) $id = $prefix.$id;
-        if(!count(self::$idToFile)) $id = '';
+        $id = count(self::$idToFile) ? $e->getAttribute("id") : '';
+        if($id != $prefix) $id = "$prefix#$id";
         if(!array_key_exists($filePath, self::$fileToId))
           self::$fileToId[$filePath] = $id;
         self::$idToParentId[$id] = $parentId; // skip '' => ''
@@ -166,7 +164,6 @@ class HTMLPlusBuilder {
         self::registerStructure($e, $id, $prefix, $filePath);
       }
     }
-    return $id;
   }
 
   private static function setHeadingInfo($id, DOMElementPlus $h) {
