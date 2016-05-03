@@ -300,18 +300,20 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       $filePath = "$rootDir/".(strlen($subDir) ? "$subDir/" : "").$fileName;
       $file = stripDataFolder($filePath);
       try {
-        $doc = HTMLPlusBuilder::build($filePath, $subDir, $subDir);
-        $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
+        $vars[$filePath] = HTMLPlusBuilder::register($filePath, $subDir, $subDir);
+        $vars[$filePath]["link"] = HTMLPlusBuilder::getFileToId($filePath);
+        var_dump($vars[$filePath]);
+        #$vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
       } catch(Exception $e) {
         Logger::critical($e->getMessage());
         continue;
       }
-      if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
-        $this->docinfo = $vars[$filePath];
-        $this->currentSubdir = $subDir;
-        $this->currentFilepath = $file;
-        $this->currentDoc = $doc;
-      }
+      #if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
+      #  $this->docinfo = $vars[$filePath];
+      #  $this->currentSubdir = $subDir;
+      #  $this->currentFilepath = $file;
+      #  $this->currentDoc = $doc;
+      #}
       if(is_file($inotify)) continue;
       $cacheKey = apc_get_key($filePath);
       if(apc_is_valid_cache($cacheKey, filemtime($filePath))) continue;

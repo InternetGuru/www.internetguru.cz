@@ -16,29 +16,73 @@ use DateTime;
 
 class HTMLPlusBuilder {
 
-  public static $uriToInt = array();
-  private static $intToElement = array();
-  public static $intToParentInt = array();
+  private static $fileToId = array();
+  private static $fileToDoc = array();
+
+  private static $idToParentId = array();
+  private static $idToFile = array();
+  private static $idToFileMtime = array();
+  private static $idToShort = array();
+  private static $idToHeading = array();
+  private static $idToTitle = array();
+  private static $idToDesc = array();
+  private static $idToKw = array();
+  private static $idToAuthor = array();
+  private static $idToAuthorId = array();
+  private static $idToResp = array();
+  private static $idToRespId = array();
+  private static $idToCtime = array();
+  private static $idToMtime = array();
+
   private static $include;
 
-  public static function build($filePath, $parentUri=null, $prefixUri=null) {
-    $parentInt = 0;
-    if(!is_null($parentUri)) {
-      if(array_key_exists($parentUri, self::$uriToInt)) {
-        $parentInt = self::$uriToInt[$parentUri];
-      } else {
-        #Logger::user_warning(sprintf(_("File %s root URI '%s' not found"), $filePath, $parentUri));
-        $prefixUri = null;
-      }
+  private static function getRegister($id) {
+    var_dump($id);
+    $register = array();
+    $properties = (new \ReflectionClass(get_called_class()))->getStaticProperties();
+    foreach(array_keys($properties) as $p) {
+      if(strpos($p, "idTo") !== 0) continue;
+      $register[strtolower(substr($p, 4))] = self::${$p}[$id];
     }
-    self::$include = false;
+    return $register;
+  }
+
+  public static function __callStatic($methodName, $arguments) {
+    if(strpos($methodName, "get") !== 0) {
+      throw new Exception("Undefined method $methodName");
+    }
+    $propertyName = strtolower(substr($methodName, 3, 1)).substr($methodName, 4);
+    if(!property_exists(get_called_class(), $propertyName)) {
+      throw new Exception("Undefined property $propertyName");
+    }
+    if(count($arguments)) {
+      if(!array_key_exists($arguments[0], self::$$propertyName))
+        throw new Exception("Undefined id {$arguments[0]} in property $propertyName");
+      return self::${$propertyName}[$arguments[0]];
+    }
+    return self::$$propertyName;
+  }
+
+  public static function build($filePath, $parentId='', $prefixId='') {
+    #register iff not registered
+    if(!array_key_exists($filePath, self::$fileToDoc))
+      self::register($filePath, $parentId, $prefixId);
+    $doc = self::$fileToDoc[$filePath];
+    #load iff not loaded
+    if(!is_null($doc)) return $doc;
     $doc = self::load($filePath);
-    $prefix = null;
-    if(count(self::$uriToInt)) {
+    self::$fileToDoc[$filePath] = $doc;
+    return $doc;
+  }
+
+  public static function register($filePath, $parentId='', $prefixId='') {
+    $doc = self::load($filePath);
+    self::$fileToDoc[$filePath] = $doc;
+    self::$include = false;
+    $prefix = '';
+    if(count(self::$idToParentId)) {
       $prefix = $doc->documentElement->firstElement->getAttribute("id");
-      if(!is_null($prefixUri)) {
-        $prefix = "$prefixUri/$prefix";
-      }
+      if(!strlen($prefixId)) $prefix = "$prefixId/$prefix";
     }
     if(self::$include) {
       $doc->repairIds();
@@ -46,8 +90,8 @@ class HTMLPlusBuilder {
         Logger::user_notice(sprintf(_("Duplicit identifiers fixed %s times after includes in %s"),
           count($doc->getErrors()), $filePath));
     }
-    self::registerStructure($doc->documentElement, $parentInt, $prefix);
-    return $doc;
+    $id = self::registerStructure($doc->documentElement, $parentId, $prefix, $filePath);
+    return self::getRegister($id);
   }
 
   private static function load($filePath) {
@@ -103,20 +147,40 @@ class HTMLPlusBuilder {
     $include->parentNode->removeChild($include);
   }
 
-  private static function registerStructure(DOMElementPlus $section, $parentInt, $prefix) {
+  private static function registerStructure(DOMElementPlus $section, $parentId, $prefix, $filePath) {
     foreach($section->childElementsArray as $e) {
       if($e->nodeName == "h") {
-        $int = count(self::$uriToInt);
-        $id = $e->getAttribute("id");
-        self::$uriToInt["$prefix#$id"] = $int;
-        self::$intToParentInt[$int] = $parentInt;
-        self::$intToElement[$int] = $e;
+        $id = "#".$e->getAttribute("id");
+        if($id == "#".$prefix) $id = $prefix;
+        elseif(strlen($prefix)) $id = $prefix.$id;
+        if(!count(self::$idToFile)) $id = '';
+        if(!array_key_exists($filePath, self::$fileToId))
+          self::$fileToId[$filePath] = $id;
+        self::$idToParentId[$id] = $parentId; // skip '' => ''
+        self::$idToFile[$id] = $filePath;
+        self::$idToFileMtime[$id] = filemtime($filePath);
+        self::setHeadingInfo($id, $e);
         continue;
       }
       if($e->nodeName == "section") {
-        self::registerStructure($e, $int, $prefix);
+        self::registerStructure($e, $id, $prefix, $filePath);
       }
     }
+    return $id;
+  }
+
+  private static function setHeadingInfo($id, DOMElementPlus $h) {
+    self::$idToShort[$id] = $h->getAttribute("short");
+    self::$idToHeading[$id] = $h->nodeValue;
+    self::$idToTitle[$id] = $h->getAttribute("title");
+    self::$idToDesc[$id] = $h->nextElement->nodeValue;
+    self::$idToKw[$id] = $h->nextElement->getAttribute("kw");
+    self::$idToAuthor[$id] = $h->getAttribute("author");
+    self::$idToAuthorId[$id] = $h->getAttribute("authorid");
+    self::$idToResp[$id] = $h->getAttribute("resp");
+    self::$idToRespId[$id] = $h->getAttribute("respid");
+    self::$idToCtime[$id] = $h->getAttribute("ctime");
+    self::$idToMtime[$id] = $h->getAttribute("mtime");
   }
 
 }

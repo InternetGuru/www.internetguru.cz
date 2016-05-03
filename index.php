@@ -72,8 +72,10 @@ try {
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
 
-  var_dump(HTMLPlusBuilder::$uriToInt);
-  var_dump(HTMLPlusBuilder::$intToParentInt); die("die");
+  var_dump(HTMLPlusBuilder::getIdToParentId());
+  #var_dump(HTMLPlusBuilder::getUriToInt("pavel_petrzela"));
+  #var_dump(HTMLPlusBuilder::getIntToParentInt());
+  die("die");
 
   Cms::contentProcessVariables();
   $plugins->setStatus(STATUS_POSTPROCESS);
