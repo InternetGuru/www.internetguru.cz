@@ -14,17 +14,18 @@ use IGCMS\Core\Plugin;
 use Exception;
 use SplObserver;
 use SplSubject;
+use DateTime;
 
 class Agregator extends Plugin implements SplObserver, ContentStrategyInterface {
-  private $files = array();  // filePath => fileInfo(?)
+  private $vars = array();  // filePath => fileInfo(?)
   private $docinfo = array();
-  private $currentDoc = null;
   private $currentSubdir = null;
   private $currentFilepath = null;
   private $useCache = true;
   private $edit;
   private $cfg;
   private static $sortKey;
+  private static $reverse;
   const APC_PREFIX = "1";
 
   public function __construct(SplSubject $s) {
@@ -47,7 +48,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       foreach($list as $subDir => $files) {
         $vars = $this->getFileVars($subDir, $files);
         if(!count($vars)) continue;
-        $this->createCmsVars($subDir, $vars);
+        $this->createCmsVars($vars, $subDir);
       }
       $list = array();
       $this->createList(FILES_FOLDER, $list);
@@ -62,22 +63,25 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function getContent(HTMLPlus $c) {
-    if(is_null($this->currentDoc)) return $c;
     Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
-    $this->insertDocInfo($this->currentDoc);
-    #$this->insertContent($this->currentDoc, $this->currentSubdir);
-    return $this->currentDoc;
+    foreach($this->vars as $filePath => $var) {
+      if($var["link"] != getCurLink()) continue;
+      $doc = HTMLPlusBuilder::build($filePath);
+      $this->insertDocInfo($doc, $var);
+      return $doc;
+    }
+    return $c;
   }
 
-  private function insertDocInfo(HTMLPlus $doc) {
+  private function insertDocInfo(HTMLPlus $doc, Array $info) {
     $vars = array();
     foreach($this->cfg->getElementsByTagName("var") as $var) {
       $vars[$var->getAttribute("id")] = $var;
     }
     foreach($doc->getElementsByTagName("h") as $h) {
-      $ul = $this->createDocInfo($h, $vars);
+      $ul = $this->createDocInfo($h, $vars, $info);
       if(!$ul->childNodes->length) continue;
-      $ul->processVariables($this->docinfo, array(), true);
+      $ul->processVariables($info, array(), true);
       if($h->parentNode->nodeName == "body") {
         $wrapper = $doc->createElement("var");
         $wrapper->appendChild($ul);
@@ -94,7 +98,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     }
   }
 
-  private function createDocInfo(DOMElementPlus $h, Array $vars) {
+  private function createDocInfo(DOMElementPlus $h, Array $vars, Array $info) {
     $doc = $h->ownerDocument;
     $ul = $doc->createElement("ul");
     if($h->parentNode->nodeName == "body") {
@@ -106,7 +110,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
         $li->appendChild($doc->importNode($n, true));
       }
       // global modification
-      if(substr($this->docinfo["ctime"], 0, 10) != substr($this->docinfo["mtime"], 0, 10)) {
+      if(substr($info["ctime"], 0, 10) != substr($info["mtime"], 0, 10)) {
         $li = $ul->appendChild($doc->createElement("li"));
         $li->setAttribute("class", "modified");
         foreach($vars["modified"]->childNodes as $n) {
@@ -155,29 +159,6 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     return $ul;
   }
 
-  private function insertContent(HTMLPlus $doc, $subDir) {
-    $dest = Cms::getContentFull()->getElementById($subDir);
-    if(is_null($dest)) $dest = Cms::getContentFull()->documentElement->firstElement->nextElement;
-    while($dest->nodeName != "section") {
-      if(is_null($dest->nextElement)) {
-        $dest = $dest->parentNode->appendChild($dest->ownerDocument->createElement("section"));
-        break;
-      }
-      if($dest->nextElement->nodeName == "h") {
-        $dest = $dest->parentNode->insertBefore($dest->ownerDocument->createElement("section"), $dest->nextElement);
-        break;
-      }
-      $dest = $dest->nextElement;
-    }
-    foreach($doc->documentElement->attributes as $a) {
-      if($a->nodeName == "ns") continue;
-      $dest->setAttribute($a->nodeName, $a->nodeValue);
-    }
-    foreach($doc->documentElement->childElementsArray as $e) {
-      $dest->appendChild($dest->ownerDocument->importNode($e, true));
-    }
-  }
-
   private function createList($rootDir, Array &$list, $ext=null, $subDir=null) {
     if(isset($list[$subDir])) return; // user dir (with at least one file) beats admin dir
     $workingDir = "$rootDir".(strlen($subDir) ? "/$subDir" : "");
@@ -216,7 +197,6 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
         continue;
       }
       $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-      self::$sortKey = "name";
       $cacheKey = apc_get_key($vName);
       if($useCache && apc_exists($cacheKey)) {
         $doc = new DOMDocumentPlus();
@@ -224,7 +204,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
         Cms::setVariable($vName, $doc->documentElement);
         continue;
       }
-      $vars = $this->sort($vars, $image);
+      $this->sort($vars, $image, "name", false);
       $vValue = $this->getDOM($vars, $image);
       apc_store_cache($cacheKey, $vValue->saveXML(), $vName);
       Cms::setVariable($vName, $vValue->documentElement);
@@ -290,40 +270,46 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     $vars = array();
     $cacheKey = apc_get_key($subDir);
     $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
-    if(is_file($inotify)) $checkSum = filemtime($inotify);
-    else $checkSum = count($files);
+    if(!IS_LOCALHOST && is_file($inotify)) $checkSum = filemtime($inotify);
+    else $checkSum = count($files); // invalidate cache with different files count
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
       apc_store_cache($cacheKey, $checkSum, $subDir);
       $this->useCache = false;
     }
+    $date = new DateTime();
     foreach($files as $fileName => $rootDir) {
       $filePath = "$rootDir/".(strlen($subDir) ? "$subDir/" : "").$fileName;
       $file = stripDataFolder($filePath);
       try {
+        #var_dump($filePath);
         $vars[$filePath] = HTMLPlusBuilder::register($filePath, $subDir, $subDir);
+        $vars[$filePath]["file"] = $filePath;
         $vars[$filePath]["link"] = HTMLPlusBuilder::getFileToId($filePath);
-        var_dump($vars[$filePath]);
-        #$vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
+        $vars[$filePath]["subdir"] = $subDir;
+        $vars[$filePath]['editlink'] = "";
+        if(Cms::isSuperUser()) {
+          $vars[$filePath]['editlink'] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>".$this->edit."</a>";
+        }
+        if(!strlen($vars[$filePath]["mtime"])) {
+          $date->setTimeStamp($vars[$filePath]["filemtime"]);
+          $vars[$filePath]["mtime"] = $date->format(DateTime::W3C);
+        }
+        $this->vars[$filePath] = $vars[$filePath];
       } catch(Exception $e) {
         Logger::critical($e->getMessage());
         continue;
       }
-      #if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
-      #  $this->docinfo = $vars[$filePath];
-      #  $this->currentSubdir = $subDir;
-      #  $this->currentFilepath = $file;
-      #  $this->currentDoc = $doc;
-      #}
-      if(is_file($inotify)) continue;
+      if(!IS_LOCALHOST && is_file($inotify)) continue;
       $cacheKey = apc_get_key($filePath);
-      if(apc_is_valid_cache($cacheKey, filemtime($filePath))) continue;
-      apc_store_cache($cacheKey, filemtime($filePath), $file);
+      if(apc_is_valid_cache($cacheKey, $vars[$filePath]["filemtime"])) continue;
+      #var_dump($vars[$filePath]);
+      apc_store_cache($cacheKey, $vars[$filePath]["filemtime"], $file);
       $this->useCache = false;
     }
     return $vars;
   }
 
-  private function createCmsVars($subDir, Array $vars) {
+  private function createCmsVars(Array $vars, $subDir) {
     $className = (new \ReflectionClass($this))->getShortName();
     $filePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($filePath);
@@ -331,10 +317,10 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$className.".xml");
       $this->useCache = false;
     }
-    foreach($this->cfg->documentElement->childElementsArray as $html) {
-      if($html->nodeName != "html") continue;
+    foreach($this->cfg->documentElement->childElementsArray as $template) {
+      if($template->nodeName != "html") continue;
       try {
-        $id = $html->getRequiredAttribute("id");
+        $id = $template->getRequiredAttribute("id");
       } catch(Exception $e) {
         Logger::user_warning($e->getMessage());
         continue;
@@ -351,10 +337,9 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
           continue;
         }
       }
-      self::$sortKey = "ctime";
-      $vars = $this->sort($vars, $html);
+      $this->sort($vars, $template, "ctime", true);
       try {
-        $vValue = $this->getDOM($vars, $html);
+        $vValue = $this->getDOM($vars, $template);
         Cms::setVariable($vName, $vValue->documentElement);
         $var = array(
           "name" => $vName,
@@ -368,11 +353,12 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     }
   }
 
-  private function sort($vars, $e) {
-    $reverse = true;
-    if($e->hasAttribute("sort") || $e->hasAttribute("rsort")) {
-      $reverse = $e->hasAttribute("rsort");
-      $userKey = $e->hasAttribute("sort") ? $e->getAttribute("sort") : $e->getAttribute("rsort");
+  private function sort(Array &$vars, DOMElementPlus $template, $defaultSortKey, $defaultReverse) {
+    self::$reverse = $defaultReverse;
+    self::$sortKey = $defaultSortKey;
+    if($template->hasAttribute("sort") || $template->hasAttribute("rsort")) {
+      self::$reverse = $template->hasAttribute("rsort");
+      $userKey = $template->hasAttribute("sort") ? $template->getAttribute("sort") : $template->getAttribute("rsort");
       if(!array_key_exists($userKey, current($vars))) {
         Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
       } else {
@@ -380,8 +366,6 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       }
     }
     uasort($vars, array("IGCMS\Plugins\Agregator", "cmp"));
-    if($reverse) $vars = array_reverse($vars);
-    return $vars;
   }
 
   private function getSubDirCache($cacheKey) {
@@ -391,7 +375,9 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private static function cmp($a, $b) {
     if($a[self::$sortKey] == $b[self::$sortKey]) return 0;
-    return ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
+    $val = ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
+    if(self::$reverse) return -$val;
+    return $val;
   }
 
   private function getDOM(Array $vars, DOMElementPlus $html) {
@@ -427,48 +413,6 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       $item->stripTag();
     }
     return $doc;
-  }
-
-  private function getHTMLVariables(HTMLPlus $doc, $filePath, $file) {
-    $cacheKey = apc_get_key("vars/$filePath");
-    $mTime = filemtime($filePath);
-    if($this->useCache && apc_exists($cacheKey)) {
-      $vars = apc_fetch($cacheKey);
-      if($vars["filemtime"] == $mTime) return $vars;
-    }
-    $vars = array();
-    $h = $doc->documentElement->firstElement;
-    $desc = $h->nextElement;
-    $vars['editlink'] = "";
-    if(Cms::isSuperUser()) {
-      $vars['editlink'] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>".$this->edit."</a>";
-    }
-    $vars['filemtime'] = $mTime;
-    $vars['heading'] = $h->nodeValue;
-    $vars['link'] = $h->getAttribute("id");
-    $vars['author'] = $h->getAttribute("author");
-    $vars['authorid'] = $h->hasAttribute("authorid") ? $h->getAttribute("authorid") : "";
-    $vars['resp'] = $h->hasAttribute("resp") ? $h->getAttribute("resp") : null;
-    $vars['respid'] = $h->hasAttribute("respid") ? $h->getAttribute("respid") : "";
-    $vars['ctime'] = $h->getAttribute("ctime");
-    $vars['mtime'] = $h->getAttribute("mtime");
-    $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
-    $vars['desc'] = $desc->nodeValue;
-    $vars['kw'] = $desc->getAttribute("kw");
-    $vars['links'] = array();
-    foreach($doc->getElementsByTagName("h") as $h) {
-      #if(!$h->hasAttribute("link")) continue;
-      $vars['links'][] = $h->getAttribute("id");
-    }
-    apc_store_cache($cacheKey, $vars, $file);
-    return $vars;
-  }
-
-  private function isCurrentDoc(Array $links) {
-    foreach($links as $link) {
-      if($link == getCurLink()) return true;
-    }
-    return false;
   }
 
 }

@@ -20,7 +20,7 @@ class HTMLPlusBuilder {
   private static $fileToDoc = array();
 
   private static $idToParentId = array();
-  private static $idToFile = array();
+  #private static $idToFile = array();
   private static $idToFileMtime = array();
   private static $idToShort = array();
   private static $idToHeading = array();
@@ -37,7 +37,6 @@ class HTMLPlusBuilder {
   private static $include;
 
   private static function getRegister($id) {
-    var_dump($id);
     $register = array();
     $properties = (new \ReflectionClass(get_called_class()))->getStaticProperties();
     foreach(array_keys($properties) as $p) {
@@ -64,16 +63,19 @@ class HTMLPlusBuilder {
   }
 
   public static function build($filePath, $parentId='', $prefixId='') {
-    #register iff not registered
-    if(!array_key_exists($filePath, self::$fileToDoc))
+    # register iff not registered
+    if(!array_key_exists($filePath, self::$fileToId))
       self::register($filePath, $parentId, $prefixId);
-    $doc = self::$fileToDoc[$filePath];
-    #load iff not loaded
-    if(!is_null($doc)) return $doc;
+    # return iff loaded
+    if(array_key_exists($filePath, self::$fileToDoc))
+      return self::$fileToDoc[$filePath];
+    # load iff not loaded
     $doc = self::load($filePath);
     self::$fileToDoc[$filePath] = $doc;
     return $doc;
   }
+
+  #public static function
 
   public static function register($filePath, $parentId='', $prefixId='') {
     $doc = self::load($filePath);
@@ -150,12 +152,12 @@ class HTMLPlusBuilder {
   private static function registerStructure(DOMElementPlus $section, $parentId, $prefix, $filePath) {
     foreach($section->childElementsArray as $e) {
       if($e->nodeName == "h") {
-        $id = count(self::$idToFile) ? $e->getAttribute("id") : '';
+        $id = count(self::$idToParentId) ? $e->getAttribute("id") : '';
         if($id != $prefix) $id = "$prefix#$id";
         if(!array_key_exists($filePath, self::$fileToId))
           self::$fileToId[$filePath] = $id;
         self::$idToParentId[$id] = $parentId; // skip '' => ''
-        self::$idToFile[$id] = $filePath;
+        #self::$idToFile[$id] = $filePath;
         self::$idToFileMtime[$id] = filemtime($filePath);
         self::setHeadingInfo($id, $e);
         continue;
