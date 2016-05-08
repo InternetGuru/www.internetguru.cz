@@ -14,7 +14,7 @@ class Auth extends Plugin implements SplObserver {
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     if(Cms::isSuperUser()) return;
-    $cfg = $this->getDOMPlus();
+    $cfg = $this->getXML();
     $url = ROOT_URL.getCurLink(true);
     $access = null;
     foreach($cfg->getElementsByTagName('url') as $e) {

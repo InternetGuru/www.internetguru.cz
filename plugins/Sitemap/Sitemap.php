@@ -37,7 +37,7 @@ class Sitemap extends Plugin implements SplObserver {
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1); // before agregator(2)
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
   }
 
   /**

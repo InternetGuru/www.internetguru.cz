@@ -44,7 +44,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   }
 
   private function createVars() {
-    $cfg = $this->getDOMPlus();
+    $cfg = $this->getXML();
     foreach($cfg->documentElement->childElementsArray as $e) {
       try {
         $id = $e->getAttribute("id");

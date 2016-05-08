@@ -19,12 +19,12 @@ class GA extends Plugin implements SplObserver {
 
   private function init() {
     // setup ga_id
-    $ga_id = $this->getDOMPlus()->getElementById("ga_id");
+    $ga_id = $this->getXML()->getElementById("ga_id");
     if(!strlen($ga_id->nodeValue)) {
-      $ga_id = $this->getDOMPlus()->getElementById(DOMAIN);
+      $ga_id = $this->getXML()->getElementById(DOMAIN);
     }
     if(is_null($ga_id)) {
-      $ga_id = $this->getDOMPlus()->getElementById("other");
+      $ga_id = $this->getXML()->getElementById("other");
     }
     $ga_id = $ga_id->nodeValue;
     // ga_id validation
@@ -39,7 +39,7 @@ class GA extends Plugin implements SplObserver {
     }
     // add js into html
     Cms::getOutputStrategy()->addJs("var ga_id = '$ga_id';", 1, "body");
-    foreach($this->getDOMPlus()->getElementsByTagName("jsFile") as $jsFile) {
+    foreach($this->getXML()->getElementsByTagName("jsFile") as $jsFile) {
       $user = !$jsFile->hasAttribute("readonly");
       $f = $this->pluginDir."/".$jsFile->nodeValue;
       Cms::getOutputStrategy()->addJsFile($f, 1, "body", $user);

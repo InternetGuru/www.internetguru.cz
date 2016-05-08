@@ -84,7 +84,7 @@ class HTMLPlusBuilder {
     $prefix = '';
     if(count(self::$idToParentId)) {
       $prefix = $doc->documentElement->firstElement->getAttribute("id");
-      if(!strlen($prefixId)) $prefix = "$prefixId/$prefix";
+      if(strlen($prefixId)) $prefix = "$prefixId/$prefix";
     }
     if(self::$include) {
       $doc->repairIds();
@@ -98,8 +98,7 @@ class HTMLPlusBuilder {
 
   private static function load($filePath) {
     $doc = new HTMLPlus();
-    if(!@$doc->load($filePath))
-      throw new Exception(sprintf(_("Unable to load '%s'"), $filePath));
+    $doc->load($filePath);
     $doc->validatePlus(true);
     if(count($doc->getErrors()))
       Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),

@@ -19,7 +19,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
   }
 
   public function getContent(DOMDocumentPlus $content) {
-    $cfg = $this->getDOMPlus();
+    $cfg = $this->getXML();
     $appendJs = false;
     $pat = array();
     $rep = array();

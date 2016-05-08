@@ -5,6 +5,7 @@ namespace IGCMS\Core;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
+use IGCMS\Core\NoFileException;
 use Exception;
 use DOMDocument;
 use DOMElement;
@@ -20,6 +21,18 @@ class DOMDocumentPlus extends DOMDocument {
   public function createElement($name, $value=null) {
     if(is_null($value)) return parent::createElement($name);
     return parent::createElement($name, htmlspecialchars($value));
+  }
+
+  public function load($filePath) {
+    if(!is_file($filePath) || file_exists(dirname($filePath)."/.".basename($filePath)))
+      throw new NoFileException(_("File not found or disabled"));
+    if(!@$this->load($filePath))
+      throw new Exception(_("Invalid XML file"));
+  }
+
+  public function loadXML($xml) {
+    if(!@$this->loadXML($xml))
+      throw new Exception(_("Invalid XML"));
   }
 
   public function getElementById($id, $aName="id", $eName = null) {

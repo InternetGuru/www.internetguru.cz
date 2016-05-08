@@ -43,7 +43,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
     if(is_null($this->favIcon)) $this->favIcon = findfile($this->pluginDir."/".self::FAVICON);
   }

@@ -281,7 +281,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
-    $xsl = $this->getDOMPlus($this->pluginDir."/$xslFile", false, false);
+    $xsl = $this->getXML($this->pluginDir."/$xslFile", false, false);
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);

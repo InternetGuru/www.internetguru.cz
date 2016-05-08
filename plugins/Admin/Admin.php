@@ -267,7 +267,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $df = findFile($this->defaultFile, $user, true);
     if(is_null($df)) return null;
     if($this->replace) return file_get_contents($df);
-    $doc = $this->getDOMPlus($this->defaultFile, false, $user);
+    $doc = $this->getXML($this->defaultFile, false, $user);
     $doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();

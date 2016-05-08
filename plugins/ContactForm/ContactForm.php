@@ -57,7 +57,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   private function initForm() {
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     $this->createGlobalVars();
     foreach($this->forms as $formId => $form) {
       $form->addClass("fillable");

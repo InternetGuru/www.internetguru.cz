@@ -41,7 +41,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
         if(isset($_GET[$this->getOk])) Logger::user_success(_("Changes successfully saved"));
         $this->loadVars();
       }
-      $this->cfg = $this->getDOMPlus();
+      $this->cfg = $this->getXML();
       foreach($this->cfg->documentElement->childElementsArray as $e) {
         if($e->nodeName == "set") continue;
         if($e->nodeName == "passwd") continue;

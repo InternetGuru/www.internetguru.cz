@@ -39,7 +39,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function createLinkList(DOMElementPlus $wrapper) {
-    $cfg = $this->getDOMPlus();
+    $cfg = $this->getXML();
     foreach($cfg->documentElement->childElementsArray as $e) {
       if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
       $vars[$e->getAttribute("id")] = $e;

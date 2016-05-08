@@ -40,7 +40,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $h1 = $cf->getElementById($link, "id", "h");
       if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
-    $cfg = $this->getDOMPlus();
+    $cfg = $this->getXML();
     foreach($cfg->documentElement->childElementsArray as $e) {
       if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
       $this->vars[$e->getAttribute("id")] = $e;

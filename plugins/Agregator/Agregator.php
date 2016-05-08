@@ -21,11 +21,11 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
   private $docinfo = array();
   private $currentSubdir = null;
   private $currentFilepath = null;
-  private $useCache = true;
   private $edit;
   private $cfg;
   private static $sortKey;
   private static $reverse;
+  const APC = false;
   const APC_PREFIX = "1";
 
   public function __construct(SplSubject $s) {
@@ -37,7 +37,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     $curLink = getCurLink();
     try {
       mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
@@ -46,8 +46,6 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       $this->createList(USER_FOLDER."/".$this->pluginDir, $list, "html");
       $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list, "html");
       foreach($list as $subDir => $files) {
-        $vars = $this->getFileVars($subDir, $files);
-        if(!count($vars)) continue;
         $this->createCmsVars($vars, $subDir);
       }
       $list = array();
@@ -66,7 +64,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
     foreach($this->vars as $filePath => $var) {
       if($var["link"] != getCurLink()) continue;
-      $doc = HTMLPlusBuilder::build($filePath);
+      $doc = HTMLPlusBuilder::build($filePath, $var["parentid"], $var["prefixid"]);
       $this->insertDocInfo($doc, $var);
       return $doc;
     }
@@ -177,8 +175,8 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
 
   private function createImgVar($subDir, Array $files) {
     $cacheKey = apc_get_key($subDir);
-    $useCache = true;
     $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
+    $useCache = self::APC;
     if(is_file($inotify)) $checkSum = filemtime($inotify);
     else $checkSum = count($files);
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
@@ -266,7 +264,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     }
   }
 
-  private function getFileVars($subDir, Array $files) {
+  private function getFileVars($subDir, Array $files, &$useCache) {
     $vars = array();
     $cacheKey = apc_get_key($subDir);
     $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
@@ -274,18 +272,21 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     else $checkSum = count($files); // invalidate cache with different files count
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
       apc_store_cache($cacheKey, $checkSum, $subDir);
-      $this->useCache = false;
+      $useCache = false;
     }
     $date = new DateTime();
     foreach($files as $fileName => $rootDir) {
       $filePath = "$rootDir/".(strlen($subDir) ? "$subDir/" : "").$fileName;
       $file = stripDataFolder($filePath);
       try {
+        $parentId = $this->getParentId($subDir);
+        $prefixId = $this->getPrefixId($subDir);
         #var_dump($filePath);
-        $vars[$filePath] = HTMLPlusBuilder::register($filePath, $subDir, $subDir);
+        $vars[$filePath] = HTMLPlusBuilder::register($filePath, $parentId, $prefixId);
+        $vars[$filePath]["parentid"] = $parentId;
+        $vars[$filePath]["prefixid"] = $prefixId;
         $vars[$filePath]["file"] = $filePath;
         $vars[$filePath]["link"] = HTMLPlusBuilder::getFileToId($filePath);
-        $vars[$filePath]["subdir"] = $subDir;
         $vars[$filePath]['editlink'] = "";
         if(Cms::isSuperUser()) {
           $vars[$filePath]['editlink'] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>".$this->edit."</a>";
@@ -304,18 +305,29 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       if(apc_is_valid_cache($cacheKey, $vars[$filePath]["filemtime"])) continue;
       #var_dump($vars[$filePath]);
       apc_store_cache($cacheKey, $vars[$filePath]["filemtime"], $file);
-      $this->useCache = false;
+      $useCache = false;
     }
     return $vars;
   }
 
-  private function createCmsVars(Array $vars, $subDir) {
+  private function getParentId($default) {
+    return $default;
+  }
+
+  private function getPrefixId($default) {
+    return $default;
+  }
+
+  private function createCmsVars($subDir, $files) {
+    $useCache = self::APC;
+    $vars = $this->getFileVars($subDir, $files, $useCache);
+    if(!count($vars)) return;
     $className = (new \ReflectionClass($this))->getShortName();
     $filePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($filePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
       apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$className.".xml");
-      $this->useCache = false;
+      $useCache = false;
     }
     foreach($this->cfg->documentElement->childElementsArray as $template) {
       if($template->nodeName != "html") continue;
@@ -328,7 +340,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       $cacheKey = apc_get_key($vName);
       // use cache
-      if($this->useCache) {
+      if($useCache) {
         $sCache = $this->getSubDirCache($cacheKey);
         if(!is_null($sCache)) {
           $doc = new DOMDocumentPlus();
@@ -348,7 +360,6 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
         apc_store_cache($cacheKey, $var, $vName);
       } catch(Exception $e) {
         Logger::critical($e->getMessage());
-        continue;
       }
     }
   }

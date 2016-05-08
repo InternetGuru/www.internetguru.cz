@@ -22,7 +22,7 @@ class UrlHandler extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached(array("HtmlOutput", "ContentLink"))) return;
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     if(!IS_LOCALHOST) $this->httpsRedir();
     $this->cfgRedir();
     if(getCurLink() == "") {

@@ -45,7 +45,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->detachIfNotAttached("HtmlOutput")) return;
     try {
       // load config
-      $this->cfg = $this->getDOMPlus();
+      $this->cfg = $this->getXML();
       $this->validateConfigCache();
       $this->loadVariables();
       // after submitting form delete cookies
