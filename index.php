@@ -58,8 +58,6 @@ try {
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => buildQuery($query, false))));
   }
 
-  DOMBuilder::setCacheMtime();
-
   $plugins = new Plugins();
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();

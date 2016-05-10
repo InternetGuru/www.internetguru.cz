@@ -13,12 +13,41 @@ use DOMElement;
 use DOMComment;
 use DateTime;
 
-/**
- * Create DOM from XML file and update elements from adm/usr directories.
- * Add by default; empty element to delete all elements with same nodeName.
- * Preserve values with readonly attribute.
- */
 class DOMBuilder {
+  private static $newestFileMtime = null;
+  private static $newestCacheMtime = null;
+
+  public static function isCacheOutdated() {
+    if(IS_LOCALHOST) return false;
+    if(is_null(self::$newestFileMtime))
+      throw new Exception(_("FileMtime is not set"));
+    return self::$newestFileMtime > getNewestCacheMtime();
+  }
+
+  protected static function setNewestFileMtime($fp) {
+    $mtime = filemtime($fp);
+    if($mtime <= self::$newestFileMtime) return;
+    self::$newestFileMtime = $mtime;
+    if(!Cms::isSuperUser()) return;
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
+    if(!self::isCacheOutdated()) return;
+    Logger::user_notice(_("Outdated server cache"));
+  }
+
+  private static function getNewestCacheMtime() {
+    if(!is_null(self::$newestCacheMtime)) return self::$newestCacheMtime;
+    foreach(getNginxCacheFiles() as $cacheFilePath) {
+      $cacheMtime = filemtime($cacheFilePath);
+      if($cacheMtime < self::$newestCacheMtime) continue;
+      self::$newestCacheMtime = $cacheMtime;
+    }
+    return self::$newestCacheMtime;
+  }
+
+
+
+  /* ------------------------------------------------------------------- */
+
 
   const DEBUG = false;
   private static $included = array();

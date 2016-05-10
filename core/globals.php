@@ -522,17 +522,6 @@ function getNginxCacheFiles($folder = null, $link = "") {
   return $fPaths;
 }
 
-function getNewestCacheMtime() {
-  if(IS_LOCALHOST) return null;
-  $newestCacheMtime = null;
-  foreach(getNginxCacheFiles() as $cacheFilePath) {
-    $cacheMtime = filemtime($cacheFilePath);
-    if($cacheMtime < $newestCacheMtime) continue;
-    $newestCacheMtime = $cacheMtime;
-  }
-  return $newestCacheMtime;
-}
-
 function getIP() {
   if(!empty($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
   if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];

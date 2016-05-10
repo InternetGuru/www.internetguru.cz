@@ -3,6 +3,7 @@
 namespace IGCMS\Core;
 
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -14,19 +15,21 @@ use DOMElement;
 use DOMComment;
 use DateTime;
 
-class XMLBuilder {
+class XMLBuilder extends DOMBuilder {
 
   public static function build($fileName) {
     $doc = new DOMDocumentPlus();
 
     $fp = CMS_FOLDER."/$fileName";
     $doc->load($fp);
+    self::setNewestMtime($fp);
 
     $fp = ADMIN_FOLDER."/$fileName";
     try {
       $adminDoc = new DOMDocumentPlus();
       $adminDoc->load($fp);
       self::updateDOM($doc, $adminDoc);
+      self::setNewestMtime($fp);
     } catch(NoFileException $e) {
       // skip
     } catch(Exception $e) {
@@ -38,6 +41,7 @@ class XMLBuilder {
       $userDoc = new DOMDocumentPlus();
       $userDoc->load($fp);
       self::updateDOM($doc, $userDoc);
+      self::setNewestMtime($fp);
     } catch(NoFileException $e) {
       // skip
     } catch(Exception $e) {
@@ -47,7 +51,7 @@ class XMLBuilder {
     return $doc;
   }
 
-  private function updateDOM(DOMDocumentPlus $doc, DOMDocumentPlus $newDoc) {
+  private static function updateDOM(DOMDocumentPlus $doc, DOMDocumentPlus $newDoc) {
     $docId = null;
     foreach($newDoc->documentElement->childElementsArray as $n) {
       // if empty && readonly => user cannot modify

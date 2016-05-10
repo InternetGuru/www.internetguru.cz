@@ -103,7 +103,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function checkCache() {
     if(!$this->isResource($this->type)) {
-      if(DOMBuilder::isNginxOutdated()) {
+      if(DOMBuilder::isCacheOutdated()) {
         Cms::notice(_("Saving changes will clear server cache"));
       }
       return;

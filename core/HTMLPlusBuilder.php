@@ -3,6 +3,7 @@
 namespace IGCMS\Core;
 
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -14,7 +15,7 @@ use DOMElement;
 use DOMComment;
 use DateTime;
 
-class HTMLPlusBuilder {
+class HTMLPlusBuilder extends DOMBuilder {
 
   private static $fileToId = array();
   private static $fileToDoc = array();
@@ -104,6 +105,7 @@ class HTMLPlusBuilder {
       Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
         count($doc->getErrors()), $filePath));
     self::insertIncludes($doc, dirname($filePath));
+    self::setNewestMtime($fp);
     return $doc;
   }
 
