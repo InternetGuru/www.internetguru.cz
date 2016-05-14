@@ -74,8 +74,8 @@ class Sitemap extends Plugin implements SplObserver {
   private function getLinks() {
     $links = array();
     $dt = new DateTime();
-    foreach(DOMBuilder::getLinks(false) as $link) {
-      $file = DOMBuilder::getFile($link);
+    foreach(DOMBuilder::getIdToLink() as $link) {
+      $file = DOMBuilder::getIdToFile($link);
       $dt->setTimestamp(filemtime($file));
       $mtime = $dt->format(DATE_W3C);
       $links[$link] = $mtime;

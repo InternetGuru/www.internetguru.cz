@@ -2,7 +2,6 @@
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
-use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Plugins;
@@ -69,6 +68,7 @@ try {
   Cms::buildContent();
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
+
 
   #var_dump(HTMLPlusBuilder::getIdToParentId());
   #var_dump(HTMLPlusBuilder::getUriToInt("pavel_petrzela"));

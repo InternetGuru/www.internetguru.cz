@@ -17,12 +17,10 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
   private $emlFiles;
   private $curFilePath;
   private $curFileName;
-  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
-    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {

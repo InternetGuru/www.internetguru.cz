@@ -4,8 +4,9 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\ContentStrategyInterface;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -21,7 +22,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const STATUS_UNKNOWN = 4;
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
-  private $className = null;
   private $content = null;
   private $contentValue = null;
   private $scheme = null;
@@ -44,7 +44,6 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
     $this->dataFileStatus = self::STATUS_UNKNOWN;
-    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {
@@ -295,7 +294,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function setDefaultFile() {
     $fileName = $_GET[$this->className];
     $this->defaultFile = $this->getFilepath($fileName);
-    $fLink = DOMBuilder::getLink(findFile($fileName));
+    $fLink = HTMLPlusBuilder::getFileToId($fileName);
     if(is_null($fLink)) $fLink = getCurLink();
     if($this->defaultFile != $fileName || $fLink != getCurLink()) {
       redirTo(buildLocalUrl(array("path" => $fLink, "query" => $this->className."=".$this->defaultFile)));
@@ -306,7 +305,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function getFilepath($f) {
     if(!strlen($f)) {
       if(getCurLink() == "") return INDEX_HTML;
-      $path = DOMBuilder::getFile(getCurLink());
+      $path = HTMLPlusBuilder::getIdToFile(getCurLink());
       if(!is_null($path)) return $path;
       return INDEX_HTML;
     }

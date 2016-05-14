@@ -8,6 +8,7 @@ use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
+use IGCMS\Core\NoFileException;
 use Exception;
 use DOMXPath;
 use DOMDocument;
@@ -19,17 +20,16 @@ class XMLBuilder extends DOMBuilder {
 
   public static function build($fileName) {
     $doc = new DOMDocumentPlus();
-
     $fp = CMS_FOLDER."/$fileName";
     $doc->load($fp);
-    self::setNewestMtime($fp);
+    self::setNewestFileMtime(filemtime($fp));
 
     $fp = ADMIN_FOLDER."/$fileName";
     try {
       $adminDoc = new DOMDocumentPlus();
       $adminDoc->load($fp);
       self::updateDOM($doc, $adminDoc);
-      self::setNewestMtime($fp);
+      self::setNewestFileMtime(filemtime($fp));
     } catch(NoFileException $e) {
       // skip
     } catch(Exception $e) {
@@ -41,7 +41,7 @@ class XMLBuilder extends DOMBuilder {
       $userDoc = new DOMDocumentPlus();
       $userDoc->load($fp);
       self::updateDOM($doc, $userDoc);
-      self::setNewestMtime($fp);
+      self::setNewestFileMtime(filemtime($fp));
     } catch(NoFileException $e) {
       // skip
     } catch(Exception $e) {

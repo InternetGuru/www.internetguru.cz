@@ -3,9 +3,10 @@
 namespace IGCMS\Core;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Logger;
+use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\XMLBuilder;
 use Exception;
 use SplSubject;
 
@@ -17,8 +18,8 @@ class Plugin {
 
   public function __construct(SplSubject $s) {
     $this->subject = $s;
-    $this->pluginDir = PLUGINS_DIR."/".(new \ReflectionClass($this))->getShortName();
     $this->className = (new \ReflectionClass($this))->getShortName();
+    $this->pluginDir = PLUGINS_DIR."/".$this->className;
   }
 
   public function isDebug() {

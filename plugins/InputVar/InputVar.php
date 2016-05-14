@@ -24,11 +24,9 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private $passwd = null;
   private $getOk = "ivok";
   private $vars = array();
-  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $this->className = (new \ReflectionClass($this))->getShortName();
     $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml";
     $s->setPriority($this, 5);
   }
@@ -37,11 +35,11 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       if($subject->getStatus() == STATUS_POSTPROCESS) $this->processPost();
       if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
+      $this->cfg = $this->getXML();
       if($subject->getStatus() == STATUS_INIT) {
         if(isset($_GET[$this->getOk])) Logger::user_success(_("Changes successfully saved"));
         $this->loadVars();
       }
-      $this->cfg = $this->getXML();
       foreach($this->cfg->documentElement->childElementsArray as $e) {
         if($e->nodeName == "set") continue;
         if($e->nodeName == "passwd") continue;
@@ -70,11 +68,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function loadVars() {
-    if(!is_file($this->userCfgPath)) return;
-    $userCfg = new DOMDocumentPlus();
-    if(!@$userCfg->load($this->userCfgPath))
-      throw new Exception(sprintf(_("Unable to load content from user config")));
-    foreach($userCfg->documentElement->childElementsArray as $e) {
+    foreach($this->cfg->documentElement->childElementsArray as $e) {
       if($e->nodeName == "var") $this->vars[$e->getAttribute("id")] = $e;
       if(!IS_LOCALHOST && $e->nodeName == "passwd") $this->passwd = $e->nodeValue;
     }

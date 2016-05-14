@@ -24,8 +24,7 @@ class DOMBuilder {
     return self::$newestFileMtime > getNewestCacheMtime();
   }
 
-  protected static function setNewestFileMtime($fp) {
-    $mtime = filemtime($fp);
+  protected static function setNewestFileMtime($mtime) {
     if($mtime <= self::$newestFileMtime) return;
     self::$newestFileMtime = $mtime;
     if(!Cms::isSuperUser()) return;
@@ -46,7 +45,7 @@ class DOMBuilder {
 
 
 
-  /* ------------------------------------------------------------------- */
+  /* -------------------------------------------------------------------
 
 
   const DEBUG = false;
@@ -57,8 +56,6 @@ class DOMBuilder {
   private static $linkToId = array(); // link => id
   private static $linkToFile = array(); // link => filepath
   private static $defaultPrefix = null;
-  private static $newestFileMtime = null;
-  private static $newestCacheMtime = null;
   private static $nginxOutdated = false;
 
   public static function setCacheMtime() {
@@ -80,7 +77,6 @@ class DOMBuilder {
     self::globalReadonly($doc);
     return $doc;
   }
-
   public static function normalizeLink(Array $pUrl) {
     #var_dump($pUrl);
     #if(empty($pUrl)) return "";
@@ -139,7 +135,6 @@ class DOMBuilder {
     reset(self::$idToLink);
     return key(self::$idToLink);
   }
-
   public static function getLinks($fragments = true) {
     if($fragments) return array_keys(self::$linkToId);
     $links = array();
@@ -547,13 +542,6 @@ class DOMBuilder {
     return null;
   }
 
-  /**
-   * Load XML file into DOMDocument using backup/restore
-   * Respect subdom attribute
-   * @param  string      $filePath File to be loaded into document
-   * @return void
-   * @throws Exception   if unable to load XML file incl.backup file
-   */
   private static function updateDOM(DOMDocumentPlus $doc, $filePath, $ignoreReadonly=false) {
     $newDoc = new DOMDocumentPlus();
     $docId = null;
@@ -612,7 +600,7 @@ class DOMBuilder {
     if($n->attributes->length == 1 && !$n->hasAttribute("readonly")) return false;
     return true;
   }
-
+*/
 }
 
 ?>

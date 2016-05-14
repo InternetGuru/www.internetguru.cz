@@ -4,7 +4,6 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\ContentStrategyInterface;
-use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
@@ -15,6 +14,9 @@ use Exception;
 use SplObserver;
 use SplSubject;
 use DateTime;
+
+# TODO:
+# registr souborů: v id celá cesta, v hodnotě pole štítků
 
 class Agregator extends Plugin implements SplObserver, ContentStrategyInterface {
   private $vars = array();  // filePath => fileInfo(?)
@@ -40,16 +42,16 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->cfg = $this->getXML();
     $curLink = getCurLink();
     try {
-      mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
       mkdir_plus(USER_FOLDER."/".$this->pluginDir);
+      mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
       $list = array();
-      $this->createList(USER_FOLDER."/".$this->pluginDir, $list, "html");
-      $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list, "html");
+      $this->createList(USER_FOLDER, $this->pluginDir, $list, "html");
+      $this->createList(ADMIN_FOLDER, $this->pluginDir, $list, "html");
       foreach($list as $subDir => $files) {
-        $this->createCmsVars($vars, $subDir);
+        $this->createCmsVars($subDir, $files);
       }
       $list = array();
-      $this->createList(FILES_FOLDER, $list);
+      $this->createList("", FILES_FOLDER, $list);
       #$this->createFilesVar(FILES_FOLDER);
       foreach($list as $subDir => $files) {
         $this->createImgVar($subDir, $files);
@@ -157,14 +159,14 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     return $ul;
   }
 
-  private function createList($rootDir, Array &$list, $ext=null, $subDir=null) {
+  private function createList($prefixDir, $rootDir, Array &$list, $ext=null, $subDir=null) {
     if(isset($list[$subDir])) return; // user dir (with at least one file) beats admin dir
-    $workingDir = "$rootDir".(strlen($subDir) ? "/$subDir" : "");
+    $workingDir = "$prefixDir/$rootDir".(strlen($subDir) ? "/$subDir" : "");
     if(!is_dir($workingDir)) return;
     foreach(scandir($workingDir) as $f) {
       if(strpos($f, ".") === 0) continue;
       if(is_dir("$workingDir/$f")) {
-        $this->createList($rootDir, $list, $ext, is_null($subDir) ? $f : "$subDir/$f");
+        $this->createList($prefixDir, $rootDir, $list, $ext, is_null($subDir) ? $f : "$subDir/$f");
         continue;
       }
       if(!is_null($ext) && pathinfo($f, PATHINFO_EXTENSION) != $ext) continue;
@@ -276,20 +278,19 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     }
     $date = new DateTime();
     foreach($files as $fileName => $rootDir) {
-      $filePath = "$rootDir/".(strlen($subDir) ? "$subDir/" : "").$fileName;
-      $file = stripDataFolder($filePath);
+      $filePath = $rootDir."/".(strlen($subDir) ? "$subDir/" : "").$fileName;
       try {
         $parentId = $this->getParentId($subDir);
         $prefixId = $this->getPrefixId($subDir);
-        #var_dump($filePath);
         $vars[$filePath] = HTMLPlusBuilder::register($filePath, $parentId, $prefixId);
+        $vars[$filePath]["filemtime"] = HTMLPlusBuilder::getFileMtime($filePath);
         $vars[$filePath]["parentid"] = $parentId;
         $vars[$filePath]["prefixid"] = $prefixId;
         $vars[$filePath]["file"] = $filePath;
         $vars[$filePath]["link"] = HTMLPlusBuilder::getFileToId($filePath);
         $vars[$filePath]['editlink'] = "";
         if(Cms::isSuperUser()) {
-          $vars[$filePath]['editlink'] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>".$this->edit."</a>";
+          $vars[$filePath]['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";
         }
         if(!strlen($vars[$filePath]["mtime"])) {
           $date->setTimeStamp($vars[$filePath]["filemtime"]);
@@ -304,7 +305,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
       $cacheKey = apc_get_key($filePath);
       if(apc_is_valid_cache($cacheKey, $vars[$filePath]["filemtime"])) continue;
       #var_dump($vars[$filePath]);
-      apc_store_cache($cacheKey, $vars[$filePath]["filemtime"], $file);
+      apc_store_cache($cacheKey, $vars[$filePath]["filemtime"], $filePath);
       $useCache = false;
     }
     return $vars;

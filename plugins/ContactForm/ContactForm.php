@@ -27,7 +27,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $messages;
   private $errors = array();
   private $forms = array();
-  private $className = null;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -35,7 +34,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
-    $this->className = (new \ReflectionClass($this))->getShortName();
     $mail = new PHPMailer;
   }
 

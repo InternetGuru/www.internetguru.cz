@@ -19,10 +19,10 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static $fileToId = array();
   private static $fileToDoc = array();
+  private static $fileMtime = array();
 
   private static $idToParentId = array();
-  #private static $idToFile = array();
-  private static $idToFileMtime = array();
+  private static $idToFile = array();
   private static $idToShort = array();
   private static $idToHeading = array();
   private static $idToTitle = array();
@@ -34,6 +34,9 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static $idToRespId = array();
   private static $idToCtime = array();
   private static $idToMtime = array();
+
+  private static $idToLink = array();
+  private static $linkToId = array();
 
   private static $include;
 
@@ -76,8 +79,6 @@ class HTMLPlusBuilder extends DOMBuilder {
     return $doc;
   }
 
-  #public static function
-
   public static function register($filePath, $parentId='', $prefixId='') {
     $doc = self::load($filePath);
     self::$fileToDoc[$filePath] = $doc;
@@ -97,15 +98,21 @@ class HTMLPlusBuilder extends DOMBuilder {
     return self::getRegister(self::$fileToId[$filePath]);
   }
 
+  public static function isLink($link) {
+    return array_key_exists($link, self::$linkToId);
+  }
+
   private static function load($filePath) {
     $doc = new HTMLPlus();
-    $doc->load($filePath);
+    $fp = findFile($filePath);
+    $doc->load($fp);
     $doc->validatePlus(true);
     if(count($doc->getErrors()))
       Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
         count($doc->getErrors()), $filePath));
-    self::insertIncludes($doc, dirname($filePath));
-    self::setNewestMtime($fp);
+    self::insertIncludes($doc, dirname($fp));
+    self::$fileMtime[$filePath] = filemtime($fp);
+    self::setNewestFileMtime(self::$fileMtime[$filePath]);
     return $doc;
   }
 
@@ -154,12 +161,14 @@ class HTMLPlusBuilder extends DOMBuilder {
     foreach($section->childElementsArray as $e) {
       if($e->nodeName == "h") {
         $id = count(self::$idToParentId) ? $e->getAttribute("id") : '';
-        if($id != $prefix) $id = "$prefix#$id";
+        if($id == basename($prefix)) $id = $prefix;
+        elseif($id != $prefix) $id = "$prefix#$id";
         if(!array_key_exists($filePath, self::$fileToId))
           self::$fileToId[$filePath] = $id;
+        self::$idToLink[$id] = $id;
+        self::$linkToId[$id] = $id;
         self::$idToParentId[$id] = $parentId; // skip '' => ''
-        #self::$idToFile[$id] = $filePath;
-        self::$idToFileMtime[$id] = filemtime($filePath);
+        self::$idToFile[$id] = $filePath;
         self::setHeadingInfo($id, $e);
         continue;
       }

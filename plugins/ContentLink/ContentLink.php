@@ -33,11 +33,13 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $c) {
-    $cf = Cms::getContentFull();
+    $this->generateBc();
+    return $c;
+    # TODO
     $link = getCurLink();
-    if($this->isRoot) $h1 = $cf->documentElement->firstElement;
+    if($this->isRoot) $h1 = $c->documentElement->firstElement;
     else {
-      $h1 = $cf->getElementById($link, "id", "h");
+      $h1 = $c->getElementById($link, "id", "h");
       if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), $link), 404);
     }
     $cfg = $this->getXML();
@@ -47,7 +49,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     }
 
     $this->setPath($h1);
-    $this->generateBc($c);
     if($this->isRoot) return $c;
 
     $desc = $h1->nextElement;
@@ -65,7 +66,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
     $content = new HTMLPlus();
     $content->formatOutput = true;
     $body = $content->appendChild($content->createElement("body"));
-    $body->setAttribute("ns", $cf->documentElement->getAttribute("ns"));
+    $body->setAttribute("ns", $c->documentElement->getAttribute("ns"));
     foreach($h1->parentNode->attributes as $attName => $attNode) {
       $body->setAttributeNode($content->importNode($attNode));
     }

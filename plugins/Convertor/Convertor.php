@@ -22,14 +22,12 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   private $docName = null;
   private $tmpFolder;
   private $importedFiles = array();
-  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
     mkdir_plus($this->tmpFolder);
-    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {

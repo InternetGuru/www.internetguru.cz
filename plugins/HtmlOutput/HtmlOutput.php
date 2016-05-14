@@ -3,13 +3,14 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\XMLBuilder;
 use Exception;
 use DOMImplementation;
 use DOMDocument;
@@ -157,7 +158,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     stableSort($this->transformationsPriority);
     foreach($this->transformationsPriority as $xslt => $priority) {
       try {
-        $newContent = $this->transform($content, $xslt, $this->transformations[$xslt]['user'], $proc);
+        $newContent = $this->transform($content, $xslt, $proc);
         $newContent->encoding="utf-8";
         $xml = $newContent->saveXML();
         if(!@$newContent->loadXML($xml))
@@ -234,7 +235,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     #var_dump(getCurLink());
     #var_dump(getCurLink(true));
     #var_dump($pLink);
+
     $link = DOMBuilder::normalizeLink($pLink);
+
     #if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
     #var_dump($link);
     #var_dump(implodeLink($link));
@@ -254,8 +257,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       if(!strlen($a->getAttribute("title"))) $a->stripAttr("title");
       return;
     }
-    $title = DOMBuilder::getTitle($link);
-    if(normalize($title) == normalize($a->nodeValue)) $title = DOMBuilder::getDesc($link);
+    $title = HTMLPlusBuilder::getIdToTitle($link);
+    if(normalize($title) == normalize($a->nodeValue)) $title = HTMLPlusBuilder::getIdToDesc($link);
     if(is_null($title)) return;
     if(normalize($title) == normalize($a->nodeValue)) return;
     $a->setAttribute("title", $title);
@@ -376,7 +379,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".xsl", 1, false);
+    $this->addTransformation($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".xsl", 1);
 
     // add template files
     $theme = $cfg->getElementById("theme");
@@ -397,8 +400,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       try {
         switch ($n->nodeName) {
           case "xslt":
-          $user = !$n->hasAttribute("readonly");
-          $this->addTransformation($n->nodeValue, 5, $user);
+          $this->addTransformation($n->nodeValue, 5);
           break;
           case "jsFile":
           $user = !$n->hasAttribute("readonly");
@@ -424,9 +426,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
-  private function transform(DOMDocument $content, $fileName, $user, XSLTProcessor $proc) {
+  private function transform(DOMDocument $content, $fileName, XSLTProcessor $proc) {
     #var_dump($fileName);
-    $xsl = DOMBuilder::buildDOMPlus($fileName, true, $user);
+    $xsl = XMLBuilder::build($fileName);
     if(!@$proc->importStylesheet($xsl))
       throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
     if(($doc = @$proc->transformToDoc($content) ) === false)
@@ -524,16 +526,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
 
-  public function addTransformation($filePath, $priority = 10, $user = true) {
+  public function addTransformation($filePath, $priority=10) {
     if(isset($this->transformations[$filePath])) return;
     Cms::addVariableItem("transformations", $filePath);
-    #if(findFile($filePath, $user) === false) throw new Exception();
-    if(!$user && is_file(USER_FOLDER."/".$filePath))
-      Logger::user_warning(sprintf(_("File %s modification is disabled"), $filePath));
     $this->transformations[$filePath] = array(
       "priority" => $priority,
-      "file" => $filePath,
-      "user" => $user);
+      "file" => $filePath);
     $this->transformationsPriority[$filePath] = $priority;
   }
 

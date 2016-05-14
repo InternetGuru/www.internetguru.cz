@@ -112,6 +112,8 @@ define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MOD
 if(CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
+  setlocale(LC_ALL, "en_US.UTF-8");
+  putenv("LANG=en_US.UTF-8"); // for gettext
 } else {
   #if(!IS_LOCALHOST)
   setlocale(LC_ALL, "cs_CZ.UTF-8");

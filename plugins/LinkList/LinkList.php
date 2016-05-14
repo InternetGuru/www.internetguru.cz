@@ -4,7 +4,7 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\ContentStrategyInterface;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Plugin;
@@ -82,7 +82,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
     $text = $link->getAttribute("title");
     if(!$link->hasAttribute("title")) {
       $href = $link->getAttribute("href");
-      $text = DOMBuilder::getTitle($href);
+      $text = HTMLPlusBuilder::getIdToTitle($href);
       if(is_null($text)) {
         $text = $href;
         $c = 0;

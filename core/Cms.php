@@ -49,7 +49,7 @@ class Cms {
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    self::$contentFull = HTMLPlusBuilder::build(findFile(INDEX_HTML));
+    self::$contentFull = HTMLPlusBuilder::build(INDEX_HTML);
     $h1 = self::$contentFull->documentElement->firstElement;
     self::setVariable("lang", self::$contentFull->documentElement->getAttribute("xml:lang"));
     self::setVariable("ctime", $h1->getAttribute("ctime"));

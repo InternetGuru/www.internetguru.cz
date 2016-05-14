@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use Exception;
@@ -21,7 +21,6 @@ class UrlHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached(array("HtmlOutput", "ContentLink"))) return;
     $this->cfg = $this->getXML();
     if(!IS_LOCALHOST) $this->httpsRedir();
     $this->cfgRedir();
@@ -70,7 +69,8 @@ class UrlHandler extends Plugin implements SplObserver {
         if(strpos($redir->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
         #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
         try {
-          $pLink = DOMBuilder::normalizeLink($pLink);
+          # TODO
+          #$pLink = DOMBuilder::normalizeLink($pLink);
           #todo: configurable status code
           redirTo(buildLocalUrl($pLink));
         } catch(Exception $e) {
@@ -103,14 +103,14 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function proceed() {
-    $links = DOMBuilder::getLinks();
+    $links = array_keys(HTMLPlusBuilder::getLinkToId());
     $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
-    if(!DOMBuilder::isLink($path)) {
+    if(!HTMLPlusBuilder::isLink($path)) {
       if(self::DEBUG) var_dump($links);
       $linkId = $this->findSimilarLinkId($links, $path);
       if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    if(!DOMBuilder::isLink($path) || $path == $links[0]) $path = "";
+    if(!HTMLPlusBuilder::isLink($path) || $path == $links[0]) $path = "";
     if($path == getCurLink()) return;
     $code = 404;
     if(self::DEBUG) die("Redirecting to '$path'");
