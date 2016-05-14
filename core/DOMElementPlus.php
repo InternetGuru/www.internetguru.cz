@@ -244,6 +244,15 @@ class DOMElementPlus extends DOMElement {
     return null;
   }
 
+  public function getSelfOrParentValue($attName=null, $eName=null) {
+    if(!strlen($attName)) {
+      if(strlen($this->nodeValue)) return htmlspecialchars($this->nodeValue); // TODO: remove specialchars?
+    } else {
+      if(strlen($this->getAttribute($attName))) return $this->getAttribute($attName);
+    }
+    return $this->getParentValue($attName, $eName);
+  }
+
   public function getParentValue($attName=null, $eName=null) {
     $parent = $this;
     while(!is_null($parent)) {
@@ -253,7 +262,7 @@ class DOMElementPlus extends DOMElement {
       if(!is_null($attName) && $parent->hasAttribute($attName)) {
         return $parent->getAttribute($attName);
       } elseif(is_null($attName) && strlen($parent->nodeValue)) {
-        return htmlspecialchars($parent->nodeValue);
+        return htmlspecialchars($parent->nodeValue); // TODO: remove specialchars?
       }
     }
     return null;
@@ -292,6 +301,9 @@ class DOMElementPlus extends DOMElement {
       break;
       case "firstElement":
       return $this->getFirstElement();
+      break;
+      case "lastElement":
+      return $this->getLastElement();
       break;
       #default:
       #return parent::__get($name);
@@ -345,6 +357,12 @@ class DOMElementPlus extends DOMElement {
     $childElements = $this->childElementsArray;
     if(!count($childElements)) return null;
     return $childElements[0];
+  }
+
+  private function getLastElement() {
+    $childElements = $this->childElementsArray;
+    if(!count($childElements)) return null;
+    return $childElements[count($childElements)-1];
   }
 
 }

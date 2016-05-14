@@ -34,6 +34,7 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static $idToRespId = array();
   private static $idToCtime = array();
   private static $idToMtime = array();
+  private static $idToLang = array();
 
   private static $idToLink = array();
   private static $linkToId = array();
@@ -45,6 +46,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     $properties = (new \ReflectionClass(get_called_class()))->getStaticProperties();
     foreach(array_keys($properties) as $p) {
       if(strpos($p, "idTo") !== 0) continue;
+      if($p == "idToParentId") continue;
       $register[strtolower(substr($p, 4))] = self::${$p}[$id];
     }
     return $register;
@@ -83,7 +85,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     $doc = self::load($filePath);
     self::$fileToDoc[$filePath] = $doc;
     self::$include = false;
-    $prefix = '';
+    $prefix = null;
     if(count(self::$idToParentId)) {
       $prefix = $doc->documentElement->firstElement->getAttribute("id");
       if(strlen($prefixId)) $prefix = "$prefixId/$prefix";
@@ -103,17 +105,21 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   private static function load($filePath) {
-    $doc = new HTMLPlus();
-    $fp = findFile($filePath);
-    $doc->load($fp);
-    $doc->validatePlus(true);
-    if(count($doc->getErrors()))
-      Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
-        count($doc->getErrors()), $filePath));
-    self::insertIncludes($doc, dirname($fp));
-    self::$fileMtime[$filePath] = filemtime($fp);
-    self::setNewestFileMtime(self::$fileMtime[$filePath]);
-    return $doc;
+    try {
+      $doc = new HTMLPlus();
+      $fp = findFile($filePath);
+      $doc->load($fp);
+      $doc->validatePlus(true);
+      if(count($doc->getErrors()))
+        Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
+          count($doc->getErrors()), $filePath));
+      self::insertIncludes($doc, dirname($fp));
+      self::$fileMtime[$filePath] = filemtime($fp);
+      self::setNewestFileMtime(self::$fileMtime[$filePath]);
+      return $doc;
+    } catch(Exception $e) {
+      throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $e->getMessage()));
+    }
   }
 
   private static function insertIncludes(HTMLPlus $doc, $workingDir) {
@@ -159,20 +165,23 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function registerStructure(DOMElementPlus $section, $parentId, $prefix, $filePath) {
     foreach($section->childElementsArray as $e) {
-      if($e->nodeName == "h") {
-        $id = count(self::$idToParentId) ? $e->getAttribute("id") : '';
+      switch($e->nodeName) {
+        case "h":
+        $id = $e->getAttribute("id");
         if($id == basename($prefix)) $id = $prefix;
         elseif($id != $prefix) $id = "$prefix#$id";
         if(!array_key_exists($filePath, self::$fileToId))
           self::$fileToId[$filePath] = $id;
-        self::$idToLink[$id] = $id;
-        self::$linkToId[$id] = $id;
-        self::$idToParentId[$id] = $parentId; // skip '' => ''
         self::$idToFile[$id] = $filePath;
+        $link = empty(self::$idToLink) ? "" : $id;
+        self::$idToLink[$id] = $link;
+        self::$linkToId[$link] = $id;
         self::setHeadingInfo($id, $e);
-        continue;
-      }
-      if($e->nodeName == "section") {
+        if(empty(self::$idToParentId)) $parentId = null;
+        elseif(!array_key_exists($parentId, self::$idToParentId)) $parentId = key(self::$idToParentId);
+        self::$idToParentId[$id] = $parentId;
+        break;
+        case "section":
         self::registerStructure($e, $id, $prefix, $filePath);
       }
     }
@@ -190,6 +199,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     self::$idToRespId[$id] = $h->getAttribute("respid");
     self::$idToCtime[$id] = $h->getAttribute("ctime");
     self::$idToMtime[$id] = $h->getAttribute("mtime");
+    self::$idToLang[$id] = $h->getSelfOrParentValue("xml:lang");
   }
 
 }

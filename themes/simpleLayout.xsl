@@ -3,7 +3,7 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:param name="cms-title" select="''"/>
-  <xsl:param name="contentlink-bc" select="''"/>
+  <xsl:param name="navigation-bc" select="''"/>
   <xsl:param name="globalmenu" select="''"/>
   <xsl:param name="agregator-filepath" select="''"/>
 
@@ -60,7 +60,7 @@
           </p>
         </xsl:if>
         <xsl:copy-of select="."/>
-        <xsl:value-of disable-output-escaping="yes" select="$contentlink-bc"/>
+        <xsl:value-of disable-output-escaping="yes" select="$navigation-bc"/>
       </div>
     </div>
   </xsl:template>
