@@ -4,6 +4,7 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\ContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
@@ -15,17 +16,45 @@ use SplObserver;
 use SplSubject;
 
 class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
+  private $tree = array();
+
+
   private $content = null;
   private $sets = array();
   private $defaultSet = null;
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_INIT) {
-      if($this->detachIfNotAttached(array("HtmlOutput", "ContentLink"))) return;
+    if($subject->getStatus() != STATUS_PROCESS) return;
+    $this->setTree();
+    $this->balanceLinks();
+  }
+
+  private function setTree() {
+    foreach(HTMLPlusBuilder::getIdToParentId() as $id => $parentId) {
+      $this->tree[$id] = array();
+      if(is_null($parentId)) continue;
+      if(HTMLPlusBuilder::getIdToFile($id) != HTMLPlusBuilder::getIdToFile($parentId)) continue;
+      $this->tree[$parentId][] = $id;
     }
   }
 
+  private function balanceLinks() {
+    $idToLink = HTMLPlusBuilder::getIdToLink();
+    foreach($idToLink as $id => $void) {
+      $link = $idToLink[$id];
+      if(empty($this->tree[$id]) || $link == "") continue;
+      $newLink = str_replace("#", "/", $link);
+      if(strpos($newLink, "/") === 0) $newLink = substr($newLink, 1);
+      foreach($this->tree[$id] as $childId) {
+        $idToLink[$childId] = $newLink.$idToLink[$childId];
+      }
+      $idToLink[$id] = $newLink;
+    }
+    HTMLPlusBuilder::setIdToLink($idToLink);
+  }
+
   public function getContent(HTMLPlus $content) {
+    return $content;
     // set vars
     $this->createVars();
     // check sets

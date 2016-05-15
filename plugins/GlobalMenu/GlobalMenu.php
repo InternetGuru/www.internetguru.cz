@@ -66,7 +66,7 @@ class GlobalMenu extends Plugin implements SplObserver {
       if($ul->nodeName == "ul") $li->removeChild($ul);
     }
     $root->firstElement->setAttribute("class", "globalmenu noprint");
-    Cms::setVariable("menu", $menu->documentElement);
+    Cms::setVariable("", $menu->documentElement);
   }
 
   private function getHeadingValues($id) {

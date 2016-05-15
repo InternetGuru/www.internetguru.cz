@@ -81,6 +81,14 @@ class HTMLPlusBuilder extends DOMBuilder {
     return $doc;
   }
 
+  public static function setIdToLink(Array $idToLink) {
+    self::$idToLink = $idToLink;
+    self::$linkToId = array();
+    foreach($idToLink as $id => $link) {
+      self::$linkToId[$link] = $id;
+    }
+  }
+
   public static function register($filePath, $parentId='', $prefixId='') {
     $doc = self::load($filePath);
     self::$fileToDoc[$filePath] = $doc;
