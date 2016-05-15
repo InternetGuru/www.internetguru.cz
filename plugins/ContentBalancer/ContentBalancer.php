@@ -23,8 +23,13 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   private $sets = array();
   private $defaultSet = null;
 
-  public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_PROCESS) return;
+ public function __construct(SplSubject $s) {
+   parent::__construct($s);
+   $s->setPriority($this, 3);
+ }
+
+ public function update(SplSubject $subject) {
+    if($subject->getStatus() != STATUS_INIT) return;
     $this->setTree();
     $this->balanceLinks();
   }
@@ -50,10 +55,13 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       }
       $idToLink[$id] = $newLink;
     }
+    var_dump($this->tree);
     HTMLPlusBuilder::setIdToLink($idToLink);
   }
 
   public function getContent(HTMLPlus $content) {
+    #$curId = HTMLPlusBuilder::getLinkToId(getCurLink());
+    #$id = substr($curId, strpos($curId, "#")+1);
     return $content;
     // set vars
     $this->createVars();

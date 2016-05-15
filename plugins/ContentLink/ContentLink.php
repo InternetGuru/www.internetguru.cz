@@ -5,6 +5,7 @@ namespace IGCMS\Plugins;
 use IGCMS\Core\Cms;
 use IGCMS\Core\ContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\ErrorPage;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
@@ -33,10 +34,9 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   public function getContent(HTMLPlus $c) {
-    $this->generateBc();
-    return $c;
-    # TODO
-    $link = getCurLink();
+    var_dump(HTMLPlusBuilder::getIdToLink());
+    $link = basename(getCurLink());
+    die();
     if($this->isRoot) $h1 = $c->documentElement->firstElement;
     else {
       $h1 = $c->getElementById($link, "id", "h");
@@ -48,7 +48,7 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $this->vars[$e->getAttribute("id")] = $e;
     }
 
-    $this->setPath($h1);
+    #$this->setPath($h1);
     if($this->isRoot) return $c;
 
     $desc = $h1->nextElement;
@@ -71,7 +71,6 @@ class ContentLink extends Plugin implements SplObserver, ContentStrategyInterfac
       $body->setAttributeNode($content->importNode($attNode));
     }
     $this->appendUntilSame($h1, $body);
-
     return $content;
   }
 
