@@ -27,13 +27,9 @@ class Navigation extends Plugin implements SplObserver {
   }
 
   private function generateMenu() {
-    #$parentId = HTMLPlusBuilder::getLinkToId(getCurLink());
-    #$bcLang = HTMLPlusBuilder::getIdToLang($parentId);
-
     $menu = new DOMDocumentPlus();
     $root = $menu->appendChild($menu->createElement("root"));
-    $curLink = "#bocni_markyzy";
-
+    $curLink = getCurLink();
     $idToLi = array();
     $idToLevel = array();
     foreach(HTMLPlusBuilder::getIdToFile() as $id => $file) {
@@ -64,14 +60,14 @@ class Navigation extends Plugin implements SplObserver {
       $idToLi[$id] = $li;
       $idToLevel[$id] = $idToLevel[$parentId]+1;
     }
-    $maxLevel = 1;
+    $maxLevel = $this->vars["menudepth"]->nodeValue;
+    if(!is_numeric($maxLevel)) $maxLevel = 1;
     foreach($idToLi as $id => $li) {
       if($idToLevel[$id] != $maxLevel) continue;
       $ul = $li->lastElement;
       if($ul->nodeName == "ul") $li->removeChild($ul);
     }
-    echo $menu->saveXML();
-    die();
+    Cms::setVariable("menu", $menu->documentElement);
   }
 
   private function getHeadingValues($id) {

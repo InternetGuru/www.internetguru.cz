@@ -4,7 +4,7 @@
 
   <xsl:param name="cms-title" select="''"/>
   <xsl:param name="navigation-bc" select="''"/>
-  <xsl:param name="globalmenu" select="''"/>
+  <xsl:param name="navigation-menu" select="''"/>
   <xsl:param name="agregator-filepath" select="''"/>
 
   <xsl:param name="cms-lang" select="''"/>
