@@ -43,16 +43,21 @@ class Plugin {
     new ErrorPage(sprintf(_("Active CMS version required for plugin %s"), get_class($this)), 403);
   }
 
-  protected function getHTMLPlus($filePath=null) {
-    if(is_null($filePath))
-      $filePath = $this->pluginDir."/".$this->className.".html";
-    return HTMLPlusBuilder::build($filePath);
+  private static function getCallerName() {
+    $backtrace = debug_backtrace();
+    return basename(dirname($backtrace[1]["file"]));
   }
 
-  protected function getXML($filePath=null) {
-    if(is_null($filePath))
-      $filePath = $this->pluginDir."/".$this->className.".xml";
-    return XMLBuilder::build($filePath);
+  public static function getHTMLPlus($fileName=null) {
+    $pluginName = self::getCallerName();
+    if(is_null($fileName)) $fileName = "$pluginName.html";
+    return HTMLPlusBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+  }
+
+  public static function getXML($fileName=null) {
+    $pluginName = self::getCallerName();
+    if(is_null($fileName)) $fileName = "$pluginName.xml";
+    return XMLBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
   }
 
   private function getKey($a, $b=null, $c=null) {

@@ -6,7 +6,7 @@ use IGCMS\Core\ErrorPage;
 try {
   include("init.php");
 
-  if(false) foreach(scandir(PLUGINS_FOLDER) as $plugin) {
+  foreach(scandir(PLUGINS_FOLDER) as $plugin) {
     if(strpos($plugin, ".") === 0) continue;
     if(!is_dir(PLUGINS_FOLDER."/$plugin")) continue;
     if(is_dir(PLUGINS_FOLDER."/.$plugin")) continue;
