@@ -4,6 +4,7 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\TitleStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMBuilder;
@@ -14,7 +15,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
+class Admin extends Plugin implements SplObserver, ContentStrategyInterface, TitleStrategyInterface {
   const STATUS_NEW = 0;
   const STATUS_ENABLED = 1;
   const STATUS_DISABLED = 2;
@@ -26,6 +27,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private $contentValue = null;
   private $scheme = null;
   private $type = "txt";
+  private $title = null;
   private $redir = false;
   private $replace = true;
   private $error = false;
@@ -69,6 +71,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $pLink["path"] = getCurLink();
     if(!isset($_POST["saveandgo"])) $pLink["query"] = $this->className."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
+  }
+
+  public function getTitle() {
+    return $this->title;
   }
 
   private function process() {
@@ -250,9 +256,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["cache_value"] = $cache ? $_GET[CACHE_PARAM] : "";
     $vars["filepicker_options"] = $this->createFilepicker();
     $newContent->processVariables($vars);
-    if(is_null($this->defaultFile)) Cms::setVariable("title", $vars["heading"]);
-    else Cms::setVariable("title", sprintf(_("%s (%s) - Administration"),
-      basename($this->defaultFile), ROOT_URL.$this->defaultFile));
+    if(is_null($this->defaultFile)) $this->title = $vars["heading"];
+    else $this->title = sprintf(_("%s (%s) - Administration"),
+      basename($this->defaultFile), ROOT_URL.$this->defaultFile);
     return $newContent;
   }
 

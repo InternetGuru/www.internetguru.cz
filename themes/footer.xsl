@@ -3,8 +3,8 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:param name="cms-title" select="''"/>
-  <xsl:param name="navigation-bc" select="''"/>
-  <xsl:param name="navigation-menu" select="''"/>
+  <xsl:param name="breadcrumb" select="''"/>
+  <xsl:param name="globalmenu" select="''"/>
   <xsl:param name="agregator-filepath" select="''"/>
 
   <xsl:param name="cms-lang" select="''"/>
@@ -56,7 +56,7 @@
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates/>
       <div id="footer">
-        <xsl:value-of disable-output-escaping="yes" select="$navigation-menu"/>
+        <xsl:value-of disable-output-escaping="yes" select="$globalmenu"/>
         <ul>
           <xsl:attribute name="lang">
             <xsl:value-of disable-output-escaping="yes" select="$cms-lang"/>

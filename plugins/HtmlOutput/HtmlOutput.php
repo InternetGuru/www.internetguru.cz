@@ -333,12 +333,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   */
 
   private function getTitle(DOMElementPlus $h1) {
-    $title = $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
-    foreach($this->subject->getIsInterface("IGCMS\Core\ContentStrategyInterface") as $clsName => $cls) {
-      $tmp = Cms::getVariable(strtolower($clsName)."-title");
-      if(!is_null($tmp)) $title = $tmp;
+    $title = null;
+    foreach($this->subject->getIsInterface("IGCMS\Core\TitleStrategyInterface") as $clsName => $cls) {
+      $title = $cls->getTitle();
     }
-    return $title;
+    if(!is_null($title)) return $title;
+    return $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
   }
 
   private function getProcParams() {

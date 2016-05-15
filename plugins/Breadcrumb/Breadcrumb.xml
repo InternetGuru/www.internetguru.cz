@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Breadcrumb>
-  <var id="menudepth" modifyonly="modifionly">1</var>
   <var id="reset" modifyonly="modifionly">Resetovat parametry</var>
   <!-- <var id="logo" type="image/png">logo.png</var> -->
 </Breadcrumb>

@@ -4,106 +4,79 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use Exception;
-use DOMXPath;
-use DOMElement;
 use SplObserver;
 use SplSubject;
+use DateTime;
 
 class GlobalMenu extends Plugin implements SplObserver {
-  private $current = null;
-
-  public function __construct(SplSubject $s) {
-    parent::__construct($s);
-    $s->setPriority($this, 1);
-  }
+  private $vars = array();
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached("HtmlOutput")) return;
-    $this->setVariables();
-  }
-
-  public function setVariables() {
-    $doc = new DOMDocumentPlus();
-    $xpath = new DOMXPath(Cms::getContentFull());
-    $sect = $xpath->query("/body/section")->item(0);
-    if(is_null($sect)) return;
-    $menu = $this->getMenu($doc, $sect);
-    $root = $doc->appendChild($doc->createElement("root"));
-    $root->appendChild($menu);
-    $menu->setAttribute("class", "globalmenu noprint");
-    $this->trimList($menu, true);
-    if(!is_null($this->current)) $this->setCurrentClass($this->current);
-    #var_dump($doc->saveXML());
-    Cms::setVariable("globalmenu", $root);
-  }
-
-  private function trimList(DOMElement $ul, $root=false) {
-    $currentLink = false;
-    $deepLink = false;
-    foreach($ul->childElementsArray as $li) {
-      foreach($li->childElementsArray as $n) {
-        if($this->isProperLink($n)) $currentLink = true;
-        if($n->nodeName == "ul") $deepLink = $this->trimList($n);
-      }
+    if($subject->getStatus() != STATUS_POSTPROCESS) return;
+    foreach($this->getXML()->documentElement->childElementsArray as $e) {
+      if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
+      $this->vars[$e->getAttribute("id")] = $e;
     }
-    if($currentLink || $deepLink) return true;
-    if($ul->isSameNode($ul->ownerDocument->documentElement)) return true;
-    if(!$root) $ul->parentNode->removeChild($ul);
-    return false;
+    $this->generateMenu();
   }
 
-  private function isProperLink(DOMElement $n) {
-    if($n->nodeName != "a") return false;
-    if($n->hasAttribute("class") && $n->getAttribute("class") == "fragment") return false;
-    return true;
-  }
-
-  private function getMenu(DOMDocumentPlus $doc, DOMElement $section, $lang=null) {
-    $ul = $doc->createElement("ul");
-    if(is_null($lang)) {
-      $lang = Cms::getVariable("cms-lang");
-      $ul->setAttribute("lang", $lang); //?
-    }
-    $li = null;
-    $prefix = Cms::getContentFull()->documentElement->firstElement->getAttribute("id");
-    foreach($section->childElementsArray as $n) {
-      if($n->nodeName == "section") {
-        $menu = $this->getMenu($doc, $n, $lang);
-        if(is_null($menu)) continue;
-        $curLang = $n->firstElement->getParentValue("xml:lang");
-        if($curLang != $lang) $menu->setAttribute("lang", $curLang);
-        $li->appendChild($menu);
+  private function generateMenu() {
+    $menu = new DOMDocumentPlus();
+    $root = $menu->appendChild($menu->createElement("root"));
+    $curLink = getCurLink();
+    $idToLi = array();
+    $idToLevel = array();
+    foreach(HTMLPlusBuilder::getIdToFile() as $id => $file) {
+      if($file != INDEX_HTML) break;
+      $parentId = HTMLPlusBuilder::getIdToParentId($id);
+      if(is_null($parentId)) {
+        $idToLi[$id] = $root;
+        $idToLevel[$id] = 0;
+        continue;
       }
-      if($n->nodeName != "h") continue;
-      $li = $doc->createElement("li");
-      #$link = null;
-      #if($n->hasAttribute("link")) $link = $n->getAttribute("link");
-      $link = $n->getAttribute("id");
-      $a = $doc->createElement("a", $n->nodeValue);
-      if($n->hasAttribute("short")) {
-        $a->nodeValue = htmlspecialchars($n->getAttribute("short"));
-        #$a->setAttribute("title", $n->nodeValue);
+      $values = $this->getHeadingValues($id);
+      $parentUl = $idToLi[$parentId]->lastElement;
+      if(is_null($parentUl) || $parentUl->nodeName != "ul") {
+        $parentUl = $idToLi[$parentId]->appendChild($menu->createElement("ul"));
       }
-      if(getCurLink() === $link) $this->current = $a;
-      if(!is_null($link)) $a->setAttribute("href", $link);
-      else $a->setAttribute("href", "$prefix#".$n->getAttribute("id"));
-      if(is_null($link)) $a->setAttribute("class", "fragment");
-      $li->appendChild($a);
-      $ul->appendChild($li);
+      $li = $parentUl->appendChild($menu->createElement("li"));
+      $a = $li->appendChild($menu->createElement("a", $values[0]));
+      $link = HTMLPlusBuilder::getIdToLink($id);
+      if($link == $curLink) {
+        $p = $li;
+        while(!is_null($p)) {
+          if($p->nodeName == "li") $p->firstElement->setAttribute("class", "current"); // TODO: li.current
+          $p = $p->parentNode->parentNode;
+        }
+      }
+      $a->setAttribute("href", $link);
+      $a->setAttribute("title", $values[1]);
+      $idToLi[$id] = $li;
+      $idToLevel[$id] = $idToLevel[$parentId]+1;
     }
-    if(is_null($li)) return null;
-    return $ul;
+    $maxLevel = $this->vars["menudepth"]->nodeValue;
+    if(!is_numeric($maxLevel)) $maxLevel = 1;
+    foreach($idToLi as $id => $li) {
+      if($idToLevel[$id] != $maxLevel) continue;
+      $ul = $li->lastElement;
+      if($ul->nodeName == "ul") $li->removeChild($ul);
+    }
+    $root->firstElement->setAttribute("class", "globalmenu noprint");
+    Cms::setVariable("menu", $menu->documentElement);
   }
 
-  private function setCurrentClass(DOMElementPlus $a) {
-    $a->setAttribute("class", $a->getAttribute("class")." current");
-    $parentLi = $a->parentNode->parentNode->parentNode;
-    if(is_null($parentLi) || $parentLi->nodeName != "li") return;
-    $this->setCurrentClass($parentLi->firstElement);
+  private function getHeadingValues($id) {
+    $values = array();
+    if(strlen(HTMLPlusBuilder::getIdToShort($id))) {
+      $values[] = HTMLPlusBuilder::getIdToShort($id);
+    }
+    $values[] = HTMLPlusBuilder::getIdToHeading($id);
+    $values[] = getShortString(HTMLPlusBuilder::getIdToDesc($id));
+    return $values;
   }
 
 }
