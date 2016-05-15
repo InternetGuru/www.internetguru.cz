@@ -13,7 +13,7 @@ use SplSubject;
 use DateTime;
 
 
-class Navigation extends Plugin implements SplObserver {
+class Breadcrumb extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_POSTPROCESS) return;
