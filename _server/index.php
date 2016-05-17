@@ -16,7 +16,7 @@ try {
   foreach(scandir(getcwd()) as $f) {
     if(is_dir($f)) continue;
     if(strpos($f, "REDIR.") === 0) { // eg. REDIR.www.internetguru.cz
-      header("Location: //".substr($f, 6)."/".$_GET["q"]);
+      header("Location: http://".substr($f, 6)."/".$_GET["q"]);
       exit;
     }
     if(strpos($f, "VERSION.") === 0) { // eg. VERSION.1.0
