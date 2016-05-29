@@ -45,8 +45,6 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
 
   private function balanceLinks() {
     $idToLink = HTMLPlusBuilder::getIdToLink();
-    var_dump($this->tree);
-    var_dump($idToLink);
     foreach($idToLink as $id => $void) {
       $link = $idToLink[$id];
       if(empty($this->tree[$id]) || $link == "") continue;
@@ -60,11 +58,8 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
         $idToLink[$childId] = $link."#".basename($childId);
       }
       if(count($this->tree[$id]) != 1) $idToLink[$id] = $link;
-      #$idToLink[$id] .= " -to- ".$link;
     }
-    var_dump($idToLink);
-    die();
-    #HTMLPlusBuilder::setIdToLink($idToLink);
+    HTMLPlusBuilder::setIdToLink($idToLink);
   }
 
   public function getContent(HTMLPlus $content) {
