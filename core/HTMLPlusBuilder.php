@@ -89,22 +89,18 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
   }
 
-  public static function register($filePath, $parentId='', $prefixId='') {
+  public static function register($filePath, $parentId='', $linkPrefix='') {
     $doc = self::load($filePath);
     self::$fileToDoc[$filePath] = $doc;
     self::$include = false;
-    $prefix = null;
-    if(count(self::$idToParentId)) {
-      $prefix = $doc->documentElement->firstElement->getAttribute("id");
-      if(strlen($prefixId)) $prefix = "$prefixId/$prefix";
-    }
     if(self::$include) {
       $doc->repairIds();
       if(count($doc->getErrors()))
         Logger::user_notice(sprintf(_("Duplicit identifiers fixed %s times after includes in %s"),
           count($doc->getErrors()), $filePath));
     }
-    self::registerStructure($doc->documentElement, $parentId, $prefix, $filePath);
+    $prefixId = $doc->documentElement->firstElement->getAttribute("id");
+    self::registerStructure($doc->documentElement, $parentId, $prefixId, $linkPrefix, $filePath);
     return self::getRegister(self::$fileToId[$filePath]);
   }
 
@@ -171,17 +167,19 @@ class HTMLPlusBuilder extends DOMBuilder {
     $include->parentNode->removeChild($include);
   }
 
-  private static function registerStructure(DOMElementPlus $section, $parentId, $prefix, $filePath) {
+  private static function registerStructure(DOMElementPlus $section, $parentId, $prefixId, $linkPrefix, $filePath) {
     foreach($section->childElementsArray as $e) {
       switch($e->nodeName) {
         case "h":
         $id = $e->getAttribute("id");
-        if($id == basename($prefix)) $id = $prefix;
-        elseif($id != $prefix) $id = "$prefix#$id";
+        $link = empty(self::$idToLink) ? "" : "$linkPrefix/$id";
+        if($id != $prefixId) {
+          $link = self::$idToLink[$prefixId]."#$id";
+          $id = "$prefixId/$id";
+        }
         if(!array_key_exists($filePath, self::$fileToId))
           self::$fileToId[$filePath] = $id;
         self::$idToFile[$id] = $filePath;
-        $link = empty(self::$idToLink) ? "" : $id;
         self::$idToLink[$id] = $link;
         self::$linkToId[$link] = $id;
         self::setHeadingInfo($id, $e);
@@ -190,7 +188,7 @@ class HTMLPlusBuilder extends DOMBuilder {
         self::$idToParentId[$id] = $parentId;
         break;
         case "section":
-        self::registerStructure($e, $id, $prefix, $filePath);
+        self::registerStructure($e, $id, $prefixId, $linkPrefix, $filePath);
       }
     }
   }
