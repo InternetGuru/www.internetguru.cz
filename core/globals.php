@@ -139,7 +139,7 @@ function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
   if(isset($pLink["path"])) {
     $path = ltrim($pLink["path"], "/");
     if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
-    else $pLink["path"] = ROOT_URL.$pLink["path"];
+    else $pLink["path"] = ROOT_URL.$path;
   } else return implodeLink($pLink);
   if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
   $scriptFile = SCRIPT_NAME;

@@ -33,6 +33,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
   private function generateBc() {
     #var_dump(HTMLPlusBuilder::getLinkToId());
     $parentId = HTMLPlusBuilder::getLinkToId(getCurLink());
+    if(is_null($parentId)) throw new Exception(sprintf(_("Link %s not found"), getCurLink()));
     $bcLang = HTMLPlusBuilder::getIdToLang($parentId);
     while(!is_null($parentId)) {
       $path[] = $parentId;
@@ -50,7 +51,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       $lang = HTMLPlusBuilder::getIdToLang($id);
       if($lang != $bcLang) $li->setAttribute("lang", $lang);
       $a = $li->appendChild($bc->createElement("a"));
-      $a->setAttribute("href", HTMLPlusBuilder::getIdToLink($id));
+      $a->setAttribute("href", $id);
       if(strlen(HTMLPlusBuilder::getIdToTitle($id)))
         $aValue = HTMLPlusBuilder::getIdToTitle($id);
       elseif(strlen(HTMLPlusBuilder::getIdToShort($id)))

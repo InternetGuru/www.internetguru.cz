@@ -63,14 +63,11 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   public function getContent(HTMLPlus $c) {
-    try {
-      $file = HTMLPlusBuilder::getIdToFile(HTMLPlusBuilder::getLinkToId(getCurLink()));
-      if(!array_key_exists($file, $this->vars)) return $c;
-      Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
-      return HTMLPlusBuilder::build($file, $this->vars[$file]["parentid"], $this->vars[$file]["prefixid"]);
-    } catch(Exception $e) {
-      return $c;
-    }
+    $file = HTMLPlusBuilder::getCurFile();
+    if(is_null($file)) return $c;
+    if(!array_key_exists($file, $this->vars)) return $c;
+    Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
+    return HTMLPlusBuilder::build($file, $this->vars[$file]["parentid"], $this->vars[$file]["prefixid"]);
   }
 
   private function insertDocInfo(HTMLPlus $doc, Array $info) {
@@ -285,7 +282,7 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
         $vars[$filePath]["parentid"] = $subDir;
         $vars[$filePath]["prefixid"] = $subDir;
         $vars[$filePath]["file"] = $filePath;
-        $vars[$filePath]["link"] = HTMLPlusBuilder::getIdToLink(HTMLPlusBuilder::getFileToId($filePath));
+        $vars[$filePath]["link"] = HTMLPlusBuilder::getFileToId($filePath);
         $vars[$filePath]['editlink'] = "";
         if(Cms::isSuperUser()) {
           $vars[$filePath]['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";

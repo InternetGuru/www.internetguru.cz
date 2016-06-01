@@ -61,8 +61,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       throw new Exception("Undefined property $propertyName");
     }
     if(count($arguments)) {
-      if(!array_key_exists($arguments[0], self::$$propertyName))
-        throw new Exception("Undefined id {$arguments[0]} in property $propertyName");
+      if(!array_key_exists($arguments[0], self::$$propertyName)) return null;
       return self::${$propertyName}[$arguments[0]];
     }
     return self::$$propertyName;
@@ -106,6 +105,10 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   public static function isLink($link) {
     return array_key_exists($link, self::$linkToId);
+  }
+
+  public static function getCurFile() {
+    return HTMLPlusBuilder::getIdToFile(HTMLPlusBuilder::getLinkToId(getCurLink()));
   }
 
   private static function load($filePath) {

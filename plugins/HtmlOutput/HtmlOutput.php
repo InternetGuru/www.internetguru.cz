@@ -86,12 +86,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $a->removeAttribute("xml:lang");
     }
     $this->consolidateLang($contentPlus->documentElement, $lang);
-
-    # TODO
-    #$ids = $this->getIds($xPath);
-    #$this->fragToLinks($contentPlus, $ids, "a", "href");
-    #$this->fragToLinks($contentPlus, $ids, "form", "action");
-    #$this->fragToLinks($contentPlus, $ids, "object", "data");
+    $this->processLinks($contentPlus);
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement, true);
@@ -180,85 +175,70 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return ROOT_URL.self::FAVICON;
   }
 
-  private function getIds(DOMXPath $xPath) {
-    $ids = array();
-    $toStrip = array();
-    foreach($xPath->query("//*[@id]") as $e) {
-      $id = $e->getAttribute("id");
-      if(isset($ids[$id])) {
-        $toStrip[] = $e;
+  private function processLinks(DOMDocumentPlus $doc) {
+    $file = HTMLPlusBuilder::getCurFile();
+    $rootId = HTMLPlusBuilder::getFileToId($file);
+    foreach ($doc->getElementsByTagName("a") as $a) {
+      $href = $a->getAttribute("href");
+      if(!strlen($href)) {
+        $a->stripAttr("href", _("Empty attribute href stripped"));
         continue;
       }
-      $ids[$id] = $e;
-    }
-    foreach($toStrip as $e) {
-      $m = sprintf(_("Removed duplicit id %s"), $e->getAttribute("id"));
-      $e->stripAttr("id", $m);
-      Logger::user_warning($m);
-    }
-    return $ids;
-  }
-
-  private function fragToLinks(DOMDocumentPlus $doc, Array $ids, $eName, $aName) {
-    $toStrip = array();
-    foreach($doc->getElementsByTagName($eName) as $a) {
-      #var_dump($a->nodeValue);
-      if(!$a->hasAttribute($aName)) continue; // no link found
       try {
-        #var_dump($a->getAttribute($aName));
-        $pUrl = parseLocalLink($a->getAttribute($aName));
-        if(is_null($pUrl)) continue; // link is external
-        if(isset($pUrl["path"]) && preg_match("/".FILEPATH_PATTERN."/", $pUrl["path"])) { // link to file
-          if(Cms::isSuperUser() && $eName == "object" && is_file($pUrl["path"])) {
-            $mimeType = getFileMime($pUrl["path"]);
-            if($a->getAttribute("type") != $mimeType)
-              Logger::user_warning(sprintf(_("Object %s attribute type invalid or missing: %s"), $pUrl["path"], $mimeType));
-          }
-          $a->setAttribute($aName, ROOT_URL.$pUrl["path"]);
+        $pLink = parseLocalLink($href);
+        if(is_null($pLink)) continue; # external
+        $pLink = $this->getLink($pLink, $rootId);
+        if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
+        if(empty($pLink)) {
+          $a->stripAttr("href", sprintf(_("Link '%s' not found"), $link));
           continue;
         }
-        $this->setupLink($a, $aName, $pUrl, $ids);
+        $link = buildLocalUrl($pLink);
       } catch(Exception $e) {
-        $toStrip[] = array($a, sprintf(_("Link %s removed: %s"), $a->getAttribute($aName), $e->getMessage()));
+        $a->stripAttr("href", $e->getMessage());
+        continue;
       }
-
-    }
-    foreach($toStrip as $a) {
-      $a[0]->stripAttr($aName, $a[1]);
-      $a[0]->stripAttr("title", "");
+      if(array_key_exists("id", $pLink))
+        $this->insertTitle($a, $pLink["id"]);
+      $a->setAttribute("href", $link);
     }
   }
 
-  private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
-    #var_dump("---------");
-    #var_dump(implodeLink($pLink));
-    #var_dump(getCurLink());
-    #var_dump(getCurLink(true));
-    #var_dump($pLink);
-
-    $link = DOMBuilder::normalizeLink($pLink);
-
-    #if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
-    #var_dump($link);
-    #var_dump(implodeLink($link));
-    #if($a->nodeName != "form" && (!isset($link["path"]) ? getCurLink() : "").implodeLink($link) == getCurLink(true))
-    #  throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
-    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, implodeLink($link));
-    $localUrl = buildLocalUrl($link, $a->nodeName == "form");
-    #var_dump($localUrl);
-    if(strpos($localUrl, "#") === 0 && !array_key_exists($pLink["fragment"], $ids))
-      throw new Exception(sprintf(_("Local fragment %s to undefined id"), $pLink["fragment"]));
-    $a->setAttribute($aName, $localUrl);
+  private function getLink($pHref, $rootId) {
+    $pHref["id"] = $rootId;
+    if(array_key_exists("path", $pHref)) $pHref["id"] = $pHref["path"];
+    if(array_key_exists("fragment", $pHref)) $pHref["id"] .= "/".$pHref["fragment"];
+    if(is_null($pHref["id"])) return $pHref;
+    $id = HTMLPlusBuilder::getLinkToId($pHref["id"]);
+    if(!is_null($id)) {
+      $pHref["id"] = $id;
+      return $pHref;
+    }
+    $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
+    if(!is_null($link)) {
+      $linkArray = explode("#", $link);
+      $pHref["path"] = $linkArray[0];
+      if(count($linkArray) > 1) $pHref["fragment"] = $linkArray[1];
+      return $pHref;
+    }
+    if(!array_key_exists("fragment", $pHref)) return array();
+    if(!array_key_exists("path", $pHref)) return $pHref;
+    $pHref["id"] = $pHref["path"];
+    $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
+    if(is_null($link)) return array();
+    $linkArray = explode("#", $link);
+    $pHref["path"] = $linkArray[0];
+    if(count($linkArray) > 1) $pHref["fragment"] = $linkArray[1];
+    return $pHref;
   }
 
-  private function insertTitle(DOMElement $a, $link) {
-    #var_dump($link);
+  private function insertTitle(DOMElement $a, $id) {
     if($a->hasAttribute("title")) {
       if(!strlen($a->getAttribute("title"))) $a->stripAttr("title");
       return;
     }
-    $title = HTMLPlusBuilder::getIdToTitle($link);
-    if(normalize($title) == normalize($a->nodeValue)) $title = HTMLPlusBuilder::getIdToDesc($link);
+    $title = HTMLPlusBuilder::getIdToTitle($id);
+    if(normalize($title) == normalize($a->nodeValue)) $title = HTMLPlusBuilder::getIdToDesc($id);
     if(is_null($title)) return;
     if(normalize($title) == normalize($a->nodeValue)) return;
     $a->setAttribute("title", $title);
