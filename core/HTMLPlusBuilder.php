@@ -170,36 +170,47 @@ class HTMLPlusBuilder extends DOMBuilder {
     $include->parentNode->removeChild($include);
   }
 
-  private static function registerStructure(DOMElementPlus $section, $parentId, $prefixId, $linkPrefix, $filePath) {
-    foreach($section->childElementsArray as $e) {
-      switch($e->nodeName) {
-        case "h":
-        $id = $e->getAttribute("id");
-        $link = empty(self::$idToLink) ? "" : "$linkPrefix/$id";
-        if($id != $prefixId) {
-          $link = self::$idToLink[$prefixId]."#$id";
-          $id = "$prefixId/$id";
+  private static function registerStructure(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
+    $hId = $parentId;
+    foreach($e->childElementsArray as $child) {
+      if(strlen($child->getAttribute("id"))) {
+        if($child->nodeName == "h") {
+          $hId = self::registerElement($child, $parentId, $prefixId, $linkPrefix, $filePath);
+        } else {
+          self::registerElement($child, $hId, $prefixId, $linkPrefix, $filePath);
         }
-        if(!array_key_exists($filePath, self::$fileToId))
-          self::$fileToId[$filePath] = $id;
-        self::$idToFile[$id] = $filePath;
-        self::$idToLink[$id] = $link;
-        self::$linkToId[$link] = $id;
-        self::setHeadingInfo($id, $e);
-        if(empty(self::$idToParentId)) $parentId = null;
-        elseif(!array_key_exists($parentId, self::$idToParentId)) $parentId = key(self::$idToParentId);
-        self::$idToParentId[$id] = $parentId;
-        break;
-        case "section":
-        self::registerStructure($e, $id, $prefixId, $linkPrefix, $filePath);
       }
+      self::registerStructure($child, $hId, $prefixId, $linkPrefix, $filePath);
     }
+  }
+
+  private static function registerElement(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
+    $id = $e->getAttribute("id");
+    if($e->nodeName == "h") {
+      $link = empty(self::$idToLink) ? "" : "$linkPrefix/$id";
+      if($id != $prefixId) {
+        $link = self::$idToLink[$prefixId]."#$id";
+        $id = "$prefixId/$id";
+      }
+      self::$idToLink[$id] = $link;
+      self::$linkToId[$link] = $id;
+      self::setHeadingInfo($id, $e);
+    }
+    if(!array_key_exists($filePath, self::$fileToId))
+      self::$fileToId[$filePath] = $id;
+    self::$idToFile[$id] = $filePath;
+    self::$idToTitle[$id] = $e->getAttribute("title");
+    if(empty(self::$idToLink) || !array_key_exists($parentId, self::$idToLink))
+      $parentId = null;
+    elseif($parentId === "")
+      $parentId = key(self::$idToLink);
+    self::$idToParentId[$id] = $parentId;
+    return $id;
   }
 
   private static function setHeadingInfo($id, DOMElementPlus $h) {
     self::$idToShort[$id] = $h->getAttribute("short");
     self::$idToHeading[$id] = $h->nodeValue;
-    self::$idToTitle[$id] = $h->getAttribute("title");
     self::$idToDesc[$id] = $h->nextElement->nodeValue;
     self::$idToKw[$id] = $h->nextElement->getAttribute("kw");
     self::$idToAuthor[$id] = $h->getAttribute("author");
