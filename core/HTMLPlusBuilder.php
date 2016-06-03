@@ -186,12 +186,12 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function registerElement(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
     $id = $e->getAttribute("id");
+    $link = empty(self::$idToLink) ? "" : "$linkPrefix/$id";
+    if($id != $prefixId) {
+      $link = self::$idToLink[$prefixId]."#$id";
+      $id = "$prefixId/$id";
+    }
     if($e->nodeName == "h") {
-      $link = empty(self::$idToLink) ? "" : "$linkPrefix/$id";
-      if($id != $prefixId) {
-        $link = self::$idToLink[$prefixId]."#$id";
-        $id = "$prefixId/$id";
-      }
       self::$idToLink[$id] = $link;
       self::$linkToId[$link] = $id;
       self::setHeadingInfo($id, $e);
@@ -200,10 +200,8 @@ class HTMLPlusBuilder extends DOMBuilder {
       self::$fileToId[$filePath] = $id;
     self::$idToFile[$id] = $filePath;
     self::$idToTitle[$id] = $e->getAttribute("title");
-    if(empty(self::$idToLink) || !array_key_exists($parentId, self::$idToLink))
-      $parentId = null;
-    elseif($parentId === "")
-      $parentId = key(self::$idToLink);
+    if(empty(self::$idToParentId)) $parentId = null;
+    elseif(!array_key_exists($parentId, self::$idToLink)) $parentId = key(self::$idToLink);
     self::$idToParentId[$id] = $parentId;
     return $id;
   }
