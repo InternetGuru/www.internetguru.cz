@@ -188,11 +188,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         $pLink = parseLocalLink($href);
         if(is_null($pLink)) continue; # external
         $pLink = $this->getLink($pLink, $rootId);
-        if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
         if(empty($pLink)) {
-          $a->stripAttr("href", sprintf(_("Link '%s' not found"), $link));
+          $a->stripAttr("href", sprintf(_("Link '%s' not found"), $href));
           continue;
         }
+        if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
         $link = buildLocalUrl($pLink);
       } catch(Exception $e) {
         $a->stripAttr("href", $e->getMessage());
@@ -205,27 +205,16 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   private function getLink($pHref, $rootId) {
-    $pHref["id"] = $rootId;
-    if(array_key_exists("path", $pHref)) $pHref["id"] = $pHref["path"];
+    if(!array_key_exists("path", $pHref) && !array_key_exists("fragment", $pHref))
+      return $pHref;
+    $pHref["id"] = array_key_exists("path", $pHref) ? $pHref["path"] : $rootId;
     if(array_key_exists("fragment", $pHref)) $pHref["id"] .= "/".$pHref["fragment"];
-    if(is_null($pHref["id"])) return $pHref;
-    $id = HTMLPlusBuilder::getLinkToId($pHref["id"]);
-    if(!is_null($id)) {
-      $pHref["id"] = $id;
-      return $pHref;
-    }
     $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
-    if(!is_null($link)) {
-      $linkArray = explode("#", $link);
-      $pHref["path"] = $linkArray[0];
-      if(count($linkArray) > 1) $pHref["fragment"] = $linkArray[1];
-      return $pHref;
+    if(is_null($link)) {
+      $pHref["id"] = HTMLPlusBuilder::getIdToParentId($pHref["id"]);
+      if(is_null($pHref["id"])) return array();
+      $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
     }
-    if(!array_key_exists("fragment", $pHref)) return array();
-    if(!array_key_exists("path", $pHref)) return $pHref;
-    $pHref["id"] = $pHref["path"];
-    $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
-    if(is_null($link)) return array();
     $linkArray = explode("#", $link);
     $pHref["path"] = $linkArray[0];
     if(count($linkArray) > 1) $pHref["fragment"] = $linkArray[1];
