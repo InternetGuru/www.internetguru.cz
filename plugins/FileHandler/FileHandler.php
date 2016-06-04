@@ -116,16 +116,24 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File illegal path"), 403);
     // search for sorce
-    $fInfo["src"] = findFile($fInfo["src"], true, true);
+    $fInfo["src"] = self::findFile($fInfo["src"]);
     if(!$resDir && is_null($fInfo["src"]) && self::isImage($fInfo["ext"])) {
       $fInfo["imgmode"] = self::getImageMode($srcFilePath);
       if(strlen($fInfo["imgmode"])) {
         $imgFilePath = self::getImageSource($srcFilePath, $fInfo["imgmode"]);
-        $fInfo["src"] = findFile($imgFilePath, true, true);
+        $fInfo["src"] = self::findFile($imgFilePath);
       }
     }
     if(is_null($fInfo["src"])) throw new Exception(_("File not found"), 404);
     return $fInfo;
+  }
+
+  private static function findFile($filePath) {
+    try {
+      return findFile($filePath);
+    } catch(Exception $e) {
+      return null;
+    }
   }
 
   private static function getImageSource($src, $mode) {
@@ -181,10 +189,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private function updateCacheFile($fileName, $cacheFilePath, $isResDir) {
-    $sourceFilePath = findFile($fileName, true, true);
+    $sourceFilePath = self::findFile($fileName);
     if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
       $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
-      $sourceFilePath = findFile($sourceFilePath, true, true);
+      $sourceFilePath = self::findFile($sourceFilePath);
     }
     if(!is_file($sourceFilePath)) { // file is redundant
       return $this->deleteCache($cacheFilePath, $fileName);
