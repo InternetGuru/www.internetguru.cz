@@ -201,29 +201,25 @@ function buildQuery($pQuery, $questionMark=true) {
   return ($questionMark ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
-function slugify($text) {
-  $text = str_replace(array(" ", " - "), array("_", "-"), trim($text));
-  $text = preg_replace('#[^\\pL\d_-]+#u', '', $text);
-  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
-  $text = strtolower($text);
-  $text = preg_replace('#[^-\w]+#', '', $text);
-  return $text;
-}
-
-function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
-  if($convertToUtf8) $s = utf8_encode($s);
-  if($tolower) $s = mb_strtolower($s, "utf-8");
+function normalize($text, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
+  if(!strlen(trim($text))) return "";
+  if($convertToUtf8) $text = utf8_encode($text);
+  #$text = preg_replace('#[^\\pL\d _-]+#u', '', $text);
+  #if($pred != $text) {var_dump($pred); var_dump($text); }
+  #if($tolower) $text = mb_strtolower($text, "utf-8");
   // iconv
   // http://php.net/manual/en/function.iconv.php#74101
   // works with setlocale(LC_ALL, "[any].UTF-8")
-  $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
-  if($tolower) $s = strtolower($s);
-  if(is_null($replace)) $replace = "_";
-  if(is_null($keep)) $keep = "a-zA-Z0-9_-";
-  $s = @preg_replace("~[^$keep]~", $replace, $s);
-  if(is_null($s))
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+  $text = preg_replace('# +#u', '_', $text);
+  $text = preg_replace('#_?-_?#u', '-', $text);
+  if($tolower) $text = strtolower($text);
+  if(is_null($replace)) $replace = "";
+  if(is_null($keep)) $keep = "\w\d_-";
+  $text = @preg_replace("~[^$keep]~", $replace, $text);
+  if(is_null($text))
     throw new Exception(_("Invalid parameter 'keep'"));
-  return $s;
+  return $text;
 }
 
 function file_put_contents_plus($dest, $string) {

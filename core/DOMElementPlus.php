@@ -335,11 +335,11 @@ class DOMElementPlus extends DOMElement {
   }
 
   private function getValidId() {
-    $id = slugify($this->getAttribute("name"));
+    $id = normalize($this->getAttribute("name"));
     if(isValidId($id)) return $id;
-    $id = slugify($this->getAttribute("short"));
+    $id = normalize($this->getAttribute("short"));
     if(isValidId($id)) return $id;
-    $id = slugify($this->nodeValue);
+    $id = normalize($this->nodeValue);
     if(isValidId($id)) return $id;
     return $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);
   }
