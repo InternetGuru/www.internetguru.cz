@@ -18,6 +18,14 @@ use DateTime;
 
 class XMLBuilder extends DOMBuilder {
 
+  public static function load($fileName) {
+    $doc = new DOMDocumentPlus();
+    $fp = findFile($fileName);
+    $doc->load($fp);
+    self::setNewestFileMtime(filemtime($fp));
+    return $doc;
+  }
+
   public static function build($fileName) {
     $doc = new DOMDocumentPlus();
     $fp = CMS_FOLDER."/$fileName";

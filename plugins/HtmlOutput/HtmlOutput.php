@@ -397,7 +397,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   private function transform(DOMDocument $content, $fileName, XSLTProcessor $proc) {
     #var_dump($fileName);
-    $xsl = XMLBuilder::build($fileName);
+    $xsl = XMLBuilder::load($fileName);
     if(!@$proc->importStylesheet($xsl))
       throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
     if(($doc = @$proc->transformToDoc($content) ) === false)
