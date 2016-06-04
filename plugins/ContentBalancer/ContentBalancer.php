@@ -25,7 +25,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
 
  public function __construct(SplSubject $s) {
    parent::__construct($s);
-   $s->setPriority($this, 3);
+   $s->setPriority($this, 2);
  }
 
  public function update(SplSubject $subject) {
@@ -35,7 +35,8 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   }
 
   private function setTree() {
-    foreach(HTMLPlusBuilder::getIdToParentId() as $id => $parentId) {
+    foreach(HTMLPlusBuilder::getIdToLink() as $id => $void) {
+      $parentId = HTMLPlusBuilder::getIdToParentId($id);
       $this->tree[$id] = array();
       if(is_null($parentId)) continue;
       if(HTMLPlusBuilder::getIdToFile($id) != HTMLPlusBuilder::getIdToFile($parentId)) continue;
@@ -63,9 +64,6 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
   }
 
   public function getContent(HTMLPlus $content) {
-    #$curId = HTMLPlusBuilder::getLinkToId(getCurLink());
-    #$id = substr($curId, strpos($curId, "#")+1);
-    return $content;
     // set vars
     $this->createVars();
     // check sets
@@ -79,8 +77,58 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
       $this->defaultSet = key($this->sets);
     }
     // proceed
-    $this->filter($content);
+    $prefixId = $content->documentElement->firstElement->getAttribute("id");
+    $content = $this->strip($content);
+    $h1id = $content->documentElement->firstElement->getAttribute("id");
+    if($h1id != $prefixId) $h1id = "$prefixId/$h1id";
+    $this->balance($content, $h1id);
     return $content;
+  }
+
+  private function strip(HTMLPlus $c) {
+    $link = basename(getCurLink());
+    if($this->isRoot($link)) return $c;
+    $h1 = $c->getElementById($link, "id", "h");
+    if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), getCurLink()), 404);
+    $this->handleAttribute($h1, "ctime");
+    $this->handleAttribute($h1, "mtime");
+    $this->handleAttribute($h1, "author");
+    $this->handleAttribute($h1, "authorid");
+    $this->handleAttribute($h1, "resp");
+    $this->handleAttribute($h1, "respid");
+    $this->handleAttribute($h1->parentNode, "xml:lang", true);
+    $content = new HTMLPlus();
+    $content->formatOutput = true;
+    $body = $content->appendChild($content->createElement("body"));
+    $body->setAttribute("ns", $c->documentElement->getAttribute("ns"));
+    foreach($h1->parentNode->attributes as $attName => $attNode) {
+      $body->setAttributeNode($content->importNode($attNode));
+    }
+    $this->appendUntilSame($h1, $body);
+    return $content;
+  }
+
+  private function isRoot($link) {
+    if($link == "") return true;
+    return array_key_exists($link, HTMLPlusBuilder::getIdToLink());
+  }
+
+  private function handleAttribute(DOMElement $e, $aName, $anyElement=false) {
+    if($e->hasAttribute($aName)) return;
+    $eName = $anyElement ? null : $e->nodeName;
+    $value = $e->getAncestorValue($aName, $eName);
+    if(is_null($value)) return;
+    $e->setAttribute($aName, $value);
+  }
+
+  private function appendUntilSame(DOMElement $e, DOMElement $into) {
+    $doc = $into->ownerDocument;
+    $into->appendChild($doc->importNode($e, true));
+    $untilName = $e->nodeName;
+    while(($e = $e->nextElement) !== null) {
+      if($e->nodeName == $untilName) break;
+      $into->appendChild($doc->importNode($e, true));
+    }
   }
 
   private function createVars() {
@@ -104,45 +152,43 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     }
   }
 
-
-  private function filter(HTMLPlus $content) {
-    $xpath = new DOMXPath($content);
-    $nodes = array();
-    foreach($xpath->query("/body/section/section") as $e) $nodes[] = $e;
-    foreach($nodes as $section) {
-      $className = strtolower((new \ReflectionClass($this))->getShortName());
-      $setId = null;
-      foreach(explode(" ", $section->getAttribute("class")) as $c) {
-        if(strpos($c, "$className-") !== 0) continue;
-        $setId = substr($c, strlen("$className-"));
-      }
-      if($setId == "none") {
-        $section->parentNode->removeChild($section);
+  private function balance(HTMLPlus $content, $h1id) {
+    foreach($this->tree[$h1id] as $h2id) {
+      $h3s = $this->tree[$h2id];
+      if(count($h3s) < 2) {
+        $this->balance($content, $h2id);
         continue;
       }
-      $set = $this->sets[$this->defaultSet];
-      if(!is_null($setId)) {
-        if(isset($this->sets[$setId])) $set = $this->sets[$setId];
-        else Logger::user_warning(sprintf(_("Item id %s not found, using default"), $setId));
-      }
-      $hs = array();
-      foreach($section->childElementsArray as $e) if($e->nodeName == "h") $hs[] = $e;
-      $force = $section->getPreviousElement("h")->hasAttribute("link");
-      $wrapper = $content->createElement($set->getAttribute("wrapper"));
-      #if($set->getAttribute("id") != $this->defaultSet)
-      $className .= "-".$set->getAttribute("id");
-      $wrapper->setAttribute("class", $className);
-      foreach($hs as $h) {
-        if(!$force && !$h->hasAttribute("link")) continue 2;
-        $vars = $this->getVariables($h);
-        $root = $this->createDOMElement($vars, $set);
-        foreach($root->childElementsArray as $e) {
-          $wrapper->appendChild($content->importNode($e, true));
-        }
-      }
-      $section->parentNode->replaceChild($wrapper, $section);
+      $section = $content->getElementById(basename($h3s[0]), "id", "h")->parentNode;
+      $this->balanceHeading($section, $h3s);
     }
-    return $content;
+  }
+
+  private function balanceHeading(DOMElementPlus $section, $h3ids) {
+    $setId = null;
+    foreach(explode(" ", $section->getAttribute("class")) as $c) {
+      if(strpos($c, "$this->className-") !== 0) continue;
+      $setId = substr($c, strlen("$this->className-"));
+    }
+    if($setId == "none") {
+      $section->parentNode->removeChild($section);
+      return;
+    }
+    $set = $this->sets[$this->defaultSet];
+    if(!is_null($setId)) {
+      if(isset($this->sets[$setId])) $set = $this->sets[$setId];
+      else Logger::user_warning(sprintf(_("Item id %s not found, using default"), $setId));
+    }
+    $wrapper = $section->ownerDocument->createElement($set->getAttribute("wrapper"));
+    $wrapper->setAttribute("class", strtolower($this->className)."-".$set->getAttribute("id"));
+    foreach($h3ids as $h3id) {
+      $vars = $this->getVariables($h3id);
+      $root = $this->createDOMElement($vars, $set);
+      foreach($root->childElementsArray as $e) {
+        $wrapper->appendChild($section->ownerDocument->importNode($e, true));
+      }
+    }
+    $section->parentNode->replaceChild($wrapper, $section);
   }
 
   private function createDOMElement(Array $vars, DOMElementPlus $set) {
@@ -152,15 +198,16 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     return $doc->documentElement;
   }
 
-  private function getVariables(DOMElementPlus $h) {
+  private function getVariables($id) {
     $vars = array();
-    $desc = $h->nextElement;
-    $vars['heading'] = $h->nodeValue;
-    $vars['link'] = $h->hasAttribute("link") ? $h->getAttribute("link") : $h->getAncestorValue("link", "h")."#".$h->getAttribute("id");
-    $vars['headingplus'] = $h->hasAttribute("short") ? $h->getAttribute("short") : $h->nodeValue;
-    $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
-    $vars['desc'] = strlen($desc->nodeValue) ? $desc->nodeValue : null;
-    $vars['kw'] = $desc->hasAttribute("kw") ? $desc->getAttribute("kw") : null;
+    $desc = HTMLPlusBuilder::getIdToDesc($id);
+    $vars['heading'] = HTMLPlusBuilder::getIdToHeading($id);
+    $vars['link'] = $id;
+    $values = HTMLPlusBuilder::getHeadingValues($id);
+    $vars['headingplus'] = $values[0];
+    $vars['short'] = HTMLPlusBuilder::getIdToShort($id);
+    $vars['desc'] = HTMLPlusBuilder::getIdToDesc($id);
+    $vars['kw'] = HTMLPlusBuilder::getIdToKw($id);
     return $vars;
   }
 
