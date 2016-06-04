@@ -38,7 +38,7 @@ class GlobalMenu extends Plugin implements SplObserver {
         $idToLevel[$id] = 0;
         continue;
       }
-      $values = $this->getHeadingValues($id);
+      $values = HTMLPlusBuilder::getHeadingValues($id);
       $parentUl = $idToLi[$parentId]->lastElement;
       if(is_null($parentUl) || $parentUl->nodeName != "ul") {
         $parentUl = $idToLi[$parentId]->appendChild($menu->createElement("ul"));
@@ -67,16 +67,6 @@ class GlobalMenu extends Plugin implements SplObserver {
     }
     $root->firstElement->setAttribute("class", "globalmenu noprint");
     Cms::setVariable("", $menu->documentElement);
-  }
-
-  private function getHeadingValues($id) {
-    $values = array();
-    if(strlen(HTMLPlusBuilder::getIdToShort($id))) {
-      $values[] = HTMLPlusBuilder::getIdToShort($id);
-    }
-    $values[] = HTMLPlusBuilder::getIdToHeading($id);
-    $values[] = getShortString(HTMLPlusBuilder::getIdToDesc($id));
-    return $values;
   }
 
 }

@@ -108,7 +108,17 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   public static function getCurFile() {
-    return HTMLPlusBuilder::getIdToFile(HTMLPlusBuilder::getLinkToId(getCurLink()));
+    return self::getIdToFile(self::getLinkToId(getCurLink()));
+  }
+
+  public static function getHeadingValues($id) {
+    $values = array();
+    if(strlen(self::getIdToShort($id))) {
+      $values[] = self::getIdToShort($id);
+    }
+    $values[] = self::getIdToHeading($id);
+    $values[] = getShortString(self::getIdToDesc($id));
+    return $values;
   }
 
   private static function load($filePath) {
