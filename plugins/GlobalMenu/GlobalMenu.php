@@ -54,7 +54,7 @@ class GlobalMenu extends Plugin implements SplObserver {
         }
       }
       $a->setAttribute("href", $id);
-      $a->setAttribute("title", $values[1]);
+      #$a->setAttribute("title", $values[1]);
       $idToLi[$id] = $li;
       $idToLevel[$id] = $idToLevel[$parentId]+1;
     }

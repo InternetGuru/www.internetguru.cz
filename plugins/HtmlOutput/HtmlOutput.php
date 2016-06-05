@@ -178,7 +178,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function processLinks(DOMDocumentPlus $doc) {
     $file = HTMLPlusBuilder::getCurFile();
     $rootId = HTMLPlusBuilder::getFileToId($file);
-    foreach ($doc->getElementsByTagName("a") as $a) {
+    foreach($doc->getElementsByTagName("a") as $a) {
       $href = $a->getAttribute("href");
       if(!strlen($href)) {
         $a->stripAttr("href", _("Empty attribute href stripped"));
@@ -194,14 +194,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           continue;
         }
         #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
+        if(array_key_exists("id", $pLink))
+          $this->insertTitle($a, $pLink["id"]);
         $link = buildLocalUrl($pLink);
+        $a->setAttribute("href", $link);
       } catch(Exception $e) {
         $a->stripAttr("href", $e->getMessage());
         continue;
       }
-      if(array_key_exists("id", $pLink))
-        $this->insertTitle($a, $pLink["id"]);
-      $a->setAttribute("href", $link);
     }
   }
 
@@ -238,11 +238,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       if(!strlen($a->getAttribute("title"))) $a->stripAttr("title");
       return;
     }
-    $title = HTMLPlusBuilder::getIdToTitle($id);
-    if(normalize($title) == normalize($a->nodeValue)) $title = HTMLPlusBuilder::getIdToDesc($id);
-    if(is_null($title)) return;
-    if(normalize($title) == normalize($a->nodeValue)) return;
-    $a->setAttribute("title", $title);
+    foreach(HTMLPlusBuilder::getHeadingValues($id, true) as $value) {
+      if($value == $a->nodeValue) continue;
+      $a->setAttribute("title", $value);
+      return;
+    }
   }
 
   private function validateImages(DOMDocumentPlus $dom) {

@@ -4,6 +4,7 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\TitleStrategyInterface;
 use IGCMS\Core\Logger;
@@ -52,15 +53,12 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       if($lang != $bcLang) $li->setAttribute("lang", $lang);
       $a = $li->appendChild($bc->createElement("a"));
       $a->setAttribute("href", $id);
-      if(strlen(HTMLPlusBuilder::getIdToTitle($id)))
-        $aValue = HTMLPlusBuilder::getIdToTitle($id);
-      elseif(strlen(HTMLPlusBuilder::getIdToShort($id)))
-        $aValue = HTMLPlusBuilder::getIdToShort($id);
-      else
-        $aValue = HTMLPlusBuilder::getIdToHeading($id);
+      $values = HTMLPlusBuilder::getHeadingValues($id, true);
+      $aValue = $values[0];
       if(empty($title) && array_key_exists("logo", $this->vars)) {
         $this->insertLogo($this->vars["logo"], $a, $id);
-        $a->parentNode->appendChild($doc->createElement("span", $aValue));
+        if(!strlen(getCurLink()))
+          $a->parentNode->appendChild($bc->createElement("span", $aValue));
       } else {
         $a->nodeValue = $aValue;
       }
@@ -69,7 +67,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       else
         $title[] = HTMLPlusBuilder::getIdToHeading($id);
     }
-    if($a->getAttribute("href") != getCurLink(true)) {
+    if(HTMLPlusBuilder::getIdToLink($a->getAttribute("href")) != getCurLink(true)) {
       $a->setAttribute("title", $this->vars["reset"]->nodeValue);
     }
     $this->title = implode(" - ", array_reverse($title));
@@ -77,7 +75,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
   }
 
   private function insertLogo(DOMElementPlus $logo, DOMElementPlus $a, $id) {
-    $doc = $a->documentElement;
+    $doc = $a->ownerDocument;
     $o = $doc->createElement("object");
     $o->nodeValue = HTMLPlusBuilder::getIdToHeading($id);
     $o->setAttribute("data", $logo->nodeValue);

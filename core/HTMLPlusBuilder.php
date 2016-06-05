@@ -115,8 +115,11 @@ class HTMLPlusBuilder extends DOMBuilder {
     return key(self::$idToParentId);
   }
 
-  public static function getHeadingValues($id) {
+  public static function getHeadingValues($id, $title=false) {
     $values = array();
+    if($title && strlen(self::getIdToTitle($id))) {
+      $values[] = self::getIdToTitle($id);
+    }
     if(strlen(self::getIdToShort($id))) {
       $values[] = self::getIdToShort($id);
     }
