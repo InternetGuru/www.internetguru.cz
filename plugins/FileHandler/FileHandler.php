@@ -164,7 +164,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
 
   private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
     if(!is_dir($cacheFolder)) return;
-    $inotifyCache = $cacheFolder."/".$sourceFolder."/".INOTIFY;
+    $inotifyCache = $cacheFolder."/".INOTIFY;
     $inotifySource = USER_FOLDER."/".$sourceFolder."/".INOTIFY;
     $folderUptodate = true;
     $skipFolder = false;
