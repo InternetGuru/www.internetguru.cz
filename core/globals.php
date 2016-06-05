@@ -135,21 +135,19 @@ function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
-  $path = null;
-  if(isset($pLink["path"])) {
-    $path = ltrim($pLink["path"], "/");
-    if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
-    else $pLink["path"] = ROOT_URL.$path;
-  } else return implodeLink($pLink);
-  if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  $scriptFile = SCRIPT_NAME;
-  if($scriptFile == "index.php") return implodeLink($pLink);
-  $pLink["path"] = ROOT_URL.$scriptFile;
+  if(!isset($pLink["path"])) return implodeLink($pLink);
+  $path = $pLink["path"];
+  #$path = ltrim($pLink["path"], "/");
+  if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
+  else $pLink["path"] = ROOT_URL.$path;
+  #if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
+  if(SCRIPT_NAME == "index.php") return implodeLink($pLink);
+  $pLink["path"] = ROOT_URL.SCRIPT_NAME;
   if($cyclic) $pLink["path"] = "";
-  $q = array();
-  if(strlen($path)) $q[] = "q=".$path;
-  if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
-  if(count($q)) $pLink["query"] = implode("&", $q);
+  $query = array();
+  if(strlen($path)) $query[] = "q=".$path;
+  if(isset($pLink["query"]) && strlen($pLink["query"])) $query[] = $pLink["query"];
+  if(count($query)) $pLink["query"] = implode("&", $query);
   return implodeLink($pLink);
 }
 

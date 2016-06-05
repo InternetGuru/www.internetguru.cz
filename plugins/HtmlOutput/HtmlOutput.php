@@ -187,12 +187,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       try {
         $pLink = parseLocalLink($href);
         if(is_null($pLink)) continue; # external
+        if(array_key_exists("path", $pLink) && is_file($pLink["path"])) continue; # link to domain file
         $pLink = $this->getLink($pLink, $rootId);
         if(empty($pLink)) {
           $a->stripAttr("href", sprintf(_("Link '%s' not found"), $href));
           continue;
         }
-        if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
+        #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
         $link = buildLocalUrl($pLink);
       } catch(Exception $e) {
         $a->stripAttr("href", $e->getMessage());
@@ -208,16 +209,17 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if(!array_key_exists("path", $pHref) && !array_key_exists("fragment", $pHref))
       return $pHref;
     $pHref["id"] = array_key_exists("path", $pHref) ? $pHref["path"] : $rootId;
+    if(!strlen($pHref["id"])) $pHref["id"] = HTMLPlusBuilder::getRootId();
     if(array_key_exists("fragment", $pHref)) $pHref["id"] .= "/".$pHref["fragment"];
     $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
     if(is_null($link)) {
-      $pHref["id"] = HTMLPlusBuilder::getIdToParentId($pHref["id"]);
-      if(is_null($pHref["id"])) return array();
-      $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
+      $id = HTMLPlusBuilder::getIdToParentId($pHref["id"]);
+      if(is_null($id)) return array();
+      $link = HTMLPlusBuilder::getIdToLink($id);
     }
     $linkArray = explode("#", $link);
     $pHref["path"] = $linkArray[0];
-    if(count($linkArray) > 1) $pHref["fragment"] = $linkArray[1];
+    if(isset($linkArray[1]) && !isset($pHref["fragment"])) $pHref["fragment"] = $linkArray[1];
     return $pHref;
   }
 

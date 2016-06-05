@@ -111,6 +111,10 @@ class HTMLPlusBuilder extends DOMBuilder {
     return self::getIdToFile(self::getLinkToId(getCurLink()));
   }
 
+  public static function getRootId() {
+    return key(self::$idToParentId);
+  }
+
   public static function getHeadingValues($id) {
     $values = array();
     if(strlen(self::getIdToShort($id))) {
