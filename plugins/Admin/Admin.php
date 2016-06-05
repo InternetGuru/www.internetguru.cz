@@ -391,7 +391,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
         $doc = new HTMLPlus();
         $doc->defaultAuthor = Cms::getVariable("cms-author");
       } else $doc = new DOMDocumentPlus();
-      if(!@$doc->loadXml($this->contentValue)) throw new Exception(_("Invalid XML syntax"));
+      $doc->loadXml($this->contentValue);
     }
     $repair = $this->isPost() && isset($_POST["repair"]);
     try {

@@ -25,7 +25,7 @@ class DOMDocumentPlus extends DOMDocument {
 
   public function load($filePath, $options=0) {
     if(!is_file($filePath) || file_exists(dirname($filePath)."/.".basename($filePath)))
-      throw new NoFileException(_("File $filePath not found or disabled"));
+      throw new NoFileException(_("File not found or disabled"));
     if(!@parent::load($filePath, $options))
       throw new Exception(_("Invalid XML file"));
   }

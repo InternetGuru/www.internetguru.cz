@@ -211,14 +211,24 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $pHref["id"] = array_key_exists("path", $pHref) ? $pHref["path"] : $rootId;
     if(!strlen($pHref["id"])) $pHref["id"] = HTMLPlusBuilder::getRootId();
     if(array_key_exists("fragment", $pHref)) $pHref["id"] .= "/".$pHref["fragment"];
+    // href is link
+    $id = HTMLPlusBuilder::getLinkToId($pHref["id"]);
+    if(!is_null($id)) {
+      $pHref["id"] = $id;
+      return $pHref;
+    }
+    // href is heading id
     $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
+    // href is non-heading id
     if(is_null($link)) {
       $id = HTMLPlusBuilder::getIdToParentId($pHref["id"]);
+      // link not found
       if(is_null($id)) return array();
       $link = HTMLPlusBuilder::getIdToLink($id);
     }
     $linkArray = explode("#", $link);
     $pHref["path"] = $linkArray[0];
+    // update fragment iff not non-heading id
     if(isset($linkArray[1]) && !isset($pHref["fragment"])) $pHref["fragment"] = $linkArray[1];
     return $pHref;
   }

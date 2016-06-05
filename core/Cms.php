@@ -86,11 +86,13 @@ class Cms {
     self::$flashList->firstElement->appendChild($li);
     $li->setAttribute("class", strtolower($type).($prevRequest ? " prev-request" : ""));
     $doc = new DOMDocumentPlus();
-    if(!@$doc->loadXML("<var>$message</var>")) {
-      $li->nodeValue = htmlspecialchars($message);
-    } else {
-      foreach($doc->documentElement->childNodes as $ch)
+    try {
+      $doc->loadXML("<var>$message</var>");
+      foreach($doc->documentElement->childNodes as $ch) {
         $li->appendChild($li->ownerDocument->importNode($ch, true));
+      }
+    } catch(Exception $e) {
+      $li->nodeValue = htmlspecialchars($message);
     }
   }
 

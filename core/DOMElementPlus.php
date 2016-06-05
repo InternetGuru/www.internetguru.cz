@@ -146,7 +146,9 @@ class DOMElementPlus extends DOMElement {
     $dom = new DOMDocumentPlus();
     $eNam = $this->nodeName;
     $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
-    if(!@$dom->loadXML($xml)) {
+    try {
+      $dom->loadXML($xml);
+    } catch(Exception $e) {
       $var = $dom->appendChild($dom->createElement("var"));
       foreach($html as $k => $v) {
         $e = $var->appendChild($dom->createElement($eNam));
