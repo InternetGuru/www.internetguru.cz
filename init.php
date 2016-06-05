@@ -78,13 +78,7 @@ if(IS_LOCALHOST) {
   define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
   define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
   define("CMSRES_FOLDER", WWW_FOLDER."/".CMSRES_DIR."/".CMS_RELEASE);
-  $userId = null;
-  foreach(scandir(getcwd()) as $f) {
-    $varName = substr($f, 0, 6);
-    if($varName != "ADMIN.") continue; // eg. ADMIN.ig1
-    $userId = substr($f, 6);
-  }
-  define('ADMIN_ID', $userId);
+  define('ADMIN_ID', is_file("ADMIN") ? file_get_contents("ADMIN") : null);
   define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
   define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
   define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);

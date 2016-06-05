@@ -35,11 +35,11 @@ try {
     redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
-  if(!IS_LOCALHOST) initLinks();
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
 
   Cms::checkAuth();
+  if(!IS_LOCALHOST && Cms::isSuperUser()) initIndexFiles();
   if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
     try {
       clearNginxCache();

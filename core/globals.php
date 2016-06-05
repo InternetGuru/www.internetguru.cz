@@ -278,7 +278,7 @@ function initDirs() {
   foreach($dirs as $d) mkdir_plus($d);
 }
 
-function initLinks() {
+function initIndexFiles() {
   $links = array();
   foreach(scandir(CMS_ROOT_FOLDER) as $f) {
     if(strpos($f, ".") === 0) continue;
