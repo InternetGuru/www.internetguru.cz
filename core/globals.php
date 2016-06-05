@@ -160,7 +160,7 @@ function isCyclicLink(Array $pLink) {
 }
 
 function addPermParam(Array &$pLink, $parName) {
-  if(!isset($_GET[$parName])) return;
+  if(!isset($_GET[$parName]) || !strlen($_GET[$parName])) return;
   $parAndVal = "$parName=".$_GET[$parName];
   if(isset($pLink["query"])) {
     if(strpos($pLink["query"], $parName) !== false) return;

@@ -61,7 +61,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $pVal = $redir->hasAttribute("parValue") ? $redir->getAttribute("parValue") : null;
       if(!$this->queryMatch($pNam, $pVal)) continue;
       try {
-        if($redir->nodeValue == "/" || $redir->nodeValue == "") redirTo(array("path" => ""));
+        if($redir->nodeValue == "/") redirTo(array("path" => ""));
         $pLink = parseLocalLink($redir->nodeValue);
         if(is_null($pLink)) redirTo($redir->nodeValue); // external redir
         $silent = !isset($pLink["path"]);

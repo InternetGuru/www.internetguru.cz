@@ -14,11 +14,11 @@
     - parValue ... hodnota parametru
 
     CÍLOVÁ ADRESA (obsah elementu redir)
-      / nebo ""     ... domovská stránka
+      /             ... domovská stránka
       bez cesty     ... zachová aktuální cestu, např. "?Admin"
       prázdná cesta ... smaže aktuální cestu, např. "/?Admin"
       bez parametru ... zachová aktuální parametry, např. "/"
-      prázdný param ... smaže aktuální parametry, např. "/?"
+      prázdný param ... smaže aktuální parametry, např. "?"
   -->
 
   <redir link="login">?login</redir>
@@ -37,9 +37,9 @@
   <redir parName="CHANGELOG" parValue="">?LogViewer=CHANGELOG</redir>
   <redir parName="log" parValue="">?LogViewer=usr</redir>
 
-  <redir parName="PageSpeed" parValue="">/</redir>
-  <redir parName="Debug" parValue="">/</redir>
-  <redir parName="Cache" parValue="">/</redir>
+  <redir parName="PageSpeed" parValue="">?</redir>
+  <redir parName="Debug" parValue="">?</redir>
+  <redir parName="Cache" parValue="">?</redir>
 
   <redir parName="Login">?login</redir>
   <redir parName="admin">?Admin</redir>
