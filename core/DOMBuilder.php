@@ -19,21 +19,16 @@ class DOMBuilder {
 
   public static function isCacheOutdated() {
     if(IS_LOCALHOST) return false;
-    if(is_null(self::$newestFileMtime))
-      throw new Exception(_("FileMtime is not set"));
-    return self::$newestFileMtime > getNewestCacheMtime();
+    if(is_null(self::getNewestCacheMtime())) return false;
+    return self::$newestFileMtime > self::getNewestCacheMtime();
   }
 
   protected static function setNewestFileMtime($mtime) {
     if($mtime <= self::$newestFileMtime) return;
     self::$newestFileMtime = $mtime;
-    if(!Cms::isSuperUser()) return;
-    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) return;
-    if(!self::isCacheOutdated()) return;
-    Logger::user_notice(_("Outdated server cache"));
   }
 
-  private static function getNewestCacheMtime() {
+  protected static function getNewestCacheMtime() {
     if(!is_null(self::$newestCacheMtime)) return self::$newestCacheMtime;
     foreach(getNginxCacheFiles() as $cacheFilePath) {
       $cacheMtime = filemtime($cacheFilePath);

@@ -5,6 +5,7 @@ use IGCMS\Core\Logger;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Plugins;
+use IGCMS\Core\DOMBuilder;
 
 try {
 
@@ -37,17 +38,8 @@ try {
 
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
-
   Cms::checkAuth();
-  if(!IS_LOCALHOST && Cms::isSuperUser()) initIndexFiles();
-  if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
-    try {
-      clearNginxCache();
-      Logger::user_success(_("Cache successfully purged"));
-    } catch(Exception $e) {
-      Logger::critical($e->getMessage());
-    }
-  }
+  if(Cms::isSuperUser() && !IS_LOCALHOST) initIndexFiles();
 
   // remove ?login form url
   if(isset($_GET["login"])) {
@@ -69,7 +61,6 @@ try {
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
 
-
   #var_dump(HTMLPlusBuilder::getIdToLink());
   #var_dump(HTMLPlusBuilder::getIdToParentId());
   #var_dump(HTMLPlusBuilder::getUriToInt("pavel_petrzela"));
@@ -79,6 +70,19 @@ try {
   Cms::contentProcessVariables();
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
+
+  if(Cms::isSuperUser() && DOMBuilder::isCacheOutdated()) {
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
+      try {
+        clearNginxCache();
+        Logger::user_success(_("Cache successfully purged"));
+      } catch(Exception $e) {
+        Logger::critical($e->getMessage());
+      }
+    } elseif(!isset($_GET[CACHE_PARAM]) || $_GET[CACHE_PARAM] != CACHE_IGNORE) {
+      Logger::user_notice(_("Server cache (nginx) is outdated"));
+    }
+  }
 
   Cms::getMessages();
   Cms::contentProcessVariables();
