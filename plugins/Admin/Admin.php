@@ -269,10 +269,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
 
   private function showContent($user) {
     if(is_null($this->defaultFile)) return null;
-    $df = findFile($this->defaultFile, $user, true);
-    if(is_null($df)) return null;
+    try {
+      $df = findFile($this->defaultFile, $user, true);
+    } catch(Exception $e) {
+      return null;
+    }
     if($this->replace) return file_get_contents($df);
-    $doc = $this->getXML($this->defaultFile, false, $user);
+    $doc = new DOMDocumentPlus();
+    $doc->load(($user ? USER_FOLDER : CMS_FOLDER)."/".$this->defaultFile);
     $doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();
@@ -300,7 +304,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
   private function setDefaultFile() {
     $fileName = $_GET[$this->className];
     $this->defaultFile = $this->getFilepath($fileName);
-    $fLink = HTMLPlusBuilder::getFileToId($fileName);
+    $fLink = HTMLPlusBuilder::getIdToLink(HTMLPlusBuilder::getFileToId($this->defaultFile));
     if(is_null($fLink)) $fLink = getCurLink();
     if($this->defaultFile != $fileName || $fLink != getCurLink()) {
       redirTo(buildLocalUrl(array("path" => $fLink, "query" => $this->className."=".$this->defaultFile)));
@@ -311,19 +315,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
   private function getFilepath($f) {
     if(!strlen($f)) {
       if(getCurLink() == "") return INDEX_HTML;
-      $path = HTMLPlusBuilder::getIdToFile(getCurLink());
+      $path = HTMLPlusBuilder::getIdToFile(HTMLPlusBuilder::getLinkToId(getCurLink()));
       if(!is_null($path)) return $path;
       return INDEX_HTML;
     }
-    if(strpos($f, USER_FOLDER."/") === 0) {
-      $f = substr($f, strlen(USER_FOLDER)+1);
-    }
-    if(strpos($f, ADMIN_FOLDER."/") === 0) {
-      $f = substr($f, strlen(ADMIN_FOLDER)+1);
-    }
+    $f = stripDataFolder($f);
     if(preg_match("~^[\w-]+$~", $f)) {
       $pluginFile = PLUGINS_DIR."/$f/$f.xml";
-      if(!is_null(findFile($pluginFile))) return $pluginFile;
+      if(is_file(CMS_FOLDER."/$pluginFile")) return $pluginFile;
     }
     if(!preg_match("/^".FILEPATH_PATTERN."$/", $f) || strpos($f, "..") !== false) {
       $this->dataFileStatus = self::STATUS_INVALID;
@@ -332,9 +331,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
     if(strpos(basename($f), ".") === 0) {
       $f = dirname($f)."/".substr(basename($f), 1);
     }
-    if(!is_null(findFile(PLUGINS_DIR."/$f", false))) {
-      $f = PLUGINS_DIR."/$f";
-    }
+    if(is_file(CMS_FOLDER."/".PLUGINS_DIR."/$f")) $f = PLUGINS_DIR."/$f";
     return $f;
   }
 
@@ -368,15 +365,20 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
 
   private function processXml() {
     // get default schema
-    $df = findFile($this->defaultFile, false);
-    if(!is_null($df)) $this->scheme = $this->getScheme($df);
+    try {
+      $df = findFile($this->defaultFile, false);
+      $this->scheme = $this->getScheme($df);
+    } catch(Exception $e) {
+      $df = false;
+    }
     // get user schema if default schema not exists
     if(is_null($this->scheme) && file_exists($this->dataFile)) {
       $this->scheme = $this->getScheme($this->dataFile);
     }
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
       if($this->type == "html") {
-        $doc = $this->getHTMLPlus(INDEX_HTML, false);
+        $doc = new HTMLPlus();
+        $doc->load(CMS_FOLDER."/".INDEX_HTML);
       } else {
         $doc = new DOMDocumentPlus();
         $doc->formatOutput = true;
@@ -493,9 +495,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
     $line = str_replace("'", '"', fgets($h));
     fclose($h);
     if(!preg_match('<\?xml-model href="([^"]+)" ?\?>', $line, $m)) return;
-    $schema = findFile($m[1], false, false);
-    if(!file_exists($schema))
+    try {
+      $schema = findFile($m[1], false, false);
+    } catch(Exception $e) {
       throw new Exception(sprintf(_("Schema file '%s' not found"), $schema));
+    }
     return $schema;
   }
 
