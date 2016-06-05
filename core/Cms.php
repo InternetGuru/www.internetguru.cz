@@ -78,13 +78,13 @@ class Cms {
     self::setVariable("messages", self::$flashList);
   }
 
-  private static function addFlashItem($message, $type, $prevRequest=false) {
+  private static function addFlashItem($message, $type, Array $requests) {
     $types = self::getTypes();
     self::$$type = true;
     if(!is_null(self::getLoggedUser())) $message = self::$types[$type].": $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
-    $li->setAttribute("class", strtolower($type).($prevRequest ? " prev-request" : ""));
+    $li->setAttribute("class", strtolower($type)." ".implode(" ", $requests));
     $doc = new DOMDocumentPlus();
     try {
       $doc->loadXML("<var>$message</var>");
@@ -100,13 +100,12 @@ class Cms {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
     if(is_null(self::$flashList)) self::createFlashList();
     foreach($_SESSION["cms"]["flash"] as $type => $item) {
-      foreach($item as $token => $messages) {
-        foreach($messages as $message) {
-          self::addFlashItem($message, $type, $token != self::$requestToken);
-        }
+      foreach($item as $hash => $message) {
+        self::addFlashItem($message, $type, $_SESSION["cms"]["request"][$type][$hash]);
       }
     }
     $_SESSION["cms"]["flash"] = array();
+    $_SESSION["cms"]["request"] = array();
   }
 
   public static function getContentFull() {
@@ -203,7 +202,8 @@ class Cms {
     if(is_null(self::$flashList)) self::createFlashList();
     if(is_null(self::$requestToken)) self::$requestToken = rand();
     if(self::isSuperUser()) {
-      $_SESSION["cms"]["flash"][$type][self::$requestToken][] = $message;
+      $_SESSION["cms"]["flash"][$type][hash(FILE_HASH_ALGO, $message)] = $message;
+      $_SESSION["cms"]["request"][$type][hash(FILE_HASH_ALGO, $message)][] = self::$requestToken;
       return;
     }
     self::addFlashItem($message, $type);
