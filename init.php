@@ -78,7 +78,7 @@ if(IS_LOCALHOST) {
   define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
   define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
   define("CMSRES_FOLDER", WWW_FOLDER."/".CMSRES_DIR."/".CMS_RELEASE);
-  define('ADMIN_ID', is_file("ADMIN") ? file_get_contents("ADMIN") : null);
+  define('ADMIN_ID', is_file("ADMIN") ? trim(file_get_contents("ADMIN")) : null);
   define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
   define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
   define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);

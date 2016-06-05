@@ -10,14 +10,14 @@ try {
   }
 
   if(is_file("REDIR")) {
-    header("Location: ".file_get_contents("REDIR")."/".$_GET["q"]);
+    header("Location: ".trim(file_get_contents("REDIR"))."/".$_GET["q"]);
     exit;
   }
 
-  if(is_file("VERSION")) throw new Exception("File VERSION not found");
-  $version = file_get_contents("VERSION");
+  if(!is_file("VERSION")) throw new Exception("File VERSION not found");
+  $version = trim(file_get_contents("VERSION"));
   $index = "/var/www/cms/$version/index.php";
-  if(is_file($index)) throw new Exception("CMS $version index.php not found");
+  if(!is_file($index)) throw new Exception("CMS $version index.php not found");
   include($index);
 
 } catch(Exception $e) {
