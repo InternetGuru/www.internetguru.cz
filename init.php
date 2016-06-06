@@ -7,6 +7,7 @@ use IGCMS\Core\Logger;
 session_cache_limiter("");
 
 define("INDEX_HTML", "index.html");
+define("FINDEX_PHP", "findex.php");
 define("INOTIFY", ".inotify");
 define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
 define("PLUGINS_DIR", "plugins");
@@ -120,7 +121,8 @@ if(CMS_DEBUG) {
 define('METHOD_NA', _("Method %s is no longer available"));
 if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 require_once(CORE_FOLDER.'/globals.php');
-if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)) {
+if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
+  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)) {
   redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
 initDirs();
