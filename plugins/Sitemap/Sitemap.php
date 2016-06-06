@@ -32,8 +32,9 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
    */
   private static $changefreqVals = array("always", "hourly", "daily", "weekly", "monthly", "yearly", "never", "");
 
-  public static function isSupportedRequest() {
-    return getCurLink() == self::SITEMAP;
+  public static function isSupportedRequest($filePath=null) {
+    if(is_null($filePath)) $filePath = getCurLink();
+    return $filePath == self::SITEMAP;
   }
 
   public function update(SplSubject $subject) {}

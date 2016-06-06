@@ -55,8 +55,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     #if(!is_dir(USER_FOLDER."/".$this->pluginDir)) mkdir_plus(USER_FOLDER."/".$this->pluginDir);
   }
 
-  public static function isSupportedRequest() {
-    $ext = strtolower(pathinfo(getCurLink(), PATHINFO_EXTENSION));
+  public static function isSupportedRequest($filePath=null) {
+    if(is_null($filePath)) $filePath = getCurLink();
+    $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
     foreach(self::$legalMime as $extensions) {
       if(in_array($ext, $extensions)) return true;
     }

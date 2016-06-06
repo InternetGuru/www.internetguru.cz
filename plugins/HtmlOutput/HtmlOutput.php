@@ -10,6 +10,7 @@ use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use IGCMS\Core\XMLBuilder;
 use Exception;
 use DOMImplementation;
@@ -86,7 +87,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $a->removeAttribute("xml:lang");
     }
     $this->consolidateLang($contentPlus->documentElement, $lang);
-    $this->processLinks($contentPlus);
+    foreach($contentPlus->getElementsByTagName("a") as $e) {
+      $this->processLinks($e, "href", true);
+    }
+    foreach($contentPlus->getElementsByTagName("object") as $e) {
+      $this->processLinks($e, "data", false);
+    }
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement, true);
@@ -175,33 +181,41 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return ROOT_URL.self::FAVICON;
   }
 
-  private function processLinks(DOMDocumentPlus $doc) {
-    $file = HTMLPlusBuilder::getCurFile();
-    $rootId = HTMLPlusBuilder::getFileToId($file);
-    foreach($doc->getElementsByTagName("a") as $a) {
-      $href = $a->getAttribute("href");
-      if(!strlen($href)) {
-        $a->stripAttr("href", _("Empty attribute href stripped"));
-        continue;
-      }
-      try {
-        $pLink = parseLocalLink($href);
-        if(is_null($pLink)) continue; # external
-        if(array_key_exists("path", $pLink) && is_file($pLink["path"])) continue; # link to domain file
-        $pLink = $this->getLink($pLink, $rootId);
-        if(empty($pLink)) {
-          $a->stripAttr("href", sprintf(_("Link '%s' not found"), $href));
-          continue;
+  private function processLinks(DOMElementPlus $e, $aName, $getLink) {
+    $url = $e->getAttribute($aName);
+    if(!strlen($url)) {
+      $e->stripAttr($aName, sprintf(_("Empty attribute '%s' stripped"), $aName));
+      return;
+    }
+    try {
+      $pLink = parseLocalLink($url);
+      if(is_null($pLink)) return; # external
+      $getLink = true;
+      if(array_key_exists("path", $pLink)) {
+        // link to supported file
+        global $plugins;
+        foreach($plugins->getIsInterface("IGCMS\Core\ResourceInterface") as $ri) {
+          if(!$getLink) break;
+          if($ri::isSupportedRequest($pLink["path"])) $getLink = false;
         }
-        #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
-        if(array_key_exists("id", $pLink))
-          $this->insertTitle($a, $pLink["id"]);
-        $link = buildLocalUrl($pLink);
-        $a->setAttribute("href", $link);
-      } catch(Exception $e) {
-        $a->stripAttr("href", $e->getMessage());
-        continue;
+        // link to existing file
+        if($getLink && is_file($pLink["path"])) $getLink = false;
       }
+      if($getLink) {
+        $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
+        $pLink = $this->getLink($pLink, $rootId);
+      }
+      if(empty($pLink)) {
+        $e->stripAttr($aName, sprintf(_("Link '%s' not found"), $url));
+        return;
+      }
+      #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
+      if(array_key_exists("id", $pLink))
+        $this->insertTitle($e, $pLink["id"]);
+      $link = buildLocalUrl($pLink);
+      $e->setAttribute($aName, $link);
+    } catch(Exception $ex) {
+      $e->stripAttr($aName, $ex->getMessage());
     }
   }
 
