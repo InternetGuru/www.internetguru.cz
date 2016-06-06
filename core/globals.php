@@ -128,10 +128,10 @@ function parseLocalLink($link, $host=null) {
   return $pLink;
 }
 
-function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
-  addPermParam($pLink, PAGESPEED_PARAM);
-  addPermParam($pLink, DEBUG_PARAM);
-  addPermParam($pLink, CACHE_PARAM);
+function buildLocalUrl(Array $pLink, $ignoreCyclic=false, $addPermParam=true) {
+  if($addPermParam) foreach(array(PAGESPEED_PARAM, DEBUG_PARAM, CACHE_PARAM) as $param) {
+    addPermParam($pLink, $param);
+  }
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
