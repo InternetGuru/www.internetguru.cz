@@ -55,12 +55,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/InternetGuru/CodeMirror.git",
-                "reference": "4ecdb6d80c42bd8211ceab171c5804873d05d09b"
+                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/4ecdb6d80c42bd8211ceab171c5804873d05d09b",
-                "reference": "4ecdb6d80c42bd8211ceab171c5804873d05d09b",
+                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/f86367959bc16be6c9acc57af4eedac6d4925a9f",
+                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f",
                 "shasum": ""
             },
             "type": "library",
@@ -71,9 +71,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/InternetGuru/CodeMirror/tree/0.1"
+                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.1.4"
             },
-            "time": "2016-04-23 15:44:45"
+            "time": "2016-06-06 18:56:07"
         },
         {
             "name": "monolog/monolog",
