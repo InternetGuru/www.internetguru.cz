@@ -296,6 +296,12 @@ function initIndexFiles() {
   }
 }
 
+function timestamptToW3C($timestamp) {
+  $date = new DateTime();
+  $date->setTimeStamp($timestamp);
+  return $date->format(DateTime::W3C);
+}
+
 function update_file($src, $dest, $hash=false) {
   if(is_link($dest)) return false;
   if(!is_file($src)) throw new Exception("Source file not found");

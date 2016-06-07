@@ -287,10 +287,6 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
         if(Cms::isSuperUser()) {
           $vars[$filePath]['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";
         }
-        if(!strlen($vars[$filePath]["mtime"])) {
-          $date->setTimeStamp($vars[$filePath]["filemtime"]);
-          $vars[$filePath]["mtime"] = $date->format(DateTime::W3C);
-        }
         $this->vars[$filePath] = $vars[$filePath];
       } catch(Exception $e) {
         Logger::critical($e->getMessage());

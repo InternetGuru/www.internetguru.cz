@@ -64,12 +64,10 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
    */
   private static function getLinks() {
     $links = array();
-    $dt = new DateTime();
     foreach(HTMLPlusBuilder::getIdToLink() as $id => $link) {
       if(strpos($link, "#") !== false) continue;
       $file = HTMLPlusBuilder::getIdToFile($id);
-      $dt->setTimestamp(HTMLPlusBuilder::getFileMtime($file));
-      $mtime = $dt->format(DATE_W3C);
+      $mtime = timestamptToW3C(HTMLPlusBuilder::getFileMtime($file));
       $links[$link] = $mtime;
     }
     return $links;

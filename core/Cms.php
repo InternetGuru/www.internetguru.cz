@@ -11,7 +11,6 @@ use DOMNode;
 class Cms {
 
   private static $types = null;
-  private static $contentFull = null; // HTMLPlus
   private static $content = null; // HTMLPlus
   private static $outputStrategy = null; // OutputStrategyInterface
   private static $variables = array();
@@ -49,15 +48,14 @@ class Cms {
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    self::$contentFull = HTMLPlusBuilder::build(INDEX_HTML);
-    $h1 = self::$contentFull->documentElement->firstElement;
-    self::setVariable("lang", self::$contentFull->documentElement->getAttribute("xml:lang"));
-    self::setVariable("ctime", $h1->getAttribute("ctime"));
-    self::setVariable("mtime", $h1->hasAttribute("mtime") ? $h1->getAttribute("mtime") : null);
-    self::setVariable("author", $h1->getAttribute("author"));
-    self::setVariable("authorid", $h1->hasAttribute("authorid") ? $h1->getAttribute("authorid") : null);
-    self::setVariable("resp", $h1->getAttribute("resp"));
-    self::setVariable("respid", $h1->hasAttribute("respid") ? $h1->getAttribute("respid") : null);
+    $reg = HTMLPlusBuilder::register(INDEX_HTML);
+    self::setVariable("lang", $reg["lang"]);
+    self::setVariable("ctime", $reg["ctime"]);
+    self::setVariable("mtime", $reg["mtime"]);
+    self::setVariable("author", $reg["author"]);
+    self::setVariable("authorid", $reg["authorid"]);
+    self::setVariable("resp", $reg["resp"]);
+    self::setVariable("respid", $reg["respid"]);
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
     self::setVariable("uri", URI);
@@ -108,12 +106,7 @@ class Cms {
     $_SESSION["cms"]["request"] = array();
   }
 
-  public static function getContentFull() {
-    return self::$contentFull;
-  }
-
   public static function buildContent() {
-    if(is_null(self::$contentFull)) throw new Exception(_("Full content must be set to build content"));
     if(!is_null(self::$content)) throw new Exception(_("Method cannot run twice"));
     self::$content = clone self::$contentFull;
     try {

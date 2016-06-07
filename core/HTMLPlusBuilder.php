@@ -98,9 +98,10 @@ class HTMLPlusBuilder extends DOMBuilder {
         Logger::user_notice(sprintf(_("Duplicit identifiers fixed %s times after includes in %s"),
           count($doc->getErrors()), $filePath));
     }
-    $prefixId = $doc->documentElement->firstElement->getAttribute("id");
-    self::registerStructure($doc->documentElement, $parentId, $prefixId, $linkPrefix, $filePath);
-    return self::getRegister(self::$fileToId[$filePath]);
+    $id = $doc->documentElement->firstElement->getAttribute("id");
+    self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
+    if(!strlen(self::$idToMtime[$id])) self::$idToMtime[$id] = timestamptToW3C(self::$fileMtime[$filePath]);
+    return self::getRegister($id);
   }
 
   public static function isLink($link) {
