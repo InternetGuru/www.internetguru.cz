@@ -224,6 +224,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     #$v = $d->appendChild($d->createElement("var"));
     #$v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
     #$vars["heading"] = $d->documentElement;
+    $vars["rooturl"] = ROOT_URL;
     $vars["heading"] = _("Administration");
     if(!is_null($this->defaultFile))
       $vars["heading"] = sprintf(_("File %s Administration"), basename($this->defaultFile));
@@ -504,7 +505,5 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   }
 
 }
-
-
 
 ?>
