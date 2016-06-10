@@ -11,7 +11,8 @@ use Exception;
 use SplSubject;
 
 class Plugin {
-  private $doms = array();
+  private static $xml = array();
+  private static $html = array();
   protected $subject;
   protected $pluginDir;
   protected $className;
@@ -49,15 +50,19 @@ class Plugin {
   }
 
   public static function getHTMLPlus($fileName=null) {
+    if(array_key_exists($fileName, self::$html)) return self::$html[$fileName];
     $pluginName = self::getCallerName();
     if(is_null($fileName)) $fileName = "$pluginName.html";
-    return HTMLPlusBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    self::$html[$fileName] = HTMLPlusBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    return self::$html[$fileName];
   }
 
   public static function getXML($fileName=null) {
+    if(array_key_exists($fileName, self::$xml)) return self::$xml[$fileName];
     $pluginName = self::getCallerName();
     if(is_null($fileName)) $fileName = "$pluginName.xml";
-    return XMLBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    self::$xml[$fileName] = XMLBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    return self::$xml[$fileName];
   }
 
   private function getKey($a, $b=null, $c=null) {
