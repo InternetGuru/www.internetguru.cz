@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -15,7 +15,7 @@ use DOMXPath;
 use SplObserver;
 use SplSubject;
 
-class ContactForm extends Plugin implements SplObserver, ContentStrategyInterface {
+class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   private $cfg;
   private $vars = array();
@@ -113,7 +113,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     if(!$xpath->query("//*[contains(@var, 'contactform-')]")->length) return $content;
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {

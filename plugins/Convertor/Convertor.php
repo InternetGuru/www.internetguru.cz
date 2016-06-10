@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
@@ -16,7 +16,7 @@ use SplSubject;
 
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 
-class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
+class Convertor extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $html = null;
   private $file = null;
   private $docName = null;
@@ -166,9 +166,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     }
   }
 
-  public function getContent(HTMLPlus $c) {
+  public function getContent() {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
-    $newContent = $this->getHTMLPlus();
+    $content = $this->getHTMLPlus();
     $vars["action"] = "?".$this->className;
     $vars["link"] = $_GET[$this->className];
     $vars["path"] = $this->pluginDir;
@@ -178,8 +178,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $vars["nohide"] = "nohide";
       $vars["content"] = $this->html;
     }
-    $newContent->processVariables($vars);
-    return $newContent;
+    $content->processVariables($vars);
+    return $content;
   }
 
   private function regenerateIds(DOMDocumentPlus $doc) {

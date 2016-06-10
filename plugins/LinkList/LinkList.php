@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -12,7 +12,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
+class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   private $cssClass = "linklist";
 
@@ -23,7 +23,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {}
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
     $sections = $content->documentElement->getElementsByTagName("section");
     foreach($sections as $s) {
       if(!$s->hasClass($this->cssClass)) continue;
@@ -33,8 +33,6 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->createLinkList($content->documentElement);
     }
     Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".css");
-    #echo $content->saveXML($content);
-    #die();
     return $content;
   }
 

@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -16,7 +16,7 @@ use DOMText;
 use SplObserver;
 use SplSubject;
 
-class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
+class InputVar extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $userCfgPath = null;
   private $contentXPath;
   private $cfg = null;
@@ -75,8 +75,8 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
 
   }
 
-  public function getContent(HTMLPlus $content) {
-    if(!isset($_GET[$this->className])) return $content;
+  public function getContent() {
+    if(!isset($_GET[$this->className])) return null;
     $newContent = $this->getHTMLPlus();
     $form = $newContent->getElementsByTagName("form")->item(0);
     $this->formId = $form->getAttribute("id");

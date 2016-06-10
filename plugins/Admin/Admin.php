@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\TitleStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
@@ -15,7 +15,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class Admin extends Plugin implements SplObserver, ContentStrategyInterface, TitleStrategyInterface {
+class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, TitleStrategyInterface {
   const STATUS_NEW = 0;
   const STATUS_ENABLED = 1;
   const STATUS_DISABLED = 2;
@@ -184,7 +184,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
     return $var;
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function getContent() {
     Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
     Cms::getOutputStrategy()->addJs("
       if(typeof IGCMS === \"undefined\") throw \"IGCMS is not defined\";
@@ -196,7 +196,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
     if($this->type == "html") $format = "html+";
     if(!is_null($this->scheme)) $format .= " (".pathinfo($this->scheme, PATHINFO_BASENAME).")";
 
-    $newContent = $this->getHTMLPlus();
+    $content = $this->getHTMLPlus();
 
     $la = "?".$this->className."=".$_GET[$this->className];
     $statusChanged = self::FILE_DISABLE;
@@ -255,11 +255,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface, Tit
     $vars["cache"] = $cache ? null : "";
     $vars["cache_value"] = $cache ? $_GET[CACHE_PARAM] : "";
     $vars["filepicker_options"] = $this->createFilepicker();
-    $newContent->processVariables($vars);
+    $content->processVariables($vars);
     if(is_null($this->defaultFile)) $this->title = $vars["heading"];
     else $this->title = sprintf(_("%s (%s) - Administration"),
       basename($this->defaultFile), ROOT_URL.$this->defaultFile);
-    return $newContent;
+    return $content;
   }
 
   private function getDataFileHash() {

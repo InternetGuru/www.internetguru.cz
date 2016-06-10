@@ -2,7 +2,7 @@
 
 namespace IGCMS\Plugins;
 
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMElementPlus;
@@ -15,10 +15,8 @@ use DOMXPath;
 use SplObserver;
 use SplSubject;
 
-class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInterface {
+class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrategyInterface {
   private $tree = array();
-
-
   private $content = null;
   private $sets = array();
   private $defaultSet = null;
@@ -63,7 +61,7 @@ class ContentBalancer extends Plugin implements SplObserver, ContentStrategyInte
     HTMLPlusBuilder::setIdToLink($idToLink);
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
     // set vars
     $this->createVars();
     // check sets

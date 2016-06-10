@@ -2,7 +2,8 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use Exception;
 use Closure;
@@ -11,7 +12,6 @@ use DOMNode;
 class Cms {
 
   private static $types = null;
-  private static $content = null; // HTMLPlus
   private static $outputStrategy = null; // OutputStrategyInterface
   private static $variables = array();
   private static $functions = array();
@@ -107,27 +107,34 @@ class Cms {
   }
 
   public static function buildContent() {
-    if(!is_null(self::$content)) throw new Exception(_("Method cannot run twice"));
-    self::$content = clone self::$contentFull;
-    try {
-      $cs = null;
-      global $plugins;
-      foreach($plugins->getIsInterface("IGCMS\Core\ContentStrategyInterface") as $cs) {
-        $c = $cs->getContent(self::$content);
-        $object = gettype($c) == "object";
-        if(!($object && $c instanceof HTMLPlus)) {
-          throw new Exception(sprintf(_("Content must be an instance of HTMLPlus (%s given)"), ($object ? get_class($c) : gettype($c))));
-        }
-        try {
-          $c->validatePlus();
-        } catch(Exception $e) {
-          throw new Exception(sprintf(_("Invalid HTMLPlus content: %s"), $e->getMessage()));
-        }
-        self::$content = $c;
+    global $plugins;
+    $content = null;
+    $pluginExceptionMessage = _("Plugin %s exception: %s");
+    foreach($plugins->getIsInterface("IGCMS\Core\GetContentStrategyInterface") as $plugin) {
+      try {
+        $content = $plugin->getContent();
+        if(is_null($content)) continue;
+        self::validateContent($content);
+        break;
+      } catch (Exception $e) {
+        throw new Exception(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
       }
-    } catch (Exception $e) {
-      throw new Exception(sprintf(_("Plugin %s exception: %s"), get_class($cs), $e->getMessage()));
     }
+    if(is_null($content)) {
+      $content = HTMLPlusBuilder::build(INDEX_HTML);
+      self::validateContent($content);
+    }
+    foreach($plugins->getIsInterface("IGCMS\Core\ModifyContentStrategyInterface") as $plugin) {
+      try {
+        $tmpContent = clone $content;
+        $tmpContent = $plugin->modifyContent($tmpContent);
+        self::validateContent($tmpContent);
+        $content = $tmpContent;
+      } catch (Exception $e) {
+        throw new Exception(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
+      }
+    }
+    return $content;
   }
 
   public static function checkAuth() {
@@ -175,20 +182,33 @@ class Cms {
     return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
   }
 
-  public static function contentProcessVariables() {
-    $oldContent = clone self::$content;
+  public static function contentProcessVariables(HTMLPlus $content) {
+    $tmpContent = clone $content;
     try {
-      self::$content = self::$content->processVariables(self::$variables);
-      self::$content->validatePlus(true);
-      #self::$content->processFunctions(self::$functions, self::$variables);
+      $tmpContent = $tmpContent->processVariables(self::$variables);
+      $tmpContent->validatePlus(true);
+      return $tmpContent;
     } catch(Exception $e) {
       Logger::user_error(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()));
-      self::$content = $oldContent;
+      return $content;
     }
   }
 
   public static function setOutputStrategy(OutputStrategyInterface $strategy) {
     self::$outputStrategy = $strategy;
+  }
+
+  private static function validateContent(HTMLPlus $content) {
+    $object = gettype($content) == "object";
+    if(!($object && $content instanceof HTMLPlus)) {
+      $name = $object ? get_class($content) : gettype($content);
+      throw new Exception(sprintf(_("Content must be an instance of HTMLPlus (%s given)"), $name));
+    }
+    try {
+      $content->validatePlus();
+    } catch(Exception $e) {
+      throw new Exception(sprintf(_("Invalid HTMLPlus content: %s"), $e->getMessage()));
+    }
   }
 
   private static function addMessage($type, $message) {
@@ -269,10 +289,9 @@ class Cms {
     self::$forceFlash = true;
   }
 
-  public static function getOutput() {
-    if(is_null(self::$content)) throw new Exception(_("Content is not set"));
-    if(!is_null(self::$outputStrategy)) return self::$outputStrategy->getOutput(self::$content);
-    return self::$content->saveXML();
+  public static function getOutput(HTMLPlus $content) {
+    if(is_null(self::$outputStrategy)) return $content->saveXML();
+    return self::$outputStrategy->getOutput($content);
   }
 
   public static function getOutputStrategy() {

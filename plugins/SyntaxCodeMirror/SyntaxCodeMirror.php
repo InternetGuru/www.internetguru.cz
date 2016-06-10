@@ -3,13 +3,13 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Plugin;
 use SplObserver;
 use SplSubject;
 
-class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInterface {
+class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   const CM_DIR = "internetguru/codemirror";
 
@@ -25,7 +25,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ContentStrategyInt
     }
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
 
     // supported syntax only
     $xml = VENDOR_DIR."/".self::CM_DIR."/mode/xml/xml.js";

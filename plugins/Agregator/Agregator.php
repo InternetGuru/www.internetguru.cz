@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
@@ -18,7 +18,7 @@ use DateTime;
 # TODO:
 # registr souborů: v id celá cesta, v hodnotě pole štítků
 
-class Agregator extends Plugin implements SplObserver, ContentStrategyInterface {
+class Agregator extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $vars = array();  // filePath => fileInfo(?)
   private $docinfo = array();
   private $currentSubdir = null;
@@ -62,10 +62,9 @@ class Agregator extends Plugin implements SplObserver, ContentStrategyInterface 
     }
   }
 
-  public function getContent(HTMLPlus $c) {
+  public function getContent() {
     $file = HTMLPlusBuilder::getCurFile();
-    if(is_null($file)) return $c;
-    if(!array_key_exists($file, $this->vars)) return $c;
+    if(is_null($file) || !array_key_exists($file, $this->vars)) return null;
     Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
     return HTMLPlusBuilder::build($file, $this->vars[$file]["parentid"], $this->vars[$file]["prefixid"]);
   }

@@ -57,7 +57,7 @@ try {
   $plugins->setStatus(STATUS_INIT);
   $plugins->notify();
 
-  Cms::buildContent();
+  $content = Cms::buildContent();
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
 
@@ -67,7 +67,7 @@ try {
   #var_dump(HTMLPlusBuilder::getIntToParentInt());
   #die("die");
 
-  Cms::contentProcessVariables();
+  $content = Cms::contentProcessVariables($content);
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
@@ -85,8 +85,8 @@ try {
   }
 
   Cms::getMessages();
-  Cms::contentProcessVariables();
-  echo Cms::getOutput();
+  $content = Cms::contentProcessVariables($content);
+  echo Cms::getOutput($content);
 
 } catch(Exception $e) {
 
