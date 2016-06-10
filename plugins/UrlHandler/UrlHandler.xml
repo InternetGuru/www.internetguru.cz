@@ -1,11 +1,6 @@
 <UrlHandler>
 
-  <!--
-    Adresy běžící na https (prázné pro celý web)
-  -->
-
-  <https>?login</https>
-
+  <var id="protocol" pattern="https?">http</var>
 
   <!--
     ATRIBUTY elementu redir

@@ -32,25 +32,11 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function httpsRedir() {
-    $https = true;
-    $urlMatch = false;
-    foreach($this->cfg->documentElement->childNodes as $redir) {
-      if($redir->nodeName != "https") continue;
-      $https = false;
-      $urlMatch = true;
-      $pRedir = parseLocalLink($redir->nodeValue);
-      if(isset($pRedir["path"]) && $pRedir["path"] != getCurLink()) $urlMatch = false;
-      if(isset($pRedir["query"]) && $pRedir["query"] != getCurQuery()) $urlMatch = false;
-      if($urlMatch) break;
-    }
-    Cms::setVariable("default_protocol", ($https ? "https" : "http"));
-    if(SCHEME == "https") {
-      if(is_null(Cms::getLoggedUser()) && !$urlMatch && !$https) {
-        redirTo("http://".HOST.$_SERVER["REQUEST_URI"]);
-      }
-     return;
-    }
-    if($urlMatch || $https) redirTo("https://".HOST.$_SERVER["REQUEST_URI"]);
+    $protocol = $this->cfg->getElementById("protocol", "var");
+    Cms::setVariable("default_protocol", $protocol);
+    if(SCHEME == $protocol) return;
+    if(SCHEME == "https" && !is_null(Cms::getLoggedUser())) return;
+    redirTo("$protocol://".HOST.$_SERVER["REQUEST_URI"]);
   }
 
   private function cfgRedir() {
