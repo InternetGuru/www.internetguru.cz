@@ -1,6 +1,7 @@
 (function(win) {
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
+  if(IGCMS.Hideable) throw "IGCMS.Hideable is not defined";
 
   var Config = {}
   Config.tocTitle = "Table of contents";
@@ -15,13 +16,6 @@
       hLevels = [],
       headingsPatt = null,
       tocRoot = null,
-      include = function(src, e) {
-        var base = window.Base ? window.Base : "/";
-        script = document.createElement('script');
-        script.type = 'text/javascript';
-        script.src = base + src;
-        e.appendChild(script);
-      },
       createTocWrapper = function() {
         var d = document.getElementsByTagName("div");
         var i = 0;
@@ -31,7 +25,7 @@
           break;
         }
         if(tocRoot == null) return false
-        var div = document.createElement("div");
+        var div = document.createElement("p");
         div.className = "list";
         tocWrapper = document.createElement("dl");
         tocWrapper.className = "hideable nohide toc";
@@ -97,9 +91,6 @@
           + 'dl.toc ol > li {margin-left: 1em; }'
           + 'dl.toc ol > li:before {content: counters(item, ".") " "; counter-increment: item; }';
           IGCMS.appendStyle();
-          if(IGCMS.Hideable) return;
-          include("themes/hideable.js", document.body);
-          include("themes/hideableinit.js", document.body);
         }
       }
    };

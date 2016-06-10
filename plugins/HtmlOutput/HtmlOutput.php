@@ -98,7 +98,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $content = $doc->importNode($contentPlus->documentElement, true);
     $html->appendChild($content);
     $cXpath = new DOMXPath($html->ownerDocument);
-    $this->addJs("window.Base = '".ROOT_URL."';", 1, self::APPEND_HEAD);
     $this->appendJsFiles($html->getElementsByTagName("head")->item(0), self::APPEND_HEAD, $cXpath);
     $this->appendJsFiles($content, self::APPEND_BODY, $cXpath);
 
