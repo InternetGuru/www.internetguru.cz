@@ -8,6 +8,7 @@ use IGCMS\Core\TitleStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\XMLBuilder;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -276,8 +277,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return null;
     }
     if($this->replace) return file_get_contents($df);
-    $doc = new DOMDocumentPlus();
-    $doc->load(($user ? USER_FOLDER : CMS_FOLDER)."/".$this->defaultFile);
+    $doc = XMLBuilder::build($this->defaultFile, $user);
     $doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();

@@ -26,7 +26,7 @@ class XMLBuilder extends DOMBuilder {
     return $doc;
   }
 
-  public static function build($fileName) {
+  public static function build($fileName, $user=true) {
     $doc = new DOMDocumentPlus();
     $fp = CMS_FOLDER."/$fileName";
     $doc->load($fp);
@@ -43,6 +43,8 @@ class XMLBuilder extends DOMBuilder {
     } catch(Exception $e) {
       Logger::error(sprintf(_("Unable load admin XML file %s: %s"), $fileName, $e->getMessage()));
     }
+
+    if(!$user) return $doc;
 
     $fp = USER_FOLDER."/$fileName";
     try {
@@ -62,34 +64,24 @@ class XMLBuilder extends DOMBuilder {
   private static function updateDOM(DOMDocumentPlus $doc, DOMDocumentPlus $newDoc) {
     $docId = null;
     foreach($newDoc->documentElement->childElementsArray as $n) {
-      // if empty && readonly => user cannot modify
-      foreach($doc->getElementsByTagName($n->nodeName) as $d) {
-        if($d->hasAttribute("readonly") && $d->nodeValue == "")
-          continue 2;
-      }
-      if(self::doRemove($n)) {
-        $remove = array();
-        foreach($doc->documentElement->childElementsArray as $d) {
-          if($d->nodeName != $n->nodeName) continue;
-          if($d->hasAttribute("modifyonly")) continue;
-          if(!$d->hasAttribute("readonly")) $remove[] = $d;
-        }
-        foreach($remove as $d) $d->parentNode->removeChild($d);
-      } elseif($n->hasAttribute("id")) {
-        if(is_null($docId)) $docId = self::getIds($doc);
-        $curId = $n->getAttribute("id");
-        if(!array_key_exists($curId, $docId)) {
-          $doc->documentElement->appendChild($doc->importNode($n, true));
-          continue;
-        }
-        $sameIdElement = $docId[$curId];
-        if($sameIdElement->nodeName != $n->nodeName)
-          throw new Exception(sprintf(_("ID '%s' conflicts with element '%s'"), $curId, $n->nodeName));
-        if($sameIdElement->hasAttribute("readonly")) continue;
-        $doc->documentElement->replaceChild($doc->importNode($n, true), $sameIdElement);
-      } else {
+      if(!$n->hasAttribute("id")) {
         $doc->documentElement->appendChild($doc->importNode($n, true));
+        continue;
       }
+      if(is_null($docId)) $docId = self::getIds($doc);
+      $curId = $n->getAttribute("id");
+      if(!array_key_exists($curId, $docId)) {
+        $doc->documentElement->appendChild($doc->importNode($n, true));
+        continue;
+      }
+      if($docId[$curId]->nodeName != $n->nodeName)
+        throw new Exception(sprintf(_("Element id '%s' names differ"), $curId));
+      if($docId[$curId]->hasAttribute("readonly"))
+        throw new Exception(sprintf(_("Element id '%s' is readonly"), $curId));
+      $pattern = $docId[$curId]->getAttribute("pattern");
+      if(strlen($pattern) && !preg_match("/^$pattern$/", $n->nodeValue))
+        throw new Exception(sprintf(_("Element id '%s' pattern mismatch"), $curId));
+      $doc->documentElement->replaceChild($doc->importNode($n, true), $docId[$curId]);
     }
   }
 
@@ -100,13 +92,6 @@ class XMLBuilder extends DOMBuilder {
       $ids[$n->getAttribute("id")] = $n;
     }
     return $ids;
-  }
-
-  private static function doRemove(DOMElement $n) {
-    if($n->nodeValue != "") return false;
-    if($n->attributes->length > 1) return false;
-    if($n->attributes->length == 1 && !$n->hasAttribute("readonly")) return false;
-    return true;
   }
 
 }
