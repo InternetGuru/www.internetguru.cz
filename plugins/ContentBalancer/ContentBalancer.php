@@ -86,7 +86,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   private function strip(HTMLPlus $c) {
     $link = basename(getCurLink());
     if($this->isRoot($link)) return $c;
-    $h1 = $c->getElementById($link, "id", "h");
+    $h1 = $c->getElementById($link, "h");
     if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), getCurLink()), 404);
     $this->handleAttribute($h1, "ctime");
     $this->handleAttribute($h1, "mtime");
@@ -158,7 +158,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
         $this->balance($content, $h2id);
         continue;
       }
-      $section = $content->getElementById(basename($h3s[0]), "id", "h")->parentNode;
+      $section = $content->getElementById(basename($h3s[0]), "h")->parentNode;
       $this->balanceHeading($section, $h3s);
     }
   }

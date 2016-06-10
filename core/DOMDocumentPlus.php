@@ -35,7 +35,7 @@ class DOMDocumentPlus extends DOMDocument {
       throw new Exception(_("Invalid XML"));
   }
 
-  public function getElementById($id, $aName="id", $eName = null) {
+  public function getElementById($id, $eName=null, $aName="id") {
     try {
       if(!is_null($eName)) {
         $element = null;
