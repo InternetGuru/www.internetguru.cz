@@ -151,6 +151,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   }
 
   private function balance(HTMLPlus $content, $h1id) {
+    if(!array_key_exists($h1id, $this->tree)) return;
     foreach($this->tree[$h1id] as $h2id) {
       $h3s = $this->tree[$h2id];
       if(count($h3s) < 2) {
