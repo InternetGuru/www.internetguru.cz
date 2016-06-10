@@ -32,7 +32,7 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function httpsRedir() {
-    $protocol = $this->cfg->getElementById("protocol", "var");
+    $protocol = $this->cfg->getElementById("protocol", "var")->nodeValue;
     Cms::setVariable("default_protocol", $protocol);
     if(SCHEME == $protocol) return;
     if(SCHEME == "https" && !is_null(Cms::getLoggedUser())) return;
