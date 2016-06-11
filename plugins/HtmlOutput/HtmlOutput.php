@@ -205,8 +205,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         $pLink = $this->getLink($pLink, $rootId);
       }
       if(empty($pLink)) {
-        $e->stripAttr($aName, sprintf(_("Link '%s' not found"), $url));
-        return;
+        throw new Exception(sprintf(_("Link '%s' not found"), $url));
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
       if(array_key_exists("id", $pLink) && !array_key_exists("query", $pLink)) {
@@ -215,7 +214,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $link = buildLocalUrl($pLink, false, $getLink);
       $e->setAttribute($aName, $link);
     } catch(Exception $ex) {
-      $e->stripAttr($aName, sprintf(_("Link %s removed: %s"), $url, $ex->getMessage()));
+      $e->stripAttr($aName, sprintf(_("Attribute href '%s' removed: %s"), $url, $ex->getMessage()));
     }
   }
 
