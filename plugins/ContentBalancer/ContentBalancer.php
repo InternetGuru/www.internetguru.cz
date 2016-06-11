@@ -99,8 +99,8 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $content->formatOutput = true;
     $body = $content->appendChild($content->createElement("body"));
     $body->setAttribute("ns", $c->documentElement->getAttribute("ns"));
-    foreach($h1->parentNode->attributes as $attName => $attNode) {
-      $body->setAttributeNode($content->importNode($attNode));
+    foreach($h1->parentNode->attributes as $attNode) {
+      $body->setAttribute($attNode->nodeName, $attNode->nodeValue);
     }
     $this->appendUntilSame($h1, $body);
     return $content;
