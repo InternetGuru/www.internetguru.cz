@@ -209,8 +209,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         return;
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
-      if(array_key_exists("id", $pLink))
+      if(array_key_exists("id", $pLink) && !array_key_exists("query", $pLink)) {
         $this->insertTitle($e, $pLink["id"]);
+      }
       $link = buildLocalUrl($pLink, false, $getLink);
       $e->setAttribute($aName, $link);
     } catch(Exception $ex) {
