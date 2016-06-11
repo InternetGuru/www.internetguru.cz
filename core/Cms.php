@@ -189,7 +189,7 @@ class Cms {
       $tmpContent->validatePlus(true);
       return $tmpContent;
     } catch(Exception $e) {
-      Logger::user_error(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()));
+      Logger::user_error(sprintf(_("Invalid HTML+ caused by: %s"), $e->getMessage()));
       return $content;
     }
   }
@@ -202,12 +202,12 @@ class Cms {
     $object = gettype($content) == "object";
     if(!($object && $content instanceof HTMLPlus)) {
       $name = $object ? get_class($content) : gettype($content);
-      throw new Exception(sprintf(_("Content must be an instance of HTMLPlus (%s given)"), $name));
+      throw new Exception(sprintf(_("Content must be an instance of HTML+ (%s given)"), $name));
     }
     try {
       $content->validatePlus();
     } catch(Exception $e) {
-      throw new Exception(sprintf(_("Invalid HTMLPlus content: %s"), $e->getMessage()));
+      throw new Exception(sprintf(_("Invalid HTML+ content: %s"), $e->getMessage()));
     }
   }
 
