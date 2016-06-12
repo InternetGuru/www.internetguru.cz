@@ -1,0 +1,11 @@
+RewriteEngine  on
+
+##
+# set rewrite base
+RewriteCond   %{HTTP_REFERER}        localhost/([^/]+)
+RewriteRule   .                      - [E=RB:/%1/]
+
+##
+# create _GET parameters
+RewriteCond   %{REQUEST_FILENAME}    !-f
+RewriteRule   .*                     %{ENV:RB}findex.php?q=$0 [QSA]
