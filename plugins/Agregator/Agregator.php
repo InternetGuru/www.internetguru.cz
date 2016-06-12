@@ -276,12 +276,13 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     foreach($files as $fileName => $rootDir) {
       $filePath = $rootDir."/".(strlen($subDir) ? "$subDir/" : "").$fileName;
       try {
-        $vars[$filePath] = HTMLPlusBuilder::register($filePath, $subDir, $subDir);
+        $id = HTMLPlusBuilder::register($filePath, $subDir, $subDir);
+        $vars[$filePath] = HTMLPlusBuilder::getIdToAll($id);
         $vars[$filePath]["filemtime"] = HTMLPlusBuilder::getFileMtime($filePath);
         $vars[$filePath]["parentid"] = $subDir;
         $vars[$filePath]["prefixid"] = $subDir;
         $vars[$filePath]["file"] = $filePath;
-        $vars[$filePath]["link"] = HTMLPlusBuilder::getFileToId($filePath);
+        $vars[$filePath]["link"] = $id;
         $vars[$filePath]['editlink'] = "";
         if(Cms::isSuperUser()) {
           $vars[$filePath]['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";

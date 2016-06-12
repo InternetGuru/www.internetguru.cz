@@ -23,6 +23,10 @@ class DOMBuilder {
     return self::$newestFileMtime > self::getNewestCacheMtime();
   }
 
+  public static function getNewestFileMtime() {
+    return timestamptToW3C(self::$newestFileMtime);
+  }
+
   protected static function setNewestFileMtime($mtime) {
     if($mtime <= self::$newestFileMtime) return;
     self::$newestFileMtime = $mtime;

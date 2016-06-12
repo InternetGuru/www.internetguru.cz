@@ -48,14 +48,11 @@ class Cms {
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    $reg = HTMLPlusBuilder::register(INDEX_HTML);
-    self::setVariable("lang", $reg["lang"]);
-    self::setVariable("ctime", $reg["ctime"]);
-    self::setVariable("mtime", $reg["mtime"]);
-    self::setVariable("author", $reg["author"]);
-    self::setVariable("authorid", $reg["authorid"]);
-    self::setVariable("resp", $reg["resp"]);
-    self::setVariable("respid", $reg["respid"]);
+    $id = HTMLPlusBuilder::register(INDEX_HTML);
+    foreach(HTMLPlusBuilder::getIdToAll($id) as $k => $v) {
+      self::setVariable($k, $v);
+    }
+    self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
     self::setVariable("uri", URI);
