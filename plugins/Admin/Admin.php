@@ -114,11 +114,12 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       }
       return;
     }
-    if(getRealResDir() == RESOURCES_DIR
-      && is_file($this->defaultFile)
-      && isUptodate($this->dataFile, $this->defaultFile)) return;
-    if(is_file(getRealResDir($this->defaultFile))
-      && isUptodate($this->dataFile, getRealResDir($this->defaultFile))) return;
+    if(!is_file(getRealResDir($this->defaultFile))
+      || isUptodate($this->dataFile, getRealResDir($this->defaultFile))) {
+      if(getRealResDir() != RESOURCES_DIR) return;
+      if(!is_file($this->defaultFile)
+        || isUptodate($this->dataFile, $this->defaultFile)) return;
+    }
     Cms::notice(_("Saving changes will remove outdated file cache"));
   }
 
