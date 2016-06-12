@@ -333,8 +333,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $title = null;
     foreach($this->subject->getIsInterface("IGCMS\Core\TitleStrategyInterface") as $clsName => $cls) {
       $title = $cls->getTitle();
+      if(!is_null($title)) return $title;
     }
-    if(!is_null($title)) return $title;
     return $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
   }
 
