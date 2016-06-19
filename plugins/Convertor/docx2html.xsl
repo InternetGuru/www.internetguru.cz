@@ -119,13 +119,25 @@
                     </xsl:apply-templates>
                   </desc>
                 </xsl:when>
-                <xsl:otherwise>·
-  <xsl:copy-of select="$secIndent"/><desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found (use @ to specify keywords) --></xsl:text></desc>
-                  <xsl:if test="not($nextHPos = $curHPos+1)">
-                    <xsl:apply-templates select="//p[position() = $curHPos+1]">
-                      <xsl:with-param name="pIndent" select="$secIndent"/>
-                    </xsl:apply-templates>
-                  </xsl:if>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="//p[position() = $curHPos+1][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">·
+  <xsl:copy-of select="$secIndent"/><desc>
+                        <xsl:apply-templates select="//p[position() = $curHPos+1]">
+                          <xsl:with-param name="nop" select="1"/>
+                        </xsl:apply-templates>
+                      </desc>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <desc>n/a</desc>
+                      <xsl:if test="not($nextHPos = $curHPos+1)">
+                        <xsl:apply-templates select="//p[position() = $curHPos+1]">
+                          <xsl:with-param name="pIndent" select="$secIndent"/>
+                        </xsl:apply-templates>
+                      </xsl:if>
+                    </xsl:otherwise>
+                    <xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found (use @ to specify keywords) --></xsl:text>
+                  </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>

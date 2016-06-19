@@ -100,22 +100,20 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     if(!$firstHeading->hasAttribute("short") && !is_null($this->docName))
       $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
-    $this->regenerateIds($doc);
+    foreach($doc->getElementsByTagName("h") as $h) {
+      $h->setAttribute("id", "");
+    }
     try {
-      $doc->validatePlus();
-    } catch(Exception $e) {
-      try {
-        $doc->validatePlus(true);
-        foreach($doc->getErrors() as $error) {
-          Logger::user_notice(_("Autocorrected").":$error");
-        }
-      } catch(Exception $e) {
-        Cms::notice(_("Use @ to specify short/link attributes for heading"));
-        Cms::notice(_("Eg. This Is Long Heading @ Short Heading"));
-        Cms::notice(_("Use @ to specify kw attribute for description"));
-        Cms::notice(_("Eg. This is description @ these, are, some, keywords"));
-        throw $e;
+      $doc->validatePlus(true);
+      foreach($doc->getErrors() as $error) {
+        Logger::user_notice(_("Autocorrected").":$error");
       }
+    } catch(Exception $e) {
+      Cms::notice(_("Use @ to specify short attribute for heading"));
+      Cms::notice(_("Eg. This Is Long Heading @ Short Heading"));
+      Cms::notice(_("Use @ to specify kw attribute for description"));
+      Cms::notice(_("Eg. This is description @ these, are, some, keywords"));
+      throw $e;
     }
     $doc->applySyntax();
     $this->html = $doc->saveXML();
@@ -159,13 +157,6 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
-  private function addLinks(HTMLPlus $doc) {
-    foreach($doc->getElementsByTagName("h") as $e) {
-      if(!$e->hasAttribute("short")) continue;
-      $e->setAttribute("link", normalize($e->getAttribute("short"), "a-zA-Z0-9/_-", ""));
-    }
-  }
-
   public function getContent() {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $content = $this->getHTMLPlus();
@@ -180,12 +171,6 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
     $content->processVariables($vars);
     return $content;
-  }
-
-  private function regenerateIds(DOMDocumentPlus $doc) {
-    foreach($doc->getElementsByTagName("h") as $h) {
-      $h->setUniqueId($h->nodeValue);
-    }
   }
 
   private function getFile($dest) {
@@ -279,7 +264,11 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
-    $xsl = $this->getXML($this->pluginDir."/$xslFile", false, false);
+    try {
+      $xsl = $this->getXML($xslFile, false, false);
+    } catch(Exception $e) {
+      throw new Exception(sprintf(_("Unable to load transforamtion file %s: %s"), $xslFile, $e->getMessage()));
+    }
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);
