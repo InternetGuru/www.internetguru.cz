@@ -267,7 +267,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     try {
       $xsl = $this->getXML($xslFile, false, false);
     } catch(Exception $e) {
-      throw new Exception(sprintf(_("Unable to load transforamtion file %s: %s"), $xslFile, $e->getMessage()));
+      throw new Exception(sprintf(_("Unable to load transformation file %s: %s"), $xslFile, $e->getMessage()));
     }
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
