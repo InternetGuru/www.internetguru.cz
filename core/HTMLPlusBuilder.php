@@ -19,7 +19,6 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static $fileToId = array();
   private static $fileToDoc = array();
-  private static $fileToInclude = array();
   private static $fileToMtime = array();
 
   private static $idToParentId = array();
@@ -179,12 +178,11 @@ class HTMLPlusBuilder extends DOMBuilder {
       $doc = new HTMLPlus();
       $fp = findFile($filePath);
       $doc->load($fp);
+      self::validateHtml($doc, $filePath, false);
       self::insertIncludes($doc, dirname($filePath));
-      $doc->validatePlus(true);
-      if(count($doc->getErrors())) {
-        Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
-          count($doc->getErrors()), $filePath));
-        self::$storeCache = false;
+      if(array_key_exists("fileToMtime", self::$currentFileTo)
+        && count(self::$currentFileTo["fileToMtime"]) > 1) {
+        self::validateHtml($doc, $filePath, true);
       }
       self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
       self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
@@ -194,12 +192,20 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
   }
 
+  private static function validateHtml(HTMLPlus $doc, $filePath, $included) {
+    $doc->validatePlus(true);
+    if(empty($doc->getErrors())) return;
+    if($included) $msg = _("File %s invalid syntax caused by includes fixed %s times");
+    else $msg = _("File %s invalid syntax fixed %s times");
+    Logger::user_notice(sprintf($msg, $filePath, count($doc->getErrors())));
+    self::$storeCache = false;
+  }
+
   private static function insertIncludes(HTMLPlus $doc, $workingDir) {
     foreach($doc->getElementsByTagName("h") as $h) {
       if(!$h->hasAttribute("src")) continue;
       try {
         $file = self::insert($h, $workingDir);
-        self::$currentFileTo["fileToInclude"][] = $file;
       } catch(Exception $e) {
         $msg = sprintf(_("Unable to import: %s"), $e->getMessage());
         Logger::user_error($msg);
