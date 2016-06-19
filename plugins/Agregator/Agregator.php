@@ -278,7 +278,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       try {
         $id = HTMLPlusBuilder::register($filePath, $subDir, $subDir);
         $vars[$filePath] = HTMLPlusBuilder::getIdToAll($id);
-        $vars[$filePath]["filemtime"] = HTMLPlusBuilder::getFileMtime($filePath);
+        $vars[$filePath]["fileToMtime"] = HTMLPlusBuilder::getFileToMtime($filePath);
         $vars[$filePath]["parentid"] = $subDir;
         $vars[$filePath]["prefixid"] = $subDir;
         $vars[$filePath]["file"] = $filePath;
@@ -294,9 +294,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       }
       if(!IS_LOCALHOST && is_file($inotify)) continue;
       $cacheKey = apc_get_key($filePath);
-      if(apc_is_valid_cache($cacheKey, $vars[$filePath]["filemtime"])) continue;
+      if(apc_is_valid_cache($cacheKey, $vars[$filePath]["fileToMtime"])) continue;
       #var_dump($vars[$filePath]);
-      apc_store_cache($cacheKey, $vars[$filePath]["filemtime"], $filePath);
+      apc_store_cache($cacheKey, $vars[$filePath]["fileToMtime"], $filePath);
       $useCache = false;
     }
     return $vars;

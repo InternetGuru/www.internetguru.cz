@@ -67,7 +67,7 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
     foreach(HTMLPlusBuilder::getIdToLink() as $id => $link) {
       if(strpos($link, "#") !== false) continue;
       $file = HTMLPlusBuilder::getIdToFile($id);
-      $mtime = timestamptToW3C(HTMLPlusBuilder::getFileMtime($file));
+      $mtime = timestamptToW3C(HTMLPlusBuilder::getFileToMtime($file));
       $links[$link] = $mtime;
     }
     return $links;

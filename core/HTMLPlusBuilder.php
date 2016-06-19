@@ -20,7 +20,7 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static $fileToId = array();
   private static $fileToDoc = array();
   private static $fileToInclude = array();
-  private static $fileMtime = array();
+  private static $fileToMtime = array();
 
   private static $idToParentId = array();
   private static $idToFile = array();
@@ -41,7 +41,8 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static $linkToId = array();
 
   private static $storeCache;
-  private static $current;
+  private static $currentFileTo;
+  private static $currentIdTo;
 
   public static function getIdToAll($id) {
     $register = array();
@@ -55,12 +56,13 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   public static function __callStatic($methodName, $arguments) {
+    $className = (new \ReflectionClass(self::class))->getShortName();
     if(strpos($methodName, "get") !== 0) {
-      throw new Exception("Undefined method $methodName");
+      throw new Exception("Undefined $className method $methodName");
     }
     $propertyName = strtolower(substr($methodName, 3, 1)).substr($methodName, 4);
     if(!property_exists(get_called_class(), $propertyName)) {
-      throw new Exception("Undefined property $propertyName");
+      throw new Exception("Undefined $className property $propertyName");
     }
     if(count($arguments)) {
       if(!array_key_exists($arguments[0], self::$$propertyName)) return null;
@@ -91,10 +93,11 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   public static function register($filePath, $parentId='', $linkPrefix='') {
-    self::$current = array();
+    self::$currentFileTo = array();
+    self::$currentIdTo = array();
     #self::$storeCache = true;
     #$cacheKey = apc_get_key($filePath);
-    #if(apc_is_valid_cache($cacheKey, $fileMtime)) {
+    #if(apc_is_valid_cache($cacheKey, $fileToMtime)) {
       # load $current
       # register $current
       # self::$storeCache = false
@@ -102,9 +105,9 @@ class HTMLPlusBuilder extends DOMBuilder {
     #}
 
     $doc = self::load($filePath);
-    self::$current["fileToDoc"] = $doc;
+    self::$currentFileTo["fileToDoc"] = $doc;
     $id = $doc->documentElement->firstElement->getAttribute("id");
-    self::$current["fileToId"] = $id;
+    self::$currentFileTo["fileToId"] = $id;
     self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
     self::addToRegister($filePath);
 
@@ -138,17 +141,14 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   private static function addToRegister($filePath) {
-    foreach(self::$current as $name => $value) {
-      switch($name) {
-        case "fileToId":
-        case "fileToDoc":
-        case "fileToInclude":
-        case "fileToMtime":
-        self::$$name[$filePath] = $value;
-        break;
-        default:
-        foreach($value as $id => $v) self::$$name[$id] = $v;
-      }
+    foreach(self::$currentFileTo as $name => $value) {
+      self::${$name}[$filePath] = $value;
+    }
+    foreach(self::$currentIdTo as $name => $value) {
+      foreach($value as $id => $v) self::${$name}[$id] = $v;
+    }
+    foreach(self::$currentIdTo["idToLink"] as $name => $value) {
+      self::$linkToId[$name] = $value;
     }
   }
 
@@ -162,8 +162,8 @@ class HTMLPlusBuilder extends DOMBuilder {
         Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
           count($doc->getErrors()), $filePath));
       self::insertIncludes($doc, dirname($fp));
-      self::$current["fileMtime"][$filePath] = filemtime($fp);
-      self::setNewestFileMtime(self::$current["fileMtime"][$filePath]);
+      self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
+      self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
       return $doc;
     } catch(Exception $e) {
       throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $e->getMessage()));
@@ -176,7 +176,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     foreach($includes as $include) {
       try {
         $file = self::insert($include, $workingDir);
-        self::$current["fileToInclude"][] = $file;
+        self::$currentFileTo["fileToInclude"][] = $file;
       } catch(Exception $e) {
         $msg = sprintf(_("Unable to import: %s"), $e->getMessage());
         $c = new DOMComment(" $msg ");
@@ -230,37 +230,37 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static function registerElement(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
     $id = $e->getAttribute("id");
     $link = "$linkPrefix/$id";
-    if($filePath == INDEX_HTML && !array_key_exists("idToLink", self::$current)) {
+    if($filePath == INDEX_HTML && !array_key_exists("idToLink", self::$currentIdTo)) {
       $link = "";
       $parentId = null;
     }
     if($id != $prefixId) {
-      $link = self::$current["idToLink"][$prefixId]."#$id";
+      $link = self::$currentIdTo["idToLink"][$prefixId]."#$id";
       $id = "$prefixId/$id";
     }
     if($e->nodeName == "h") {
-      self::$current["idToLink"][$id] = $link;
-      self::$current["linkToId"][$link] = $id;
+      self::$currentIdTo["idToLink"][$id] = $link;
+      #self::$currentIdTo["linkToId"][$link] = $id;
       self::setHeadingInfo($id, $e);
     }
-    self::$current["idToFile"][$id] = $filePath;
-    self::$current["idToTitle"][$id] = $e->getAttribute("title");
-    self::$current["idToParentId"][$id] = $parentId;
+    self::$currentIdTo["idToFile"][$id] = $filePath;
+    self::$currentIdTo["idToTitle"][$id] = $e->getAttribute("title");
+    self::$currentIdTo["idToParentId"][$id] = $parentId;
     return $id;
   }
 
   private static function setHeadingInfo($id, DOMElementPlus $h) {
-    self::$current["idToShort"][$id] = $h->getAttribute("short");
-    self::$current["idToHeading"][$id] = $h->nodeValue;
-    self::$current["idToDesc"][$id] = $h->nextElement->nodeValue;
-    self::$current["idToKw"][$id] = $h->nextElement->getAttribute("kw");
-    self::$current["idToAuthor"][$id] = $h->getAttribute("author");
-    self::$current["idToAuthorId"][$id] = $h->getAttribute("authorid");
-    self::$current["idToResp"][$id] = $h->getAttribute("resp");
-    self::$current["idToRespId"][$id] = $h->getAttribute("respid");
-    self::$current["idToCtime"][$id] = $h->getAttribute("ctime");
-    self::$current["idToMtime"][$id] = $h->getAttribute("mtime");
-    self::$current["idToLang"][$id] = $h->getSelfOrParentValue("xml:lang");
+    self::$currentIdTo["idToShort"][$id] = $h->getAttribute("short");
+    self::$currentIdTo["idToHeading"][$id] = $h->nodeValue;
+    self::$currentIdTo["idToDesc"][$id] = $h->nextElement->nodeValue;
+    self::$currentIdTo["idToKw"][$id] = $h->nextElement->getAttribute("kw");
+    self::$currentIdTo["idToAuthor"][$id] = $h->getAttribute("author");
+    self::$currentIdTo["idToAuthorId"][$id] = $h->getAttribute("authorid");
+    self::$currentIdTo["idToResp"][$id] = $h->getAttribute("resp");
+    self::$currentIdTo["idToRespId"][$id] = $h->getAttribute("respid");
+    self::$currentIdTo["idToCtime"][$id] = $h->getAttribute("ctime");
+    self::$currentIdTo["idToMtime"][$id] = $h->getAttribute("mtime");
+    self::$currentIdTo["idToLang"][$id] = $h->getSelfOrParentValue("xml:lang");
   }
 
 }
