@@ -202,7 +202,7 @@ class HTMLPlus extends DOMDocumentPlus {
   public function validatePlus($repair = false) {
     $i = 0;
     $hash = hash(FILE_HASH_ALGO, $this->saveXML());
-    $version = 2; // increment if validatePlus changes
+    $version = 3; // increment if validatePlus changes
     $cacheKey = apc_get_key("HTMLPlus/validatePlus/$hash/$version");
     if(apc_exists($cacheKey)) $i = apc_fetch($cacheKey);
     #var_dump("$hash found $i");
@@ -215,15 +215,16 @@ class HTMLPlus extends DOMDocumentPlus {
         case 1: $this->validateSections($repair); $i++;
         case 2: $this->validateLang($repair); $i++;
         case 3: $this->validateHid($repair); $i++;
-        case 4: $this->validateHempty($repair); $i++;
-        case 5: $this->validateDl($repair); $i++;
-        case 6: $this->validateDates($repair); $i++;
-        case 7: $this->validateAuthor($repair); $i++;
-        case 8: $this->validateFirstHeadingAuthor($repair); $i++;
-        case 9: $this->validateFirstHeadingCtime($repair); $i++;
-        case 10: $this->validateBodyNs($repair); $i++;
-        case 11: $this->validateDesc($repair); $i++;
-        case 12: $this->relaxNGValidatePlus(); $i++;
+        case 4: $this->validateHsrc($repair); $i++;
+        case 5: $this->validateHempty($repair); $i++;
+        case 6: $this->validateDl($repair); $i++;
+        case 7: $this->validateDates($repair); $i++;
+        case 8: $this->validateAuthor($repair); $i++;
+        case 9: $this->validateFirstHeadingAuthor($repair); $i++;
+        case 10: $this->validateFirstHeadingCtime($repair); $i++;
+        case 11: $this->validateBodyNs($repair); $i++;
+        case 12: $this->validateDesc($repair); $i++;
+        case 13: $this->relaxNGValidatePlus(); $i++;
       }
     } catch(Exception $e) {
       $this->status = self::STATUS_INVALID;
@@ -252,7 +253,8 @@ class HTMLPlus extends DOMDocumentPlus {
       }
     }
     if(empty($invalid)) return;
-    throw new Exception(sprintf(_("Heading description missing or empty: %s"), implode(", ", $invalid)));
+    $message = sprintf(_("Heading description missing or empty: %s"), implode(", ", $invalid));
+    $this->errorHandler($message, false);
   }
 
   private function validateBodyNs($repair) {
@@ -289,8 +291,10 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   private function validateRoot($repair) {
-    if(is_null($this->documentElement))
-      throw new Exception(_("Root element not found"));
+    if(is_null($this->documentElement)) {
+      $message = _("Root element not found");
+      $this->errorHandler($message, false);
+    }
     if($this->documentElement->nodeName != "body") {
       $message = _("Root element must be 'body'");
       $this->errorHandler($message, $repair);
@@ -392,6 +396,18 @@ class HTMLPlus extends DOMDocumentPlus {
       }
       $hIds[$h->getAttribute("id")] = null;
     }
+  }
+
+  private function validateHsrc($repair) {
+    $invalid = array();
+    foreach($this->headings as $h) {
+      if(!$h->hasAttribute("src")) continue;
+      if(preg_match("#^[a-z][a-z0-9_/.-]*\.html$#", $h->getAttribute("src"))) continue;
+      $invalid[] = $h->getAttribute("src");
+    }
+    if(empty($invalid)) return;
+    $message = sprintf(_("Invalid src format: %s"), implode(", ", $invalid));
+    $this->errorHandler($message, false);
   }
 
   private function validateHempty($repair) {

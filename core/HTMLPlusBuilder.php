@@ -157,32 +157,28 @@ class HTMLPlusBuilder extends DOMBuilder {
       $doc = new HTMLPlus();
       $fp = findFile($filePath);
       $doc->load($fp);
+      self::insertIncludes($doc, dirname($filePath));
       $doc->validatePlus(true);
       if(count($doc->getErrors()))
         Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
           count($doc->getErrors()), $filePath));
-      self::insertIncludes($doc, dirname($fp));
       self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
       self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
       return $doc;
     } catch(Exception $e) {
-      throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $e->getMessage()));
+      throw new Exception(sprintf(_("Unable to load %s: %s"), $fp, $e->getMessage()));
     }
   }
 
   private static function insertIncludes(HTMLPlus $doc, $workingDir) {
-    $includes = array();
-    foreach($doc->getElementsByTagName("include") as $include) $includes[] = $include;
-    foreach($includes as $include) {
+    foreach($doc->getElementsByTagName("h") as $h) {
+      if(!$h->hasAttribute("src")) continue;
       try {
-        $file = self::insert($include, $workingDir);
+        $file = self::insert($h, $workingDir);
         self::$currentFileTo["fileToInclude"][] = $file;
       } catch(Exception $e) {
         $msg = sprintf(_("Unable to import: %s"), $e->getMessage());
-        $c = new DOMComment(" $msg ");
-        $include->parentNode->insertBefore($c, $include);
         Logger::user_error($msg);
-        $include->stripTag();
         self::$storeCache = false;
       }
     }
@@ -191,25 +187,29 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static function getIncludeSrc($src, $workingDir) {
     if(pathinfo($src, PATHINFO_EXTENSION) != "html")
       throw new Exception(sprintf(_("Included file '%s' extension must be html"), $src));
-    $file = realpath("$workingDir/$src");
-    if($file === false)
-      throw new Exception(sprintf(_("Included file '%s' not found"), $src));
-    if(strpos($file, realpath("$workingDir/")) !== 0)
+    $file = findFile("$workingDir/$src");
+    if(strpos(realpath($file), realpath("$workingDir/")) !== 0)
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $src));
+    if($workingDir == ".") return $src;
     return "$workingDir/$src";
   }
 
-  private static function insert(DOMElement $include, $workingDir) {
-    $src = $include->getAttribute("src");
+  private static function insert(DOMElement $h, $workingDir) {
+    $src = $h->getAttribute("src");
     $includeFile = self::getIncludeSrc($src, $workingDir);
     $doc = self::load($includeFile);
     $lang = $doc->documentElement->getAttribute("xml:lang");
     foreach($doc->documentElement->childElementsArray as $n) {
-      $e = $include->parentNode->insertBefore($include->ownerDocument->importNode($n, true), $include);
+      $e = $h->parentNode->insertBefore($h->ownerDocument->importNode($n, true), $h);
       if(strlen($e->getAttribute("xml:lang"))) continue;
       $e->setAttribute("xml:lang", $lang);
     }
-    $include->parentNode->removeChild($include);
+    while(!is_null($h)) {
+      $next = $h->nextElement;
+      $h->parentNode->removeChild($h);
+      $h = $next;
+      if($h->nodeName == "h") break;
+    }
     return $includeFile;
   }
 
