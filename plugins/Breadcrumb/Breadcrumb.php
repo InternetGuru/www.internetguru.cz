@@ -40,8 +40,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       $path[] = $parentId;
       $parentId = HTMLPlusBuilder::getIdToParentId($parentId);
     }
-    var_dump(HTMLPlusBuilder::getIdToParentId());
-    var_dump($path); die("die");
+    #var_dump($path); die("die");
     $bc = new DOMDocumentPlus();
     $root = $bc->appendChild($bc->createElement("root"));
     $ol = $root->appendChild($bc->createElement("ol"));

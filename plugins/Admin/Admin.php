@@ -43,7 +43,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 5);
+    $s->setPriority($this, 2);
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
     $this->dataFileStatus = self::STATUS_UNKNOWN;
@@ -64,7 +64,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     try {
       $this->process();
     } catch (Exception $e) {
-      Logger::user_error($e->getMessage());
+      Logger::user_error($this->className.": ".$e->getMessage());
       return;
     }
     if(!$this->isPost()) return;
