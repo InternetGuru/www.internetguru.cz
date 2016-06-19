@@ -40,9 +40,11 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static $idToLink = array();
   private static $linkToId = array();
 
-  private static $storeCache;
+  private static $storeCache = true;
   private static $currentFileTo;
   private static $currentIdTo;
+
+  const APC_ID = 0;
 
   public static function getIdToAll($id) {
     $register = array();
@@ -95,24 +97,44 @@ class HTMLPlusBuilder extends DOMBuilder {
   public static function register($filePath, $parentId=null, $linkPrefix='') {
     self::$currentFileTo = array();
     self::$currentIdTo = array();
-    #self::$storeCache = true;
-    #$cacheKey = apc_get_key($filePath);
-    #if(apc_is_valid_cache($cacheKey, $fileToMtime)) {
-      # load $current
-      # register $current
-      # self::$storeCache = false
-      # return $current
-    #}
-
-    $doc = self::load($filePath);
+    $cacheKey = apc_get_key(self::APC_ID.$filePath);
+    $useCache = false;
+    $cache = null;
+    if(apc_exists($cacheKey)) {
+      $cache = apc_fetch($cacheKey);
+      $useCache = true;
+      foreach($cache["currentFileTo"]["fileToMtime"] as $file => $mtime) {
+        try {
+          if($mtime == filemtime(findFile($file))) continue;
+        } catch(Exception $e) {}
+        $useCache = false;
+        break;
+      }
+    }
+    if($useCache) {
+      self::$currentFileTo = $cache["currentFileTo"];
+      $doc = new HTMLPlus();
+      $doc->loadXML(self::$currentFileTo["fileToXML"]);
+      self::$currentIdTo = $cache["currentIdTo"];
+      unset(self::$currentFileTo["fileToXML"]);
+      self::$storeCache = false;
+    } else {
+      $doc = self::load($filePath);
+      $id = $doc->documentElement->firstElement->getAttribute("id");
+      self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
+      self::$currentFileTo["fileToId"] = $id;
+    }
     self::$currentFileTo["fileToDoc"] = $doc;
-    $id = $doc->documentElement->firstElement->getAttribute("id");
-    self::$currentFileTo["fileToId"] = $id;
-    self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
     self::addToRegister($filePath);
+    if(self::$storeCache) self::setApc($cacheKey, $filePath);
+    return self::$currentFileTo["fileToId"];
+  }
 
-    #if(self::$storeCache) self::setApc($cacheKey);
-    return $id;
+  private static function setApc($cacheKey, $filePath) {
+    self::$currentFileTo["fileToXML"] = self::$currentFileTo["fileToDoc"]->saveXML();
+    unset(self::$currentFileTo["fileToDoc"]);
+    $value = array("currentIdTo" => self::$currentIdTo, "currentFileTo" => self::$currentFileTo);
+    apc_store_cache($cacheKey, $value, $filePath);
   }
 
   public static function isLink($link) {
@@ -159,9 +181,11 @@ class HTMLPlusBuilder extends DOMBuilder {
       $doc->load($fp);
       self::insertIncludes($doc, dirname($filePath));
       $doc->validatePlus(true);
-      if(count($doc->getErrors()))
+      if(count($doc->getErrors())) {
         Logger::user_notice(sprintf(_("Invalid HTML+ syntax fixed %s times: %s"),
           count($doc->getErrors()), $filePath));
+        self::$storeCache = false;
+      }
       self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
       self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
       return $doc;
