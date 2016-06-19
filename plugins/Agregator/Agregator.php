@@ -276,7 +276,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     foreach($files as $fileName => $rootDir) {
       $filePath = $rootDir."/".(strlen($subDir) ? "$subDir/" : "").$fileName;
       try {
-        $id = HTMLPlusBuilder::register($filePath, HTMLPlusBuilder::getFileToId(INDEX_HTML), $subDir);
+        $id = HTMLPlusBuilder::register($filePath, null, $subDir);
         $vars[$filePath] = HTMLPlusBuilder::getIdToAll($id);
         $vars[$filePath]["fileToMtime"] = HTMLPlusBuilder::getFileToMtime($filePath);
         $vars[$filePath]["parentid"] = $subDir;

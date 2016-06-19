@@ -92,7 +92,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
   }
 
-  public static function register($filePath, $parentId='', $linkPrefix='') {
+  public static function register($filePath, $parentId=null, $linkPrefix='') {
     self::$currentFileTo = array();
     self::$currentIdTo = array();
     #self::$storeCache = true;
@@ -230,9 +230,9 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static function registerElement(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
     $id = $e->getAttribute("id");
     $link = "$linkPrefix/$id";
-    if($filePath == INDEX_HTML && !array_key_exists("idToLink", self::$currentIdTo)) {
-      $link = "";
-      $parentId = null;
+    if(is_null($parentId)) {
+      if($filePath == INDEX_HTML) $link = "";
+      else $parentId = current(self::$fileToId);
     }
     if($id != $prefixId) {
       $link = self::$currentIdTo["idToLink"][$prefixId]."#$id";
