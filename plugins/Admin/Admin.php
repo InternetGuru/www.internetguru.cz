@@ -84,12 +84,13 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     if($this->isPost()) {
       if($_POST["userfilehash"] != $this->getDataFileHash())
         throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
-      $this->processPost();
+      $this->contentValue = str_replace("\r\n", "\n", $_POST["content"]);;
     } else {
       $this->setContent();
     }
     if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
     if(!$this->isResource($this->type)) $this->processXml();
+    if($this->isPost()) $this->contentChanged = $this->getContentChanged();
     if($this->isToEnable()) $this->enableDataFile();
     if($this->isPost()) {
       $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
@@ -415,18 +416,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->validateXml($doc);
   }
 
-  private function processPost() {
-    $post_n = str_replace("\r\n", "\n", $_POST["content"]);
-    $post_rn = str_replace("\n", "\r\n", $post_n);
-    $this->contentValue = $post_n;
-    #if((isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_DISABLED)
-    #  || (!isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_ENABLED)) {
-    #  $this->dataFile = $this->changeStatus($this->dataFile);
-    #  $this->statusChanged = true;
-    #}
-    if(!in_array($_POST["userfilehash"], array($this->getHash($post_n), $this->getHash($post_rn)))) {
-      $this->contentChanged = true;
-    }
+  private function getContentChanged() {
+    $post_rn = str_replace("\n", "\r\n", $this->contentValue);
+    return !in_array($_POST["userfilehash"], array($this->getHash($this->contentValue), $this->getHash($post_rn)));
   }
 
   private function setContent() {
