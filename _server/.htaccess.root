@@ -2,8 +2,8 @@ RewriteEngine  on
 
 ##
 # set rewrite base
-RewriteCond   %{HTTP_REFERER}        localhost/([^/]+)
-RewriteRule   .                      - [E=RB:/%1/]
+RewriteCond   %{HTTP_REFERER}        localhost(:\d+)?/([^/]+)
+RewriteRule   .                      - [E=RB:/%2/]
 
 ##
 # create _GET parameters
