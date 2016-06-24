@@ -3,37 +3,22 @@
 try {
 
   // localhost
-  $cmsIndex = "../cms/index.php";
-  if(is_file($cmsIndex)) {
-    include($cmsIndex);
+  $index = "../cms/index.php";
+  if(is_file($index)) {
+    include($index);
     exit;
   }
 
-  // find version file and best release
-  $cmsIndex = null;
-  $cmsVersion = null;
-  $redir = null;
-  foreach(scandir(getcwd()) as $f) {
-    if(is_dir($f)) continue;
-    if(strpos($f, "REDIR.") === 0) { // eg. REDIR.www.internetguru.cz
-      header("Location: http://".substr($f, 6)."/".$_GET["q"]);
-      exit;
-    }
-    if(strpos($f, "VERSION.") === 0) { // eg. VERSION.1.0
-      $cmsVersion = substr($f, 8);
-    }
-    if(!preg_match("/^\d+\.\d+\.php$/", $f)) continue;
-    if(version_compare(substr($cmsIndex, 0, -4), substr($f, 0, -4)) > 0) continue;
-    $cmsIndex = $f;
+  if(is_file("REDIR")) {
+    header("Location: ".trim(file_get_contents("REDIR"))."/".$_GET["q"]);
+    exit;
   }
-  if(!is_null($cmsVersion)) $cmsIndex = "/var/www/cms/$cmsVersion/index.php";
 
-  // else throw
-  if(!is_file($cmsIndex)) throw new Exception("Unable to find stable CMS version");
-  if(is_null($cmsVersion)) touch("VERSION.".substr($cmsIndex, 0, -4));
-
-  // include link given version
-  include($cmsIndex);
+  if(!is_file("VERSION")) throw new Exception("File VERSION not found");
+  $version = trim(file_get_contents("VERSION"));
+  $index = "/var/www/cms/$version/index.php";
+  if(!is_file($index)) throw new Exception("CMS $version index.php not found");
+  include($index);
 
 } catch(Exception $e) {
 

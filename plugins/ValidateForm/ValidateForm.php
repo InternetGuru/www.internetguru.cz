@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
@@ -13,7 +13,7 @@ use DOMXPath;
 use SplObserver;
 use SplSubject;
 
-class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterface {
+class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
   const FORM_ID = "validateform-id";
@@ -35,7 +35,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.(new \ReflectionClass($this))->getShortName().'.css');
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     foreach($xpath->query("//form") as $form) {
       if(!$form->hasClass("validable")) continue;

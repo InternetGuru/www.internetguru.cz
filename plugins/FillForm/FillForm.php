@@ -2,14 +2,14 @@
 
 namespace IGCMS\Plugins;
 
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Plugin;
 use SplObserver;
 use SplSubject;
 
-class FillForm extends Plugin implements SplObserver, ContentStrategyInterface {
+class FillForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -18,12 +18,12 @@ class FillForm extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {}
 
-  public function getContent(HTMLPlus $c) {
-    foreach($c->getElementsByTagName("form") as $form) {
+  public function modifyContent(HTMLPlus $content) {
+    foreach($content->getElementsByTagName("form") as $form) {
       if(!$form->hasClass("fillable")) continue;
       $this->fillForm($form);
     }
-    return $c;
+    return $content;
   }
 
   private function fillForm(DOMElementPlus $form) {

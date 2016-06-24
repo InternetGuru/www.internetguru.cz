@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
@@ -12,7 +12,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
+class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   private $cfg;
   private $vars = array();
@@ -21,7 +21,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
   private $cookieProducts = array();
   private $useCache = true;
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
     $content->processVariables($this->productVars);
     return $content;
   }
@@ -45,7 +45,7 @@ class Basket extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->detachIfNotAttached("HtmlOutput")) return;
     try {
       // load config
-      $this->cfg = $this->getDOMPlus();
+      $this->cfg = $this->getXML();
       $this->validateConfigCache();
       $this->loadVariables();
       // after submitting form delete cookies

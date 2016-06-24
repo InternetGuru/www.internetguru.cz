@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -15,7 +15,7 @@ use DOMXPath;
 use SplObserver;
 use SplSubject;
 
-class ContactForm extends Plugin implements SplObserver, ContentStrategyInterface {
+class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   private $cfg;
   private $vars = array();
@@ -27,7 +27,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   private $messages;
   private $errors = array();
   private $forms = array();
-  private $className = null;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
   const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
@@ -35,7 +34,6 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
-    $this->className = (new \ReflectionClass($this))->getShortName();
     $mail = new PHPMailer;
   }
 
@@ -57,7 +55,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
   }
 
   private function initForm() {
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     $this->createGlobalVars();
     foreach($this->forms as $formId => $form) {
       $form->addClass("fillable");
@@ -115,7 +113,7 @@ class ContactForm extends Plugin implements SplObserver, ContentStrategyInterfac
     }
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     if(!$xpath->query("//*[contains(@var, 'contactform-')]")->length) return $content;
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {

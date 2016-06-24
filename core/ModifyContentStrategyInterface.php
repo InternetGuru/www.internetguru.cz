@@ -4,13 +4,12 @@ namespace IGCMS\Core;
 
 use IGCMS\Core\HTMLPlus;
 
-interface ContentStrategyInterface {
+interface ModifyContentStrategyInterface {
   /**
-   * [getContent description]
    * @param  HTMLPlus $content
    * @return HTMLPlus          changed or same $content
    */
-  public function getContent(HTMLPlus $content);
+  public function modifyContent(HTMLPlus $content);
 }
 
 ?>

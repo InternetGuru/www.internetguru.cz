@@ -146,7 +146,9 @@ class DOMElementPlus extends DOMElement {
     $dom = new DOMDocumentPlus();
     $eNam = $this->nodeName;
     $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
-    if(!@$dom->loadXML($xml)) {
+    try {
+      $dom->loadXML($xml);
+    } catch(Exception $e) {
       $var = $dom->appendChild($dom->createElement("var"));
       foreach($html as $k => $v) {
         $e = $var->appendChild($dom->createElement($eNam));
@@ -244,6 +246,15 @@ class DOMElementPlus extends DOMElement {
     return null;
   }
 
+  public function getSelfOrParentValue($attName=null, $eName=null) {
+    if(!strlen($attName)) {
+      if(strlen($this->nodeValue)) return htmlspecialchars($this->nodeValue); // TODO: remove specialchars?
+    } else {
+      if(strlen($this->getAttribute($attName))) return $this->getAttribute($attName);
+    }
+    return $this->getParentValue($attName, $eName);
+  }
+
   public function getParentValue($attName=null, $eName=null) {
     $parent = $this;
     while(!is_null($parent)) {
@@ -253,7 +264,7 @@ class DOMElementPlus extends DOMElement {
       if(!is_null($attName) && $parent->hasAttribute($attName)) {
         return $parent->getAttribute($attName);
       } elseif(is_null($attName) && strlen($parent->nodeValue)) {
-        return htmlspecialchars($parent->nodeValue);
+        return htmlspecialchars($parent->nodeValue); // TODO: remove specialchars?
       }
     }
     return null;
@@ -293,6 +304,9 @@ class DOMElementPlus extends DOMElement {
       case "firstElement":
       return $this->getFirstElement();
       break;
+      case "lastElement":
+      return $this->getLastElement();
+      break;
       #default:
       #return parent::__get($name);
     }
@@ -310,11 +324,26 @@ class DOMElementPlus extends DOMElement {
     return $e;
   }
 
-  public function setUniqueId() {
-    $id = $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);
-    if(!isValidId($id)) $this->setUniqueId();
-    if(!is_null($this->ownerDocument->getElementById($id))) $this->setUniqueId();
-    $this->setAttribute("id", $id);
+  public function setUniqueId($i=0) {
+    $id = $this->getValidId();
+    if($i != 0) $id .= $i;
+    try {
+      if(is_null($this->ownerDocument->getElementById($id))) {
+        $this->setAttribute("id", $id);
+        return;
+      }
+    } catch(Exception $e) {}
+    $this->setUniqueId(++$i);
+  }
+
+  private function getValidId() {
+    $id = normalize($this->getAttribute("name"));
+    if(isValidId($id)) return $id;
+    $id = normalize($this->getAttribute("short"));
+    if(isValidId($id)) return $id;
+    $id = normalize($this->nodeValue);
+    if(isValidId($id)) return $id;
+    return $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);
   }
 
   private function getChildElementsArray() {
@@ -330,6 +359,12 @@ class DOMElementPlus extends DOMElement {
     $childElements = $this->childElementsArray;
     if(!count($childElements)) return null;
     return $childElements[0];
+  }
+
+  private function getLastElement() {
+    $childElements = $this->childElementsArray;
+    if(!count($childElements)) return null;
+    return $childElements[count($childElements)-1];
   }
 
 }

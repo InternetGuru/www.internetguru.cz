@@ -33,10 +33,7 @@
       <element name="section">
         <ref name="Common.attrib"/>
         <oneOrMore>
-          <choice>
-            <ref name="contentBlock"/>
-            <ref name="htmlplus.include"/>
-          </choice>
+          <ref name="contentBlock"/>
         </oneOrMore>
       </element>
     </optional>
@@ -50,17 +47,6 @@
     </optional>
   </define>
 
-  <define name="htmlplus.include">
-    <element name="include">
-      <attribute name="src">
-        <data type="string">
-          <param name="pattern">[a-z][a-z0-9_/.-]*</param>
-        </data>
-      </attribute>
-      <ref name="contentBlock"/>
-    </element>
-  </define>
-
   <define name="htmlplus.h">
     <element name="h">
       <ref name="CommonIdRequired.attrib"/>
@@ -70,13 +56,6 @@
         <attribute name="short">
           <data type="string">
             <param name="pattern">.*\S.*</param>
-          </data>
-        </attribute>
-      </optional>
-      <optional>
-        <attribute name="link">
-          <data type="string">
-            <param name="pattern">[a-z][a-z0-9_/-]*</param>
           </data>
         </attribute>
       </optional>
@@ -116,6 +95,13 @@
       <optional>
         <attribute name="ctime">
           <ref name="datetime"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="src">
+          <data type="string">
+            <param name="pattern">[a-z][a-z0-9_/.-]*\.html</param>
+          </data>
         </attribute>
       </optional>
       <zeroOrMore>

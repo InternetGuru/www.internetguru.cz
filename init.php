@@ -7,6 +7,7 @@ use IGCMS\Core\Logger;
 session_cache_limiter("");
 
 define("INDEX_HTML", "index.html");
+define("FINDEX_PHP", "findex.php");
 define("INOTIFY", ".inotify");
 define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
 define("PLUGINS_DIR", "plugins");
@@ -78,13 +79,7 @@ if(IS_LOCALHOST) {
   define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
   define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
   define("CMSRES_FOLDER", WWW_FOLDER."/".CMSRES_DIR."/".CMS_RELEASE);
-  $userId = null;
-  foreach(scandir(getcwd()) as $f) {
-    $varName = substr($f, 0, 6);
-    if($varName != "ADMIN.") continue; // eg. ADMIN.ig1
-    $userId = substr($f, 6);
-  }
-  define('ADMIN_ID', $userId);
+  define('ADMIN_ID', is_file("ADMIN") ? trim(file_get_contents("ADMIN")) : null);
   define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
   define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
   define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);
@@ -112,6 +107,8 @@ define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MOD
 if(CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
+  setlocale(LC_ALL, "en_US.UTF-8");
+  putenv("LANG=en_US.UTF-8"); // for gettext
 } else {
   #if(!IS_LOCALHOST)
   setlocale(LC_ALL, "cs_CZ.UTF-8");
@@ -124,7 +121,9 @@ if(CMS_DEBUG) {
 define('METHOD_NA', _("Method %s is no longer available"));
 if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 require_once(CORE_FOLDER.'/globals.php');
-if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)) {
+if(isset($_GET["login"]) && SCHEME == "http") loginRedir();
+if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
+  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)) {
   redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
 initDirs();

@@ -3,8 +3,8 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\ModifyContentStrategyInterface;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Plugin;
@@ -12,7 +12,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
+class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   private $cssClass = "linklist";
 
@@ -23,7 +23,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function update(SplSubject $subject) {}
 
-  public function getContent(HTMLPlus $content) {
+  public function modifyContent(HTMLPlus $content) {
     $sections = $content->documentElement->getElementsByTagName("section");
     foreach($sections as $s) {
       if(!$s->hasClass($this->cssClass)) continue;
@@ -33,13 +33,11 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->createLinkList($content->documentElement);
     }
     Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".css");
-    #echo $content->saveXML($content);
-    #die();
     return $content;
   }
 
   private function createLinkList(DOMElementPlus $wrapper) {
-    $cfg = $this->getDOMPlus();
+    $cfg = $this->getXML();
     foreach($cfg->documentElement->childElementsArray as $e) {
       if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
       $vars[$e->getAttribute("id")] = $e;
@@ -82,7 +80,7 @@ class LinkList extends Plugin implements SplObserver, ContentStrategyInterface {
     $text = $link->getAttribute("title");
     if(!$link->hasAttribute("title")) {
       $href = $link->getAttribute("href");
-      $text = DOMBuilder::getTitle($href);
+      $text = HTMLPlusBuilder::getIdToTitle($href);
       if(is_null($text)) {
         $text = $href;
         $c = 0;

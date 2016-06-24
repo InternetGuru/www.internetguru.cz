@@ -2,7 +2,9 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\ModifyContentStrategyInterface;
+use IGCMS\Core\HTMLPlusBuilder;
 use Exception;
 use Closure;
 use DOMNode;
@@ -10,8 +12,6 @@ use DOMNode;
 class Cms {
 
   private static $types = null;
-  private static $contentFull = null; // HTMLPlus
-  private static $content = null; // HTMLPlus
   private static $outputStrategy = null; // OutputStrategyInterface
   private static $variables = array();
   private static $functions = array();
@@ -48,15 +48,11 @@ class Cms {
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    self::$contentFull = DOMBuilder::buildHTMLPlus(INDEX_HTML);
-    $h1 = self::$contentFull->documentElement->firstElement;
-    self::setVariable("lang", self::$contentFull->documentElement->getAttribute("xml:lang"));
-    self::setVariable("mtime", $h1->getAttribute("mtime"));
-    self::setVariable("ctime", $h1->getAttribute("ctime"));
-    self::setVariable("author", $h1->getAttribute("author"));
-    self::setVariable("authorid", $h1->hasAttribute("authorid") ? $h1->getAttribute("authorid") : null);
-    self::setVariable("resp", $h1->getAttribute("resp"));
-    self::setVariable("respid", $h1->hasAttribute("respid") ? $h1->getAttribute("respid") : null);
+    $id = HTMLPlusBuilder::register(INDEX_HTML);
+    foreach(HTMLPlusBuilder::getIdToAll($id) as $k => $v) {
+      self::setVariable($k, $v);
+    }
+    self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
     self::setVariable("uri", URI);
@@ -77,20 +73,21 @@ class Cms {
     self::setVariable("messages", self::$flashList);
   }
 
-
-  private static function addFlashItem($message, $type, $prevRequest=false) {
+  private static function addFlashItem($message, $type, Array $requests) {
     $types = self::getTypes();
     self::$$type = true;
     if(!is_null(self::getLoggedUser())) $message = self::$types[$type].": $message";
     $li = self::$flashList->ownerDocument->createElement("li");
     self::$flashList->firstElement->appendChild($li);
-    $li->setAttribute("class", strtolower($type).($prevRequest ? " prev-request" : ""));
+    $li->setAttribute("class", strtolower($type)." ".implode(" ", $requests));
     $doc = new DOMDocumentPlus();
-    if(!@$doc->loadXML("<var>$message</var>")) {
-      $li->nodeValue = htmlspecialchars($message);
-    } else {
-      foreach($doc->documentElement->childNodes as $ch)
+    try {
+      $doc->loadXML("<var>$message</var>");
+      foreach($doc->documentElement->childNodes as $ch) {
         $li->appendChild($li->ownerDocument->importNode($ch, true));
+      }
+    } catch(Exception $e) {
+      $li->nodeValue = htmlspecialchars($message);
     }
   }
 
@@ -98,42 +95,43 @@ class Cms {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
     if(is_null(self::$flashList)) self::createFlashList();
     foreach($_SESSION["cms"]["flash"] as $type => $item) {
-      foreach($item as $token => $messages) {
-        foreach($messages as $message) {
-          self::addFlashItem($message, $type, $token != self::$requestToken);
-        }
+      foreach($item as $hash => $message) {
+        self::addFlashItem($message, $type, $_SESSION["cms"]["request"][$type][$hash]);
       }
     }
     $_SESSION["cms"]["flash"] = array();
-  }
-
-  public static function getContentFull() {
-    return self::$contentFull;
+    $_SESSION["cms"]["request"] = array();
   }
 
   public static function buildContent() {
-    if(is_null(self::$contentFull)) throw new Exception(_("Full content must be set to build content"));
-    if(!is_null(self::$content)) throw new Exception(_("Method cannot run twice"));
-    self::$content = clone self::$contentFull;
-    try {
-      $cs = null;
-      global $plugins;
-      foreach($plugins->getIsInterface("IGCMS\Core\ContentStrategyInterface") as $cs) {
-        $c = $cs->getContent(self::$content);
-        $object = gettype($c) == "object";
-        if(!($object && $c instanceof HTMLPlus)) {
-          throw new Exception(sprintf(_("Content must be an instance of HTMLPlus (%s given)"), ($object ? get_class($c) : gettype($c))));
-        }
-        try {
-          $c->validatePlus();
-        } catch(Exception $e) {
-          throw new Exception(sprintf(_("HTMLPlus content is invalid: %s"), $e->getMessage()));
-        }
-        self::$content = $c;
+    global $plugins;
+    $content = null;
+    $pluginExceptionMessage = _("Plugin %s exception: %s");
+    foreach($plugins->getIsInterface("IGCMS\Core\GetContentStrategyInterface") as $plugin) {
+      try {
+        $content = $plugin->getContent();
+        if(is_null($content)) continue;
+        self::validateContent($content);
+        break;
+      } catch (Exception $e) {
+        throw new Exception(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
       }
-    } catch (Exception $e) {
-      throw new Exception(sprintf(_("Plugin %s exception: %s"), get_class($cs), $e->getMessage()));
     }
+    if(is_null($content)) {
+      $content = HTMLPlusBuilder::build(INDEX_HTML);
+      self::validateContent($content);
+    }
+    foreach($plugins->getIsInterface("IGCMS\Core\ModifyContentStrategyInterface") as $plugin) {
+      try {
+        $tmpContent = clone $content;
+        $tmpContent = $plugin->modifyContent($tmpContent);
+        self::validateContent($tmpContent);
+        $content = $tmpContent;
+      } catch (Exception $e) {
+        throw new Exception(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
+      }
+    }
+    return $content;
   }
 
   public static function checkAuth() {
@@ -181,15 +179,15 @@ class Cms {
     return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
   }
 
-  public static function contentProcessVariables() {
-    $oldContent = clone self::$content;
+  public static function contentProcessVariables(HTMLPlus $content) {
+    $tmpContent = clone $content;
     try {
-      self::$content = self::$content->processVariables(self::$variables);
-      self::$content->validatePlus(true);
-      #self::$content->processFunctions(self::$functions, self::$variables);
+      $tmpContent = $tmpContent->processVariables(self::$variables);
+      $tmpContent->validatePlus(true);
+      return $tmpContent;
     } catch(Exception $e) {
-      Logger::user_error(sprintf(_("Some variables are causing HTML+ error: %s"), $e->getMessage()));
-      self::$content = $oldContent;
+      Logger::user_error(sprintf(_("Invalid HTML+ caused by: %s"), $e->getMessage()));
+      return $content;
     }
   }
 
@@ -197,11 +195,25 @@ class Cms {
     self::$outputStrategy = $strategy;
   }
 
+  private static function validateContent(HTMLPlus $content) {
+    $object = gettype($content) == "object";
+    if(!($object && $content instanceof HTMLPlus)) {
+      $name = $object ? get_class($content) : gettype($content);
+      throw new Exception(sprintf(_("Content must be an instance of HTML+ (%s given)"), $name));
+    }
+    try {
+      $content->validatePlus();
+    } catch(Exception $e) {
+      throw new Exception(sprintf(_("Invalid HTML+ content: %s"), $e->getMessage()));
+    }
+  }
+
   private static function addMessage($type, $message) {
     if(is_null(self::$flashList)) self::createFlashList();
     if(is_null(self::$requestToken)) self::$requestToken = rand();
     if(self::isSuperUser()) {
-      $_SESSION["cms"]["flash"][$type][self::$requestToken][] = $message;
+      $_SESSION["cms"]["flash"][$type][hash(FILE_HASH_ALGO, $message)] = $message;
+      $_SESSION["cms"]["request"][$type][hash(FILE_HASH_ALGO, $message)][] = self::$requestToken;
       return;
     }
     self::addFlashItem($message, $type);
@@ -274,10 +286,9 @@ class Cms {
     self::$forceFlash = true;
   }
 
-  public static function getOutput() {
-    if(is_null(self::$content)) throw new Exception(_("Content is not set"));
-    if(!is_null(self::$outputStrategy)) return self::$outputStrategy->getOutput(self::$content);
-    return self::$content->saveXML();
+  public static function getOutput(HTMLPlus $content) {
+    if(is_null(self::$outputStrategy)) return $content->saveXML();
+    return self::$outputStrategy->getOutput($content);
   }
 
   public static function getOutputStrategy() {

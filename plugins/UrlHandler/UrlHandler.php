@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use Exception;
@@ -21,8 +21,7 @@ class UrlHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached(array("HtmlOutput", "ContentLink"))) return;
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     if(!IS_LOCALHOST) $this->httpsRedir();
     $this->cfgRedir();
     if(getCurLink() == "") {
@@ -33,25 +32,11 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function httpsRedir() {
-    $https = true;
-    $urlMatch = false;
-    foreach($this->cfg->documentElement->childNodes as $redir) {
-      if($redir->nodeName != "https") continue;
-      $https = false;
-      $urlMatch = true;
-      $pRedir = parseLocalLink($redir->nodeValue);
-      if(isset($pRedir["path"]) && $pRedir["path"] != getCurLink()) $urlMatch = false;
-      if(isset($pRedir["query"]) && $pRedir["query"] != getCurQuery()) $urlMatch = false;
-      if($urlMatch) break;
-    }
-    Cms::setVariable("default_protocol", ($https ? "https" : "http"));
-    if(SCHEME == "https") {
-      if(is_null(Cms::getLoggedUser()) && !$urlMatch && !$https) {
-        redirTo("http://".HOST.$_SERVER["REQUEST_URI"]);
-      }
-     return;
-    }
-    if($urlMatch || $https) redirTo("https://".HOST.$_SERVER["REQUEST_URI"]);
+    $protocol = $this->cfg->getElementById("protocol", "var")->nodeValue;
+    Cms::setVariable("default_protocol", $protocol);
+    if(SCHEME == $protocol) return;
+    if(SCHEME == "https" && !is_null(Cms::getLoggedUser())) return;
+    redirTo("$protocol://".HOST.$_SERVER["REQUEST_URI"]);
   }
 
   private function cfgRedir() {
@@ -62,7 +47,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $pVal = $redir->hasAttribute("parValue") ? $redir->getAttribute("parValue") : null;
       if(!$this->queryMatch($pNam, $pVal)) continue;
       try {
-        if($redir->nodeValue == "/" || $redir->nodeValue == "") redirTo(array("path" => ""));
+        if($redir->nodeValue == "/") redirTo(array("path" => ""));
         $pLink = parseLocalLink($redir->nodeValue);
         if(is_null($pLink)) redirTo($redir->nodeValue); // external redir
         $silent = !isset($pLink["path"]);
@@ -70,7 +55,8 @@ class UrlHandler extends Plugin implements SplObserver {
         if(strpos($redir->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
         #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
         try {
-          $pLink = DOMBuilder::normalizeLink($pLink);
+          # TODO
+          #$pLink = DOMBuilder::normalizeLink($pLink);
           #todo: configurable status code
           redirTo(buildLocalUrl($pLink));
         } catch(Exception $e) {
@@ -103,14 +89,14 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function proceed() {
-    $links = DOMBuilder::getLinks();
+    $links = array_keys(HTMLPlusBuilder::getLinkToId());
     $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
-    if(!DOMBuilder::isLink($path)) {
+    if(!HTMLPlusBuilder::isLink($path)) {
       if(self::DEBUG) var_dump($links);
       $linkId = $this->findSimilarLinkId($links, $path);
       if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    if(!DOMBuilder::isLink($path) || $path == $links[0]) $path = "";
+    if(!HTMLPlusBuilder::isLink($path) || $path == $links[0]) $path = "";
     if($path == getCurLink()) return;
     $code = 404;
     if(self::DEBUG) die("Redirecting to '$path'");

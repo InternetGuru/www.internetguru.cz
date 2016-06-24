@@ -19,7 +19,7 @@ function findFile($filePath, $user=true, $admin=true) {
     if(is_file("$dir/$inactiveFilePath")) continue;
     return "$dir/$filePath";
   }
-  return null;
+  throw new Exception(sprintf(_("File '%s' not found"), $filePath));
 }
 
 function createSymlink($link, $target) {
@@ -128,28 +128,26 @@ function parseLocalLink($link, $host=null) {
   return $pLink;
 }
 
-function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
-  addPermParam($pLink, PAGESPEED_PARAM);
-  addPermParam($pLink, DEBUG_PARAM);
-  addPermParam($pLink, CACHE_PARAM);
+function buildLocalUrl(Array $pLink, $ignoreCyclic=false, $addPermParam=true) {
+  if($addPermParam) foreach(array(PAGESPEED_PARAM, DEBUG_PARAM, CACHE_PARAM) as $param) {
+    addPermParam($pLink, $param);
+  }
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
-  $path = null;
-  if(isset($pLink["path"])) {
-    $path = ltrim($pLink["path"], "/");
-    if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
-    else $pLink["path"] = ROOT_URL.$pLink["path"];
-  } else return implodeLink($pLink);
-  if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  $scriptFile = SCRIPT_NAME;
-  if($scriptFile == "index.php") return implodeLink($pLink);
-  $pLink["path"] = ROOT_URL.$scriptFile;
+  if(!isset($pLink["path"])) return implodeLink($pLink);
+  $path = $pLink["path"];
+  #$path = ltrim($pLink["path"], "/");
+  if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
+  else $pLink["path"] = ROOT_URL.$path;
+  #if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
+  if(SCRIPT_NAME == "index.php") return implodeLink($pLink);
+  $pLink["path"] = ROOT_URL.SCRIPT_NAME;
   if($cyclic) $pLink["path"] = "";
-  $q = array();
-  if(strlen($path)) $q[] = "q=".$path;
-  if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
-  if(count($q)) $pLink["query"] = implode("&", $q);
+  $query = array();
+  if(strlen($path)) $query[] = "q=".$path;
+  if(isset($pLink["query"]) && strlen($pLink["query"])) $query[] = $pLink["query"];
+  if(count($query)) $pLink["query"] = implode("&", $query);
   return implodeLink($pLink);
 }
 
@@ -162,7 +160,7 @@ function isCyclicLink(Array $pLink) {
 }
 
 function addPermParam(Array &$pLink, $parName) {
-  if(!isset($_GET[$parName])) return;
+  if(!isset($_GET[$parName]) || !strlen($_GET[$parName])) return;
   $parAndVal = "$parName=".$_GET[$parName];
   if(isset($pLink["query"])) {
     if(strpos($pLink["query"], $parName) !== false) return;
@@ -201,20 +199,25 @@ function buildQuery($pQuery, $questionMark=true) {
   return ($questionMark ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
-function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
-  if($convertToUtf8) $s = utf8_encode($s);
-  if($tolower) $s = mb_strtolower($s, "utf-8");
+function normalize($text, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
+  if(!strlen(trim($text))) return "";
+  if($convertToUtf8) $text = utf8_encode($text);
+  #$text = preg_replace('#[^\\pL\d _-]+#u', '', $text);
+  #if($pred != $text) {var_dump($pred); var_dump($text); }
+  #if($tolower) $text = mb_strtolower($text, "utf-8");
   // iconv
   // http://php.net/manual/en/function.iconv.php#74101
   // works with setlocale(LC_ALL, "[any].UTF-8")
-  $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
-  if($tolower) $s = strtolower($s);
-  if(is_null($replace)) $replace = "_";
-  if(is_null($keep)) $keep = "a-zA-Z0-9_-";
-  $s = @preg_replace("~[^$keep]~", $replace, $s);
-  if(is_null($s))
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+  $text = preg_replace('# +#u', '_', $text);
+  $text = preg_replace('#_?-_?#u', '-', $text);
+  if($tolower) $text = strtolower($text);
+  if(is_null($replace)) $replace = "";
+  if(is_null($keep)) $keep = "\w\d_-";
+  $text = @preg_replace("~[^$keep]~", $replace, $text);
+  if(is_null($text))
     throw new Exception(_("Invalid parameter 'keep'"));
-  return $s;
+  return $text;
 }
 
 function file_put_contents_plus($dest, $string) {
@@ -273,7 +276,7 @@ function initDirs() {
   foreach($dirs as $d) mkdir_plus($d);
 }
 
-function initLinks() {
+function initIndexFiles() {
   $links = array();
   foreach(scandir(CMS_ROOT_FOLDER) as $f) {
     if(strpos($f, ".") === 0) continue;
@@ -291,6 +294,12 @@ function initLinks() {
   foreach($links as $l => $t) {
     createSymlink($l, $t);
   }
+}
+
+function timestamptToW3C($timestamp) {
+  $date = new DateTime();
+  $date->setTimeStamp($timestamp);
+  return $date->format(DateTime::W3C);
 }
 
 function update_file($src, $dest, $hash=false) {
@@ -511,17 +520,6 @@ function getNginxCacheFiles($folder = null, $link = "") {
     $fPaths[] = $ff;
   }
   return $fPaths;
-}
-
-function getNewestCacheMtime() {
-  if(IS_LOCALHOST) return null;
-  $newestCacheMtime = null;
-  foreach(getNginxCacheFiles() as $cacheFilePath) {
-    $cacheMtime = filemtime($cacheFilePath);
-    if($cacheMtime < $newestCacheMtime) continue;
-    $newestCacheMtime = $cacheMtime;
-  }
-  return $newestCacheMtime;
 }
 
 function getIP() {

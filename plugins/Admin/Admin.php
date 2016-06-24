@@ -3,9 +3,12 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\TitleStrategyInterface;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\XMLBuilder;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -13,7 +16,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
+class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, TitleStrategyInterface {
   const STATUS_NEW = 0;
   const STATUS_ENABLED = 1;
   const STATUS_DISABLED = 2;
@@ -21,11 +24,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   const STATUS_UNKNOWN = 4;
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
-  private $className = null;
   private $content = null;
   private $contentValue = null;
   private $scheme = null;
   private $type = "txt";
+  private $title = null;
   private $redir = false;
   private $replace = true;
   private $error = false;
@@ -40,11 +43,10 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 5);
+    $s->setPriority($this, 2);
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
     $this->dataFileStatus = self::STATUS_UNKNOWN;
-    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {
@@ -62,7 +64,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       $this->process();
     } catch (Exception $e) {
-      Logger::user_error($e->getMessage());
+      Logger::user_error($this->className.": ".$e->getMessage());
       return;
     }
     if(!$this->isPost()) return;
@@ -72,18 +74,23 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     redirTo(buildLocalUrl($pLink, true));
   }
 
+  public function getTitle() {
+    return $this->title;
+  }
+
   private function process() {
     $this->setDefaultFile();
     $this->setDataFiles();
     if($this->isPost()) {
       if($_POST["userfilehash"] != $this->getDataFileHash())
         throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
-      $this->processPost();
+      $this->contentValue = str_replace("\r\n", "\n", $_POST["content"]);;
     } else {
       $this->setContent();
     }
     if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
     if(!$this->isResource($this->type)) $this->processXml();
+    if($this->isPost()) $this->contentChanged = $this->getContentChanged();
     if($this->isToEnable()) $this->enableDataFile();
     if($this->isPost()) {
       $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
@@ -103,16 +110,17 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function checkCache() {
     if(!$this->isResource($this->type)) {
-      if(DOMBuilder::isNginxOutdated()) {
+      if(DOMBuilder::isCacheOutdated()) {
         Cms::notice(_("Saving changes will clear server cache"));
       }
       return;
     }
-    if(getRealResDir() == RESOURCES_DIR
-      && is_file($this->defaultFile)
-      && isUptodate($this->dataFile, $this->defaultFile)) return;
-    if(is_file(getRealResDir($this->defaultFile))
-      && isUptodate($this->dataFile, getRealResDir($this->defaultFile))) return;
+    if(!is_file(getRealResDir($this->defaultFile))
+      || isUptodate($this->dataFile, getRealResDir($this->defaultFile))) {
+      if(getRealResDir() != RESOURCES_DIR) return;
+      if(!is_file($this->defaultFile)
+        || isUptodate($this->dataFile, $this->defaultFile)) return;
+    }
     Cms::notice(_("Saving changes will remove outdated file cache"));
   }
 
@@ -179,7 +187,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     return $var;
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function getContent() {
     Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
     Cms::getOutputStrategy()->addJs("
       if(typeof IGCMS === \"undefined\") throw \"IGCMS is not defined\";
@@ -191,7 +199,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->type == "html") $format = "html+";
     if(!is_null($this->scheme)) $format .= " (".pathinfo($this->scheme, PATHINFO_BASENAME).")";
 
-    $newContent = $this->getHTMLPlus();
+    $content = $this->getHTMLPlus();
 
     $la = "?".$this->className."=".$_GET[$this->className];
     $statusChanged = self::FILE_DISABLE;
@@ -219,6 +227,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     #$v = $d->appendChild($d->createElement("var"));
     #$v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
     #$vars["heading"] = $d->documentElement;
+    $vars["rooturl"] = ROOT_URL;
     $vars["heading"] = _("Administration");
     if(!is_null($this->defaultFile))
       $vars["heading"] = sprintf(_("File %s Administration"), basename($this->defaultFile));
@@ -250,11 +259,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $vars["cache"] = $cache ? null : "";
     $vars["cache_value"] = $cache ? $_GET[CACHE_PARAM] : "";
     $vars["filepicker_options"] = $this->createFilepicker();
-    $newContent->processVariables($vars);
-    if(is_null($this->defaultFile)) Cms::setVariable("title", $vars["heading"]);
-    else Cms::setVariable("title", sprintf(_("%s (%s) - Administration"),
-      basename($this->defaultFile), ROOT_URL.$this->defaultFile));
-    return $newContent;
+    $content->processVariables($vars);
+    if(is_null($this->defaultFile)) $this->title = $vars["heading"];
+    else $this->title = sprintf(_("%s (%s) - Administration"),
+      basename($this->defaultFile), ROOT_URL.$this->defaultFile);
+    return $content;
   }
 
   private function getDataFileHash() {
@@ -264,10 +273,13 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function showContent($user) {
     if(is_null($this->defaultFile)) return null;
-    $df = findFile($this->defaultFile, $user, true);
-    if(is_null($df)) return null;
+    try {
+      $df = findFile($this->defaultFile, $user, true);
+    } catch(Exception $e) {
+      return null;
+    }
     if($this->replace) return file_get_contents($df);
-    $doc = $this->getDOMPlus($this->defaultFile, false, $user);
+    $doc = XMLBuilder::build($this->defaultFile, $user);
     $doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();
@@ -295,7 +307,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function setDefaultFile() {
     $fileName = $_GET[$this->className];
     $this->defaultFile = $this->getFilepath($fileName);
-    $fLink = DOMBuilder::getLink(findFile($fileName));
+    $fLink = HTMLPlusBuilder::getIdToLink(HTMLPlusBuilder::getFileToId($this->defaultFile));
     if(is_null($fLink)) $fLink = getCurLink();
     if($this->defaultFile != $fileName || $fLink != getCurLink()) {
       redirTo(buildLocalUrl(array("path" => $fLink, "query" => $this->className."=".$this->defaultFile)));
@@ -306,19 +318,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
   private function getFilepath($f) {
     if(!strlen($f)) {
       if(getCurLink() == "") return INDEX_HTML;
-      $path = DOMBuilder::getFile(getCurLink());
+      $path = HTMLPlusBuilder::getIdToFile(HTMLPlusBuilder::getLinkToId(getCurLink()));
       if(!is_null($path)) return $path;
       return INDEX_HTML;
     }
-    if(strpos($f, USER_FOLDER."/") === 0) {
-      $f = substr($f, strlen(USER_FOLDER)+1);
-    }
-    if(strpos($f, ADMIN_FOLDER."/") === 0) {
-      $f = substr($f, strlen(ADMIN_FOLDER)+1);
-    }
+    $f = stripDataFolder($f);
     if(preg_match("~^[\w-]+$~", $f)) {
       $pluginFile = PLUGINS_DIR."/$f/$f.xml";
-      if(!is_null(findFile($pluginFile))) return $pluginFile;
+      if(is_file(CMS_FOLDER."/$pluginFile")) return $pluginFile;
     }
     if(!preg_match("/^".FILEPATH_PATTERN."$/", $f) || strpos($f, "..") !== false) {
       $this->dataFileStatus = self::STATUS_INVALID;
@@ -327,9 +334,7 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if(strpos(basename($f), ".") === 0) {
       $f = dirname($f)."/".substr(basename($f), 1);
     }
-    if(!is_null(findFile(PLUGINS_DIR."/$f", false))) {
-      $f = PLUGINS_DIR."/$f";
-    }
+    if(is_file(CMS_FOLDER."/".PLUGINS_DIR."/$f")) $f = PLUGINS_DIR."/$f";
     return $f;
   }
 
@@ -363,17 +368,20 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
 
   private function processXml() {
     // get default schema
-    $df = findFile($this->defaultFile, false);
-    if(!is_null($df)) $this->scheme = $this->getScheme($df);
+    try {
+      $df = findFile($this->defaultFile, false);
+      $this->scheme = $this->getScheme($df);
+    } catch(Exception $e) {
+      $df = false;
+    }
     // get user schema if default schema not exists
     if(is_null($this->scheme) && file_exists($this->dataFile)) {
       $this->scheme = $this->getScheme($this->dataFile);
     }
-    $defaultLink = normalize(pathinfo($this->defaultFile, PATHINFO_FILENAME), "a-zA-Z0-9/_-");
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
       if($this->type == "html") {
-        $doc = $this->getHTMLPlus(INDEX_HTML, false);
-        $doc->documentElement->firstElement->setAttribute("link", $defaultLink);
+        $doc = new HTMLPlus();
+        $doc->load(CMS_FOLDER."/".INDEX_HTML);
       } else {
         $doc = new DOMDocumentPlus();
         $doc->formatOutput = true;
@@ -386,10 +394,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     } else {
       if($this->type == "html") {
         $doc = new HTMLPlus();
-        $doc->defaultLink = $defaultLink;
         $doc->defaultAuthor = Cms::getVariable("cms-author");
       } else $doc = new DOMDocumentPlus();
-      if(!@$doc->loadXml($this->contentValue)) throw new Exception(_("Invalid XML syntax"));
+      $doc->loadXml($this->contentValue);
     }
     $repair = $this->isPost() && isset($_POST["repair"]);
     try {
@@ -409,18 +416,9 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $this->validateXml($doc);
   }
 
-  private function processPost() {
-    $post_n = str_replace("\r\n", "\n", $_POST["content"]);
-    $post_rn = str_replace("\n", "\r\n", $post_n);
-    $this->contentValue = $post_n;
-    #if((isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_DISABLED)
-    #  || (!isset($_POST["active"]) && $this->dataFileStatus == self::STATUS_ENABLED)) {
-    #  $this->dataFile = $this->changeStatus($this->dataFile);
-    #  $this->statusChanged = true;
-    #}
-    if(!in_array($_POST["userfilehash"], array($this->getHash($post_n), $this->getHash($post_rn)))) {
-      $this->contentChanged = true;
-    }
+  private function getContentChanged() {
+    $post_rn = str_replace("\n", "\r\n", $this->contentValue);
+    return !in_array($_POST["userfilehash"], array($this->getHash($this->contentValue), $this->getHash($post_rn)));
   }
 
   private function setContent() {
@@ -491,14 +489,14 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     $line = str_replace("'", '"', fgets($h));
     fclose($h);
     if(!preg_match('<\?xml-model href="([^"]+)" ?\?>', $line, $m)) return;
-    $schema = findFile($m[1], false, false);
-    if(!file_exists($schema))
+    try {
+      $schema = findFile($m[1], false, false);
+    } catch(Exception $e) {
       throw new Exception(sprintf(_("Schema file '%s' not found"), $schema));
+    }
     return $schema;
   }
 
 }
-
-
 
 ?>

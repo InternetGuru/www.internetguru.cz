@@ -2,8 +2,8 @@
 # git hook to run a command after `git pull` if a specified file was changed
 
 echo
-echo "Running .git/hooks/post-merge"
-/var/scripts/resbuilder "$PWD"
+php composer.phar install -o
 
 echo
-php composer.phar install -o
+echo "Running .git/hooks/post-merge"
+/var/scripts/resbuilder "$PWD"

@@ -1,14 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <GA>
-
-  <jsFile readonly="readonly"/>
-  <jsFile>GA.js</jsFile>
-
-  <var id="ga_id" modifyonly="modifyonly"><!-- UA-123456789-0 --></var>
-
-  <groupId readonly="readonly"/>
-  <groupId id="internetguru.cz">UA-52883188-3</groupId>
-  <groupId id="e-zakladna.cz">UA-52883188-4</groupId>
-  <groupId id="other">UA-52883188-5</groupId>
-
+  <var id="jsfile" readonly="readonly">GA.js</var>
+  <var id="ga_id" pattern="UA-\d+-\d+"><!-- UA-123456789-0 --></var>
+  <group id="internetguru.cz" readonly="readonly">UA-52883188-3</group>
+  <group id="e-zakladna.cz" readonly="readonly">UA-52883188-4</group>
+  <group id="other" readonly="readonly">UA-52883188-5</group>
 </GA>
