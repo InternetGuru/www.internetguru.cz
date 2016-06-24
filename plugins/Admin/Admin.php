@@ -233,7 +233,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       $vars["heading"] = sprintf(_("File %s Administration"), basename($this->defaultFile));
     $vars["link"] = getCurLink();
     $vars["linkadmin"] = $la;
-    if($this->contentValue !== "" ) $vars["content"] = $this->contentValue;
+    if($this->contentValue !== "" ) $vars["content"] = htmlspecialchars($this->contentValue);
     $vars["filename"] = $_GET[$this->className];
     $vars["filepathpattern"] = FILEPATH_PATTERN;
     $vars["schema"] = $format;
@@ -241,8 +241,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $vars["classtype"] = $type;
     if($this->dataFileStatus == self::STATUS_DISABLED)
       $vars["disabled"] = "disabled";
-    $vars["defaultcontent"] = $this->showContent(false);
-    $vars["resultcontent"] = $this->showContent(true);
+    $vars["defaultcontent"] = htmlspecialchars($this->showContent(false));
+    $vars["resultcontent"] = htmlspecialchars($this->showContent(true));
     $vars["status"] = $this->dataFileStatuses[$this->dataFileStatus];
     $vars["userfilehash"] = $usrDestHash;
     if((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED))
