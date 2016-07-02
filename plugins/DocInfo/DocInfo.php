@@ -16,12 +16,7 @@ use SplSubject;
 
 class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
-  public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
-    if(HTMLPlusBuilder::getCurFile() == INDEX_HTML) {
-      $this->subject->detach($this);
-    }
-  }
+  public function update(SplSubject $subject) {}
 
   public function modifyContent(HTMLPlus $content) {
     $filePath = HTMLPlusBuilder::getCurFile();
@@ -60,8 +55,10 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     $ul = $doc->createElement("ul");
     // first heading
     if($h->parentNode->nodeName == "body") {
-      $this->createGlobalDocInfo($ul, $vars, $globalInfo, $filePath);
-      $vars = $globalInfo;
+      if(HTMLPlusBuilder::getCurFile() != INDEX_HTML) {
+        $this->createGlobalDocInfo($ul, $vars, $globalInfo, $filePath);
+        $vars = $globalInfo;
+      }
     } else {
       $vars = $this->createLocalDocInfo($h, $ul, $vars, $globalInfo, $filePath);
       if(empty($vars)) return $ul;
