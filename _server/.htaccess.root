@@ -8,4 +8,5 @@ RewriteRule   .                      - [E=RB:/%2/]
 ##
 # create _GET parameters
 RewriteCond   %{REQUEST_FILENAME}    !-f
+RewriteCond   %{REQUEST_FILENAME}    !-d
 RewriteRule   .*                     %{ENV:RB}findex.php?q=$0 [QSA]
