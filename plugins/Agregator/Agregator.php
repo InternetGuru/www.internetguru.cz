@@ -99,7 +99,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $vars = $this->buildImgVars($files, $alts, $subDir);
     if(empty($vars)) return;
     foreach($this->cfg->documentElement->childElementsArray as $image) {
-      if($image->nodeName != "image") continue;
+      if($image->nodeName != "imglist") continue;
       try {
         $id = $image->getRequiredAttribute("id");
       } catch(Exception $e) {
@@ -228,7 +228,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       $useCache = false;
     }
     foreach($this->cfg->documentElement->childElementsArray as $template) {
-      if($template->nodeName != "html") continue;
+      if($template->nodeName != "doclist") continue;
       try {
         $id = $template->getRequiredAttribute("id");
       } catch(Exception $e) {
@@ -289,37 +289,25 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $val;
   }
 
-  private function getDOM(Array $vars, DOMElementPlus $html) {
-    $items = $html->childElementsArray;
-    $id = $html->getAttribute("id");
-    $class = $html->getAttribute("class");
+  private function getDOM(Array $vars, DOMElementPlus $doclist) {
+    $id = $doclist->getAttribute("id");
+    $class = $doclist->getAttribute("class");
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
-    if(strlen($html->getAttribute("wrapper")))
-      $root = $root->appendChild($doc->createElement($html->getAttribute("wrapper")));
+    if(strlen($doclist->getAttribute("wrapper")))
+      $root = $root->appendChild($doc->createElement($doclist->getAttribute("wrapper")));
     if(strlen($class)) $root->setAttribute("class", $class);
-    $nonItemElement = false;
-    $patterns = array();
-    foreach($items as $item) {
-      if($item->nodeName != "item") {
-        $nonItemElement = true;
-        continue;
-      }
-      if($item->hasAttribute("since"))
-        $patterns[$item->getAttribute("since")-1] = $item;
-      else $patterns[] = $item;
-    }
-    if($nonItemElement) Logger::user_warning(sprintf(_("Redundant element(s) found in %s"), $id));
-    if(empty($patterns)) throw new Exception(_("No item element found"));
-    $i = -1;
-    $pattern = null;
+    $skip = $doclist->getAttribute("skip");
+    if(!is_numeric($skip)) $skip = 0;
+    $limit = $doclist->getAttribute("limit");
+    if(!is_numeric($limit)) $limit = 0;
+    $i = 0;
     foreach($vars as $k => $v) {
-      $i++;
-      if(isset($patterns[$i])) $pattern = $patterns[$i];
-      if(is_null($pattern) || !$pattern->childNodes->length) continue;
-      $item = $root->appendChild($doc->importNode($pattern, true));
-      $item->processVariables($v, array(), true);
-      $item->stripTag();
+      if($i++ < $skip) continue;
+      if($limit > 0 && $i > $skip + $limit) break;
+      $list = $root->appendChild($doc->importNode($doclist, true));
+      $list->processVariables($v, array(), true);
+      $list->stripTag();
     }
     return $doc;
   }
