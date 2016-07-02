@@ -112,6 +112,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     if($useCache) {
       self::$currentFileTo = $cache["currentFileTo"];
+      self::setNewestFileMtime(current($cache["currentFileTo"]["fileToMtime"]));
       $doc = new HTMLPlus();
       $doc->loadXML(self::$currentFileTo["fileToXML"]);
       self::$currentIdTo = $cache["currentIdTo"];
