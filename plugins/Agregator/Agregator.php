@@ -85,10 +85,15 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  private function createVars($subDir, Array $files, Array $vars, $cacheKey) {
+    $useCache = self::APC;
+
+  }
+
   private function createImgVar($subDir, Array $files) {
     $cacheKey = apc_get_key($subDir);
     $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
-    $useCache = self::APC;
+    // $useCache = self::APC;
     if(is_file($inotify)) $checkSum = filemtime($inotify);
     else $checkSum = count($files);
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
@@ -217,16 +222,15 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
   private function createCmsVars($subDir, $files) {
-    $useCache = self::APC;
-    $vars = $this->getFileVars($subDir, $files, $useCache);
-    if(!count($vars)) return;
-    $className = (new \ReflectionClass($this))->getShortName();
+    // $useCache = self::APC;
     $filePath = findFile($this->pluginDir."/".$className.".xml");
     $cacheKey = apc_get_key($filePath);
     if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$className.".xml");
+      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$this->className.".xml");
       $useCache = false;
     }
+    $vars = $this->getFileVars($subDir, $files, $useCache);
+    if(!count($vars)) return;
     foreach($this->cfg->documentElement->childElementsArray as $template) {
       if($template->nodeName != "doclist") continue;
       try {
