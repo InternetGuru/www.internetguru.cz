@@ -27,25 +27,25 @@
 
   -->
 
-  <fn id="monthcs" fn="replace">
-    <data name="leden">ledna</data>
-    <data name="únor">února</data>
-    <data name="březen">března</data>
-    <data name="duben">dubna</data>
-    <data name="květen">května</data>
-    <data name="červen">června</data>
-    <data name="červenec">července</data>
-    <data name="srpen">srpna</data>
-    <!-- <data name="září">září</data> -->
-    <data name="říjen">října</data>
-    <data name="listopad">listopadu</data>
-    <data name="prosinec">prosince</data>
+  <fn id="months" fn="replace">
+    <data name="[01]">ledna</data>
+    <data name="[02]">února</data>
+    <data name="[03]">března</data>
+    <data name="[04]">dubna</data>
+    <data name="[05]">května</data>
+    <data name="[06]">června</data>
+    <data name="[07]">července</data>
+    <data name="[08]">srpna</data>
+    <data name="[09]">září</data>
+    <data name="[10]">října</data>
+    <data name="[11]">listopadu</data>
+    <data name="[12]">prosince</data>
   </fn>
   <fn id="yearformat" fn="strftime" format="%Y"/>
-  <fn id="tmpdateformat" fn="strftime" format="%e. %B %Y"/>
+  <fn id="tmpdateformat" fn="strftime" format="%e. [%m] %Y"/>
   <fn id="dateformat" fn="sequence">
     <call>tmpdateformat</call>
-    <call>monthcs</call>
+    <call>months</call>
   </fn>
 
   <var id="nodebug">Provozní režim</var>

@@ -327,7 +327,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
           Logger::user_warning($e->getMessage());
           continue;
         }
-        $tr["~(?<!\pL)".$name."(?!\pL)~u"] = $this->parse($d->nodeValue);
+        $tr[$name] = $this->parse($d->nodeValue);
       }
       $fn = $this->createFnReplace($id, $tr);
       break;
@@ -381,8 +381,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   private function createFnReplace($id, Array $replace) {
     if(empty($replace)) throw new Exception(_("No data found"));
     return function(DOMNode $node) use ($replace) {
-      #return str_replace(array_keys($replace), $replace, $node->nodeValue);
-      return preg_replace(array_keys($replace), $replace, $node->nodeValue);
+      return str_replace(array_keys($replace), $replace, $node->nodeValue);
     };
   }
 
