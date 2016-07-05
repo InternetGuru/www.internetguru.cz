@@ -114,7 +114,8 @@ class Cms {
         self::validateContent($content);
         break;
       } catch (Exception $e) {
-        throw new Exception(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
+        Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
+        $content = null;
       }
     }
     if(is_null($content)) {
@@ -128,7 +129,7 @@ class Cms {
         self::validateContent($tmpContent);
         $content = $tmpContent;
       } catch (Exception $e) {
-        throw new Exception(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
+        Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
       }
     }
     return $content;
