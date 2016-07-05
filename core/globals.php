@@ -3,7 +3,6 @@
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
-use IGCMS\Core\LoggerException;
 
 function isValidId($id) {
   return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
@@ -73,7 +72,7 @@ function absoluteLink($link=null) {
   if(substr($link, 0, 1) == "/") $link = substr($link, 1);
   if(substr($link, -1) == "/") $link = substr($link, 0, -1);
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse URL '%s'"), $link));
+  if($pLink === false) throw new Exception(sprintf(_("Unable to parse URL '%s'"), $link));
   $scheme = isset($pLink["scheme"]) ? $pLink["scheme"] : $_SERVER["REQUEST_SCHEME"];
   $host = isset($pLink["host"]) ? $pLink["host"] : $_SERVER["HTTP_HOST"];
   $path = isset($pLink["path"]) && $pLink["path"] != "" ? "/".$pLink["path"] : "";
@@ -114,7 +113,7 @@ function implodeLink(Array $p, $query=true) {
 
 function parseLocalLink($link, $host=null) {
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse attribute href '%s'"), $link)); // fail2parse
+  if($pLink === false) throw new Exception(sprintf(_("Unable to parse attribute href '%s'"), $link)); // fail2parse
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
   if(isset($pLink["path"])) $pLink["path"] = trim($pLink["path"], "/");
   if(isset($pLink["scheme"])) {

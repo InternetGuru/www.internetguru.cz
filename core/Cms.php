@@ -245,7 +245,7 @@ class Cms {
 
   private static function getVarId($name) {
     $d = debug_backtrace();
-    if(!isset($d[2]["class"])) throw new LoggerException(_("Unknown caller class"));
+    if(!isset($d[2]["class"])) throw new Exception(_("Unknown caller class"));
     $varId = strtolower((new \ReflectionClass($d[2]["class"]))->getShortName());
     if($varId == $name) return $varId;
     return $varId.(strlen($name) ? "-".normalize($name) : "");
