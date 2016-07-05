@@ -27,14 +27,15 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   private $messages;
   private $errors = array();
   private $forms = array();
+  private $prefix = null;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
-  const CSS_WARNING = "contactform-warning";
   const DEBUG = false;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
     $mail = new PHPMailer;
+    $this->prefix = strtolower($this->className);
   }
 
   public function update(SplSubject $subject) {
@@ -62,6 +63,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       $form->addClass("validable");
       $formVar = $this->parseForm($form);
       $this->formsElements[normalize($this->className)."-$formId"] = $formVar;
+      Cms::setVariable($formId, $formVar);
     }
   }
 
@@ -115,11 +117,16 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
 
   public function modifyContent(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
-    if(!$xpath->query("//*[contains(@var, 'contactform-')]")->length) return $content;
+    $forms = $xpath->query("//*[contains(@var, '$this->prefix-')]");
+    if(!$forms->length) return $content;
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
       Logger::user_warning(_("Admin address is not set or invalid"));
     }
-    $content->processVariables($this->formsElements);
+    foreach($forms as $f) {
+      $id = substr($f->getAttribute("var"), strlen($this->prefix)+1);
+      if(array_key_exists($id, $this->messages)) continue;
+      Logger::user_warning(sprintf(_("Missing message for form id '%s'"), $id));
+    }
     return $content;
   }
 
