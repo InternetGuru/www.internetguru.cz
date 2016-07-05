@@ -144,7 +144,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     $IPFilePath = USER_FOLDER."/".$this->pluginDir."/$IPFile";
     $bannedIPFilePath = USER_FOLDER."/".$this->pluginDir."/.$IPFile";
     if(is_file($bannedIPFilePath)) {
-      throw new Exception(sprintf(_("Your IP adress %s is banned"), $IP));
+      throw new Exception(sprintf(_("Your IP address %s is banned"), $IP));
     }
     if(is_file($IPFilePath)) {
       if(time() - filemtime($IPFilePath) < $time) { // 2 min timeout

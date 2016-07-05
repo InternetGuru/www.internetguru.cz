@@ -105,7 +105,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $this->createFs($content, $fieldset, $set, $set->getAttribute("type"));
       break;
       default:
-      Logger::user_warning(sprintf(_("Element set uknown type %s"), $set->getAttribute("type")));
+      Logger::user_warning(sprintf(_("Unsupported attribute type value '%s'"), $set->getAttribute("type")));
     }
   }
 
@@ -242,7 +242,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
     }
     if(@$var->ownerDocument->save($this->userCfgPath) === false)
-      throw new Exception(_("Unabe to save user config"));
+      throw new Exception(_("Unable to save user config"));
     #if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON)
     clearNginxCache();
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => $this->className."&".$this->getOk), true));

@@ -217,7 +217,7 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function getIncludeSrc($src, $workingDir) {
     if(pathinfo($src, PATHINFO_EXTENSION) != "html")
-      throw new Exception(sprintf(_("Included file '%s' extension must be html"), $src));
+      throw new Exception(sprintf(_("Included file '%s' extension must be .html"), $src));
     $file = findFile("$workingDir/$src");
     if(strpos(realpath($file), realpath("$workingDir/")) !== 0)
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $src));

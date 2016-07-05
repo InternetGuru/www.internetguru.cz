@@ -114,7 +114,7 @@ function implodeLink(Array $p, $query=true) {
 
 function parseLocalLink($link, $host=null) {
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
+  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse attribute href '%s'"), $link)); // fail2parse
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
   if(isset($pLink["path"])) $pLink["path"] = trim($pLink["path"], "/");
   if(isset($pLink["scheme"])) {

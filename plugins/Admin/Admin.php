@@ -406,7 +406,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       foreach($doc->getErrors() as $error) {
         Logger::user_notice("$error".($repair ? " (".$doc->getStatus().")" : ""));
       }
-      if(!$repair) throw new Exception(_("Repairable error(s) occured"));
+      if(!$repair) throw new Exception(_("Repairable error(s) occurred"));
       $this->contentValue = $doc->saveXML();
     }
     if($this->type != "xml" || $this->isPost()) return;

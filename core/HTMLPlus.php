@@ -265,7 +265,7 @@ class HTMLPlus extends DOMDocumentPlus {
       $this->defaultNs = $h->getAttribute("ns");
       $h->removeAttribute("ns");
     }
-    $message = _("Body attribude 'ns' missing");
+    $message = _("Body attribute 'ns' missing");
     $this->errorHandler($message, $repair && !is_null($this->defaultNs));
     $b->setAttribute("ns", $this->defaultNs);
   }
@@ -363,7 +363,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $xpath = new DOMXPath($this);
     $langs = $xpath->query("//*[@lang]");
     if(!$langs->length) return;
-    $message = _("Lang attribute without xml namespace");
+    $message = _("Lang attribute without XML namespace");
     $this->errorHandler($message, $repair);
     foreach($langs as $n) {
       if(!$n->hasAttribute("xml:lang"))
@@ -427,7 +427,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!is_null($nextElement) && $nextElement->tagName == "dd") continue;
       $this->errorHandler(_("Element dt following sibling must be dd"), $repair);
       $dd = $this->createElement("dd");
-      $dd->appendChild($this->newDOMComment(_("created empty element dd")));
+      $dd->appendChild($this->newDOMComment(_("Created empty element dd")));
       if(is_null($nextElement)) $dt->parentNode->appendChild($dd);
       else $dt->parentNode->insertBefore($dd, $nextElement);
     }
@@ -437,8 +437,8 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("author")) continue;
       if(strlen(trim($h->getAttribute("author")))) continue;
-      $this->errorHandler(_("Attr 'author' cannot be empty"), $repair);
-      $h->parentNode->insertBefore($this->newDOMComment(_("removed empty attr 'author'")), $h);
+      $this->errorHandler(_("Attribute 'author' cannot be empty"), $repair);
+      $h->parentNode->insertBefore($this->newDOMComment(_("Removed empty attribute 'author'")), $h);
       $h->removeAttribute("author");
     }
   }
@@ -459,19 +459,19 @@ class HTMLPlus extends DOMDocumentPlus {
       $ctime_date = $this->createDate($ctime);
       if(is_null($ctime_date)) {
         $this->errorHandler(_("Invalid 'ctime' attribute format"), $repair);
-        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("removed ctime='%s'")), $ctime), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute ctime '%s'")), $ctime), $h);
         $h->removeAttribute("ctime");
       }
       if(is_null($mtime)) return;
       $mtime_date = $this->createDate($mtime);
       if(is_null($mtime_date)) {
         $this->errorHandler(_("Invalid 'mtime' attribute format"), $repair);
-        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("removed mtime='%s'")), $mtime), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute mtime '%s'")), $mtime), $h);
         $h->removeAttribute("mtime");
       }
       if($mtime_date < $ctime_date) {
-        $this->errorHandler(_("'mtime' cannot be lower than 'ctime'"), $repair);
-        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("removed mtime='%s'")), $mtime), $h);
+        $this->errorHandler(_("Attribute 'mtime' cannot be lower than 'ctime'"), $repair);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute mtime '%s'")), $mtime), $h);
         $h->removeAttribute("mtime");
       }
     }

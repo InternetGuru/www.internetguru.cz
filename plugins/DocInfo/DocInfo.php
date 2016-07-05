@@ -92,7 +92,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     if(Cms::isSuperUser()) {
       $li = $ul->appendChild($doc->createElement("li"));
       $li->setAttribute("class", "edit noprint");
-      $a = $li->appendChild($doc->createElement("a", _("Editovat")));
+      $a = $li->appendChild($doc->createElement("a", _("Edit")));
       $a->setAttribute("href", "?Admin=".$filePath);
       $a->setAttribute("title", $filePath);
     }

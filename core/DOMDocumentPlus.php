@@ -147,7 +147,7 @@ class DOMDocumentPlus extends DOMDocument {
       libxml_use_internal_errors(true);
       libxml_clear_errors();
       if(!$this->relaxNGValidate($f))
-        throw new Exception(_("relaxNGValidate() internal error occured"));
+        throw new Exception(_("relaxNGValidate() internal error occurred"));
     } catch (Exception $e) {
       $internal_errors = libxml_get_errors();
       if(count($internal_errors)) {

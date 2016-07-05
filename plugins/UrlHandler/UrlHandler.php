@@ -63,7 +63,7 @@ class UrlHandler extends Plugin implements SplObserver {
           if(!$silent) throw $e;
         }
       } catch(Exception $e) {
-        Logger::user_warning(sprintf(_("Unable to redir to %s: %s"), implodeLink($pLink), $e->getMessage()));
+        Logger::user_warning(sprintf(_("Unable to redirect to %s: %s"), implodeLink($pLink), $e->getMessage()));
       }
     }
   }

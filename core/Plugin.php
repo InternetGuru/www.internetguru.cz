@@ -33,7 +33,7 @@ class Plugin {
       global $plugins;
       if($plugins->isAttachedPlugin($p)) continue;
       $this->subject->detach($this);
-      Logger::user_warning(sprintf(_("Detaching '%s' due to '%s' dependancy"), get_class($this), $p));
+      Logger::user_warning(sprintf(_("Detaching '%s' due to '%s' dependency"), get_class($this), $p));
       return true;
     }
     return false;

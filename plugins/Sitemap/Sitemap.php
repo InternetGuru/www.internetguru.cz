@@ -82,7 +82,7 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
     $links = array();
     foreach($cfg->documentElement->childElementsArray as $e) {
       if($e->nodeName != "url") continue;
-      if(!$e->hasAttribute("link")) throw new Exception(_("Element url missing atribute link"));
+      if(!$e->hasAttribute("link")) throw new Exception(_("Element url missing attribute link"));
       foreach($e->childElementsArray as $f) {
         if(!in_array($f->nodeName, self::$configurableElements)) continue;
         $links[$e->getAttribute("link")][$f->nodeName] = $f->nodeValue;

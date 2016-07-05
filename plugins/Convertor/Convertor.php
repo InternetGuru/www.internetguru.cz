@@ -205,7 +205,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     } else $headers = @get_headers($url);
     $rh = $http_response_header;
     if(strpos($headers[0], '302') !== false)
-      throw new Exception(_("Destination URL is unaccessible; must be shared publically"));
+      throw new Exception(_("Destination URL is unaccessible; must be shared publicly"));
     elseif(strpos($headers[0], '200') === false)
       throw new Exception(sprintf(_("Destination URL error: %s"), $headers[0]));
     stream_context_set_default($defaultContext);

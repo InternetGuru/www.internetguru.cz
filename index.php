@@ -23,7 +23,7 @@ try {
       $errno = 403;
     }
     if(!is_null($error))
-      new ErrorPage(sprintf(_("%s disallowed on inactve CMS version"), $error), $errno);
+      new ErrorPage(sprintf(_("%s disallowed on inactive CMS version"), $error), $errno);
   }
 
   // prevent unauthorized no-cached requests
