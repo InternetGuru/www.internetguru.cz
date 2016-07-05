@@ -15,6 +15,9 @@ use DOMElement;
 use DOMComment;
 use DateTime;
 
+#TODO: build() load and store html+ file into fileToDoc; public for Admin - getHtmlPlus()
+#TODO: build() jako soucast register(); public for Agregator...
+
 class HTMLPlusBuilder extends DOMBuilder {
 
   private static $fileToId = array();
@@ -96,6 +99,7 @@ class HTMLPlusBuilder extends DOMBuilder {
   public static function register($filePath, $parentId=null, $linkPrefix='') {
     self::$currentFileTo = array();
     self::$currentIdTo = array();
+    self::$storeCache = true;
     $cacheKey = apc_get_key(self::APC_ID.$filePath);
     $useCache = false;
     $cache = null;
@@ -110,6 +114,18 @@ class HTMLPlusBuilder extends DOMBuilder {
         break;
       }
     }
+    if(!$useCache) {
+      try {
+        $doc = self::load($filePath);
+        $id = $doc->documentElement->firstElement->getAttribute("id");
+        self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
+        self::$currentFileTo["fileToId"] = $id;
+      } catch(Exception $e) {
+        if(!apc_exists($cacheKey)) throw $e;
+        Logger::error($e->getMessage());
+        $useCache = true;
+      }
+    }
     if($useCache) {
       self::$currentFileTo = $cache["currentFileTo"];
       self::setNewestFileMtime(current($cache["currentFileTo"]["fileToMtime"]));
@@ -118,11 +134,6 @@ class HTMLPlusBuilder extends DOMBuilder {
       self::$currentIdTo = $cache["currentIdTo"];
       unset(self::$currentFileTo["fileToXML"]);
       self::$storeCache = false;
-    } else {
-      $doc = self::load($filePath);
-      $id = $doc->documentElement->firstElement->getAttribute("id");
-      self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
-      self::$currentFileTo["fileToId"] = $id;
     }
     self::$currentFileTo["fileToDoc"] = $doc;
     self::addToRegister($filePath);
