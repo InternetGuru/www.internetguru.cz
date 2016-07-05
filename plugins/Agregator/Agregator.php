@@ -27,7 +27,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   private $cfg;
   private static $sortKey;
   private static $reverse;
-  const APC = false;
+  const DEBUG = false;
   const APC_PREFIX = "1";
 
   public function __construct(SplSubject $s) {
@@ -85,15 +85,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
-  private function createVars($subDir, Array $files, Array $vars, $cacheKey) {
-    $useCache = self::APC;
-
-  }
-
   private function createImgVar($subDir, Array $files) {
     $cacheKey = apc_get_key($subDir);
     $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
-    // $useCache = self::APC;
     if(is_file($inotify)) $checkSum = filemtime($inotify);
     else $checkSum = count($files);
     if(!apc_is_valid_cache($cacheKey, $checkSum)) {
@@ -103,10 +97,27 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $alts = $this->buildImgAlts();
     $vars = $this->buildImgVars($files, $alts, $subDir);
     if(empty($vars)) return;
-    foreach($this->cfg->documentElement->childElementsArray as $image) {
-      if($image->nodeName != "imglist") continue;
+    $this->createVars($subDir, $files, $vars, $cacheKey, "imglist", "name", $useCache);
+  }
+
+  private function createCmsVars($subDir, Array $files) {
+    $filePath = findFile($this->pluginDir."/".$this->className.".xml");
+    $cacheKey = apc_get_key($filePath);
+    if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
+      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$this->className.".xml");
+      $useCache = false;
+    }
+    $vars = $this->getFileVars($subDir, $files, $useCache);
+    if(!count($vars)) return;
+    $this->createVars($subDir, $files, $vars, $cacheKey, "doclist", "mtime", $useCache);
+  }
+
+  private function createVars($subDir, Array $files, Array $vars, $cacheKey, $cfgElName, $sort, $useCache) {
+    $useCache = !self::DEBUG;
+    foreach($this->cfg->documentElement->childElementsArray as $child) {
+      if($child->nodeName != $cfgElName) continue;
       try {
-        $id = $image->getRequiredAttribute("id");
+        $id = $child->getRequiredAttribute("id");
       } catch(Exception $e) {
         Logger::user_warning($e->getMessage());
         continue;
@@ -114,15 +125,26 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
       $cacheKey = apc_get_key($vName);
       if($useCache && apc_exists($cacheKey)) {
-        $doc = new DOMDocumentPlus();
-        $doc->loadXML(apc_fetch($cacheKey));
-        Cms::setVariable($vName, $doc->documentElement);
-        continue;
+        $sCache = apc_fetch($cacheKey);
+        if(!is_null($sCache)) {
+          $doc = new DOMDocumentPlus();
+          $doc->loadXML($sCache["value"]);
+          Cms::setVariable($sCache["name"], $doc->documentElement);
+          continue;
+        }
       }
-      $this->sort($vars, $image, "name", false);
-      $vValue = $this->getDOM($vars, $image);
-      apc_store_cache($cacheKey, $vValue->saveXML(), $vName);
-      Cms::setVariable($vName, $vValue->documentElement);
+      $this->sort($vars, $child, $sort, false);
+      try {
+        $vValue = $this->getDOM($vars, $child);
+        Cms::setVariable($vName, $vValue->documentElement);
+        $var = array(
+          "name" => $vName,
+          "value" => $vValue->saveXML(),
+        );
+        apc_store_cache($cacheKey, $var, $vName);
+      } catch(Exception $e) {
+        Logger::critical($e->getMessage());
+      }
     }
   }
 
@@ -219,51 +241,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       $useCache = false;
     }
     return $vars;
-  }
-
-  private function createCmsVars($subDir, $files) {
-    // $useCache = self::APC;
-    $filePath = findFile($this->pluginDir."/".$className.".xml");
-    $cacheKey = apc_get_key($filePath);
-    if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$this->className.".xml");
-      $useCache = false;
-    }
-    $vars = $this->getFileVars($subDir, $files, $useCache);
-    if(!count($vars)) return;
-    foreach($this->cfg->documentElement->childElementsArray as $template) {
-      if($template->nodeName != "doclist") continue;
-      try {
-        $id = $template->getRequiredAttribute("id");
-      } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
-        continue;
-      }
-      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-      $cacheKey = apc_get_key($vName);
-      // use cache
-      if($useCache) {
-        $sCache = $this->getSubDirCache($cacheKey);
-        if(!is_null($sCache)) {
-          $doc = new DOMDocumentPlus();
-          $doc->loadXML($sCache["value"]);
-          Cms::setVariable($sCache["name"], $doc->documentElement);
-          continue;
-        }
-      }
-      $this->sort($vars, $template, "ctime", true);
-      try {
-        $vValue = $this->getDOM($vars, $template);
-        Cms::setVariable($vName, $vValue->documentElement);
-        $var = array(
-          "name" => $vName,
-          "value" => $vValue->saveXML(),
-        );
-        apc_store_cache($cacheKey, $var, $vName);
-      } catch(Exception $e) {
-        Logger::critical($e->getMessage());
-      }
-    }
   }
 
   private function sort(Array &$vars, DOMElementPlus $template, $defaultSortKey, $defaultReverse) {
