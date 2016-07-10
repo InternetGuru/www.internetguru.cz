@@ -28,6 +28,7 @@
       },
       createEmailLink = function(span, addr) {
         var a = document.createElement("a");
+        a.className = span.className;
         var email = addr.textContent;
         for(var i = 0; i < Config.rep.length; i++) {
           email = email.replace(new RegExp(IGCMS.preg_quote(Config.rep[i][1]), "g"), Config.rep[i][0]);
@@ -37,7 +38,9 @@
         else addr.textContent = email;
         span.parentNode.insertBefore(a, span);
         span.parentNode.removeChild(span);
-        a.appendChild(span);
+        for(var i = 0; i < span.childNodes.length; i++) {
+          a.appendChild(span.childNodes[i]);
+        }
       }
 
       // public
