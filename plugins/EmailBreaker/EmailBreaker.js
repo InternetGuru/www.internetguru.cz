@@ -17,12 +17,16 @@
       createEmails = function() {
         var spans = document.getElementsByTagName("span");
         var toUnwrap = [];
+        var emails = [];
         for(var i = 0; i < spans.length; i++) {
           if(!spans[i].classList.contains("emailbreaker")) continue;
-          var addrs = spans[i].getElementsByTagName("span");
+          emails.push(spans[i]);
+        }
+        for(var i = 0; i < emails.length; i++) {
+          var addrs = emails[i].getElementsByTagName("span");
           for(var j = 0; j < addrs.length; j++) {
             if(!addrs[j].classList.contains("addr")) continue;
-            createEmailLink(spans[i], addrs[j]);
+            createEmailLink(emails[i], addrs[j]);
           }
         }
       },
