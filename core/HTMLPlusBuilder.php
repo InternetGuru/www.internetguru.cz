@@ -15,9 +15,6 @@ use DOMElement;
 use DOMComment;
 use DateTime;
 
-#TODO: build() load and store html+ file into fileToDoc; public for Admin - getHtmlPlus()
-#TODO: build() jako soucast register(); public for Agregator...
-
 class HTMLPlusBuilder extends DOMBuilder {
 
   private static $fileToId = array();
@@ -75,17 +72,47 @@ class HTMLPlusBuilder extends DOMBuilder {
     return self::$$propertyName;
   }
 
-  public static function build($filePath, $parentId='', $prefixId='') {
-    # register iff not registered
-    if(!array_key_exists($filePath, self::$fileToId))
-      self::register($filePath, $parentId, $prefixId);
-    # return iff loaded
+  private static function isValidApc($mtimes) {
+    foreach($mtimes as $file => $mtime) {
+      try {
+        if($mtime == filemtime(findFile($file))) continue;
+      } catch(Exception $e) {}
+      return false;
+    }
+    return true;
+  }
+
+  public static function build($filePath) {
     if(array_key_exists($filePath, self::$fileToDoc))
-      return self::$fileToDoc[$filePath];
-    # load iff not loaded
-    $doc = self::load($filePath);
-    self::$fileToDoc[$filePath] = $doc;
-    return $doc;
+      throw new Exception("File $filePath already built");
+    $cacheKey = apc_get_key(self::APC_ID."/".__FUNCTION__."/".$filePath);
+    $useCache = false;
+    if(apc_exists($cacheKey)) {
+      $cache = apc_fetch($cacheKey);
+      $useCache = self::isValidApc($cache["fileToMtime"]);
+    }
+    if(!$useCache) {
+      try {
+        $doc = self::load($filePath);
+        self::$fileToDoc[$filePath] = $doc;
+        $value = array(
+          "fileToMtime" => self::$currentFileTo["fileToMtime"],
+          "xml" => $doc->saveXML()
+        );
+        apc_store_cache($cacheKey, $value, $filePath);
+        return $doc;
+      } catch(Exception $e) {
+        if(!apc_exists($cacheKey)) throw $e;
+        Logger::error($e->getMessage());
+        $useCache = true;
+      }
+    }
+    if($useCache) {
+      $doc = new HTMLPlus();
+      $doc->loadXML($cache["xml"]);
+      self::$fileToDoc[$filePath] = $doc;
+      return $doc;
+    }
   }
 
   public static function setIdToLink(Array $idToLink) {
@@ -100,50 +127,31 @@ class HTMLPlusBuilder extends DOMBuilder {
     self::$currentFileTo = array();
     self::$currentIdTo = array();
     self::$storeCache = true;
-    $cacheKey = apc_get_key(self::APC_ID.$filePath);
+    $cacheKey = apc_get_key(self::APC_ID."/".__FUNCTION__."/".$filePath);
     $useCache = false;
     $cache = null;
     if(apc_exists($cacheKey)) {
       $cache = apc_fetch($cacheKey);
-      $useCache = true;
-      foreach($cache["currentFileTo"]["fileToMtime"] as $file => $mtime) {
-        try {
-          if($mtime == filemtime(findFile($file))) continue;
-        } catch(Exception $e) {}
-        $useCache = false;
-        break;
-      }
-    }
-    if(!$useCache) {
-      try {
-        $doc = self::load($filePath);
-        $id = $doc->documentElement->firstElement->getAttribute("id");
-        self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
-        self::$currentFileTo["fileToId"] = $id;
-      } catch(Exception $e) {
-        if(!apc_exists($cacheKey)) throw $e;
-        Logger::error($e->getMessage());
-        $useCache = true;
-      }
+      $useCache = self::isValidApc($cache["currentFileTo"]["fileToMtime"]);
     }
     if($useCache) {
       self::$currentFileTo = $cache["currentFileTo"];
       self::setNewestFileMtime(current($cache["currentFileTo"]["fileToMtime"]));
-      $doc = new HTMLPlus();
-      $doc->loadXML(self::$currentFileTo["fileToXML"]);
+      $doc = self::build($filePath);
       self::$currentIdTo = $cache["currentIdTo"];
-      unset(self::$currentFileTo["fileToXML"]);
       self::$storeCache = false;
+    } else {
+      $doc = self::build($filePath);
+      $id = $doc->documentElement->firstElement->getAttribute("id");
+      self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
+      self::$currentFileTo["fileToId"] = $id;
     }
-    self::$currentFileTo["fileToDoc"] = $doc;
     self::addToRegister($filePath);
     if(self::$storeCache) self::setApc($cacheKey, $filePath);
     return self::$currentFileTo["fileToId"];
   }
 
   private static function setApc($cacheKey, $filePath) {
-    self::$currentFileTo["fileToXML"] = self::$currentFileTo["fileToDoc"]->saveXML();
-    unset(self::$currentFileTo["fileToDoc"]);
     $value = array("currentIdTo" => self::$currentIdTo, "currentFileTo" => self::$currentFileTo);
     apc_store_cache($cacheKey, $value, $filePath);
   }
@@ -186,9 +194,9 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   private static function load($filePath) {
+    $doc = new HTMLPlus();
+    $fp = findFile($filePath);
     try {
-      $doc = new HTMLPlus();
-      $fp = findFile($filePath);
       $doc->load($fp);
       self::validateHtml($doc, $filePath, false);
       self::insertIncludes($doc, dirname($filePath));

@@ -119,7 +119,7 @@ class Cms {
       }
     }
     if(is_null($content)) {
-      $content = HTMLPlusBuilder::build(INDEX_HTML);
+      $content = HTMLPlusBuilder::getFileToDoc(INDEX_HTML);
       self::validateContent($content);
     }
     foreach($plugins->getIsInterface("IGCMS\Core\ModifyContentStrategyInterface") as $plugin) {

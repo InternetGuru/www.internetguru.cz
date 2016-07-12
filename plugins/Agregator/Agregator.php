@@ -66,7 +66,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $file = HTMLPlusBuilder::getCurFile();
     if(is_null($file) || !array_key_exists($file, $this->vars)) return null;
     Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
-    return HTMLPlusBuilder::build($file, $this->vars[$file]["parentid"], $this->vars[$file]["prefixid"]);
+    return HTMLPlusBuilder::getFileToDoc($file);
   }
 
   private function createList($prefixDir, $rootDir, Array &$list, $ext=null, $subDir=null) {
