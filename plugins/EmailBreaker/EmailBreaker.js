@@ -40,11 +40,11 @@
         a.href = "mailto:" + email.replace(" ", "");
         if(addr.classList.contains("del")) addr.parentNode.removeChild(addr);
         else addr.textContent = email;
+        while(span.childNodes.length > 0) {
+          a.appendChild(span.childNodes[0]);
+        }
         span.parentNode.insertBefore(a, span);
         span.parentNode.removeChild(span);
-        for(var i = 0; i < span.childNodes.length; i++) {
-          a.appendChild(span.childNodes[i]);
-        }
       }
 
       // public
