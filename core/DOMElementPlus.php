@@ -19,7 +19,7 @@ class DOMElementPlus extends DOMElement {
   public function rename($name) {
     $newnode = $this->ownerDocument->createElement($name);
     $children = array();
-    foreach ($this->childElementsArray as $child) {
+    foreach ($this->childNodes as $child) {
       $children[] = $child;
     }
     foreach ($children as $child) {
