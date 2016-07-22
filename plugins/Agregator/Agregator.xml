@@ -33,16 +33,6 @@
     <dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
   </doclist>
 
-  <doclist id="dd-coop" path="coop" rsort="mtime" doclist="dd" />
-  <doclist id="dd-coop-test" path="coop" rsort="mtime" kw="test" doclist="dd" />
-  <doclist id="dd-coop-dva" path="coop" rsort="mtime" kw="dva" doclist="dd" />
-  <doclist id="dd-coop-dva-tri" path="coop" rsort="mtime" kw="dva, tri" doclist="dd" />
-
-  <!--
-    TODO, nové attributy: doclist (ref), path, kw
-    <doclist id="dd-koutek" path="koutek" rsort="mtime" kw="ruka" doclist="dd" />
-  -->
-
   <!--
 
     Obrázkové sestavy

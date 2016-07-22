@@ -23,7 +23,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   private $docinfo = array();
   private $currentSubdir = null;
   private $currentFilepath = null;
-  private $edit;
   private $cfg;
   private static $sortKey;
   private static $reverse;
@@ -33,7 +32,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 2);
-    $this->edit = _("Edit");
   }
 
   public function update(SplSubject $subject) {
@@ -120,18 +118,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->createVars($subDir, $files, $vars, $cacheKey, "imglist", "name", $useCache);
   }
 
-  private function createDocList($subDir, Array $files) {
-    // $filePath = findFile($this->pluginDir."/".$this->className.".xml");
-    // $cacheKey = apc_get_key($filePath);
-    // if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-    //   apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$this->className.".xml");
-    //   $useCache = false;
-    // }
-    // $vars = $this->getFileVars($subDir, $files, $useCache);
-    // if(!count($vars)) return;
-    $this->createVars($subDir, $files, $vars, $cacheKey, "doclist", "mtime", $useCache);
-  }
-
   private function buildImgAlts() {
     $alts = array();
     foreach($this->cfg->documentElement->childElementsArray as $alt) {
@@ -210,54 +196,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $vars;
   }
 
-  private function sort(Array &$vars, DOMElementPlus $template, $defaultSortKey, $defaultReverse) {
-    self::$reverse = $defaultReverse;
-    self::$sortKey = $defaultSortKey;
-    if($template->hasAttribute("sort") || $template->hasAttribute("rsort")) {
-      self::$reverse = $template->hasAttribute("rsort");
-      $userKey = $template->hasAttribute("sort") ? $template->getAttribute("sort") : $template->getAttribute("rsort");
-      if(!array_key_exists($userKey, current($vars))) {
-        Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
-      } else {
-        self::$sortKey = $userKey;
-      }
-    }
-    uasort($vars, array("IGCMS\Plugins\Agregator", "cmp"));
-  }
-
   private function getSubDirCache($cacheKey) {
     if(!apc_exists($cacheKey)) return null;
     return apc_fetch($cacheKey);
-  }
-
-  private static function cmp($a, $b) {
-    if($a[self::$sortKey] == $b[self::$sortKey]) return 0;
-    $val = ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
-    if(self::$reverse) return -$val;
-    return $val;
-  }
-
-  private function getDOM(Array $vars, DOMElementPlus $doclist) {
-    $id = $doclist->getAttribute("id");
-    $class = $doclist->getAttribute("class");
-    $doc = new DOMDocumentPlus();
-    $root = $doc->appendChild($doc->createElement("root"));
-    if(strlen($doclist->getAttribute("wrapper")))
-      $root = $root->appendChild($doc->createElement($doclist->getAttribute("wrapper")));
-    if(strlen($class)) $root->setAttribute("class", $class);
-    $skip = $doclist->getAttribute("skip");
-    if(!is_numeric($skip)) $skip = 0;
-    $limit = $doclist->getAttribute("limit");
-    if(!is_numeric($limit)) $limit = 0;
-    $i = 0;
-    foreach($vars as $k => $v) {
-      if($i++ < $skip) continue;
-      if($limit > 0 && $i > $skip + $limit) break;
-      $list = $root->appendChild($doc->importNode($doclist, true));
-      $list->processVariables($v, array(), true);
-      $list->stripTag();
-    }
-    return $doc;
   }
 
 }

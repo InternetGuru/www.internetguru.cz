@@ -186,7 +186,15 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function addToRegister($filePath) {
     foreach(self::$currentFileTo as $name => $value) {
-      self::${$name}[$filePath] = $value;
+      switch($name) {
+        case "fileToMtime":
+        foreach($value as $file => $mtime) {
+          self::${$name}[$file] = $mtime;
+        }
+        break;
+        default:
+        self::${$name}[$filePath] = $value;
+      }
     }
     foreach(self::$currentIdTo as $name => $value) {
       foreach($value as $id => $v) self::${$name}[$id] = $v;
@@ -283,7 +291,8 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static function registerElement(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
     $id = $e->getAttribute("id");
     $link = "$linkPrefix/$id";
-    if(is_null($parentId)) {
+    if(!strlen($parentId)) {
+      $parentId = null;
       if($filePath == INDEX_HTML) $link = "";
       else $parentId = current(self::$fileToId);
     }

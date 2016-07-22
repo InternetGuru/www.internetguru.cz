@@ -2,7 +2,10 @@
 
 namespace IGCMS\Plugins;
 use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Cms;
+use DateTime;
 
 class DocList {
   private $id;
@@ -33,7 +36,11 @@ class DocList {
     $this->limit = $doclist->hasAttribute("limit");
     if(!is_numeric($this->limit)) $this->limit = 0;
     if(is_null($pattern)) $pattern = $doclist;
-    $this->createVars();
+    $vars = $this->createVars();
+    if(empty($vars)) return;
+    $list = $this->getDOM($pattern, $vars);
+    #todo: sort
+    Cms::setVariable($this->id, $list);
   }
 
   private function createVars() {
@@ -48,27 +55,20 @@ class DocList {
       }
       $fileIds[$file] = $id;
     }
-    var_dump($this->id);
-    var_dump($fileIds);
-    return;
     $vars = array();
-    foreach(scandir($dir) as $file) {
-      if(pathinfo($file, PATHINFO_EXTENSION) != "html") continue;
-      # todo: kw
-      $filePath = "$dir/$file";
+    $date = new DateTime();
+    foreach($fileIds as $file => $id) {
       try {
-        #$id = HTMLPlusBuilder::register($filePath, null, $subDir);
-        $vars[$filePath] = HTMLPlusBuilder::getIdToAll($id);
-        $vars[$filePath]["fileToMtime"] = HTMLPlusBuilder::getFileToMtime($filePath);
-        $vars[$filePath]["parentid"] = $subDir;
-        $vars[$filePath]["prefixid"] = $subDir;
-        $vars[$filePath]["file"] = $filePath;
-        $vars[$filePath]["link"] = $id;
-        $vars[$filePath]['editlink'] = "";
+        $vars[$file] = HTMLPlusBuilder::getIdToAll($id);
+        $vars[$file]["fileToMtime"] = HTMLPlusBuilder::getFileToMtime($file);
+        $date->setTimeStamp($vars[$file]["fileToMtime"]);
+        $vars[$file]["mtime"] = $date->format(DateTime::W3C);
+        $vars[$file]["file"] = $file;
+        $vars[$file]["link"] = $id;
+        $vars[$file]["editlink"] = "";
         if(Cms::isSuperUser()) {
-          $vars[$filePath]['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";
+          $vars[$file]["editlink"] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>"._("Edit")."</a>";
         }
-        $this->vars[$filePath] = $vars[$filePath];
       } catch(Exception $e) {
         Logger::critical($e->getMessage());
         continue;
@@ -77,6 +77,44 @@ class DocList {
     return $vars;
   }
 
+  private function getDOM(DOMElementPlus $pattern, Array $vars) {
+    $doc = new DOMDocumentPlus();
+    $root = $doc->appendChild($doc->createElement("root"));
+    if(strlen($this->wrapper))
+      $root = $root->appendChild($doc->createElement($this->wrapper));
+    if(strlen($this->class)) $root->setAttribute("class", $this->class);
+    $i = 0;
+    foreach($vars as $k => $v) {
+      if($i++ < $this->skip) continue;
+      if($this->limit > 0 && $i > $this->skip + $this->limit) break;
+      $list = $root->appendChild($doc->importNode($pattern, true));
+      $list->processVariables($v, array(), true);
+      $list->stripTag();
+    }
+    return $doc;
+  }
+
+  private function sort(Array &$vars, DOMElementPlus $template, $defaultSortKey, $defaultReverse) {
+    self::$reverse = $defaultReverse;
+    self::$sortKey = $defaultSortKey;
+    if($template->hasAttribute("sort") || $template->hasAttribute("rsort")) {
+      self::$reverse = $template->hasAttribute("rsort");
+      $userKey = $template->hasAttribute("sort") ? $template->getAttribute("sort") : $template->getAttribute("rsort");
+      if(!array_key_exists($userKey, current($vars))) {
+        Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
+      } else {
+        self::$sortKey = $userKey;
+      }
+    }
+    uasort($vars, array("IGCMS\Plugins\DocList", "cmp"));
+  }
+
+  private static function cmp($a, $b) {
+    if($a[self::$sortKey] == $b[self::$sortKey]) return 0;
+    $val = ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
+    if(self::$reverse) return -$val;
+    return $val;
+  }
 
 
 }
