@@ -4,8 +4,10 @@ namespace IGCMS\Plugins;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Logger;
 use IGCMS\Core\Cms;
 use DateTime;
+use Exception;
 
 class DocList {
   private $id;
@@ -36,8 +38,12 @@ class DocList {
     $this->limit = $doclist->hasAttribute("limit");
     if(!is_numeric($this->limit)) $this->limit = 0;
     if(is_null($pattern)) $pattern = $doclist;
-    $vars = $this->createVars();
-    if(empty($vars)) return;
+    try {
+      $vars = $this->createVars();
+    } catch(Exception $e) {
+      Logger::user_warning(sprintf(_("Doclist '%s' not created: %s"), $this->id, $e->getMessage()));
+      return;
+    }
     $list = $this->getDOM($pattern, $vars);
     #todo: sort
     Cms::setVariable($this->id, $list);
@@ -45,15 +51,21 @@ class DocList {
 
   private function createVars() {
     $fileIds = array();
+    $somethingFound = false;
     $userKw = preg_split("/ *, */", $this->kw);
     $userKw = array_filter($userKw, function($value) { return $value !== ''; });
     foreach(HTMLPlusBuilder::getFileToId() as $file => $id) {
       if(strpos($file, PLUGINS_DIR."/".basename(__DIR__)."/".$this->path."/") !== 0) continue;
+      $somethingFound = true;
       if(count($userKw)) {
         $docKw = preg_split("/ *, */", HTMLPlusBuilder::getIdToKw($id));
         if(array_diff($userKw, $docKw)) continue;
       }
       $fileIds[$file] = $id;
+    }
+    if(empty($fileIds)) {
+      if(!$somethingFound) throw new Exception(sprintf(_("Path '%s' not found or empty"), $this->path));
+      throw new Exception(sprintf(_("No files matching attribute kw '%s'"), $this->kw));
     }
     $vars = array();
     $date = new DateTime();

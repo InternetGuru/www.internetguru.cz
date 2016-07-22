@@ -19,19 +19,21 @@
       skip            přeskočí prvních <n> souborů (výchozí skip="0")
       limit           zahrne maximálně <n> souborů (výchozí limit="0" pro neomezený počet)
 
+    Examples:
+
+    <doclist id="ul" wrapper="ul">
+      <li><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
+    </doclist>
+    <doclist id="dl" wrapper="dl">
+      <dt><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
+      <dd>Poslední změna: <strong fn="inputvar-dateformat" var="mtime">n/a</strong></dd>
+      <dd>Klíčová slova: <em var="kw">n/a</em></dd>
+      <dd var="desc">n/a</dd>
+    </doclist>
+    <doclist id="dd" sort="mtime">
+      <dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
+    </doclist>
   -->
-  <doclist id="ul" wrapper="ul">
-    <li><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
-  </doclist>
-  <doclist id="dl" wrapper="dl">
-    <dt><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
-    <dd>Poslední změna: <strong fn="inputvar-dateformat" var="mtime">n/a</strong></dd>
-    <dd>Klíčová slova: <em var="kw">n/a</em></dd>
-    <dd var="desc">n/a</dd>
-  </doclist>
-  <doclist id="dd" sort="mtime">
-    <dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
-  </doclist>
 
   <!--
 
