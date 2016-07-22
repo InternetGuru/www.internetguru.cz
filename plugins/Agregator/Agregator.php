@@ -1,7 +1,6 @@
 <?php
 
 namespace IGCMS\Plugins;
-
 use IGCMS\Core\Cms;
 use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
@@ -17,6 +16,7 @@ use DateTime;
 
 # TODO:
 # registr souborů: v id celá cesta, v hodnotě pole štítků
+# register recursive from root...
 
 class Agregator extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $vars = array();  // filePath => fileInfo(?)
@@ -27,7 +27,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   private $cfg;
   private static $sortKey;
   private static $reverse;
-  const DEBUG = false;
+  const DEBUG = true;
   const APC_PREFIX = "1";
 
   public function __construct(SplSubject $s) {
@@ -40,25 +40,37 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     if($subject->getStatus() != STATUS_INIT) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
     $this->cfg = $this->getXML();
-    $curLink = getCurLink();
-    try {
-      mkdir_plus(USER_FOLDER."/".$this->pluginDir);
-      mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
-      $list = array();
-      $this->createList(USER_FOLDER, $this->pluginDir, $list, "html");
-      $this->createList(ADMIN_FOLDER, $this->pluginDir, $list, "html");
-      foreach($list as $subDir => $files) {
-        $this->createCmsVars($subDir, $files);
+    $this->registerFiles(CMS_FOLDER);
+    $this->registerFiles(ADMIN_FOLDER);
+    $this->registerFiles(USER_FOLDER);
+    $this->createLists();
+  }
+
+  private function createLists() {
+    $docLists = array();
+    $docListElements = array();
+    foreach($this->cfg->documentElement->childNodes as $child) {
+      if($child->nodeType != XML_ELEMENT_NODE) continue;
+      try {
+        switch($child->nodeName) {
+          case "doclist":
+          $id = $child->getRequiredAttribute("id");
+          $docListRef = $child->getAttribute("doclist");
+          if(!strlen($docListRef)) {
+            $docLists[$id] = new DocList($child);
+            $docListElements[$id] = $child;
+            continue;
+          }
+          if(!array_key_exists($docListRef, $docListElements)) {
+            throw new Exception(sprintf(_("Reference id '%s' not found"), $docListRef));
+          }
+          $docLists[$id] = new DocList($child, $docListElements[$docListRef]);
+          #break;
+          #case "imglist":
+        }
+      } catch(Exception $e) {
+        Logger::user_warning($e->getMessage());
       }
-      $list = array();
-      $this->createList("", FILES_FOLDER, $list);
-      #$this->createFilesVar(FILES_FOLDER);
-      foreach($list as $subDir => $files) {
-        $this->createImgVar($subDir, $files);
-      }
-    } catch(Exception $e) {
-      Logger::critical($e->getMessage());
-      return;
     }
   }
 
@@ -69,83 +81,55 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     return HTMLPlusBuilder::getFileToDoc($file);
   }
 
-  private function createList($prefixDir, $rootDir, Array &$list, $ext=null, $subDir=null) {
-    if(isset($list[$subDir])) return; // user dir (with at least one file) beats admin dir
-    $workingDir = "$prefixDir/$rootDir".(strlen($subDir) ? "/$subDir" : "");
-    if(!is_dir($workingDir)) return;
-    foreach(scandir($workingDir) as $f) {
-      if(strpos($f, ".") === 0) continue;
-      if(is_dir("$workingDir/$f")) {
-        $this->createList($prefixDir, $rootDir, $list, $ext, is_null($subDir) ? $f : "$subDir/$f");
+  private function registerFiles($workingDir, $folder=null) {
+    $cwd = "$workingDir/".$this->pluginDir."/$folder";
+    if(!is_dir($cwd)) return;
+    switch($workingDir) {
+      case CMS_FOLDER:
+      if(is_dir(ADMIN_FOLDER."/".$this->pluginDir."/$folder")
+        && !file_exists(ADMIN_FOLDER."/".$this->pluginDir."/.$folder")) return;
+      case ADMIN_FOLDER:
+      if(is_dir(USER_FOLDER."/".$this->pluginDir."/$folder")
+        && !file_exists(USER_FOLDER."/".$this->pluginDir."/.$folder")) return;
+    }
+    foreach(scandir($cwd) as $file) {
+      if(strpos($file, ".") === 0) continue;
+      if(file_exists("$cwd/.$file")) continue;
+      $filePath = is_null($folder) ? $file : "$folder/$file";
+      if(is_dir("$cwd/$file")) {
+        $this->registerFiles($workingDir, $filePath);
         continue;
       }
-      if(!is_null($ext) && pathinfo($f, PATHINFO_EXTENSION) != $ext) continue;
-      if(is_file("$workingDir/.$f")) continue;
-      $list[$subDir][$f] = $rootDir;
+      if(pathinfo($file, PATHINFO_EXTENSION) != "html") continue;
+      HTMLPlusBuilder::register($this->pluginDir."/$filePath", $folder);
     }
   }
 
-  private function createImgVar($subDir, Array $files) {
-    $cacheKey = apc_get_key($subDir);
-    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
-    if(is_file($inotify)) $checkSum = filemtime($inotify);
-    else $checkSum = count($files);
-    if(!apc_is_valid_cache($cacheKey, $checkSum)) {
-      apc_store_cache($cacheKey, $checkSum, $subDir);
-      $useCache = false;
-    }
-    $alts = $this->buildImgAlts();
-    $vars = $this->buildImgVars($files, $alts, $subDir);
-    if(empty($vars)) return;
+  private function createImgList($subDir, Array $files) {
+    // $cacheKey = apc_get_key($subDir);
+    // $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
+    // if(is_file($inotify)) $checkSum = filemtime($inotify);
+    // else $checkSum = count($files);
+    // if(!apc_is_valid_cache($cacheKey, $checkSum)) {
+    //   apc_store_cache($cacheKey, $checkSum, $subDir);
+    //   $useCache = false;
+    // }
+    // $alts = $this->buildImgAlts();
+    // $vars = $this->buildImgVars($files, $alts, $subDir);
+    // if(empty($vars)) return;
     $this->createVars($subDir, $files, $vars, $cacheKey, "imglist", "name", $useCache);
   }
 
-  private function createCmsVars($subDir, Array $files) {
-    $filePath = findFile($this->pluginDir."/".$this->className.".xml");
-    $cacheKey = apc_get_key($filePath);
-    if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$this->className.".xml");
-      $useCache = false;
-    }
-    $vars = $this->getFileVars($subDir, $files, $useCache);
-    if(!count($vars)) return;
+  private function createDocList($subDir, Array $files) {
+    // $filePath = findFile($this->pluginDir."/".$this->className.".xml");
+    // $cacheKey = apc_get_key($filePath);
+    // if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
+    //   apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$this->className.".xml");
+    //   $useCache = false;
+    // }
+    // $vars = $this->getFileVars($subDir, $files, $useCache);
+    // if(!count($vars)) return;
     $this->createVars($subDir, $files, $vars, $cacheKey, "doclist", "mtime", $useCache);
-  }
-
-  private function createVars($subDir, Array $files, Array $vars, $cacheKey, $cfgElName, $sort, $useCache) {
-    $useCache = !self::DEBUG;
-    foreach($this->cfg->documentElement->childElementsArray as $child) {
-      if($child->nodeName != $cfgElName) continue;
-      try {
-        $id = $child->getRequiredAttribute("id");
-      } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
-        continue;
-      }
-      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-      $cacheKey = apc_get_key($vName);
-      if($useCache && apc_exists($cacheKey)) {
-        $sCache = apc_fetch($cacheKey);
-        if(!is_null($sCache)) {
-          $doc = new DOMDocumentPlus();
-          $doc->loadXML($sCache["value"]);
-          Cms::setVariable($sCache["name"], $doc->documentElement);
-          continue;
-        }
-      }
-      $this->sort($vars, $child, $sort, false);
-      try {
-        $vValue = $this->getDOM($vars, $child);
-        Cms::setVariable($vName, $vValue->documentElement);
-        $var = array(
-          "name" => $vName,
-          "value" => $vValue->saveXML(),
-        );
-        apc_store_cache($cacheKey, $var, $vName);
-      } catch(Exception $e) {
-        Logger::critical($e->getMessage());
-      }
-    }
   }
 
   private function buildImgAlts() {
@@ -184,23 +168,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       $vars[$filePath] = $v;
     }
     return $vars;
-  }
-
-  private function createFilesVar($rootDir) {
-    foreach($this->files as $subDir => $null) {
-      $workingDir = $subDir == "" ? $rootDir : "$rootDir/$subDir";
-      $doc = new DOMDocumentPlus();
-      $root = $doc->appendChild($doc->createElement("root"));
-      $ol = $root->appendChild($doc->createElement("ol"));
-      foreach($this->files[$subDir] as $f => $null) {
-        $li = $ol->appendChild($doc->createElement("li"));
-        $a = $li->appendChild($doc->createElement("a"));
-        $href = $subDir == "" ? $f : "$subDir/$f";
-        $a->setAttribute("href", "/$href");
-        $a->nodeValue = $href;
-      }
-      Cms::setVariable("files".($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)), $root);
-    }
   }
 
   private function getFileVars($subDir, Array $files, &$useCache) {

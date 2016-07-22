@@ -5,15 +5,19 @@
 
     HTML sestavy
 
-    Dostupné proměnné:
+    Dostupné proměnné pro atribut var:
       editlink, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
 
     Atributy elementu doclist:
-      id (povinné)
-      class
-      sort | rsort (reverzní) s hodnotou dostupné proměnné (výchozí rsort="ctime")
-      skip (výchozí skip="0")
-      limit (výchozí limit="0" pro neomezený počet)
+      id (povinné)    identifikátor proměnné s názvem agregator-[id]
+      doclist         id existujícího elementu doclist, jehož předpis se má použít
+      path            soubory uvedeného adresáře (výchozí je kořenový adresář)
+      kw              dokumenty s klíčovými slovy oddělenými čárkou (výchozí všechny)
+      wrapper         obalí sestavu elementem uvedeného názvu
+      class           vloží uvedenou třídu do obalujícího elementu (výchozí class="agregator [id]")
+      sort | rsort    seřadí sestavu podle proměnné (výchozí rsort="ctime")
+      skip            přeskočí prvních <n> souborů (výchozí skip="0")
+      limit           zahrne maximálně <n> souborů (výchozí limit="0" pro neomezený počet)
 
   -->
   <doclist id="ul" wrapper="ul">
@@ -28,6 +32,11 @@
   <doclist id="dd" sort="mtime">
     <dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
   </doclist>
+
+  <doclist id="dd-coop" path="coop" rsort="mtime" doclist="dd" />
+  <doclist id="dd-coop-test" path="coop" rsort="mtime" kw="test" doclist="dd" />
+  <doclist id="dd-coop-dva" path="coop" rsort="mtime" kw="dva" doclist="dd" />
+  <doclist id="dd-coop-dva-tri" path="coop" rsort="mtime" kw="dva, tri" doclist="dd" />
 
   <!--
     TODO, nové attributy: doclist (ref), path, kw
@@ -48,9 +57,7 @@
 
   -->
   <imglist id="gallery" wrapper="ul" class="gallery">
-    <item>
-      <li><a var="url-big@href"><object var="type@type url-thumbs@data alt@title name@title alt name"></object></a></li>
-    </item>
+    <li><a var="url-big@href"><object var="type@type url-thumbs@data alt@title name@title alt name"></object></a></li>
   </imglist>
 
   <!--
