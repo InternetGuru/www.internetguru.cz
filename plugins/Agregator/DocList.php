@@ -1,6 +1,6 @@
 <?php
 
-namespace IGCMS\Plugins;
+namespace IGCMS\Plugins\Agregator;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
@@ -15,10 +15,11 @@ class DocList {
   private $path;
   private $kw;
   private $wrapper;
-  private $sortby;
-  private $rsort;
   private $skip;
   private $limit;
+  private static $sortby;
+  private static $rsort;
+
   const DEFAULT_SORTBY = "ctime";
 
   public function __construct(DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
@@ -27,12 +28,13 @@ class DocList {
     $this->path = $doclist->getAttribute("path");
     $this->kw = $doclist->getAttribute("kw");
     $this->wrapper = $doclist->getAttribute("wrapper");
-    $this->rsort = $doclist->hasAttribute("rsort");
-    if($this->rsort) {
-      $this->sortby = $doclist->getAttribute("rsort");
+    self::$rsort = $doclist->hasAttribute("rsort");
+    if(self::$rsort) {
+      self::$sortby = $doclist->getAttribute("rsort");
     } else {
-      $this->sortby = $doclist->getAttribute("sort");
+      self::$sortby = $doclist->getAttribute("sort");
     }
+    if(!strlen(self::$sortby)) self::$sortby = self::DEFAULT_SORTBY;
     $this->skip = $doclist->hasAttribute("skip");
     if(!is_numeric($this->skip)) $this->skip = 0;
     $this->limit = $doclist->hasAttribute("limit");
@@ -44,8 +46,8 @@ class DocList {
       Logger::user_warning(sprintf(_("Doclist '%s' not created: %s"), $this->id, $e->getMessage()));
       return;
     }
+    $this->sort($vars);
     $list = $this->getDOM($pattern, $vars);
-    #todo: sort
     Cms::setVariable($this->id, $list);
   }
 
@@ -106,25 +108,18 @@ class DocList {
     return $doc;
   }
 
-  private function sort(Array &$vars, DOMElementPlus $template, $defaultSortKey, $defaultReverse) {
-    self::$reverse = $defaultReverse;
-    self::$sortKey = $defaultSortKey;
-    if($template->hasAttribute("sort") || $template->hasAttribute("rsort")) {
-      self::$reverse = $template->hasAttribute("rsort");
-      $userKey = $template->hasAttribute("sort") ? $template->getAttribute("sort") : $template->getAttribute("rsort");
-      if(!array_key_exists($userKey, current($vars))) {
-        Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
-      } else {
-        self::$sortKey = $userKey;
-      }
+  private function sort(Array &$vars) {
+    if(strlen(self::$sortby) && !array_key_exists(self::$sortby, current($vars))) {
+      Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), self::$sortby));
+      self::$sortby = self::DEFAULT_SORTBY;
     }
-    uasort($vars, array("IGCMS\Plugins\DocList", "cmp"));
+    uasort($vars, array("IGCMS\Plugins\Agregator\DocList", "cmp"));
   }
 
   private static function cmp($a, $b) {
-    if($a[self::$sortKey] == $b[self::$sortKey]) return 0;
-    $val = ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
-    if(self::$reverse) return -$val;
+    if($a[self::$sortby] == $b[self::$sortby]) return 0;
+    $val = ($a[self::$sortby] < $b[self::$sortby]) ? -1 : 1;
+    if(self::$rsort) return -$val;
     return $val;
   }
 

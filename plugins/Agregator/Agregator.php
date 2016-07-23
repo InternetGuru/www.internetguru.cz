@@ -1,6 +1,7 @@
 <?php
 
 namespace IGCMS\Plugins;
+use IGCMS\Plugins\Agregator\DocList;
 use IGCMS\Core\Cms;
 use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
@@ -24,8 +25,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   private $currentSubdir = null;
   private $currentFilepath = null;
   private $cfg;
-  private static $sortKey;
-  private static $reverse;
   const DEBUG = true;
   const APC_PREFIX = "1";
 
@@ -154,51 +153,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       $vars[$filePath] = $v;
     }
     return $vars;
-  }
-
-  private function getFileVars($subDir, Array $files, &$useCache) {
-    $vars = array();
-    $cacheKey = apc_get_key($subDir);
-    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
-    if(!IS_LOCALHOST && is_file($inotify)) $checkSum = filemtime($inotify);
-    else $checkSum = count($files); // invalidate cache with different files count
-    if(!apc_is_valid_cache($cacheKey, $checkSum)) {
-      apc_store_cache($cacheKey, $checkSum, $subDir);
-      $useCache = false;
-    }
-    $date = new DateTime();
-    foreach($files as $fileName => $rootDir) {
-      $filePath = $rootDir."/".(strlen($subDir) ? "$subDir/" : "").$fileName;
-      try {
-        $id = HTMLPlusBuilder::register($filePath, null, $subDir);
-        $vars[$filePath] = HTMLPlusBuilder::getIdToAll($id);
-        $vars[$filePath]["fileToMtime"] = HTMLPlusBuilder::getFileToMtime($filePath);
-        $vars[$filePath]["parentid"] = $subDir;
-        $vars[$filePath]["prefixid"] = $subDir;
-        $vars[$filePath]["file"] = $filePath;
-        $vars[$filePath]["link"] = $id;
-        $vars[$filePath]['editlink'] = "";
-        if(Cms::isSuperUser()) {
-          $vars[$filePath]['editlink'] = "<a href='?Admin=$filePath' title='$filePath' class='flaticon-drawing3'>".$this->edit."</a>";
-        }
-        $this->vars[$filePath] = $vars[$filePath];
-      } catch(Exception $e) {
-        Logger::critical($e->getMessage());
-        continue;
-      }
-      if(!IS_LOCALHOST && is_file($inotify)) continue;
-      $cacheKey = apc_get_key($filePath);
-      if(apc_is_valid_cache($cacheKey, $vars[$filePath]["fileToMtime"])) continue;
-      #var_dump($vars[$filePath]);
-      apc_store_cache($cacheKey, $vars[$filePath]["fileToMtime"], $filePath);
-      $useCache = false;
-    }
-    return $vars;
-  }
-
-  private function getSubDirCache($cacheKey) {
-    if(!apc_exists($cacheKey)) return null;
-    return apc_fetch($cacheKey);
   }
 
 }
