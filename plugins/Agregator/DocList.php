@@ -28,8 +28,9 @@ class DocList extends AgregatorList {
     $somethingFound = false;
     $userKw = preg_split("/ *, */", $this->kw);
     $userKw = array_filter($userKw, function($value) { return $value !== ''; });
+    $dirPrefix = PLUGINS_DIR."/".basename(__DIR__)."/".(strlen($this->path) ? $this->path."/" : "");
     foreach(HTMLPlusBuilder::getFileToId() as $file => $id) {
-      if(strpos($file, PLUGINS_DIR."/".basename(__DIR__)."/".$this->path."/") !== 0) continue;
+      if(strpos($file, $dirPrefix) !== 0) continue;
       $somethingFound = true;
       if(count($userKw)) {
         $docKw = preg_split("/ *, */", HTMLPlusBuilder::getIdToKw($id));
@@ -38,7 +39,7 @@ class DocList extends AgregatorList {
       $fileIds[$file] = $id;
     }
     if(empty($fileIds)) {
-      if(!$somethingFound) throw new Exception(sprintf(_("Path '%s' not found or empty"), $this->path));
+      if(!$somethingFound) throw new Exception(sprintf(_("No documents registered in '%s'"), $dirPrefix));
       throw new Exception(sprintf(_("No files matching attribute kw '%s'"), $this->kw));
     }
     $vars = array();

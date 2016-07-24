@@ -126,6 +126,9 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   public static function register($filePath, $prefix='') {
+    if(strlen($prefix) && !array_key_exists($prefix, self::$linkToId)) {
+      throw new Exception(sprintf(_("Undefined link '%s'"), $prefix));
+    }
     self::$currentFileTo = array();
     self::$currentIdTo = array();
     self::$storeCache = true;
@@ -290,7 +293,7 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function registerElement(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
     $id = $e->getAttribute("id");
-    $link = "$linkPrefix/$id";
+    $link = strlen($linkPrefix) ? "$linkPrefix/$id" : $id;
     if(!strlen($parentId)) {
       $parentId = null;
       if($filePath == INDEX_HTML) $link = "";
