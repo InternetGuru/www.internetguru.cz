@@ -124,8 +124,14 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     }
     foreach($forms as $f) {
       $id = substr($f->getAttribute("var"), strlen($this->prefix)+1);
-      if(array_key_exists($id, $this->messages)) continue;
-      Logger::user_warning(sprintf(_("Missing message for form id '%s'"), $id));
+      if(!array_key_exists($id, $this->forms)) {
+        Logger::user_warning(sprintf(_("Form id '%s' not found"), $id));
+        continue;
+      }
+      if(!array_key_exists($id, $this->messages)) {
+        Logger::user_warning(sprintf(_("Missing message for form id '%s'"), $id));
+        continue;
+      }
     }
     return $content;
   }
