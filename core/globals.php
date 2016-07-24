@@ -25,6 +25,12 @@ function findFile($filePath, $user=true, $admin=true) {
   throw new Exception(sprintf(_("File '%s' not found"), $filePath));
 }
 
+function getCallerClass($i=1) {
+  $backtrace = debug_backtrace();
+  if(!array_key_exists("class", $backtrace[$i+1])) throw new Exception(_("Unknown caller class"));
+  return (new \ReflectionClass($backtrace[$i+1]["class"]))->getShortName();
+}
+
 function createSymlink($link, $target) {
   $restart = false;
   if(is_link($link) && readlink($link) == $target) return;

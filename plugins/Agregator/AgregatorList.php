@@ -12,7 +12,6 @@ use Exception;
 class AgregatorList {
   protected $id;
   protected $path;
-  private $class;
   private $wrapper;
   private $defaultSortby;
   private $skip;
@@ -22,7 +21,6 @@ class AgregatorList {
 
   public function __construct(DOMElementPlus $doclist, $defaultSortby, $defaultRsort) {
     $this->id = $doclist->getRequiredAttribute("id");
-    $this->class = "agregator ".$this->id;
     $this->path = $doclist->getAttribute("path");
     $this->wrapper = $doclist->getAttribute("wrapper");
     $this->defaultSortby = $defaultSortby;
@@ -47,9 +45,10 @@ class AgregatorList {
   private function getDOM(DOMElementPlus $pattern, Array $vars) {
     $doc = new DOMDocumentPlus();
     $root = $doc->appendChild($doc->createElement("root"));
-    if(strlen($this->wrapper))
+    if(strlen($this->wrapper)) {
       $root = $root->appendChild($doc->createElement($this->wrapper));
-    if(strlen($this->class)) $root->setAttribute("class", $this->class);
+      $root->setAttribute("class", "agregator ".strtolower(getCallerClass(2))." ".$this->id);
+    }
     $i = 0;
     foreach($vars as $k => $v) {
       if($i++ < $this->skip) continue;

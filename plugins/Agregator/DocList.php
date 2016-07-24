@@ -12,7 +12,7 @@ use Exception;
 class DocList extends AgregatorList {
   private $kw;
   const DEFAULT_SORTBY = "ctime";
-  const DEFAULT_RSORT = false;
+  const DEFAULT_RSORT = true;
 
   public function __construct(DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
