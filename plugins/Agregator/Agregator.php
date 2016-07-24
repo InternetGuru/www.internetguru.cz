@@ -66,7 +66,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
           #case "imglist":
         }
       } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
+        Logger::user_warning(sprintf(_("List '%s' not created: %s"), $id, $e->getMessage()));
       }
     }
   }

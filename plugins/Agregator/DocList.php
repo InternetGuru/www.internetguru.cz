@@ -9,45 +9,17 @@ use IGCMS\Core\Cms;
 use DateTime;
 use Exception;
 
-class DocList {
-  private $id;
-  private $class;
-  private $path;
+class DocList extends AgregatorList {
   private $kw;
-  private $wrapper;
-  private $skip;
-  private $limit;
-  private static $sortby;
-  private static $rsort;
-
   const DEFAULT_SORTBY = "ctime";
+  const DEFAULT_RSORT = false;
 
   public function __construct(DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
-    $this->id = $doclist->getRequiredAttribute("id");
-    $this->class = "agregator ".$this->id;
-    $this->path = $doclist->getAttribute("path");
+    parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
     $this->kw = $doclist->getAttribute("kw");
-    $this->wrapper = $doclist->getAttribute("wrapper");
-    self::$rsort = $doclist->hasAttribute("rsort");
-    if(self::$rsort) {
-      self::$sortby = $doclist->getAttribute("rsort");
-    } else {
-      self::$sortby = $doclist->getAttribute("sort");
-    }
-    if(!strlen(self::$sortby)) self::$sortby = self::DEFAULT_SORTBY;
-    $this->skip = $doclist->hasAttribute("skip");
-    if(!is_numeric($this->skip)) $this->skip = 0;
-    $this->limit = $doclist->hasAttribute("limit");
-    if(!is_numeric($this->limit)) $this->limit = 0;
+    $vars = $this->createVars();
     if(is_null($pattern)) $pattern = $doclist;
-    try {
-      $vars = $this->createVars();
-    } catch(Exception $e) {
-      Logger::user_warning(sprintf(_("Doclist '%s' not created: %s"), $this->id, $e->getMessage()));
-      return;
-    }
-    $this->sort($vars);
-    $list = $this->getDOM($pattern, $vars);
+    $list = $this->createList($pattern, $vars);
     Cms::setVariable($this->id, $list);
   }
 
@@ -90,38 +62,5 @@ class DocList {
     }
     return $vars;
   }
-
-  private function getDOM(DOMElementPlus $pattern, Array $vars) {
-    $doc = new DOMDocumentPlus();
-    $root = $doc->appendChild($doc->createElement("root"));
-    if(strlen($this->wrapper))
-      $root = $root->appendChild($doc->createElement($this->wrapper));
-    if(strlen($this->class)) $root->setAttribute("class", $this->class);
-    $i = 0;
-    foreach($vars as $k => $v) {
-      if($i++ < $this->skip) continue;
-      if($this->limit > 0 && $i > $this->skip + $this->limit) break;
-      $list = $root->appendChild($doc->importNode($pattern, true));
-      $list->processVariables($v, array(), true);
-      $list->stripTag();
-    }
-    return $doc;
-  }
-
-  private function sort(Array &$vars) {
-    if(strlen(self::$sortby) && !array_key_exists(self::$sortby, current($vars))) {
-      Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), self::$sortby));
-      self::$sortby = self::DEFAULT_SORTBY;
-    }
-    uasort($vars, array("IGCMS\Plugins\Agregator\DocList", "cmp"));
-  }
-
-  private static function cmp($a, $b) {
-    if($a[self::$sortby] == $b[self::$sortby]) return 0;
-    $val = ($a[self::$sortby] < $b[self::$sortby]) ? -1 : 1;
-    if(self::$rsort) return -$val;
-    return $val;
-  }
-
 
 }
