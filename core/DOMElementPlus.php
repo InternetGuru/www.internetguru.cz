@@ -49,8 +49,11 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function addClass($class) {
+    if(!preg_match("/^[A-Za-z][A-Za-z0-9_-]*$/", $class)) {
+      throw new Exception(sprintf(_("Invalid class name '%s'")), $class);
+    }
     if($this->hasClass($class)) return;
-    if(!$this->hasAttribute("class")) $this->setAttribute("class", $class);
+    if(!strlen(trim($this->getAttribute("class")))) $this->setAttribute("class", $class);
     else $this->setAttribute("class", $this->getAttribute("class")." $class");
   }
 
