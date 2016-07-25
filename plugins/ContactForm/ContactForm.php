@@ -61,6 +61,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     foreach($this->forms as $formId => $form) {
       $form->addClass("fillable");
       $form->addClass("validable");
+      $form->addClass("editable");
       $formVar = $this->parseForm($form);
       $this->formsElements[normalize($this->className)."-$formId"] = $formVar;
       Cms::setVariable($formId, $formVar);
