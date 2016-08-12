@@ -80,7 +80,6 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $h1id = $content->documentElement->firstElement->getAttribute("id");
     if($h1id != $prefixId) $h1id = "$prefixId/$h1id";
     $this->balance($content, $h1id);
-    return $content;
   }
 
   private function strip(HTMLPlus $c) {

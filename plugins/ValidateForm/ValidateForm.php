@@ -80,7 +80,6 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       $this->getLabels($xpath, $form);
       Cms::setVariable($id, $this->verifyItems($xpath, $form, $request));
     }
-    return $content;
   }
 
   private function hpCheck($request) {

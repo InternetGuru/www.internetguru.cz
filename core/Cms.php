@@ -125,7 +125,7 @@ class Cms {
     foreach($plugins->getIsInterface("IGCMS\Core\ModifyContentStrategyInterface") as $plugin) {
       try {
         $tmpContent = clone $content;
-        $tmpContent = $plugin->modifyContent($tmpContent);
+        $plugin->modifyContent($tmpContent);
         self::validateContent($tmpContent);
         $content = $tmpContent;
       } catch (Exception $e) {

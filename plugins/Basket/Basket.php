@@ -23,7 +23,6 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
 
   public function modifyContent(HTMLPlus $content) {
     $content->processVariables($this->productVars);
-    return $content;
   }
 
   public function update(SplSubject $subject) {

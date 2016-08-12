@@ -56,7 +56,6 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
 
     // add sources and return
     if($codemirror) $this->addSources($libs);
-    return $content;
   }
 
   private function addSources(Array $libs) {

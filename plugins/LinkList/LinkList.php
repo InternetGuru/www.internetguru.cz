@@ -35,7 +35,6 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
       $this->createLinkList($s);
       break;
     }
-    return $content;
   }
 
   private function createLinkList(DOMElementPlus $wrapper) {

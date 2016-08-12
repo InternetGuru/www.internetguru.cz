@@ -134,7 +134,6 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
         continue;
       }
     }
-    return $content;
   }
 
   private function parseForm(DOMElementPlus $form) {

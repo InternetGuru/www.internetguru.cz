@@ -29,7 +29,6 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     $globalInfo["resp"] = HTMLPlusBuilder::getIdToResp($id);
     $globalInfo["respid"] = HTMLPlusBuilder::getIdToRespId($id);
     $this->insertDocInfo($content, $globalInfo, $filePath);
-    return $content;
   }
 
   private function insertDocInfo(HTMLPlus $doc, Array $globalInfo, $filePath) {

@@ -23,7 +23,6 @@ class FillForm extends Plugin implements SplObserver, ModifyContentStrategyInter
       if(!$form->hasClass("fillable")) continue;
       $this->fillForm($form);
     }
-    return $content;
   }
 
   private function fillForm(DOMElementPlus $form) {
