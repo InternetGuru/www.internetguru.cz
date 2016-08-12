@@ -95,11 +95,13 @@ class HTMLPlusBuilder extends DOMBuilder {
       try {
         $doc = self::load($filePath);
         self::$fileToDoc[$filePath] = $doc;
-        $value = array(
-          "fileToMtime" => self::$currentFileTo["fileToMtime"],
-          "xml" => $doc->saveXML()
-        );
-        apc_store_cache($cacheKey, $value, $filePath);
+        if(self::$storeCache) {
+          $value = array(
+            "fileToMtime" => self::$currentFileTo["fileToMtime"],
+            "xml" => $doc->saveXML(),
+          );
+          apc_store_cache($cacheKey, $value, $filePath);
+        }
         return $doc;
       } catch(Exception $e) {
         if(!apc_exists($cacheKey)) throw $e;
@@ -147,13 +149,14 @@ class HTMLPlusBuilder extends DOMBuilder {
       self::$currentFileTo["fileToId"] = $id;
     }
     self::addToRegister($filePath);
-    if(self::$storeCache) self::setApc($cacheKey, $filePath);
+    if(self::$storeCache) {
+      $value = array(
+        "currentIdTo" => self::$currentIdTo,
+        "currentFileTo" => self::$currentFileTo,
+      );
+      apc_store_cache($cacheKey, $value, $filePath);
+    }
     return self::$currentFileTo["fileToId"];
-  }
-
-  private static function setApc($cacheKey, $filePath) {
-    $value = array("currentIdTo" => self::$currentIdTo, "currentFileTo" => self::$currentFileTo);
-    apc_store_cache($cacheKey, $value, $filePath);
   }
 
   public static function isLink($link) {
@@ -204,12 +207,12 @@ class HTMLPlusBuilder extends DOMBuilder {
         && count(self::$currentFileTo["fileToMtime"]) > 1) {
         self::validateHtml($doc, $filePath, true);
       }
-      self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
-      self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
-      return $doc;
     } catch(Exception $e) {
       throw new Exception(sprintf(_("Unable to load %s: %s"), $fp, $e->getMessage()));
     }
+    self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
+    self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
+    return $doc;
   }
 
   private static function validateHtml(HTMLPlus $doc, $filePath, $included) {
