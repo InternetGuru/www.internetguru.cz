@@ -3,6 +3,15 @@
   <var id="protocol" pattern="https?">http</var>
 
   <!--
+    PŘEPIS URL adresy; element rewrite
+    - atribut match    ... přepisovaná část
+    - obsah elementu   ... náhrada
+
+    např.:
+    <rewrite match="coop/"></rewrite>
+  -->
+
+  <!--
     ATRIBUTY elementu redir
     - link     ... cesta
     - parName  ... název parametru
