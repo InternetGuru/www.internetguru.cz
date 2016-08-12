@@ -82,10 +82,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $this->balance($content, $h1id);
   }
 
-  private function strip(HTMLPlus $c) {
+  private function strip(HTMLPlus $content) {
     $link = basename(getCurLink());
-    if($this->isRoot($link)) return $c;
-    $h1 = $c->getElementById($link, "h");
+    if($this->isRoot($link)) return $content;
+    $h1 = $content->getElementById($link, "h");
     if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), getCurLink()), 404);
     $this->handleAttribute($h1, "ctime");
     $this->handleAttribute($h1, "mtime");
@@ -94,15 +94,28 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $this->handleAttribute($h1, "resp");
     $this->handleAttribute($h1, "respid");
     $this->handleAttribute($h1->parentNode, "xml:lang", true);
-    $content = new HTMLPlus();
-    $content->formatOutput = true;
-    $body = $content->appendChild($content->createElement("body"));
-    $body->setAttribute("ns", $c->documentElement->getAttribute("ns"));
+    $body = $content->documentElement;
     foreach($h1->parentNode->attributes as $attNode) {
       $body->setAttribute($attNode->nodeName, $attNode->nodeValue);
     }
-    $this->appendUntilSame($h1, $body);
+    $elements = $this->getUntilSame($h1);
+    foreach($body->childElementsArray as $child) {
+      $body->removeChild($child);
+    }
+    foreach($elements as $e) {
+      $body->appendChild($e);
+    }
     return $content;
+  }
+
+  private function getUntilSame(DOMElement $e) {
+    $elements = array($e);
+    $untilName = $e->nodeName;
+    while(($e = $e->nextElement) !== null) {
+      if($e->nodeName == $untilName) break;
+      $elements[] = $e;
+    }
+    return $elements;
   }
 
   private function isRoot($link) {
@@ -116,16 +129,6 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $value = $e->getAncestorValue($aName, $eName);
     if(is_null($value)) return;
     $e->setAttribute($aName, $value);
-  }
-
-  private function appendUntilSame(DOMElement $e, DOMElement $into) {
-    $doc = $into->ownerDocument;
-    $into->appendChild($doc->importNode($e, true));
-    $untilName = $e->nodeName;
-    while(($e = $e->nextElement) !== null) {
-      if($e->nodeName == $untilName) break;
-      $into->appendChild($doc->importNode($e, true));
-    }
   }
 
   private function createVars() {
