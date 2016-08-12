@@ -67,19 +67,6 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
   return $newString;
 }
 
-function absoluteLink($link=null) {
-  if(is_null($link)) $link = $_SERVER["REQUEST_URI"];
-  if(substr($link, 0, 1) == "/") $link = substr($link, 1);
-  if(substr($link, -1) == "/") $link = substr($link, 0, -1);
-  $pLink = parse_url($link);
-  if($pLink === false) throw new Exception(sprintf(_("Unable to parse URL '%s'"), $link));
-  $scheme = isset($pLink["scheme"]) ? $pLink["scheme"] : $_SERVER["REQUEST_SCHEME"];
-  $host = isset($pLink["host"]) ? $pLink["host"] : $_SERVER["HTTP_HOST"];
-  $path = isset($pLink["path"]) && $pLink["path"] != "" ? "/".$pLink["path"] : "";
-  $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
-  return "$scheme://$host$path$query";
-}
-
 function redirTo($link, $code=null, $msg=null) {
   http_response_code(is_null($code) ? 302 : $code);
   if(!strlen($link)) {
