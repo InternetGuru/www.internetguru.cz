@@ -187,7 +187,7 @@ class Cms {
       $tmpContent->validatePlus(true);
       return $tmpContent;
     } catch(Exception $e) {
-      Logger::user_error(sprintf(_("Invalid HTML+ caused by: %s"), $e->getMessage()));
+      Logger::user_error(sprintf(_("Invalid HTML+: %s"), $e->getMessage()));
       return $content;
     }
   }
