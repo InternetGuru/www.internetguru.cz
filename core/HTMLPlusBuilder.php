@@ -297,7 +297,9 @@ class HTMLPlusBuilder extends DOMBuilder {
       self::setHeadingInfo($id, $e);
     }
     self::$currentIdTo["idToFile"][$id] = $filePath;
-    self::$currentIdTo["idToTitle"][$id] = $e->getAttribute("title");
+    if($e->hasAttribute("title")) {
+      self::$currentIdTo["idToTitle"][$id] = $e->getAttribute("title");
+    }
     self::$currentIdTo["idToParentId"][$id] = $parentId;
     return $id;
   }
