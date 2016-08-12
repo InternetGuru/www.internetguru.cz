@@ -156,12 +156,6 @@ function addPermParam(Array &$pLink, $parName) {
   $pLink["query"] = $parAndVal;
 }
 
-function __toString($o) {
-  echo "|";
-  if(is_array($o)) return implode(", ", $o);
-  return (string) $o;
-}
-
 function stableSort(Array &$a) {
   if(count($a) < 2) return;
   $order = range(1, count($a));
@@ -234,15 +228,6 @@ function mkdir_plus($dir, $mode=0775, $recursive=true) {
   if(is_dir($dir)) return;
   @mkdir($dir, $mode, $recursive); // race condition
   if(!is_dir($dir)) throw new Exception(_("Unable to create directory"));
-}
-
-function safeRemoveDir($dir) {
-  if(!is_dir($dir)) return true;
-  if(count(scandir($dir)) == 2) return rmdir($dir);
-  $i = 1;
-  $delDir = "$dir~";
-  while(is_dir($delDir.$i)) $i++;
-  return rename($dir, $delDir.$i);
 }
 
 function incrementalRename($src, $dest=null) {
@@ -328,19 +313,6 @@ function unlock_file($fpr, $fileName=null, $ext="lock") {
   }
 }
 
-function deleteRedundantFiles($in, $according) {
-  if(!is_dir($in)) return;
-  foreach(scandir($in) as $f) {
-    if(in_array($f, array(".", ".."))) continue;
-    if(is_dir("$in/$f")) {
-      deleteRedundantFiles("$in/$f", "$according/$f");
-      if(!is_dir("$according/$f")) rmdir("$in/$f");
-      continue;
-    }
-    if(!is_file("$according/$f")) unlink("$in/$f");
-  }
-}
-
 function translateUtf8Entities($xmlSource, $reverse = FALSE) {
   static $literal2NumericEntity;
   if(empty($literal2NumericEntity)) {
@@ -406,11 +378,6 @@ function fileSizeConvert($b) {
 function getFileHash($filePath) {
   if(!is_file($filePath)) return "";
   return hash_file(FILE_HASH_ALGO, $filePath);
-}
-
-function getDirHash($dirPath) {
-  if(!is_dir($dirPath)) return "";
-  return hash(FILE_HASH_ALGO, implode("", scandir($dirPath)));
 }
 
 function stripDataFolder($filePath) {
@@ -540,14 +507,6 @@ function validate_callStatic($methodName, Array $arguments, Array $functions, $n
   for($i=0; $i<$nonEmptyArgumentsCount; $i++) {
     if(array_key_exists($i, $arguments) && strlen($arguments[$i])) continue;
     throw new Exception(sprintf(_("Argument[%s] empty or missing"), $i));
-  }
-}
-
-// UNUSED
-function clearApcCache() {
-  $cache_info = apc_cache_info();
-  foreach($cache_info["cache_list"] as $data) {
-    if(strpos($data["info"], HOST) === 0) apc_delete($data["info"]);
   }
 }
 
