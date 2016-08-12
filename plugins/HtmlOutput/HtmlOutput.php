@@ -183,6 +183,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return ROOT_URL.self::FAVICON;
   }
 
+  private function isLocalFragment(Array $pLink) {
+    if(array_key_exists("path", $pLink)) return false;
+    return array_key_exists("fragment", $pLink);
+  }
+
   private function processLinks(DOMElementPlus $e, $aName, $getLink) {
     $url = $e->getAttribute($aName);
     if(!strlen($url)) {
@@ -192,13 +197,15 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     try {
       $pLink = parseLocalLink($url);
       if(is_null($pLink)) return; # external
+      if($this->isLocalFragment($pLink)) return;
       $getLink = true;
       if(array_key_exists("path", $pLink)) {
         // link to supported file
         global $plugins;
         foreach($plugins->getIsInterface("IGCMS\Core\ResourceInterface") as $ri) {
-          if(!$getLink) break;
-          if($ri::isSupportedRequest($pLink["path"])) $getLink = false;
+          if(!$ri::isSupportedRequest($pLink["path"])) continue;
+          $getLink = false;
+          break;
         }
         // link to existing file
         if($getLink && is_file($pLink["path"])) $getLink = false;
@@ -305,29 +312,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
     foreach($toStrip as $o) $o[0]->stripTag($o[1]);
   }
-
-  /*
-  private function asynchronousExternalImageCheck($file) {
-    $headers = @get_headers(absoluteLink(ROOT_URL.$filePath), 1);
-    $invalid = !is_array($headers) || !array_key_exists("Content-Type", $headers)
-      || !array_key_exists("Content-Length", $headers);
-    if($invalid || strpos($headers[0], '200') === false) {
-      $error = $invalid ? "bad response" : $headers[0];
-      throw new Exception("object data '$filePath' not found ($error)");
-    }
-    $mime = $headers["Content-Type"];
-    if(strpos($mime, "image/") !== 0)
-      throw new Exception("invalid object '$filePath' mime type '$mime'");
-    if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
-      $o->setAttribute("type", $mime);
-      Logger::warning("Object '$filePath' attr type set to '".$mime."'");
-    }
-    $size = (int) $headers["Content-Length"];
-    if(!$size || $size > 350*1024) {
-      Logger::warning("Object '$filePath' too big or invalid size ".fileSizeConvert($size));
-    }
-  }
-  */
 
   private function getTitle(DOMElementPlus $h1) {
     $title = null;
