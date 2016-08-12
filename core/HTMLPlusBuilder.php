@@ -125,7 +125,10 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
   }
 
-  public static function register($filePath, $parentId=null, $linkPrefix='') {
+  public static function register($filePath, $prefix='') {
+    if(strlen($prefix) && !array_key_exists($prefix, self::$linkToId)) {
+      throw new Exception(sprintf(_("Undefined link '%s'"), $prefix));
+    }
     self::$currentFileTo = array();
     self::$currentIdTo = array();
     self::$storeCache = true;
@@ -145,7 +148,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     } else {
       $doc = self::build($filePath);
       $id = $doc->documentElement->firstElement->getAttribute("id");
-      self::registerStructure($doc->documentElement, $parentId, $id, $linkPrefix, $filePath);
+      self::registerStructure($doc->documentElement, $prefix, $id, $prefix, $filePath);
       self::$currentFileTo["fileToId"] = $id;
     }
     self::addToRegister($filePath);
@@ -186,7 +189,15 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function addToRegister($filePath) {
     foreach(self::$currentFileTo as $name => $value) {
-      self::${$name}[$filePath] = $value;
+      switch($name) {
+        case "fileToMtime":
+        foreach($value as $file => $mtime) {
+          self::${$name}[$file] = $mtime;
+        }
+        break;
+        default:
+        self::${$name}[$filePath] = $value;
+      }
     }
     foreach(self::$currentIdTo as $name => $value) {
       foreach($value as $id => $v) self::${$name}[$id] = $v;
@@ -241,7 +252,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     if(pathinfo($src, PATHINFO_EXTENSION) != "html")
       throw new Exception(sprintf(_("Included file '%s' extension must be .html"), $src));
     $file = findFile("$workingDir/$src");
-    if(strpos(realpath($file), realpath("$workingDir/")) !== 0)
+    if(strpos($file, realpath("$workingDir/")) !== 0)
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $src));
     if($workingDir == ".") return $src;
     return "$workingDir/$src";
@@ -282,8 +293,9 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function registerElement(DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
     $id = $e->getAttribute("id");
-    $link = "$linkPrefix/$id";
-    if(is_null($parentId)) {
+    $link = strlen($linkPrefix) ? "$linkPrefix/$id" : $id;
+    if(!strlen($parentId)) {
+      $parentId = null;
       if($filePath == INDEX_HTML) $link = "";
       else $parentId = current(self::$fileToId);
     }

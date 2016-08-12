@@ -13,12 +13,22 @@ function findFile($filePath, $user=true, $admin=true) {
   $dirs = array(CMS_FOLDER);
   if($admin) array_unshift($dirs, ADMIN_FOLDER);
   if($user) array_unshift($dirs, USER_FOLDER);
-  foreach($dirs as $dir) {
-    if(!is_file("$dir/$filePath")) continue;
-    if(is_file("$dir/$inactiveFilePath")) continue;
-    return "$dir/$filePath";
+  foreach($dirs as $d) {
+    if(!is_file("$d/$filePath")) continue;
+    if(is_file("$d/$inactiveFilePath")) continue;
+    $path = realpath("$d/$filePath");
+    if(strpos($path, realpath($d).DIRECTORY_SEPARATOR) !== 0) {
+      throw new Exception(sprintf(_("File '%s' is out of working space"), $filePath));
+    }
+    return $path;
   }
   throw new Exception(sprintf(_("File '%s' not found"), $filePath));
+}
+
+function getCallerClass($i=1) {
+  $backtrace = debug_backtrace();
+  if(!array_key_exists("class", $backtrace[$i+1])) throw new Exception(_("Unknown caller class"));
+  return (new \ReflectionClass($backtrace[$i+1]["class"]))->getShortName();
 }
 
 function createSymlink($link, $target) {
