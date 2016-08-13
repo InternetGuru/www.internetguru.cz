@@ -27,6 +27,7 @@ class HTMLPlus extends DOMDocumentPlus {
   const STATUS_INVALID = 2;
   const STATUS_REPAIRED = 3;
   const RNG_FILE = "HTMLPlus.rng";
+  const USE_APC = true;
 
   function __construct($version="1.0", $encoding="utf-8") {
     parent::__construct($version, $encoding);
@@ -204,7 +205,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $hash = hash(FILE_HASH_ALGO, $this->saveXML());
     $version = 3; // increment if validatePlus changes
     $cacheKey = apc_get_key("HTMLPlus/validatePlus/$hash/$version");
-    if(apc_exists($cacheKey)) $i = apc_fetch($cacheKey);
+    if(self::USE_APC && apc_exists($cacheKey)) $i = apc_fetch($cacheKey);
     #var_dump("$hash found $i");
     $this->headings = $this->getElementsByTagName("h");
     $this->status = self::STATUS_VALID;
@@ -230,7 +231,7 @@ class HTMLPlus extends DOMDocumentPlus {
       $this->status = self::STATUS_INVALID;
       throw $e;
     } finally {
-      if(!count($this->errors)) {
+      if(self::USE_APC && !count($this->errors)) {
         apc_store_cache($cacheKey, $i, "validatePlus");
       }
     }
