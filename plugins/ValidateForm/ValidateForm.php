@@ -13,7 +13,7 @@ use DOMXPath;
 use SplObserver;
 use SplSubject;
 
-class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
+class ValidateForm extends Plugin implements SplObserver {
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
   const FORM_ID = "validateform-id";
@@ -30,14 +30,16 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       $subject->detach($this);
       return;
     }
-    if($subject->getStatus() != STATUS_PREINIT) return;
+    if($subject->getStatus() != STATUS_INIT) return;
     $this->detachIfNotAttached("HtmlOutput");
+    $this->modifyFormVars();
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.$this->className.'.css');
   }
 
-  public function modifyContent(HTMLPlus $content) {
-    $xpath = new DOMXPath($content);
-    foreach($xpath->query("//form") as $form) {
+  private function modifyFormVars() {
+    foreach(Cms::getAllVariables() as $varId => $formDoc) {
+      if(strpos($varId, "contactform-") !== 0) continue;
+      $form = $formDoc->documentElement->firstChild;
       if(!$form->hasClass("validable")) continue;
       try {
         $id = $form->getRequiredAttribute("id");
@@ -48,15 +50,15 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       $time = $this->getWaitTime($form);
       if($form->hasClass("validateform-notime")) $time = 0;
 
-      $div = $content->createElement("div");
+      $div = $formDoc->createElement("div");
 
-      $input = $content->createElement("input");
+      $input = $formDoc->createElement("input");
       $input->setAttribute("type", "email");
       $input->setAttribute("name", self::FORM_HP);
       $input->setAttribute("class", self::FORM_HP);
       $div->appendChild($input);
 
-      $input = $content->createElement("input");
+      $input = $formDoc->createElement("input");
       $input->setAttribute("type", "hidden");
       $input->setAttribute("name", self::FORM_ID);
       $input->setAttribute("value", $id);
@@ -77,8 +79,8 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
         Logger::user_error($e->getMessage());
         continue;
       }
-      $this->getLabels($xpath, $form);
-      Cms::setVariable($id, $this->verifyItems($xpath, $form, $request));
+      $this->getLabels($form);
+      Cms::setVariable($id, $this->verifyItems($form, $request));
     }
   }
 
@@ -86,39 +88,52 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     return isset($request[self::FORM_HP]) && !strlen($request[self::FORM_HP]);
   }
 
-  private function getLabels(DOMXPath $xpath, DOMElementPlus $form) {
-    foreach($xpath->query(".//label", $form) as $label) {
+  private function getLabels(DOMElementPlus $form) {
+    foreach($form->getElementsByTagName("label") as $label) {
       if($label->hasAttribute("for")) {
         $id = $label->getAttribute("for");
       } else {
-        $items = $xpath->query(".//input | .//textarea | .//select", $label);
-        if(!$items->length) continue;
-        $item = $items->item(0);
-        if(!$item->hasAttribute("id")) $item->setUniqueId();
-        $id = $item->getAttribute("id");
+        $fields = array();
+        $this->getFormFields($label, $fields);
+        if(count($fields) != 1) {
+          Logger::warning(sprintf(_("Invalid label '%s' with %s input fields"), $label->nodeValue, count($fields)));
+          continue;
+        }
+        if(!$fields[0]->hasAttribute("id")) $fields[0]->setUniqueId();
+        $id = $fields[0]->getAttribute("id");
       }
       $this->labels[$id][] = $label->nodeValue;
     }
   }
 
-  private function verifyItems(DOMXPath $xpath, DOMElementPlus $form, Array $request) {
+  private function getFormFields(DOMElementPlus $e, Array &$fields) {
+    foreach($e->childNodes as $child) {
+      if($child->nodeType != XML_ELEMENT_NODE) continue;
+      if(in_array($child->nodeName, array("input", "textarea", "select"))) $fields[] = $child;
+      $this->getFormFields($child, $fields);
+    }
+  }
+
+  private function verifyItems(DOMElementPlus $form, Array $request) {
     $isValid = true;
     $values = array();
-    foreach($xpath->query(".//input | .//textarea | .//select", $form) as $item) {
+    $fields = array();
+    $this->getFormFields($form, $fields);
+    foreach($fields as $field) {
       try {
-        $name = normalize($item->getAttribute("name"), null, "", false);
+        $name = normalize($field->getAttribute("name"), null, "", false);
         $value = isset($request[$name]) ? $request[$name] : null;
-        $this->verifyItem($item, $value);
+        $this->verifyItem($field, $value);
         $values[$name] = is_array($value) ? implode(", ", $value) : $value;
       } catch(Exception $e) {
-        if(!$item->hasAttribute("id")) $item->setUniqueId();
-        $id = $item->getAttribute("id");
+        if(!$field->hasAttribute("id")) $field->setUniqueId();
+        $id = $field->getAttribute("id");
         $error = $e->getMessage();
         if(isset($this->labels[$id][0])) $name = $this->labels[$id][0];
         if(isset($this->labels[$id][1])) $error = $this->labels[$id][1];
         Logger::user_error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
-        $item->parentNode->addClass(self::CSS_WARNING);
-        $item->addClass(self::CSS_WARNING);
+        $field->parentNode->addClass(self::CSS_WARNING);
+        $field->addClass(self::CSS_WARNING);
         $isValid = false;
       }
     }

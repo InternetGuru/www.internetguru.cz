@@ -72,7 +72,6 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
 
     $formToSend = null;
     $formIdToSend = null;
-
     foreach($this->forms as $formId => $form) {
       $prefixedFormId = normalize($this->className)."-$formId";
       $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
@@ -119,7 +118,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   public function modifyContent(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     $forms = $xpath->query("//*[contains(@var, '$this->prefix-')]");
-    if(!$forms->length) return $content;
+    if(!$forms->length) return;
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
       Logger::user_warning(_("Admin address is not set or invalid"));
     }
