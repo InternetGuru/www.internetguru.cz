@@ -51,7 +51,8 @@ class HTMLPlusBuilder extends DOMBuilder {
     foreach(array_keys($properties) as $p) {
       if(strpos($p, "idTo") !== 0) continue;
       #if($p == "idToParentId") continue;
-      $register[strtolower(substr($p, 4))] = self::${$p}[$id];
+      $register[strtolower(substr($p, 4))] =
+        array_key_exists($id, self::${$p}) ? self::${$p}[$id] : null;
     }
     return $register;
   }
@@ -219,6 +220,7 @@ class HTMLPlusBuilder extends DOMBuilder {
         self::validateHtml($doc, $filePath, true);
       }
     } catch(Exception $e) {
+      self::$storeCache = false;
       throw new Exception(sprintf(_("Unable to load %s: %s"), $fp, $e->getMessage()));
     }
     self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);

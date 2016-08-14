@@ -168,7 +168,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   private function balanceHeading(DOMElementPlus $section, $h3ids) {
     $setId = null;
     foreach(explode(" ", $section->getAttribute("class")) as $c) {
-      if(strpos($c, "$this->className-") !== 0) continue;
+      if(strpos($c, strtolower("$this->className-")) !== 0) continue;
       $setId = substr($c, strlen("$this->className-"));
     }
     if($setId == "none") {
