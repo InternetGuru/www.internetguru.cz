@@ -197,7 +197,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     try {
       $pLink = parseLocalLink($url);
       if(is_null($pLink)) return; # external
-      if($this->isLocalFragment($pLink)) return;
       $getLink = true;
       if(array_key_exists("path", $pLink)) {
         // link to supported file
@@ -215,6 +214,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         $pLink = $this->getLink($pLink, $rootId);
       }
       if(empty($pLink)) {
+        if($this->isLocalFragment($pLink)) return;
         throw new Exception(sprintf(_("Link '%s' not found"), $url));
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
