@@ -94,8 +94,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     if(!$useCache) {
       try {
-        $doc = self::load($filePath);
-        self::$fileToDoc[$filePath] = $doc;
+        $doc = self::doBuild($filePath);
         if(self::$storeCache) {
           $value = array(
             "fileToMtime" => self::$currentFileTo["fileToMtime"],
@@ -105,9 +104,14 @@ class HTMLPlusBuilder extends DOMBuilder {
         }
         return $doc;
       } catch(Exception $e) {
-        if(!apc_exists($cacheKey)) throw $e;
         Logger::error($e->getMessage());
-        $useCache = true;
+        if(apc_exists($cacheKey)) {
+          $useCache = true;
+        } else try {
+          return self::doBuild($filePath, false);
+        } catch(Exception $e) {
+          return self::doBuild($filePath, false, false);
+        }
       }
     }
     if($useCache) {
@@ -116,6 +120,12 @@ class HTMLPlusBuilder extends DOMBuilder {
       self::$fileToDoc[$filePath] = $doc;
       return $doc;
     }
+  }
+
+  private static function doBuild($filePath, $user=true, $admin=true) {
+    $doc = self::load($filePath, $user, $admin);
+    self::$fileToDoc[$filePath] = $doc;
+    return $doc;
   }
 
   public static function setIdToLink(Array $idToLink) {
@@ -208,9 +218,9 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
   }
 
-  private static function load($filePath) {
+  private static function load($filePath, $user=true, $admin=true) {
     $doc = new HTMLPlus();
-    $fp = findFile($filePath);
+    $fp = findFile($filePath, $user, $admin);
     try {
       $doc->load($fp);
       self::validateHtml($doc, $filePath, false);
@@ -221,7 +231,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       }
     } catch(Exception $e) {
       self::$storeCache = false;
-      throw new Exception(sprintf(_("Unable to load %s: %s"), $fp, $e->getMessage()));
+      throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $e->getMessage()));
     }
     self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
     self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
