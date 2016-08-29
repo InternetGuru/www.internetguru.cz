@@ -264,9 +264,9 @@ class HTMLPlusBuilder extends DOMBuilder {
     if(pathinfo($src, PATHINFO_EXTENSION) != "html")
       throw new Exception(sprintf(_("Included file '%s' extension must be .html"), $src));
     $file = findFile("$workingDir/$src");
+    if($workingDir == ".") return $src;
     if(strpos($file, realpath("$workingDir/")) !== 0)
       throw new Exception(sprintf(_("Included file '%s' is out of working directory"), $src));
-    if($workingDir == ".") return $src;
     return "$workingDir/$src";
   }
 
