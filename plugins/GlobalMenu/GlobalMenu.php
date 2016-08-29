@@ -15,8 +15,13 @@ use DateTime;
 class GlobalMenu extends Plugin implements SplObserver {
   private $vars = array();
 
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this, 5);
+  }
+
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_POSTPROCESS) return;
+    if($subject->getStatus() != STATUS_PROCESS) return;
     foreach($this->getXML()->documentElement->childElementsArray as $e) {
       if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
       $this->vars[$e->getAttribute("id")] = $e;
