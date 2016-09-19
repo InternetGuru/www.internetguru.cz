@@ -31,9 +31,9 @@ class AgregatorList {
     } else {
       self::$sortby = $doclist->getAttribute("sort");
     }
-    $this->skip = $doclist->hasAttribute("skip");
+    $this->skip = $doclist->getAttribute("skip");
     if(!is_numeric($this->skip)) $this->skip = 0;
-    $this->limit = $doclist->hasAttribute("limit");
+    $this->limit = $doclist->getAttribute("limit");
     if(!is_numeric($this->limit)) $this->limit = 0;
   }
 
