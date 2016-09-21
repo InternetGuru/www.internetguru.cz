@@ -25,7 +25,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
   private $content = null;
-  private $contentValue = null;
+  private $contentValue = "";
   private $scheme = null;
   private $type = "txt";
   private $title = null;
