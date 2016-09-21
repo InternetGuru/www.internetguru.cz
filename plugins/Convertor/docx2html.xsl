@@ -475,28 +475,27 @@
       </hyperlink>
   -->
   <!-- Template for hyperlinks -->
-    <xsl:template match="hyperlink">
-      <xsl:variable name="relationships" select="document($relationsFile)"/>
-
-      <xsl:element name="a">
-          <xsl:attribute name="href">
-              <xsl:choose>
-                  <xsl:when test="@anchor">#<xsl:value-of select="@anchor"/></xsl:when>
-                  <xsl:when test="@bookmark">#<xsl:value-of select="@bookmark"/></xsl:when>
-                  <xsl:when test="@arbLocation">#<xsl:value-of select="@arbLocation"/></xsl:when>
-                  <xsl:when test="@id">
-                      <xsl:variable name="idRelationship" select="@id"/>
-                      <xsl:value-of select="$relationships//*[name() = 'Relationship' and @Id=$idRelationship]/@Target"/>
-                  </xsl:when>
-                  <xsl:otherwise><xsl:apply-templates select="node()"/></xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:apply-templates select="node()">
-              <xsl:with-param name="nosamp" select="1"/>
-            </xsl:apply-templates>
-            <!-- <xsl:copy-of select="node()//t/text()"/> -->
-      </xsl:element>
-    </xsl:template>
+  <xsl:template match="hyperlink">
+    <xsl:variable name="relationships" select="document($relationsFile)"/>
+    <xsl:element name="a">
+        <xsl:attribute name="href">
+          <xsl:choose>
+            <xsl:when test="@anchor">#<xsl:value-of select="@anchor"/></xsl:when>
+            <xsl:when test="@bookmark">#<xsl:value-of select="@bookmark"/></xsl:when>
+            <xsl:when test="@arbLocation">#<xsl:value-of select="@arbLocation"/></xsl:when>
+            <xsl:when test="@id">
+              <xsl:variable name="idRelationship" select="@id"/>
+              <xsl:value-of select="$relationships//*[name() = 'Relationship' and @Id=$idRelationship]/@Target"/>
+          </xsl:when>
+            <xsl:otherwise><xsl:apply-templates select="node()"/></xsl:otherwise>
+        </xsl:choose>
+        </xsl:attribute>
+        <xsl:apply-templates select="node()">
+          <xsl:with-param name="nosamp" select="1"/>
+        </xsl:apply-templates>
+        <!-- <xsl:copy-of select="node()//t/text()"/> -->
+    </xsl:element>
+  </xsl:template>
 
   <!--
       <tbl>
