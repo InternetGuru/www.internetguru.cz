@@ -100,9 +100,6 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     if(!$firstHeading->hasAttribute("short") && !is_null($this->docName))
       $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
-    foreach($doc->getElementsByTagName("h") as $h) {
-      $h->removeAttribute("id");
-    }
     try {
       $doc->validatePlus(true);
       foreach($doc->getErrors() as $error) {

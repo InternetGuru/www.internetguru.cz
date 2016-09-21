@@ -380,20 +380,25 @@ class HTMLPlus extends DOMDocumentPlus {
 
   private function validateHid($repair) {
     $hIds = array();
+    $anchors = $this->getElementsByTagName("a");
     foreach($this->headings as $h) {
       $id = $h->getAttribute("id");
+      $message = null;
       if(!strlen($id)) {
         $message = sprintf(_("Heading attribute id empty or missing: %s"), $h->nodeValue);
-        $this->errorHandler($message, $repair);
-        $h->setUniqueId();
       } elseif(!isValidId($id)) {
         $message = sprintf(_("Invalid heading attribute id '%s'"), $id);
-        $this->errorHandler($message, $repair);
-        $h->setUniqueId();
       } elseif(array_key_exists($id, $hIds)) {
         $message = sprintf(_("Duplicit heading attribute id '%s'"), $id);
+      }
+      if(!is_null($message)) {
         $this->errorHandler($message, $repair);
-        $h->setUniqueId();
+        $newId = $h->setUniqueId();
+        foreach ($anchors as $a) {
+          $href = $a->getAttribute("href");
+          if(strpos($href, "#$id") === false) continue;
+          $a->setAttribute("href", str_replace("#$id", "#$newId", $href));
+        }
       }
       $hIds[$h->getAttribute("id")] = null;
     }

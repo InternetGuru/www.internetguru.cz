@@ -333,10 +333,10 @@ class DOMElementPlus extends DOMElement {
     try {
       if(is_null($this->ownerDocument->getElementById($id))) {
         $this->setAttribute("id", $id);
-        return;
+        return $id;
       }
     } catch(Exception $e) {}
-    $this->setUniqueId(++$i);
+    return $this->setUniqueId(++$i);
   }
 
   private function getValidId() {
