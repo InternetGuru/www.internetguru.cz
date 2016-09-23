@@ -73,7 +73,8 @@ class HTMLPlusBuilder extends DOMBuilder {
     return self::$$propertyName;
   }
 
-  private static function isValidApc($mtimes) {
+  private static function isValidApc(Array $mtimes) {
+    if(empty($mtimes)) throw new Exception("Empty mtime array");
     foreach($mtimes as $file => $mtime) {
       try {
         if($mtime == filemtime(findFile($file))) continue;
@@ -83,12 +84,12 @@ class HTMLPlusBuilder extends DOMBuilder {
     return true;
   }
 
-  public static function build($filePath) {
+  public static function build($filePath, $force=false) {
     if(array_key_exists($filePath, self::$fileToDoc))
       throw new Exception("File $filePath already built");
     $cacheKey = apc_get_key(self::APC_ID."/".__FUNCTION__."/".$filePath);
     $useCache = false;
-    if(apc_exists($cacheKey)) {
+    if(!$force && apc_exists($cacheKey)) {
       $cache = apc_fetch($cacheKey);
       $useCache = self::isValidApc($cache["fileToMtime"]);
     }
@@ -106,6 +107,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       } catch(Exception $e) {
         Logger::error($e->getMessage());
         if(apc_exists($cacheKey)) {
+          $cache = apc_fetch($cacheKey);
           $useCache = true;
         } else try {
           return self::doBuild($filePath, false);
@@ -148,7 +150,8 @@ class HTMLPlusBuilder extends DOMBuilder {
     $cache = null;
     if(apc_exists($cacheKey)) {
       $cache = apc_fetch($cacheKey);
-      $useCache = self::isValidApc($cache["currentFileTo"]["fileToMtime"]);
+      if(array_key_exists("fileToMtime", $cache["currentFileTo"]))
+        $useCache = self::isValidApc($cache["currentFileTo"]["fileToMtime"]);
     }
     if($useCache) {
       self::$currentFileTo = $cache["currentFileTo"];
@@ -157,7 +160,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       self::$currentIdTo = $cache["currentIdTo"];
       self::$storeCache = false;
     } else {
-      $doc = self::build($filePath);
+      $doc = self::build($filePath, true);
       $id = $doc->documentElement->firstElement->getAttribute("id");
       self::registerStructure($doc->documentElement, $prefix, $id, $prefix, $filePath);
       self::$currentFileTo["fileToId"] = $id;
