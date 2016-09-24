@@ -21,7 +21,6 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   const STATUS_ENABLED = 1;
   const STATUS_DISABLED = 2;
   const STATUS_INVALID = 3;
-  const STATUS_UNKNOWN = 4;
   const FILE_DISABLE = "disable";
   const FILE_ENABLE = "enable";
   private $content = null;
@@ -37,7 +36,6 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   private $dataFileDisabled = null;
   private $dataFileStatus;
   private $defaultFile = null;
-  private $statusChanged = false;
   private $dataFileStatuses;
   private $contentChanged = false;
 
@@ -46,7 +44,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $s->setPriority($this, 2);
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
-    $this->dataFileStatus = self::STATUS_UNKNOWN;
+    $this->dataFileStatus = self::STATUS_NEW;
   }
 
   public function update(SplSubject $subject) {
@@ -78,9 +76,28 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     return $this->title;
   }
 
+  private function initDataFiles() {
+    $this->dataFile = USER_FOLDER."/".$this->defaultFile;
+    $this->dataFileDisabled = dirname($this->dataFile)."/.".basename($this->dataFile);
+    try {
+      if(isset($_GET[self::FILE_ENABLE])) {
+        $this->enableDataFile();
+        Logger::user_success(sprintf(_("File '%s' enabled"), $this->dataFile));
+      }
+      if(isset($_GET[self::FILE_DISABLE])) {
+        $this->disableDataFile();
+        Logger::user_success(sprintf(_("File '%s' disabled"), $this->dataFile));
+      }
+    } catch(Exception $e) {
+      Logger::user_warning($e->getMessage());
+    }
+    if(file_exists($this->dataFile)) $this->dataFileStatus = self::STATUS_ENABLED;
+    if(file_exists($this->dataFileDisabled)) $this->dataFileStatus = self::STATUS_DISABLED;
+  }
+
   private function process() {
     $this->setDefaultFile();
-    $this->setDataFiles();
+    $this->initDataFiles();
     if($this->isPost()) {
       if($_POST["userfilehash"] != $this->getDataFileHash())
         throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
@@ -91,21 +108,27 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     if($this->isPost() && !Cms::isSuperUser()) throw new Exception(_("Insufficient right to save changes"));
     if(!$this->isResource($this->type)) $this->processXml();
     if($this->isPost()) $this->contentChanged = $this->getContentChanged();
-    if($this->isToEnable()) $this->enableDataFile();
     if($this->isPost()) {
       $this->destFile = USER_FOLDER."/".$this->getFilepath($_POST["filename"]);
       if($this->contentChanged || $this->dataFile != $this->destFile) {
         $this->savePost();
         $this->updateCache();
-      } elseif(!$this->isToDisable() && !$this->statusChanged) {
+      } else {
         Logger::user_notice(_("No changes made"));
       }
     }
-    if($this->isToDisable()) $this->disableDataFile();
-    if($this->statusChanged) {
-      $this->redir = true;
-      Logger::user_success(_("File status successfully changed"));
-    }
+  }
+
+  private function enableDataFile() {
+    if(!is_file($this->dataFileDisabled)) throw new Exception("Cannot enable active file");
+    if(is_file($this->dataFile)) $status = unlink($this->dataFileDisabled);
+    else $status = rename($this->dataFileDisabled, $this->dataFile);
+    if(!$status) throw new Exception(_("Failed to enable file"));
+  }
+
+  private function disableDataFile() {
+    if(is_file($this->dataFileDisabled)) throw new Exception("Cannot disable inactive file");
+    if(!touch($this->dataFileDisabled)) throw new Exception(_("Failed to disable file"));
   }
 
   private function checkCache() {
@@ -202,10 +225,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $content = $this->getHTMLPlus();
 
     $la = "?".$this->className."=".$_GET[$this->className];
-    $statusChanged = self::FILE_DISABLE;
     if($this->dataFileStatus == self::STATUS_DISABLED) {
       $vars["warning"] = "warning";
-      $statusChanged = self::FILE_ENABLE;
     }
     $usrDestHash = $this->getDataFileHash();
     $mode = $this->replace ? _("replace") : _("modify");
@@ -244,6 +265,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $vars["defaultcontent"] = htmlspecialchars($this->showContent(false));
     $vars["resultcontent"] = htmlspecialchars($this->showContent(true));
     $vars["status"] = $this->dataFileStatuses[$this->dataFileStatus];
+    $vars["changestatus"] = $this->dataFileStatus == self::STATUS_DISABLED ? _("enable") : _("disable");
+    $vars["changestatusurl"] = $this->dataFileStatus == self::STATUS_DISABLED ? "$la&enable" : "$la&disable";
     $vars["userfilehash"] = $usrDestHash;
     if((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED))
       $vars["checked"] = "checked";
@@ -336,30 +359,6 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
     if(is_file(CMS_FOLDER."/".PLUGINS_DIR."/$f")) $f = PLUGINS_DIR."/$f";
     return $f;
-  }
-
-  private function setDataFiles() {
-    $this->dataFile = USER_FOLDER."/".$this->defaultFile;
-    $this->dataFileDisabled = dirname($this->dataFile)."/.".basename($this->dataFile);
-    // disabled if.file or both files exist, else new
-    $this->dataFileStatus = self::STATUS_NEW;
-    if(file_exists($this->dataFile)) $this->dataFileStatus = self::STATUS_ENABLED;
-    if(file_exists($this->dataFileDisabled)) $this->dataFileStatus = self::STATUS_DISABLED;
-    #if(!file_exists($this->dataFile) && file_exists($this->dataFileDisabled)) $this->dataFile = $this->dataFileDisabled;
-  }
-
-  private function isToDisable() {
-    if(!is_file($this->dataFile)) return false;
-    if(isset($_GET[self::FILE_DISABLE])) return true;
-    if(count($_POST) && isset($_POST["disable"])) return true;
-    return false;
-  }
-
-  private function isToEnable() {
-    if(!is_file($this->dataFileDisabled)) return false;
-    if(isset($_GET[self::FILE_ENABLE])) return true;
-    if(count($_POST) && !isset($_POST["disable"])) return true;
-    return false;
   }
 
   private function isResource($type) {
@@ -457,19 +456,6 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     } finally {
       unlock_file($fp, $this->destFile);
     }
-  }
-
-  private function enableDataFile() {
-    if(is_file($this->dataFile)) $status = unlink($this->dataFileDisabled);
-    else $status = rename($this->dataFileDisabled, $this->dataFile);
-    if(!$status) throw new Exception(_("Unable to enable file"));
-    $this->statusChanged = true;
-  }
-
-  private function disableDataFile() {
-    if(!rename($this->dataFile, $this->dataFileDisabled))
-      throw new Exception(_("Unable to disable file"));
-    $this->statusChanged = true;
   }
 
   private function validateXml(DOMDocumentPlus $doc) {
