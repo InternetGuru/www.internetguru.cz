@@ -88,10 +88,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
     $this->consolidateLang($contentPlus->documentElement, $lang);
     foreach($contentPlus->getElementsByTagName("a") as $e) {
-      $this->processLinks($e, "href", true);
+      $this->processLinks($e, "href");
     }
     foreach($contentPlus->getElementsByTagName("object") as $e) {
-      $this->processLinks($e, "data", false);
+      $this->processLinks($e, "data");
     }
     foreach($contentPlus->getElementsByTagName("form") as $e) {
       $this->processLinks($e, "action", false);
@@ -188,7 +188,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return array_key_exists("fragment", $pLink);
   }
 
-  private function processLinks(DOMElementPlus $e, $aName, $getLink) {
+  private function processLinks(DOMElementPlus $e, $aName, $linkType=true) {
     $url = $e->getAttribute($aName);
     if(!strlen($url)) {
       $e->stripAttr($aName, sprintf(_("Empty attribute '%s' stripped"), $aName));
@@ -218,10 +218,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         throw new Exception(sprintf(_("Link '%s' not found"), $url));
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
-      if(array_key_exists("id", $pLink) && !array_key_exists("query", $pLink)) {
+      if($linkType && array_key_exists("id", $pLink) && !array_key_exists("query", $pLink)) {
         $this->insertTitle($e, $pLink["id"]);
       }
-      $link = buildLocalUrl($pLink, false, $getLink);
+      $link = buildLocalUrl($pLink, !$linkType, $getLink);
       $e->setAttribute($aName, $link);
     } catch(Exception $ex) {
       $e->stripAttr($aName, sprintf(_("Attribute href '%s' removed: %s"), $url, $ex->getMessage()));
