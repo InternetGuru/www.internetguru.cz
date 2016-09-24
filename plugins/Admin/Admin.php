@@ -42,19 +42,26 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 6);
+    $s->setPriority($this, 2);
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
     $this->dataFileStatus = self::STATUS_NEW;
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_PROCESS) {
+    switch($subject->getStatus()) {
+      case STATUS_INIT:
+      $this->main();
+      break;
+      case STATUS_PROCESS:
       $this->checkCache();
+      break;
+      case STATUS_POSTPROCESS:
       $this->createVarList();
-      return;
     }
-    if($subject->getStatus() != STATUS_INIT) return;
+  }
+
+  private function main() {
     if(!isset($_GET[$this->className])) {
       $subject->detach($this);
       return;
