@@ -17,7 +17,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 2);
+    $s->setPriority($this, 7);
   }
 
   public function update(SplSubject $subject) {
