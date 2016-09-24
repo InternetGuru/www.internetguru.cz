@@ -96,15 +96,15 @@ function redirTo($link, $code=null, $msg=null) {
   exit();
 }
 
-function implodeLink(Array $p, $query=true) {
+function implodeLink(Array $pLink, $query=true) {
   $url = "";
-  if(isset($p["scheme"])) {
-    $url .= $p["scheme"]."://".HOST."/";
-    if(isset($p["path"])) $p["path"] = ltrim($p["path"], "/");
+  if(isset($pLink["scheme"])) {
+    $url .= $pLink["scheme"]."://".HOST."/";
+    if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
   }
-  if(isset($p["path"])) $url .= $p["path"];
-  if($query && isset($p["query"]) && strlen($p["query"])) $url .= "?".$p["query"];
-  if(isset($p["fragment"])) $url .= "#".$p["fragment"];
+  if(isset($pLink["path"])) $url .= $pLink["path"];
+  if($query && isset($pLink["query"]) && strlen($pLink["query"])) $url .= "?".$pLink["query"];
+  if(isset($pLink["fragment"])) $url .= "#".$pLink["fragment"];
   return $url;
 }
 
@@ -125,9 +125,7 @@ function parseLocalLink($link, $host=null) {
 }
 
 function buildLocalUrl(Array $pLink, $ignoreCyclic=false, $addPermParam=true) {
-  if($addPermParam) foreach(array(PAGESPEED_PARAM, DEBUG_PARAM, CACHE_PARAM) as $param) {
-    addPermParam($pLink, $param);
-  }
+  if($addPermParam) addPermParams($pLink);
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
@@ -155,15 +153,17 @@ function isCyclicLink(Array $pLink) {
   return true;
 }
 
-function addPermParam(Array &$pLink, $parName) {
-  if(!isset($_GET[$parName]) || !strlen($_GET[$parName])) return;
-  $parAndVal = "$parName=".$_GET[$parName];
-  if(isset($pLink["query"])) {
-    if(strpos($pLink["query"], $parName) !== false) return;
-    $pLink["query"] = $pLink["query"]."&".$parAndVal;
-    return;
+function addPermParams(Array &$pLink) {
+  foreach(array(PAGESPEED_PARAM, DEBUG_PARAM, CACHE_PARAM) as $parName) {
+    if(!isset($_GET[$parName]) || !strlen($_GET[$parName])) continue;
+    $parAndVal = "$parName=".$_GET[$parName];
+    if(isset($pLink["query"])) {
+      if(strpos($pLink["query"], $parName) !== false) continue;
+      $pLink["query"] = $pLink["query"]."&".$parAndVal;
+      continue;
+    }
+    $pLink["query"] = $parAndVal;
   }
-  $pLink["query"] = $parAndVal;
 }
 
 function stableSort(Array &$a) {
