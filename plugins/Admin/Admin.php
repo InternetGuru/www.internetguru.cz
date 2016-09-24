@@ -51,6 +51,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   public function update(SplSubject $subject) {
     switch($subject->getStatus()) {
       case STATUS_INIT:
+      if(!isset($_GET[$this->className])) {
+        $subject->detach($this);
+        return;
+      }
       $this->main();
       break;
       case STATUS_PROCESS:
@@ -62,10 +66,6 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   }
 
   private function main() {
-    if(!isset($_GET[$this->className])) {
-      $subject->detach($this);
-      return;
-    }
     $this->requireActiveCms();
     try {
       $this->process();
