@@ -7,6 +7,7 @@ use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use PHPMailer;
@@ -143,7 +144,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $formId = $htmlForm->getAttribute("id");
     $htmlForm->removeAllAttributes(array("id", "class"));
     $htmlForm->setAttribute("method", "post");
-    $htmlForm->setAttribute("action", getCurLink());
+    $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(getCurLink()));
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
     return $doc;
