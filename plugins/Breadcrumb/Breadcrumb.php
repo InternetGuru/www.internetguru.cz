@@ -67,7 +67,9 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
     }
     array_pop($title);
     $title[] = HTMLPlusBuilder::getIdToHeading($id);
-    if(HTMLPlusBuilder::getIdToLink($a->getAttribute("href")) != getCurLink(true)) {
+    $pLink["path"] = HTMLPlusBuilder::getIdToLink($a->getAttribute("href"));
+    addPermParams($pLink);
+    if(implodeLink($pLink) != getCurLink(true)) {
       $a->setAttribute("title", $this->vars["reset"]->nodeValue);
     }
     $this->title = implode(" - ", array_reverse($title));
