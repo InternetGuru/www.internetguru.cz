@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Plugin;
@@ -9,7 +10,7 @@ use IGCMS\Core\Cms;
 use SplObserver;
 use SplSubject;
 
-class FillForm extends Plugin implements SplObserver {
+class FillForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -20,13 +21,18 @@ class FillForm extends Plugin implements SplObserver {
     if($subject->getStatus() != STATUS_INIT) return;
     foreach(Cms::getAllVariables() as $varId => $formDoc) {
       if(strpos($varId, "contactform-") !== 0) continue;
-      $form = $formDoc->documentElement->firstChild;
-      if(!$form->hasClass("fillable")) continue;
+      $this->fillForm($formDoc->documentElement->firstChild);
+    }
+  }
+
+  public function modifyContent(HTMLPlus $content) {
+    foreach($content->getElementsByTagName("form") as $form) {
       $this->fillForm($form);
     }
   }
 
   private function fillForm(DOMElementPlus $form) {
+    if(!$form->hasClass("fillable")) return;
     #$post = strtolower($form->getAttribute("method")) == "post";
     foreach($form->getElementsByTagName("input") as $input) {
       $value = $this->getRequestData($input->getAttribute("name"));
