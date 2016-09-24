@@ -62,7 +62,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       } else {
         $a->nodeValue = $aValue;
       }
-      if(!empty($title) && strlen(HTMLPlusBuilder::getIdToShort($id)))
+      if(empty($title) && strlen(HTMLPlusBuilder::getIdToShort($id)))
         $title[] = HTMLPlusBuilder::getIdToShort($id);
       else
         $title[] = HTMLPlusBuilder::getIdToHeading($id);
