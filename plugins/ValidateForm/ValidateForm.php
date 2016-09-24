@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -12,7 +13,7 @@ use DOMXPath;
 use SplObserver;
 use SplSubject;
 
-class ValidateForm extends Plugin implements SplObserver {
+class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
   const FORM_ID = "validateform-id";
@@ -31,56 +32,62 @@ class ValidateForm extends Plugin implements SplObserver {
     }
     if($subject->getStatus() != STATUS_INIT) return;
     $this->detachIfNotAttached("HtmlOutput");
-    $this->modifyFormVars();
+    foreach(Cms::getAllVariables() as $varId => $formDoc) {
+      if(strpos($varId, "contactform-") !== 0) continue;
+      $this->modifyFormVars($formDoc->documentElement->firstChild);
+    }
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.$this->className.'.css');
   }
 
-  private function modifyFormVars() {
-    foreach(Cms::getAllVariables() as $varId => $formDoc) {
-      if(strpos($varId, "contactform-") !== 0) continue;
-      $form = $formDoc->documentElement->firstChild;
-      if(!$form->hasClass("validable")) continue;
-      try {
-        $id = $form->getRequiredAttribute("id");
-      } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
-        continue;
-      }
-      $time = $this->getWaitTime($form);
-      if($form->hasClass("validateform-notime")) $time = 0;
-
-      $div = $formDoc->createElement("div");
-
-      $input = $formDoc->createElement("input");
-      $input->setAttribute("type", "email");
-      $input->setAttribute("name", self::FORM_HP);
-      $input->setAttribute("class", self::FORM_HP);
-      $div->appendChild($input);
-
-      $input = $formDoc->createElement("input");
-      $input->setAttribute("type", "hidden");
-      $input->setAttribute("name", self::FORM_ID);
-      $input->setAttribute("value", $id);
-      $div->appendChild($input);
-
-      $form->appendChild($div);
-      $method = strtolower($form->getAttribute("method"));
-      $request = $method == "post" ? $_POST : $_GET;
-      if(empty($request)) continue;
-      if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
-      if(!$this->hpCheck($request)) {
-        Logger::info(_("Honeypot check failed"));
-        continue;
-      }
-      try {
-        if(!Cms::isSuperUser()) $this->ipCheck($time);
-      } catch(Exception $e) {
-        Logger::user_error($e->getMessage());
-        continue;
-      }
-      $this->getLabels($form);
-      Cms::setVariable($id, $this->verifyItems($form, $request));
+  public function modifyContent(HTMLPlus $content) {
+    foreach($content->getElementsByTagName("form") as $form) {
+      $this->modifyFormVars($form);
     }
+  }
+
+  private function modifyFormVars(DOMElementPlus $form) {
+    if(!$form->hasClass("validable")) return;
+    try {
+      $id = $form->getRequiredAttribute("id");
+    } catch(Exception $e) {
+      Logger::user_warning($e->getMessage());
+      return;
+    }
+    $time = $this->getWaitTime($form);
+    if($form->hasClass("validateform-notime")) $time = 0;
+
+    $doc = $form->ownerDocument;
+    $div = $doc->createElement("div");
+
+    $input = $doc->createElement("input");
+    $input->setAttribute("type", "email");
+    $input->setAttribute("name", self::FORM_HP);
+    $input->setAttribute("class", self::FORM_HP);
+    $div->appendChild($input);
+
+    $input = $doc->createElement("input");
+    $input->setAttribute("type", "hidden");
+    $input->setAttribute("name", self::FORM_ID);
+    $input->setAttribute("value", $id);
+    $div->appendChild($input);
+
+    $form->appendChild($div);
+    $method = strtolower($form->getAttribute("method"));
+    $request = $method == "post" ? $_POST : $_GET;
+    if(empty($request)) return;
+    if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) return;
+    if(!$this->hpCheck($request)) {
+      Logger::info(_("Honeypot check failed"));
+      return;
+    }
+    try {
+      if(!Cms::isSuperUser()) $this->ipCheck($time);
+    } catch(Exception $e) {
+      Logger::user_error($e->getMessage());
+      return;
+    }
+    $this->getLabels($form);
+    Cms::setVariable($id, $this->verifyItems($form, $request));
   }
 
   private function hpCheck($request) {
