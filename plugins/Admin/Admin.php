@@ -7,6 +7,7 @@ use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\TitleStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\XMLBuilder;
 use IGCMS\Core\HTMLPlus;
@@ -41,7 +42,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 2);
+    $s->setPriority($this, 6);
     $this->dataFileStatuses = array(_("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"));
     $this->dataFileStatus = self::STATUS_NEW;
@@ -49,8 +50,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PROCESS) {
-      $os = Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Admin.xsl");
       $this->checkCache();
+      $this->createVarList();
       return;
     }
     if($subject->getStatus() != STATUS_INIT) return;
@@ -70,6 +71,44 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $pLink["path"] = getCurLink();
     if(!isset($_POST["saveandgo"])) $pLink["query"] = $this->className."=".$_POST["filename"];
     redirTo(buildLocalUrl($pLink, true));
+  }
+
+  private function createVarList() {
+    $doc = new DOMDocumentPlus();
+    $varListVar = $doc->createElement("var");
+    $varlist = $doc->createElement("dl");
+    $varListVar->appendChild($varlist);
+    foreach(Cms::getAllVariables() as $name => $value) {
+      $varlist->appendChild($doc->createElement("dt", "$name"));
+      $dd = $varlist->appendChild($doc->createElement("dd"));
+      switch(gettype($value)) {
+        case "NULL":
+        $dd->nodeValue = _("null value");
+        continue 2;
+        case "array":
+        $value = implode(", ", $value);
+        case "string":
+        if(!strlen($value)) {
+          $dd->nodeValue = _("empty value");
+          continue 2;
+        }
+        break;
+        case "object":
+        if($value instanceof \DOMDocument) $value = $value->documentElement;
+        if($value instanceof \DOMElement) $value = $value->nodeValue;
+        if(is_string($value)) {
+          $value = preg_replace("/^\s*/m", "", $value);
+          break;
+        }
+        $dd->nodeValue = get_class($value);
+        continue 2;
+        default:
+        $dd->nodeValue = gettype($value);
+        continue 2;
+      }
+      $dd->appendChild($doc->createElement("samp", getShortString($value)));
+    }
+    Cms::setVariable("varlist", $varListVar);
   }
 
   public function getTitle() {
