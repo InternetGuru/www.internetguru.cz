@@ -224,7 +224,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $link = buildLocalUrl($pLink, !$linkType, $getLink);
       $e->setAttribute($aName, $link);
     } catch(Exception $ex) {
-      $e->stripAttr($aName, sprintf(_("Attribute href '%s' removed: %s"), $url, $ex->getMessage()));
+      $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $url, $ex->getMessage()));
     }
   }
 

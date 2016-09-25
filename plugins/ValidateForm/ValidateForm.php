@@ -80,14 +80,15 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       Logger::info(_("Honeypot check failed"));
       return;
     }
+    $this->getLabels($form);
+    $items = $this->verifyItems($form, $request);
     try {
-      if(!Cms::isSuperUser()) $this->ipCheck($time);
+      if(!Cms::isSuperUser() && !is_null($items)) $this->ipCheck($time);
     } catch(Exception $e) {
       Cms::error($e->getMessage());
       return;
     }
-    $this->getLabels($form);
-    Cms::setVariable($id, $this->verifyItems($form, $request));
+    Cms::setVariable($id, $items);
   }
 
   private function hpCheck($request) {

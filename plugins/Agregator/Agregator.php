@@ -21,7 +21,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
+    if($subject->getStatus() != STATUS_PREINIT) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
     $this->registerFiles(CMS_FOLDER);
     $this->registerFiles(ADMIN_FOLDER);
