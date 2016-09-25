@@ -49,10 +49,13 @@ class Cms {
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
     $id = HTMLPlusBuilder::getFileToId(INDEX_HTML);
-    foreach(HTMLPlusBuilder::getIdToAll($id) as $k => $v) {
-      self::setVariable($k, $v);
-    }
-    self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
+    self::setVariable("author", HTMLPlusBuilder::getIdToAuthor($id));
+    self::setVariable("authorid", HTMLPlusBuilder::getIdToAuthorId($id));
+    self::setVariable("resp", HTMLPlusBuilder::getIdToResp($id));
+    self::setVariable("respid", HTMLPlusBuilder::getIdToRespId($id));
+    self::setVariable("ctime", HTMLPlusBuilder::getIdToCtime($id));
+    self::setVariable("mtime", HTMLPlusBuilder::getIdToMtime($id));
+    self::setVariable("lang", HTMLPlusBuilder::getIdToLang($id));
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
     self::setVariable("uri", URI);
@@ -132,6 +135,7 @@ class Cms {
         Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
       }
     }
+    self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
     return $content;
   }
 
