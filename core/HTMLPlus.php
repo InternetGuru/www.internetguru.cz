@@ -396,7 +396,7 @@ class HTMLPlus extends DOMDocumentPlus {
         $newId = $h->setUniqueId();
         foreach ($anchors as $a) {
           $href = $a->getAttribute("href");
-          if(strpos($href, "#$id") === false) continue;
+          if(substr($href, -strlen("#$id")) != "#$id") continue;
           $a->setAttribute("href", str_replace("#$id", "#$newId", $href));
         }
       }
