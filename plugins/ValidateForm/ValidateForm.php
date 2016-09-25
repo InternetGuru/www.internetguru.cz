@@ -83,7 +83,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     try {
       if(!Cms::isSuperUser()) $this->ipCheck($time);
     } catch(Exception $e) {
-      Logger::user_error($e->getMessage());
+      Cms::error($e->getMessage());
       return;
     }
     $this->getLabels($form);
@@ -137,7 +137,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
         $error = $e->getMessage();
         if(isset($this->labels[$id][0])) $name = $this->labels[$id][0];
         if(isset($this->labels[$id][1])) $error = $this->labels[$id][1];
-        Logger::user_error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
+        Cms::error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
         $field->parentNode->addClass(self::CSS_WARNING);
         $field->addClass(self::CSS_WARNING);
         $isValid = false;

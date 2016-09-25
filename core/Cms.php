@@ -217,7 +217,7 @@ class Cms {
       $_SESSION["cms"]["request"][$type][hash(FILE_HASH_ALGO, $message)][] = self::$requestToken;
       return;
     }
-    self::addFlashItem($message, $type);
+    self::addFlashItem($message, $type, array(self::$requestToken));
   }
 
   public static function getVariable($name) {
