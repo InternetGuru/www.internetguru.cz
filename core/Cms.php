@@ -48,7 +48,7 @@ class Cms {
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    $id = HTMLPlusBuilder::register(INDEX_HTML);
+    $id = HTMLPlusBuilder::getFileToId(INDEX_HTML);
     foreach(HTMLPlusBuilder::getIdToAll($id) as $k => $v) {
       self::setVariable($k, $v);
     }

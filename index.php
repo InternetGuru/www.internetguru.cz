@@ -50,6 +50,7 @@ try {
   }
 
   $plugins = new Plugins();
+  HTMLPlusBuilder::register(INDEX_HTML);
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 
