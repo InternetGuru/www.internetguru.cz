@@ -3,7 +3,7 @@
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
   var Config = {}
-  Config.change = "* ";
+  Config.favicon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABWElEQVR42oXTzysEcRjH8e/OrEiUlZRCxJ5ZF8rBQSGllJSbH1c5kwMOLrQHfwGpTWolyclhS5z9ipOTlMtusg67GLtf78OnZtr146lXz8zneea7U9uYQIXUXfUh5JFFnzIHZRUKDFwx1DmsHCgL+3P1wE0ETuBNLmHlyD+gvCqQhIcTtCjfgpV5Zc1I4BFLRjWmpS/1W7jo0n0a9ajBnbKi9ntgupHTwFPf1eHX2NZ1smQngzajGscV3gILy4hjCqvK8njFPQb9f8GvajQhih1Y5HRQOyKoguM/6x9QiU70YhSHKCCjwyYxgA64pT8+iycUxGIGa5jGhLKi5g8YMaoYPrXwob6h2QX2dB3X7F39GQ0w/QoK6ik9EEURL2hUdgorWbQa1SJusIk6ZSuwsqCsFuvancOP5aqfwcqxsvBfDzklH0sKVvaVhcWB+98bDMNDGrHfPudvDyNmsqHBLvwAAAAASUVORK5CYII=";
   Config.unload_msg = "Form content has been changed.";
   Config.editable_class = "editable";
 
@@ -52,7 +52,19 @@
     setModified = function() {
       if(modified) return;
       modified = true;
-      document.title = Config.change + document.title;
+      var links = document.getElementsByTagName("link");
+      link = null;
+      for(var i = 0; i < links.length; i++) {
+        if(links[i].rel != "shortcut icon") continue;
+        link = links[i];
+      }
+      if(link === null) {
+        var link = document.createElement('link');
+        link.type = "image/x-icon";
+        link.rel = "shortcut icon";
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = Config.favicon;
     }
     // public
     return {
