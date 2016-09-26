@@ -30,6 +30,7 @@ class ImgList extends AgregatorList {
       throw new Exception(sprintf(_("Path '%s' not found"), $fileDir));
     }
     foreach(scandir($fileFolder) as $file) {
+      if(strpos($file, ".") === 0) continue;
       $filePath = "$fileDir/$file";
       $fullFilePath = "$fileFolder/$file";
       if(is_dir($fullFilePath)) continue;
