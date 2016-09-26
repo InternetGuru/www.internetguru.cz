@@ -251,6 +251,10 @@
         if(Config.navig === null) throw "Config.navig is null";
         initStructure();
         initEvents();
+      },
+      openNavig : function() {
+        Config.navig.focus();
+        inputText(null);
       }
     }
   };
@@ -293,9 +297,13 @@
     IGCMS.appendStyle(css);
   }
 
+  var completable = null;
+
   for (var i = 0; i < toInit.length; i++) {
     completable = new Completable();
     completable.init(toInit[i]);
   }
+
+  IGCMS.Completable = completable;
 
 })(window);
