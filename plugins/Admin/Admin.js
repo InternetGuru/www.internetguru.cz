@@ -22,24 +22,43 @@
           if(!forms[i].classList.contains(IGCMS.Editable.getEditableClass())) continue;
           setSaveEvents(forms[i]);
         }
+        win.addEventListener("keydown", function(e) {
+          var vars = getEventVars(e);
+          var key = vars.key;
+          var isCtrl = vars.isCtrl;
+          if(!isCtrl || key != 80) return;
+          // Ctrl + P
+          IGCMS.Completable.openNavig();
+          e.preventDefault();
+        }, true);
       },
+      getEventVars = function(e) {
+        vars = {};
+        if (win.event) {
+          vars.key = win.event.keyCode;
+          vars.isShift = !!win.event.shiftKey; // typecast to boolean
+          vars.isCtrl = !!win.event.ctrlKey; // typecast to boolean
+        } else {
+          vars.key = e.which;
+          vars.isShift = !!e.shiftKey;
+          vars.isCtrl = !!e.ctrlKey;
+        }
+        return vars;
+      }
       setSaveEvents = function(form) {
         form.onkeydown = function(e) {
-          var key = (window.event) ? window.event.keyCode : key = e.which;
-          var isCtrl;
-          var isShift;
-          if (window.event) {
-            key = window.event.keyCode;
-            isShift = !!window.event.shiftKey; // typecast to boolean
-            isCtrl = !!window.event.ctrlKey; // typecast to boolean
-          } else {
-            key = e.which;
-            isShift = !!e.shiftKey;
-            isCtrl = !!e.ctrlKey;
-          }
+          var vars = getEventVars(e);
+          var key = vars.key;
+          var isShift = vars.isShift;
+          var isCtrl = vars.isCtrl;
           // letter s and ctrl or meta
           if(!e.ctrlKey && !e.metaKey) return true;
           switch(key) {
+            // P
+            case 80:
+            IGCMS.Completable.openNavig();
+            e.preventDefault();
+            break;
             // S
             case 83:
             // save and exit if shift
@@ -50,7 +69,6 @@
             // save and stay
             form['saveandstay'].click();
             return false;
-            break;
 
             default: return true;
           }
