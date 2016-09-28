@@ -73,13 +73,20 @@ class HTMLPlusBuilder extends DOMBuilder {
     return self::$$propertyName;
   }
 
-  private static function isValidApc(Array $mtimes) {
-    if(empty($mtimes)) throw new Exception("Empty mtime array");
-    foreach($mtimes as $file => $mtime) {
+  private static function isValidApc(Array $fileCache, Array $idCache=array()) {
+    if(!array_key_exists("fileToMtime", $fileCache) || empty($fileCache["fileToMtime"]))
+      throw new Exception("Missing or empty mtime array");
+    foreach($fileCache["fileToMtime"] as $file => $mtime) {
       try {
         if($mtime == filemtime(findFile($file))) continue;
       } catch(Exception $e) {}
       return false;
+    }
+    if(empty($idCache)) return true;
+    if(!array_key_exists("idToParentId", $idCache) || empty($idCache["idToParentId"]))
+      throw new Exception("Missing or empty parentId array");
+    foreach($idCache["idToParentId"] as $id => $parentId) {
+      if(!array_key_exists($parentId, self::$idToParentId)) return false;
     }
     return true;
   }
@@ -91,7 +98,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     $useCache = false;
     if(!$force && apc_exists($cacheKey)) {
       $cache = apc_fetch($cacheKey);
-      $useCache = self::isValidApc($cache["fileToMtime"]);
+      $useCache = self::isValidApc($cache);
     }
     if(!$useCache) {
       try {
@@ -153,8 +160,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     $cache = null;
     if(apc_exists($cacheKey)) {
       $cache = apc_fetch($cacheKey);
-      if(array_key_exists("fileToMtime", $cache["currentFileTo"]))
-        $useCache = self::isValidApc($cache["currentFileTo"]["fileToMtime"]);
+      $useCache = self::isValidApc($cache["currentFileTo"], $cache["currentIdTo"]);
     }
     if($useCache) {
       self::$currentFileTo = $cache["currentFileTo"];
