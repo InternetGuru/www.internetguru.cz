@@ -64,8 +64,8 @@
   <var id="mtime">Úpravy webu: <span var="cms-mtime" fn="inputvar-dateformat">n/a</span></var>
   <var id="admin">Admin: <span var="cms-admin_id">n/a</span></var>
   <var id="cyear" fn="yearformat" var="cms-ctime"/>
-  <var id="year" fn="yearformat">now</var>
-  <var id="today" fn="dateformat">now</var>
+  <var id="year" fn="yearformat" var="cms-server">now</var><!-- cms-server to disable value for webdiff -->
+  <var id="today" fn="dateformat" var="cms-server">now</var><!-- cms-server to disable value for webdiff -->
   <var id="adminmenu">
     <ul class="adminmenu noprint">
       <li><a href="?admin">Administrace</a></li>
