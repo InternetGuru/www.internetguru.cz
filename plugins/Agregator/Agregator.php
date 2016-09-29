@@ -1,14 +1,12 @@
 <?php
 
 namespace IGCMS\Plugins;
-use IGCMS\Plugins\Agregator\DocList;
-use IGCMS\Plugins\Agregator\ImgList;
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
 use SplObserver;
 use SplSubject;
 
@@ -65,8 +63,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   public function getContent() {
     $file = HTMLPlusBuilder::getCurFile();
     if(is_null($file) || !array_key_exists($file, $this->registered)) return null;
-    Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
-    return HTMLPlusBuilder::getFileToDoc($file);
+    $content =  HTMLPlusBuilder::getFileToDoc($file);
+    $content->documentElement->addClass(strtolower($this->className));
+    return $content;
   }
 
   private function registerFiles($workingDir, $folder=null) {
