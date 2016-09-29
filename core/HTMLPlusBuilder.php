@@ -75,7 +75,7 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   private static function isValidApc(Array $fileCache, Array $idCache=array()) {
     if(!array_key_exists("fileToMtime", $fileCache) || empty($fileCache["fileToMtime"]))
-      throw new Exception("Missing or empty mtime array");
+      return false;
     foreach($fileCache["fileToMtime"] as $file => $mtime) {
       try {
         if($mtime == filemtime(findFile($file))) continue;
@@ -84,7 +84,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     if(empty($idCache)) return true;
     if(!array_key_exists("idToParentId", $idCache) || empty($idCache["idToParentId"]))
-      throw new Exception("Missing or empty parentId array");
+      return false;
     foreach($idCache["idToParentId"] as $id => $parentId) {
       if(!array_key_exists($parentId, self::$idToParentId)) return false;
     }
