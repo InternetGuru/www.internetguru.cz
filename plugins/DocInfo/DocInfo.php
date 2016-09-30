@@ -48,25 +48,20 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
         $info = $this->createGlobalDocInfo($globalInfo, $filePath);
       } else {
         $info = $this->createLocalDocInfo($h, $globalInfo);
-        if(!$info->childNodes->length) continue;
         $before = $h->nextElement;
         while(!is_null($before)) {
           if($before->nodeName == "h") break;
           $before = $before->nextElement;
         }
       }
+      if(is_null($info)) return;
       $info = $doc->importNode($info, true);
       if(is_null($before)) {
         $section = $doc->getElementsByTagName("section")->item(0);
-        foreach($info->childElementsArray as $child) {
-          $section->appendChild($child);
-        }
+        foreach($info->childElementsArray as $child) $section->appendChild($child);
         return;
       }
-      foreach($info->childElementsArray as $child) {
-        $before->parentNode->insertBefore($child, $before);
-      }
-      //echo $doc->saveXML(); die();
+      foreach($info->childElementsArray as $child) $before->parentNode->insertBefore($child, $before);
     }
   }
 
@@ -77,7 +72,6 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
   }
 
   private function createGlobalDocInfo(Array $globalInfo, $filePath) {
-    $doc = $this->createDOM($this->vars["docinfo"]);
     $lists = array(
       "created" => $this->vars["created"],
       "edit" => "",
@@ -94,6 +88,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
       $globalInfo["editurl"] = "?Admin=".$filePath;
       $lists["edit"] = $this->vars["edit"];
     }
+    $doc = $this->createDOM($this->vars["docinfo"]);
     $doc->processVariables($lists);
     $doc->processVariables($globalInfo);
     return $doc->documentElement;
@@ -114,6 +109,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
       $vars["mtime"] = $h->getAttribute("mtime");
       $lists["part_modified"] = $this->vars["part_modified"];
     }
+    if(empty($vars)) return null;
     $doc->processVariables($lists);
     $doc->processVariables($vars);
     return $doc->documentElement;
