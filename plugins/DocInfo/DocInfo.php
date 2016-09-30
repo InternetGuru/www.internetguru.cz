@@ -31,31 +31,42 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     $this->insertDocInfo($content, $globalInfo, $filePath);
   }
 
+  /**
+   * @param HTMLPlus $doc
+   * @param array $globalInfo
+   * @param $filePath
+   */
   private function insertDocInfo(HTMLPlus $doc, Array $globalInfo, $filePath) {
     $this->vars = array();
     foreach($this->getXML()->getElementsByTagName("var") as $var) {
       $this->vars[$var->getAttribute("id")] = $var;
     }
     foreach($doc->getElementsByTagName("h") as $h) {
+      $before = null;
       if($h->parentNode->nodeName == "body") {
         if($filePath == INDEX_HTML) continue;
-        $ul = $this->createGlobalDocInfo($globalInfo);
+        $info = $this->createGlobalDocInfo($globalInfo, $filePath);
       } else {
-        $ul = $this->createLocalDocInfo($h, $globalInfo);
+        $info = $this->createLocalDocInfo($h, $globalInfo);
+        if(!$info->childNodes->length) continue;
+        $before = $h->nextElement;
+        while(!is_null($before)) {
+          if($before->nodeName == "h") break;
+          $before = $before->nextElement;
+        }
       }
-      if(!$ul->childNodes->length) continue;
-      $e = $h->nextElement;
-      while(!is_null($e)) {
-        if($e->nodeName == "h") break;
-        $e = $e->nextElement;
+      $info = $doc->importNode($info, true);
+      if(is_null($before)) {
+        $section = $doc->getElementsByTagName("section")->item(0);
+        foreach($info->childElementsArray as $child) {
+          $section->appendChild($child);
+        }
+        return;
       }
-      $ul = $doc->importNode($ul, true);
-      if(is_null($e)) $section = $doc->getElementsByTagName("section")->item(0);
-      foreach($ul->childElementsArray as $child) {
-        if(is_null($e)) $section->appendChild($child);
-        else $h->parentNode->insertBefore($child, $e);
+      foreach($info->childElementsArray as $child) {
+        $before->parentNode->insertBefore($child, $before);
       }
-      echo $doc->saveXML(); die();
+      //echo $doc->saveXML(); die();
     }
   }
 
@@ -65,7 +76,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     return $doc;
   }
 
-  private function createGlobalDocInfo(Array $globalInfo) {
+  private function createGlobalDocInfo(Array $globalInfo, $filePath) {
     $doc = $this->createDOM($this->vars["docinfo"]);
     $lists = array(
       "created" => $this->vars["created"],
@@ -80,7 +91,8 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
       $lists["responsible"] = $this->vars["responsible"];
     }
     if(Cms::isSuperUser()) {
-      $lists["modified"] = $this->vars["modified"];
+      $globalInfo["editurl"] = "?Admin=".$filePath;
+      $lists["edit"] = $this->vars["edit"];
     }
     $doc->processVariables($lists);
     $doc->processVariables($globalInfo);
