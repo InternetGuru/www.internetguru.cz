@@ -2,16 +2,16 @@
 
 namespace IGCMS\Plugins;
 
+use Autoprefixer;
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\ResourceInterface;
-use Autoprefixer;
-use UglifyPHP\JS;
 use Imagick;
-use Exception;
 use SplObserver;
 use SplSubject;
+use UglifyPHP\JS;
 
 class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   const DEBUG = false;

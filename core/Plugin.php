@@ -2,12 +2,6 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Cms;
-use IGCMS\Core\ErrorPage;
-use IGCMS\Core\Logger;
-use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\XMLBuilder;
-use Exception;
 use SplSubject;
 
 class Plugin {

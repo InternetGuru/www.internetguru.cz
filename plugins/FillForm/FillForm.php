@@ -2,11 +2,11 @@
 
 namespace IGCMS\Plugins;
 
-use IGCMS\Core\ModifyContentStrategyInterface;
+use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
-use IGCMS\Core\Cms;
 use SplObserver;
 use SplSubject;
 

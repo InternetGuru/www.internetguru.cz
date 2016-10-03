@@ -1,13 +1,9 @@
 <?php
 
 namespace IGCMS\Plugins\Agregator;
-use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
-use IGCMS\Core\Cms;
-use DateTime;
-use Exception;
 
 class AgregatorList {
   protected $id;

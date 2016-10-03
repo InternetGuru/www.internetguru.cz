@@ -3,12 +3,11 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ModifyContentStrategyInterface;
-use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
-use Exception;
 use SplObserver;
 use SplSubject;
 

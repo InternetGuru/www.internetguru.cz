@@ -5,12 +5,9 @@ namespace IGCMS\Plugins;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
 use SplObserver;
 use SplSubject;
-use DateTime;
 
 class GlobalMenu extends Plugin implements SplObserver {
   private $vars = array();

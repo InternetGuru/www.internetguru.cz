@@ -3,7 +3,6 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use SplObserver;
 use SplSubject;

@@ -2,24 +2,23 @@
 
 namespace IGCMS\Plugins;
 
+use DOMDocument;
+use DOMElement;
+use DOMImplementation;
+use DOMXPath;
+use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
-use IGCMS\Core\Plugins;
 use IGCMS\Core\XMLBuilder;
-use Exception;
-use DOMImplementation;
-use DOMDocument;
-use DOMElement;
-use DOMXPath;
-use XSLTProcessor;
 use SplObserver;
 use SplSubject;
+use XSLTProcessor;
 
 
 class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {

@@ -2,17 +2,16 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\TitleStrategyInterface;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
+use IGCMS\Core\TitleStrategyInterface;
 use SplObserver;
 use SplSubject;
-use DateTime;
 
 class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
   private $vars = array();

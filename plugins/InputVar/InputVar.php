@@ -2,17 +2,17 @@
 
 namespace IGCMS\Plugins;
 
-use IGCMS\Core\Cms;
-use IGCMS\Core\GetContentStrategyInterface;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\HTMLPlus;
-use IGCMS\Core\Logger;
-use IGCMS\Core\Plugin;
-use Exception;
 use DOMElement;
 use DOMNode;
 use DOMText;
+use Exception;
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
 use SplObserver;
 use SplSubject;
 

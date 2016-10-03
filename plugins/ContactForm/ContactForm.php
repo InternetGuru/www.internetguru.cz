@@ -2,17 +2,17 @@
 
 namespace IGCMS\Plugins;
 
+use DOMXPath;
+use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
 use PHPMailer;
-use Exception;
-use DOMXPath;
 use SplObserver;
 use SplSubject;
 

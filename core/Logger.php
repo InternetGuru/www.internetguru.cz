@@ -3,14 +3,12 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Cms;
-use Monolog\Logger as MonologLogger;
-use Monolog\Handler\NativeMailerHandler;
-use Monolog\Handler\ChromePHPHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Processor\IntrospectionProcessor;
 use Exception;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\ChromePHPHandler;
+use Monolog\Handler\NativeMailerHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger as MonologLogger;
 
 // TODO doc
 class Logger {

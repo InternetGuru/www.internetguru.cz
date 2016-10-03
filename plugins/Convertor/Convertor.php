@@ -2,17 +2,17 @@
 
 namespace IGCMS\Plugins;
 
+use DOMDocument;
+use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
-use DOMDocument;
-use XSLTProcessor;
 use SplObserver;
 use SplSubject;
+use XSLTProcessor;
 
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 

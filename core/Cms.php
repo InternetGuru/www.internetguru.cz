@@ -2,12 +2,9 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\GetContentStrategyInterface;
-use IGCMS\Core\ModifyContentStrategyInterface;
-use IGCMS\Core\HTMLPlusBuilder;
-use Exception;
 use Closure;
 use DOMNode;
+use Exception;
 
 class Cms {
 

@@ -2,8 +2,6 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Logger;
-
 class ErrorPage {
   private $relDir = "error";
   private $headingFile = "headings.txt";

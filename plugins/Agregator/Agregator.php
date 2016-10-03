@@ -2,7 +2,6 @@
 
 namespace IGCMS\Plugins;
 use Exception;
-use IGCMS\Core\Cms;
 use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
