@@ -82,11 +82,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
     foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
     foreach($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
-    foreach($xPath->query("//*[@xml:lang]") as $a) {
-      if(!$a->hasAttribute("lang")) $a->setAttribute("lang", $a->getAttribute("xml:lang"));
-      $a->removeAttribute("xml:lang");
-    }
-    $this->consolidateLang($contentPlus->documentElement, $lang);
     foreach($contentPlus->getElementsByTagName("a") as $e) {
       $this->processLinks($e, "href");
     }
@@ -96,6 +91,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($contentPlus->getElementsByTagName("form") as $e) {
       $this->processLinks($e, "action", false);
     }
+    foreach($xPath->query("//*[@xml:lang]") as $a) {
+      if(!$a->hasAttribute("lang")) $a->setAttribute("lang", $a->getAttribute("xml:lang"));
+      $a->removeAttribute("xml:lang");
+    }
+    $this->consolidateLang($contentPlus->documentElement, $lang);
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement, true);
@@ -218,8 +218,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         throw new Exception(sprintf(_("Link '%s' not found"), $url));
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
-      if($linkType && array_key_exists("id", $pLink) && !array_key_exists("query", $pLink)) {
-        $this->insertTitle($e, $pLink["id"]);
+      if($linkType && array_key_exists("id", $pLink)) {
+        if(!array_key_exists("query", $pLink)) $this->insertTitle($e, $pLink["id"]);
+        $e->setAttribute("xml:lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
       }
       $link = buildLocalUrl($pLink, !$linkType, $getLink);
       $e->setAttribute($aName, $link);
