@@ -21,12 +21,13 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   private $cfg;
   private $vars = array();
   private $formsElements = array();
+  private $formNames = array();
+  private $formGroupValues = array();
   private $formIds;
   private $formVars;
   private $formValues;
   private $formItems = array();
   private $messages;
-  private $errors = array();
   private $forms = array();
   private $prefix = null;
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
@@ -35,7 +36,6 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
-    $mail = new PHPMailer;
     $this->prefix = strtolower($this->className);
   }
 
@@ -70,7 +70,6 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   }
 
   private function proceedForm() {
-
     $formToSend = null;
     $formIdToSend = null;
     foreach($this->forms as $formId => $form) {
@@ -101,10 +100,10 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       foreach($this->formVars as $k => $v) {
         $this->formVars[$k] = replaceVariables($v, $variables);
       }
-      if(array_key_exists($formIdToSend, $this->messages)) {
+      if(array_key_exists($formIdToSend, $this->messages) && strlen($this->messages[$formIdToSend])) {
         $msg = replaceVariables($this->messages[$formIdToSend], $variables);
-      } else $msg = $this->createMessage($this->cfg, $formIdToSend);
-      $this->sendForm($formIdToSend, $formToSend, $msg);
+      } else $msg = $this->createMessage();
+      $this->sendForm($formIdToSend, $msg);
       if(self::DEBUG) {
         var_dump($this->formVars);
         var_dump($this->formValues);
@@ -150,7 +149,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     return $doc;
   }
 
-  private function sendForm($formIdToSend, DOMElementPlus $form, $msg) {
+  private function sendForm($formIdToSend, $msg) {
     if(!strlen($this->formVars["adminaddr"])) throw new Exception(_("Missing admin address"));
     if(!preg_match("/".EMAIL_PATTERN."/", $this->formVars["adminaddr"]))
       throw new Exception(sprintf(_("Invalid admin email address: '%s'"), $this->formVars["adminaddr"]));
@@ -240,12 +239,10 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   }
 
   private function registerFormItems(DOMElementPlus $form, $prefix) {
-    $time = time();
     $idInput = $form->ownerDocument->createElement("input");
     $idInput->setAttribute("name", $this->className);
     $idInput->setAttribute("type", "hidden");
     $idInput->setAttribute("value", $form->getAttribute("id"));
-    $i = 1;
     $e = null;
     $this->formItems = array();
     $this->formValues = array();
@@ -349,7 +346,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     return $value;
   }
 
-  private function createMessage(DOMDocumentPlus $cfg, $formId) {
+  private function createMessage() {
     foreach($this->formValues as $k => $v) {
       if(is_array($v)) $v = implode(", ", $v);
       $msg[] = "$k: $v";
