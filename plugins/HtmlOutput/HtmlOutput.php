@@ -220,7 +220,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
       if($linkType && array_key_exists("id", $pLink)) {
         if(!array_key_exists("query", $pLink)) $this->insertTitle($e, $pLink["id"]);
-        $e->setAttribute("xml:lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
+        $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
       }
       $link = buildLocalUrl($pLink, !$linkType, $getLink);
       $e->setAttribute($aName, $link);
