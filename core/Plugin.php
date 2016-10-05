@@ -51,6 +51,10 @@ class Plugin {
     return self::$html[$fileName];
   }
 
+  /**
+   * @param string|null $fileName
+   * @return DOMDocumentPlus
+   */
   public static function getXML($fileName=null) {
     if(array_key_exists($fileName, self::$xml)) return self::$xml[$fileName];
     $pluginName = self::getCallerName();

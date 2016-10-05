@@ -7,6 +7,12 @@ use DOMElement;
 use DOMXPath;
 use Exception;
 
+/**
+ * Class DOMDocumentPlus
+ * @package IGCMS\Core
+ *
+ * @property DOMElementPlus documentElement
+ */
 class DOMDocumentPlus extends DOMDocument {
 
   function __construct($version="1.0", $encoding="utf-8") {
@@ -31,6 +37,13 @@ class DOMDocumentPlus extends DOMDocument {
       throw new Exception(_("Invalid XML"));
   }
 
+  /**
+   * @param string $id
+   * @param string|null $eName
+   * @param string $aName
+   * @return DOMElementPlus|null
+   * @throws Exception
+   */
   public function getElementById($id, $eName=null, $aName="id") {
     try {
       if(!is_null($eName)) {

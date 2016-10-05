@@ -5,6 +5,24 @@ namespace IGCMS\Core;
 use DOMElement;
 use Exception;
 
+/**
+ * @method static getIdToParentId($id=null)
+ * @method static getIdToFile($id=null)
+ * @method static getIdToShort($id=null)
+ * @method static getIdToHeading($id=null)
+ * @method static getIdToTitle($id=null)
+ * @method static getIdToDesc($id=null)
+ * @method static getIdToKw($id=null)
+ * @method static getIdToAuthor($id=null)
+ * @method static getIdToAuthorId($id=null)
+ * @method static getIdToResp($id=null)
+ * @method static getIdToRespId($id=null)
+ * @method static getIdToCtime($id=null)
+ * @method static getIdToMtime($id=null)
+ * @method static getIdToLang($id=null)
+ * @method static getIdToLink($id=null)
+ * @method static getLinkToId($id=null)
+ */
 class HTMLPlusBuilder extends DOMBuilder {
 
   private static $fileToId = array();

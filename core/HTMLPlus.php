@@ -7,6 +7,11 @@ use DOMComment;
 use DOMXPath;
 use Exception;
 
+/**
+ * Class HTMLPlus
+ * @package IGCMS\Core
+ *
+ */
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
   private $defaultAuthor = null;

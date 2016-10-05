@@ -5,6 +5,17 @@ namespace IGCMS\Core;
 use DOMElement;
 use Exception;
 
+/**
+ * Class DOMElementPlus
+ * @package IGCMS\Core
+ *
+ * @property DOMElementPlus|DOMElement parentNode
+ * @property DOMElementPlus nextElement
+ * @property DOMElementPlus previousElement
+ * @property DOMElementPlus firstElement
+ * @property DOMElementPlus[] childElementsArray
+ * @property DOMElementPlus lastElement
+ */
 class DOMElementPlus extends DOMElement {
 
   public function getRequiredAttribute($aName) {
@@ -356,9 +367,11 @@ class DOMElementPlus extends DOMElement {
   }
 
   private function getFirstElement() {
-    $childElements = $this->childElementsArray;
-    if(!count($childElements)) return null;
-    return $childElements[0];
+    foreach($this->childNodes as $n) {
+      if($n->nodeType != XML_ELEMENT_NODE) continue;
+      return $n;
+    }
+    return null;
   }
 
   private function getLastElement() {
