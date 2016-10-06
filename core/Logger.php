@@ -152,7 +152,7 @@ class Logger {
       return;
       case MonologLogger::NOTICE:
       case MonologLogger::WARNING:
-      Cms::{$level}($message);
+      Cms::$level($message);
       return;
       default:
       Cms::error($message);
