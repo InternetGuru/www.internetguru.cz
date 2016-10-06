@@ -22,37 +22,110 @@ use Exception;
  * @method static getIdToLang($id=null)
  * @method static getIdToLink($id=null)
  * @method static getLinkToId($id=null)
+ * @method static getFileToId($fileName=null);
+ * @method static getFileToDoc($fileName=null);
+ * @method static getFileToMtime($fileName=null);
  */
 class HTMLPlusBuilder extends DOMBuilder {
-
+  /**
+   * @var array
+   */
   private static $fileToId = array();
+  /**
+   * @var array
+   */
   private static $fileToDoc = array();
+  /**
+   * @var array
+   */
   private static $fileToMtime = array();
-
+  /**
+   * @var array
+   */
   private static $idToParentId = array();
+  /**
+   * @var array
+   */
   private static $idToFile = array();
+  /**
+   * @var array
+   */
   private static $idToShort = array();
+  /**
+   * @var array
+   */
   private static $idToHeading = array();
+  /**
+   * @var array
+   */
   private static $idToTitle = array();
+  /**
+   * @var array
+   */
   private static $idToDesc = array();
+  /**
+   * @var array
+   */
   private static $idToKw = array();
+  /**
+   * @var array
+   */
   private static $idToAuthor = array();
+  /**
+   * @var array
+   */
   private static $idToAuthorId = array();
+  /**
+   * @var array
+   */
   private static $idToResp = array();
+  /**
+   * @var array
+   */
   private static $idToRespId = array();
+  /**
+   * @var array
+   */
   private static $idToCtime = array();
+  /**
+   * @var array
+   */
   private static $idToMtime = array();
+  /**
+   * @var array
+   */
   private static $idToLang = array();
 
+  /**
+   * @var array
+   */
   private static $idToLink = array();
+  /**
+   * @var array
+   */
   private static $linkToId = array();
 
+  /**
+   * @var bool
+   */
   private static $storeCache = true;
+  /**
+   * @var array
+   */
   private static $currentFileTo;
+  /**
+   * @var array
+   */
   private static $currentIdTo;
-
+  /**
+   * @var int
+   */
   const APC_ID = 0;
 
+  /**
+   * @param string $id
+   * @return array
+   */
   public static function getIdToAll($id) {
     $register = array();
     $properties = (new \ReflectionClass(get_called_class()))->getStaticProperties();
@@ -65,6 +138,12 @@ class HTMLPlusBuilder extends DOMBuilder {
     return $register;
   }
 
+  /**
+   * @param string $methodName
+   * @param string $arguments
+   * @return mixed|null
+   * @throws Exception
+   */
   public static function __callStatic($methodName, $arguments) {
     $className = (new \ReflectionClass(self::class))->getShortName();
     if(strpos($methodName, "get") !== 0) {
@@ -81,6 +160,11 @@ class HTMLPlusBuilder extends DOMBuilder {
     return self::$$propertyName;
   }
 
+  /**
+   * @param array $fileCache
+   * @param array $idCache
+   * @return bool
+   */
   private static function isValidApc(Array $fileCache, Array $idCache=array()) {
     if(!array_key_exists("fileToMtime", $fileCache) || empty($fileCache["fileToMtime"]))
       return false;

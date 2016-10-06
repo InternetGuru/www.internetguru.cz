@@ -75,6 +75,10 @@ class Plugins implements SplSubject {
     $this->status = null;
   }
 
+  /**
+   * @param $itf
+   * @return array
+   */
   public function getIsInterface($itf) {
     $contentStrategies = array();
     stableSort($this->observerPriority);

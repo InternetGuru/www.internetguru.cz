@@ -2,7 +2,6 @@
 
 namespace IGCMS\Plugins;
 
-use DOMElement;
 use Exception;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
@@ -12,21 +11,28 @@ use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
 class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrategyInterface {
   private $tree = array();
-  private $content = null;
   private $sets = array();
   private $defaultSet = null;
 
- public function __construct(SplSubject $s) {
-   parent::__construct($s);
-   $s->setPriority($this, 2);
- }
+  /**
+   * ContentBalancer constructor.
+   * @param SplSubject|Plugins $s
+   */
+  public function __construct(SplSubject $s) {
+    parent::__construct($s);
+    $s->setPriority($this, 2);
+  }
 
- public function update(SplSubject $subject) {
+  /**
+   * @param SplSubject|Plugins $subject
+   */
+  public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
     $this->setTree();
     $this->balanceLinks();
@@ -108,7 +114,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     return $content;
   }
 
-  private function getUntilSame(DOMElement $e) {
+  private function getUntilSame(DOMElementPlus $e) {
     $elements = array($e);
     $untilName = $e->nodeName;
     while(($e = $e->nextElement) !== null) {
@@ -123,7 +129,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     return array_key_exists($link, HTMLPlusBuilder::getIdToLink());
   }
 
-  private function handleAttribute(DOMElement $e, $aName, $anyElement=false) {
+  private function handleAttribute(DOMElementPlus $e, $aName, $anyElement=false) {
     if($e->hasAttribute($aName)) return;
     $eName = $anyElement ? null : $e->nodeName;
     $value = $e->getAncestorValue($aName, $eName);
@@ -142,7 +148,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
           break;
           case "item":
           if($id == "") throw new Exception(_("Element item missing id"));
-          $wrapper = $e->getRequiredAttribute("wrapper"); // only check
+          $e->getRequiredAttribute("wrapper"); // only check
           $this->sets[$id] = $e;
           break;
         }
@@ -201,7 +207,6 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
 
   private function getVariables($id) {
     $vars = array();
-    $desc = HTMLPlusBuilder::getIdToDesc($id);
     $vars['heading'] = HTMLPlusBuilder::getIdToHeading($id);
     $vars['link'] = $id;
     $values = HTMLPlusBuilder::getHeadingValues($id);
@@ -210,14 +215,6 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $vars['desc'] = HTMLPlusBuilder::getIdToDesc($id);
     $vars['kw'] = HTMLPlusBuilder::getIdToKw($id);
     return $vars;
-  }
-
-  private function getParentHeading(DOMElement $e) {
-    $h = $e;
-    while( ($h = $h->previousElement) != null) {
-      if($h->nodeName == "h") return $h;
-    }
-    throw new Exception(sprintf(_("Unable to find parent heading for %s"), $h->nodeValue));
   }
 
 }

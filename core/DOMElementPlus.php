@@ -15,6 +15,7 @@ use Exception;
  * @property DOMElementPlus firstElement
  * @property DOMElementPlus[] childElementsArray
  * @property DOMElementPlus lastElement
+ *
  */
 class DOMElementPlus extends DOMElement {
 
