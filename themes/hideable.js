@@ -74,7 +74,7 @@
           link.innerHTML = Config.expand;
         }
       }
-    }
+    };
 
     // public
     return {

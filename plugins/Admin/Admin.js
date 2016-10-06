@@ -2,7 +2,7 @@
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  var Config = {}
+  var Config = {};
   Config.saveInactive = "Data file is inactive. Are you sure?";
 
    var Admin = function() {
@@ -33,7 +33,7 @@
         }, true);
       },
       getEventVars = function(e) {
-        vars = {};
+        var vars = {};
         if (win.event) {
           vars.key = win.event.keyCode;
           vars.isShift = !!win.event.shiftKey; // typecast to boolean
@@ -44,13 +44,12 @@
           vars.isCtrl = !!e.ctrlKey;
         }
         return vars;
-      }
+      },
       setSaveEvents = function(form) {
         form.onkeydown = function(e) {
           var vars = getEventVars(e);
           var key = vars.key;
           var isShift = vars.isShift;
-          var isCtrl = vars.isCtrl;
           // letter s and ctrl or meta
           if(!e.ctrlKey && !e.metaKey) return true;
           switch(key) {
@@ -73,11 +72,11 @@
             default: return true;
           }
 
-        }
+        };
 
         form['saveandgo'].onclick = function(e) { confirmInactive(e, form); }
         form['saveandstay'].onclick = function(e) { confirmInactive(e, form); }
-      }
+      };
 
       // public
       return {

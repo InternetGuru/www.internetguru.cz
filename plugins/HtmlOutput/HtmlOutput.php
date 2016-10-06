@@ -15,43 +15,86 @@ use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use IGCMS\Core\XMLBuilder;
 use SplObserver;
 use SplSubject;
 use XSLTProcessor;
 
-
+/**
+ * Class HtmlOutput
+ * @package IGCMS\Plugins
+ */
 class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
+  /**
+   * @var array
+   */
   private $jsFiles = array(); // String filename => Int priority
+  /**
+   * @var array
+   */
   private $jsFilesPriority = array(); // String filename => Int priority
-  private $jsContent = array();
-  private $jsContentBody = array();
+  /**
+   * @var array
+   */
   private $cssFiles = array();
+  /**
+   * @var array
+   */
   private $cssFilesPriority = array();
+  /**
+   * @var array
+   */
   private $transformationsPriority = array();
+  /**
+   * @var array
+   */
   private $transformations = array();
+  /**
+   * @var string|null
+   */
   private $favIcon = null;
+  /**
+   * @var DOMDocumentPlus|null
+   */
   private $cfg = null;
+  /**
+   * @var string
+   */
   const APPEND_HEAD = "head";
+  /**
+   * @var string
+   */
   const APPEND_BODY = "body";
+  /**
+   * @var string
+   */
   const FAVICON = "favicon.ico";
 
+  /**
+   * HtmlOutput constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1000);
     Cms::setOutputStrategy($this);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
-    if(is_null($this->favIcon)) $this->favIcon = findfile($this->pluginDir."/".self::FAVICON);
+    if(is_null($this->favIcon)) $this->favIcon = findFile($this->pluginDir."/".self::FAVICON);
   }
 
   /**
    * Create HTML 5 output from HTML+ content and own registers (JS/CSS)
-   * @return void
+   * @param HTMLPlus $content
+   * @return string
    */
   public function getOutput(HTMLPlus $content) {
     stableSort($this->cssFilesPriority);
@@ -66,18 +109,19 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
     // final plugin modification
     global $plugins;
-    foreach($plugins->getIsInterface("IGCMS\Core\FinalContentStrategyInterface") as $fcs) {
+    foreach($plugins->getIsInterface("IGCMS\\Core\\FinalContentStrategyInterface") as $fcs) {
       $contentPlus = $fcs->getContent($contentPlus);
     }
 
     // create output DOM with doctype
     $doc = $this->createDoc();
     $html = $this->addRoot($doc, $lang);
-    $head = $this->addHead($doc, $html, $h1);
+    $this->addHead($doc, $html, $h1);
 
     // final validation
     $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
     $xPath = new DOMXPath($contentPlus);
+    /** @var DOMElementPlus $a */
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
     foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
     foreach($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
@@ -97,6 +141,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->consolidateLang($contentPlus->documentElement, $lang);
 
     // import into html and save
+    /** @var DOMElement $content */
     $content = $doc->importNode($contentPlus->documentElement, true);
     $html->appendChild($content);
     $cXpath = new DOMXPath($html->ownerDocument);
@@ -108,6 +153,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return substr($html, strpos($html, "\n")+1);
   }
 
+  /**
+   * @param DOMElementPlus $parent
+   * @param string $lang
+   */
   private function consolidateLang(DOMElementPlus $parent, $lang) {
     if($parent->getAttribute("lang") == $lang) $parent->removeAttribute("lang");
     foreach($parent->childElementsArray as $e) {
@@ -115,6 +164,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
+  /**
+   * @return DOMDocument
+   */
   private function createDoc() {
     $imp = new DOMImplementation();
     $dtd = $imp->createDocumentType('html');
@@ -126,6 +178,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return $doc;
   }
 
+  /**
+   * @param DOMDocument $doc
+   * @param string $lang
+   * @return DOMElement
+   */
   private function addRoot(DOMDocument $doc, $lang) {
     $html = $doc->createElement("html");
     $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
@@ -135,6 +192,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return $html;
   }
 
+  /**
+   * @param DOMDocument $doc
+   * @param DOMElement $html
+   * @param DOMElementPlus $h1
+   * @return DOMElement
+   */
   private function addHead(DOMDocument $doc, DOMElement $html, DOMElementPlus $h1) {
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
@@ -147,15 +210,20 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $robots = $this->cfg->getElementById("robots");
     $this->appendMeta($head, "robots", $robots->nodeValue);
     update_file($this->favIcon, self::FAVICON); // hash?
-    $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false, true);
+    $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
     update_file(findFile($this->pluginDir."/robots.txt"), "robots.txt"); // hash?
     $this->appendCssFiles($head);
     $html->appendChild($head);
     return $head;
   }
 
+  /**
+   * @param DOMDocumentPlus $content
+   * @return DOMDocument|DOMDocumentPlus
+   */
   private function applyTransformations(DOMDocumentPlus $content) {
     $proc = new XSLTProcessor();
+    /** @noinspection PhpParamsInspection */
     $proc->setParameter('', $this->getProcParams());
     stableSort($this->transformationsPriority);
     foreach($this->transformationsPriority as $xslt => $priority) {
@@ -174,6 +242,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return $content;
   }
 
+  /**
+   * @return string
+   */
   private function getFavIcon() {
     if(Cms::hasErrorMessage()) return $this->cfg->getElementById("error")->nodeValue;
     if(Cms::hasWarningMessage()) return $this->cfg->getElementById("warning")->nodeValue;
@@ -182,11 +253,20 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return ROOT_URL.self::FAVICON;
   }
 
+  /**
+   * @param array $pLink
+   * @return bool
+   */
   private function isLocalFragment(Array $pLink) {
     if(array_key_exists("path", $pLink)) return false;
     return array_key_exists("fragment", $pLink);
   }
 
+  /**
+   * @param DOMElementPlus $e
+   * @param string $aName
+   * @param bool $linkType
+   */
   private function processLinks(DOMElementPlus $e, $aName, $linkType=true) {
     $url = $e->getAttribute($aName);
     if(!strlen($url)) {
@@ -200,7 +280,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       if(array_key_exists("path", $pLink)) {
         // link to supported file
         global $plugins;
-        foreach($plugins->getIsInterface("IGCMS\Core\ResourceInterface") as $ri) {
+        foreach($plugins->getIsInterface("IGCMS\\Core\\ResourceInterface") as $ri) {
           if(!$ri::isSupportedRequest($pLink["path"])) continue;
           $isLink = false;
           break;
@@ -231,6 +311,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
+  /**
+   * @param array $pHref
+   * @param string $rootId
+   * @return array
+   */
   private function getLink($pHref, $rootId) {
     if(!array_key_exists("path", $pHref) && !array_key_exists("fragment", $pHref))
       return $pHref;
@@ -259,7 +344,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return $pHref;
   }
 
-  private function insertTitle(DOMElement $a, $id) {
+  /**
+   * @param DOMElementPlus $a
+   * @param string $id
+   */
+  private function insertTitle(DOMElementPlus $a, $id) {
     if($a->hasAttribute("title")) {
       if(!strlen($a->getAttribute("title"))) $a->stripAttr("title");
       return;
@@ -271,65 +360,26 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
-  private function validateImages(DOMDocumentPlus $dom) {
-    $toStrip = array();
-    foreach($dom->getElementsByTagName("object") as $o) {
-      if(!$o->hasAttribute("data")) continue;
-      if(strpos($dataFile, ROOT_URL) === 0) $dataFile = substr($o->getAttribute("data"), strlen(ROOT_URL));
-      $dataFile = findFile($o->getAttribute("data"));
-      if(is_null($dataFile)) continue;
-      try {
-        $pUrl = parseLocalLink($dataFile);
-      } catch(Exception $e) {
-        $toStrip[] = array($o, $e->getMessage());
-        continue;
-      }
-      if(is_null($pUrl)) continue; // external
-      $query = array();
-      if(isset($pUrl["query"])) parse_str($pUrl["query"], $query);
-      $filePath = USER_FOLDER."/".(array_key_exists("q", $query) ? $query["q"] : $pUrl["path"]);
-      if(!is_file($filePath)) {
-        $toStrip[] = array($o, sprintf(_("Object data '%s' not found"), $pUrl["path"]));
-        continue;
-      }
-      try {
-        $mime = getFileMime($filePath);
-        if(strpos($mime, "image/") !== 0)
-          throw new Exception(sprintf(_("Invalid object '%s' MIME type '%s'"), $dataFile, $mime), 1);
-        if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
-          $o->setAttribute("type", $mime);
-          Logger::user_warning(sprintf(_("Object '%s' attribute type set to '%s'"), $dataFile, $mime));
-        }
-        if(array_key_exists("full", $query)) {
-          unset($query["full"]);
-          $o->setAttribute("data", $pUrl["path"].buildQuery($query));
-          Logger::user_warning(sprintf(_("Parameter 'full' removed from data attribute '%s'"), $dataFile));
-        }
-      } catch(Exception $e) {
-        if($e->getCode() === 1)
-          Logger::user_warning($e->getMessage());
-        else
-          Logger::critical($e->getMessage());
-        $toStrip[] = array($o, $e->getMessage());
-      }
-    }
-    foreach($toStrip as $o) $o[0]->stripTag($o[1]);
-  }
-
+  /**
+   * @param DOMElementPlus $h1
+   * @return string|null
+   */
   private function getTitle(DOMElementPlus $h1) {
     $title = null;
-    foreach($this->subject->getIsInterface("IGCMS\Core\TitleStrategyInterface") as $clsName => $cls) {
+    foreach($this->subject->getIsInterface("IGCMS\\Core\\TitleStrategyInterface") as $clsName => $cls) {
       $title = $cls->getTitle();
       if(!is_null($title)) return $title;
     }
     return $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
   }
 
+  /**
+   * @return array
+   */
   private function getProcParams() {
     $o = array();
     foreach(Cms::getAllVariables() as $k => $v) {
-      $valid = true;
-      if($v instanceof Closure) continue;
+      if($v instanceof \Closure) continue;
       elseif($v instanceof DOMDocumentPlus) {
         $s = $v->saveXML($v->documentElement);
       } elseif($v instanceof DOMElement) {
@@ -360,6 +410,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return $o;
   }
 
+  /**
+   * @param DOMDocumentPlus $cfg
+   */
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
@@ -378,7 +431,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->addThemeFiles($cfg->documentElement);
   }
 
-  private function addThemeFiles(DOMElement $e = null) {
+  /**
+   * @param DOMElementPlus|null $e
+   */
+  private function addThemeFiles(DOMElementPlus $e = null) {
     foreach($e->childElementsArray as $n) {
       if($n->nodeValue == "" || in_array($n->nodeName, array("var", "themes"))) continue;
       try {
@@ -410,6 +466,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
+  /**
+   * @param DOMDocument $content
+   * @param string $fileName
+   * @param XSLTProcessor $proc
+   * @return DOMDocument
+   * @throws Exception
+   */
   private function transform(DOMDocument $content, $fileName, XSLTProcessor $proc) {
     #var_dump($fileName);
     $xsl = XMLBuilder::load($fileName);
@@ -427,6 +490,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param  string     $nameValue    Value of attribute name/http-equiv
    * @param  string     $contentValue Value of attribute content
    * @param  boolean    $httpEquiv    Use attr.http-equiv instead of name
+   * @param  bool       $short
    * @return void
    */
   private function appendMeta(DOMElement $e, $nameValue, $contentValue, $httpEquiv=false, $short=false) {
@@ -439,13 +503,15 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $e->appendChild($meta);
   }
 
-  private function appendMetaCharset(DOMElement $e, $charset) {
-    $meta = $e->ownerDocument->createElement("meta");
-    $meta->setAttribute("charset", $charset);
-    $e->appendChild($meta);
-  }
-
-  private function appendLinkElement(DOMElement $parent, $filePath, $rel, $type=false, $media=false, $user=true, $ieIfComment=null) {
+  /**
+   * @param DOMElement $parent
+   * @param string $filePath
+   * @param string $rel
+   * @param bool $type
+   * @param bool $media
+   * @param string|null $ieIfComment
+   */
+  private function appendLinkElement(DOMElement $parent, $filePath, $rel, $type=false, $media=false, $ieIfComment=null) {
     $e = $parent->ownerDocument->createElement("link");
     if($type) $e->setAttribute("type", $type);
     if($rel) $e->setAttribute("rel", $rel);
@@ -459,9 +525,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   /**
-   * Add unique JS file into register with priority
-   * @param string  $filePath JS file to be registered
-   * @param integer $priority The higher priority the lower appearance
+   * @param string $filePath
+   * @param int $priority
+   * @param string $append
+   * @param bool $user
+   * @param null $ieIfComment
+   * @param bool $ifXpath
    */
   public function addJsFile($filePath, $priority = 10, $append = self::APPEND_HEAD, $user=false, $ieIfComment=null, $ifXpath=false) {
     if(isset($this->jsFiles[$filePath])) return;
@@ -478,9 +547,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   /**
-   * Add JS (as a string) into register with priority
-   * @param string  $content  JS to be added
-   * @param integer $priority The higher priority the lower appearance
+   * @param string $content
+   * @param int $priority
+   * @param string $append
    */
   public function addJs($content, $priority = 10, $append = self::APPEND_BODY) {
     $key = "k".count($this->jsFiles);
@@ -492,9 +561,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   /**
-   * Add unique CSS file into register with priority
-   * @param string  $fileName JS file to be registered
-   * @param integer $priority The higher priority the lower appearance
+   * @param string $filePath
+   * @param bool $media
+   * @param int $priority
+   * @param bool $user
+   * @param string|null $ieIfComment
    */
   public function addCssFile($filePath, $media = false, $priority = 10, $user = true, $ieIfComment=null) {
     if(isset($this->cssFiles[$filePath])) return;
@@ -510,6 +581,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
 
+  /**
+   * @param string $filePath
+   * @param int $priority
+   */
   public function addTransformation($filePath, $priority=10) {
     if(isset($this->transformations[$filePath])) return;
     Cms::addVariableItem("transformations", $filePath);
@@ -520,9 +595,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   /**
-   * Append all registered JS files into a parent (usually head)
-   * @param  DOMElement $parent Element to append JS files to
-   * @return void
+   * @param DOMElement $parent
+   * @param string $append
+   * @param DOMXPath $xPath
    */
   private function appendJsFiles(DOMElement $parent, $append = self::APPEND_HEAD, DOMXPath $xPath) {
     foreach($this->jsFilesPriority as $k => $v) {
@@ -547,6 +622,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
+  /**
+   * @param DOMDocument $doc
+   */
   private function validateEmptyContent(DOMDocument $doc) {
     $emptyShort = array("input", "br", "hr", "meta", "link", "param"); // allowed empty in short format
     $emptyLong = array("script", "textarea", "object"); // allowed empty in long format only
@@ -570,6 +648,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
+  /**
+   * @param DOMElement $e
+   * @param string $comment
+   */
   private function removeEmptyElement(DOMElement $e, $comment) {
     $parent = $e->parentNode;
     if(strlen($parent->nodeValue)) {
@@ -583,6 +665,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->removeEmptyElement($parent, $comment);
   }
 
+  /**
+   * @param DOMElement $appendTo
+   * @param string $text
+   */
   private function appendCdata(DOMElement $appendTo, $text) {
     if(!strlen($text)) return;
     $cm = $appendTo->ownerDocument->createTextNode("//");
@@ -602,7 +688,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $ieIfComment = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : null;
       $filePath = ROOT_URL.getResDir($this->cssFiles[$k]["file"]);
       $this->appendLinkElement($parent, $filePath, "stylesheet", "text/css",
-        $this->cssFiles[$k]["media"], $this->cssFiles[$k]["user"], $ieIfComment);
+        $this->cssFiles[$k]["media"], $ieIfComment);
     }
   }
 

@@ -9,6 +9,12 @@ use Exception;
 /**
  * Class Cms
  * @package IGCMS\Core
+ *
+ * @method static success($msg)
+ * @method static notice($msg)
+ * @method static warning($msg)
+ * @method static error($msg)
+ *
  */
 class Cms {
 
@@ -259,6 +265,7 @@ class Cms {
   public static function contentProcessVariables(HTMLPlus $content) {
     $tmpContent = clone $content;
     try {
+      /** @var HTMLPlus $tmpContent */
       $tmpContent = $tmpContent->processVariables(self::$variables);
       $tmpContent->validatePlus(true);
       return $tmpContent;

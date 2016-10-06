@@ -4,8 +4,15 @@ namespace IGCMS\Core;
 
 use Exception;
 
+/**
+ * Class XMLBuilder
+ * @package IGCMS\Core
+ */
 class XMLBuilder extends DOMBuilder {
-
+  /**
+   * @param string $fileName
+   * @return DOMDocumentPlus
+   */
   public static function load($fileName) {
     $doc = new DOMDocumentPlus();
     $fp = findFile($fileName);
@@ -14,6 +21,11 @@ class XMLBuilder extends DOMBuilder {
     return $doc;
   }
 
+  /**
+   * @param string $fileName
+   * @param bool $user
+   * @return DOMDocumentPlus
+   */
   public static function build($fileName, $user=true) {
     $doc = new DOMDocumentPlus();
     $fp = CMS_FOLDER."/$fileName";
@@ -49,6 +61,11 @@ class XMLBuilder extends DOMBuilder {
     return $doc;
   }
 
+  /**
+   * @param DOMDocumentPlus $doc
+   * @param DOMDocumentPlus $newDoc
+   * @throws Exception
+   */
   private static function updateDOM(DOMDocumentPlus $doc, DOMDocumentPlus $newDoc) {
     $docId = null;
     foreach($newDoc->documentElement->childElementsArray as $n) {
@@ -73,6 +90,10 @@ class XMLBuilder extends DOMBuilder {
     }
   }
 
+  /**
+   * @param DOMDocumentPlus $doc
+   * @return array
+   */
   private static function getIds(DOMDocumentPlus $doc) {
     $ids = array();
     foreach($doc->documentElement->childElementsArray as $n) {

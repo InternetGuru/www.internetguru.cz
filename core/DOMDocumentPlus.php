@@ -120,7 +120,6 @@ class DOMDocumentPlus extends DOMDocument {
 
   /**
    * TODO return?
-   * TODO $this->removeAttribute?
    * @param array $variables
    * @param array $ignore
    * @param DOMElementPlus $element
@@ -136,7 +135,7 @@ class DOMDocumentPlus extends DOMDocument {
       try {
         $element->removeAttrVal("var", $var);
         if(!is_null($variables[$vName]) && !count($variables[$vName])) {
-          if(!is_null($aName)) $this->removeAttribute($aName);
+          if(!is_null($aName)) $element->removeAttribute($aName);
           else return null;
         }
         $res = $this->insertVariable($element, $variables[$vName], $aName);

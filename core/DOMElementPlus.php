@@ -9,22 +9,32 @@ use Exception;
  * Class DOMElementPlus
  * @package IGCMS\Core
  *
- * @property DOMElementPlus|DOMElement parentNode
- * @property DOMElementPlus nextElement
- * @property DOMElementPlus previousElement
- * @property DOMElementPlus firstElement
- * @property DOMElementPlus[] childElementsArray
- * @property DOMElementPlus lastElement
- *
+ * @property DOMDocumentPlus|HTMLPlus|null $ownerDocument
+ * @property DOMElementPlus $nextElement
+ * @property DOMElementPlus|null $nextSibling
+ * @property DOMElementPlus $previousElement
+ * @property DOMElementPlus|DOMElement|null $parentNode
+ * @property DOMElementPlus $firstElement
+ * @property DOMElementPlus|null $previousSibling
+ * @property DOMElementPlus[] $childElementsArray
+ * @property DOMElementPlus $lastElement
  */
 class DOMElementPlus extends DOMElement {
-
+  /**
+   * @param string $aName
+   * @return string
+   * @throws Exception
+   */
   public function getRequiredAttribute($aName) {
     if(!$this->hasAttribute($aName))
       throw new Exception(sprintf(_("Element %s missing attribute %s"), $this->nodeName, $aName));
     return $this->getAttribute($aName);
   }
 
+  /**
+   * @param string $name
+   * @return DOMElementPlus
+   */
   public function rename($name) {
     $newnode = $this->ownerDocument->createElement($name);
     $children = array();
@@ -42,6 +52,9 @@ class DOMElementPlus extends DOMElement {
     return $newnode;
   }
 
+  /**
+   * @param array $except
+   */
   public function removeAllAttributes(Array $except = array()) {
     $toRemove = array();
     foreach($this->attributes as $a) {
@@ -52,11 +65,18 @@ class DOMElementPlus extends DOMElement {
       $this->removeAttribute($a->nodeName);
     }
   }
-
+ /**
+ * @param string $class
+ * @return bool
+ */
   public function hasClass($class) {
     return in_array($class, explode(" ", $this->getAttribute("class")));
   }
 
+  /**
+   * @param string $class
+   * @throws Exception
+   */
   public function addClass($class) {
     if(!preg_match("/^[A-Za-z][A-Za-z0-9_-]*$/", $class)) {
       throw new Exception(sprintf(_("Invalid class name '%s'")), $class);
@@ -66,10 +86,22 @@ class DOMElementPlus extends DOMElement {
     else $this->setAttribute("class", $this->getAttribute("class")." $class");
   }
 
+  /**
+   * TODO return?
+   * @param array $variables
+   * @param array $ignore
+   * @param bool $deep
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   */
   public function processVariables(Array $variables, $ignore = array(), $deep = false) {
     return $this->ownerDocument->elementProcessVariables($variables, $ignore, $this, $deep);
   }
 
+  /**
+   * @param array $functions
+   * @param array $variables
+   * @param array $ignore
+   */
   public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array()) {
     foreach($this->getVariables("fn", $ignore) as list($vName, $aName, $fn)) {
       try {
@@ -95,6 +127,12 @@ class DOMElementPlus extends DOMElement {
     $p->emptyRecursive();
   }
 
+  /**
+   * TODO return?
+   * @param string $value
+   * @param string $aName
+   * @return DOMElementPlus|mixed|null
+   */
   public function insertVarString($value, $aName) {
     if(is_null($aName)) {
       return $this->insertInnerHTML($value, "");
@@ -118,6 +156,13 @@ class DOMElementPlus extends DOMElement {
     return $this;
   }
 
+  /**
+   * TODO return?
+   * @param array $value
+   * @param string $aName
+   * @return DOMElementPlus|mixed|null
+   * @throws Exception
+   */
   public function insertVarArray(Array $value, $aName) {
     if(!is_null($aName)) {
       return $this->insertVarString(implode(" ", $value), $aName);
@@ -140,7 +185,8 @@ class DOMElementPlus extends DOMElement {
       case "ul":
       case "ol":
       $this->removeChildNodes();
-      $e = $this->appendChild($this->ownerDocument->createElement("li"));
+      $e = $this->ownerDocument->createElement("li");
+      $this->appendChild($e);
       return $e->insertInnerHTML($value, $sep);
       #case "body":
       #case "section":
@@ -153,6 +199,12 @@ class DOMElementPlus extends DOMElement {
     return $this->insertInnerHTML($value, $sep);
   }
 
+  /**
+   * TODO $html type, return?
+   * @param $html
+   * @param string $sep
+   * @return mixed|null
+   */
   private function insertInnerHTML($html, $sep) {
     if(!is_array($html)) $html = array($html);
     $dom = new DOMDocumentPlus();
@@ -170,6 +222,12 @@ class DOMElementPlus extends DOMElement {
     return $this->insertVarDOMElement($dom->documentElement, null);
   }
 
+  /**
+   * TODO return?
+   * @param DOMElement $element
+   * @param string $aName
+   * @return DOMElementPlus|mixed|null
+   */
   public function insertVarDOMElement(DOMElement $element, $aName) {
     if(!is_null($aName)) {
       return $this->insertVarString($element->nodeValue, $aName);
@@ -194,6 +252,11 @@ class DOMElementPlus extends DOMElement {
     return $res;
   }
 
+  /**
+   * @param string $attr
+   * @param array $ignore
+   * @return array
+   */
   public function getVariables($attr, Array $ignore) {
     $variables = array();
     if(!$this->hasAttribute($attr)) return $variables;
@@ -209,10 +272,17 @@ class DOMElementPlus extends DOMElement {
     return $variables;
   }
 
+  /**
+   * @param string|null $comment
+   */
   public function stripElement($comment = null) {
     $this->stripTag($comment, false);
   }
 
+  /**
+   * @param string $aName
+   * @param string $aValue
+   */
   public function removeAttrVal($aName, $aValue) {
     if(!strlen($this->getAttribute($aName))) return;
     $attrs = explode(" ", $this->getAttribute($aName));
@@ -223,6 +293,10 @@ class DOMElementPlus extends DOMElement {
     else $this->setAttribute($aName, implode(" ", $attrs));
   }
 
+  /**
+   * @param string $attr
+   * @param string|null $comment
+   */
   public function stripAttr($attr, $comment = null) {
     if(!$this->hasAttribute($attr)) return;
     $aVal = $this->getAttribute($attr);
@@ -234,6 +308,10 @@ class DOMElementPlus extends DOMElement {
     $this->parentNode->insertBefore($cmt, $this);
   }
 
+  /**
+   * @param string|null $comment
+   * @param bool $keepContent
+   */
   public function stripTag($comment = null, $keepContent = true) {
     if(!is_null($comment) && (Cms::isSuperUser() || CMS_DEBUG)) {
       $cmt = $this->ownerDocument->createComment(" $comment ");
@@ -247,6 +325,11 @@ class DOMElementPlus extends DOMElement {
     $this->parentNode->removeChild($this);
   }
 
+  /**
+   * TODO return?
+   * @param string|null $eName
+   * @return DOMElement|DOMElementPlus|null
+   */
   public function getPreviousElement($eName=null) {
     $e = $this->previousElement;
     if(is_null($e)) $e = $this->parentNode;
@@ -258,6 +341,11 @@ class DOMElementPlus extends DOMElement {
     return null;
   }
 
+  /**
+   * @param string|null $attName
+   * @param string|null $eName
+   * @return string|null
+   */
   public function getSelfOrParentValue($attName=null, $eName=null) {
     if(!strlen($attName)) {
       if(strlen($this->nodeValue)) return htmlspecialchars($this->nodeValue); // TODO: remove specialchars?
@@ -267,6 +355,11 @@ class DOMElementPlus extends DOMElement {
     return $this->getParentValue($attName, $eName);
   }
 
+  /**
+   * @param string|null $attName
+   * @param string|null $eName
+   * @return string|null
+   */
   public function getParentValue($attName=null, $eName=null) {
     $parent = $this;
     while(!is_null($parent)) {
@@ -282,6 +375,11 @@ class DOMElementPlus extends DOMElement {
     return null;
   }
 
+  /**
+   * @param string|null $attName
+   * @param string|null $eName
+   * @return string|null
+   */
   public function getAncestorValue($attName=null, $eName=null) {
     $ancestor = $this->parentNode;
     while(!is_null($ancestor)) {
@@ -324,18 +422,28 @@ class DOMElementPlus extends DOMElement {
     }
   }
 
+  /**
+   * @return DOMElementPlus
+   */
   private function getNextSiblingElement() {
     $e = $this->nextSibling;
     while(!is_null($e) && $e->nodeType != XML_ELEMENT_NODE) $e = $e->nextSibling;
     return $e;
   }
 
+  /**
+   * @return DOMElementPlus
+   */
   private function getPreviousSiblingElement() {
     $e = $this->previousSibling;
     while(!is_null($e) && $e->nodeType != XML_ELEMENT_NODE) $e = $e->previousSibling;
     return $e;
   }
 
+  /**
+   * @param int $i
+   * @return string
+   */
   public function setUniqueId($i=0) {
     $id = $this->getValidId();
     if($i != 0) $id .= $i;
@@ -348,6 +456,9 @@ class DOMElementPlus extends DOMElement {
     return $this->setUniqueId(++$i);
   }
 
+  /**
+   * @return string
+   */
   private function getValidId() {
     $id = normalize($this->getAttribute("name"));
     if(isValidId($id)) return $id;
@@ -358,6 +469,9 @@ class DOMElementPlus extends DOMElement {
     return $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);
   }
 
+  /**
+   * @return DOMElementPlus[]
+   */
   private function getChildElementsArray() {
     $elements = array();
     foreach($this->childNodes as $n) {
@@ -367,6 +481,9 @@ class DOMElementPlus extends DOMElement {
     return $elements;
   }
 
+  /**
+   * @return DOMElementPlus|null
+   */
   private function getFirstElement() {
     foreach($this->childNodes as $n) {
       if($n->nodeType != XML_ELEMENT_NODE) continue;
@@ -375,6 +492,9 @@ class DOMElementPlus extends DOMElement {
     return null;
   }
 
+  /**
+   * @return DOMElementPlus|null
+   */
   private function getLastElement() {
     $childElements = $this->childElementsArray;
     if(!count($childElements)) return null;

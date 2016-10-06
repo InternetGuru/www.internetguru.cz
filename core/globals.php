@@ -389,7 +389,7 @@ function initIndexFiles() {
  */
 function timestamptToW3C($timestamp) {
   $date = new DateTime();
-  $date->setTimeStamp($timestamp);
+  $date->setTimestamp($timestamp);
   return $date->format(DateTime::W3C);
 }
 
@@ -597,7 +597,7 @@ if(!function_exists("apc_fetch")) {
 }
 
 if(!function_exists("apc_store")) {
-  function apc_store($key, $value) {
+  function apc_store($key, $value, $ttl=0) {
     return file_put_contents(apc_get_path($key), json_encode($value)) !== false;
   }
 }
@@ -732,5 +732,3 @@ function validate_callStatic($methodName, Array $arguments, Array $functions, $n
     throw new Exception(sprintf(_("Argument[%s] empty or missing"), $i));
   }
 }
-
-?>

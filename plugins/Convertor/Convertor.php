@@ -6,23 +6,48 @@ use DOMDocument;
 use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
+use IGCMS\Core\XMLBuilder;
 use SplObserver;
 use SplSubject;
 use XSLTProcessor;
 
-#bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
-
+/**
+ * TODO bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
+ * Class Convertor
+ * @package IGCMS\Plugins
+ */
 class Convertor extends Plugin implements SplObserver, GetContentStrategyInterface {
+  /**
+   * @var string|null
+   */
   private $html = null;
+  /**
+   * @var string|null
+   */
   private $file = null;
+  /**
+   * @var string|null
+   */
   private $docName = null;
+  /**
+   * @var string
+   */
   private $tmpFolder;
+  /**
+   * @var array
+   */
   private $importedFiles = array();
 
+  /**
+   * Convertor constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
@@ -30,6 +55,9 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     mkdir_plus($this->tmpFolder);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PREINIT) {
       if(!Cms::isSuperUser()) $subject->detach($this);
@@ -57,6 +85,10 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  /**
+   * @param string $fileUrl
+   * @throws Exception
+   */
   private function processImport($fileUrl) {
     if(!strlen($_GET[$this->className]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
       throw new Exception(_("File URL cannot be empty"));
@@ -78,14 +110,17 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  /**
+   * @param string $f
+   * @throws Exception
+   */
   private function parseZippedDoc($f) {
     $doc = $this->transformFile($this->tmpFolder."/$f");
-    $d = new DOMDocumentPlus();
     $xml = $doc->saveXML();
     $xml = str_replace("·\n", "\n", $xml); // remove "format hack" from transformation
     $mergable = array("strong", "em", "sub", "sup", "ins", "del", "q", "cite", "acronym", "code", "dfn", "kbd", "samp");
-    foreach($mergable as $tag) $xml = preg_replace("/<\/$tag>(\s)*<$tag>/", "$1", $xml);
-    foreach($mergable as $tag) $xml = preg_replace("/(\s)*(<\/$tag>)/", "$2$1", $xml);
+    foreach($mergable as $tag) $xml = preg_replace('/<\/'.$tag.'>(\s)*<'.$tag.'>/', "$1", $xml);
+    foreach($mergable as $tag) $xml = preg_replace('/(\s)*(<\/'.$tag.'>)/', "$2$1", $xml);
 
     $doc = new HTMLPlus();
     $doc->defaultAuthor = Cms::getVariable("cms-author");
@@ -137,7 +172,13 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  /**
+   * @param HTMLPlus $doc
+   * @param string $eName
+   * @param string $aName
+   */
   private function parseContent(HTMLPlus $doc, $eName, $aName) {
+    /** @var DOMElementPlus $e */
     foreach($doc->getElementsByTagName($eName) as $e) {
       $lastText = null;
       foreach($e->childNodes as $ch) {
@@ -154,6 +195,10 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  /**
+   * TODO add addCssFile to interface?
+   * @return HTMLPlus
+   */
   public function getContent() {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $content = $this->getHTMLPlus();
@@ -170,6 +215,11 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $content;
   }
 
+  /**
+   * @param string $dest
+   * @return string
+   * @throws Exception
+   */
   private function getFile($dest) {
     $f = $this->saveFromUrl($dest);
     if(!is_null($f)) return $f;
@@ -178,6 +228,11 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $dest;
   }
 
+  /**
+   * @param string $url
+   * @return string|null
+   * @throws Exception
+   */
   private function saveFromUrl($url) {
     $purl = parse_url($url);
     if($purl === false) throw new Exception(_("Unable to parse link"));
@@ -212,7 +267,12 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $filename;
   }
 
-  private function get_real_filename($headers, $url) {
+  /**
+   * @param array $headers
+   * @param string $url
+   * @return string
+   */
+  private function get_real_filename(Array $headers, $url) {
     foreach($headers as $header) {
       if(strpos(strtolower($header), 'content-disposition') !== false) {
         $tmp_name = explode('\'\'', $header);
@@ -227,6 +287,11 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     return basename($stripped_url);
   }
 
+  /**
+   * @param string $f
+   * @return DOMDocument
+   * @throws Exception
+   */
   private function transformFile($f) {
     $dom = new DOMDocument();
     $varFiles = array(
@@ -260,14 +325,22 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $this->transform("docx2html.xsl", $dom, $variables);
   }
 
+  /**
+   * @param string $xslFile
+   * @param DOMDocument $content
+   * @param array $vars
+   * @return DOMDocument
+   * @throws Exception
+   */
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
     try {
-      $xsl = $this->getXML($xslFile, false, false);
+      $xsl = XMLBuilder::build($xslFile, false);
     } catch(Exception $e) {
       throw new Exception(sprintf(_("Unable to load transformation file %s: %s"), $xslFile, $e->getMessage()));
     }
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
+    /** @noinspection PhpParamsInspection */
     $proc->setParameter('', $vars);
     $doc = $proc->transformToDoc($content);
     if($doc === false) throw new Exception(sprintf(_("Failed to apply transformation '%s'"), $xslFile));

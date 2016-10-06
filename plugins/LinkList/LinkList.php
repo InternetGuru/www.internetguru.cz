@@ -8,40 +8,65 @@ use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class LinkList
+ * @package IGCMS\Plugins
+ */
 class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
+  /**
+   * @var string
+   */
   private $cssClass;
 
+  /**
+   * LinkList constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $this->cssClass = strtolower($this->className);
     $s->setPriority($this, 200);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {}
 
+  /**
+   * @param HTMLPlus $content
+   * @return HTMLPlus
+   */
   public function modifyContent(HTMLPlus $content) {
     $sections = $content->documentElement->getElementsByTagName("section");
     if($content->documentElement->hasClass($this->cssClass)) {
       $this->createLinkList($content->documentElement);
       return $content;
     }
+    /** @var DOMElementPlus $s */
     foreach($sections as $s) {
       if(!$s->hasClass($this->cssClass)) continue;
       $this->createLinkList($s);
       break;
     }
+    return $content;
   }
 
+  /**
+   * @param DOMElementPlus $wrapper
+   */
   private function createLinkList(DOMElementPlus $wrapper) {
     $count = 1;
     $links = array();
     $linksArray = array();
     $list = $wrapper->ownerDocument->createElement("ol");
     foreach($wrapper->getElementsByTagName("a") as $l) { $links[] = $l; }
+    /** @var DOMElementPlus $l */
     foreach($links as $l) {
       if(!$l->hasAttribute("href")) continue;
       if(!isset($linksArray[$l->getAttribute("href")])
@@ -62,14 +87,21 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
     Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".$this->className.".css");
   }
 
+  /**
+   * @param DOMElementPlus $list
+   * @param DOMElementPlus $link
+   * @param int $i
+   * @return bool
+   */
   private function addLi(DOMElementPlus $list, DOMElementPlus $link, $i) {
     $href = $link->getAttribute("href");
     if(strpos($href, "#") === 0) return false; // local fragment
-    if(preg_match("/^\w+:/", $href)) return false; // external
+    if(preg_match('/^\w+:/', $href)) return false; // external
     if(preg_match("/".FILEPATH_PATTERN."$/", $href)) return false; // file
     $li = $list->ownerDocument->createElement("li");
     $list->appendChild($li);
-    $a = $li->appendChild($li->ownerDocument->createElement("a"));
+    $a = $li->ownerDocument->createElement("a");
+    $li->appendChild($a);
     if(is_null(HTMLPlusBuilder::getLinkToId($href))) {
       if(is_null(Cms::getLoggedUser())) return false; // nonexist local link
       $a->setAttribute("class", "invalid-local-link");

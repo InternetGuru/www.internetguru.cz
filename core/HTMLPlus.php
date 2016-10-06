@@ -11,6 +11,11 @@ use Exception;
  * Class HTMLPlus
  * @package IGCMS\Core
  *
+ * @property string $defaultAuthor
+ * @property string $defaultCtime
+ * @property string $defaultHeading
+ * @property string $defaultDesc
+ * @property string $defaultKw
  */
 class HTMLPlus extends DOMDocumentPlus {
   /**

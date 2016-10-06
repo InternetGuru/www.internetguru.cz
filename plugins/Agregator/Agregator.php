@@ -2,21 +2,35 @@
 
 namespace IGCMS\Plugins;
 use Exception;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class Agregator
+ * @package IGCMS\Plugins
+ */
 class Agregator extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $registered = array();  // filePath => fileInfo(?)
 
+  /**
+   * Agregator constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 2);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
@@ -29,14 +43,16 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
   private function createLists() {
-    $docListClass = "IGCMS\Plugins\Agregator\DocList";
-    $imgListClass = "IGCMS\Plugins\Agregator\ImgList";
+    $docListClass = "IGCMS\\Plugins\\Agregator\\DocList";
+    $imgListClass = "IGCMS\\Plugins\\Agregator\\ImgList";
     $listElements[$docListClass] = array();
     $listElements[$imgListClass] = array();
     foreach($this->getXML()->documentElement->childNodes as $child) {
       if($child->nodeType != XML_ELEMENT_NODE) continue;
+      /** @var DOMElementPlus $child */
+      $id = "n/a";
+      $listClass = $docListClass;
       try {
-        $listClass = $docListClass;
         switch($child->nodeName) {
           case "imglist":
           $listClass = $imgListClass;
@@ -59,6 +75,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  /**
+   * @return HTMLPlus|null
+   */
   public function getContent() {
     $file = HTMLPlusBuilder::getCurFile();
     if(is_null($file) || !array_key_exists($file, $this->registered)) return null;
@@ -67,6 +86,10 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $content;
   }
 
+  /**
+   * @param string $workingDir
+   * @param string|null $folder
+   */
   private function registerFiles($workingDir, $folder=null) {
     $cwd = "$workingDir/".$this->pluginDir."/$folder";
     if(!is_dir($cwd)) return;

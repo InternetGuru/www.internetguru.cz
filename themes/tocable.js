@@ -3,7 +3,7 @@
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
   if(!IGCMS.hasOwnProperty("Hideable")) throw "IGCMS.Hideable is not defined";
 
-  var Config = {}
+  var Config = {};
   Config.tocTitle = "Table of contents";
   Config.maxDepth = 2; // 0 for no limit
   Config.ns = "tocable";
@@ -24,7 +24,7 @@
           tocRoot = d[i];
           break;
         }
-        if(tocRoot == null) return false
+        if(tocRoot == null) return false;
         var div = document.createElement("p");
         div.className = "list";
         tocWrapper = document.createElement("dl");
@@ -45,8 +45,9 @@
         }
       },
       createTOC = function(i, ol) {
-        var currentLevel = hLevels[i];
-        for(i, len = hElements.length; i < len; i++) {
+        var currentLevel = hLevels[i],
+            len = hElements.length;
+        for(i; i < len; i++) {
           if(hLevels[i] < currentLevel) break;
 
           // add all current level headings
@@ -65,7 +66,7 @@
           createTOC(i+1, subOl);
           li.appendChild(subOl);
         }
-      }
+      };
 
       return {
         init : function(cfg) {

@@ -9,15 +9,28 @@ use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class DocInfo
+ * @package IGCMS\Plugins
+ */
 class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterface {
-
+  /**
+   * @var array
+   */
   private $vars = array();
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {}
 
+  /**
+   * @param HTMLPlus $content
+   */
   public function modifyContent(HTMLPlus $content) {
     $filePath = HTMLPlusBuilder::getCurFile();
     $id = HTMLPlusBuilder::getFileToId($filePath);
@@ -38,6 +51,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
    */
   private function insertDocInfo(HTMLPlus $doc, Array $globalInfo, $filePath) {
     $this->vars = array();
+    /** @var DOMElementPlus $var */
     foreach($this->getXML()->getElementsByTagName("var") as $var) {
       $this->vars[$var->getAttribute("id")] = $var;
     }
@@ -55,6 +69,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
         }
       }
       if(is_null($info)) return;
+      /** @var DOMElementPlus $info */
       $info = $doc->importNode($info, true);
       if(is_null($before)) {
         $section = $doc->getElementsByTagName("section")->item(0);
@@ -65,12 +80,21 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     }
   }
 
+  /**
+   * @param DOMElementPlus $set
+   * @return DOMDocumentPlus
+   */
   private function createDOM(DOMElementPlus $set) {
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($set, true));
     return $doc;
   }
 
+  /**
+   * @param array $globalInfo
+   * @param string $filePath
+   * @return DOMElementPlus
+   */
   private function createGlobalDocInfo(Array $globalInfo, $filePath) {
     $lists = array(
       "created" => $this->vars["created"],
@@ -94,6 +118,11 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     return $doc->documentElement;
   }
 
+  /**
+   * @param DOMElementPlus $h
+   * @param array $globalInfo
+   * @return DOMElementPlus|null
+   */
   private function createLocalDocInfo(DOMElementPlus $h, Array $globalInfo) {
     $doc = $this->createDOM($this->vars["partinfo"]);
     $vars = array();

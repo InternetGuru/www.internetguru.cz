@@ -15,17 +15,17 @@
   <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var> <!-- proměnná $summary-total -->
 
   <div id="basket-wrapper" var="status@class" modifyonly="modifyonly">
-    <a class="basket-button" var="title@title formpage@href"><span class="flaticon-shopping232" var="gotoorder"></span></a>
+    <a class="basket-button" var="title@title formpage@href"><span class="flaticon-shopping232" var="gotoorder"/></a>
   </div> <!-- proměnná empty, title -->
 
   <template id="basic">
     <form method="post" var="product-id@id action@action" class="product fillable validable validateform-notime">
       <dl>
-        <dt var="name-name"></dt>
-        <dd><span var="name"></span></dd>
-        <dt var="image-name"></dt>
+        <dt var="name-name"/>
+        <dd><span var="name"/></dd>
+        <dt var="image-name"/>
         <dd><span var="image"/></dd>
-        <dt var="price-name"></dt>
+        <dt var="price-name"/>
         <dd><span var="price"/> <span var="currency"/></dd>
         <dd>
           <ul>

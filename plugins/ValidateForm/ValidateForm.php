@@ -9,21 +9,48 @@ use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class ValidateForm
+ * @package IGCMS\Plugins
+ */
 class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
+  /**
+   * @var array
+   */
   private $labels = array();
+  /**
+   * @var string
+   */
   const CSS_WARNING = "validateform-warning";
+  /**
+   * @var string
+   */
   const FORM_ID = "validateform-id";
+  /**
+   * @var string
+   */
   const FORM_HP = "validateform-hp";
+  /**
+   * @var int
+   */
   const WAIT = 120;
 
+  /**
+   * ValidateForm constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 30);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if(!Cms::isActive()) {
       $subject->detach($this);
@@ -38,12 +65,18 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.$this->className.'.css');
   }
 
+  /**
+   * @param HTMLPlus $content
+   */
   public function modifyContent(HTMLPlus $content) {
     foreach($content->getElementsByTagName("form") as $form) {
       $this->modifyFormVars($form);
     }
   }
 
+  /**
+   * @param DOMElementPlus $form
+   */
   private function modifyFormVars(DOMElementPlus $form) {
     if(!$form->hasClass("validable")) return;
     try {
@@ -90,11 +123,19 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     Cms::setVariable($id, $items);
   }
 
+  /**
+   * @param array $request
+   * @return bool
+   */
   private function hpCheck($request) {
     return isset($request[self::FORM_HP]) && !strlen($request[self::FORM_HP]);
   }
 
+  /**
+   * @param DOMElementPlus $form
+   */
   private function getLabels(DOMElementPlus $form) {
+    /** @var DOMElementPlus $label */
     foreach($form->getElementsByTagName("label") as $label) {
       if($label->hasAttribute("for")) {
         $id = $label->getAttribute("for");
@@ -112,6 +153,10 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     }
   }
 
+  /**
+   * @param DOMElementPlus $e
+   * @param array $fields
+   */
   private function getFormFields(DOMElementPlus $e, Array &$fields) {
     foreach($e->childNodes as $child) {
       if($child->nodeType != XML_ELEMENT_NODE) continue;
@@ -120,6 +165,11 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     }
   }
 
+  /**
+   * @param DOMElementPlus $form
+   * @param array $request
+   * @return array|null
+   */
   private function verifyItems(DOMElementPlus $form, Array $request) {
     $isValid = true;
     $values = array();
@@ -147,7 +197,11 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     return $values;
   }
 
-  private function getWaitTime($form) {
+  /**
+   * @param DOMElementPlus $form
+   * @return int
+   */
+  private function getWaitTime(DOMElementPlus $form) {
     $time = self::WAIT;
     foreach(explode(" ", $form->getAttribute("class")) as $class) {
       if(strpos($class, "validateform-") !== 0) continue;
@@ -157,6 +211,10 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     return $time;
   }
 
+  /**
+   * @param int $time
+   * @throws Exception
+   */
   private function ipCheck($time) {
     if($time == 0) return;
     $IP = getIP();
@@ -176,10 +234,14 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     if(!touch($IPFilePath)) throw new Exception(_("Unable to create security file"));
   }
 
+  /**
+   * @param DOMElementPlus $e
+   * @param string $value
+   * @throws Exception
+   */
   private function verifyItem(DOMElementPlus $e, $value) {
     $pattern = $e->getAttribute("pattern");
     $req = $e->hasAttribute("required");
-    $id = $e->getAttribute("id");
     switch($e->nodeName) {
       case "textarea":
       $this->verifyText($value, $pattern, $req);
@@ -216,8 +278,14 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     }
   }
 
+  /**
+   * @param DOMElementPlus $select
+   * @param string $value
+   * @throws Exception
+   */
   private function verifySelect(DOMElementPlus $select, $value) {
     $match = false;
+    /** @var DOMElementPlus $option */
     foreach($select->getElementsByTagName("option") as $option) {
       $oVal = $option->hasAttribute("value") ? $option->getAttribute("value") : $option->nodeValue;
       if($oVal == $value) $match = true;
@@ -225,11 +293,23 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     if(!$match) throw new Exception(_("Select value does not match any option"));
   }
 
+  /**
+   * @param mixed $value
+   * @param int $min
+   * @param int $max
+   * @throws Exception
+   */
   private function verifyNumber($value, $min, $max) {
     if(strlen($min) && (int)$value < (int)$min) throw new Exception(_("Item value is lower then allowed minimum"));
     if(strlen($max) && (int)$value > (int)$max) throw new Exception(_("Item value is greater then allowed maximum"));
   }
 
+  /**
+   * @param mixed $value
+   * @param string $pattern
+   * @param bool $required
+   * @throws Exception
+   */
   private function verifyText($value, $pattern, $required) {
     if(is_null($value)) throw new Exception(_("Value missing"));
     if(!strlen(trim($value))) {
@@ -246,6 +326,11 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     throw new Exception(_("Item value does not match required pattern"));
   }
 
+  /**
+   * @param bool $checked
+   * @param bool $required
+   * @throws Exception
+   */
   private function verifyChecked($checked, $required) {
     if(!$required || $checked) return;
     throw new Exception(_("Item must be checked"));

@@ -6,39 +6,104 @@ use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use IGCMS\Core\TitleStrategyInterface;
 use IGCMS\Core\XMLBuilder;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class Admin
+ * @package IGCMS\Plugins
+ */
 class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, TitleStrategyInterface {
+  /**
+   * @var int
+   */
   const STATUS_NEW = 0;
+  /**
+   * @var int
+   */
   const STATUS_ENABLED = 1;
+  /**
+   * @var int
+   */
   const STATUS_DISABLED = 2;
+  /**
+   * @var int
+   */
   const STATUS_INVALID = 3;
+  /**
+   * @var string
+   */
   const FILE_DISABLE = "disable";
+  /**
+   * @var string
+   */
   const FILE_ENABLE = "enable";
-  private $content = null;
+  /**
+   * @var string
+   */
   private $contentValue = "";
+  /**
+   * @var string|null
+   */
   private $scheme = null;
+  /**
+   * @var string
+   */
   private $type = "txt";
+  /**
+   * @var string|null
+   */
   private $title = null;
+  /**
+   * @var bool
+   */
   private $redir = false;
+  /**
+   * @var bool
+   */
   private $replace = true;
-  private $error = false;
+  /**
+   * @var string|null
+   */
   private $dataFile = null;
+  /**
+   * @var string|null
+   */
   private $destFile = null;
+  /**
+   * @var string|null
+   */
   private $dataFileDisabled = null;
+  /**
+   * @var int
+   */
   private $dataFileStatus;
+  /**
+   * @var string|null
+   */
   private $defaultFile = null;
+  /**
+   * @var array
+   */
   private $dataFileStatuses;
+  /**
+   * @var bool
+   */
   private $contentChanged = false;
 
+  /**
+   * Admin constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 2);
@@ -47,6 +112,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->dataFileStatus = self::STATUS_NEW;
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     switch($subject->getStatus()) {
       case STATUS_INIT:
@@ -103,7 +171,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         if($value instanceof \DOMDocument) $value = $value->documentElement;
         if($value instanceof \DOMElement) $value = $value->nodeValue;
         if(is_string($value)) {
-          $value = preg_replace("/^\s*/m", "", $value);
+          $value = preg_replace('/^\s*/m', "", $value);
           break;
         }
         $dd->nodeValue = get_class($value);
@@ -117,6 +185,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     Cms::setVariable("varlist", $varListVar);
   }
 
+  /**
+   * @return string|null
+   */
   public function getTitle() {
     return $this->title;
   }
@@ -140,6 +211,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     if(file_exists($this->dataFileDisabled)) $this->dataFileStatus = self::STATUS_DISABLED;
   }
 
+  /**
+   * @throws Exception
+   */
   private function process() {
     $this->setDefaultFile();
     $this->initDataFiles();
@@ -164,6 +238,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
   }
 
+  /**
+   * @throws Exception
+   */
   private function enableDataFile() {
     if(!is_file($this->dataFileDisabled)) throw new Exception("Cannot enable active file");
     if(is_file($this->dataFile)) $status = unlink($this->dataFileDisabled);
@@ -171,6 +248,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     if(!$status) throw new Exception(_("Failed to enable file"));
   }
 
+  /**
+   * @throws Exception
+   */
   private function disableDataFile() {
     if(is_file($this->dataFileDisabled)) throw new Exception("Cannot disable inactive file");
     if(!touch($this->dataFileDisabled)) throw new Exception(_("Failed to disable file"));
@@ -208,11 +288,19 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
   }
 
+  /**
+   * @return bool
+   */
   private function isPost() {
     return isset($_POST["content"], $_POST["userfilehash"], $_POST["filename"]);
   }
 
-  private function getFilesRecursive($folder, $prefix = "") {
+  /**
+   * @param string $folder
+   * @param string $prefix
+   * @return array
+   */
+  private function getFilesRecursive($folder, $prefix="") {
     $files = array();
     foreach(scandir($folder) as $f) {
       if($f == "." || $f == "..") continue;
@@ -228,6 +316,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     return $files;
   }
 
+  /**
+   * @return DOMElementPlus
+   */
   private function createFilepicker() {
     $paths = array(
       USER_FOLDER => "",
@@ -255,6 +346,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     return $var;
   }
 
+  /**
+   * TODO addJsFile & addJs to interface?
+   * @return HTMLPlus
+   */
   public function getContent() {
     Cms::getOutputStrategy()->addJsFile($this->pluginDir.'/Admin.js', 100, "body");
     Cms::getOutputStrategy()->addJs("
@@ -334,11 +429,18 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     return $content;
   }
 
+  /**
+   * @return string
+   */
   private function getDataFileHash() {
     if(is_file($this->dataFile)) return getFileHash($this->dataFile);
     return getFileHash($this->dataFileDisabled);
   }
 
+  /**
+   * @param string $user
+   * @return string|null
+   */
   private function showContent($user) {
     if(is_null($this->defaultFile)) return null;
     try {
@@ -353,6 +455,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     return $doc->saveXML();
   }
 
+  /**
+   * @param string $data
+   * @return string
+   */
   private function getHash($data) {
     return hash(FILE_HASH_ALGO, $data);
   }
@@ -383,6 +489,11 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
   }
 
+  /**
+   * @param string $f
+   * @return string
+   * @throws Exception
+   */
   private function getFilepath($f) {
     if(!strlen($f)) {
       if(getCurLink() == "") return INDEX_HTML;
@@ -391,7 +502,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return INDEX_HTML;
     }
     $f = stripDataFolder($f);
-    if(preg_match("~^[\w-]+$~", $f)) {
+    if(preg_match('~^[\w-]+$~', $f)) {
       $pluginFile = PLUGINS_DIR."/$f/$f.xml";
       if(is_file(CMS_FOLDER."/$pluginFile")) return $pluginFile;
     }
@@ -406,10 +517,17 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     return $f;
   }
 
+  /**
+   * @param string $type
+   * @return bool
+   */
   private function isResource($type) {
     return !in_array($type, array("xml", "xsl", "html"));
   }
 
+  /**
+   * @throws Exception
+   */
   private function processXml() {
     // get default schema
     try {
@@ -440,7 +558,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         $doc = new HTMLPlus();
         $doc->defaultAuthor = Cms::getVariable("cms-author");
       } else $doc = new DOMDocumentPlus();
-      $doc->loadXml($this->contentValue);
+      $doc->loadXML($this->contentValue);
     }
     $repair = $this->isPost() && isset($_POST["repair"]);
     try {
@@ -460,11 +578,17 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->validateXml($doc);
   }
 
+  /**
+   * @return bool
+   */
   private function getContentChanged() {
     $post_rn = str_replace("\n", "\r\n", $this->contentValue);
     return !in_array($_POST["userfilehash"], array($this->getHash($this->contentValue), $this->getHash($post_rn)));
   }
 
+  /**
+   * @throws Exception
+   */
   private function setContent() {
     $f = $this->dataFile;
     if(!file_exists($f)) {
@@ -475,6 +599,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       throw new Exception(sprintf(_("Unable to get contents from '%s'"), $this->dataFile));
   }
 
+  /**
+   * @throws Exception
+   */
   private function savePost() {
     mkdir_plus(dirname($this->destFile));
     $fp = lock_file($this->destFile);
@@ -503,6 +630,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
   }
 
+  /**
+   * @param DOMDocumentPlus $doc
+   * @throws Exception
+   */
   private function validateXml(DOMDocumentPlus $doc) {
     if(is_null($this->scheme)) return;
     switch(pathinfo($this->scheme, PATHINFO_EXTENSION)) {
@@ -514,18 +645,24 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
   }
 
+  /**
+   * @param string $f
+   * @return string|null
+   * @throws Exception
+   */
   private function getScheme($f) {
     $h = fopen($f, "r");
     fgets($h); // skip first line
     $line = str_replace("'", '"', fgets($h));
     fclose($h);
-    if(!preg_match('<\?xml-model href="([^"]+)" ?\?>', $line, $m)) return;
+    $scheme = null;
+    if(!preg_match('<\?xml-model href="([^"]+)" ?\?>', $line, $m)) return $scheme;
     try {
-      $schema = findFile($m[1], false, false);
+      $scheme = findFile($m[1], false, false);
     } catch(Exception $e) {
-      throw new Exception(sprintf(_("Schema file '%s' not found"), $schema));
+      throw new Exception(sprintf(_("Schema file '%s' not found"), $scheme));
     }
-    return $schema;
+    return $scheme;
   }
 
 }

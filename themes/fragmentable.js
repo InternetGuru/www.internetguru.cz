@@ -3,7 +3,7 @@
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
 
-  Config = {};
+  var Config = {};
   Config.ns = "fragmentable";
 
   var Fragmentable = function() {
@@ -28,7 +28,7 @@
         return;
       }
       window.history.replaceState("", "", "#"+h.id);
-    }
+    };
 
     return {
       /**
@@ -42,7 +42,7 @@
       }
     }
 
-  }
+  };
 
   win.IGCMS.Fragmentable = new Fragmentable();
 

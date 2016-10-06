@@ -2,7 +2,7 @@
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  var Config = {}
+  var Config = {};
   Config.initClass = "filterable";
   Config.classPrefix = "filterable-";
   Config.close = "✕";
@@ -12,14 +12,13 @@
 
   var Filterable = function() {
     var
-    that = this,
     initFilters = function() {
       var dls = document.querySelectorAll("dl." + Config.initClass);
       for(var i = 0; i < dls.length; i++) {
         var fDl = new FilterableDl(dls[i]);
         fDl.init();
       }
-    }
+    };
     return {
       init : function(cfg) {
         IGCMS.initCfg(Config,cfg);
@@ -39,9 +38,9 @@
         initFilters();
       }
     }
-  }
+  };
 
-  FilterableDl = function(dl) {
+  var FilterableDl = function(dl) {
     var
     that = this,
     filterButton = null,
@@ -325,7 +324,7 @@
       a.appendChild(info);
       if(!(kwn in tags)) tags[kwn] = [];
       return {tag: a, info: info, size: 1, dd: dd};
-    }
+    },
     loadKws = function() {
       wrapper.classList.add(Config.classPrefix+"on");
       wrapper.classList.remove(Config.classPrefix+"off");
@@ -337,7 +336,7 @@
         }
         dds[i].className = Config.classPrefix+"row";
         dds[i].innerHTML = "";
-        kwsObjects = [];
+        var kwsObjects = [];
         var vals = [];
         for(var j = 0; j < kws.length; j++) {
           var kwn = normalize(kws[j]);
@@ -416,7 +415,7 @@
       filterButton.textContent = active ? Config.clearFilter : Config.disableFilter;
       filterButton.className = Config.classPrefix+"toggle "+Config.classPrefix+ (active ? "clear" : "disable");
     },
-    toggleFilterButton = function(e) {
+    toggleFilterButton = function() {
       var options = { 'hitType': 'event', 'eventCategory': 'filterable', 'eventAction': 'filter button', 'eventLabel': filterButton.textContent };
       sendGAEvent(options);
       switch(filterButton.textContent) {
@@ -440,12 +439,12 @@
       var dds = wrapper.getElementsByTagName("dd");
       for(var i = 0; i < dds.length; i++) { dds[i].className = Config.classPrefix+"row" }
       var dts = wrapper.getElementsByTagName("dt");
-      for(var i = 0; i < dts.length; i++) { dts[i].className = "" }
+      for(i = 0; i < dts.length; i++) { dts[i].className = "" }
       for(var kw in tags) {
-        if(tags[kw].length > 1) for(i in tags[kw]) {
-          if(typeof tags[kw][i] !== "object") continue;
-          deactivate(tags[kw][i].tag);
-          tags[kw][i].info.textContent = tags[kw][i].size + "×";
+        if(tags[kw].length > 1) for(var item in tags[kw]) {
+          if(typeof tags[kw][item] !== "object") continue;
+          deactivate(tags[kw][item].tag);
+          tags[kw][item].info.textContent = tags[kw][item].size + "×";
         }
       }
     },
@@ -521,16 +520,16 @@
       }
       for(var kw in tags) {
         if(kw != value) continue;
-        for(var i = 0; i < tags[kw]. length; i++) {
+        for(i = 0; i < tags[kw]. length; i++) {
           activate(tags[kw][i].tag);
           tags[kw][i].info.textContent = Config.close;
         }
       }
     },
-    filterHash = function(e) {
+    filterHash = function() {
       var hash = normalize(window.location.hash ? window.location.hash.substring(1) : "");
       doFilter(hash);
-    }
+    };
     return {
       init : function() {
         if(typeof ga == "function" || Config.debug) events = true;
@@ -539,7 +538,7 @@
         win.addEventListener("popstate", filterHash, false);
       }
     }
-  }
+  };
 
   IGCMS.Filterable = new Filterable();
 

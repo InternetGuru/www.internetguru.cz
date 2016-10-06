@@ -15,9 +15,22 @@ use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class ContentBalancer
+ * @package IGCMS\Plugins
+ */
 class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrategyInterface {
+  /**
+   * @var array
+   */
   private $tree = array();
+  /**
+   * @var array
+   */
   private $sets = array();
+  /**
+   * @var string|null
+   */
   private $defaultSet = null;
 
   /**
@@ -67,6 +80,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     HTMLPlusBuilder::setIdToLink($idToLink);
   }
 
+  /**
+   * @param HTMLPlus $content
+   * @return HTMLPlus
+   */
   public function modifyContent(HTMLPlus $content) {
     // set vars
     $this->createVars();
@@ -88,6 +105,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $this->balance($content, $h1id);
   }
 
+  /**
+   * @param HTMLPlus $content
+   * @return HTMLPlus
+   */
   private function strip(HTMLPlus $content) {
     $link = basename(getCurLink());
     if($this->isRoot($link)) return $content;
@@ -114,6 +135,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     return $content;
   }
 
+  /**
+   * @param DOMElementPlus $e
+   * @return array
+   */
   private function getUntilSame(DOMElementPlus $e) {
     $elements = array($e);
     $untilName = $e->nodeName;
@@ -124,11 +149,20 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     return $elements;
   }
 
+  /**
+   * @param string $link
+   * @return bool
+   */
   private function isRoot($link) {
     if($link == "") return true;
     return array_key_exists($link, HTMLPlusBuilder::getIdToLink());
   }
 
+  /**
+   * @param DOMElementPlus $e
+   * @param string $aName
+   * @param bool $anyElement
+   */
   private function handleAttribute(DOMElementPlus $e, $aName, $anyElement=false) {
     if($e->hasAttribute($aName)) return;
     $eName = $anyElement ? null : $e->nodeName;
@@ -158,6 +192,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
   }
 
+  /**
+   * @param HTMLPlus $content
+   * @param string $h1id
+   */
   private function balance(HTMLPlus $content, $h1id) {
     if(!array_key_exists($h1id, $this->tree)) return;
     foreach($this->tree[$h1id] as $h2id) {
@@ -171,6 +209,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
   }
 
+  /**
+   * @param DOMElementPlus $section
+   * @param array $h3ids
+   */
   private function balanceHeading(DOMElementPlus $section, $h3ids) {
     $setId = null;
     foreach(explode(" ", $section->getAttribute("class")) as $c) {
@@ -198,6 +240,11 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $section->parentNode->replaceChild($wrapper, $section);
   }
 
+  /**
+   * @param array $vars
+   * @param DOMElementPlus $set
+   * @return DOMElementPlus
+   */
   private function createDOMElement(Array $vars, DOMElementPlus $set) {
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($set, true));
@@ -205,6 +252,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     return $doc->documentElement;
   }
 
+  /**
+   * @param string $id
+   * @return array
+   */
   private function getVariables($id) {
     $vars = array();
     $vars['heading'] = HTMLPlusBuilder::getIdToHeading($id);

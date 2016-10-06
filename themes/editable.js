@@ -2,7 +2,7 @@
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  var Config = {}
+  var Config = {};
   Config.change = "* ";
   Config.favicon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAfwAAAH8BuLbMiQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADVSURBVDiNldM9TsNAEIbhBxrKSEhOcgkuQcPF0iNOkCZniGgiUVKkyo9dcIOcIFRDwTpyFttsRhpZWu/7fjvWWkQobVTY4OmydiO8Q+DUSm4RLBMcXUlp8gKP+MwkmxJ4nzavMskO1Rg8xSFLbCVLVIPfYABue3G1twee4TgA79vkXsE/8CGHrwSYox6Bp73jJniCZgA+DsER4d5vnfHub9V4johTz7tLPWCbRnjtJNeYFVw0LwloOpIG88Ir7q2Tuk0nmpT+I3dY4ys9PyLie2zevH4AVeK3Am/wPTAAAAAASUVORK5CYII=";
   Config.unload_msg = "Form content has been changed.";
@@ -36,8 +36,8 @@
     indicateChange = function() {
       var elements = document.getElementsByTagName("textarea");
       for(var i = 0; i < elements.length; i++) setInputEvent(elements[i]);
-      var elements = document.getElementsByTagName("input")
-      for(var i = 0; i < elements.length; i++) setInputEvent(elements[i]);
+      elements = document.getElementsByTagName("input");
+      for(i = 0; i < elements.length; i++) setInputEvent(elements[i]);
     },
     setInputEvent = function(e) {
       if(e.nodeName.toLowerCase() == "input" && e.type != "text") return;
@@ -67,7 +67,7 @@
         document.getElementsByTagName('head')[0].appendChild(link);
       }
       link.href = Config.favicon;
-    }
+    };
     // public
     return {
       getParentForm : getParentForm,
