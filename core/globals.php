@@ -135,7 +135,8 @@ function buildLocalUrl(Array $pLink, $ignoreCyclic=false, $addPermParam=true) {
   if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
   else $pLink["path"] = ROOT_URL.$path;
   #if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  if(SCRIPT_NAME == "index.php") return implodeLink($pLink);
+  if(SCRIPT_NAME == "index.php" || strpos($path, FILES_DIR) === 0)
+    return implodeLink($pLink);
   $pLink["path"] = ROOT_URL.SCRIPT_NAME;
   if($cyclic) $pLink["path"] = "";
   $query = array();

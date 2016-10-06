@@ -203,6 +203,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         global $plugins;
         foreach($plugins->getIsInterface("IGCMS\Core\ResourceInterface") as $ri) {
           if(!$ri::isSupportedRequest($pLink["path"])) continue;
+
           $getLink = false;
           break;
         }
