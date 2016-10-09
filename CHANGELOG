@@ -1,3 +1,25 @@
+HTML+: odstranění atributu link z elementu h (odkaz se vytváří z atributu id)
+HTML+: element include je nahrazen atributem src v elementu h
+ContentBalancer: automatické zalamování obsahu (minimálně dva podnadpisy)
+Agregátor: nové atributy pro vytváření sestav (path, kw, limit a skip)
+Agregátor: žádné výchozí sestavy
+Agregátor: rozdělení sestav na doclist a imglist
+Core: zobrazí poslední známý obsah, pokud je aktuální obsah nevalidní
+Core: sjednocení stejných chybových hlášení
+ContentLink: rozšíření rozděleno na ContentBalancer, GlobalMenu a BreadCrumb a zrušeno
+GlobalMenu: nové rozšíření pro generování globální navigace (proměnná globalmenu)
+BreadCrumb: nové rozšíření pro generování drobečkové navigace (proměnná breadcrumb)
+DocInfo: nový plugin pro zobrazení metainformací souboru
+LinkList: vytváří globální proměnnou linklist
+UrlHandler: přidán element rewrite pro modifikaci URL
+HtmlOutput: automatické doplnění atributu lang k lokálním odkazům
+ContactForm: pokud je zpráva k formuláři uvedená jako prázdná, použije se výchozí
+ContactForm: přidání výchozí třídy editable
+Admin: přidána zkratka Ctrl+P pro otevření Volby souboru
+Admin: zobrazení dostupných proměnných a jejich hodnot
+EmailBreaker: podpora inline elementů uvnitř odkazu
+editable.js: editace formuláře mění favicon
+InputVar: oprava překladu data do češtiny
 
 1.13 | 2016-09-01
 
