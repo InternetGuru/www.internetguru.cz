@@ -1,7 +1,7 @@
 (function(win) {
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
-  if(IGCMS.Hideable) throw "IGCMS.Hideable is not defined";
+  if(!IGCMS.hasOwnProperty("Hideable")) throw "IGCMS.Hideable is not defined";
 
   var Config = {}
   Config.tocTitle = "Table of contents";
@@ -90,7 +90,7 @@
           + 'dl.toc ol {counter-reset: item; list-style: none; }'
           + 'dl.toc ol > li {margin-left: 1em; }'
           + 'dl.toc ol > li:before {content: counters(item, ".") " "; counter-increment: item; }';
-          IGCMS.appendStyle();
+          IGCMS.appendStyle(css);
         }
       }
    };
