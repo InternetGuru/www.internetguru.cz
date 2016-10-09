@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -11,18 +11,16 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
-class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface {
+class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $usrFiles;
   private $sysFiles;
   private $emlFiles;
   private $curFilePath;
   private $curFileName;
-  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
-    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {
@@ -35,7 +33,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $this->histFiles = array(CMS_CHANGELOG_FILENAME => CMS_FOLDER."/".CMS_CHANGELOG_FILENAME);
   }
 
-  public function getContent(HTMLPlus $content) {
+  public function getContent() {
     $fName = $_GET[$this->className];
     try {
       $fPath = $this->getCurFilePath($fName);
@@ -43,7 +41,7 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     } catch(Exception $e) {
       Logger::user_warning($e->getMessage());
     }
-    $newContent = $this->getHTMLPlus();
+    $content = $this->getHTMLPlus();
     $vars["cur_file"] = $fName;
     $usrFiles = $this->makeLink($this->usrFiles);
     $vars["usr_files"] = empty($usrFiles) ? null : $usrFiles;
@@ -52,8 +50,8 @@ class LogViewer extends Plugin implements SplObserver, ContentStrategyInterface 
     $emlFiles = $this->makeLink($this->emlFiles);
     $vars["eml_files"] = empty($emlFiles) ? null : $emlFiles;
     $vars["history_file"] = $this->makeLink($this->histFiles);
-    $newContent->processVariables($vars);
-    return $newContent;
+    $content->processVariables($vars);
+    return $content;
   }
 
   private function getCurFilePath($fName) {

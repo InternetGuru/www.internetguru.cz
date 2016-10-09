@@ -4,32 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "38d26453e5632353020937475c5529eb",
-    "content-hash": "1db737bf65dbd36cf9c5087ce2317d71",
+    "hash": "d0749c82bc1d7528aa73338d688b38c7",
+    "content-hash": "5320d5b14cd821578c14f91d8521744c",
     "packages": [
         {
-            "name": "InternetGuru/CodeMirror",
-            "version": "dev-ig",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/InternetGuru/CodeMirror",
-                "reference": "ig"
-            },
-            "type": "library",
-            "time": "2016-02-11 15:17:27"
-        },
-        {
             "name": "components/highlightjs",
-            "version": "9.1.0",
+            "version": "9.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/components/highlightjs.git",
-                "reference": "08edd75426b52b165cc2b8a569870df4794c36dc"
+                "reference": "08d860a08b885d78975076cf3f9fb165ed9ff253"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/components/highlightjs/zipball/08edd75426b52b165cc2b8a569870df4794c36dc",
-                "reference": "08edd75426b52b165cc2b8a569870df4794c36dc",
+                "url": "https://api.github.com/repos/components/highlightjs/zipball/08d860a08b885d78975076cf3f9fb165ed9ff253",
+                "reference": "08d860a08b885d78975076cf3f9fb165ed9ff253",
                 "shasum": ""
             },
             "type": "component",
@@ -58,20 +47,46 @@
                 }
             ],
             "description": "Highlight.js highlights syntax in code examples on blogs, forums and in fact on any web pages.",
-            "time": "2016-01-16 07:21:12"
+            "time": "2016-03-05 17:39:56"
         },
         {
-            "name": "monolog/monolog",
-            "version": "1.18.0",
+            "name": "internetguru/codemirror",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "e19b764b5c855580e8ffa7e615f72c10fd2f99cc"
+                "url": "https://github.com/InternetGuru/CodeMirror.git",
+                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/e19b764b5c855580e8ffa7e615f72c10fd2f99cc",
-                "reference": "e19b764b5c855580e8ffa7e615f72c10fd2f99cc",
+                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/f86367959bc16be6c9acc57af4eedac6d4925a9f",
+                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f",
+                "shasum": ""
+            },
+            "type": "library",
+            "authors": [
+                {
+                    "name": "petrzpav",
+                    "email": "pavel@petrzela.eu"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.1.4"
+            },
+            "time": "2016-06-06 18:56:07"
+        },
+        {
+            "name": "monolog/monolog",
+            "version": "1.19.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/monolog.git",
+                "reference": "5f56ed5212dc509c8dc8caeba2715732abb32dbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/5f56ed5212dc509c8dc8caeba2715732abb32dbf",
+                "reference": "5f56ed5212dc509c8dc8caeba2715732abb32dbf",
                 "shasum": ""
             },
             "require": {
@@ -86,13 +101,13 @@
                 "doctrine/couchdb": "~1.0@dev",
                 "graylog2/gelf-php": "~1.0",
                 "jakub-onderka/php-parallel-lint": "0.9",
+                "php-amqplib/php-amqplib": "~2.4",
                 "php-console/php-console": "^3.1.3",
                 "phpunit/phpunit": "~4.5",
                 "phpunit/phpunit-mock-objects": "2.3.0",
                 "raven/raven": "^0.13",
                 "ruflin/elastica": ">=0.90 <3.0",
-                "swiftmailer/swiftmailer": "~5.3",
-                "videlalvaro/php-amqplib": "~2.4"
+                "swiftmailer/swiftmailer": "~5.3"
             },
             "suggest": {
                 "aws/aws-sdk-php": "Allow sending log messages to AWS services like DynamoDB",
@@ -101,11 +116,11 @@
                 "ext-mongo": "Allow sending log messages to a MongoDB server",
                 "graylog2/gelf-php": "Allow sending log messages to a GrayLog2 server",
                 "mongodb/mongodb": "Allow sending log messages to a MongoDB server via PHP Driver",
+                "php-amqplib/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib",
                 "php-console/php-console": "Allow sending log messages to Google Chrome",
                 "raven/raven": "Allow sending log messages to a Sentry server",
                 "rollbar/rollbar": "Allow sending log messages to Rollbar",
-                "ruflin/elastica": "Allow sending log messages to an Elastic Search server",
-                "videlalvaro/php-amqplib": "Allow sending log messages to an AMQP server using php-amqplib"
+                "ruflin/elastica": "Allow sending log messages to an Elastic Search server"
             },
             "type": "library",
             "extra": {
@@ -136,7 +151,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-03-01 18:00:40"
+            "time": "2016-04-12 18:29:35"
         },
         {
             "name": "phpmailer/phpmailer",

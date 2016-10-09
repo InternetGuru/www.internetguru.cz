@@ -38,8 +38,8 @@ form dt, form dt+dd+dd {
   clear:left;
 }
 
-form dd > input[type="text"],
-form dd > input[type="email"] {
+form input[type="text"],
+form input[type="email"] {
   border-top: none;
   border-right: none;
   border-left: none;

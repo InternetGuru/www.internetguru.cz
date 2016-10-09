@@ -6,6 +6,7 @@ use Exception;
 use SplObserver;
 use SplSubject;
 
+# TODO: to static
 class Plugins implements SplSubject {
   private $status = null;
   private $observers = array(); // list of enabled observer (names => Observer)

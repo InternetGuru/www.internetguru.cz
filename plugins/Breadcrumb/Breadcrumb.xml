@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentLink>
+<Breadcrumb>
   <var id="reset" modifyonly="modifionly">Resetovat parametry</var>
   <!-- <var id="logo" type="image/png">logo.png</var> -->
-</ContentLink>
+</Breadcrumb>

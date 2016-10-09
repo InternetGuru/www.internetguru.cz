@@ -7,6 +7,7 @@ use IGCMS\Core\Logger;
 session_cache_limiter("");
 
 define("INDEX_HTML", "index.html");
+define("FINDEX_PHP", "findex.php");
 define("INOTIFY", ".inotify");
 define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
 define("PLUGINS_DIR", "plugins");
@@ -37,7 +38,7 @@ define("FILE_LOCK_WAIT_SEC", 4);
 define('W3C_DATETIME_PATTERN', "(19|20)\d\d(-(0[1-9]|1[012])(-(0[1-9]|[12]\d|3[01])(T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00)?)?)?");
 define('EMAIL_PATTERN', "([_a-zA-Z0-9-]+(?:\.[_a-zA-Z0-9-]+)*)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)\.([a-zA-Z]{2,})");
 define('SUBDOM_PATTERN', "[a-z][a-z0-9]*");
-define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z0-9_]+');
+define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z0-9_-]+');
 #define('FILEPATH_PATTERN', "(?:[a-zA-Z0-9_-][a-zA-Z0-9._-]*\/)*[a-zA-Z0-9_-][a-zA-Z0-9._-]*\.[a-zA-Z0-9]{2,4}");
 define('FILEPATH_PATTERN', "(?:[.a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}");
 define('FILE_HASH_ALGO', 'crc32b');
@@ -78,13 +79,7 @@ if(IS_LOCALHOST) {
   define("CMS_ROOT_FOLDER", WWW_FOLDER."/".CMS_DIR);
   define("CMS_FOLDER", CMS_ROOT_FOLDER."/".CMS_RELEASE);
   define("CMSRES_FOLDER", WWW_FOLDER."/".CMSRES_DIR."/".CMS_RELEASE);
-  $userId = null;
-  foreach(scandir(getcwd()) as $f) {
-    $varName = substr($f, 0, 6);
-    if($varName != "ADMIN.") continue; // eg. ADMIN.ig1
-    $userId = substr($f, 6);
-  }
-  define('ADMIN_ID', $userId);
+  define('ADMIN_ID', is_file("ADMIN") ? trim(file_get_contents("ADMIN")) : null);
   define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
   define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
   define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);
@@ -104,7 +99,7 @@ define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
 define('CMS_VERSION_FILENAME', "VERSION");
 define('CMS_CHANGELOG_FILENAME', "CHANGELOG");
 define('CMS_VERSION', trim(file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME)));
-define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MODE" : ""));
+define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG" : ""));
 #print_r(get_defined_constants(true)); die();
 #todo: date_default_timezone_set()
 #todo: localize lang
@@ -112,6 +107,8 @@ define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG_MOD
 if(CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
+  setlocale(LC_ALL, "en_US.UTF-8");
+  putenv("LANG=en_US.UTF-8"); // for gettext
 } else {
   #if(!IS_LOCALHOST)
   setlocale(LC_ALL, "cs_CZ.UTF-8");
@@ -124,7 +121,9 @@ if(CMS_DEBUG) {
 define('METHOD_NA', _("Method %s is no longer available"));
 if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
 require_once(CORE_FOLDER.'/globals.php');
-if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)) {
+if(isset($_GET["login"]) && SCHEME == "http") loginRedir();
+if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
+  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)) {
   redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
 initDirs();

@@ -3,7 +3,8 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use Exception;
@@ -13,6 +14,7 @@ use SplSubject;
 class UrlHandler extends Plugin implements SplObserver {
   const DEBUG = false;
   private $cfg = null;
+  private $newReg = array();
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
@@ -21,8 +23,7 @@ class UrlHandler extends Plugin implements SplObserver {
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
-    if($this->detachIfNotAttached(array("HtmlOutput", "ContentLink"))) return;
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     if(!IS_LOCALHOST) $this->httpsRedir();
     $this->cfgRedir();
     if(getCurLink() == "") {
@@ -33,52 +34,58 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function httpsRedir() {
-    $https = true;
-    $urlMatch = false;
-    foreach($this->cfg->documentElement->childNodes as $redir) {
-      if($redir->nodeName != "https") continue;
-      $https = false;
-      $urlMatch = true;
-      $pRedir = parseLocalLink($redir->nodeValue);
-      if(isset($pRedir["path"]) && $pRedir["path"] != getCurLink()) $urlMatch = false;
-      if(isset($pRedir["query"]) && $pRedir["query"] != getCurQuery()) $urlMatch = false;
-      if($urlMatch) break;
-    }
-    Cms::setVariable("default_protocol", ($https ? "https" : "http"));
-    if(SCHEME == "https") {
-      if(is_null(Cms::getLoggedUser()) && !$urlMatch && !$https) {
-        redirTo("http://".HOST.$_SERVER["REQUEST_URI"]);
-      }
-     return;
-    }
-    if($urlMatch || $https) redirTo("https://".HOST.$_SERVER["REQUEST_URI"]);
+    $protocol = $this->cfg->getElementById("protocol", "var")->nodeValue;
+    Cms::setVariable("default_protocol", $protocol);
+    if(SCHEME == $protocol) return;
+    if(SCHEME == "https" && !is_null(Cms::getLoggedUser())) return;
+    redirTo("$protocol://".HOST.$_SERVER["REQUEST_URI"]);
   }
 
   private function cfgRedir() {
-    foreach($this->cfg->documentElement->childNodes as $redir) {
-      if($redir->nodeName != "redir") continue;
-      if($redir->hasAttribute("link") && $redir->getAttribute("link") != getCurLink()) continue;
-      $pNam = $redir->hasAttribute("parName") ? $redir->getAttribute("parName") : null;
-      $pVal = $redir->hasAttribute("parValue") ? $redir->getAttribute("parValue") : null;
-      if(!$this->queryMatch($pNam, $pVal)) continue;
-      try {
-        if($redir->nodeValue == "/" || $redir->nodeValue == "") redirTo(array("path" => ""));
-        $pLink = parseLocalLink($redir->nodeValue);
-        if(is_null($pLink)) redirTo($redir->nodeValue); // external redir
-        $silent = !isset($pLink["path"]);
-        if($silent) $pLink["path"] = getCurLink(); // no path = keep current path
-        if(strpos($redir->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
-        #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
-        try {
-          $pLink = DOMBuilder::normalizeLink($pLink);
-          #todo: configurable status code
-          redirTo(buildLocalUrl($pLink));
-        } catch(Exception $e) {
-          if(!$silent) throw $e;
-        }
-      } catch(Exception $e) {
-        Logger::user_warning(sprintf(_("Unable to redir to %s: %s"), implodeLink($pLink), $e->getMessage()));
+    $this->newReg = HTMLPlusBuilder::getIdToLink();
+    foreach($this->cfg->documentElement->childNodes as $e) {
+      switch ($e->nodeName) {
+        case 'redir':
+        case 'rewrite':
+        $this->{$e->nodeName}($e);
+        break;
+        default: continue;
       }
+    }
+    if(!empty($this->newReg)) HTMLPlusBuilder::setIdToLink($this->newReg);
+  }
+
+  private function rewrite(DOMElementPlus $rewrite) {
+    $match = $rewrite->getRequiredAttribute("match");
+    foreach($this->newReg as $id => $link) {
+      if(strpos($link, $match) === false) continue;
+      $this->newReg[$id] = str_replace($match, $rewrite->nodeValue, $link);
+    }
+  }
+
+  private function redir(DOMElementPlus $redir) {
+    if($redir->hasAttribute("link") && $redir->getAttribute("link") != getCurLink()) return;
+    $pNam = $redir->hasAttribute("parName") ? $redir->getAttribute("parName") : null;
+    $pVal = $redir->hasAttribute("parValue") ? $redir->getAttribute("parValue") : null;
+    if(!$this->queryMatch($pNam, $pVal)) return;
+    try {
+      if($redir->nodeValue == "/") redirTo(array("path" => ""));
+      $pLink = parseLocalLink($redir->nodeValue);
+      if(is_null($pLink)) redirTo($redir->nodeValue); // external redir
+      $silent = !isset($pLink["path"]);
+      if($silent) $pLink["path"] = getCurLink(); // no path = keep current path
+      if(strpos($redir->nodeValue, "?") === false) $pLink["query"] = getCurQuery(); // no query = keep current query
+      #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
+      try {
+        # TODO
+        #$pLink = DOMBuilder::normalizeLink($pLink);
+        #todo: configurable status code
+        redirTo(buildLocalUrl($pLink));
+      } catch(Exception $e) {
+        if(!$silent) throw $e;
+      }
+    } catch(Exception $e) {
+      Logger::user_warning(sprintf(_("Unable to redirect to %s: %s"), implodeLink($pLink), $e->getMessage()));
     }
   }
 
@@ -103,14 +110,14 @@ class UrlHandler extends Plugin implements SplObserver {
   }
 
   private function proceed() {
-    $links = DOMBuilder::getLinks();
+    $links = array_keys(HTMLPlusBuilder::getLinkToId());
     $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
-    if(!DOMBuilder::isLink($path)) {
+    if(!HTMLPlusBuilder::isLink($path)) {
       if(self::DEBUG) var_dump($links);
       $linkId = $this->findSimilarLinkId($links, $path);
       if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    if(!DOMBuilder::isLink($path) || $path == $links[0]) $path = "";
+    if(!HTMLPlusBuilder::isLink($path) || $path == $links[0]) $path = "";
     if($path == getCurLink()) return;
     $code = 404;
     if(self::DEBUG) die("Redirecting to '$path'");

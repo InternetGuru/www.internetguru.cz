@@ -3,17 +3,32 @@
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
-use IGCMS\Core\LoggerException;
 
 function isValidId($id) {
   return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
 }
 
 function findFile($filePath, $user=true, $admin=true) {
-  if($user && is_file(USER_FOLDER."/$filePath")) return USER_FOLDER."/$filePath";
-  if($admin && is_file(ADMIN_FOLDER."/$filePath")) return ADMIN_FOLDER."/$filePath";
-  if(is_file(CMS_FOLDER."/$filePath")) return CMS_FOLDER."/$filePath";
-  return null;
+  $inactiveFilePath = dirname($filePath)."/.".basename($filePath);
+  $dirs = array(CMS_FOLDER);
+  if($admin) array_unshift($dirs, ADMIN_FOLDER);
+  if($user) array_unshift($dirs, USER_FOLDER);
+  foreach($dirs as $d) {
+    if(!is_file("$d/$filePath")) continue;
+    if(is_file("$d/$inactiveFilePath")) continue;
+    $path = realpath("$d/$filePath");
+    if(strpos($path, realpath($d).DIRECTORY_SEPARATOR) !== 0) {
+      throw new Exception(sprintf(_("File '%s' is out of working space"), $filePath));
+    }
+    return $path;
+  }
+  throw new Exception(sprintf(_("File '%s' not found"), $filePath));
+}
+
+function getCallerClass($i=1) {
+  $backtrace = debug_backtrace();
+  if(!array_key_exists("class", $backtrace[$i+1])) throw new Exception(_("Unknown caller class"));
+  return (new \ReflectionClass($backtrace[$i+1]["class"]))->getShortName();
 }
 
 function createSymlink($link, $target) {
@@ -62,19 +77,6 @@ function replaceVariables($string, Array $variables, $varPrefix=null) {
   return $newString;
 }
 
-function absoluteLink($link=null) {
-  if(is_null($link)) $link = $_SERVER["REQUEST_URI"];
-  if(substr($link, 0, 1) == "/") $link = substr($link, 1);
-  if(substr($link, -1) == "/") $link = substr($link, 0, -1);
-  $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse URL '%s'"), $link));
-  $scheme = isset($pLink["scheme"]) ? $pLink["scheme"] : $_SERVER["REQUEST_SCHEME"];
-  $host = isset($pLink["host"]) ? $pLink["host"] : $_SERVER["HTTP_HOST"];
-  $path = isset($pLink["path"]) && $pLink["path"] != "" ? "/".$pLink["path"] : "";
-  $query = isset($pLink["query"]) ? "?".$pLink["query"] : "";
-  return "$scheme://$host$path$query";
-}
-
 function redirTo($link, $code=null, $msg=null) {
   http_response_code(is_null($code) ? 302 : $code);
   if(!strlen($link)) {
@@ -94,21 +96,21 @@ function redirTo($link, $code=null, $msg=null) {
   exit();
 }
 
-function implodeLink(Array $p, $query=true) {
+function implodeLink(Array $pLink, $query=true) {
   $url = "";
-  if(isset($p["scheme"])) {
-    $url .= $p["scheme"]."://".HOST."/";
-    if(isset($p["path"])) $p["path"] = ltrim($p["path"], "/");
+  if(isset($pLink["scheme"])) {
+    $url .= $pLink["scheme"]."://".HOST."/";
+    if(isset($pLink["path"])) $pLink["path"] = ltrim($pLink["path"], "/");
   }
-  if(isset($p["path"])) $url .= $p["path"];
-  if($query && isset($p["query"]) && strlen($p["query"])) $url .= "?".$p["query"];
-  if(isset($p["fragment"])) $url .= "#".$p["fragment"];
+  if(isset($pLink["path"])) $url .= $pLink["path"];
+  if($query && isset($pLink["query"]) && strlen($pLink["query"])) $url .= "?".$pLink["query"];
+  if(isset($pLink["fragment"])) $url .= "#".$pLink["fragment"];
   return $url;
 }
 
 function parseLocalLink($link, $host=null) {
   $pLink = parse_url($link);
-  if($pLink === false) throw new LoggerException(sprintf(_("Unable to parse href '%s'"), $link)); // fail2parse
+  if($pLink === false) throw new Exception(sprintf(_("Unable to parse attribute href '%s'"), $link)); // fail2parse
   foreach($pLink as $k => $v) if(!strlen($v)) unset($pLink[$k]);
   if(isset($pLink["path"])) $pLink["path"] = trim($pLink["path"], "/");
   if(isset($pLink["scheme"])) {
@@ -122,28 +124,25 @@ function parseLocalLink($link, $host=null) {
   return $pLink;
 }
 
-function buildLocalUrl(Array $pLink, $ignoreCyclic = false) {
-  addPermParam($pLink, PAGESPEED_PARAM);
-  addPermParam($pLink, DEBUG_PARAM);
-  addPermParam($pLink, CACHE_PARAM);
+function buildLocalUrl(Array $pLink, $ignoreCyclic=false, $addPermParam=true) {
+  if($addPermParam) addPermParams($pLink);
   $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
   if($cyclic && !isset($pLink["fragment"]))
     throw new Exception(_("Link is cyclic"));
-  $path = null;
-  if(isset($pLink["path"])) {
-    $path = ltrim($pLink["path"], "/");
-    if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
-    else $pLink["path"] = ROOT_URL.$pLink["path"];
-  } else return implodeLink($pLink);
-  if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  $scriptFile = SCRIPT_NAME;
-  if($scriptFile == "index.php") return implodeLink($pLink);
-  $pLink["path"] = ROOT_URL.$scriptFile;
+  if(!isset($pLink["path"])) return implodeLink($pLink);
+  $path = $pLink["path"];
+  #$path = ltrim($pLink["path"], "/");
+  if(count($pLink) > 1 && $cyclic) unset($pLink["path"]);
+  else $pLink["path"] = ROOT_URL.$path;
+  #if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
+  if(SCRIPT_NAME == "index.php" || strpos($path, FILES_DIR) === 0)
+    return implodeLink($pLink);
+  $pLink["path"] = ROOT_URL.SCRIPT_NAME;
   if($cyclic) $pLink["path"] = "";
-  $q = array();
-  if(strlen($path)) $q[] = "q=".$path;
-  if(isset($pLink["query"]) && strlen($pLink["query"])) $q[] = $pLink["query"];
-  if(count($q)) $pLink["query"] = implode("&", $q);
+  $query = array();
+  if(strlen($path)) $query[] = "q=".$path;
+  if(isset($pLink["query"]) && strlen($pLink["query"])) $query[] = $pLink["query"];
+  if(count($query)) $pLink["query"] = implode("&", $query);
   return implodeLink($pLink);
 }
 
@@ -155,21 +154,17 @@ function isCyclicLink(Array $pLink) {
   return true;
 }
 
-function addPermParam(Array &$pLink, $parName) {
-  if(!isset($_GET[$parName])) return;
-  $parAndVal = "$parName=".$_GET[$parName];
-  if(isset($pLink["query"])) {
-    if(strpos($pLink["query"], $parName) !== false) return;
-    $pLink["query"] = $pLink["query"]."&".$parAndVal;
-    return;
+function addPermParams(Array &$pLink) {
+  foreach(array(PAGESPEED_PARAM, DEBUG_PARAM, CACHE_PARAM) as $parName) {
+    if(!isset($_GET[$parName]) || !strlen($_GET[$parName])) continue;
+    $parAndVal = "$parName=".$_GET[$parName];
+    if(isset($pLink["query"])) {
+      if(strpos($pLink["query"], $parName) !== false) continue;
+      $pLink["query"] = $pLink["query"]."&".$parAndVal;
+      continue;
+    }
+    $pLink["query"] = $parAndVal;
   }
-  $pLink["query"] = $parAndVal;
-}
-
-function __toString($o) {
-  echo "|";
-  if(is_array($o)) return implode(", ", $o);
-  return (string) $o;
 }
 
 function stableSort(Array &$a) {
@@ -195,20 +190,25 @@ function buildQuery($pQuery, $questionMark=true) {
   return ($questionMark ? "?" : "").rtrim(urldecode(http_build_query($pQuery)), "=");
 }
 
-function normalize($s, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
-  if($convertToUtf8) $s = utf8_encode($s);
-  if($tolower) $s = mb_strtolower($s, "utf-8");
+function normalize($text, $keep=null, $replace=null, $tolower=true, $convertToUtf8=false) {
+  if(!strlen(trim($text))) return "";
+  if($convertToUtf8) $text = utf8_encode($text);
+  #$text = preg_replace('#[^\\pL\d _-]+#u', '', $text);
+  #if($pred != $text) {var_dump($pred); var_dump($text); }
+  #if($tolower) $text = mb_strtolower($text, "utf-8");
   // iconv
   // http://php.net/manual/en/function.iconv.php#74101
   // works with setlocale(LC_ALL, "[any].UTF-8")
-  $s = iconv("UTF-8", "US-ASCII//TRANSLIT", $s);
-  if($tolower) $s = strtolower($s);
-  if(is_null($replace)) $replace = "_";
-  if(is_null($keep)) $keep = "a-zA-Z0-9_-";
-  $s = @preg_replace("~[^$keep]~", $replace, $s);
-  if(is_null($s))
+  $text = iconv('utf-8', 'us-ascii//TRANSLIT', $text);
+  $text = preg_replace('# +#u', '_', $text);
+  $text = preg_replace('#_?-_?#u', '-', $text);
+  if($tolower) $text = strtolower($text);
+  if(is_null($replace)) $replace = "";
+  if(is_null($keep)) $keep = "\w\d_-";
+  $text = @preg_replace("~[^$keep]~", $replace, $text);
+  if(is_null($text))
     throw new Exception(_("Invalid parameter 'keep'"));
-  return $s;
+  return $text;
 }
 
 function file_put_contents_plus($dest, $string) {
@@ -241,15 +241,6 @@ function mkdir_plus($dir, $mode=0775, $recursive=true) {
   if(!is_dir($dir)) throw new Exception(_("Unable to create directory"));
 }
 
-function safeRemoveDir($dir) {
-  if(!is_dir($dir)) return true;
-  if(count(scandir($dir)) == 2) return rmdir($dir);
-  $i = 1;
-  $delDir = "$dir~";
-  while(is_dir($delDir.$i)) $i++;
-  return rename($dir, $delDir.$i);
-}
-
 function incrementalRename($src, $dest=null) {
   if(!file_exists($src))
     throw new Exception(sprintf(_("Source file '%s' not found"), basename($src)));
@@ -267,7 +258,7 @@ function initDirs() {
   foreach($dirs as $d) mkdir_plus($d);
 }
 
-function initLinks() {
+function initIndexFiles() {
   $links = array();
   foreach(scandir(CMS_ROOT_FOLDER) as $f) {
     if(strpos($f, ".") === 0) continue;
@@ -285,6 +276,12 @@ function initLinks() {
   foreach($links as $l => $t) {
     createSymlink($l, $t);
   }
+}
+
+function timestamptToW3C($timestamp) {
+  $date = new DateTime();
+  $date->setTimeStamp($timestamp);
+  return $date->format(DateTime::W3C);
 }
 
 function update_file($src, $dest, $hash=false) {
@@ -324,19 +321,6 @@ function unlock_file($fpr, $fileName=null, $ext="lock") {
   for($i=0; $i<20; $i++) {
     if(@unlink("$fileName.$ext")) return;
     usleep(100000);
-  }
-}
-
-function deleteRedundantFiles($in, $according) {
-  if(!is_dir($in)) return;
-  foreach(scandir($in) as $f) {
-    if(in_array($f, array(".", ".."))) continue;
-    if(is_dir("$in/$f")) {
-      deleteRedundantFiles("$in/$f", "$according/$f");
-      if(!is_dir("$according/$f")) rmdir("$in/$f");
-      continue;
-    }
-    if(!is_file("$according/$f")) unlink("$in/$f");
   }
 }
 
@@ -405,11 +389,6 @@ function fileSizeConvert($b) {
 function getFileHash($filePath) {
   if(!is_file($filePath)) return "";
   return hash_file(FILE_HASH_ALGO, $filePath);
-}
-
-function getDirHash($dirPath) {
-  if(!is_dir($dirPath)) return "";
-  return hash(FILE_HASH_ALGO, implode("", scandir($dirPath)));
 }
 
 function stripDataFolder($filePath) {
@@ -507,17 +486,6 @@ function getNginxCacheFiles($folder = null, $link = "") {
   return $fPaths;
 }
 
-function getNewestCacheMtime() {
-  if(IS_LOCALHOST) return null;
-  $newestCacheMtime = null;
-  foreach(getNginxCacheFiles() as $cacheFilePath) {
-    $cacheMtime = filemtime($cacheFilePath);
-    if($cacheMtime < $newestCacheMtime) continue;
-    $newestCacheMtime = $cacheMtime;
-  }
-  return $newestCacheMtime;
-}
-
 function getIP() {
   if(!empty($_SERVER['HTTP_CLIENT_IP'])) return $_SERVER['HTTP_CLIENT_IP'];
   if(!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) return $_SERVER['HTTP_X_FORWARDED_FOR'];
@@ -537,12 +505,11 @@ function getResDir($file="") {
   return getRealResDir($file);
 }
 
-function checkFileCache($sourceFile, $cacheFile) {
-  if(!is_file($cacheFile)) return;
-  if(!is_file($sourceFile)) throw new Exception(_("Cache file is redundant"), 1);
-  if(filemtime($cacheFile) == filemtime($sourceFile)) return;
-  if(getFileHash($cacheFile) != getFileHash($sourceFile)) throw new Exception(_("Cache file is outdated"), 2);
+function isUptodate($sourceFile, $cacheFile) {
+  if(filemtime($cacheFile) == filemtime($sourceFile)) return true;
+  if(getFileHash($cacheFile) != getFileHash($sourceFile)) return false;
   touch($cacheFile, filemtime($sourceFile));
+  return true;
 }
 
 function validate_callStatic($methodName, Array $arguments, Array $functions, $nonEmptyArgumentsCount=0) {
@@ -551,14 +518,6 @@ function validate_callStatic($methodName, Array $arguments, Array $functions, $n
   for($i=0; $i<$nonEmptyArgumentsCount; $i++) {
     if(array_key_exists($i, $arguments) && strlen($arguments[$i])) continue;
     throw new Exception(sprintf(_("Argument[%s] empty or missing"), $i));
-  }
-}
-
-// UNUSED
-function clearApcCache() {
-  $cache_info = apc_cache_info();
-  foreach($cache_info["cache_list"] as $data) {
-    if(strpos($data["info"], HOST) === 0) apc_delete($data["info"]);
   }
 }
 

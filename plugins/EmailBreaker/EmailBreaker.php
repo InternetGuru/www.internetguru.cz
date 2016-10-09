@@ -20,8 +20,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
   }
 
   public function getContent(DOMDocumentPlus $content) {
-    $cfg = $this->getDOMPlus();
-    $appendJs = false;
+    $cfg = $this->getXML();
     $pat = array();
     $rep = array();
     foreach($cfg->getElementsByTagName("replace") as $replace) {
@@ -39,10 +38,11 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
       $rep[] = $replace->nodeValue;
     }
     $anchors = array();
-    foreach($content->getElementsByTagName("a") as $a) $anchors[] = $a;
-    $toStrip = array();
-    foreach($anchors as $a) {
+    foreach($content->getElementsByTagName("a") as $a) {
       if(strpos($a->getAttribute("href"), "mailto:") === false) continue;
+      $anchors[] = $a;
+    }
+    foreach($anchors as $a) {
       $address = substr($a->getAttribute("href"), 7);
       $a->addClass("emailbreaker");
       $a->removeAttribute("href");
@@ -55,9 +55,8 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
         $a->appendChild($spanAddr);
       }
       $a->rename("span");
-      $appendJs = true;
     }
-    if($appendJs) $this->appendJs($pat, $rep);
+    if(count($anchors)) $this->appendJs($pat, $rep);
     return $content;
   }
 
@@ -71,9 +70,10 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
       }
       if(strpos($chld->nodeValue, $pat) === false) continue;
       foreach(explode($pat, $chld->nodeValue) as $k => $part) {
-        if($k % 2 != 0) $ele->appendChild($rep);
-        else $ele->appendChild($ele->ownerDocument->createTextNode($part));
+        if($k > 0) $ele->insertBefore($rep, $chld);
+        $ele->insertBefore($ele->ownerDocument->createTextNode($part), $chld);
       }
+      $ele->removeChild($chld);
       $replaced = true;
     }
     return $replaced;
@@ -96,7 +96,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     foreach($pat as $k => $p) {
       $jsRep[] = "['$p','{$rep[$k]}']";
     }
-    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".js");
+    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".$this->className.".js");
     Cms::getOutputStrategy()->addJs("EmailBreaker.init({
       rep: [".implode(",", $jsRep)."]
     });");

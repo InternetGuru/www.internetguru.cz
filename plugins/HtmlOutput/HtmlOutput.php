@@ -3,13 +3,15 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
+use IGCMS\Core\XMLBuilder;
 use Exception;
 use DOMImplementation;
 use DOMDocument;
@@ -43,13 +45,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
-    $this->cfg = $this->getDOMPlus();
+    $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
     if(is_null($this->favIcon)) $this->favIcon = findfile($this->pluginDir."/".self::FAVICON);
   }
 
   /**
-   * Create XHTML 1.1 output from HTML+ content and own registers (JS/CSS)
+   * Create HTML 5 output from HTML+ content and own registers (JS/CSS)
    * @return void
    */
   public function getOutput(HTMLPlus $content) {
@@ -75,29 +77,43 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $head = $this->addHead($doc, $html, $h1);
 
     // final validation
-    #$contentPlus->processVariables(Cms::getAllVariables());
     $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
     $xPath = new DOMXPath($contentPlus);
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
     foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
     foreach($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
-    $ids = $this->getIds($xPath);
-    $this->fragToLinks($contentPlus, $ids, "a", "href");
-    $this->fragToLinks($contentPlus, $ids, "form", "action");
-    $this->fragToLinks($contentPlus, $ids, "object", "data");
-    #$this->validateImages($contentPlus);
+    foreach($contentPlus->getElementsByTagName("a") as $e) {
+      $this->processLinks($e, "href");
+    }
+    foreach($contentPlus->getElementsByTagName("object") as $e) {
+      $this->processLinks($e, "data");
+    }
+    foreach($contentPlus->getElementsByTagName("form") as $e) {
+      $this->processLinks($e, "action", false);
+    }
+    foreach($xPath->query("//*[@xml:lang]") as $a) {
+      if(!$a->hasAttribute("lang")) $a->setAttribute("lang", $a->getAttribute("xml:lang"));
+      $a->removeAttribute("xml:lang");
+    }
+    $this->consolidateLang($contentPlus->documentElement, $lang);
 
     // import into html and save
     $content = $doc->importNode($contentPlus->documentElement, true);
     $html->appendChild($content);
     $cXpath = new DOMXPath($html->ownerDocument);
-    $this->addJs("window.Base = '".ROOT_URL."';", 1, self::APPEND_HEAD);
     $this->appendJsFiles($html->getElementsByTagName("head")->item(0), self::APPEND_HEAD, $cXpath);
     $this->appendJsFiles($content, self::APPEND_BODY, $cXpath);
 
     $this->validateEmptyContent($doc);
     $html = $doc->saveXML();
     return substr($html, strpos($html, "\n")+1);
+  }
+
+  private function consolidateLang(DOMElementPlus $parent, $lang) {
+    if($parent->getAttribute("lang") == $lang) $parent->removeAttribute("lang");
+    foreach($parent->childElementsArray as $e) {
+      $this->consolidateLang($e, $lang);
+    }
   }
 
   private function createDoc() {
@@ -145,7 +161,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     stableSort($this->transformationsPriority);
     foreach($this->transformationsPriority as $xslt => $priority) {
       try {
-        $newContent = $this->transform($content, $xslt, $this->transformations[$xslt]['user'], $proc);
+        $newContent = $this->transform($content, $xslt, $proc);
         $newContent->encoding="utf-8";
         $xml = $newContent->saveXML();
         if(!@$newContent->loadXML($xml))
@@ -167,86 +183,91 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     return ROOT_URL.self::FAVICON;
   }
 
-  private function getIds(DOMXPath $xPath) {
-    $ids = array();
-    $toStrip = array();
-    foreach($xPath->query("//*[@id]") as $e) {
-      $id = $e->getAttribute("id");
-      if(isset($ids[$id])) {
-        $toStrip[] = $e;
-        continue;
-      }
-      $ids[$id] = $e;
-    }
-    foreach($toStrip as $e) {
-      $m = sprintf(_("Removed duplicit id %s"), $e->getAttribute("id"));
-      $e->stripAttr("id", $m);
-      Logger::user_warning($m);
-    }
-    return $ids;
+  private function isLocalFragment(Array $pLink) {
+    if(array_key_exists("path", $pLink)) return false;
+    return array_key_exists("fragment", $pLink);
   }
 
-  private function fragToLinks(DOMDocumentPlus $doc, Array $ids, $eName, $aName) {
-    $toStrip = array();
-    foreach($doc->getElementsByTagName($eName) as $a) {
-      #var_dump($a->nodeValue);
-      if(!$a->hasAttribute($aName)) continue; // no link found
-      try {
-        #var_dump($a->getAttribute($aName));
-        $pUrl = parseLocalLink($a->getAttribute($aName));
-        if(is_null($pUrl)) continue; // link is external
-        if(isset($pUrl["path"]) && preg_match("/".FILEPATH_PATTERN."/", $pUrl["path"])) { // link to file
-          if(Cms::isSuperUser() && $eName == "object" && is_file($pUrl["path"])) {
-            $mimeType = getFileMime($pUrl["path"]);
-            if($a->getAttribute("type") != $mimeType)
-              Logger::user_warning(sprintf(_("Object %s attribute type invalid or missing: %s"), $pUrl["path"], $mimeType));
-          }
-          $a->setAttribute($aName, ROOT_URL.$pUrl["path"]);
-          continue;
+  private function processLinks(DOMElementPlus $e, $aName, $linkType=true) {
+    $url = $e->getAttribute($aName);
+    if(!strlen($url)) {
+      $e->stripAttr($aName, sprintf(_("Empty attribute '%s' stripped"), $aName));
+      return;
+    }
+    try {
+      $pLink = parseLocalLink($url);
+      if(is_null($pLink)) return; # external
+      $getLink = true;
+      if(array_key_exists("path", $pLink)) {
+        // link to supported file
+        global $plugins;
+        foreach($plugins->getIsInterface("IGCMS\Core\ResourceInterface") as $ri) {
+          if(!$ri::isSupportedRequest($pLink["path"])) continue;
+
+          $getLink = false;
+          break;
         }
-        $this->setupLink($a, $aName, $pUrl, $ids);
-      } catch(Exception $e) {
-        $toStrip[] = array($a, sprintf(_("Link %s removed: %s"), $a->getAttribute($aName), $e->getMessage()));
+        // link to existing file
+        if($getLink && is_file($pLink["path"])) $getLink = false;
       }
-
-    }
-    foreach($toStrip as $a) {
-      $a[0]->stripAttr($aName, $a[1]);
-      $a[0]->stripAttr("title", "");
+      if($getLink) {
+        $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
+        $pLink = $this->getLink($pLink, $rootId);
+      }
+      if(empty($pLink)) {
+        if($this->isLocalFragment($pLink)) return;
+        throw new Exception(sprintf(_("Link '%s' not found"), $url));
+      }
+      #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
+      if($linkType && array_key_exists("id", $pLink)) {
+        if(!array_key_exists("query", $pLink)) $this->insertTitle($e, $pLink["id"]);
+        $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
+      }
+      $link = buildLocalUrl($pLink, !$linkType, $getLink);
+      $e->setAttribute($aName, $link);
+    } catch(Exception $ex) {
+      $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $url, $ex->getMessage()));
     }
   }
 
-  private function setupLink(DOMElement $a, $aName, $pLink, Array $ids) {
-    #var_dump("---------");
-    #var_dump(implodeLink($pLink));
-    #var_dump(getCurLink());
-    #var_dump(getCurLink(true));
-    #var_dump($pLink);
-    $link = DOMBuilder::normalizeLink($pLink);
-    #if(!is_null($linkId)) $link = $linkId; else $link = implodeLink($pLink);
-    #var_dump($link);
-    #var_dump(implodeLink($link));
-    #if($a->nodeName != "form" && (!isset($link["path"]) ? getCurLink() : "").implodeLink($link) == getCurLink(true))
-    #  throw new Exception(sprintf(_("Removed cyclic link %s"), $a->getAttribute($aName)));
-    if($a->nodeName == "a" && !isset($pLink["query"])) $this->insertTitle($a, implodeLink($link));
-    $localUrl = buildLocalUrl($link, $a->nodeName == "form");
-    #var_dump($localUrl);
-    if(strpos($localUrl, "#") === 0 && !array_key_exists($pLink["fragment"], $ids))
-      throw new Exception(sprintf(_("Local fragment %s to undefined id"), $pLink["fragment"]));
-    $a->setAttribute($aName, $localUrl);
+  private function getLink($pHref, $rootId) {
+    if(!array_key_exists("path", $pHref) && !array_key_exists("fragment", $pHref))
+      return $pHref;
+    $pHref["id"] = array_key_exists("path", $pHref) ? $pHref["path"] : $rootId;
+    if(!strlen($pHref["id"])) $pHref["id"] = HTMLPlusBuilder::getRootId();
+    if(array_key_exists("fragment", $pHref)) $pHref["id"] .= "/".$pHref["fragment"];
+    // href is link
+    $id = HTMLPlusBuilder::getLinkToId($pHref["id"]);
+    if(!is_null($id)) {
+      $pHref["id"] = $id;
+      return $pHref;
+    }
+    // href is heading id
+    $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
+    // href is non-heading id
+    if(is_null($link)) {
+      $id = HTMLPlusBuilder::getIdToParentId($pHref["id"]);
+      // link not found
+      if(is_null($id)) return array();
+      $link = HTMLPlusBuilder::getIdToLink($id);
+    }
+    $linkArray = explode("#", $link);
+    $pHref["path"] = $linkArray[0];
+    // update fragment iff not non-heading id
+    if(isset($linkArray[1]) && !isset($pHref["fragment"])) $pHref["fragment"] = $linkArray[1];
+    return $pHref;
   }
 
-  private function insertTitle(DOMElement $a, $link) {
-    #var_dump($link);
+  private function insertTitle(DOMElement $a, $id) {
     if($a->hasAttribute("title")) {
       if(!strlen($a->getAttribute("title"))) $a->stripAttr("title");
       return;
     }
-    $title = DOMBuilder::getTitle($link);
-    if(normalize($title) == normalize($a->nodeValue)) $title = DOMBuilder::getDesc($link);
-    if(is_null($title)) return;
-    if(normalize($title) == normalize($a->nodeValue)) return;
-    $a->setAttribute("title", $title);
+    foreach(HTMLPlusBuilder::getHeadingValues($id, true) as $value) {
+      if($value == $a->nodeValue) continue;
+      $a->setAttribute("title", $value);
+      return;
+    }
   }
 
   private function validateImages(DOMDocumentPlus $dom) {
@@ -294,36 +315,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($toStrip as $o) $o[0]->stripTag($o[1]);
   }
 
-  /*
-  private function asynchronousExternalImageCheck($file) {
-    $headers = @get_headers(absoluteLink(ROOT_URL.$filePath), 1);
-    $invalid = !is_array($headers) || !array_key_exists("Content-Type", $headers)
-      || !array_key_exists("Content-Length", $headers);
-    if($invalid || strpos($headers[0], '200') === false) {
-      $error = $invalid ? "bad response" : $headers[0];
-      throw new Exception("object data '$filePath' not found ($error)");
-    }
-    $mime = $headers["Content-Type"];
-    if(strpos($mime, "image/") !== 0)
-      throw new Exception("invalid object '$filePath' mime type '$mime'");
-    if(!$o->hasAttribute("type") || $o->getAttribute("type") != $mime) {
-      $o->setAttribute("type", $mime);
-      Logger::warning("Object '$filePath' attr type set to '".$mime."'");
-    }
-    $size = (int) $headers["Content-Length"];
-    if(!$size || $size > 350*1024) {
-      Logger::warning("Object '$filePath' too big or invalid size ".fileSizeConvert($size));
-    }
-  }
-  */
-
   private function getTitle(DOMElementPlus $h1) {
-    $title = $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
-    foreach($this->subject->getIsInterface("IGCMS\Core\ContentStrategyInterface") as $clsName => $cls) {
-      $tmp = Cms::getVariable(strtolower($clsName)."-title");
-      if(!is_null($tmp)) $title = $tmp;
+    $title = null;
+    foreach($this->subject->getIsInterface("IGCMS\Core\TitleStrategyInterface") as $clsName => $cls) {
+      $title = $cls->getTitle();
+      if(!is_null($title)) return $title;
     }
-    return $title;
+    return $h1->hasAttribute("short") ? $h1->getAttribute("short") : $h1->nodeValue;
   }
 
   private function getProcParams() {
@@ -364,7 +362,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function registerThemes(DOMDocumentPlus $cfg) {
 
     // add default xsl
-    $this->addTransformation($this->pluginDir."/".(new \ReflectionClass($this))->getShortName().".xsl", 1, false);
+    $this->addTransformation($this->pluginDir."/".$this->className.".xsl", 1);
 
     // add template files
     $theme = $cfg->getElementById("theme");
@@ -385,8 +383,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       try {
         switch ($n->nodeName) {
           case "xslt":
-          $user = !$n->hasAttribute("readonly");
-          $this->addTransformation($n->nodeValue, 5, $user);
+          $this->addTransformation($n->nodeValue, 5);
           break;
           case "jsFile":
           $user = !$n->hasAttribute("readonly");
@@ -412,9 +409,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
   }
 
-  private function transform(DOMDocument $content, $fileName, $user, XSLTProcessor $proc) {
+  private function transform(DOMDocument $content, $fileName, XSLTProcessor $proc) {
     #var_dump($fileName);
-    $xsl = DOMBuilder::buildDOMPlus($fileName, true, $user);
+    $xsl = XMLBuilder::load($fileName);
     if(!@$proc->importStylesheet($xsl))
       throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
     if(($doc = @$proc->transformToDoc($content) ) === false)
@@ -512,16 +509,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
 
-  public function addTransformation($filePath, $priority = 10, $user = true) {
+  public function addTransformation($filePath, $priority=10) {
     if(isset($this->transformations[$filePath])) return;
     Cms::addVariableItem("transformations", $filePath);
-    #if(findFile($filePath, $user) === false) throw new Exception();
-    if(!$user && is_file(USER_FOLDER."/".$filePath))
-      Logger::user_warning(sprintf(_("File %s modification is disabled"), $filePath));
     $this->transformations[$filePath] = array(
       "priority" => $priority,
-      "file" => $filePath,
-      "user" => $user);
+      "file" => $filePath);
     $this->transformationsPriority[$filePath] = $priority;
   }
 

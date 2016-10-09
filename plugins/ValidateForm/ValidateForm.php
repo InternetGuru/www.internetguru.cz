@@ -2,8 +2,8 @@
 
 namespace IGCMS\Plugins;
 
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
@@ -13,7 +13,7 @@ use DOMXPath;
 use SplObserver;
 use SplSubject;
 
-class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterface {
+class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
   private $labels = array();
   const CSS_WARNING = "validateform-warning";
   const FORM_ID = "validateform-id";
@@ -30,96 +30,117 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
       $subject->detach($this);
       return;
     }
-    if($subject->getStatus() != STATUS_PREINIT) return;
+    if($subject->getStatus() != STATUS_INIT) return;
     $this->detachIfNotAttached("HtmlOutput");
-    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.(new \ReflectionClass($this))->getShortName().'.css');
+    foreach(Cms::getAllVariables() as $varId => $formDoc) {
+      if(strpos($varId, "contactform-") !== 0) continue;
+      $this->modifyFormVars($formDoc->documentElement->firstChild);
+    }
+    Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/'.$this->className.'.css');
   }
 
-  public function getContent(HTMLPlus $content) {
-    $xpath = new DOMXPath($content);
-    foreach($xpath->query("//form") as $form) {
-      if(!$form->hasClass("validable")) continue;
-      try {
-        $id = $form->getRequiredAttribute("id");
-      } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
-        continue;
-      }
-      $time = $this->getWaitTime($form);
-      if($form->hasClass("validateform-notime")) $time = 0;
-
-      $div = $content->createElement("div");
-
-      $input = $content->createElement("input");
-      $input->setAttribute("type", "email");
-      $input->setAttribute("name", self::FORM_HP);
-      $input->setAttribute("class", self::FORM_HP);
-      $div->appendChild($input);
-
-      $input = $content->createElement("input");
-      $input->setAttribute("type", "hidden");
-      $input->setAttribute("name", self::FORM_ID);
-      $input->setAttribute("value", $id);
-      $div->appendChild($input);
-
-      $form->appendChild($div);
-      $method = strtolower($form->getAttribute("method"));
-      $request = $method == "post" ? $_POST : $_GET;
-      if(empty($request)) continue;
-      if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) continue;
-      if(!$this->hpCheck($request)) {
-        Logger::info(_("Honeypot check failed"));
-        continue;
-      }
-      try {
-        if(!Cms::isSuperUser()) $this->ipCheck($time);
-      } catch(Exception $e) {
-        Logger::user_error($e->getMessage());
-        continue;
-      }
-      $this->getLabels($xpath, $form);
-      Cms::setVariable($id, $this->verifyItems($xpath, $form, $request));
+  public function modifyContent(HTMLPlus $content) {
+    foreach($content->getElementsByTagName("form") as $form) {
+      $this->modifyFormVars($form);
     }
-    return $content;
+  }
+
+  private function modifyFormVars(DOMElementPlus $form) {
+    if(!$form->hasClass("validable")) return;
+    try {
+      $id = $form->getRequiredAttribute("id");
+    } catch(Exception $e) {
+      Logger::user_warning($e->getMessage());
+      return;
+    }
+    $time = $this->getWaitTime($form);
+    if($form->hasClass("validateform-notime")) $time = 0;
+
+    $doc = $form->ownerDocument;
+    $div = $doc->createElement("div");
+
+    $input = $doc->createElement("input");
+    $input->setAttribute("type", "email");
+    $input->setAttribute("name", self::FORM_HP);
+    $input->setAttribute("class", self::FORM_HP);
+    $div->appendChild($input);
+
+    $input = $doc->createElement("input");
+    $input->setAttribute("type", "hidden");
+    $input->setAttribute("name", self::FORM_ID);
+    $input->setAttribute("value", $id);
+    $div->appendChild($input);
+
+    $form->appendChild($div);
+    $method = strtolower($form->getAttribute("method"));
+    $request = $method == "post" ? $_POST : $_GET;
+    if(empty($request)) return;
+    if(!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) return;
+    if(!$this->hpCheck($request)) {
+      Logger::info(_("Honeypot check failed"));
+      return;
+    }
+    $this->getLabels($form);
+    $items = $this->verifyItems($form, $request);
+    try {
+      if(!Cms::isSuperUser() && !is_null($items)) $this->ipCheck($time);
+    } catch(Exception $e) {
+      Cms::error($e->getMessage());
+      return;
+    }
+    Cms::setVariable($id, $items);
   }
 
   private function hpCheck($request) {
     return isset($request[self::FORM_HP]) && !strlen($request[self::FORM_HP]);
   }
 
-  private function getLabels(DOMXPath $xpath, DOMElementPlus $form) {
-    foreach($xpath->query(".//label", $form) as $label) {
+  private function getLabels(DOMElementPlus $form) {
+    foreach($form->getElementsByTagName("label") as $label) {
       if($label->hasAttribute("for")) {
         $id = $label->getAttribute("for");
       } else {
-        $items = $xpath->query(".//input | .//textarea | .//select", $label);
-        if(!$items->length) continue;
-        $item = $items->item(0);
-        if(!$item->hasAttribute("id")) $item->setUniqueId();
-        $id = $item->getAttribute("id");
+        $fields = array();
+        $this->getFormFields($label, $fields);
+        if(count($fields) != 1) {
+          Logger::warning(sprintf(_("Invalid label '%s' with %s input fields"), $label->nodeValue, count($fields)));
+          continue;
+        }
+        if(!$fields[0]->hasAttribute("id")) $fields[0]->setUniqueId();
+        $id = $fields[0]->getAttribute("id");
       }
       $this->labels[$id][] = $label->nodeValue;
     }
   }
 
-  private function verifyItems(DOMXPath $xpath, DOMElementPlus $form, Array $request) {
+  private function getFormFields(DOMElementPlus $e, Array &$fields) {
+    foreach($e->childNodes as $child) {
+      if($child->nodeType != XML_ELEMENT_NODE) continue;
+      if(in_array($child->nodeName, array("input", "textarea", "select"))) $fields[] = $child;
+      $this->getFormFields($child, $fields);
+    }
+  }
+
+  private function verifyItems(DOMElementPlus $form, Array $request) {
     $isValid = true;
     $values = array();
-    foreach($xpath->query(".//input | .//textarea | .//select", $form) as $item) {
+    $fields = array();
+    $this->getFormFields($form, $fields);
+    foreach($fields as $field) {
       try {
-        $name = normalize($item->getAttribute("name"), null, "", false);
+        $name = normalize($field->getAttribute("name"), null, "", false);
         $value = isset($request[$name]) ? $request[$name] : null;
-        $this->verifyItem($item, $value);
+        $this->verifyItem($field, $value);
         $values[$name] = is_array($value) ? implode(", ", $value) : $value;
       } catch(Exception $e) {
-        if(!$item->hasAttribute("id")) $item->setUniqueId();
-        $id = $item->getAttribute("id");
+        if(!$field->hasAttribute("id")) $field->setUniqueId();
+        $id = $field->getAttribute("id");
         $error = $e->getMessage();
         if(isset($this->labels[$id][0])) $name = $this->labels[$id][0];
         if(isset($this->labels[$id][1])) $error = $this->labels[$id][1];
-        Logger::user_error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
-        $item->parentNode->addClass(self::CSS_WARNING);
-        $item->addClass(self::CSS_WARNING);
+        Cms::error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
+        $field->parentNode->addClass(self::CSS_WARNING);
+        $field->addClass(self::CSS_WARNING);
         $isValid = false;
       }
     }
@@ -144,7 +165,7 @@ class ValidateForm extends Plugin implements SplObserver, ContentStrategyInterfa
     $IPFilePath = USER_FOLDER."/".$this->pluginDir."/$IPFile";
     $bannedIPFilePath = USER_FOLDER."/".$this->pluginDir."/.$IPFile";
     if(is_file($bannedIPFilePath)) {
-      throw new Exception(sprintf(_("Your IP adress %s is banned"), $IP));
+      throw new Exception(sprintf(_("Your IP address %s is banned"), $IP));
     }
     if(is_file($IPFilePath)) {
       if(time() - filemtime($IPFilePath) < $time) { // 2 min timeout

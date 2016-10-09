@@ -119,13 +119,25 @@
                     </xsl:apply-templates>
                   </desc>
                 </xsl:when>
-                <xsl:otherwise>·
-  <xsl:copy-of select="$secIndent"/><desc><xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found (use @ to specify keywords) --></xsl:text></desc>
-                  <xsl:if test="not($nextHPos = $curHPos+1)">
-                    <xsl:apply-templates select="//p[position() = $curHPos+1]">
-                      <xsl:with-param name="pIndent" select="$secIndent"/>
-                    </xsl:apply-templates>
-                  </xsl:if>
+                <xsl:otherwise>
+                  <xsl:choose>
+                    <xsl:when test="//p[position() = $curHPos+1][not(pPr/numPr)] and not($nextHPos = $curHPos+1)">·
+  <xsl:copy-of select="$secIndent"/><desc>
+                        <xsl:apply-templates select="//p[position() = $curHPos+1]">
+                          <xsl:with-param name="nop" select="1"/>
+                        </xsl:apply-templates>
+                      </desc>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <desc>n/a</desc>
+                      <xsl:if test="not($nextHPos = $curHPos+1)">
+                        <xsl:apply-templates select="//p[position() = $curHPos+1]">
+                          <xsl:with-param name="pIndent" select="$secIndent"/>
+                        </xsl:apply-templates>
+                      </xsl:if>
+                    </xsl:otherwise>
+                    <xsl:text disable-output-escaping="yes">&lt;!-- centered paragraph not found (use @ to specify keywords) --></xsl:text>
+                  </xsl:choose>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>
@@ -266,8 +278,8 @@
             <xsl:choose>
               <!-- definition list if first is bold -->
               <xsl:when test="count(r) = count(r/rPr/b[@val = 1])">·
-    <xsl:copy-of select="$pIndent"/><dl>·
-      <xsl:copy-of select="$pIndent"/><dt>
+  <xsl:copy-of select="$pIndent"/><dl>·
+    <xsl:copy-of select="$pIndent"/><dt>
                     <xsl:apply-templates select="node()">
                       <xsl:with-param name="nostrong" select="1"/>
                     </xsl:apply-templates>
@@ -277,7 +289,7 @@
                     <xsl:with-param name="i" select="1"/>
                     <xsl:with-param name="pIndent" select="$pIndent"/>
                   </xsl:call-template>·
-    <xsl:copy-of select="$pIndent"/></dl>
+  <xsl:copy-of select="$pIndent"/></dl>
               </xsl:when>
               <xsl:otherwise>
                 <xsl:call-template name="buildList">
@@ -295,7 +307,7 @@
           <xsl:choose>
             <xsl:when test="$nop"><xsl:apply-templates select="node()"/></xsl:when>
             <xsl:otherwise>·
-    <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
+  <xsl:copy-of select="$pIndent"/><p><xsl:apply-templates select="node()"/></p>
             </xsl:otherwise>
           </xsl:choose>
         </xsl:otherwise>
@@ -463,28 +475,27 @@
       </hyperlink>
   -->
   <!-- Template for hyperlinks -->
-    <xsl:template match="hyperlink">
-      <xsl:variable name="relationships" select="document($relationsFile)"/>
-
-      <xsl:element name="a">
-          <xsl:attribute name="href">
-              <xsl:choose>
-                  <xsl:when test="@anchor">#<xsl:value-of select="@anchor"/></xsl:when>
-                  <xsl:when test="@bookmark">#<xsl:value-of select="@bookmark"/></xsl:when>
-                  <xsl:when test="@arbLocation">#<xsl:value-of select="@arbLocation"/></xsl:when>
-                  <xsl:when test="@id">
-                      <xsl:variable name="idRelationship" select="@id"/>
-                      <xsl:value-of select="$relationships//*[name() = 'Relationship' and @Id=$idRelationship]/@Target"/>
-                  </xsl:when>
-                  <xsl:otherwise><xsl:apply-templates select="node()"/></xsl:otherwise>
-              </xsl:choose>
-            </xsl:attribute>
-            <xsl:apply-templates select="node()">
-              <xsl:with-param name="nosamp" select="1"/>
-            </xsl:apply-templates>
-            <!-- <xsl:copy-of select="node()//t/text()"/> -->
-      </xsl:element>
-    </xsl:template>
+  <xsl:template match="hyperlink">
+    <xsl:variable name="relationships" select="document($relationsFile)"/>
+    <xsl:element name="a">
+        <xsl:attribute name="href">
+          <xsl:choose>
+            <xsl:when test="@anchor">#<xsl:value-of select="@anchor"/></xsl:when>
+            <xsl:when test="@bookmark">#<xsl:value-of select="@bookmark"/></xsl:when>
+            <xsl:when test="@arbLocation">#<xsl:value-of select="@arbLocation"/></xsl:when>
+            <xsl:when test="@id">
+              <xsl:variable name="idRelationship" select="@id"/>
+              <xsl:value-of select="$relationships//*[name() = 'Relationship' and @Id=$idRelationship]/@Target"/>
+          </xsl:when>
+            <xsl:otherwise><xsl:apply-templates select="node()"/></xsl:otherwise>
+        </xsl:choose>
+        </xsl:attribute>
+        <xsl:apply-templates select="node()">
+          <xsl:with-param name="nosamp" select="1"/>
+        </xsl:apply-templates>
+        <!-- <xsl:copy-of select="node()//t/text()"/> -->
+    </xsl:element>
+  </xsl:template>
 
   <!--
       <tbl>

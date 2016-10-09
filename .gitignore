@@ -1,10 +1,7 @@
-*.bak
 ~*
-usr/*
-adm/*
-log/*
-.DS_Store
-*.corrupted
-tests/_output/*
+*~
+.*
+*.bak
 *.old
+tests/_output/*
 vendor/*

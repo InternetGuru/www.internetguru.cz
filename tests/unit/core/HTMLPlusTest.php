@@ -12,7 +12,6 @@ class HTMLPlusTest extends \PHPUnit_Framework_TestCase
     private $doc;
 
     const DEFAULT_CTIME = "2015";
-    const DEFAULT_LINK = "test";
     const DEFAULT_AUTHOR = "test";
     const DEFAULT_DESC= "desc";
     const DEFAULT_KW = "kw, kw2";
@@ -21,7 +20,6 @@ class HTMLPlusTest extends \PHPUnit_Framework_TestCase
     {
       $this->doc = new HTMLPlus();
       $this->doc->defaultCtime = self::DEFAULT_CTIME;
-      $this->doc->defaultLink = self::DEFAULT_LINK;
       $this->doc->defaultAuthor = self::DEFAULT_AUTHOR;
       $this->doc->defaultDesc= self::DEFAULT_DESC;
       $this->doc->defaultKw= self::DEFAULT_KW;

@@ -2,9 +2,10 @@
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
-use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Plugins;
+use IGCMS\Core\DOMBuilder;
 
 try {
 
@@ -22,7 +23,7 @@ try {
       $errno = 403;
     }
     if(!is_null($error))
-      new ErrorPage(sprintf(_("%s disallowed on inactve CMS version"), $error), $errno);
+      new ErrorPage(sprintf(_("%s disallowed on inactive CMS version"), $error), $errno);
   }
 
   // prevent unauthorized no-cached requests
@@ -35,19 +36,10 @@ try {
     redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
-  if(!IS_LOCALHOST) initLinks();
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
-
   Cms::checkAuth();
-  if(Cms::isSuperUser() && isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
-    try {
-      clearNginxCache();
-      Logger::user_success(_("Cache successfully purged"));
-    } catch(Exception $e) {
-      Logger::critical($e->getMessage());
-    }
-  }
+  if(Cms::isSuperUser() && !IS_LOCALHOST) initIndexFiles();
 
   // remove ?login form url
   if(isset($_GET["login"])) {
@@ -57,9 +49,8 @@ try {
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => buildQuery($query, false))));
   }
 
-  DOMBuilder::setCacheMtime();
-
   $plugins = new Plugins();
+  HTMLPlusBuilder::register(INDEX_HTML);
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
 
@@ -67,17 +58,36 @@ try {
   $plugins->setStatus(STATUS_INIT);
   $plugins->notify();
 
-  Cms::buildContent();
+  $content = Cms::buildContent();
   $plugins->setStatus(STATUS_PROCESS);
   $plugins->notify();
 
-  Cms::contentProcessVariables();
+  #var_dump(HTMLPlusBuilder::getIdToLink());
+  #var_dump(HTMLPlusBuilder::getIdToParentId());
+  #var_dump(HTMLPlusBuilder::getUriToInt("pavel_petrzela"));
+  #var_dump(HTMLPlusBuilder::getIntToParentInt());
+  #die("die");
+
+  $content = Cms::contentProcessVariables($content);
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
+  if(Cms::isSuperUser() && DOMBuilder::isCacheOutdated()) {
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
+      try {
+        clearNginxCache();
+        Logger::user_success(_("Cache successfully purged"));
+      } catch(Exception $e) {
+        Logger::critical($e->getMessage());
+      }
+    } elseif(!isset($_GET[CACHE_PARAM]) || $_GET[CACHE_PARAM] != CACHE_IGNORE) {
+      Logger::user_notice(_("Server cache (nginx) is outdated"));
+    }
+  }
+
   Cms::getMessages();
-  Cms::contentProcessVariables();
-  echo Cms::getOutput();
+  $content = Cms::contentProcessVariables($content);
+  echo Cms::getOutput($content);
 
 } catch(Exception $e) {
 

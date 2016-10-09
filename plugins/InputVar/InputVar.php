@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -16,7 +16,7 @@ use DOMText;
 use SplObserver;
 use SplSubject;
 
-class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
+class InputVar extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $userCfgPath = null;
   private $contentXPath;
   private $cfg = null;
@@ -24,11 +24,9 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private $passwd = null;
   private $getOk = "ivok";
   private $vars = array();
-  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $this->className = (new \ReflectionClass($this))->getShortName();
     $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml";
     $s->setPriority($this, 5);
   }
@@ -37,11 +35,11 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
     try {
       if($subject->getStatus() == STATUS_POSTPROCESS) $this->processPost();
       if(!in_array($subject->getStatus(), array(STATUS_INIT, STATUS_PROCESS))) return;
+      $this->cfg = $this->getXML();
       if($subject->getStatus() == STATUS_INIT) {
         if(isset($_GET[$this->getOk])) Logger::user_success(_("Changes successfully saved"));
         $this->loadVars();
       }
-      $this->cfg = $this->getDOMPlus();
       foreach($this->cfg->documentElement->childElementsArray as $e) {
         if($e->nodeName == "set") continue;
         if($e->nodeName == "passwd") continue;
@@ -70,19 +68,15 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   }
 
   private function loadVars() {
-    if(!is_file($this->userCfgPath)) return;
-    $userCfg = new DOMDocumentPlus();
-    if(!@$userCfg->load($this->userCfgPath))
-      throw new Exception(sprintf(_("Unable to load content from user config")));
-    foreach($userCfg->documentElement->childElementsArray as $e) {
+    foreach($this->cfg->documentElement->childElementsArray as $e) {
       if($e->nodeName == "var") $this->vars[$e->getAttribute("id")] = $e;
       if(!IS_LOCALHOST && $e->nodeName == "passwd") $this->passwd = $e->nodeValue;
     }
 
   }
 
-  public function getContent(HTMLPlus $content) {
-    if(!isset($_GET[$this->className])) return $content;
+  public function getContent() {
+    if(!isset($_GET[$this->className])) return null;
     $newContent = $this->getHTMLPlus();
     $form = $newContent->getElementsByTagName("form")->item(0);
     $this->formId = $form->getAttribute("id");
@@ -111,7 +105,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       $this->createFs($content, $fieldset, $set, $set->getAttribute("type"));
       break;
       default:
-      Logger::user_warning(sprintf(_("Element set uknown type %s"), $set->getAttribute("type")));
+      Logger::user_warning(sprintf(_("Unsupported attribute type value '%s'"), $set->getAttribute("type")));
     }
   }
 
@@ -248,7 +242,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
       }
     }
     if(@$var->ownerDocument->save($this->userCfgPath) === false)
-      throw new Exception(_("Unabe to save user config"));
+      throw new Exception(_("Unable to save user config"));
     #if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON)
     clearNginxCache();
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => $this->className."&".$this->getOk), true));
@@ -333,7 +327,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
           Logger::user_warning($e->getMessage());
           continue;
         }
-        $tr["~(?<!\pL)".$name."(?!\pL)~u"] = $this->parse($d->nodeValue);
+        $tr[$name] = $this->parse($d->nodeValue);
       }
       $fn = $this->createFnReplace($id, $tr);
       break;
@@ -387,8 +381,7 @@ class InputVar extends Plugin implements SplObserver, ContentStrategyInterface {
   private function createFnReplace($id, Array $replace) {
     if(empty($replace)) throw new Exception(_("No data found"));
     return function(DOMNode $node) use ($replace) {
-      #return str_replace(array_keys($replace), $replace, $node->nodeValue);
-      return preg_replace(array_keys($replace), $replace, $node->nodeValue);
+      return str_replace(array_keys($replace), $replace, $node->nodeValue);
     };
   }
 

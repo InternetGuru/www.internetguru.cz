@@ -4,6 +4,7 @@
 
   var Config = {}
   Config.change = "* ";
+  Config.favicon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAfwAAAH8BuLbMiQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAADVSURBVDiNldM9TsNAEIbhBxrKSEhOcgkuQcPF0iNOkCZniGgiUVKkyo9dcIOcIFRDwTpyFttsRhpZWu/7fjvWWkQobVTY4OmydiO8Q+DUSm4RLBMcXUlp8gKP+MwkmxJ4nzavMskO1Rg8xSFLbCVLVIPfYABue3G1twee4TgA79vkXsE/8CGHrwSYox6Bp73jJniCZgA+DsER4d5vnfHub9V4johTz7tLPWCbRnjtJNeYFVw0LwloOpIG88Ir7q2Tuk0nmpT+I3dY4ys9PyLie2zevH4AVeK3Am/wPTAAAAAASUVORK5CYII=";
   Config.unload_msg = "Form content has been changed.";
   Config.editable_class = "editable";
 
@@ -53,6 +54,19 @@
       if(modified) return;
       modified = true;
       document.title = Config.change + document.title;
+      var links = document.getElementsByTagName("link");
+      link = null;
+      for(var i = 0; i < links.length; i++) {
+        if(links[i].rel != "shortcut icon") continue;
+        link = links[i];
+      }
+      if(link === null) {
+        var link = document.createElement('link');
+        link.type = "image/x-icon";
+        link.rel = "shortcut icon";
+        document.getElementsByTagName('head')[0].appendChild(link);
+      }
+      link.href = Config.favicon;
     }
     // public
     return {

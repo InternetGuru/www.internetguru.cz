@@ -5,6 +5,7 @@ namespace IGCMS\Core;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
+use IGCMS\Core\NoFileException;
 use Exception;
 use DOMDocument;
 use DOMElement;
@@ -22,7 +23,19 @@ class DOMDocumentPlus extends DOMDocument {
     return parent::createElement($name, htmlspecialchars($value));
   }
 
-  public function getElementById($id, $aName="id", $eName = null) {
+  public function load($filePath, $options=0) {
+    if(!is_file($filePath) || file_exists(dirname($filePath)."/.".basename($filePath)))
+      throw new NoFileException(_("File not found or disabled"));
+    if(!@parent::load($filePath, $options))
+      throw new Exception(_("Invalid XML file"));
+  }
+
+  public function loadXML($xml, $options=0) {
+    if(!@parent::loadXML($xml, $options))
+      throw new Exception(_("Invalid XML"));
+  }
+
+  public function getElementById($id, $eName=null, $aName="id") {
     try {
       if(!is_null($eName)) {
         $element = null;
@@ -134,7 +147,7 @@ class DOMDocumentPlus extends DOMDocument {
       libxml_use_internal_errors(true);
       libxml_clear_errors();
       if(!$this->relaxNGValidate($f))
-        throw new Exception(_("relaxNGValidate() internal error occured"));
+        throw new Exception(_("relaxNGValidate() internal error occurred"));
     } catch (Exception $e) {
       $internal_errors = libxml_get_errors();
       if(count($internal_errors)) {

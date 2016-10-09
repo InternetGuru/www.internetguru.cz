@@ -1,466 +1,101 @@
 <?php
 
 namespace IGCMS\Plugins;
-
+use IGCMS\Plugins\Agregator\DocList;
+use IGCMS\Plugins\Agregator\ImgList;
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use Exception;
 use SplObserver;
 use SplSubject;
 
-class Agregator extends Plugin implements SplObserver {
-  private $files = array();  // filePath => fileInfo(?)
-  private $docinfo = array();
-  private $currentDoc = null;
-  private $currentSubdir = null;
-  private $currentFilepath = null;
-  private $useCache = true;
-  private $edit;
-  private $cfg;
-  private static $sortKey;
-  const APC_PREFIX = "1";
+class Agregator extends Plugin implements SplObserver, GetContentStrategyInterface {
+  private $registered = array();  // filePath => fileInfo(?)
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 2);
-    $this->edit = _("Edit");
   }
 
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
+    if($subject->getStatus() != STATUS_PREINIT) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
-    $this->cfg = $this->getDOMPlus();
-    $curLink = getCurLink();
-    try {
-      mkdir_plus(ADMIN_FOLDER."/".$this->pluginDir);
-      mkdir_plus(USER_FOLDER."/".$this->pluginDir);
-      $list = array();
-      $this->createList(USER_FOLDER."/".$this->pluginDir, $list, "html");
-      $this->createList(ADMIN_FOLDER."/".$this->pluginDir, $list, "html");
-      foreach($list as $subDir => $files) {
-        $vars = $this->getFileVars($subDir, $files);
-        #if(!count($vars)) continue;
-        $this->createCmsVars($subDir, $vars);
+    $this->registerFiles(CMS_FOLDER);
+    $this->registerFiles(ADMIN_FOLDER);
+    $this->registerFiles(USER_FOLDER);
+    $this->createLists();
+    #var_dump(HTMLPlusBuilder::getIdToParentId());
+    #die();
+  }
+
+  private function createLists() {
+    $docListClass = "IGCMS\Plugins\Agregator\DocList";
+    $imgListClass = "IGCMS\Plugins\Agregator\ImgList";
+    $listElements[$docListClass] = array();
+    $listElements[$imgListClass] = array();
+    foreach($this->getXML()->documentElement->childNodes as $child) {
+      if($child->nodeType != XML_ELEMENT_NODE) continue;
+      try {
+        $listClass = $docListClass;
+        switch($child->nodeName) {
+          case "imglist":
+          $listClass = $imgListClass;
+          case "doclist":
+          $id = $child->getRequiredAttribute("id");
+          $listRef = $child->getAttribute($child->nodeName);
+          if(!strlen($listRef)) {
+            $listElements[$listClass][$id] = $child;
+            $listId[$id] = new $listClass($child);
+            continue;
+          }
+          if(!array_key_exists($listRef, $listElements[$listClass])) {
+            throw new Exception(sprintf(_("Reference id '%s' not found"), $listRef));
+          }
+          $listId[$id] = new $listClass($child, $listElements[$listClass][$listRef]);
+        }
+      } catch(Exception $e) {
+        Logger::user_warning(sprintf(_("List '%s' not created: %s"), $id, $e->getMessage()));
       }
-      $list = array();
-      $this->createList(FILES_FOLDER, $list);
-      #$this->createFilesVar(FILES_FOLDER);
-      foreach($list as $subDir => $files) {
-        $this->createImgVar($subDir, $files);
-      }
-    } catch(Exception $e) {
-      Logger::critical($e->getMessage());
-      return;
     }
-    if(is_null($this->currentDoc)) return;
+  }
+
+  public function getContent() {
+    $file = HTMLPlusBuilder::getCurFile();
+    if(is_null($file) || !array_key_exists($file, $this->registered)) return null;
     Cms::getOutputStrategy()->addTransformation($this->pluginDir."/Agregator.xsl");
-    $this->insertDocInfo($this->currentDoc);
-    $this->insertContent($this->currentDoc, $this->currentSubdir);
+    return HTMLPlusBuilder::getFileToDoc($file);
   }
 
-  private function insertDocInfo(HTMLPlus $doc) {
-    $vars = array();
-    foreach($this->cfg->getElementsByTagName("var") as $var) {
-      $vars[$var->getAttribute("id")] = $var;
+  private function registerFiles($workingDir, $folder=null) {
+    $cwd = "$workingDir/".$this->pluginDir."/$folder";
+    if(!is_dir($cwd)) return;
+    switch($workingDir) {
+      case CMS_FOLDER:
+      if(is_dir(ADMIN_FOLDER."/".$this->pluginDir."/$folder")
+        && !file_exists(ADMIN_FOLDER."/".$this->pluginDir."/.$folder")) return;
+      case ADMIN_FOLDER:
+      if(is_dir(USER_FOLDER."/".$this->pluginDir."/$folder")
+        && !file_exists(USER_FOLDER."/".$this->pluginDir."/.$folder")) return;
     }
-    foreach($doc->getElementsByTagName("h") as $h) {
-      $ul = $this->createDocInfo($h, $vars);
-      if(!$ul->childNodes->length) continue;
-      $ul->processVariables($this->docinfo, array(), true);
-      if($h->parentNode->nodeName == "body") {
-        $wrapper = $doc->createElement("var");
-        $wrapper->appendChild($ul);
-        Cms::setVariable("docinfo", $wrapper);
+    foreach(scandir($cwd) as $file) {
+      if(strpos($file, ".") === 0) continue;
+      if(file_exists("$cwd/.$file")) continue;
+      $filePath = is_null($folder) ? $file : "$folder/$file";
+      if(is_dir("$cwd/$file")) {
+        $this->registerFiles($workingDir, $filePath);
         continue;
       }
-      $e = $h->nextElement;
-      while(!is_null($e)) {
-        if($e->nodeName == "h") break;
-        $e = $e->nextElement;
-      }
-      if(is_null($e)) $h->parentNode->appendChild($ul);
-      else $h->parentNode->insertBefore($ul, $e);
-    }
-  }
-
-  private function createDocInfo(DOMElementPlus $h, Array $vars) {
-    $doc = $h->ownerDocument;
-    $ul = $doc->createElement("ul");
-    if($h->parentNode->nodeName == "body") {
-      $ul->setAttribute("class", "docinfo nomultiple global");
-      $li = $ul->appendChild($doc->createElement("li"));
-      // global author & creation
-      $li->setAttribute("class", "creation");
-      foreach($vars["creation"]->childNodes as $n) {
-        $li->appendChild($doc->importNode($n, true));
-      }
-      // global modification
-      if(substr($this->docinfo["ctime"], 0, 10) != substr($this->docinfo["mtime"], 0, 10)) {
-        $li = $ul->appendChild($doc->createElement("li"));
-        $li->setAttribute("class", "modified");
-        foreach($vars["modified"]->childNodes as $n) {
-          $li->appendChild($doc->importNode($n, true));
-        }
-      }
-      // global responsibility
-      if($h->hasAttribute("resp")) {
-        $li = $ul->appendChild($doc->createElement("li"));
-        $li->setAttribute("class", "responsible");
-        foreach($vars["responsible"]->childNodes as $n) {
-          $li->appendChild($doc->importNode($n, true));
-        }
-      }
-      // edit link
-      if(Cms::isSuperUser()) {
-        $li = $ul->appendChild($doc->createElement("li"));
-        $li->setAttribute("class", "edit noprint");
-        $a = $li->appendChild($doc->createElement("a", $this->edit));
-        $a->setAttribute("href", "?Admin=".$this->currentFilepath);
-        $a->setAttribute("title", $this->currentFilepath);
-      }
-    } else {
-      $ul->setAttribute("class", "docinfo nomultiple partial");
-      $partinfo = array();
-      // local author (?)
-      // local responsibility (?)
-      // local creation
-      if($h->hasAttribute("ctime") && substr($this->docinfo["ctime"], 0, 10) != substr($h->getAttribute("ctime"), 0, 10)) {
-        $partinfo["ctime"] = $h->getAttribute("ctime");
-        $li = $ul->appendChild($doc->createElement("li"));
-        foreach($vars["part_created"]->childNodes as $n) {
-          $li->appendChild($doc->importNode($n, true));
-        }
-      }
-      // local modification
-      if($h->hasAttribute("mtime") && substr($this->docinfo["mtime"], 0, 10) != substr($h->getAttribute("mtime"), 0, 10)) {
-        $partinfo["mtime"] = $h->getAttribute("mtime");
-        $li = $ul->appendChild($doc->createElement("li"));
-        foreach($vars["part_modified"]->childNodes as $n) {
-          $li->appendChild($doc->importNode($n, true));
-        }
-      }
-      $ul->processVariables($partinfo, array(), true);
-    }
-    return $ul;
-  }
-
-  private function insertContent(HTMLPlus $doc, $subDir) {
-    $dest = Cms::getContentFull()->getElementById($subDir, "link");
-    if(is_null($dest)) $dest = Cms::getContentFull()->documentElement->firstElement->nextElement;
-    while($dest->nodeName != "section") {
-      if(is_null($dest->nextElement)) {
-        $dest = $dest->parentNode->appendChild($dest->ownerDocument->createElement("section"));
-        break;
-      }
-      if($dest->nextElement->nodeName == "h") {
-        $dest = $dest->parentNode->insertBefore($dest->ownerDocument->createElement("section"), $dest->nextElement);
-        break;
-      }
-      $dest = $dest->nextElement;
-    }
-    foreach($doc->documentElement->attributes as $a) {
-      if($a->nodeName == "ns") continue;
-      $dest->setAttribute($a->nodeName, $a->nodeValue);
-    }
-    foreach($doc->documentElement->childElementsArray as $e) {
-      $dest->appendChild($dest->ownerDocument->importNode($e, true));
-    }
-  }
-
-  private function createList($rootDir, Array &$list, $ext=null, $subDir=null) {
-    if(isset($list[$subDir])) return; // user dir (with at least one file) beats admin dir
-    $workingDir = "$rootDir".(strlen($subDir) ? "/$subDir" : "");
-    if(!is_dir($workingDir)) return;
-    foreach(scandir($workingDir) as $f) {
-      if(strpos($f, ".") === 0) continue;
-      if(is_dir("$workingDir/$f")) {
-        $this->createList($rootDir, $list, $ext, is_null($subDir) ? $f : "$subDir/$f");
-        continue;
-      }
-      if(!is_null($ext) && pathinfo($f, PATHINFO_EXTENSION) != $ext) continue;
-      if(is_file("$workingDir/.$f")) continue;
-      $list[$subDir][$f] = $rootDir;
-    }
-  }
-
-  private function createImgVar($subDir, Array $files) {
-    $cacheKey = apc_get_key($subDir);
-    $useCache = true;
-    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
-    if(is_file($inotify)) $checkSum = filemtime($inotify);
-    else $checkSum = count($files);
-    if(!apc_is_valid_cache($cacheKey, $checkSum)) {
-      apc_store_cache($cacheKey, $checkSum, $subDir);
-      $useCache = false;
-    }
-    $alts = $this->buildImgAlts();
-    $vars = $this->buildImgVars($files, $alts, $subDir);
-    if(empty($vars)) return;
-    foreach($this->cfg->documentElement->childElementsArray as $image) {
-      if($image->nodeName != "image") continue;
+      if(pathinfo($file, PATHINFO_EXTENSION) != "html") continue;
       try {
-        $id = $image->getRequiredAttribute("id");
+        HTMLPlusBuilder::register($this->pluginDir."/$filePath", $folder);
+        $this->registered[$this->pluginDir."/$filePath"] = null;
       } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
-        continue;
-      }
-      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-      self::$sortKey = "name";
-      $cacheKey = apc_get_key($vName);
-      if($useCache && apc_exists($cacheKey)) {
-        $doc = new DOMDocumentPlus();
-        $doc->loadXML(apc_fetch($cacheKey));
-        Cms::setVariable($vName, $doc->documentElement);
-        continue;
-      }
-      $vars = $this->sort($vars, $image);
-      $vValue = $this->getDOM($vars, $image);
-      apc_store_cache($cacheKey, $vValue->saveXML(), $vName);
-      Cms::setVariable($vName, $vValue->documentElement);
-    }
-  }
-
-  private function buildImgAlts() {
-    $alts = array();
-    foreach($this->cfg->documentElement->childElementsArray as $alt) {
-      if($alt->nodeName != "alt") continue;
-      try {
-        $for = $alt->getRequiredAttribute("for");
-      } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
-        continue;
-      }
-      $alts[$for] = $alt->nodeValue;
-    }
-    return $alts;
-  }
-
-  private function buildImgVars(Array $files, Array $alts, $subDir) {
-    $vars = array();
-    foreach($files as $fileName => $rootDir) {
-      if(strlen($subDir)) $fileName = "$subDir/$fileName";
-      $filePath = "$rootDir/$fileName";
-      $mimeType = getFileMime($filePath);
-      if($mimeType != "image/svg+xml" && strpos($mimeType, "image/") !== 0) continue;
-      $v = array();
-      $v["name"] = $fileName;
-      $v["type"] = $mimeType;
-      $v["mtime"] = filemtime($filePath);
-      $v["url"] = FILES_DIR."/$fileName"; // $filePath ???
-      $v["url-images"] = $v["url"]; // alias for $v["url"]
-      $v["url-thumbs"] = FILES_DIR."/thumbs/$fileName";
-      $v["url-preview"] = FILES_DIR."/preview/$fileName";
-      $v["url-big"] = FILES_DIR."/big/$fileName";
-      $v["url-full"] = FILES_DIR."/full/$fileName";
-      if(isset($alts[$fileName])) $v["alt"] = $alts[$fileName];
-      $vars[$filePath] = $v;
-    }
-    return $vars;
-  }
-
-  private function createFilesVar($rootDir) {
-    foreach($this->files as $subDir => $null) {
-      $workingDir = $subDir == "" ? $rootDir : "$rootDir/$subDir";
-      $doc = new DOMDocumentPlus();
-      $root = $doc->appendChild($doc->createElement("root"));
-      $ol = $root->appendChild($doc->createElement("ol"));
-      foreach($this->files[$subDir] as $f => $null) {
-        $li = $ol->appendChild($doc->createElement("li"));
-        $a = $li->appendChild($doc->createElement("a"));
-        $href = $subDir == "" ? $f : "$subDir/$f";
-        $a->setAttribute("href", "/$href");
-        $a->nodeValue = $href;
-      }
-      Cms::setVariable("files".($subDir == "" ? "" : "_".str_replace("/", "_", $subDir)), $root);
-    }
-  }
-
-  private function getFileVars($subDir, Array $files) {
-    $vars = array();
-    $cacheKey = apc_get_key($subDir);
-    $inotify = current($files)."/".(strlen($subDir) ? "$subDir/" : "").INOTIFY;
-    if(is_file($inotify)) $checkSum = filemtime($inotify);
-    else $checkSum = count($files);
-    if(!apc_is_valid_cache($cacheKey, $checkSum)) {
-      apc_store_cache($cacheKey, $checkSum, $subDir);
-      $this->useCache = false;
-    }
-    foreach($files as $fileName => $rootDir) {
-      $filePath = "$rootDir/".(strlen($subDir) ? "$subDir/" : "").$fileName;
-      $file = stripDataFolder($filePath);
-      try {
-        $doc = DOMBuilder::buildHTMLPlus($file);
-        $vars[$filePath] = $this->getHTMLVariables($doc, $filePath, $file);
-      } catch(Exception $e) {
-        Logger::critical($e->getMessage());
-        continue;
-      }
-      if(is_null($this->currentDoc) && $this->isCurrentDoc($vars[$filePath]["links"])) {
-        $this->docinfo = $vars[$filePath];
-        $this->currentSubdir = $subDir;
-        $this->currentFilepath = $file;
-        $this->currentDoc = $doc;
-      }
-      if(is_file($inotify)) continue;
-      $cacheKey = apc_get_key($filePath);
-      if(apc_is_valid_cache($cacheKey, filemtime($filePath))) continue;
-      apc_store_cache($cacheKey, filemtime($filePath), $file);
-      $this->useCache = false;
-    }
-    return $vars;
-  }
-
-  private function createCmsVars($subDir, Array $vars) {
-    $className = (new \ReflectionClass($this))->getShortName();
-    $filePath = findFile($this->pluginDir."/".$className.".xml");
-    $cacheKey = apc_get_key($filePath);
-    if(!apc_is_valid_cache($cacheKey, filemtime($filePath))) {
-      apc_store_cache($cacheKey, filemtime($filePath), $this->pluginDir."/".$className.".xml");
-      $this->useCache = false;
-    }
-    foreach($this->cfg->documentElement->childElementsArray as $html) {
-      if($html->nodeName != "html") continue;
-      try {
-        $id = $html->getRequiredAttribute("id");
-      } catch(Exception $e) {
-        Logger::user_warning($e->getMessage());
-        continue;
-      }
-      $vName = $id.($subDir == "" ? "" : "_".str_replace("/", "_", $subDir));
-      $cacheKey = apc_get_key($vName);
-      // use cache
-      if($this->useCache) {
-        $sCache = $this->getSubDirCache($cacheKey);
-        if(!is_null($sCache)) {
-          $doc = new DOMDocumentPlus();
-          $doc->loadXML($sCache["value"]);
-          Cms::setVariable($sCache["name"], $doc->documentElement);
-          continue;
-        }
-      }
-      self::$sortKey = "ctime";
-      $vars = $this->sort($vars, $html);
-      try {
-        $vValue = $this->getDOM($vars, $html);
-        Cms::setVariable($vName, $vValue->documentElement);
-        $var = array(
-          "name" => $vName,
-          "value" => $vValue->saveXML(),
-        );
-        apc_store_cache($cacheKey, $var, $vName);
-      } catch(Exception $e) {
-        Logger::critical($e->getMessage());
-        continue;
+        Logger::user_warning(sprintf(_("Unable to register '%s': %s"), $filePath, $e->getMessage()));
       }
     }
-  }
-
-  private function sort($vars, $e) {
-    $reverse = true;
-    if($e->hasAttribute("sort") || $e->hasAttribute("rsort")) {
-      $reverse = $e->hasAttribute("rsort");
-      $userKey = $e->hasAttribute("sort") ? $e->getAttribute("sort") : $e->getAttribute("rsort");
-      if(!array_key_exists($userKey, current($vars))) {
-        Logger::user_warning(sprintf(_("Sort variable %s not found; using default"), $userKey));
-      } else {
-        self::$sortKey = $userKey;
-      }
-    }
-    uasort($vars, array("IGCMS\Plugins\Agregator", "cmp"));
-    if($reverse) $vars = array_reverse($vars);
-    return $vars;
-  }
-
-  private function getSubDirCache($cacheKey) {
-    if(!apc_exists($cacheKey)) return null;
-    return apc_fetch($cacheKey);
-  }
-
-  private static function cmp($a, $b) {
-    if($a[self::$sortKey] == $b[self::$sortKey]) return 0;
-    return ($a[self::$sortKey] < $b[self::$sortKey]) ? -1 : 1;
-  }
-
-  private function getDOM(Array $vars, DOMElementPlus $html) {
-    $items = $html->childElementsArray;
-    $id = $html->getAttribute("id");
-    $class = $html->getAttribute("class");
-    $doc = new DOMDocumentPlus();
-    $root = $doc->appendChild($doc->createElement("root"));
-    if(strlen($html->getAttribute("wrapper")))
-      $root = $root->appendChild($doc->createElement($html->getAttribute("wrapper")));
-    if(strlen($class)) $root->setAttribute("class", $class);
-    $nonItemElement = false;
-    $patterns = array();
-    foreach($items as $item) {
-      if($item->nodeName != "item") {
-        $nonItemElement = true;
-        continue;
-      }
-      if($item->hasAttribute("since"))
-        $patterns[$item->getAttribute("since")-1] = $item;
-      else $patterns[] = $item;
-    }
-    if($nonItemElement) Logger::user_warning(sprintf(_("Redundant element(s) found in %s"), $id));
-    if(empty($patterns)) throw new Exception(_("No item element found"));
-    $i = -1;
-    $pattern = null;
-    foreach($vars as $k => $v) {
-      $i++;
-      if(isset($patterns[$i])) $pattern = $patterns[$i];
-      if(is_null($pattern) || !$pattern->childNodes->length) continue;
-      $item = $root->appendChild($doc->importNode($pattern, true));
-      $item->processVariables($v, array(), true);
-      $item->stripTag();
-    }
-    return $doc;
-  }
-
-  private function getHTMLVariables(HTMLPlus $doc, $filePath, $file) {
-    $cacheKey = apc_get_key("vars/$filePath");
-    $mTime = filemtime($filePath);
-    if($this->useCache && apc_exists($cacheKey)) {
-      $vars = apc_fetch($cacheKey);
-      if($vars["filemtime"] == $mTime) return $vars;
-    }
-    $vars = array();
-    $h = $doc->documentElement->firstElement;
-    $desc = $h->nextElement;
-    $vars['editlink'] = "";
-    if(Cms::isSuperUser()) {
-      $vars['editlink'] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>".$this->edit."</a>";
-    }
-    $vars['filemtime'] = $mTime;
-    $vars['heading'] = $h->nodeValue;
-    $vars['link'] = $h->getAttribute("link");
-    $vars['author'] = $h->getAttribute("author");
-    $vars['authorid'] = $h->hasAttribute("authorid") ? $h->getAttribute("authorid") : "";
-    $vars['resp'] = $h->hasAttribute("resp") ? $h->getAttribute("resp") : null;
-    $vars['respid'] = $h->hasAttribute("respid") ? $h->getAttribute("respid") : "";
-    $vars['ctime'] = $h->getAttribute("ctime");
-    $vars['mtime'] = $h->getAttribute("mtime");
-    $vars['short'] = $h->hasAttribute("short") ? $h->getAttribute("short") : null;
-    $vars['desc'] = $desc->nodeValue;
-    $vars['kw'] = $desc->getAttribute("kw");
-    $vars['links'] = array();
-    foreach($doc->getElementsByTagName("h") as $h) {
-      if(!$h->hasAttribute("link")) continue;
-      $vars['links'][] = $h->getAttribute("link");
-    }
-    apc_store_cache($cacheKey, $vars, $file);
-    return $vars;
-  }
-
-  private function isCurrentDoc(Array $links) {
-    foreach($links as $link) {
-      if($link == getCurLink()) return true;
-    }
-    return false;
   }
 
 }

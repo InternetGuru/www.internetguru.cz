@@ -3,7 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\ContentStrategyInterface;
+use IGCMS\Core\GetContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
@@ -16,20 +16,18 @@ use SplSubject;
 
 #bug: <p>$contactform-basic</p> does not parse to <p var="..."/>
 
-class Convertor extends Plugin implements SplObserver, ContentStrategyInterface {
+class Convertor extends Plugin implements SplObserver, GetContentStrategyInterface {
   private $html = null;
   private $file = null;
   private $docName = null;
   private $tmpFolder;
   private $importedFiles = array();
-  private $className = null;
 
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
     mkdir_plus($this->tmpFolder);
-    $this->className = (new \ReflectionClass($this))->getShortName();
   }
 
   public function update(SplSubject $subject) {
@@ -91,7 +89,6 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
 
     $doc = new HTMLPlus();
     $doc->defaultAuthor = Cms::getVariable("cms-author");
-    $doc->defaultLink = pathinfo($f, PATHINFO_FILENAME);
     $doc->loadXML($xml);
     if(is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h") {
@@ -103,22 +100,17 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     if(!$firstHeading->hasAttribute("short") && !is_null($this->docName))
       $firstHeading->setAttribute("short", $this->docName);
     $this->parseContent($doc, "desc", "kw");
-    $this->addLinks($doc);
     try {
-      $doc->validatePlus();
-    } catch(Exception $e) {
-      try {
-        $doc->validatePlus(true);
-        foreach($doc->getErrors() as $error) {
-          Logger::user_notice(_("Autocorrected").":$error");
-        }
-      } catch(Exception $e) {
-        Cms::notice(_("Use @ to specify short/link attributes for heading"));
-        Cms::notice(_("Eg. This Is Long Heading @ Short Heading"));
-        Cms::notice(_("Use @ to specify kw attribute for description"));
-        Cms::notice(_("Eg. This is description @ these, are, some, keywords"));
-        throw $e;
+      $doc->validatePlus(true);
+      foreach($doc->getErrors() as $error) {
+        Logger::user_notice(_("Autocorrected").":$error");
       }
+    } catch(Exception $e) {
+      Cms::notice(_("Use @ to specify short attribute for heading"));
+      Cms::notice(_("Eg. This Is Long Heading @ Short Heading"));
+      Cms::notice(_("Use @ to specify kw attribute for description"));
+      Cms::notice(_("Eg. This is description @ these, are, some, keywords"));
+      throw $e;
     }
     $doc->applySyntax();
     $this->html = $doc->saveXML();
@@ -162,16 +154,9 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     }
   }
 
-  private function addLinks(HTMLPlus $doc) {
-    foreach($doc->getElementsByTagName("h") as $e) {
-      if(!$e->hasAttribute("short")) continue;
-      $e->setAttribute("link", normalize($e->getAttribute("short"), "a-zA-Z0-9/_-", ""));
-    }
-  }
-
-  public function getContent(HTMLPlus $c) {
+  public function getContent() {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
-    $newContent = $this->getHTMLPlus();
+    $content = $this->getHTMLPlus();
     $vars["action"] = "?".$this->className;
     $vars["link"] = $_GET[$this->className];
     $vars["path"] = $this->pluginDir;
@@ -181,18 +166,8 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
       $vars["nohide"] = "nohide";
       $vars["content"] = $this->html;
     }
-    $newContent->processVariables($vars);
-    return $newContent;
-  }
-
-  private function regenerateIds(DOMDocumentPlus $doc) {
-    $ids = array();
-    foreach($doc->getElementsByTagName("h") as $h) {
-      $oldId = $h->getAttribute("id");
-      $h->setUniqueId();
-      $ids[$oldId] = $h->getAttribute("id");
-    }
-    return $ids;
+    $content->processVariables($vars);
+    return $content;
   }
 
   private function getFile($dest) {
@@ -227,7 +202,7 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
     } else $headers = @get_headers($url);
     $rh = $http_response_header;
     if(strpos($headers[0], '302') !== false)
-      throw new Exception(_("Destination URL is unaccessible; must be shared publically"));
+      throw new Exception(_("Destination URL is unaccessible; must be shared publicly"));
     elseif(strpos($headers[0], '200') === false)
       throw new Exception(sprintf(_("Destination URL error: %s"), $headers[0]));
     stream_context_set_default($defaultContext);
@@ -286,7 +261,11 @@ class Convertor extends Plugin implements SplObserver, ContentStrategyInterface 
   }
 
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
-    $xsl = $this->getDOMPlus($this->pluginDir."/$xslFile", false, false);
+    try {
+      $xsl = $this->getXML($xslFile, false, false);
+    } catch(Exception $e) {
+      throw new Exception(sprintf(_("Unable to load transformation file %s: %s"), $xslFile, $e->getMessage()));
+    }
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);
     $proc->setParameter('', $vars);
