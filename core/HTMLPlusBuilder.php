@@ -2,19 +2,27 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\HTMLPlus;
-use IGCMS\Core\Logger;
-use Exception;
-use DOMXPath;
-use DOMDocument;
 use DOMElement;
-use DOMComment;
-use DateTime;
+use Exception;
 
+/**
+ * @method static getIdToParentId($id=null)
+ * @method static getIdToFile($id=null)
+ * @method static getIdToShort($id=null)
+ * @method static getIdToHeading($id=null)
+ * @method static getIdToTitle($id=null)
+ * @method static getIdToDesc($id=null)
+ * @method static getIdToKw($id=null)
+ * @method static getIdToAuthor($id=null)
+ * @method static getIdToAuthorId($id=null)
+ * @method static getIdToResp($id=null)
+ * @method static getIdToRespId($id=null)
+ * @method static getIdToCtime($id=null)
+ * @method static getIdToMtime($id=null)
+ * @method static getIdToLang($id=null)
+ * @method static getIdToLink($id=null)
+ * @method static getLinkToId($id=null)
+ */
 class HTMLPlusBuilder extends DOMBuilder {
 
   private static $fileToId = array();

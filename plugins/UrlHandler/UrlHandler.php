@@ -2,12 +2,12 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
 use SplObserver;
 use SplSubject;
 

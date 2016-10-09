@@ -2,16 +2,15 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\ResourceInterface;
-use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
+use IGCMS\Core\ResourceInterface;
 use SplObserver;
 use SplSubject;
-use DateTime;
 
 
 /**

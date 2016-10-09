@@ -2,14 +2,13 @@
 
 namespace IGCMS\Plugins;
 
-use IGCMS\Core\ModifyContentStrategyInterface;
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
-use Exception;
-use DOMXPath;
 use SplObserver;
 use SplSubject;
 

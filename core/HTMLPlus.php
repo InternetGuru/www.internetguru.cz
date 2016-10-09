@@ -2,15 +2,16 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\HTMLPlus;
-use IGCMS\Core\Logger;
-use Exception;
+use DateTime;
 use DOMComment;
 use DOMXPath;
-use DateTime;
+use Exception;
 
+/**
+ * Class HTMLPlus
+ * @package IGCMS\Core
+ *
+ */
 class HTMLPlus extends DOMDocumentPlus {
   private $headings = array();
   private $defaultAuthor = null;

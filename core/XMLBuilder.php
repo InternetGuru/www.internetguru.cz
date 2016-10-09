@@ -2,19 +2,7 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\HTMLPlus;
-use IGCMS\Core\Logger;
-use IGCMS\Core\NoFileException;
 use Exception;
-use DOMXPath;
-use DOMDocument;
-use DOMElement;
-use DOMComment;
-use DateTime;
 
 class XMLBuilder extends DOMBuilder {
 

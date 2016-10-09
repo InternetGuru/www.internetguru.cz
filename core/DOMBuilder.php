@@ -2,17 +2,6 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Cms;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\HTMLPlus;
-use IGCMS\Core\Logger;
-use Exception;
-use DOMXPath;
-use DOMDocument;
-use DOMElement;
-use DOMComment;
-use DateTime;
-
 class DOMBuilder {
   private static $newestFileMtime = null;
   private static $newestCacheMtime = null;

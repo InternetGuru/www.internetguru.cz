@@ -3,16 +3,33 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Cms;
-use Monolog\Logger as MonologLogger;
-use Monolog\Handler\NativeMailerHandler;
-use Monolog\Handler\ChromePHPHandler;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Processor\IntrospectionProcessor;
 use Exception;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\ChromePHPHandler;
+use Monolog\Handler\NativeMailerHandler;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger as MonologLogger;
 
-// TODO doc
+/**
+ * Class Logger
+ * @package IGCMS\Core
+ *
+ * @method static debug($msg)
+ * @method static info($msg)
+ * @method static user_info($msg)
+ * @method static user_success($msg)
+ * @method static mail($msg)
+ * @method static notice($msg)
+ * @method static user_notice($msg)
+ * @method static warning($msg)
+ * @method static user_warning($msg)
+ * @method static error($msg)
+ * @method static user_error($msg)
+ * @method static critical($msg)
+ * @method static alert($msg)
+ * @method static emergency($msg)
+ *
+ */
 class Logger {
 
   const TYPE_SYS_LOG  = "sys";

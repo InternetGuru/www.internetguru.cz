@@ -1,10 +1,28 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <DocInfo>
 
-  <var modifyonly="modifyonly" id="creation">Autorem obsahu je <a href="" var="authorid@href author">n/a</a> ze dne <span var="ctime" fn="inputvar-dateformat">n/a</span></var>
+  <var modifyonly="modifyonly" id="docinfo">
+    <ul class="docinfo nomultiple global">
+      <li><span var="created">n/a</span></li>
+      <li><span var="modified">n/a</span></li>
+      <li><span var="responsible">n/a</span></li>
+      <li><span var="edit">n/a</span></li>
+    </ul>
+  </var>
+
+  <var modifyonly="modifyonly" id="created">Autorem obsahu je <a href="" var="authorid@href author">n/a</a> ze dne <span var="ctime" fn="inputvar-dateformat">n/a</span></var>
   <var modifyonly="modifyonly" id="modified">Obsah dokumentu byl naposledy změněn dne <span fn="inputvar-dateformat" var="mtime">n/a</span></var>
   <var modifyonly="modifyonly" id="responsible">Za obsah zodpovídá <a href="" var="respid@href resp">n/a</a></var>
+  <var modifyonly="modifyonly" id="edit"><a href="" var="editurl@href" class="edit noprint">Editovat</a></var>
+
+  <var modifyonly="modifyonly" id="partinfo">
+    <ul class="partinfo nomultiple partial">
+      <li><span var="part_created">n/a</span></li>
+      <li><span var="part_modified">n/a</span></li>
+    </ul>
+  </var>
 
   <var modifyonly="modifyonly" id="part_created">Tato část byla vytvořena dne <span fn="inputvar-dateformat" var="ctime">n/a</span></var>
   <var modifyonly="modifyonly" id="part_modified">Tato část byla upravena dne <span fn="inputvar-dateformat" var="mtime">n/a</span></var>
+
 </DocInfo>
