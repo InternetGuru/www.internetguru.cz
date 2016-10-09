@@ -9,6 +9,7 @@ use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\ErrorPage;
 use Exception;
 use DOMElement;
 use DOMXPath;

@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-25 20:02+0200\n"
-"PO-Revision-Date: 2016-09-25 20:03+0200\n"
+"POT-Creation-Date: 2016-09-30 09:52+0200\n"
+"PO-Revision-Date: 2016-09-30 09:52+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.6\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -39,40 +39,40 @@ msgstr "Varování"
 msgid "Error"
 msgstr "Error"
 
-#: core/Cms.php:112
+#: core/Cms.php:113
 #, php-format
 msgid "Plugin %s exception: %s"
 msgstr "Chyba rozšíření %s: %s"
 
-#: core/Cms.php:158
+#: core/Cms.php:159
 msgid "Unable to re/generate session ID"
 msgstr "Nepodařilo se vygenerovat session ID"
 
-#: core/Cms.php:194
+#: core/Cms.php:195
 #, php-format
 msgid "Invalid HTML+: %s"
 msgstr "Nevalidní HTML+: %s"
 
-#: core/Cms.php:207
+#: core/Cms.php:208
 #, php-format
 msgid "Content must be an instance of HTML+ (%s given)"
 msgstr "Obsah musí být instancí HTML+ (nikoli %s)"
 
-#: core/Cms.php:212
+#: core/Cms.php:213
 #, php-format
 msgid "Invalid HTML+ content: %s"
 msgstr "Nevalidní HTML+ obsah: %s"
 
-#: core/Cms.php:253 core/globals.php:30
+#: core/Cms.php:254 core/globals.php:30
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: core/Cms.php:266
+#: core/Cms.php:267
 #, php-format
 msgid "Unable to set function %s: not a function"
 msgstr "Není možné vytvořit funkci %s: nejedná se o funkci"
 
-#: core/Cms.php:306
+#: core/Cms.php:307
 #, php-format
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
@@ -303,37 +303,37 @@ msgstr "Odstraněn atribut mtime '%s'"
 msgid "Attribute 'mtime' cannot be lower than 'ctime'"
 msgstr "Atribut 'mtime' nemůže být menší než 'ctime'"
 
-#: core/HTMLPlusBuilder.php:143
+#: core/HTMLPlusBuilder.php:153
 #, php-format
 msgid "Undefined link '%s'"
 msgstr "Neznámý odkaz '%s'"
 
-#: core/HTMLPlusBuilder.php:237
+#: core/HTMLPlusBuilder.php:246
 #, php-format
 msgid "Unable to load %s: %s"
 msgstr "Nepodařilo se načíst %s: %s"
 
-#: core/HTMLPlusBuilder.php:247
+#: core/HTMLPlusBuilder.php:256
 #, php-format
 msgid "File %s invalid syntax caused by includes fixed %s times"
 msgstr "Nevalidní syntaxe souboru %s způsobená importem opravena %s krát"
 
-#: core/HTMLPlusBuilder.php:248
+#: core/HTMLPlusBuilder.php:257
 #, php-format
 msgid "File %s invalid syntax fixed %s times"
 msgstr "Nevalidní syntaxe souboru %s opravena %s krát"
 
-#: core/HTMLPlusBuilder.php:259
+#: core/HTMLPlusBuilder.php:268
 #, php-format
 msgid "Unable to import: %s"
 msgstr "Nepodařilo se importovat: %s"
 
-#: core/HTMLPlusBuilder.php:268
+#: core/HTMLPlusBuilder.php:277
 #, php-format
 msgid "Included file '%s' extension must be .html"
 msgstr "Přípona importovaného souboru '%s' musí být .html"
 
-#: core/HTMLPlusBuilder.php:272
+#: core/HTMLPlusBuilder.php:281
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
@@ -759,7 +759,7 @@ msgstr "Editovat"
 msgid "Path '%s' not found"
 msgstr "Cesta  '%s' nebyla nalezena"
 
-#: plugins/Agregator/ImgList.php:51
+#: plugins/Agregator/ImgList.php:52
 #, php-format
 msgid "No images found in '%s'"
 msgstr "Nenalezeny žádné obrázky v '%s'"
@@ -971,6 +971,11 @@ msgstr "Nepodařilo se smazat dočasný soubor: %s"
 #, php-format
 msgid "Outdated file cache successfully removed: %s"
 msgstr "Odstraněna neaktuální souborová mezipaměť: %s"
+
+#: plugins/FileHandler/FileHandler.php:160
+#, php-format
+msgid "Outdated file cache: %s"
+msgstr "Neaktuální souborová mezipaměť: %s"
 
 #: plugins/FileHandler/FileHandler.php:162
 msgid "File cache already uptodate"
