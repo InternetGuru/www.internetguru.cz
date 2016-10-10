@@ -41,6 +41,7 @@ class Cms {
     self::setVariable("messages", self::$flashList);
     self::setVariable("release", CMS_RELEASE);
     self::setVariable("version", CMS_VERSION);
+    self::setVariable("web_release", WEB_RELEASE);
     self::setVariable("name", CMS_NAME);
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
