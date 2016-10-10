@@ -51,11 +51,9 @@ class Cms {
     self::setVariable("resp", HTMLPlusBuilder::getIdToResp($id));
     self::setVariable("respid", HTMLPlusBuilder::getIdToRespId($id));
     self::setVariable("ctime", HTMLPlusBuilder::getIdToCtime($id));
-    self::setVariable("mtime", HTMLPlusBuilder::getIdToMtime($id));
     self::setVariable("lang", HTMLPlusBuilder::getIdToLang($id));
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
-    self::setVariable("uri", URI);
     self::setVariable("cache_nginx", getCurLink()."?".CACHE_PARAM."=".CACHE_NGINX);
     self::setVariable("cache_ignore", getCurLink()."?".CACHE_PARAM."=".CACHE_IGNORE);
     self::setVariable("link", getCurLink());
@@ -64,7 +62,12 @@ class Cms {
     if(isset($_GET[PAGESPEED_PARAM]) || isset($_GET[DEBUG_PARAM]) || isset($_GET[CACHE_PARAM]))
       self::setVariable("url_debug_off", getCurLink()."/?".PAGESPEED_PARAM."&".DEBUG_PARAM."&".CACHE_PARAM);
     if(isset($_GET[PAGESPEED_PARAM])) self::setVariable(PAGESPEED_PARAM, $_GET[PAGESPEED_PARAM]);
-    if(self::getLoggedUser() == "server") self::setVariable("server", "server");
+    if(self::getLoggedUser() == SERVER_USER) {
+      self::setVariable("server", SERVER_USER);
+      return;
+    }
+    self::setVariable("mtime", HTMLPlusBuilder::getIdToMtime($id));
+    self::setVariable("uri", URI);
   }
 
   private static function createFlashList() {
@@ -133,7 +136,7 @@ class Cms {
         Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
       }
     }
-    self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
+    if(self::getLoggedUser() != SERVER_USER) self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
     return $content;
   }
 
@@ -169,7 +172,7 @@ class Cms {
   public static function getLoggedUser() {
     if(IS_LOCALHOST) return ADMIN_ID;
     if(isset($_SERVER["REMOTE_ADDR"])
-      && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return "server";
+      && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return SERVER_USER;
     if(isset($_SERVER['REMOTE_USER']) && strlen($_SERVER['REMOTE_USER']))
       return $_SERVER['REMOTE_USER'];
     #if(isset($_SESSION[get_called_class()]["loggedUser"]))
