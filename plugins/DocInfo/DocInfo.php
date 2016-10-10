@@ -32,6 +32,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
    * @param HTMLPlus $content
    */
   public function modifyContent(HTMLPlus $content) {
+    if(!$content->documentElement->hasClass(strtolower($this->className))) return;
     $filePath = HTMLPlusBuilder::getCurFile();
     $id = HTMLPlusBuilder::getFileToId($filePath);
     $globalInfo = array();
