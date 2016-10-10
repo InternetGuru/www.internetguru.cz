@@ -1,3 +1,6 @@
+
+2.1 | 2016-10-10
+
 LinkList: vytváří proměnnou pouze pro dokumenty se třídou linklist v body
 DocInfo: generuje informace pouze pro dokumenty se třídou docinfo v body
 HTML+: odstranění atributu link z elementu h (odkaz se vytváří z atributu id)
