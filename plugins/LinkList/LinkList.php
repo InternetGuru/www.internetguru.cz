@@ -40,21 +40,10 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
 
   /**
    * @param HTMLPlus $content
-   * @return HTMLPlus
    */
   public function modifyContent(HTMLPlus $content) {
-    $sections = $content->documentElement->getElementsByTagName("section");
-    if($content->documentElement->hasClass($this->cssClass)) {
-      $this->createLinkList($content->documentElement);
-      return $content;
-    }
-    /** @var DOMElementPlus $s */
-    foreach($sections as $s) {
-      if(!$s->hasClass($this->cssClass)) continue;
-      $this->createLinkList($s);
-      break;
-    }
-    return $content;
+    if(!$content->documentElement->hasClass($this->cssClass)) return;
+    $this->createLinkList($content->documentElement);
   }
 
   /**

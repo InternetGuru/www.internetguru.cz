@@ -1,3 +1,4 @@
+LinkList: vytváří proměnnou pouze pro dokumenty se třídou linklist v body
 DocInfo: generuje informace pouze pro dokumenty se třídou docinfo v body
 HTML+: odstranění atributu link z elementu h (odkaz se vytváří z atributu id)
 HTML+: element include je nahrazen atributem src v elementu h
