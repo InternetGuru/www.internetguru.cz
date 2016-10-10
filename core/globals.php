@@ -148,7 +148,7 @@ function buildLocalUrl(Array $pLink, $ignoreCyclic=false, $addPermParam=true) {
 
 function isCyclicLink(Array $pLink) {
   if(isset($pLink["fragment"])) return false;
-  if(isset($pLink["path"]) && $pLink["path"] != getCurLink()) return false;
+  if(isset($pLink["path"]) && $pLink["path"] != getCurLink() && SCRIPT_NAME != $pLink["path"]) return false;
   if(!isset($pLink["query"]) && getCurQuery() != "") return false;
   if(isset($pLink["query"]) && $pLink["query"] != getCurQuery()) return false;
   return true;

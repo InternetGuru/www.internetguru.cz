@@ -196,20 +196,22 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     try {
       $pLink = parseLocalLink($url);
       if(is_null($pLink)) return; # external
-      $getLink = true;
+      $isLink = true;
       if(array_key_exists("path", $pLink)) {
         // link to supported file
         global $plugins;
         foreach($plugins->getIsInterface("IGCMS\Core\ResourceInterface") as $ri) {
           if(!$ri::isSupportedRequest($pLink["path"])) continue;
-
-          $getLink = false;
+          $isLink = false;
           break;
         }
         // link to existing file
-        if($getLink && is_file($pLink["path"])) $getLink = false;
+        if($isLink && is_file($pLink["path"])) {
+          if(pathinfo($pLink["path"], PATHINFO_EXTENSION) == "php") return;
+          $isLink = false;
+        }
       }
-      if($getLink) {
+      if($isLink) {
         $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
         $pLink = $this->getLink($pLink, $rootId);
       }
@@ -222,7 +224,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         if(!array_key_exists("query", $pLink)) $this->insertTitle($e, $pLink["id"]);
         $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
       }
-      $link = buildLocalUrl($pLink, !$linkType, $getLink);
+      $link = buildLocalUrl($pLink, !$linkType, $isLink);
       $e->setAttribute($aName, $link);
     } catch(Exception $ex) {
       $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $url, $ex->getMessage()));
