@@ -11,25 +11,83 @@ use Exception;
  * Class HTMLPlus
  * @package IGCMS\Core
  *
+ * @property string $defaultAuthor
+ * @property string $defaultCtime
+ * @property string $defaultHeading
+ * @property string $defaultDesc
+ * @property string $defaultKw
  */
 class HTMLPlus extends DOMDocumentPlus {
+  /**
+   * @var \DOMNodeList
+   */
   private $headings = array();
+  /**
+   * @var string|null
+   */
   private $defaultAuthor = null;
+  /**
+   * @var string|null
+   */
   private $defaultCtime = null;
+  /**
+   * @var string|null
+   */
   private $defaultHeading = null;
+  /**
+   * @var string|null
+   */
   private $defaultNs = null;
+  /**
+   * @var string|null
+   */
   private $defaultDesc = null;
+  /**
+   * @var string|null
+   */
   private $defaultKw = null;
+  /**
+   * @var array
+   */
   private $errors = array();
+  /**
+   * @var int
+   */
   private $status = 0;
+  /**
+   * @var array
+   */
   private $statuses;
+  /**
+   * @var int
+   */
   const STATUS_UNKNOWN = 0;
+  /**
+   * @var int
+   */
   const STATUS_VALID = 1;
+  /**
+   * @var int
+   */
   const STATUS_INVALID = 2;
+  /**
+   * @var int
+   */
   const STATUS_REPAIRED = 3;
+  /**
+   * @var string
+   */
   const RNG_FILE = "HTMLPlus.rng";
+  /**
+   * @var bool
+   */
   const USE_APC = true;
 
+  /**
+   * HTMLPlus constructor.
+   * @param string $version
+   * @param string $encoding
+   */
   function __construct($version="1.0", $encoding="utf-8") {
     parent::__construct($version, $encoding);
     $this->statuses = array(_("Unknown"), _("Valid"), _("Invalid"), _("Repaired"));
@@ -39,6 +97,11 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->defaultNs = HOST;
   }
 
+  /**
+   * @param string $vName
+   * @param string $vValue
+   * @throws Exception
+   */
   public function __set($vName, $vValue) {
     if(!is_null($vValue) && (!is_string($vValue) || !strlen($vValue)))
       throw new Exception(_("Variable value must be non-empty string or null"));
@@ -52,6 +115,9 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @return HTMLPlus
+   */
   public function __clone() {
     $doc = new HTMLPlus();
     $root = $doc->importNode($this->documentElement, true);
@@ -59,19 +125,35 @@ class HTMLPlus extends DOMDocumentPlus {
     return $doc;
   }
 
+  /**
+   * @return string
+   */
   public function getStatus() {
     return $this->statuses[$this->status];
   }
 
+  /**
+   * @return array
+   */
   public function getErrors() {
     return $this->errors;
   }
 
+  /**
+   * @param array $variables
+   * @param array $ignore
+   * @return DOMDocumentPlus
+   */
   public function processVariables(Array $variables, $ignore=array("h" => array("id"))) {
     $newContent = parent::processVariables($variables, $ignore);
     return $newContent->ownerDocument;
   }
 
+  /**
+   * @param array $functions
+   * @param array $variables
+   * @param array $ignore
+   */
   public function processFunctions(Array $functions, Array $variables=array(), $ignore=array("h" => array("id"))) {
     parent::processFunctions($functions, $variables, $ignore);
   }
@@ -99,6 +181,10 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param array $extend
+   * @return DOMElementPlus[]
+   */
   private function getNodes($extend = array()) {
     $nodes = array();
     foreach(array_merge(array("p", "dt", "dd", "li"), $extend) as $eNam) {
@@ -109,6 +195,10 @@ class HTMLPlus extends DOMDocumentPlus {
     return $nodes;
   }
 
+  /**)
+   * @param DOMElementPlus $n
+   * @return array
+   */
   private function parseSyntaxNoparse(DOMElementPlus $n) {
     $noparse = array();
     $pat = "/<noparse>(.+?)<\/noparse>/";
@@ -126,6 +216,9 @@ class HTMLPlus extends DOMDocumentPlus {
     return $noparse;
   }
 
+  /**
+   * @param DOMElementPlus $n
+   */
   private function parseSyntaxCodeTag(DOMElementPlus $n) {
     $pat = "/<code(?: [a-z]+)?>((?:.|\n)+?)<\/code>/m";
     $p = preg_split($pat, $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
@@ -147,6 +240,9 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param DOMElementPlus $n
+   */
   private function parseSyntaxCode(DOMElementPlus $n) {
     $pat = "/(?:&lsquo;|&rsquo;|'){2}(.+?)(?:&lsquo;|&rsquo;|'){2}/";
     $src = translateUtf8Entities($n->nodeValue, true);
@@ -165,6 +261,9 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param DOMElementPlus $n
+   */
   private function parseSyntaxVariable(DOMElementPlus $n) {
     //if(strpos($n->nodeValue, 'cms-') === false) return;
     foreach(explode('\$', $n->nodeValue) as $src) {
@@ -191,6 +290,9 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param DOMElementPlus $n
+   */
   private function parseSyntaxComment(DOMElementPlus $n) {
     $p = preg_split('/\(\(\s*(.+)\s*\)\)/', $n->nodeValue, -1, PREG_SPLIT_DELIM_CAPTURE);
     if(count($p) < 2) return;
@@ -201,6 +303,10 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param bool $repair
+   * @throws Exception
+   */
   public function validatePlus($repair = false) {
     $i = 0;
     $hash = hash(FILE_HASH_ALGO, $this->saveXML());
@@ -217,7 +323,7 @@ class HTMLPlus extends DOMDocumentPlus {
         case 1: $this->validateSections($repair); $i++;
         case 2: $this->validateLang($repair); $i++;
         case 3: $this->validateHid($repair); $i++;
-        case 4: $this->validateHsrc($repair); $i++;
+        case 4: $this->validateHsrc(); $i++;
         case 5: $this->validateHempty($repair); $i++;
         case 6: $this->validateDl($repair); $i++;
         case 7: $this->validateDates($repair); $i++;
@@ -225,7 +331,7 @@ class HTMLPlus extends DOMDocumentPlus {
         case 9: $this->validateFirstHeadingAuthor($repair); $i++;
         case 10: $this->validateFirstHeadingCtime($repair); $i++;
         case 11: $this->validateBodyNs($repair); $i++;
-        case 12: $this->validateDesc($repair); $i++;
+        case 12: $this->validateDesc(); $i++;
         case 13: $this->relaxNGValidatePlus(); $i++;
       }
     } catch(Exception $e) {
@@ -239,13 +345,19 @@ class HTMLPlus extends DOMDocumentPlus {
     if(count($this->errors)) $this->status = self::STATUS_REPAIRED;
   }
 
+  /**
+   * @param string $message
+   * @param bool $repair
+   * @throws Exception
+   */
   private function errorHandler($message, $repair) {
     if(!$repair) throw new Exception($message);
     $this->errors[] = $message;
   }
 
-  private function validateDesc($repair) {
+  private function validateDesc() {
     $invalid = array();
+    /** @var DOMElementPlus $h */
     foreach($this->headings as $h) {
       $desc = $h->nextElement;
       if(is_null($desc)
@@ -259,9 +371,13 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->errorHandler($message, false);
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateBodyNs($repair) {
     $b = $this->documentElement;
     if($b->hasAttribute("ns")) return;
+    /** @var DOMElementPlus $h */
     $h = $this->headings->item(0);
     if($h->hasAttribute("ns")) {
       $this->defaultNs = $h->getAttribute("ns");
@@ -272,7 +388,11 @@ class HTMLPlus extends DOMDocumentPlus {
     $b->setAttribute("ns", $this->defaultNs);
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateFirstHeadingAuthor($repair) {
+    /** @var DOMElementPlus $h */
     $h = $this->headings->item(0);
     if($h->hasAttribute("author")) return;
     $message = _("First heading attribute 'author' missing");
@@ -280,7 +400,11 @@ class HTMLPlus extends DOMDocumentPlus {
     $h->setAttribute("author", $this->defaultAuthor);
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateFirstHeadingCtime($repair) {
+    /** @var DOMElementPlus $h */
     $h = $this->headings->item(0);
     if($h->hasAttribute("ctime")) return;
     $message = _("First heading attribute 'ctime' missing");
@@ -288,10 +412,17 @@ class HTMLPlus extends DOMDocumentPlus {
     $h->setAttribute("ctime", $this->defaultCtime);
   }
 
+  /**
+   * @param string $f
+   * @return bool
+   */
   public function relaxNGValidatePlus($f=null) {
     return parent::relaxNGValidatePlus(LIB_FOLDER."/".self::RNG_FILE);
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateRoot($repair) {
     if(is_null($this->documentElement)) {
       $message = _("Root element not found");
@@ -341,6 +472,9 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->addTitleElements($s);
   }
 
+  /**
+   * @param DOMElementPlus $el
+   */
   private function addTitleElements(DOMElementPlus $el) {
     $first = $el->firstElement;
     $el->insertBefore($this->createTextNode("\n  "), $first);
@@ -350,6 +484,9 @@ class HTMLPlus extends DOMDocumentPlus {
     $el->insertBefore($this->createTextNode("\n  "), $first);
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateSections($repair) {
     $emptySect = array();
     foreach($this->getElementsByTagName("section") as $s) {
@@ -361,12 +498,16 @@ class HTMLPlus extends DOMDocumentPlus {
     foreach($emptySect as $s) $s->stripTag(_("Empty section deleted"));
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateLang($repair) {
     $xpath = new DOMXPath($this);
     $langs = $xpath->query("//*[@lang]");
     if(!$langs->length) return;
     $message = _("Lang attribute without XML namespace");
     $this->errorHandler($message, $repair);
+    /** @var DOMElementPlus $n */
     foreach($langs as $n) {
       if(!$n->hasAttribute("xml:lang"))
         $n->setAttribute("xml:lang", $n->getAttribute("lang"));
@@ -379,9 +520,13 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->validateHid(true);
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateHid($repair) {
     $hIds = array();
     $anchors = $this->getElementsByTagName("a");
+    /** @var DOMElementPlus $h */
     foreach($this->headings as $h) {
       $id = $h->getAttribute("id");
       $message = null;
@@ -395,6 +540,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if(!is_null($message)) {
         $this->errorHandler($message, $repair);
         $newId = $h->setUniqueId();
+        /** @var DOMElementPlus $a */
         foreach ($anchors as $a) {
           $href = $a->getAttribute("href");
           if(substr($href, -strlen("#$id")) != "#$id") continue;
@@ -405,8 +551,9 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  private function validateHsrc($repair) {
+  private function validateHsrc() {
     $invalid = array();
+    /** @var DOMElementPlus $h */
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("src")) continue;
       if(preg_match("#^[a-z][a-z0-9_/.-]*\.html$#", $h->getAttribute("src"))) continue;
@@ -417,6 +564,9 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->errorHandler($message, false);
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateHempty($repair) {
     foreach($this->headings as $h) {
       if(strlen(trim($h->nodeValue))) continue;
@@ -426,6 +576,9 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateDl($repair) {
     $dts = array();
     foreach($this->getElementsByTagName("dt") as $dt) $dts[] = $dt;
@@ -440,7 +593,11 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateAuthor($repair) {
+    /** @var DOMElementPlus $h */
     foreach($this->headings as $h) {
       if(!$h->hasAttribute("author")) continue;
       if(strlen(trim($h->getAttribute("author")))) continue;
@@ -450,7 +607,11 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
+  /**
+   * @param bool $repair
+   */
   private function validateDates($repair) {
+    /** @var DOMElementPlus $h */
     foreach($this->headings as $h) {
       $ctime = null;
       $mtime = null;
@@ -466,28 +627,36 @@ class HTMLPlus extends DOMDocumentPlus {
       $ctime_date = $this->createDate($ctime);
       if(is_null($ctime_date)) {
         $this->errorHandler(_("Invalid 'ctime' attribute format"), $repair);
-        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute ctime '%s'")), $ctime), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute ctime '%s'"))), $h);
         $h->removeAttribute("ctime");
       }
       if(is_null($mtime)) return;
       $mtime_date = $this->createDate($mtime);
       if(is_null($mtime_date)) {
         $this->errorHandler(_("Invalid 'mtime' attribute format"), $repair);
-        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute mtime '%s'")), $mtime), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute mtime '%s'"))), $h);
         $h->removeAttribute("mtime");
       }
       if($mtime_date < $ctime_date) {
         $this->errorHandler(_("Attribute 'mtime' cannot be lower than 'ctime'"), $repair);
-        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute mtime '%s'")), $mtime), $h);
+        $h->parentNode->insertBefore($this->newDOMComment(sprintf(_("Removed attribute mtime '%s'"))), $h);
         $h->removeAttribute("mtime");
       }
     }
   }
 
+  /**
+   * @param string $comment
+   * @return DOMComment
+   */
   private function newDOMComment($comment) {
     return new DOMComment(" $comment ");
   }
 
+  /**
+   * @param string $d
+   * @return DateTime|null
+   */
   private function createDate($d) {
     $date = new DateTime();
     $date->setTimestamp(strtotime($d));

@@ -8,16 +8,23 @@ use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use IGCMS\Core\ResourceInterface;
 use SplObserver;
 use SplSubject;
 
 
 /**
+ * Class Sitemap
+ * @package IGCMS\Plugins
+ *
  * Unlogged user (on root url) generate SITEMAP from all loaded files and save it to the root of current domain
  * @see http://www.sitemaps.org/protocol.html Sitemap definition
  */
 class Sitemap extends Plugin implements SplObserver, ResourceInterface {
+  /**
+   * @var string
+   */
   const SITEMAP = "sitemap.xml";
 
   /**
@@ -26,16 +33,22 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
   private static $configurableElements = array("changefreq", "priority");
 
   /**
-   * Allowed values for changefreq element
-   * @var array
+   * @var array Allowed values for changefreq element
    */
   private static $changefreqVals = array("always", "hourly", "daily", "weekly", "monthly", "yearly", "never", "");
 
+  /**
+   * @param string|null $filePath
+   * @return bool
+   */
   public static function isSupportedRequest($filePath=null) {
     if(is_null($filePath)) $filePath = getCurLink();
     return $filePath == self::SITEMAP;
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {}
 
   public static function handleRequest() {
@@ -59,7 +72,7 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
 
   /**
    * Get links from all included files + root link "/"
-   * @return Array links Asociative array of links => mtime in W3C format
+   * @return array links Asociative array of links => mtime in W3C format
    */
   private static function getLinks() {
     $links = array();
@@ -74,8 +87,9 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
 
   /**
    * Get links from configuration
-   * @var DOMDocumentPlus cfg
-   * @return Array Asociative array of links => the values of their elements
+   * @param  DOMDocumentPlus $cfg
+   * @return array Asociative array of links => the values of their elements
+   * @throws Exception
    */
   private static function getConfigLinks(DOMDocumentPlus $cfg) {
     $links = array();
@@ -93,7 +107,7 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
   /**
    * Get default config values from root configirable elements
    * @var DOMDocumentPlus cfg
-   * @return Array Associative array of configuration elements
+   * @return array Associative array of configuration elements
    */
   private static function getConfigDefaults(DOMDocumentPlus $cfg) {
     $defaults = array();
@@ -106,14 +120,17 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
 
   /**
    * Create SITEMAP according to $links modified by $cfgLinks
-   * @param  Array  $links
-   * @param  Array  $cfgLinks
-   * @param  Array  $cfgDefaults
+   * @param  array  $links
+   * @param  array  $cfgLinks
+   * @param  array  $cfgDefaults
+   * @return DOMDocumentPlus
+   * @throws Exception
    */
   private static function createSitemap(Array $links, Array $cfgLinks, Array $cfgDefaults) {
     $sitemap = new DOMDocumentPlus();
     $sitemap->formatOutput = true;
-    $urlset = $sitemap->appendChild($sitemap->createElement("urlset"));
+    $urlset = $sitemap->createElement("urlset");
+    $sitemap->appendChild($urlset);
     $urlset->setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
     foreach($links as $link => $h) {
       $url = $urlset->appendChild($sitemap->createElement("url"));
@@ -148,10 +165,11 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
 
   /**
    * Get value from $cfgLinks or from $cfgDefaults or null
-   * @param  String $name
-   * @param  Array  $cfgLinks
-   * @param  Array  $cfgDefaults
-   * @return String|null
+   * @param  string $name
+   * @param  string $link
+   * @param  array  $cfgLinks
+   * @param  array  $cfgDefaults
+   * @return string|null
    */
   private static function getValue($name, $link, $cfgLinks, $cfgDefaults) {
     if(isset($cfgLinks[$link]) && isset($cfgLinks[$link][$name]) && strlen($cfgLinks[$link][$name]))

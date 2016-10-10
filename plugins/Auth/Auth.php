@@ -3,20 +3,29 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class Auth
+ * @package IGCMS\Plugins
+ */
 class Auth extends Plugin implements SplObserver {
-  private $loggedUser = null;
-
+  /**
+   * Auth constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     if(Cms::isSuperUser()) return;
     $cfg = $this->getXML();
     $url = ROOT_URL.getCurLink(true);
     $access = null;
+    /** @var DOMElementPlus $e */
     foreach($cfg->getElementsByTagName('url') as $e) {
       if(strpos($url, $e->nodeValue) === false) continue;
       if($e->getAttribute("access") == "allow") $access = true;

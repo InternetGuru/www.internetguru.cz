@@ -8,12 +8,30 @@ use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 
+/**
+ * Class DocList
+ * @package IGCMS\Plugins\Agregator
+ */
 class DocList extends AgregatorList {
+  /**
+   * @var string
+   */
   private $kw;
+  /**
+   * @var string
+   */
   const DEFAULT_SORTBY = "ctime";
+  /**
+   * @var bool
+   */
   const DEFAULT_RSORT = true;
 
-  public function __construct(DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
+  /**
+   * DocList constructor.
+   * @param DOMElementPlus $doclist
+   * @param DOMElementPlus|null $pattern
+   */
+  public function __construct(DOMElementPlus $doclist, DOMElementPlus $pattern=null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
     $this->kw = $doclist->getAttribute("kw");
     $vars = $this->createVars();
@@ -22,6 +40,10 @@ class DocList extends AgregatorList {
     Cms::setVariable($this->id, $list);
   }
 
+  /**
+   * @return array
+   * @throws Exception
+   */
   private function createVars() {
     $fileIds = array();
     $somethingFound = false;
@@ -47,7 +69,7 @@ class DocList extends AgregatorList {
       try {
         $vars[$file] = HTMLPlusBuilder::getIdToAll($id);
         $vars[$file]["fileToMtime"] = HTMLPlusBuilder::getFileToMtime($file);
-        $date->setTimeStamp($vars[$file]["fileToMtime"]);
+        $date->setTimestamp($vars[$file]["fileToMtime"]);
         $vars[$file]["mtime"] = $date->format(DateTime::W3C);
         $vars[$file]["file"] = $file;
         $vars[$file]["link"] = $id;

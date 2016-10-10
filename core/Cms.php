@@ -6,25 +6,75 @@ use Closure;
 use DOMNode;
 use Exception;
 
+/**
+ * Class Cms
+ * @package IGCMS\Core
+ *
+ * @method static success($msg)
+ * @method static notice($msg)
+ * @method static warning($msg)
+ * @method static error($msg)
+ *
+ */
 class Cms {
 
+  /**
+   * @var array|null
+   */
   private static $types = null;
-  private static $outputStrategy = null; // OutputStrategyInterface
+  /**
+   * @var OutputStrategyInterface|null
+   */
+  private static $outputStrategy = null;
+  /**
+   * @var array
+   */
   private static $variables = array();
+  /**
+   * @var array
+   */
   private static $functions = array();
+  /**
+   * @var bool
+   */
   private static $forceFlash = false;
+  /**
+   * @var DOMElementPlus|null
+   */
   private static $flashList = null;
+  /**
+   * @var bool
+   */
   private static $error = false;
+  /**
+   * @var bool
+   */
   private static $warning = false;
+  /**
+   * @var bool
+   */
   private static $notice = false;
+  /**
+   * @var bool
+   */
   private static $success = false;
+  /**
+   * @var string|null
+   */
   private static $requestToken = null;
 
+  /**
+   * @param string $methodName
+   * @param array $arguments
+   */
   public static function __callStatic($methodName, $arguments) {
     validate_callStatic($methodName, $arguments, self::getTypes(), 1);
-    return self::addMessage($methodName, $arguments[0]);
+    self::addMessage($methodName, $arguments[0]);
   }
 
+  /**
+   * @return array
+   */
   private static function getTypes() {
     if(!is_null(self::$types)) return self::$types;
     self::$types = array(
@@ -74,12 +124,16 @@ class Cms {
   private static function createFlashList() {
     $doc = new DOMDocumentPlus();
     self::$flashList = $doc->appendChild($doc->createElement("root"));
-    $ul = self::$flashList->appendChild($doc->createElement("ul"));
+    self::$flashList->appendChild($doc->createElement("ul"));
     self::setVariable("messages", self::$flashList);
   }
 
+  /**
+   * @param string $message
+   * @param string $type
+   * @param array $requests
+   */
   private static function addFlashItem($message, $type, Array $requests) {
-    $types = self::getTypes();
     self::$$type = true;
     if(!is_null(self::getLoggedUser())) $message = self::$types[$type].": $message";
     $li = self::$flashList->ownerDocument->createElement("li");
@@ -108,11 +162,15 @@ class Cms {
     $_SESSION["cms"]["request"] = array();
   }
 
+  /**
+   * @return HTMLPlus|null
+   */
   public static function buildContent() {
     global $plugins;
     $content = null;
     $pluginExceptionMessage = _("Plugin %s exception: %s");
-    foreach($plugins->getIsInterface("IGCMS\Core\GetContentStrategyInterface") as $plugin) {
+    /** @var GetContentStrategyInterface $plugin */
+    foreach($plugins->getIsInterface("IGCMS\\Core\\GetContentStrategyInterface") as $plugin) {
       try {
         $content = $plugin->getContent();
         if(is_null($content)) continue;
@@ -127,7 +185,8 @@ class Cms {
       $content = HTMLPlusBuilder::getFileToDoc(INDEX_HTML);
       self::validateContent($content);
     }
-    foreach($plugins->getIsInterface("IGCMS\Core\ModifyContentStrategyInterface") as $plugin) {
+    /** @var ModifyContentStrategyInterface $plugin */
+    foreach($plugins->getIsInterface("IGCMS\\Core\\ModifyContentStrategyInterface") as $plugin) {
       try {
         $tmpContent = clone $content;
         $plugin->modifyContent($tmpContent);
@@ -151,6 +210,10 @@ class Cms {
     loginRedir();
   }
 
+  /**
+   * @param string $user
+   * @throws Exception
+   */
   public static function setLoggedUser($user) {
     self::setVariable("logged_user", $user);
     if(self::isSuperUser()) self::setVariable("super_user", $user);
@@ -161,6 +224,9 @@ class Cms {
     }
   }
 
+  /**
+   * @return bool
+   */
   public static function isSuperUser() {
     if(IS_LOCALHOST) return true;
     if(self::getLoggedUser() == "admin") return true;
@@ -170,6 +236,9 @@ class Cms {
     return false;
   }
 
+  /**
+   * @return null|string
+   */
   public static function getLoggedUser() {
     if(IS_LOCALHOST) return ADMIN_ID;
     if(isset($_SERVER["REMOTE_ADDR"])
@@ -181,14 +250,22 @@ class Cms {
     return null;
   }
 
+  /**
+   * @return bool
+   */
   public static function isActive() {
     if(IS_LOCALHOST) return true;
     return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
   }
 
+  /**
+   * @param HTMLPlus $content
+   * @return HTMLPlus
+   */
   public static function contentProcessVariables(HTMLPlus $content) {
     $tmpContent = clone $content;
     try {
+      /** @var HTMLPlus $tmpContent */
       $tmpContent = $tmpContent->processVariables(self::$variables);
       $tmpContent->validatePlus(true);
       return $tmpContent;
@@ -198,10 +275,17 @@ class Cms {
     }
   }
 
+  /**
+   * @param OutputStrategyInterface $strategy
+   */
   public static function setOutputStrategy(OutputStrategyInterface $strategy) {
     self::$outputStrategy = $strategy;
   }
 
+  /**
+   * @param HTMLPlus $content
+   * @throws Exception
+   */
   private static function validateContent(HTMLPlus $content) {
     $object = gettype($content) == "object";
     if(!($object && $content instanceof HTMLPlus)) {
@@ -215,6 +299,10 @@ class Cms {
     }
   }
 
+  /**
+   * @param string $type
+   * @param string $message
+   */
   private static function addMessage($type, $message) {
     if(is_null(self::$flashList)) self::createFlashList();
     if(is_null(self::$requestToken)) self::$requestToken = rand();
@@ -226,18 +314,30 @@ class Cms {
     self::addFlashItem($message, $type, array(self::$requestToken));
   }
 
+  /**
+   * @param string|$name
+   * @return mixed|null
+   */
   public static function getVariable($name) {
     $id = strtolower($name);
     if(!array_key_exists($id, self::$variables)) return null;
     return self::$variables[$id];
   }
 
+  /**
+   * @param $name
+   * @return Closure|null
+   */
   public static function getFunction($name) {
     $id = strtolower($name);
     if(!array_key_exists($id, self::$functions)) return null;
     return self::$functions[$id];
   }
 
+  /**
+   * @param string $name
+   * @param mixed $value
+   */
   public static function addVariableItem($name, $value) {
     $varId = self::getVarId($name);
     $var = self::getVariable($varId);
@@ -250,6 +350,11 @@ class Cms {
     self::$variables[$varId] = $var;
   }
 
+  /**
+   * @param string $name
+   * @return string
+   * @throws Exception
+   */
   private static function getVarId($name) {
     $d = debug_backtrace();
     if(!isset($d[2]["class"])) throw new Exception(_("Unknown caller class"));
@@ -258,12 +363,32 @@ class Cms {
     return $varId.(strlen($name) ? "-".normalize($name) : "");
   }
 
+  /**
+   * @return bool
+   */
   public static function hasErrorMessage() { return self::$error; }
+
+  /**
+   * @return bool
+   */
   public static function hasWarningMessage() { return self::$warning; }
+
+  /**
+   * @return bool
+   */
   public static function hasNoticeMessage() { return self::$notice; }
+
+  /**
+   * @return bool
+   */
   public static function hasSuccessMessage() { return self::$success; }
 
-  public static function setFunction($name, $value) {
+  /**
+   * @param string $name
+   * @param Closure $value
+   * @return null|string
+   */
+  public static function setFunction($name, Closure $value) {
     if(!$value instanceof Closure) {
       Logger::error(sprintf(_("Unable to set function %s: not a function"), $name));
       return null;
@@ -273,6 +398,11 @@ class Cms {
     return $varId;
   }
 
+  /**
+   * @param string $name
+   * @param mixed $value
+   * @return string
+   */
   public static function setVariable($name, $value) {
     $varId = self::getVarId($name);
     if(!array_key_exists($varId, self::$variables))
@@ -281,10 +411,16 @@ class Cms {
     return $varId;
   }
 
+  /**
+   * @return array
+   */
   public static function getAllVariables() {
     return self::$variables;
   }
 
+  /**
+   * @return array
+   */
   public static function getAllFunctions() {
     return self::$functions;
   }
@@ -293,15 +429,28 @@ class Cms {
     self::$forceFlash = true;
   }
 
+  /**
+   * @param HTMLPlus $content
+   * @return string
+   */
   public static function getOutput(HTMLPlus $content) {
     if(is_null(self::$outputStrategy)) return $content->saveXML();
     return self::$outputStrategy->getOutput($content);
   }
 
+  /**
+   * @return OutputStrategyInterface|null
+   */
   public static function getOutputStrategy() {
     return self::$outputStrategy;
   }
 
+  /**
+   * @param string $fName
+   * @param DOMNode $node
+   * @return mixed
+   * @throws Exception
+   */
   public static function applyUserFn($fName, DOMNode $node) {
     $fn = self::getFunction($fName);
     if(is_null($fn))

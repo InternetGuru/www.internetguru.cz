@@ -8,7 +8,6 @@
     Config = {},
     open = false,
     active = -1,
-    activeElement = null,
     textNavigValue = "",
     list = null,
     key = null,
@@ -30,22 +29,10 @@
         elemRect = e.getBoundingClientRect();
       return elemRect.top - bodyRect.top;
     },
-    findAncestor = function (el, cls) {
-      while ((el = el.parentElement) && !el.classList.contains(cls));
-      return el;
-    }
-    clone = function(obj) {
-      if (null == obj || "object" != typeof obj) return obj;
-      var copy = obj.constructor();
-      for (var attr in obj) {
-        if (obj.hasOwnProperty(attr)) copy[attr] = obj[attr];
-      }
-      return copy;
-    },
     initStructure = function() {
       list = document.createElement("ul");
       list.className = "navigList";
-      textNavig = document.createElement("input");
+      var textNavig = document.createElement("input");
       textNavig.autocomplete = "off";
       if(Config.navig.tabIndex) textNavig.tabIndex = Config.navig.tabIndex;
       textNavig.name = Config.navig.name;
@@ -65,19 +52,18 @@
       win.addEventListener("scroll", updateSize, false);
       Config.navig.addEventListener("keydown", processKey, false);
     },
-    fillVal = function(e) {
+    fillVal = function() {
       files = Config.files;
       for(var i = 0; i < files.length; i++) {
         if(files[i].defaultVal.toLowerCase() != Config.navig.value.toLowerCase()) continue;
         Config.navig.value = files[i].path;
       }
     },
-    openNavig = function(e) {
+    openNavig = function() {
       if(list.classList.contains("active")) inputText(null);
       else list.classList.add("active");
-    }
-    closeNavig = function(e) {
-      //if(e && activeElement && activeElement.className == "navigList") return;
+    },
+    closeNavig = function() {
       list.innerHTML = "";
       textNavigValue = "";
       open = false;
@@ -173,7 +159,7 @@
       while (left.length) result.push(left.shift());
       while (right.length) result.push(right.shift());
       return result;
-    }
+    },
     filter = function(arr, value) {
       var fs = [];
       var qvalue = IGCMS.preg_quote(value).replace(/\\\*/g, "[^/ ]*");
@@ -190,7 +176,7 @@
     doFilter = function(f, value, pattern) {
       try {
         if(!f.val.match(pattern)) return;
-        r = {};
+        var r = {};
         var priority = 3;
         if(f.path.replace(/^.*[\\\/]/, '').indexOf(value) === 0) priority = 1;
         else {
@@ -210,7 +196,7 @@
       } catch(e) {}
     },
     update = function(fs) {
-      first = true;
+      var first = true;
       for(var i = 0; i < fs.length; i++) {
         if(Config.navig.value.length && key !== 8 && fs[i].defaultVal.toLowerCase().indexOf(Config.navig.value.toLowerCase()) == 0) { // 8 is backspace
           var start = Config.navig.value.length;
@@ -240,7 +226,7 @@
         })();
         list.appendChild(li);
       }
-    }
+    };
 
     // public
     return {
@@ -263,7 +249,7 @@
   var found = false;
   var selects = document.getElementsByTagName("select");
   var toInit = [];
-  for (var i = 0; i < selects.length; i++) {
+  for (i = 0; i < selects.length; i++) {
     var s = selects[i];
     if(!s.classList.contains("completable")) continue;
     found = true;

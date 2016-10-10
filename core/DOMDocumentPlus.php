@@ -12,19 +12,37 @@ use Exception;
  * @package IGCMS\Core
  *
  * @property DOMElementPlus documentElement
+ * @property DOMDocumentPlus $ownerDocument
  */
 class DOMDocumentPlus extends DOMDocument {
 
+  /**
+   * DOMDocumentPlus constructor.
+   * @param string $version
+   * @param string $encoding
+   */
   function __construct($version="1.0", $encoding="utf-8") {
     parent::__construct($version, $encoding);
-    $r = parent::registerNodeClass("DOMElement", "IGCMS\Core\DOMElementPlus");
+    parent::registerNodeClass("DOMElement", "IGCMS\\Core\\DOMElementPlus");
   }
 
+  /**
+   * @param string $name
+   * @param string|null $value
+   * @return DOMElementPlus
+   */
   public function createElement($name, $value=null) {
     if(is_null($value)) return parent::createElement($name);
     return parent::createElement($name, htmlspecialchars($value));
   }
 
+  /**
+   * @param string $filePath
+   * @param int $options
+   * @return void
+   * @throws Exception
+   * @throws NoFileException
+   */
   public function load($filePath, $options=0) {
     if(!is_file($filePath) || file_exists(dirname($filePath)."/.".basename($filePath)))
       throw new NoFileException(_("File not found or disabled"));
@@ -32,6 +50,12 @@ class DOMDocumentPlus extends DOMDocument {
       throw new Exception(_("Invalid XML file"));
   }
 
+  /**
+   * @param string $xml
+   * @param int $options
+   * @return void
+   * @throws Exception
+   */
   public function loadXML($xml, $options=0) {
     if(!@parent::loadXML($xml, $options))
       throw new Exception(_("Invalid XML"));
@@ -48,6 +72,7 @@ class DOMDocumentPlus extends DOMDocument {
     try {
       if(!is_null($eName)) {
         $element = null;
+        /** @var DOMElementPlus $e */
         foreach($this->getElementsByTagName($eName) as $e) {
           if(!$e->hasAttribute($aName)) continue;
           if($e->getAttribute($aName) != $id) continue;
@@ -67,10 +92,24 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
+  /**
+   * TODO return?
+   * @param array $variables
+   * @param array $ignore
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   */
   public function processVariables(Array $variables, $ignore = array()) {
     return $this->elementProcessVariables($variables, $ignore, $this->documentElement, true);
   }
 
+  /**
+   * TODO return?
+   * @param array $variables
+   * @param array $ignore
+   * @param DOMElementPlus $element
+   * @param bool $deep
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   */
   public function elementProcessVariables(Array $variables, $ignore = array(), DOMElementPlus $element, $deep = false) {
     $toRemove = array();
     $res = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
@@ -79,6 +118,15 @@ class DOMDocumentPlus extends DOMDocument {
     return $res;
   }
 
+  /**
+   * TODO return?
+   * @param array $variables
+   * @param array $ignore
+   * @param DOMElementPlus $element
+   * @param bool $deep
+   * @param array $toRemove
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   */
   private function doProcessVariables(Array $variables, $ignore, DOMElementPlus $element, $deep, Array &$toRemove) {
     $res = $element;
     $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : array();
@@ -87,7 +135,7 @@ class DOMDocumentPlus extends DOMDocument {
       try {
         $element->removeAttrVal("var", $var);
         if(!is_null($variables[$vName]) && !count($variables[$vName])) {
-          if(!is_null($aName)) $this->removeAttribute($aName);
+          if(!is_null($aName)) $element->removeAttribute($aName);
           else return null;
         }
         $res = $this->insertVariable($element, $variables[$vName], $aName);
@@ -95,6 +143,7 @@ class DOMDocumentPlus extends DOMDocument {
         Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()));
       }
     }
+    /** @var DOMElementPlus $e */
     if($deep) foreach($element->childNodes as $e) {
       if($e->nodeType != XML_ELEMENT_NODE) continue;
       $r = $this->doProcessVariables($variables, $ignore, $e, $deep, $toRemove);
@@ -103,6 +152,14 @@ class DOMDocumentPlus extends DOMDocument {
     return $res;
   }
 
+  /**
+   * TODO return?
+   * @param DOMElementPlus $element
+   * @param mixed $value
+   * @param string|null $aName
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   * @throws Exception
+   */
   public function insertVariable(DOMElementPlus $element, $value, $aName=null) {
     if(is_null($element->parentNode)) return $element;
     switch(gettype($value)) {
@@ -128,10 +185,16 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
+  /**
+   * @param array $functions
+   * @param array $variables
+   * @param array $ignore
+   */
   public function processFunctions(Array $functions, Array $variables = Array(), $ignore = array()) {
     $xpath = new DOMXPath($this);
     $elements = array();
     foreach($xpath->query("//*[@fn]") as $e) $elements[] = $e;
+    /** @var DOMElementPlus $e */
     foreach(array_reverse($elements) as $e) {
       if(isset($ignore[$e->nodeName]))
         $e->processFunctions($functions, $variables, $ignore[$e->nodeName]);
@@ -139,6 +202,10 @@ class DOMDocumentPlus extends DOMDocument {
     }
   }
 
+  /**
+   * @param string $query
+   * @return int
+   */
   public function removeNodes($query) {
     $xpath = new DOMXPath($this);
     $toRemove = array();
@@ -149,6 +216,11 @@ class DOMDocumentPlus extends DOMDocument {
     return count($toRemove);
   }
 
+  /**
+   * @param string $f
+   * @return bool
+   * @throws Exception
+   */
   public function relaxNGValidatePlus($f) {
     if(!file_exists($f))
       throw new Exception(sprintf(_("Unable to find HTML+ RNG schema '%s'"), $f));
@@ -169,14 +241,6 @@ class DOMDocumentPlus extends DOMDocument {
       libxml_use_internal_errors(false);
     }
     return true;
-  }
-
-  private function removeVar($e, $attr) {
-    if(!is_null($attr)) {
-      if($e->hasAttribute($attr)) $e->removeAttribute($attr);
-      return;
-    }
-    $e->parentNode->removeChild($e);
   }
 
 }

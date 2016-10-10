@@ -3,21 +3,37 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class SyntaxCodeMirror
+ * @package IGCMS\Plugins
+ */
 class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
+  /**
+   * @var string
+   */
   const CM_DIR = "internetguru/codemirror";
 
+  /**
+   * SyntaxCodeMirror constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 100);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_INIT) {
       $this->detachIfNotAttached("HtmlOutput");
@@ -25,8 +41,10 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
     }
   }
 
+  /**
+   * @param HTMLPlus $content
+   */
   public function modifyContent(HTMLPlus $content) {
-
     // supported syntax only
     $xml = VENDOR_DIR."/".self::CM_DIR."/mode/xml/xml.js";
     $css = VENDOR_DIR."/".self::CM_DIR."/mode/css/css.js";
@@ -38,10 +56,10 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
       "javascript" => array($js),
       "htmlmixed" => array($xml, $css, $js, $html),
       );
-
     // return if no textarea containing class "codemirror"
     $libs = array();
     $codemirror = false;
+    /** @var DOMElementPlus $t */
     foreach($content->getElementsByTagName("textarea") as $t) {
       $classes = explode(" ", $t->getAttribute("class"));
       if(!in_array("codemirror", $classes)) continue;
@@ -53,11 +71,13 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
         }
       }
     }
-
     // add sources and return
     if($codemirror) $this->addSources($libs);
   }
 
+  /**
+   * @param array $libs
+   */
   private function addSources(Array $libs) {
     $os = Cms::getOutputStrategy();
 

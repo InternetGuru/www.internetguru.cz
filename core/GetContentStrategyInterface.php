@@ -2,6 +2,10 @@
 
 namespace IGCMS\Core;
 
+/**
+ * Interface GetContentStrategyInterface
+ * @package IGCMS\Core
+ */
 interface GetContentStrategyInterface {
   /**
    * [getContent description]
