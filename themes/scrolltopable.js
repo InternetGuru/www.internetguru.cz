@@ -34,7 +34,7 @@
         }
       },
       setScrollEvent = function() {
-        fn = function() {
+        win.onscroll = function() {
           win.clearTimeout(windowScrollTimeOut);
           windowScrollTimeOut = window.setTimeout( function() {
             if(getScrollTop() <= Config.hidePosition) {
@@ -48,7 +48,6 @@
             }
           }, 50);
         };
-        win.onscroll = fn;
       },
       createButton = function() {
         button = document.createElement("a");

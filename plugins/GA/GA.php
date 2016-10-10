@@ -3,14 +3,20 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
-use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
-
+/**
+ * Class GA
+ * @package IGCMS\Plugins
+ */
 class GA extends Plugin implements SplObserver {
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;

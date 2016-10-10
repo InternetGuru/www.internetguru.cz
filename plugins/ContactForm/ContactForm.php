@@ -12,33 +12,86 @@ use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use PHPMailer;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class ContactForm
+ * @package IGCMS\Plugins
+ */
 class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyInterface {
-
+  /**
+   * @var DOMDocumentPlus
+   */
   private $cfg;
+  /**
+   * @var array
+   */
   private $vars = array();
+  /**
+   * @var array
+   */
   private $formsElements = array();
+  /**
+   * @var array
+   */
   private $formNames = array();
+  /**
+   * @var array
+   */
   private $formGroupValues = array();
+  /**
+   * @var array
+   */
   private $formIds;
+  /**
+   * @var array
+   */
   private $formVars;
+  /**
+   * @var array
+   */
   private $formValues;
+  /**
+   * @var array
+   */
   private $formItems = array();
+  /**
+   * @var array
+   */
   private $messages;
+  /**
+   * @var array
+   */
   private $forms = array();
+  /**
+   * @var string|null
+   */
   private $prefix = null;
+  /**
+   * @var string
+   */
   const FORM_ITEMS_QUERY = "//input | //textarea | //select";
+  /**
+   * @var bool
+   */
   const DEBUG = false;
 
+  /**
+   * ContactForm constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 20);
     $this->prefix = strtolower($this->className);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if(!Cms::isActive()) {
       $subject->detach($this);
@@ -115,6 +168,9 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     }
   }
 
+  /**
+   * @param HTMLPlus $content
+   */
   public function modifyContent(HTMLPlus $content) {
     $xpath = new DOMXPath($content);
     $forms = $xpath->query("//*[contains(@var, '$this->prefix-')]");
@@ -122,6 +178,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     if(!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
       Logger::user_warning(_("Admin address is not set or invalid"));
     }
+    /** @var DOMElementPlus $f */
     foreach($forms as $f) {
       $id = substr($f->getAttribute("var"), strlen($this->prefix)+1);
       if(!array_key_exists($id, $this->forms)) {
@@ -135,10 +192,15 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     }
   }
 
+  /**
+   * @param DOMElementPlus $form
+   * @return DOMDocumentPlus
+   */
   private function parseForm(DOMElementPlus $form) {
     $prefix = normalize($this->className);
     $doc = new DOMDocumentPlus();
     $var = $doc->appendChild($doc->createElement("var"));
+    /** @var DOMElementPlus $htmlForm */
     $htmlForm = $var->appendChild($doc->importNode($form, true));
     $formId = $htmlForm->getAttribute("id");
     $htmlForm->removeAllAttributes(array("id", "class"));
@@ -149,6 +211,11 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     return $doc;
   }
 
+  /**
+   * @param string $formIdToSend
+   * @param string $msg
+   * @throws Exception
+   */
   private function sendForm($formIdToSend, $msg) {
     if(!strlen($this->formVars["adminaddr"])) throw new Exception(_("Missing admin address"));
     if(!preg_match("/".EMAIL_PATTERN."/", $this->formVars["adminaddr"]))
@@ -183,6 +250,15 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => "cfok=".$formIdToSend)));
   }
 
+  /**
+   * @param string $mailto
+   * @param string $mailtoname
+   * @param string $replyto
+   * @param string $replytoname
+   * @param string $msg
+   * @param string $bcc
+   * @throws Exception
+   */
   private function sendMail($mailto, $mailtoname, $replyto, $replytoname, $msg, $bcc) {
     if(self::DEBUG) {
       echo $msg;
@@ -227,6 +303,10 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     if(self::DEBUG) $this->vars["adminaddr"] = "debug@somedomain.cz";
   }
 
+  /**
+   * @param DOMElementPlus $form
+   * @return array
+   */
   private function createFormVars(DOMElementPlus $form) {
     $formVars = array();
     foreach($this->vars as $name => $value) {
@@ -238,6 +318,10 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     return $formVars;
   }
 
+  /**
+   * @param DOMElementPlus $form
+   * @param string $prefix
+   */
   private function registerFormItems(DOMElementPlus $form, $prefix) {
     $idInput = $form->ownerDocument->createElement("input");
     $idInput->setAttribute("name", $this->className);
@@ -250,11 +334,13 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $this->formIds = array();
     $this->formGroupValues = array();
     $xpath = new DOMXPath($form->ownerDocument);
+    /** @var DOMElementPlus $e */
     foreach($xpath->query(self::FORM_ITEMS_QUERY) as $e) {
       if($e->nodeName == "textarea") {
         if(!$e->hasAttribute("cols")) $e->setAttribute("cols", 40);
         if(!$e->hasAttribute("rows")) $e->setAttribute("rows", 7);
       }
+      $type = null;
       if($e->nodeName == "input") {
         try {
           $type = $e->getRequiredAttribute("type");
@@ -266,7 +352,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       $this->formItems[] = $e;
       $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
       $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
-      $name = $this->processFormItem($this->formNames, $e, "name", "", $id, true);
+      $this->processFormItem($this->formNames, $e, "name", "", $id, true);
       if(is_null(Cms::getLoggedUser()) || $type != "submit") continue;
       $e->setAttribute("value", _("Show message"));
       $e->setAttribute("title", _("Not sending form if logged user"));
@@ -287,6 +373,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
         $this->formIds[$for][] = $e;
         continue;
       }
+      /** @var DOMElementPlus $f */
       foreach($xpath->query("input | textarea | select", $e) as $f) {
         $this->formIds[$f->getAttribute("id")][] = $e;
       }
@@ -296,6 +383,9 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     }
   }
 
+  /**
+   * @param DOMElementPlus $e
+   */
   private function completeFormItem(DOMElementPlus $e) {
     switch($e->nodeName) {
       case "input":
@@ -313,6 +403,10 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     }
   }
 
+  /**
+   * @param DOMElementPlus $e
+   * @param string $default
+   */
   private function setUniqueGroupValue(DOMElementPlus $e, $default) {
     $name = $e->getAttribute("name");
     $value = $e->getAttribute("value");
@@ -327,6 +421,15 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $this->formGroupValues[$name][$value.$j] = null;
   }
 
+  /**
+   * @param array $register
+   * @param DOMElementPlus $e
+   * @param string $aName
+   * @param string $prefix
+   * @param string $default
+   * @param bool $arraySupport
+   * @return string
+   */
   private function processFormItem(Array &$register, DOMElementPlus $e, $aName, $prefix, $default, $arraySupport) {
     $value = normalize($e->getAttribute($aName), null, null, false); // remove "[]"" and stuff...
     if(!strlen($value)) $value = $default;
@@ -346,7 +449,11 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     return $value;
   }
 
+  /**
+   * @return string
+   */
   private function createMessage() {
+    $msg = array();
     foreach($this->formValues as $k => $v) {
       if(is_array($v)) $v = implode(", ", $v);
       $msg[] = "$k: $v";

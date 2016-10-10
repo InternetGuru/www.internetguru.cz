@@ -2,27 +2,49 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\GetContentStrategyInterface;
-use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class LogViewer
+ * @package IGCMS\Plugins
+ */
 class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterface {
+  /**
+   * @var array
+   */
   private $usrFiles;
+  /**
+   * @var array
+   */
   private $sysFiles;
+  /**
+   * @var array
+   */
   private $emlFiles;
-  private $curFilePath;
-  private $curFileName;
+  /**
+   * @var array
+   */
+  private $histFiles;
 
+  /**
+   * LogViewer constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if(!Cms::isSuperUser() || !isset($_GET[$this->className])) $subject->detach($this);
     if($subject->getStatus() != STATUS_INIT) return;
@@ -33,6 +55,9 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->histFiles = array(CMS_CHANGELOG_FILENAME => CMS_FOLDER."/".CMS_CHANGELOG_FILENAME);
   }
 
+  /**
+   * @return \IGCMS\Core\HTMLPlus
+   */
   public function getContent() {
     $fName = $_GET[$this->className];
     try {
@@ -54,6 +79,11 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $content;
   }
 
+  /**
+   * @param string $fName
+   * @return string
+   * @throws Exception
+   */
   private function getCurFilePath($fName) {
     switch($fName) {
       case CMS_CHANGELOG_FILENAME:
@@ -78,10 +108,17 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  /**
+   * @param string $fName
+   */
   private function redirTo($fName) {
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => $this->className."=$fName")));
   }
 
+  /**
+   * @param array $array
+   * @return array
+   */
   private function makeLink(Array $array) {
     $links = array();
     foreach($array as $name => $path) {
@@ -90,11 +127,21 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     return $links;
   }
 
+  /**
+   * @param string $file
+   * @return bool|string
+   */
   private function file_get_contents($file) {
     if(substr($file, -4) != ".zip") return file_get_contents($file);
     else return readZippedFile($file, substr(pathinfo($file, PATHINFO_BASENAME), 0, -4));
   }
 
+  /**
+   * @param string $dir
+   * @param int $limit
+   * @param string|null $ext
+   * @return array
+   */
   private function getFiles($dir, $limit=0, $ext=null) {
     $files = array();
     foreach(scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {

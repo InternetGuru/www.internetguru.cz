@@ -2,8 +2,10 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\DOMDocumentPlus;
-
+/**
+ * Interface FinalContentStrategyInterface
+ * @package IGCMS\Core
+ */
 interface FinalContentStrategyInterface {
   /**
    * @param  DOMDocumentPlus $content

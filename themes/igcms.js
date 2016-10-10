@@ -8,14 +8,14 @@
     var
     /**
      * Check if collection has element
-     * @return {bool} collection has element
+     * @return {boolean} collection has element
      */
     collectionHas = function(collection, element) {
       for(var i = 0, len = collection.length; i < len; i ++) {
         if(collection[i] == element) return true;
       }
       return false;
-    }
+    };
 
     return {
       /**
@@ -32,9 +32,9 @@
       },
       /**
        * Return element ancestor which match given selector or null if ancestor not exits
-       * @param  {DOMElement} elm      starting element
+       * @param  {Node} elm      starting element
        * @param  {String}     selector standard DOM selector
-       * @return {DOMElement|null}
+       * @return {Node|null}
        */
       findParentBySelector: function(elm, selector) {
         var all = document.querySelectorAll(selector);
@@ -65,8 +65,8 @@
       }
 
     }
-  }
+  };
 
   win.IGCMS = new IGCMS();
 
-})(window)
+})(window);

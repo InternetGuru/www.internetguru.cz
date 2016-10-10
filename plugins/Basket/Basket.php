@@ -2,29 +2,58 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
+use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
-use Exception;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class Basket
+ * @package IGCMS\Plugins
+ */
 class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterface {
-
+  /**
+   * @var DOMDocumentPlus
+   */
   private $cfg;
+  /**
+   * @var array
+   */
   private $vars = array();
+  /**
+   * @var array
+   */
   private $products = array();
+  /**
+   * @var array
+   */
   private $productVars = array();
+  /**
+   * @var array
+   */
   private $cookieProducts = array();
+  /**
+   * @var bool
+   */
   private $useCache = true;
 
+  /**
+   * @param HTMLPlus $content
+   */
   public function modifyContent(HTMLPlus $content) {
     $content->processVariables($this->productVars);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if(!Cms::isActive()) {
       $subject->detach($this);
@@ -97,6 +126,9 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     }
   }
 
+  /**
+   * @return array
+   */
   private function getCookieProducts() {
     $p = array();
     foreach($_COOKIE as $name => $value) {
@@ -163,10 +195,17 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     redirTo(buildLocalUrl(array('path' => getCurLink(), 'query' => 'btok='.$_POST['id']), true));
   }
 
+  /**
+   * @return bool
+   */
   private function isPost() {
     return isset($_POST['id']) && !is_null(Cms::getVariable('validateform-'.$_POST['id']));
   }
 
+  /**
+   * @param $cacheKey
+   * @return bool
+   */
   private function useApcCache($cacheKey) {
     return $this->useCache && apc_exists($cacheKey);
   }
@@ -192,11 +231,13 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     }
   }
 
+  /**
+   * @param DOMDocumentPlus $doc
+   */
   private function insertAction(DOMDocumentPlus $doc) {
     $var = array("action" => getCurLink(true) == "" ? "/" : getCurLink(true));
-    $doc->processVariables($var, array(), true);
+    $doc->processVariables($var, array());
   }
-
 
   private function loadVariables() {
     $keyName = "variables";
@@ -205,6 +246,7 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
       $this->vars = apc_fetch($cacheKey);
       return;
     }
+    /** @var DOMElementPlus $var */
     foreach($this->cfg->getElementsByTagName("var") as $var) {
       $id = $var->getRequiredAttribute('id');
       $value = null;
@@ -220,8 +262,13 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     apc_store_cache($cacheKey, $this->vars, $keyName);
   }
 
+  /**
+   * @return array
+   * @throws Exception
+   */
   private function loadTemplates() {
     $templates = array();
+    /** @var DOMElementPlus $tpl */
     foreach($this->cfg->getElementsByTagName("template") as $tpl) {
       $id = $tpl->getRequiredAttribute("id");
       $templates[$id] = $tpl;
@@ -230,10 +277,14 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     return $templates;
   }
 
+  /**
+   * @return array
+   */
   private function loadProducts() {
     $products = array();
+    /** @var DOMElementPlus $product */
     foreach($this->cfg->getElementsByTagName("product") as $product) {
-      $id = $product->getRequiredAttribute("id"); // only check
+      $product->getRequiredAttribute("id"); // only check
       $attrs = array();
       foreach($product->attributes as $attrName => $attrNode) {
         $attrs["product-$attrName"] = $attrNode->nodeValue;
@@ -263,12 +314,17 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     return $products;
   }
 
-  private function modifyTemplate($template, $product) {
+  /**
+   * @param DOMDocumentPlus $template
+   * @param array $product
+   * @return DOMDocumentPlus
+   */
+  private function modifyTemplate(DOMDocumentPlus $template, Array $product) {
     $tmptpl = clone $template;
     $vars = array_merge($product, array(
       "currency" => $this->vars['currency'],
     ));
-    $tmptpl->processVariables($vars, array(), true);
+    $tmptpl->processVariables($vars, array());
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($tmptpl, true));
     return $doc;

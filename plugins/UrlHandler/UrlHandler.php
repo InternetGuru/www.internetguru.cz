@@ -2,25 +2,47 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class UrlHandler
+ * @package IGCMS\Plugins
+ */
 class UrlHandler extends Plugin implements SplObserver {
+  /**
+   * @var bool
+   */
   const DEBUG = false;
+  /**
+   * @var DOMDocumentPlus|null
+   */
   private $cfg = null;
+  /**
+   * @var array
+   */
   private $newReg = array();
 
+  /**
+   * UrlHandler constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 3);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_INIT) return;
     $this->cfg = $this->getXML();
@@ -85,22 +107,15 @@ class UrlHandler extends Plugin implements SplObserver {
         if(!$silent) throw $e;
       }
     } catch(Exception $e) {
-      Logger::user_warning(sprintf(_("Unable to redirect to %s: %s"), implodeLink($pLink), $e->getMessage()));
+      Logger::user_warning(sprintf(_("Unable to redirect to %s: %s"), $redir->nodeValue, $e->getMessage()));
     }
   }
 
-  private function alterQuery($query, $pNam) {
-    $param = array();
-    foreach(explode("&", $query) as $p) {
-      list($parName, $parValue) = explode("=", "$p="); // ensure there is always parValue
-      if(!strlen($parValue)) $parValue = $_GET[$pNam];
-      $param[$parName] = $parValue;
-    }
-    $query = array();
-    foreach($param as $k => $v) $query[] = $k.(strlen($v) ? "=$v" : "");
-    return implode("&", $query);
-  }
-
+  /**
+   * @param string $pNam
+   * @param string $pVal
+   * @return bool
+   */
   private function queryMatch($pNam, $pVal) {
     foreach(explode("&", getCurQuery()) as $q) {
       if(is_null($pVal) && strpos("$q=", "$pNam=") === 0) return true;
@@ -124,6 +139,11 @@ class UrlHandler extends Plugin implements SplObserver {
     redirTo(buildLocalUrl(Array("path" => $path, "query" => getCurQuery())), $code);
   }
 
+  /**
+   * @param array $links
+   * @param array $found
+   * @return string
+   */
   private function getBestId(Array $links, Array $found) {
     if(count($found) == 1) return key($found);
     $minVal = PHP_INT_MAX;
@@ -136,6 +156,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $foundLvl[$id] = $lvl;
     }
     $minLen = PHP_INT_MAX;
+    $short = array();
     foreach($found as $id => $val) {
       if($foundLvl[$id] != $minLvl) continue;
       if($val != $minVal) continue;
@@ -163,6 +184,10 @@ class UrlHandler extends Plugin implements SplObserver {
    * - rbstavebniny/a (4)
    * - rbstavebniny/archvi (4)
    * - rbstavebniny/chiv (4)
+   *
+   * @param array $links
+   * @param string $link
+   * @return null|string
    */
   private function findSimilarLinkId(Array $links, $link) {
     if(!strlen($link)) return null;
@@ -187,6 +212,12 @@ class UrlHandler extends Plugin implements SplObserver {
     return $foundId;
   }
 
+  /**
+   * @param array $links
+   * @param string $link
+   * @param null $max
+   * @return array
+   */
   private function minPos(Array $links, $link, $max = null) {
     $linkpos = array();
     foreach ($links as $k => $l) {
@@ -206,6 +237,12 @@ class UrlHandler extends Plugin implements SplObserver {
     return $this->minPos($sublinks, $link, $max);
   }
 
+  /**
+   * @param array $links
+   * @param string $link
+   * @param int $limit
+   * @return array
+   */
   private function minLev(Array $links, $link, $limit) {
     $leven = array();
     foreach ($links as $k => $l) {

@@ -2,35 +2,64 @@
 
 namespace IGCMS\Plugins;
 
-use IGCMS\Core\Cms;
-use IGCMS\Core\GetContentStrategyInterface;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\HTMLPlus;
-use IGCMS\Core\Logger;
-use IGCMS\Core\Plugin;
-use Exception;
 use DOMElement;
 use DOMNode;
 use DOMText;
+use Exception;
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\Logger;
+use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class InputVar
+ * @package IGCMS\Plugins
+ */
 class InputVar extends Plugin implements SplObserver, GetContentStrategyInterface {
+  /**
+   * @var string|null
+   */
   private $userCfgPath = null;
-  private $contentXPath;
+  /**
+   * @var DOMDocumentPlus|null
+   */
   private $cfg = null;
+  /**
+   * @var string|null
+   */
   private $formId = null;
+  /**
+   * @var string|null
+   */
   private $passwd = null;
+  /**
+   * @var string
+   */
   private $getOk = "ivok";
+  /**
+   * @var array
+   */
   private $vars = array();
 
+  /**
+   * InputVar constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml";
     $s->setPriority($this, 5);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     try {
       if($subject->getStatus() == STATUS_POSTPROCESS) $this->processPost();
@@ -44,7 +73,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         if($e->nodeName == "set") continue;
         if($e->nodeName == "passwd") continue;
         try {
-          $id = $e->getRequiredAttribute("id"); // only check
+          $e->getRequiredAttribute("id"); // only check
         } catch(Exception $ex) {
           Logger::user_warning($ex->getMessage());
           continue;
@@ -75,15 +104,20 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
 
   }
 
+  /**
+   * @return HTMLPlus|null
+   */
   public function getContent() {
     if(!isset($_GET[$this->className])) return null;
     $newContent = $this->getHTMLPlus();
+    /** @var DOMElementPlus $form */
     $form = $newContent->getElementsByTagName("form")->item(0);
     $this->formId = $form->getAttribute("id");
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
+    /** @var DOMElementPlus $e */
     foreach($this->cfg->getElementsByTagName("set") as $e) {
       try {
-        $type = $e->getRequiredAttribute("type"); // only check
+        $e->getRequiredAttribute("type"); // only check
       } catch(Exception $ex) {
         Logger::user_warning($ex->getMessage());
         continue;
@@ -98,6 +132,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     return $newContent;
   }
 
+  /**
+   * @param HTMLPlus $content
+   * @param DOMElementPlus $fieldset
+   * @param DOMElementPlus $set
+   */
   private function createFieldset(HTMLPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set) {
     switch($set->getAttribute("type")) {
       case "text":
@@ -109,6 +148,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     }
   }
 
+  /**
+   * @param DOMDocumentPlus $content
+   * @param DOMElementPlus $fieldset
+   * @param DOMElementPlus $set
+   * @param string $type
+   */
   private function createFs(DOMDocumentPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set, $type) {
     $for = $set->getAttribute("for");
     foreach(explode(" ", $for) as $rule) {
@@ -119,7 +164,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $doc->appendChild($doc->importNode($fieldset, true));
       switch($type) {
         case "text":
-        $inputVar = $this->createTextFs($list, $set, $rule);
+        $inputVar = $this->createTextFs($list, $set);
         break;
         case "select":
         $inputVar = $this->createSelectFs($list, $set);
@@ -139,6 +184,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     }
   }
 
+  /**
+   * @param array $list
+   * @param DOMElementPlus $set
+   * @return DOMNode
+   */
   private function createSelectFs(Array $list, DOMElementPlus $set) {
     $inputDoc = new DOMDocumentPlus();
     $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
@@ -156,7 +206,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         continue;
       }
       $dt = $inputDoc->createElement("dt");
-      $label = $dt->appendChild($inputDoc->createElement("label", $v->nodeValue));
+      $label = $inputDoc->createElement("label", $v->nodeValue);
+      $dt->appendChild($label);
       $label->setAttribute("for", $id);
       $dl->appendChild($dt);
       $dd = $inputDoc->createElement("dd");
@@ -167,19 +218,26 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     return $inputVar;
   }
 
-  # todo refactor: neopakovat kod ...
-  private function createTextFs(Array $list, DOMElementPlus $set, $rule) {
+  /**
+   * TODO refactor: neopakovat kod ...
+   * @param array $list
+   * @param DOMElementPlus $set
+   * @return DOMNode
+   */
+  private function createTextFs(Array $list, DOMElementPlus $set) {
     $inputDoc = new DOMDocumentPlus();
     $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
     $dl = $inputVar->appendChild($inputDoc->createElement("dl"));
     foreach($list as $v) {
       $id = normalize($this->className."-".$v->getAttribute("id"));
       $dt = $inputDoc->createElement("dt");
-      $label = $dt->appendChild($inputDoc->createElement("label", $v->getAttribute("id")));
+      $label = $inputDoc->createElement("label", $v->getAttribute("id"));
+      $dt->appendChild($label);
       $label->setAttribute("for", $id);
       $dl->appendChild($dt);
       $dd = $inputDoc->createElement("dd");
-      $text = $dd->appendChild($inputDoc->createElement("input"));
+      $text = $inputDoc->createElement("input");
+      $dd->appendChild($text);
       $text->setAttribute("type", "text");
       $text->setAttribute("id", $id);
       $text->setAttribute("name", $v->getAttribute("id"));
@@ -194,6 +252,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     return $inputVar;
   }
 
+  /**
+   * @param DOMDocumentPlus $doc
+   * @param array $vars
+   * @param string $selectId
+   * @return DOMElementPlus
+   */
   private function createSelect(DOMDocumentPlus $doc, Array $vars, $selectId) {
     $select = $doc->createElement("select");
     $select->setAttribute("name", $selectId);
@@ -206,7 +270,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     foreach($vars as $v) {
       $id = $v->getAttribute("id");
       $value = strlen($v->nodeValue) ? $v->nodeValue : $id;
-      $option = $doc->appendChild($doc->createElement("option", $value));
+      $option = $doc->createElement("option", $value);
+      $doc->appendChild($option);
       $option->setAttribute("value", $id);
       if($id == $selected) $option->setAttribute("selected", "selected");
       $select->appendChild($option);
@@ -214,6 +279,10 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     return $select;
   }
 
+  /**
+   * @param string $rule
+   * @return array
+   */
   private function filterVars($rule) {
     $r = array();
     foreach($this->vars as $v) {
@@ -224,6 +293,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     return $r;
   }
 
+  /**
+   * @throws Exception
+   */
   private function processPost() {
     if(!is_file($this->userCfgPath)) return;
     $req = Cms::getVariable("validateform-".$this->formId);
@@ -248,12 +320,20 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     redirTo(buildLocalUrl(array("path" => getCurLink(), "query" => $this->className."&".$this->getOk), true));
   }
 
+  /**
+   * @param string $var
+   * @param string $name
+   * @param mixed $value
+   */
   private function setVar($var, $name, $value) {
     if($var == "fn") Cms::setFunction($name, $value);
     else Cms::setVariable($name, $value);
   }
 
-  private function processRule(DOMElement $element) {
+  /**
+   * @param DOMElementPlus $element
+   */
+  private function processRule(DOMElementPlus $element) {
     $id = $element->getAttribute("id");
     $name = $element->nodeName;
     $attributes = array();
@@ -297,25 +377,29 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     else Cms::setVariable($id, $fn($el));
   }
 
-  private function register(DOMElement $el) {
-    $id = $el->getAttribute("id");
+  /**
+   * @param DOMElementPlus $el
+   * @return \Closure|null
+   * @throws Exception
+   */
+  private function register(DOMElementPlus $el) {
     $fn = null;
     switch($el->getAttribute("fn")) {
       case "hash":
       $algo = $el->hasAttribute("algo") ? $el->getAttribute("algo") : null;
-      $fn = $this->createFnHash($id, $this->parse($algo));
+      $fn = $this->createFnHash($this->parse($algo));
       break;
       case "strftime":
       $format = $el->hasAttribute("format") ? $el->getAttribute("format") : null;
-      $fn = $this->createFnStrftime($id, $format);
+      $fn = $this->createFnStrftime($format);
       break;
       case "sprintf":
-      $fn = $this->createFnSprintf($id, $el->nodeValue);
+      $fn = $this->createFnSprintf($el->nodeValue);
       break;
       case "pregreplace":
       $pattern = $el->hasAttribute("pattern") ? $el->getAttribute("pattern") : null;
       $replacement = $el->hasAttribute("replacement") ? $el->getAttribute("replacement") : null;
-      $fn = $this->createFnPregReplace($id, $pattern, $replacement);
+      $fn = $this->createFnPregReplace($pattern, $replacement);
       break;
       case "replace":
       $tr = array();
@@ -329,7 +413,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         }
         $tr[$name] = $this->parse($d->nodeValue);
       }
-      $fn = $this->createFnReplace($id, $tr);
+      $fn = $this->createFnReplace($tr);
       break;
       case "sequence":
       $seq = array();
@@ -341,7 +425,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         }
         $seq[] = $call->nodeValue;
       }
-      $fn = $this->createFnSequence($id, $seq);
+      $fn = $this->createFnSequence($seq);
       break;
       default:
       throw new Exception(_("Unknown function name"));
@@ -349,18 +433,30 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     return $fn;
   }
 
+  /**
+   * @param string $value
+   * @return string
+   */
   private function parse($value) {
     return replaceVariables($value, Cms::getAllVariables(), strtolower($this->className."-"));
   }
 
-  private function createFnHash($id, $algo=null) {
+  /**
+   * @param string|null $algo
+   * @return \Closure
+   */
+  private function createFnHash($algo=null) {
     if(!in_array($algo, hash_algos())) $algo = "crc32b";
     return function(DOMNode $node) use ($algo) {
       return hash($algo, $node->nodeValue);
     };
   }
 
-  private function createFnStrftime($id, $format=null) {
+  /**
+   * @param string|null $format
+   * @return \Closure
+   */
+  private function createFnStrftime($format=null) {
     if(is_null($format)) $format = "%m/%d/%Y";
     $format = $this->crossPlatformCompatibleFormat($format);
     return function(DOMNode $node) use ($format) {
@@ -370,7 +466,13 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     };
   }
 
-  private function createFnPregReplace($id, $pattern, $replacement) {
+  /**
+   * @param string $pattern
+   * @param string $replacement
+   * @return \Closure
+   * @throws Exception
+   */
+  private function createFnPregReplace($pattern, $replacement) {
     if(is_null($pattern)) throw new Exception(_("No pattern found"));
     if(is_null($replacement)) throw new Exception(_("No replacement found"));
     return function(DOMNode $node) use ($pattern, $replacement) {
@@ -378,14 +480,24 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     };
   }
 
-  private function createFnReplace($id, Array $replace) {
+  /**
+   * @param array $replace
+   * @return \Closure
+   * @throws Exception
+   */
+  private function createFnReplace(Array $replace) {
     if(empty($replace)) throw new Exception(_("No data found"));
     return function(DOMNode $node) use ($replace) {
       return str_replace(array_keys($replace), $replace, $node->nodeValue);
     };
   }
 
-  private function createFnSprintf($id, $format) {
+  /**
+   * @param string $format
+   * @return \Closure
+   * @throws Exception
+   */
+  private function createFnSprintf($format) {
     if(!strlen($format)) throw new Exception(_("No content found"));
     return function(DOMNode $node) use ($format) {
       $elements = array();
@@ -400,7 +512,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     };
   }
 
-  private function createFnSequence($id, Array $call) {
+  /**
+   * @param array $call
+   * @return \Closure
+   * @throws Exception
+   */
+  private function createFnSequence(Array $call) {
     if(empty($call)) throw new Exception(_("No data found"));
     return function(DOMNode $node) use ($call) {
       foreach($call as $f) {
@@ -417,6 +534,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
 
   /**
    * http://php.net/manual/en/function.strftime.php
+   * @param string $format
+   * @return mixed
    */
   private function crossPlatformCompatibleFormat($format) {
     // Jan 1: results in: '%e%1%' (%%, e, %%, %e, %%)

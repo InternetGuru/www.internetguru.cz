@@ -2,27 +2,39 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\FinalContentStrategyInterface;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class EmailBreaker
+ * @package IGCMS\Plugins
+ */
 class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyInterface {
-
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     if($this->detachIfNotAttached("HtmlOutput")) return;
   }
 
+  /**
+   * @param DOMDocumentPlus $content
+   * @return DOMDocumentPlus
+   */
   public function getContent(DOMDocumentPlus $content) {
     $cfg = $this->getXML();
     $pat = array();
     $rep = array();
+    /** @var DOMElementPlus $replace */
     foreach($cfg->getElementsByTagName("replace") as $replace) {
       try {
         $pattern = $replace->getRequiredAttribute("pattern");
@@ -38,6 +50,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
       $rep[] = $replace->nodeValue;
     }
     $anchors = array();
+    /** @var DOMElementPlus $a */
     foreach($content->getElementsByTagName("a") as $a) {
       if(strpos($a->getAttribute("href"), "mailto:") === false) continue;
       $anchors[] = $a;
@@ -60,6 +73,12 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     return $content;
   }
 
+  /**
+   * @param string $pat
+   * @param DOMElementPlus $rep
+   * @param DOMElementPlus $ele
+   * @return bool
+   */
   private function replace($pat, DOMElementPlus $rep, DOMElementPlus $ele) {
     $replaced = false;
     foreach($ele->childNodes as $chld) {
@@ -79,18 +98,10 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     return $replaced;
   }
 
-  private function getAddrEl(DOMElementPlus $e, $addr) {
-    $addrEl = null;
-    foreach($e->childNodes as $child) {
-      if($child->nodeType == 1) {
-        $addrEl = getAddrEl($child, $addr);
-        if(!is_null($addrEl)) return $addrEl;
-      }
-      if(strpos($child->nodeValue, $addr) !== false) return $child;
-    }
-    return $addrEl;
-  }
-
+  /**
+   * @param array $pat
+   * @param array $rep
+   */
   private function appendJs($pat, $rep) {
     $jsRep = array();
     foreach($pat as $k => $p) {

@@ -1,10 +1,15 @@
 <?php
 
 namespace IGCMS\Core;
-
-use IGCMS\Core\HTMLPlus;
-
+/**
+ * Interface OutputStrategyInterface
+ * @package IGCMS\Core
+ */
 interface OutputStrategyInterface {
+  /**
+   * @param HTMLPlus $content
+   * @return string
+   */
   public function getOutput(HTMLPlus $content);
 }
 

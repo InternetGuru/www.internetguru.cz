@@ -6,6 +6,7 @@ use IGCMS\Core\Logger;
 
 session_cache_limiter("");
 
+define("SERVER_USER", "server");
 define("INDEX_HTML", "index.html");
 define("FINDEX_PHP", "findex.php");
 define("INOTIFY", ".inotify");
@@ -99,6 +100,8 @@ define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
 define('CMS_VERSION_FILENAME', "VERSION");
 define('CMS_CHANGELOG_FILENAME', "CHANGELOG");
 define('CMS_VERSION', trim(file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME)));
+$verfile = getcwd()."/".CMS_VERSION_FILENAME;
+define('DEFAULT_RELEASE', is_file($verfile) ? trim(file_get_contents($verfile)) : CMS_RELEASE);
 define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG" : ""));
 #print_r(get_defined_constants(true)); die();
 #todo: date_default_timezone_set()

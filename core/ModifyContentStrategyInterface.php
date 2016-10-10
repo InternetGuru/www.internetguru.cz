@@ -2,11 +2,13 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\HTMLPlus;
-
+/**
+ * Interface ModifyContentStrategyInterface
+ * @package IGCMS\Core
+ */
 interface ModifyContentStrategyInterface {
   /**
-   * @param  HTMLPlus $content
+   * @param HTMLPlus $content
    */
   public function modifyContent(HTMLPlus $content);
 }

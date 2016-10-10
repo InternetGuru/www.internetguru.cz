@@ -2,16 +2,41 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\Logger;
-
+/**
+ * Class ErrorPage
+ * @package IGCMS\Core
+ */
 class ErrorPage {
+  /**
+   * @var string
+   */
   private $relDir = "error";
+  /**
+   * @var string
+   */
   private $headingFile = "headings.txt";
+  /**
+   * @var string
+   */
   private $msgFile = "messages.txt";
+  /**
+   * @var string
+   */
   private $errFile = "error.html";
+  /**
+   * @var string
+   */
   private $errSimpleFile = "error-simple.html";
+  /**
+   * @var string
+   */
   private $whatnowFile = "whatnow.txt";
 
+  /**
+   * ErrorPage constructor.
+   * @param string $message
+   * @param int $code
+   */
   public function __construct($message, $code) {
     http_response_code($code);
     $dir = LIB_FOLDER."/".$this->relDir;
@@ -43,6 +68,10 @@ class ErrorPage {
     exit();
   }
 
+  /**
+   * @param string $dir
+   * @return array
+   */
   private function getImages($dir) {
     $i = array();
     // http://xkcd.com/1350/#p:10e7f9b6-b9b8-11e3-8003-002590d77bdd
@@ -53,6 +82,10 @@ class ErrorPage {
     return $i;
   }
 
+  /**
+   * @param int $code
+   * @return string
+   */
   private function getStatusMessage($code) {
     $http_status_codes = array(
       100 => 'Continue',

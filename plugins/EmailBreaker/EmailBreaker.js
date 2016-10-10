@@ -16,7 +16,6 @@
       },
       createEmails = function() {
         var spans = document.getElementsByTagName("span");
-        var toUnwrap = [];
         var emails = [];
         for(var i = 0; i < spans.length; i++) {
           if(!spans[i].classList.contains("emailbreaker")) continue;
@@ -45,7 +44,7 @@
         }
         span.parentNode.insertBefore(a, span);
         span.parentNode.removeChild(span);
-      }
+      };
 
       // public
       return {
@@ -56,7 +55,6 @@
       }
    };
 
-   var emailbreaker = new EmailBreaker();
-   win.EmailBreaker = emailbreaker;
+   win.EmailBreaker = new EmailBreaker();
 
 })(window);

@@ -2,8 +2,10 @@
 
 namespace IGCMS\Core;
 
-use IGCMS\Core\HTMLPlus;
-
+/**
+ * Interface GetContentStrategyInterface
+ * @package IGCMS\Core
+ */
 interface GetContentStrategyInterface {
   /**
    * [getContent description]

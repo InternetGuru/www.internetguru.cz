@@ -2,7 +2,7 @@
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  var Config = {}
+  var Config = {};
   Config.ns = "eventable";
 
    var Eventable = function() {
@@ -48,13 +48,13 @@
             'eventLabel': input.value
           });
         }
-      }
+      };
 
       // public
       return {
         debug : debug,
         init : function(cfg) {
-          IGCMS.initCfg(cfg);
+          IGCMS.initCfg(Config, cfg);
           idRegExp = new RegExp(Config.ns+"-\\d+");
           elements = document.getElementsByClassName(Config.ns);
           if(elements.length == 0) return;

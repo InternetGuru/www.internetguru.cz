@@ -5,21 +5,33 @@ namespace IGCMS\Plugins;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
-use Exception;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
-use DateTime;
 
+/**
+ * Class GlobalMenu
+ * @package IGCMS\Plugins
+ */
 class GlobalMenu extends Plugin implements SplObserver {
+  /**
+   * @var array
+   */
   private $vars = array();
 
+  /**
+   * GlobalMenu constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PROCESS) return;
     foreach($this->getXML()->documentElement->childElementsArray as $e) {
@@ -31,7 +43,8 @@ class GlobalMenu extends Plugin implements SplObserver {
 
   private function generateMenu() {
     $menu = new DOMDocumentPlus();
-    $root = $menu->appendChild($menu->createElement("root"));
+    $root = $menu->createElement("root");
+    $menu->appendChild($root);
     $curLink = getCurLink();
     $idToLi = array();
     $idToLevel = array();
@@ -46,11 +59,13 @@ class GlobalMenu extends Plugin implements SplObserver {
       $values = HTMLPlusBuilder::getHeadingValues($id);
       $parentUl = $idToLi[$parentId]->lastElement;
       if(is_null($parentUl) || $parentUl->nodeName != "ul") {
-        $parentUl = $idToLi[$parentId]->appendChild($menu->createElement("ul"));
+        $parentUl = $menu->createElement("ul");
+        $idToLi[$parentId]->appendChild($parentUl);
       }
       $parentUl->appendChild($menu->createTextNode("\n"));
       $li = $parentUl->appendChild($menu->createElement("li"));
-      $a = $li->appendChild($menu->createElement("a", $values[0]));
+      $a = $menu->createElement("a", $values[0]);
+      $li->appendChild($a);
       $link = HTMLPlusBuilder::getIdToLink($id);
       if($link == $curLink) {
         $p = $li;

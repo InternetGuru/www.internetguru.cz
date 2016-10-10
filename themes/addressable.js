@@ -1,4 +1,4 @@
-(function(win) {
+(function() {
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
@@ -105,8 +105,7 @@
       }
     },
     performAction = function(e) {
-      var target = e.target || e.srcElement;
-      var b = target;
+      var b = e.target || e.srcElement;
       var url = location.protocol + '//' + location.host + location.pathname + "?";
       input.value = url + serialize(b.form);
       b.style.display = "none";

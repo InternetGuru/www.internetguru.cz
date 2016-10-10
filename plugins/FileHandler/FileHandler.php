@@ -2,19 +2,30 @@
 
 namespace IGCMS\Plugins;
 
+use Autoprefixer;
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use IGCMS\Core\ResourceInterface;
-use Autoprefixer;
-use UglifyPHP\JS;
 use Imagick;
-use Exception;
 use SplObserver;
 use SplSubject;
+use UglifyPHP\JS;
 
+/**
+ * Class FileHandler
+ * @package IGCMS\Plugins
+ */
 class FileHandler extends Plugin implements SplObserver, ResourceInterface {
+  /**
+   * @var bool
+   */
   const DEBUG = false;
+  /**
+   * @var array
+   */
   private static $imageModes = array(
     "" => array(1000, 1000, 307200, 85), // default, e.g. resources like icons
     "images" => array(1000, 1000, 307200, 85), // 300 kB
@@ -23,6 +34,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "big" => array(1500, 1500, 460800, 75), // 450 kB
     "full" => array(0, 0, 0, 0)
   );
+  /**
+   * @var array
+   */
   private static $legalMime = array(
     "inode/x-empty" => array("css", "js"),
     "text/plain" => array("css", "js"),
@@ -41,20 +55,39 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "application/vnd.ms-opentype" => array("otf"),
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => array("docx")
   );
+  /**
+   * @var array
+   */
   private static $fileFolders = array(
     THEMES_DIR => true, PLUGINS_DIR => true, LIB_DIR => true, VENDOR_DIR => true, FILES_DIR => false
   );
+  /**
+   * @var bool
+   */
   private $deleteCache;
+  /**
+   * @var array
+   */
   private $update = array();
+  /**
+   * @var array
+   */
   private $error = array();
 
+  /**
+   * FileHandler constructor.
+   * @param Plugins|SplSubject $s
+   */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 1);
     $this->deleteCache = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE;
-    #if(!is_dir(USER_FOLDER."/".$this->pluginDir)) mkdir_plus(USER_FOLDER."/".$this->pluginDir);
   }
 
+  /**
+   * @param string|null $filePath
+   * @return bool
+   */
   public static function isSupportedRequest($filePath=null) {
     if(is_null($filePath)) $filePath = getCurLink();
     $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
@@ -64,6 +97,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return false;
   }
 
+  /**
+   * @throws Exception
+   */
   public static function handleRequest() {
     try {
       $dest = getCurLink();
@@ -84,17 +120,29 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     exit;
   }
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {
     if($subject->getStatus() == STATUS_PROCESS) $this->checkResources();
     if($subject->getStatus() != STATUS_PREINIT) return;
     Cms::setVariable("cache_file", getCurLink()."?".CACHE_PARAM."=".CACHE_FILE);
   }
 
+  /**
+   * @param string $file
+   * @param string $mime
+   */
   private static function outputFile($file, $mime) {
     header("Content-type: $mime");
     echo file_get_contents($file);
   }
 
+  /**
+   * @param string $reqFilePath
+   * @return array
+   * @throws Exception
+   */
   private static function getFileInfo($reqFilePath) {
     $fInfo["src"] = null;
     $fInfo["imgmode"] = null;
@@ -129,6 +177,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return $fInfo;
   }
 
+  /**
+   * @param string $filePath
+   * @return string|null
+   */
   private static function findFile($filePath) {
     try {
       return findFile($filePath);
@@ -137,6 +189,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
   }
 
+  /**
+   * @param string $src
+   * @param string $mode
+   * @return string
+   */
   private static function getImageSource($src, $mode) {
     if(!strlen($mode)) return $src;
     return FILES_DIR.substr($src, strlen(FILES_DIR."/".$mode));
@@ -163,6 +220,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
   }
 
+  /**
+   * @param string $cacheFolder
+   * @param string $sourceFolder
+   * @param bool $isResDir
+   */
   private function doCheckResources($cacheFolder, $sourceFolder, $isResDir) {
     if(!is_dir($cacheFolder)) return;
     $inotifyCache = $cacheFolder."/".INOTIFY;
@@ -189,6 +251,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     touch($inotifyCache, filemtime($inotifySource)); // current folder is uptodate
   }
 
+  /**
+   * @param string $fileName
+   * @param string $cacheFilePath
+   * @param bool $isResDir
+   * @return bool
+   */
   private function updateCacheFile($fileName, $cacheFilePath, $isResDir) {
     $sourceFilePath = self::findFile($fileName);
     if(is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
@@ -210,6 +278,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return false;
   }
 
+  /**
+   * @param string $cacheFilePath
+   * @param string $fileName
+   * @return bool
+   */
   private function deleteCache($cacheFilePath, $fileName) {
     if(!unlink($cacheFilePath)) {
       $this->error[] = $cacheFilePath;
@@ -219,6 +292,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return true;
   }
 
+  /**
+   * @param string $filePath
+   * @return string|null
+   */
   private static function getImageMode($filePath) {
     foreach(self::$imageModes as $mode => $null) {
       if(strpos($filePath, FILES_DIR."/$mode/") === 0) return $mode;
@@ -226,6 +303,14 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return "";
   }
 
+  /**
+   * @param string $src
+   * @param string $dest
+   * @param string $ext
+   * @param string $imgmode
+   * @param bool $isRoot
+   * @param string $resDir
+   */
   private static function createFile($src, $dest, $ext, $imgmode, $isRoot, $resDir) {
     $fp = lock_file($dest);
     try {
@@ -243,12 +328,18 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
   }
 
+  /**
+   * @param string $src
+   * @param string $dest
+   * @param string $ext
+   * @param bool $isRoot
+   */
   private static function handleResource($src, $dest, $ext, $isRoot) {
     if($isRoot) {
       if(!IS_LOCALHOST && strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
+        $log = true;
         $src = CMSRES_FOLDER."/".getCurLink();
       } else {
-        $log = true;
         switch($ext) {
           case "css":
           self::buildCss($src, $dest);
@@ -264,6 +355,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     copy_plus($src, $dest);
   }
 
+  /**
+   * @param string $src
+   * @param string $dest
+   */
   private static function buildCss($src, $dest) {
     $data = file_get_contents($src);
     $autoprefixer = new Autoprefixer(['last 2 version']);
@@ -271,6 +366,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     file_put_contents($dest, $data);
   }
 
+  /**
+   * @param string $src
+   * @param string $dest
+   * @throws Exception
+   */
   private static function buildJs($src, $dest) {
     if(!JS::installed())
       throw new Exception(_("UglifyJS not installed"));
@@ -279,16 +379,31 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     throw new Exception(_("Unable to minify JS"));
   }
 
+  /**
+   * @param string $src
+   * @param string $ext
+   * @throws Exception
+   */
   private static function checkMime($src, $ext) {
     $mime = getFileMime($src);
     if(isset(self::$legalMime[$mime]) && in_array($ext, self::$legalMime[$mime])) return;
     throw new Exception(sprintf(_("Unsupported mime type %s"), $mime), 415);
   }
 
+  /**
+   * @param string $ext
+   * @return bool
+   */
   private static function isImage($ext) {
     return in_array(strtolower($ext), array("jpg", "png", "gif", "jpeg"));
   }
 
+  /**
+   * @param string $src
+   * @param string $dest
+   * @param string $mode
+   * @throws Exception
+   */
   private static function handleImage($src, $dest, $mode) {
     $mode = self::$imageModes[$mode];
     $src = realpath($src);
@@ -319,6 +434,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if($b === false || !touch($dest, filemtime($src))) throw new Exception(_("Unable to create file"));
   }
 
+  /**
+   * @param string $imagePath
+   * @return array
+   * @throws Exception
+   */
   private static function getImageSize($imagePath) {
     $i = @getimagesize($imagePath);
     if(is_array($i)) return $i;

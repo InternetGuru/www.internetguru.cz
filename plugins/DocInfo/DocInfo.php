@@ -2,23 +2,37 @@
 
 namespace IGCMS\Plugins;
 
-use IGCMS\Core\ModifyContentStrategyInterface;
-use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\HTMLPlus;
-use IGCMS\Core\Logger;
-use IGCMS\Core\Plugin;
 use IGCMS\Core\Cms;
-use Exception;
+use IGCMS\Core\DOMDocumentPlus;
+use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\ModifyContentStrategyInterface;
+use IGCMS\Core\Plugin;
+use IGCMS\Core\Plugins;
 use SplObserver;
 use SplSubject;
 
+/**
+ * Class DocInfo
+ * @package IGCMS\Plugins
+ */
 class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterface {
+  /**
+   * @var array
+   */
+  private $vars = array();
 
+  /**
+   * @param Plugins|SplSubject $subject
+   */
   public function update(SplSubject $subject) {}
 
+  /**
+   * @param HTMLPlus $content
+   */
   public function modifyContent(HTMLPlus $content) {
+    if(!$content->documentElement->hasClass(strtolower($this->className))) return;
     $filePath = HTMLPlusBuilder::getCurFile();
     $id = HTMLPlusBuilder::getFileToId($filePath);
     $globalInfo = array();
@@ -31,88 +45,104 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     $this->insertDocInfo($content, $globalInfo, $filePath);
   }
 
+  /**
+   * @param HTMLPlus $doc
+   * @param array $globalInfo
+   * @param $filePath
+   */
   private function insertDocInfo(HTMLPlus $doc, Array $globalInfo, $filePath) {
-    $vars = array();
+    $this->vars = array();
+    /** @var DOMElementPlus $var */
     foreach($this->getXML()->getElementsByTagName("var") as $var) {
-      $vars[$var->getAttribute("id")] = $var;
+      $this->vars[$var->getAttribute("id")] = $var;
     }
     foreach($doc->getElementsByTagName("h") as $h) {
-      $ul = $this->createDocInfo($h, $vars, $globalInfo, $filePath);
-      if(!$ul->childNodes->length) continue;
-      $e = $h->nextElement;
-      while(!is_null($e)) {
-        if($e->nodeName == "h") break;
-        $e = $e->nextElement;
+      $before = null;
+      if($h->parentNode->nodeName == "body") {
+        if($filePath == INDEX_HTML) continue;
+        $info = $this->createGlobalDocInfo($globalInfo, $filePath);
+      } else {
+        $info = $this->createLocalDocInfo($h, $globalInfo);
+        $before = $h->nextElement;
+        while(!is_null($before)) {
+          if($before->nodeName == "h") break;
+          $before = $before->nextElement;
+        }
       }
-      if(is_null($e)) $h->parentNode->appendChild($ul);
-      else $h->parentNode->insertBefore($ul, $e);
-    }
-  }
-
-  private function createDocInfo(DOMElementPlus $h, Array $vars, Array $globalInfo, $filePath) {
-    $doc = $h->ownerDocument;
-    $ul = $doc->createElement("ul");
-    // first heading
-    if($h->parentNode->nodeName == "body") {
-      if(HTMLPlusBuilder::getCurFile() != INDEX_HTML) {
-        $this->createGlobalDocInfo($ul, $vars, $globalInfo, $filePath);
-        $vars = $globalInfo;
+      if(is_null($info)) return;
+      /** @var DOMElementPlus $info */
+      $info = $doc->importNode($info, true);
+      if(is_null($before)) {
+        $section = $doc->getElementsByTagName("section")->item(0);
+        foreach($info->childElementsArray as $child) $section->appendChild($child);
+        return;
       }
-    } else {
-      $vars = $this->createLocalDocInfo($h, $ul, $vars, $globalInfo, $filePath);
-      if(empty($vars)) return $ul;
-    }
-    $ul->processVariables($vars, array(), true);
-    return $ul;
-  }
-
-  private function addLi($ul, $class, $e) {
-    $doc = $ul->ownerDocument;
-    $li = $ul->appendChild($doc->createElement("li"));
-    if(strlen($class)) $li->setAttribute("class", $class);
-    foreach($e->childNodes as $n) {
-      $li->appendChild($doc->importNode($n, true));
+      foreach($info->childElementsArray as $child) $before->parentNode->insertBefore($child, $before);
     }
   }
 
-  private function createGlobalDocInfo(DOMElementPlus $ul, Array $vars, Array $globalInfo, $filePath) {
-    $ul->setAttribute("class", "docinfo nomultiple global");
-    $doc = $ul->ownerDocument;
-    $this->addLi($ul, "creation", $vars["creation"]);
-    // global modification
+  /**
+   * @param DOMElementPlus $set
+   * @return DOMDocumentPlus
+   */
+  private function createDOM(DOMElementPlus $set) {
+    $doc = new DOMDocumentPlus();
+    $doc->appendChild($doc->importNode($set, true));
+    return $doc;
+  }
+
+  /**
+   * @param array $globalInfo
+   * @param string $filePath
+   * @return DOMElementPlus
+   */
+  private function createGlobalDocInfo(Array $globalInfo, $filePath) {
+    $lists = array(
+      "created" => $this->vars["created"],
+      "edit" => "",
+      "modified" => "",
+      "responsible" => "",
+    );
     if(strlen($globalInfo["mtime"]) && substr($globalInfo["ctime"], 0, 10) != substr($globalInfo["mtime"], 0, 10)) {
-      $this->addLi($ul, "modified", $vars["modified"]);
+      $lists["modified"] = $this->vars["modified"];
     }
-    // global responsibility
     if(strlen($globalInfo["resp"])) {
-      $this->addLi($ul, "responsible", $vars["responsible"]);
+      $lists["responsible"] = $this->vars["responsible"];
     }
-    // edit link
     if(Cms::isSuperUser()) {
-      $li = $ul->appendChild($doc->createElement("li"));
-      $li->setAttribute("class", "edit noprint");
-      $a = $li->appendChild($doc->createElement("a", _("Edit")));
-      $a->setAttribute("href", "?Admin=".$filePath);
-      $a->setAttribute("title", $filePath);
+      $globalInfo["editurl"] = "?Admin=".$filePath;
+      $lists["edit"] = $this->vars["edit"];
     }
+    $doc = $this->createDOM($this->vars["docinfo"]);
+    $doc->processVariables($lists);
+    $doc->processVariables($globalInfo);
+    return $doc->documentElement;
   }
 
-  private function createLocalDocInfo(DOMElementPlus $h, DOMElementPlus $ul, Array $vars, Array $globalInfo, $filePath) {
-    $ul->setAttribute("class", "docinfo nomultiple partial");
-    $partinfo = array();
-    // local author (?)
-    // local responsibility (?)
-    // local creation
+  /**
+   * @param DOMElementPlus $h
+   * @param array $globalInfo
+   * @return DOMElementPlus|null
+   */
+  private function createLocalDocInfo(DOMElementPlus $h, Array $globalInfo) {
+    $doc = $this->createDOM($this->vars["partinfo"]);
+    $vars = array();
+    $lists = array(
+      "part_created" => "",
+      "part_modified" => "",
+    );
     if($h->hasAttribute("ctime") && substr($globalInfo["ctime"], 0, 10) != substr($h->getAttribute("ctime"), 0, 10)) {
-      $partinfo["ctime"] = $h->getAttribute("ctime");
-      $this->addLi($ul, null, $vars["part_created"]);
+      $vars["ctime"] = $h->getAttribute("ctime");
+      $lists["part_created"] = $this->vars["part_created"];
     }
-    // local modification
     if($h->hasAttribute("mtime") && (!strlen($globalInfo["mtime"]) || substr($globalInfo["mtime"], 0, 10) != substr($h->getAttribute("mtime"), 0, 10))) {
-      $partinfo["mtime"] = $h->getAttribute("mtime");
-      $this->addLi($ul, null, $vars["part_modified"]);
+      $vars["mtime"] = $h->getAttribute("mtime");
+      $lists["part_modified"] = $this->vars["part_modified"];
     }
-    return $partinfo;
+    if(empty($vars)) return null;
+    $doc->processVariables($lists);
+    $doc->processVariables($vars);
+    return $doc->documentElement;
   }
 }
 

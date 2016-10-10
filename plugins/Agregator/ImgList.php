@@ -1,19 +1,30 @@
 <?php
 
 namespace IGCMS\Plugins\Agregator;
-use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\DOMDocumentPlus;
-use IGCMS\Core\DOMElementPlus;
-use IGCMS\Core\Logger;
-use IGCMS\Core\Cms;
-use DateTime;
 use Exception;
+use IGCMS\Core\Cms;
+use IGCMS\Core\DOMElementPlus;
 
+/**
+ * Class ImgList
+ * @package IGCMS\Plugins\Agregator
+ */
 class ImgList extends AgregatorList {
+  /**
+   * @var string
+   */
   const DEFAULT_SORTBY = "name";
+  /**
+   * @var bool
+   */
   const DEFAULT_RSORT = false;
 
-  public function __construct(DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
+  /**
+   * ImgList constructor.
+   * @param DOMElementPlus $doclist
+   * @param DOMElementPlus|null $pattern
+   */
+  public function __construct(DOMElementPlus $doclist, DOMElementPlus $pattern=null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
     $vars = $this->createVars();
     if(is_null($pattern)) $pattern = $doclist;
@@ -21,6 +32,10 @@ class ImgList extends AgregatorList {
     Cms::setVariable($this->id, $list);
   }
 
+  /**
+   * @return array
+   * @throws Exception
+   */
   private function createVars() {
     $path = strlen($this->path) ? "/".$this->path : "";
     $fileDir = FILES_DIR.$path;

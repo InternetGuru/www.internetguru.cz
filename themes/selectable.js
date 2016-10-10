@@ -2,12 +2,13 @@
 
   if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
 
-  var Config = {}
+  var Config = {};
   Config.selectTitle = "Select all";
   Config.ns = "selectable";
 
    var Selectable = function() {
 
+      var
       getElements = function() {
         if (document.querySelectorAll) return document.querySelectorAll("." + Config.ns);
         var selectables = [];
@@ -34,7 +35,6 @@
             var currentI = i;
             var curE = e;
             return function() {
-              var d = curE[currentI].style.display;
               curE[currentI].style.display = "block";
               selectText(curE[currentI]);
             }
