@@ -46,7 +46,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    * @param SplSubject|Plugins $subject
    */
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
+    if($subject->getStatus() != STATUS_PREINIT) return;
     $this->setTree();
     $this->balanceLinks();
   }
