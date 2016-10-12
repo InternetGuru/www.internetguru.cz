@@ -37,14 +37,14 @@ class UrlHandler extends Plugin implements SplObserver {
    */
   public function __construct(SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 3);
+    $s->setPriority($this, 2);
   }
 
   /**
    * @param Plugins|SplSubject $subject
    */
   public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_INIT) return;
+    if($subject->getStatus() != STATUS_PREINIT) return;
     $this->cfg = $this->getXML();
     if(!IS_LOCALHOST) $this->httpsRedir();
     $this->cfgRedir();
