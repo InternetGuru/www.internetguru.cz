@@ -32,6 +32,28 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    * @var string|null
    */
   private $defaultSet = null;
+  /**
+   * @var int
+   * Balanced headings level. Zero value means no balancing at all.
+   */
+  private $level;
+  /**
+   * @var int
+   * Minimum number of subheadings to be balanced. Zero value means no limit.
+   */
+  private $limit;
+  /**
+   * @var array
+   */
+  private $idToLink;
+  /**
+   * @var int
+   */
+  const DEFAULT_LIMIT = 2;
+  /**
+   * @var int
+   */
+  const DEFAULT_LEVEL = 1;
 
   /**
    * ContentBalancer constructor.
@@ -47,8 +69,20 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
+    // TODO set from cfg
+    $this->limit = self::DEFAULT_LIMIT;
+    // TODO set from cfg
+    $this->level = self::DEFAULT_LEVEL;
+    if($this->level == 0) return;
     $this->setTree();
-    $this->balanceLinks();
+    $this->idToLink = HTMLPlusBuilder::getIdToLink();
+    var_dump($this->idToLink);
+    $this->balanceLinks(key($this->tree), current($this->tree));
+    $this->modifyFragmentLinks(key($this->tree));
+    var_dump($this->idToLink);
+//    $this->buildLinks();
+//    var_dump($this->idToLink);
+    HTMLPlusBuilder::setIdToLink($this->idToLink);
   }
 
   private function setTree() {
@@ -61,36 +95,42 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
   }
 
-  private function balanceLinks() {
-    $idToLink = HTMLPlusBuilder::getIdToLink();
-    foreach($idToLink as $id => $void) {
-      $link = $idToLink[$id];
-      if(empty($this->tree[$id]) || $link == "") continue;
-      $hashPos = strpos($link, "#");
-      if(count($this->tree[$id]) == 1) {
-        if($hashPos !== false) $link = substr($link, 0, $hashPos);
-      } else {
-        $link = $hashPos === 0 ? substr($link, 1) : str_replace("#", "/", $link);
-      }
-      foreach($this->tree[$id] as $childId) {
-        $idToLink[$childId] = $link."#".basename($childId);
-      }
-      if(count($this->tree[$id]) != 1) $idToLink[$id] = $link;
+  private function balanceLinks($id, $siblings=1) {
+    $deep = 0;
+    foreach($this->tree[$id] as $childId) {
+      $d = $this->balanceLinks($childId, count($this->tree[$id]));
+      if($d > $deep) $deep = $d;
     }
-    HTMLPlusBuilder::setIdToLink($idToLink);
+    $link = $this->idToLink[$id];
+    if($deep + 1 >= $this->level && $siblings >= $this->limit) {
+      if(strpos($link, "#") === 0) $link = substr($link, 1);
+      $this->idToLink[$id] = $link;
+    }
+    return ++$deep;
+  }
+
+  private function modifyFragmentLinks($parentId, $link="") {
+    foreach($this->tree[$parentId] as $childId) {
+      if(strpos($this->idToLink[$childId], "#") === 0) {
+        $this->idToLink[$childId] = $link.$this->idToLink[$childId];
+        $this->modifyFragmentLinks($childId, $link);
+        continue;
+      }
+      $this->modifyFragmentLinks($childId, $this->idToLink[$childId]);
+    }
   }
 
   /**
    * @param HTMLPlus $content
-   * @return HTMLPlus
    */
   public function modifyContent(HTMLPlus $content) {
+    if($this->level == 0) return;
     // set vars
     $this->createVars();
     // check sets
     if(empty($this->sets)) {
       Logger::critical(_("No sets found"));
-      return $content;
+      return;
     }
     // check default set
     if(is_null($this->defaultSet) || !isset($this->sets[$this->defaultSet])) {
@@ -102,7 +142,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $content = $this->strip($content);
     $h1id = $content->documentElement->firstElement->getAttribute("id");
     if($h1id != $prefixId) $h1id = "$prefixId/$h1id";
-    $this->balance($content, $h1id);
+//    $this->balance($content, $h1id);
+    $this->level == 1
+      ? $this->balanceAll($content, $h1id)
+      : $this->balance($content, $h1id);
   }
 
   /**
@@ -200,13 +243,25 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     if(!array_key_exists($h1id, $this->tree)) return;
     foreach($this->tree[$h1id] as $h2id) {
       $h3s = $this->tree[$h2id];
-      if(count($h3s) < 2) {
+      if(empty($h3s)) continue;
+      if(count($h3s) < $this->limit) {
         $this->balance($content, $h2id);
         continue;
       }
       $section = $content->getElementById(basename($h3s[0]), "h")->parentNode;
       $this->balanceHeading($section, $h3s);
     }
+  }
+
+  /**
+   * @param HTMLPlus $content
+   * @param string $h1id
+   */
+  private function balanceAll(HTMLPlus $content, $h1id) {
+    $section = $content->getElementsByTagName("section")->item(0);
+    if(count($this->tree[$h1id]) < $this->limit) return;
+    if(is_null($section)) return;
+    $this->balanceHeading($section, $this->tree[$h1id]);
   }
 
   /**

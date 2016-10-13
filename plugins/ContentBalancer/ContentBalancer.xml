@@ -20,4 +20,12 @@
     <dd var="desc">Bez popisu</dd>
   </item>
 
+  <!--
+    Parametry vyvažování:
+      limit {1,..}  ... minimální množství podnadpisů
+      level {0,1,2} ... od jaké úrovně nadpisů se vyvažuje
+  -->
+  <var id="limit" modifyonly="modifyonly">2</var>
+  <var id="level" modifyonly="modifyonly">2</var>
+
 </ContentBalancer>
