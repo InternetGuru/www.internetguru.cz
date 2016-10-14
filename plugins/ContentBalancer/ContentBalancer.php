@@ -148,10 +148,8 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
     $link = $this->idToLink[$id];
     if($deep + 1 >= $this->level && $siblings >= $this->limit) {
-      $hashPos = strpos($link, "#");
-      if($hashPos !== false) {
-        $link = ($hashPos === 0) ? substr($link, 1) : str_replace("#", "/", $link);
-      }
+      if(strpos($link, "#") === 0) $link = substr($link, 1);
+      $link = str_replace("#", "/", $link);
       $this->idToLink[$id] = $link;
     }
     return ++$deep;
