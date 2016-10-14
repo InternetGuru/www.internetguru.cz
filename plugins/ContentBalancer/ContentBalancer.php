@@ -53,7 +53,11 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   /**
    * @var int
    */
-  const DEFAULT_LEVEL = 1;
+  const DEFAULT_LEVEL = 2;
+  /**
+   * @var string
+   */
+  const NO_BALANCE_CLASS = "no-balance";
 
   /**
    * ContentBalancer constructor.
@@ -69,20 +73,56 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
-    // TODO set from cfg
-    $this->limit = self::DEFAULT_LIMIT;
-    // TODO set from cfg
-    $this->level = self::DEFAULT_LEVEL;
+    try {
+      $this->createVars();
+    } catch(Exception $ex) {
+      Logger::user_warning(sprintf(_("Skipped element: %s"), $ex->getMessage()));
+    }
     if($this->level == 0) return;
     $this->setTree();
     $this->idToLink = HTMLPlusBuilder::getIdToLink();
-    var_dump($this->idToLink);
-    $this->balanceLinks(key($this->tree), current($this->tree));
-    $this->modifyFragmentLinks(key($this->tree));
-    var_dump($this->idToLink);
-//    $this->buildLinks();
-//    var_dump($this->idToLink);
+    foreach(HTMLPlusBuilder::getFileToId() as $file => $id) {
+      $body = HTMLPlusBuilder::getFileToDoc($file)->documentElement;
+      if($body->hasClass(self::NO_BALANCE_CLASS)) continue;
+      $this->balanceLinks($id);
+      $this->modifyFragmentLinks($id);
+    }
     HTMLPlusBuilder::setIdToLink($this->idToLink);
+  }
+
+  /**
+   * @throws Exception
+   */
+  private function createVars() {
+    $cfg = $this->getXML();
+    foreach($cfg->documentElement->childElementsArray as $e) {
+      $id = $e->getAttribute("id");
+      if($e->nodeName == "var") {
+        $this->loadVar($id, $e);
+      }
+      else if($e->nodeName == "item") {
+        if(!strlen($id)) throw new Exception(_("Element item missing id"));
+        $e->getRequiredAttribute("wrapper"); // only check
+        $this->sets[$id] = $e;
+      }
+    }
+  }
+
+  /**
+   * @param string $id
+   * @param DOMElementPlus $e
+   */
+  private function loadVar($id, DOMElementPlus $e) {
+    switch($id) {
+      case "default":
+        $this->defaultSet = $e->nodeValue;
+        break;
+      case "limit":
+      case "level":
+        // TODO validation
+        $this->{$id} = $e->nodeValue;
+        break;
+    }
   }
 
   private function setTree() {
@@ -95,6 +135,11 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
   }
 
+  /**
+   * @param string $id
+   * @param int $siblings
+   * @return int
+   */
   private function balanceLinks($id, $siblings=1) {
     $deep = 0;
     foreach($this->tree[$id] as $childId) {
@@ -103,12 +148,19 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
     $link = $this->idToLink[$id];
     if($deep + 1 >= $this->level && $siblings >= $this->limit) {
-      if(strpos($link, "#") === 0) $link = substr($link, 1);
+      $hashPos = strpos($link, "#");
+      if($hashPos !== false) {
+        $link = ($hashPos === 0) ? substr($link, 1) : str_replace("#", "/", $link);
+      }
       $this->idToLink[$id] = $link;
     }
     return ++$deep;
   }
 
+  /**
+   * @param string $parentId
+   * @param string $link
+   */
   private function modifyFragmentLinks($parentId, $link="") {
     foreach($this->tree[$parentId] as $childId) {
       if(strpos($this->idToLink[$childId], "#") === 0) {
@@ -124,9 +176,8 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    * @param HTMLPlus $content
    */
   public function modifyContent(HTMLPlus $content) {
+    if($content->documentElement->hasClass(self::NO_BALANCE_CLASS)) return;
     if($this->level == 0) return;
-    // set vars
-    $this->createVars();
     // check sets
     if(empty($this->sets)) {
       Logger::critical(_("No sets found"));
@@ -142,10 +193,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $content = $this->strip($content);
     $h1id = $content->documentElement->firstElement->getAttribute("id");
     if($h1id != $prefixId) $h1id = "$prefixId/$h1id";
-//    $this->balance($content, $h1id);
-    $this->level == 1
-      ? $this->balanceAll($content, $h1id)
-      : $this->balance($content, $h1id);
+    $this->balanceContent($content, $h1id);
   }
 
   /**
@@ -214,54 +262,21 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $e->setAttribute($aName, $value);
   }
 
-  private function createVars() {
-    $cfg = $this->getXML();
-    foreach($cfg->documentElement->childElementsArray as $e) {
-      try {
-        $id = $e->getAttribute("id");
-        switch($e->nodeName) {
-          case "var":
-          if($id == "default") $this->defaultSet = $e->nodeValue;
-          break;
-          case "item":
-          if($id == "") throw new Exception(_("Element item missing id"));
-          $e->getRequiredAttribute("wrapper"); // only check
-          $this->sets[$id] = $e;
-          break;
-        }
-      } catch(Exception $ex) {
-        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
-      }
-    }
-  }
-
   /**
    * @param HTMLPlus $content
-   * @param string $h1id
+   * @param string $hId
+   * @param int $level
    */
-  private function balance(HTMLPlus $content, $h1id) {
-    if(!array_key_exists($h1id, $this->tree)) return;
-    foreach($this->tree[$h1id] as $h2id) {
-      $h3s = $this->tree[$h2id];
-      if(empty($h3s)) continue;
-      if(count($h3s) < $this->limit) {
-        $this->balance($content, $h2id);
-        continue;
+  private function balanceContent(HTMLPlus $content, $hId, $level=1) {
+    if(!array_key_exists($hId, $this->tree)) return;
+    if($level < $this->level || count($this->tree[$hId]) < $this->limit) {
+      foreach($this->tree[$hId] as $childId) {
+        $this->balanceContent($content, $childId, $level+1);
       }
-      $section = $content->getElementById(basename($h3s[0]), "h")->parentNode;
-      $this->balanceHeading($section, $h3s);
+      return;
     }
-  }
-
-  /**
-   * @param HTMLPlus $content
-   * @param string $h1id
-   */
-  private function balanceAll(HTMLPlus $content, $h1id) {
-    $section = $content->getElementsByTagName("section")->item(0);
-    if(count($this->tree[$h1id]) < $this->limit) return;
-    if(is_null($section)) return;
-    $this->balanceHeading($section, $this->tree[$h1id]);
+    $section = $content->getElementById(basename($this->tree[$hId][0]), "h")->parentNode;
+    $this->balanceHeading($section, $this->tree[$hId]);
   }
 
   /**
