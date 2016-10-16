@@ -82,7 +82,9 @@ try {
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
-  if(Cms::isSuperUser() && DOMBuilder::isCacheOutdated()) {
+  if(Cms::isSuperUser()
+    && Cms::getLoggedUser() != SERVER_USER
+    && DOMBuilder::isCacheOutdated()) {
     Logger::user_notice(_("Server cache (nginx) is outdated"));
   }
 
