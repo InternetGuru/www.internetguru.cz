@@ -1,7 +1,5 @@
 <UrlHandler>
 
-  <var id="protocol" pattern="https?">http</var>
-
   <!--
     PŘEPIS URL adresy; element rewrite
     - atribut match    ... přepisovaná část

@@ -24,6 +24,7 @@ define("FILES_DIR", "files");
 define("SERVER_FILES_DIR", "_server");
 define("LOG_DIR", "log");
 define("DEBUG_FILE", "DEBUG");
+define("HTTPS_FILE", "HTTPS");
 define('CACHE_PARAM', "Cache");
 define('CACHE_IGNORE', "ignore");
 define('CACHE_FILE', "file");
