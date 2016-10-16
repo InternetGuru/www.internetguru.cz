@@ -10,7 +10,7 @@
 
       editlink, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
 
-    Atributy elementu doclist:
+    Atributy elementu doclist, resp. filter:
 
       id (povinné)    identifikátor proměnné s názvem doclist-[id]
       doclist         id existujícího elementu doclist, jehož předpis se má použít
@@ -36,6 +36,15 @@
     <doclist id="dd" sort="mtime">
       <dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
     </doclist>
+
+    Příklad s uživatelským filtrem
+
+    <doclist id="tema" wrapper="ul" path="koutek" limit="10">
+      <li><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
+    </doclist>
+    <filter doclist="tema" limit="0" id="nemoci" kw="nemoci" />
+    <filter doclist="tema" limit="0" id="urazy" kw="úrazy" />
+    <filter doclist="tema" limit="0" id="zlomeniny" kw="zlomeniny" />
 
   -->
 

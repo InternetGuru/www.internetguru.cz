@@ -39,7 +39,17 @@ try {
   if(!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) touch(".".DEBUG_FILE);
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
   Cms::checkAuth();
-  if(Cms::isSuperUser() && !IS_LOCALHOST) initIndexFiles();
+  if(Cms::isSuperUser()) {
+    if(!IS_LOCALHOST) initIndexFiles();
+    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
+      try {
+        clearNginxCache();
+        Logger::user_success(_("Cache successfully purged"));
+      } catch(Exception $e) {
+        Logger::critical($e->getMessage());
+      }
+    }
+  }
 
   // remove ?login form url
   if(isset($_GET["login"])) {
@@ -72,17 +82,10 @@ try {
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
-  if(Cms::isSuperUser() && DOMBuilder::isCacheOutdated()) {
-    if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
-      try {
-        clearNginxCache();
-        Logger::user_success(_("Cache successfully purged"));
-      } catch(Exception $e) {
-        Logger::critical($e->getMessage());
-      }
-    } elseif(!isset($_GET[CACHE_PARAM]) || $_GET[CACHE_PARAM] != CACHE_IGNORE) {
-      Logger::user_notice(_("Server cache (nginx) is outdated"));
-    }
+  if(Cms::isSuperUser()
+    && Cms::getLoggedUser() != SERVER_USER
+    && DOMBuilder::isCacheOutdated()) {
+    Logger::user_notice(_("Server cache (nginx) is outdated"));
   }
 
   Cms::getMessages();

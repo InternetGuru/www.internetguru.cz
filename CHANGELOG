@@ -1,4 +1,10 @@
 
+2.2 | 2016-10-16
+
+Agregátor: podpora uživatelského filtrování seznamů
+UrlHandler: nastavení https odebráno z konfigurace
+ContentBalancer: uživatelské nastavení úrovně zalamování
+
 2.1 | 2016-10-10
 
 LinkList: vytváří proměnnou pouze pro dokumenty se třídou linklist v body

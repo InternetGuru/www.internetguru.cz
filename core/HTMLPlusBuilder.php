@@ -22,7 +22,7 @@ use Exception;
  * @method static getIdToLink($id=null)
  * @method static getLinkToId($id=null)
  * @method static getFileToId($fileName=null);
- * @method static getFileToDoc($fileName=null);
+ * @method static HTMLPlus getFileToDoc($fileName=null);
  * @method static getFileToMtime($fileName=null);
  */
 class HTMLPlusBuilder extends DOMBuilder {
