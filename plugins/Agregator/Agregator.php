@@ -54,6 +54,8 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   public function __construct(SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 2);
+    $this->lists[self::DOCLIST_CLASS] = array();
+    $this->lists[self::IMGLIST_CLASS] = array();
   }
 
   /**
@@ -123,7 +125,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
    */
   private function createList($listClass, $templateId, DOMElementPlus $template) {
     try {
-      $this->lists[$listClass] = array();
       $listRef = $template->getAttribute($template->nodeName);
       if(!strlen($listRef)) {
         $this->lists[$listClass][$templateId] = $template;
