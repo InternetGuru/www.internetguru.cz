@@ -1,14 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentBalancer>
-  <var id="default" modifyonly="modifyonly">simple</var>
+
   <!--
 
-    Dostupné proměnné:
-      headingplus ... proměnná short pokud existuje, jinak heading
-      heading, link, headingplus, short, desc, kw
+    Element se šablonou pro seznam zalomených nadpisů
 
-    Atributy elementu item:
-      id (povinné)
+    - název elementu: item
+
+    - atributy (povinné)
+      id ... unikátní název šablony
+      wrapper ... název obalovacího elementu šablony
+
+    - proměnné: heading, link, headingplus, short, desc, kw,
+      kde headingplus je proměnná short, pokud existuje, jinak heading
 
   -->
   <item id="simple" wrapper="ul" modifyonly="modifyonly">
@@ -19,5 +23,18 @@
     <dd var="kw">Bez klíčových slov</dd>
     <dd var="desc">Bez popisu</dd>
   </item>
+
+  <!--
+
+    Globální nastavení jako elementy var s identifikátorem
+
+    default ... identifikátor výchozí šablony
+    level   ... počet viditelných úrovní nadpisů, 0 pro vypnutí vyvažování
+    limit   ... minimální množství podnadpisů k zalomení
+
+  -->
+  <var id="default" modifyonly="modifyonly">simple</var>
+  <var id="level" modifyonly="modifyonly">2</var>
+  <var id="limit" modifyonly="modifyonly">2</var>
 
 </ContentBalancer>
