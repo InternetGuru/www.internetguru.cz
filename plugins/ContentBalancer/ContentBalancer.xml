@@ -2,15 +2,18 @@
 <ContentBalancer>
 
   <!--
-    Výstupní šablony
 
-    Dostupné proměnné:
-      headingplus ... proměnná short pokud existuje, jinak heading
-      heading, link, headingplus, short, desc, kw
+    Element se šablonou pro seznam zalomených nadpisů
 
-    Atributy elementu item:
-      id (povinné)      ... unikátní název šablony
-      wrapper (povinné) ... název obalovacího elementu šablony
+    - název elementu: item
+
+    - atributy (povinné)
+      id ... unikátní název šablony
+      wrapper ... název obalovacího elementu šablony
+
+    - proměnné: heading, link, headingplus, short, desc, kw,
+      kde headingplus je proměnná short, pokud existuje, jinak heading
+
   -->
   <item id="simple" wrapper="ul" modifyonly="modifyonly">
     <li><a var="link@href headingplus">n/a</a></li>
@@ -22,11 +25,13 @@
   </item>
 
   <!--
-    Nastavení
 
-    default ... výchozí šablona
-    level   ... od jaké úrovně nadpisů se vyvažuje, 0 pro vypnutí vyvažování
-    limit   ... minimální množství podnadpisů
+    Globální nastavení jako elementy var s identifikátorem
+
+    default ... identifikátor výchozí šablony
+    level   ... počet viditelných úrovní nadpisů, 0 pro vypnutí vyvažování
+    limit   ... minimální množství podnadpisů k zalomení
+
   -->
   <var id="default" modifyonly="modifyonly">simple</var>
   <var id="level" modifyonly="modifyonly">2</var>
