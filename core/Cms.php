@@ -153,6 +153,7 @@ class Cms {
   public static function getMessages() {
     if(!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) return;
     if(is_null(self::$flashList)) self::createFlashList();
+    self::getTypes();
     foreach($_SESSION["cms"]["flash"] as $type => $item) {
       foreach($item as $hash => $message) {
         self::addFlashItem($message, $type, $_SESSION["cms"]["request"][$type][$hash]);
