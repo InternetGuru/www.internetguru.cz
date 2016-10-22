@@ -28,11 +28,13 @@
 
     Globální nastavení jako elementy var s identifikátorem
 
-    default ... identifikátor výchozí šablony
-    level   ... počet viditelných úrovní nadpisů, 0 pro vypnutí vyvažování
-    limit   ... minimální množství podnadpisů k zalomení
+    nobalance ... třída elementu body souboru, který se nevyvažuje
+    default   ... identifikátor výchozí šablony
+    level     ... počet viditelných úrovní nadpisů, 0 pro vypnutí vyvažování
+    limit     ... minimální množství podnadpisů k zalomení
 
   -->
+  <var id="nobalance" modifyonly="modifyonly">nobalance</var>
   <var id="default" modifyonly="modifyonly">simple</var>
   <var id="level" modifyonly="modifyonly">2</var>
   <var id="limit" modifyonly="modifyonly">2</var>

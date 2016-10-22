@@ -47,6 +47,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   private $idToLink;
   /**
+   * @var string
+   */
+  private $noBalanceClass;
+  /**
    * @var int
    */
   const DEFAULT_LIMIT = 2;
@@ -54,10 +58,6 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    * @var int
    */
   const DEFAULT_LEVEL = 2;
-  /**
-   * @var string
-   */
-  const NO_BALANCE_CLASS = "no-balance";
 
   /**
    * ContentBalancer constructor.
@@ -83,7 +83,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $this->idToLink = HTMLPlusBuilder::getIdToLink();
     foreach(HTMLPlusBuilder::getFileToId() as $file => $id) {
       $body = HTMLPlusBuilder::getFileToDoc($file)->documentElement;
-      if($body->hasClass(self::NO_BALANCE_CLASS)) continue;
+      if($body->hasClass($this->noBalanceClass)) continue;
       $this->balanceLinks($id);
       $this->modifyFragmentLinks($id);
     }
@@ -114,6 +114,9 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   private function loadVar($id, DOMElementPlus $e) {
     switch($id) {
+      case "nobalance":
+        $this->noBalanceClass = $e->nodeValue;
+        break;
       case "default":
         $this->defaultSet = $e->nodeValue;
         break;
@@ -174,7 +177,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    * @param HTMLPlus $content
    */
   public function modifyContent(HTMLPlus $content) {
-    if($content->documentElement->hasClass(self::NO_BALANCE_CLASS)) return;
+    if($content->documentElement->hasClass($this->noBalanceClass)) return;
     if($this->level == 0) return;
     // check sets
     if(empty($this->sets)) {
