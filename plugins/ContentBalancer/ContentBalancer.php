@@ -73,11 +73,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
-    try {
-      $this->createVars();
-    } catch(Exception $ex) {
-      Logger::user_warning(sprintf(_("Skipped element: %s"), $ex->getMessage()));
-    }
+    $this->createVars();
     if($this->level == 0) return;
     $this->setTree();
     $this->idToLink = HTMLPlusBuilder::getIdToLink();
@@ -90,20 +86,19 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     HTMLPlusBuilder::setIdToLink($this->idToLink);
   }
 
-  /**
-   * @throws Exception
-   */
   private function createVars() {
     $cfg = $this->getXML();
     foreach($cfg->documentElement->childElementsArray as $e) {
-      $id = $e->getAttribute("id");
-      if($e->nodeName == "var") {
-        $this->loadVar($id, $e);
-      }
-      else if($e->nodeName == "item") {
-        if(!strlen($id)) throw new Exception(_("Element item missing id"));
-        $e->getRequiredAttribute("wrapper"); // only check
-        $this->sets[$id] = $e;
+      try {
+        $id = $e->getRequiredAttribute("id");
+        if($e->nodeName == "var") {
+          $this->loadVar($id, $e);
+        } else if($e->nodeName == "item") {
+          $e->getRequiredAttribute("wrapper"); // only check
+          $this->sets[$id] = $e;
+        }
+      } catch(Exception $ex) {
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
       }
     }
   }
@@ -122,8 +117,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
         break;
       case "limit":
       case "level":
-        // TODO validation
-        $this->{$id} = $e->nodeValue;
+        $this->{$id} = intval($e->nodeValue);
         break;
     }
   }
