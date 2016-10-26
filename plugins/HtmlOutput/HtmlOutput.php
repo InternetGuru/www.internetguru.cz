@@ -116,11 +116,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     // create output DOM with doctype
     $doc = $this->createDoc();
     $html = $this->addRoot($doc, $lang);
-    $this->addHead($doc, $html, $h1);
 
     // final validation
     $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
     $xPath = new DOMXPath($contentPlus);
+    $this->addHead($doc, $html, $h1, $xPath);
+
     /** @var DOMElementPlus $a */
     foreach($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
     foreach($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
@@ -196,9 +197,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param DOMDocument $doc
    * @param DOMElement $html
    * @param DOMElementPlus $h1
+   * @param DOMXPath $xPath
    * @return DOMElement
    */
-  private function addHead(DOMDocument $doc, DOMElement $html, DOMElementPlus $h1) {
+  private function addHead(DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath) {
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
     $this->appendMeta($head, "charset", "utf-8", false, true);
@@ -212,7 +214,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
     update_file(findFile($this->pluginDir."/robots.txt"), "robots.txt"); // hash?
-    $this->appendCssFiles($head);
+    $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
   }
@@ -455,7 +457,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           case "stylesheet":
           $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
           $ieIfComment = ($n->hasAttribute("if") ? $n->getAttribute("if") : null);
-          $this->addCssFile($n->nodeValue, $media, 10, true, $ieIfComment);
+          $ifXpath = ($n->hasAttribute("if-xpath") ? $n->getAttribute("if-xpath") : false);
+          $this->addCssFile($n->nodeValue, $media, 10, true, $ieIfComment, $ifXpath);
           break;
           case "favicon":
           $this->favIcon = findFile($n->nodeValue);
@@ -566,8 +569,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param int $priority
    * @param bool $user
    * @param string|null $ieIfComment
+   * @param bool $ifXpath
    */
-  public function addCssFile($filePath, $media = false, $priority = 10, $user = true, $ieIfComment=null) {
+  public function addCssFile($filePath, $media = false, $priority = 10, $user = true, $ieIfComment=null, $ifXpath=false) {
     if(isset($this->cssFiles[$filePath])) return;
     Cms::addVariableItem("styles", $filePath);
     #if(findFile($filePath, $user) === false) throw new Exception();
@@ -576,6 +580,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       "file" => $filePath,
       "media" => $media,
       "user" => $user,
+      "ifXpath" => $ifXpath,
       "if" => $ieIfComment);
     $this->cssFilesPriority[$filePath] = $priority;
   }
@@ -681,10 +686,16 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   /**
    * Append all registered CSS files into a parent (usually head)
    * @param  DOMElement $parent Element to append JS files to
+   * @param  DOMXPath $xPath
    * @return void
    */
-  private function appendCssFiles(DOMElement $parent) {
+  private function appendCssFiles(DOMElement $parent, DOMXPath $xPath) {
     foreach($this->cssFilesPriority as $k => $v) {
+      $ifXpath = isset($this->cssFiles[$k]["ifXpath"]) ? $this->cssFiles[$k]["ifXpath"] : false;
+      if($ifXpath !== false) {
+        $r = $xPath->query($ifXpath);
+        if($r === false || $r->length === 0) continue;
+      }
       $ieIfComment = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : null;
       $filePath = ROOT_URL.getResDir($this->cssFiles[$k]["file"]);
       $this->appendLinkElement($parent, $filePath, "stylesheet", "text/css",
