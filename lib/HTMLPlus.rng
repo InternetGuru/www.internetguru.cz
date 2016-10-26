@@ -297,6 +297,79 @@
     </optional>
   </define>
 
+  <!--http://w3c.github.io/html/semantics-embedded-content.html#elementdef-picture-->
+  <define name="htmlplus.picture">
+    <element name="picture">
+      <zeroOrMore>
+        <ref name="htmlplus.source"/>
+      </zeroOrMore>
+      <ref name="htmlplus.img"/>
+    </element>
+  </define>
+
+  <!--http://w3c.github.io/html/semantics-embedded-content.html#elementdef-picture-picture-source-->
+  <define name="htmlplus.source">
+    <element name="source">
+      <optional>
+        <attribute name="srcset"/>
+      </optional>
+      <optional>
+        <attribute name="sizes"/>
+      </optional>
+      <optional>
+        <attribute name="media"/>
+      </optional>
+      <optional>
+        <attribute name="type"/>
+      </optional>
+    </element>
+  </define>
+
+  <!--http://w3c.github.io/html/semantics-embedded-content.html#the-img-element-->
+  <define name="htmlplus.img">
+    <element name="img">
+      <optional>
+        <attribute name="alt"/>
+      </optional>
+      <optional>
+        <attribute name="src"/>
+      </optional>
+      <optional>
+        <attribute name="srcset"/>
+      </optional>
+      <optional>
+        <attribute name="sizes"/>
+      </optional>
+      <optional>
+        <attribute name="crossorigin"/>
+      </optional>
+      <optional>
+        <attribute name="usemap"/>
+      </optional>
+      <optional>
+        <attribute name="ismap"/>
+      </optional>
+      <optional>
+        <attribute name="width"/>
+      </optional>
+      <optional>
+        <attribute name="height"/>
+      </optional>
+      <optional>
+        <attribute name="longdesc"/>
+      </optional>
+    </element>
+  </define>
+
+  <define name="Inline.model" combine="interleave">
+    <optional>
+      <ref name="htmlplus.picture"/>
+    </optional>
+    <optional>
+      <ref name="htmlplus.img"/>
+    </optional>
+  </define>
+
   <include href="xhtml/param.rng"/>
   <include href="xhtml/object.rng"/>
   <include href="xhtml/list.rng"/>
