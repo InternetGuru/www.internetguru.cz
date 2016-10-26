@@ -1,36 +1,74 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <HtmlOutput>
 
-  <!-- <themes readonly="readonly"/> -->
+  <!-- Selected theme -->
+  <var id="theme">default</var>
+
   <themes>
+    <!-- Default theme -->
+    <theme id="default">
+      <!--
+        Fonts
+      -->
+      <stylesheet>lib/roboto/roboto.css</stylesheet>
+      <!--<stylesheet>lib/opensans/opensans.css</stylesheet>-->
+      <!--<stylesheet>/lib/font-awesome/css/font-awesome.min.css</stylesheet>-->
+      <!--
+        Styles
+      -->
+      <stylesheet>themes/default/default.css</stylesheet>
+      <stylesheet>themes/default/reset.css</stylesheet>
+      <stylesheet media="screen">themes/default/messages.css</stylesheet>
+      <stylesheet>themes/default/form.css</stylesheet>
+      <stylesheet>themes/default/columns.css</stylesheet>
+      <stylesheet>themes/default/breadcrumb.css</stylesheet>
+      <stylesheet>themes/default/footer.css</stylesheet>
+      <stylesheet media="screen">themes/default/custom.css</stylesheet>
+      <stylesheet media="print">themes/default/print.css</stylesheet>
+      <!--
+        Transformations
+      -->
+      <xslt>themes/default/lists.xsl</xslt>
+      <xslt>themes/default/layout.xsl</xslt>
+      <!--<xslt>themes/default/h1desc.xsl</xslt>-->
+      <!--<xslt>themes/default/hdesc.xsl</xslt>-->
+      <!--<xslt>themes/default/part.xsl</xslt>-->
+      <xslt>themes/default/footer.xsl</xslt>
+      <xslt>themes/default/ielte7.xsl</xslt>
+      <xslt>themes/default/adminmenu.xsl</xslt>
+      <xslt>themes/default/messages.xsl</xslt>
+    </theme>
+    <!-- Empty theme -->
+    <theme id="custom"/>
+    <!-- Obsolete theme -->
     <theme id="basic">
+      <stylesheet>themes/cms-default.css</stylesheet>
+      <stylesheet media="print">themes/cms-print.css</stylesheet>
+      <stylesheet>lib/opensans/opensans.css</stylesheet>
+      <stylesheet>lib/flaticon/flaticon.css</stylesheet>
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/basicLayout.xsl</xslt>
       <xslt>themes/footer.xsl</xslt>
       <xslt>themes/ielte7.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
+      <xslt>themes/cms-messages.xsl</xslt>
       <stylesheet media="screen">themes/basic.css</stylesheet>
     </theme>
+    <!-- Obsolete theme -->
     <theme id="simple">
+      <stylesheet>themes/cms-default.css</stylesheet>
+      <stylesheet media="print">themes/cms-print.css</stylesheet>
+      <stylesheet>lib/opensans/opensans.css</stylesheet>
+      <stylesheet>lib/flaticon/flaticon.css</stylesheet>
       <xslt>themes/lists.xsl</xslt>
       <xslt>themes/simpleLayout.xsl</xslt>
       <xslt>themes/footer.xsl</xslt>
       <xslt>themes/ielte7.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
+      <xslt>themes/cms-messages.xsl</xslt>
       <stylesheet media="screen">themes/simple.css</stylesheet>
     </theme>
-    <theme id="custom"/>
   </themes>
-
-  <!-- available themes: basic or simple -->
-  <var id="theme">simple</var>
-
-  <!-- Default stylesheets -->
-  <stylesheet>lib/opensans/opensans.css</stylesheet>
-  <stylesheet>lib/flaticon/flaticon.css</stylesheet>
-  <stylesheet>themes/cms-default.css</stylesheet>
-  <stylesheet media="print">themes/cms-print.css</stylesheet>
-  <!-- <stylesheet>themes/document.css</stylesheet> -->
 
   <!-- IGCMS global object -->
   <jsFile append="head">themes/igcms.js</jsFile>
@@ -44,12 +82,15 @@
   <jsFile if="lt IE 9" priority="1">themes/ie9.js</jsFile>
   <jsFile append="body">themes/iefixes.js</jsFile>
 
+  <!-- Default css -->
+  <stylesheet if-xpath="/body[contains(@class, 'doc')]">themes/document.css</stylesheet>
+
   <!-- Default scripts -->
   <jsFile append="body">themes/browserdetect.js</jsFile>
-  <jsFile append="body" if-xpath="body[contains(@class, 'scrolltopable')]">themes/scrolltopable.js</jsFile>
-  <jsFile append="body" if-xpath="body[contains(@class, 'scrolltopable')]">themes/scrolltopableinit.js</jsFile>
-  <jsFile append="body" if-xpath="body[contains(@class, 'fragmentable')]">themes/fragmentable.js</jsFile>
-  <jsFile append="body" if-xpath="body[contains(@class, 'fragmentable')]">themes/fragmentableinit.js</jsFile>
+  <jsFile append="body" if-xpath="/body[contains(@class, 'scrolltopable')]">themes/scrolltopable.js</jsFile>
+  <jsFile append="body" if-xpath="/body[contains(@class, 'scrolltopable')]">themes/scrolltopableinit.js</jsFile>
+  <jsFile append="body" if-xpath="/body[contains(@class, 'fragmentable')]">themes/fragmentable.js</jsFile>
+  <jsFile append="body" if-xpath="/body[contains(@class, 'fragmentable')]">themes/fragmentableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="10">themes/hideable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="10">themes/hideableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="5">themes/tocable.js</jsFile>
@@ -66,10 +107,6 @@
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editableinit.js</jsFile>
   <jsFile append="body" if-xpath="//select[contains(@class, 'completable')]">themes/completable.js</jsFile>
-
-
-  <!-- <xslt readonly="readonly"/> -->
-  <xslt>themes/cms-messages.xsl</xslt>
 
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
