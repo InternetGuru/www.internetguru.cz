@@ -26,6 +26,7 @@
       <stylesheet>themes/default/all.css</stylesheet>
       <stylesheet media="screen">themes/default/screen.css</stylesheet>
       <stylesheet media="print">themes/default/print.css</stylesheet>
+      <stylesheet if-xpath="/body[contains(@class, 'doc')]">themes/default/document.css</stylesheet>
       <!--
         Transformations
       -->
@@ -82,9 +83,6 @@
   <jsFile if="lte IE 9" priority="1">themes/classlist.js</jsFile>
   <jsFile if="lt IE 9" priority="1">themes/ie9.js</jsFile>
   <jsFile append="body">themes/iefixes.js</jsFile>
-
-  <!-- Default css -->
-  <stylesheet if-xpath="/body[contains(@class, 'doc')]">themes/document.css</stylesheet>
 
   <!-- Default scripts -->
   <jsFile append="body">themes/browserdetect.js</jsFile>
