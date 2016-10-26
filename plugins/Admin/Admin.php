@@ -198,11 +198,11 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     try {
       if(isset($_GET[self::FILE_ENABLE])) {
         $this->enableDataFile();
-        Logger::user_success(sprintf(_("File '%s' enabled"), $this->dataFile));
+        Logger::user_success(sprintf(_("File '%s' enabled"), $this->defaultFile));
       }
       if(isset($_GET[self::FILE_DISABLE])) {
         $this->disableDataFile();
-        Logger::user_success(sprintf(_("File '%s' disabled"), $this->dataFile));
+        Logger::user_success(sprintf(_("File '%s' disabled"), $this->defaultFile));
       }
     } catch(Exception $e) {
       Logger::user_warning($e->getMessage());
