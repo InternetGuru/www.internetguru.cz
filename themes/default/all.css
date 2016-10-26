@@ -1,14 +1,3 @@
-@charset "UTF-8";
-
-body {
-  /*font-family: 'Open Sans', Tahoma, sans-serif;*/
-  font-family: 'Roboto', Tahoma, sans-serif;
-}
-
-strong {
-  font-weight: 600;
-}
-
 h1,h2,h3,h4,h5,h6,p,ul,ol,dl,
 div.paragraph, div.list, pre {
   margin: 1em auto;

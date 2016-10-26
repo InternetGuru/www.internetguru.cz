@@ -23,7 +23,8 @@
       <stylesheet>themes/default/columns.css</stylesheet>
       <stylesheet>themes/default/breadcrumb.css</stylesheet>
       <stylesheet>themes/default/footer.css</stylesheet>
-      <stylesheet media="screen">themes/default/custom.css</stylesheet>
+      <stylesheet>themes/default/all.css</stylesheet>
+      <stylesheet media="screen">themes/default/screen.css</stylesheet>
       <stylesheet media="print">themes/default/print.css</stylesheet>
       <!--
         Transformations
