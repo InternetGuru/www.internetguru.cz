@@ -16,10 +16,12 @@
   font-family: FontAwesome;
   font-size: inherit;
   text-rendering: auto;
-  visibility: hidden;
   width: 1em;
+  visibility: hidden;
   overflow: hidden;
   word-wrap: normal;
+  word-break: normal;
+  letter-spacing: 1em;
   vertical-align: middle;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
