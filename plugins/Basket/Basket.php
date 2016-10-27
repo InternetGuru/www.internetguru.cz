@@ -39,10 +39,6 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
    * @var array
    */
   private $cookieProducts = array();
-  /**
-   * @var bool
-   */
-  private $useCache = true;
 
   /**
    * @param HTMLPlus $content
@@ -74,7 +70,6 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     try {
       // load config
       $this->cfg = $this->getXML();
-      $this->validateConfigCache();
       $this->loadVariables();
       // after submitting form delete cookies
       if(getCurLink(true) == $this->vars['formpage']."?cfok=".$this->vars['formid'])
@@ -101,15 +96,6 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
       Cms::setVariable('empty', (count($this->cookieProducts) ? null : ''));
     } catch(Exception $e) {
       Logger::user_warning($e->getMessage());
-    }
-  }
-
-  private function validateConfigCache() {
-    $configFilePath = findFile($this->pluginDir."/".$this->className.".xml");
-    $cacheKey = apc_get_key($configFilePath);
-    if(!apc_is_valid_cache($cacheKey, filemtime($configFilePath))) {
-      apc_store_cache($cacheKey, filemtime($configFilePath), $this->pluginDir."/".$this->className.".xml");
-      $this->useCache = false;
     }
   }
 
@@ -202,21 +188,13 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
     return isset($_POST['id']) && !is_null(Cms::getVariable('validateform-'.$_POST['id']));
   }
 
-  /**
-   * @param $cacheKey
-   * @return bool
-   */
-  private function useApcCache($cacheKey) {
-    return $this->useCache && apc_exists($cacheKey);
-  }
-
   private function createProductVars() {
     $templates = $this->loadTemplates();
     foreach($templates as $tplName => $tpl) {
       foreach($this->products as $product) {
         $keyName = "basket-$tplName-".$product['product-id'];
         $cacheKey = apc_get_key($keyName);
-        if($this->useApcCache($cacheKey)) {
+        if(apc_exists($cacheKey)) {
           $doc = new DOMDocumentPlus();
           $doc->loadXML(apc_fetch($cacheKey));
           $this->insertAction($doc);
@@ -242,7 +220,7 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
   private function loadVariables() {
     $keyName = "variables";
     $cacheKey = apc_get_key($keyName);
-    if($this->useApcCache($cacheKey)) {
+    if(apc_exists($cacheKey)) {
       $this->vars = apc_fetch($cacheKey);
       return;
     }
@@ -315,16 +293,16 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
   }
 
   /**
-   * @param DOMDocumentPlus $template
+   * @param DOMElementPlus $template
    * @param array $product
    * @return DOMDocumentPlus
    */
-  private function modifyTemplate(DOMDocumentPlus $template, Array $product) {
+  private function modifyTemplate(DOMElementPlus $template, Array $product) {
     $tmptpl = clone $template;
     $vars = array_merge($product, array(
       "currency" => $this->vars['currency'],
     ));
-    $tmptpl->processVariables($vars, array());
+    $tmptpl->processVariables($vars, array(), true);
     $doc = new DOMDocumentPlus();
     $doc->appendChild($doc->importNode($tmptpl, true));
     return $doc;
