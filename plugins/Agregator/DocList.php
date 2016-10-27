@@ -75,7 +75,7 @@ class DocList extends AgregatorList {
         $vars[$file]["link"] = $id;
         $vars[$file]["editlink"] = "";
         if(Cms::isSuperUser()) {
-          $vars[$file]["editlink"] = "<a href='?Admin=$file' title='$file' class='flaticon-drawing3'>"._("Edit")."</a>";
+          $vars[$file]["editlink"] = "<a href='?Admin=$file' title='$file' class='fa fa-edit'>"._("Edit")."</a>";
         }
       } catch(Exception $e) {
         Logger::critical($e->getMessage());

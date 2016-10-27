@@ -15,7 +15,7 @@
   <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var> <!-- proměnná $summary-total -->
 
   <div id="basket-wrapper" var="status@class" modifyonly="modifyonly">
-    <a class="basket-button" var="title@title formpage@href"><span class="flaticon-shopping232" var="gotoorder"/></a>
+    <a class="basket-button" var="title@title formpage@href"><span class="fa fa-shopping-cart" var="gotoorder"/></a>
   </div> <!-- proměnná empty, title -->
 
   <template id="basic">
@@ -32,7 +32,7 @@
             <li><input type="number" min="1" required="required" var="product-id@name" name="cnt-%s" value="1" /></li>
             <li>
               <input type="hidden" name="id" var="product-id@value"/>
-              <button type="submit" title="Přidat do košíku"><span class="flaticon-shopping232">Koupit</span></button>
+              <button type="submit" title="Přidat do košíku"><span class="fa fa-shopping-cart">Koupit</span></button>
             </li>
           </ul>
         </dd>
