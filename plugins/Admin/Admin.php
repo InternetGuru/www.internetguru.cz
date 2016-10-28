@@ -99,6 +99,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
    * @var bool
    */
   private $contentChanged = false;
+  /**
+   * @var array
+   */
+  private $allowedTypes = array("html", "xml", "xsl", "js", "css");
 
   /**
    * Admin constructor.
@@ -309,7 +313,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         $files = array_merge($files, $this->getFilesRecursive($folder."/$f", $prefix."$f/"));
         continue;
       }
-      if(!in_array(pathinfo($f, PATHINFO_EXTENSION), array("html", "xml", "xsl", "js", "css"))) continue;
+      if(!in_array(pathinfo($f, PATHINFO_EXTENSION), $this->allowedTypes)) continue;
       if(substr($f, 0, 1) == ".") $f = substr($f, 1);
       $files[$prefix.$f] = $prefix.$f;
     }
@@ -487,6 +491,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       redirTo(buildLocalUrl(array("path" => $fLink, "query" => $this->className."=".$this->defaultFile)));
     }
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
+    if(!in_array($this->type, $this->allowedTypes)) {
+      $this->defaultFile = "";
+      throw new Exception(sprintf(_("File type '%s' is not allowed"), $this->type));
+    }
   }
 
   /**
