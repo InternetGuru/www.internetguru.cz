@@ -301,11 +301,11 @@ class Admin extends Plugin implements SplObserver, ContentStrategyInterface {
     if($this->defaultFile != $fileName || $fLink != getCurLink()) {
       redirTo(buildLocalUrl(array("path" => $fLink, "query" => $this->className."=".$this->defaultFile)));
     }
+    $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
     if(!in_array($this->type, $this->allowedTypes)) {
       $this->defaultFile = "";
       throw new Exception(sprintf(_("File type %s is not allowed"), $this->type));
     }
-    $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
   }
 
   private function getFilepath($f) {
