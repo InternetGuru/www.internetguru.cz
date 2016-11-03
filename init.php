@@ -50,11 +50,12 @@ define('STATUS_INIT', 'init');
 define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
 define('APC_PREFIX', 2); // change if APC structure changes
-define("IS_LOCALHOST", (!isset($_SERVER["REMOTE_ADDR"])
-  || $_SERVER["REMOTE_ADDR"] == "127.0.0.1"
-  || strpos($_SERVER["REMOTE_ADDR"], "192.168.") === 0
-  || strpos($_SERVER["REMOTE_ADDR"], "10.") === 0
-  || $_SERVER["REMOTE_ADDR"] == "::1"));
+define("IS_LOCALHOST", false);
+#define("IS_LOCALHOST", (!isset($_SERVER["REMOTE_ADDR"])
+#  || $_SERVER["REMOTE_ADDR"] == "127.0.0.1"
+#  || strpos($_SERVER["REMOTE_ADDR"], "192.168.") === 0
+#  || strpos($_SERVER["REMOTE_ADDR"], "10.") === 0
+#  || $_SERVER["REMOTE_ADDR"] == "::1"));
 
 if(IS_LOCALHOST) {
   define('CURRENT_SUBDOM', basename(getcwd()));
@@ -105,7 +106,7 @@ $verfile = getcwd()."/".CMS_VERSION_FILENAME;
 define('DEFAULT_RELEASE', is_file($verfile) ? trim(file_get_contents($verfile)) : CMS_RELEASE);
 define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG" : ""));
 #print_r(get_defined_constants(true)); die();
-#todo: date_default_timezone_set()
+date_default_timezone_set("Europe/Prague");
 #todo: localize lang
 
 if(CMS_DEBUG) {
