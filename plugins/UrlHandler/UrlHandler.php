@@ -210,5 +210,3 @@ class UrlHandler extends Plugin implements SplObserver {
 
 }
 
-?>
-

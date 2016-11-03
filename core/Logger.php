@@ -51,7 +51,7 @@ class Logger {
     $msg[] = '"'.$message.'"';
     $msg[] = '['.self::getCaller().']';
     $msg[] = $duration;
-    error_log(implode(" ", $msg)."\n", 3, $logFile);
+    @error_log(implode(" ", $msg)."\n", 3, $logFile);
   }
 
 }
