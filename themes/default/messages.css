@@ -1,0 +1,49 @@
+@charset "UTF-8";
+
+#messages {
+  padding: 1em 0;
+}
+
+#messages > * {
+  padding: 0 1em;
+}
+
+#messages ul {
+  margin: 0;
+  list-style: none;
+}
+
+#messages li {
+  margin: 0.5em 0;
+  padding: 0.2em 0.5em;
+  border-left: 2em solid;
+  background: transparent;
+}
+
+#messages > span {
+  display: block;
+}
+
+#messages li.notice {
+  border-color: rgb(0, 66, 131);
+}
+
+#messages li.warning {
+  border-color: rgb(166, 120, 0);
+}
+
+#messages li.error {
+  border-color: rgb(187, 33, 33);
+}
+
+#messages li.success {
+  border-color: rgb(53, 144, 61);
+}
+
+#messages li label {
+  cursor: pointer;
+}
+
+#messages.hidden {
+  width: 100%;
+}

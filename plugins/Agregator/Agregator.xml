@@ -25,22 +25,22 @@
     Například:
 
     <doclist id="ul" wrapper="ul">
-      <li><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
+      <li><span class="noprint" var="editlink">n/a</span> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
     </doclist>
     <doclist id="dl" wrapper="dl">
-      <dt><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
+      <dt><span class="noprint" var="editlink">n/a</span> <a title="Autor: %s" var="link@href author@title heading">n/a</a></dt>
       <dd>Poslední změna: <strong fn="inputvar-dateformat" var="mtime">n/a</strong></dd>
       <dd>Klíčová slova: <em var="kw">n/a</em></dd>
       <dd var="desc">n/a</dd>
     </doclist>
     <doclist id="dd" sort="mtime">
-      <dd><em class="noprint" var="editlink">n/a</em> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
+      <dd><span class="noprint" var="editlink">n/a</span> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
     </doclist>
 
     Příklad s uživatelským filtrem
 
     <doclist id="tema" wrapper="ul" path="koutek" limit="10">
-      <li><em class="noprint" var="editlink">n/a</em> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
+      <li><span class="noprint" var="editlink">n/a</span> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
     </doclist>
     <filter doclist="tema" limit="0" id="nemoci" kw="nemoci" />
     <filter doclist="tema" limit="0" id="urazy" kw="úrazy" />

@@ -1,0 +1,30 @@
+@charset "UTF-8";
+
+ol.contentlink-bc {
+  list-style: none;
+  margin: 0 auto;
+  padding: 0.5rem 1rem;
+}
+
+ol.contentlink-bc li {
+  display: inline-block;
+  margin: 0;
+}
+
+ol.contentlink-bc > li+li:before {
+  content: "›";
+  font-size: 1.7em;
+  font-weight: 300;
+  margin-left: .3em;
+  margin-right: .3em;
+  line-height: 0;
+  vertical-align: -.1em;
+}
+
+ol.contentlink-bc li a {
+  display: inline-block;
+}
+
+ol.contentlink-bc li a:first-child {
+  padding-left: 0;
+}
