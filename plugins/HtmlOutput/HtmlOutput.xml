@@ -12,7 +12,7 @@
       -->
       <stylesheet>lib/roboto/roboto.css</stylesheet>
       <!--<stylesheet>lib/opensans/opensans.css</stylesheet>-->
-      <stylesheet>/lib/font-awesome/css/font-awesome.min.css</stylesheet>
+      <stylesheet>lib/font-awesome/css/font-awesome.min.css</stylesheet>
       <!--
         Styles
       -->
