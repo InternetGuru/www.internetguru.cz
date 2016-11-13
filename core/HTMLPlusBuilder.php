@@ -311,7 +311,7 @@ class HTMLPlusBuilder extends DOMBuilder {
   private static function registerIdToData(DOMElementPlus $body, $fileId) {
     foreach($body->attributes as $attrName => $attr) {
       if(strpos($attrName, "data-") !== 0) continue;
-      self::$currentIdTo["idToData"][$fileId][] = array(substr($attrName, strlen("data-")), $attr->nodeValue);
+      self::$currentIdTo["idToData"][$fileId][substr($attrName, strlen("data-"))] = $attr->nodeValue;
     }
   }
 
