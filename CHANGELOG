@@ -1,4 +1,7 @@
 UrlHandler: zobrazení chybové stránky při nenalezení zadané URL nebo URL jí podobné
+Agregator doclist: podpora data-[jmeno-promenne] promennych
+Attributy data-[jmeno-prommene] vytvari lokalni promenne
+Povolení data- attributů v elementu body
 Granularizace výchozích stylů
 Nové výchozí písmo roboto a font-awesome
 ContentBalancer: nastavitelný název třídy elementu body souboru, který se nevyvažuje
