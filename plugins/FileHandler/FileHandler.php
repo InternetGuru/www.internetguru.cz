@@ -44,7 +44,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "text/x-c" => array("js"),
     "application/x-elc" => array("js"),
     "application/x-empty" => array("css", "js"),
-    "application/octet-stream" => array("woff", "eot", "js"),
+    "application/octet-stream" => array("woff", "woff2", "eot", "js"),
     "image/svg+xml" => array("svg"),
     "image/png" => array("png"),
     "image/jpeg" => array("jpg", "jpeg"),
