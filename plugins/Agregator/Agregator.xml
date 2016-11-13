@@ -8,7 +8,8 @@
 
     Dostupné proměnné pro atribut var:
 
-      editlink, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
+      1) editlink, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
+      2) proměnné generované z attributů data-[jmeno-promenne] v elemetu body
 
     Atributy elementu doclist, resp. filter:
 
