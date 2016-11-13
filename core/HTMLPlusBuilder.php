@@ -19,6 +19,7 @@ use Exception;
  * @method static getIdToCtime($id=null)
  * @method static getIdToMtime($id=null)
  * @method static getIdToLang($id=null)
+ * @method static getIdToData($id=null)
  * @method static getIdToLink($id=null)
  * @method static getLinkToId($id=null)
  * @method static getFileToId($fileName=null);
@@ -94,6 +95,10 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @var array
    */
   private static $idToLang = array();
+  /**
+   * @var array
+   */
+  private static $idToData = array();
 
   /**
    * @var array
@@ -284,6 +289,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     } else {
       $doc = self::build($filePath, true);
       $id = $doc->documentElement->firstElement->getAttribute("id");
+      self::registerIdToData($doc->documentElement, $id);
       self::registerStructure($doc->documentElement, $parentId, $id, $prefix, $filePath);
       self::$currentFileTo["fileToId"] = $id;
     }
@@ -296,6 +302,17 @@ class HTMLPlusBuilder extends DOMBuilder {
       apc_store_cache($cacheKey, $value, $filePath);
     }
     return self::$currentFileTo["fileToId"];
+  }
+
+  /**
+   * @param DOMElementPlus $body
+   * @param string $fileId
+   */
+  private static function registerIdToData(DOMElementPlus $body, $fileId) {
+    foreach($body->attributes as $attrName => $attr) {
+      if(strpos($attrName, "data-") !== 0) continue;
+      self::$currentIdTo["idToData"][$fileId][] = array(substr($attrName, strlen("data-")), $attr->nodeValue);
+    }
   }
 
   /**
