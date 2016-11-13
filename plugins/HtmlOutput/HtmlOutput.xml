@@ -12,13 +12,13 @@
       -->
       <stylesheet>lib/roboto/roboto.css</stylesheet>
       <!--<stylesheet>lib/opensans/opensans.css</stylesheet>-->
-      <stylesheet>lib/font-awesome/css/font-awesome.min.css</stylesheet>
+      <!--<stylesheet>lib/font-awesome/css/font-awesome.css</stylesheet>-->
       <!--
         Styles
       -->
       <stylesheet>themes/default/default.css</stylesheet>
       <stylesheet>themes/default/reset.css</stylesheet>
-      <stylesheet media="screen">themes/default/messages.css</stylesheet>
+      <stylesheet media="screen" if-xpath="//div[@id='messages']">themes/default/messages.css</stylesheet>
       <stylesheet>themes/default/form.css</stylesheet>
       <stylesheet>themes/default/columns.css</stylesheet>
       <stylesheet>themes/default/breadcrumb.css</stylesheet>
