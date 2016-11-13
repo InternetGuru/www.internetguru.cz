@@ -40,6 +40,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private static $legalMime = array(
     "inode/x-empty" => array("css", "js"),
     "text/plain" => array("css", "js"),
+    "text/troff" => array("css"),
     "text/html" => array("js"),
     "text/x-c" => array("js"),
     "application/x-elc" => array("js"),
