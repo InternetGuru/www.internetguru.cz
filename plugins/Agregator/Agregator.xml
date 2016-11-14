@@ -6,10 +6,10 @@
     Sestavy dokumentů
     =================
 
-    Dostupné proměnné pro atribut var:
+    Dostupné lokální proměnné souborů HTML+:
 
       1) editlink, heading, link, author, authorid, resp, respid, ctime, mtime, short, desc, kw
-      2) proměnné generované z attributů data-[jmeno-promenne] v elemetu body
+      2) proměnné generované z uživatelských attributů data-[název proměnné] v elemetu body
 
     Atributy elementu doclist, resp. filter:
 
