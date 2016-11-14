@@ -631,7 +631,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param DOMDocument $doc
    */
   private function validateEmptyContent(DOMDocument $doc) {
-    $emptyShort = array("input", "br", "hr", "meta", "link", "param"); // allowed empty in short format
+    $emptyShort = array("input", "br", "hr", "meta", "link", "param", "img", "source"); // allowed empty in short format
     $emptyLong = array("script", "textarea", "object"); // allowed empty in long format only
     $xpath = new DOMXPath($doc);
     $toExpand = array();
