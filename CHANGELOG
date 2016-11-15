@@ -1,4 +1,7 @@
 UrlHandler: zobrazení chybové stránky při nenalezení zadané URL nebo URL jí podobné
+Agregator: podpora lokálních proměnných v sestavách z uživatelských atributů
+Podpora lokálních proměnných v souborech HTML+ z uživatelských atributů
+HTML+: podpora uživatelských atributů data-* (alá HTML5) v elementu body
 Granularizace výchozích stylů
 Nové výchozí písmo roboto a font-awesome
 ContentBalancer: nastavitelný název třídy elementu body souboru, který se nevyvažuje
