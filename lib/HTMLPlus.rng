@@ -328,9 +328,7 @@
   <!--http://w3c.github.io/html/semantics-embedded-content.html#the-img-element-->
   <define name="htmlplus.img">
     <element name="img">
-      <optional>
-        <attribute name="alt"/>
-      </optional>
+      <attribute name="alt"/>
       <optional>
         <attribute name="src"/>
       </optional>
