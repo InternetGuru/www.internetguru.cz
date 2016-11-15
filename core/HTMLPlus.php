@@ -12,6 +12,7 @@ use Exception;
  * @package IGCMS\Core
  *
  * @property string $defaultAuthor
+ * @property string $defaultId
  * @property string $defaultCtime
  * @property string $defaultHeading
  * @property string $defaultDesc
@@ -26,6 +27,10 @@ class HTMLPlus extends DOMDocumentPlus {
    * @var string|null
    */
   private $defaultAuthor = null;
+  /**
+   * @var string|null
+   */
+  private $defaultId = null;
   /**
    * @var string|null
    */
@@ -108,6 +113,7 @@ class HTMLPlus extends DOMDocumentPlus {
     switch($vName) {
       case "defaultCtime":
       case "defaultAuthor":
+      case "defaultId":
       case "defaultHeading":
       case "defaultDesc":
       case "defaultKw":
@@ -310,7 +316,7 @@ class HTMLPlus extends DOMDocumentPlus {
   public function validatePlus($repair = false) {
     $i = 0;
     $hash = hash(FILE_HASH_ALGO, $this->saveXML());
-    $version = 4; // increment if validatePlus changes
+    $version = 5; // increment if validatePlus changes
     $cacheKey = apc_get_key("HTMLPlus/validatePlus/$hash/$version");
     if(self::USE_APC && apc_exists($cacheKey)) $i = apc_fetch($cacheKey);
     #var_dump("$hash found $i");
@@ -323,17 +329,18 @@ class HTMLPlus extends DOMDocumentPlus {
         case 1: $this->validateBodyAttributes($repair); $i++;
         case 2: $this->validateSections($repair); $i++;
         case 3: $this->validateLang($repair); $i++;
-        case 4: $this->validateHid($repair); $i++;
-        case 5: $this->validateHsrc(); $i++;
-        case 6: $this->validateHempty($repair); $i++;
-        case 7: $this->validateDl($repair); $i++;
-        case 8: $this->validateDates($repair); $i++;
-        case 9: $this->validateAuthor($repair); $i++;
-        case 10: $this->validateFirstHeadingAuthor($repair); $i++;
+        case 4: $this->validateHsrc(); $i++;
+        case 5: $this->validateHempty($repair); $i++;
+        case 6: $this->validateDl($repair); $i++;
+        case 7: $this->validateDates($repair); $i++;
+        case 8: $this->validateAuthor($repair); $i++;
+        case 9: $this->validateFirstHeadingAuthor($repair); $i++;
+        case 10: $this->validateFirstHeadingId($repair); $i++;
         case 11: $this->validateFirstHeadingCtime($repair); $i++;
-        case 12: $this->validateBodyNs($repair); $i++;
-        case 13: $this->validateDesc(); $i++;
-        case 14: $this->relaxNGValidatePlus(); $i++;
+        case 12: $this->validateHid($repair); $i++;
+        case 13: $this->validateBodyNs($repair); $i++;
+        case 14: $this->validateDesc(); $i++;
+        case 15: $this->relaxNGValidatePlus(); $i++;
       }
     } catch(Exception $e) {
       $this->status = self::STATUS_INVALID;
@@ -412,6 +419,18 @@ class HTMLPlus extends DOMDocumentPlus {
     $message = _("First heading attribute 'author' missing");
     $this->errorHandler($message, $repair && !is_null($this->defaultAuthor));
     $h->setAttribute("author", $this->defaultAuthor);
+  }
+
+  /**
+   * @param bool $repair
+   */
+  private function validateFirstHeadingId($repair) {
+    /** @var DOMElementPlus $h */
+    $h = $this->headings->item(0);
+    if($h->hasAttribute("id")) return;
+    $message = _("First heading attribute 'id' missing");
+    $this->errorHandler($message, $repair && !is_null($this->defaultId));
+    $h->setAttribute("id", $this->defaultId);
   }
 
   /**
