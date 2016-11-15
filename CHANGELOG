@@ -1,3 +1,4 @@
+UrlHandler: zobrazení chybové stránky při nenalezení zadané URL nebo URL jí podobné
 Granularizace výchozích stylů
 Nové výchozí písmo roboto a font-awesome
 ContentBalancer: nastavitelný název třídy elementu body souboru, který se nevyvažuje
