@@ -22,15 +22,16 @@ button[disabled] {
   color: inherit;
 }
 
-object {
+object, img, picture {
   max-width: 100%;
   width: auto;
 }
 
-p object {
+p object, p img, p picture {
   display: block;
   margin: 1em auto;
 }
+
 input {
   vertical-align: middle;
 }
