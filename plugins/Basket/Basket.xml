@@ -56,7 +56,7 @@
     <name name="Název">Modrý hřeben, velikost X</name>
     <image name="Obrázek">
       <a href="files/hreben-modry-x.jpg">
-        <object type="image/jpeg" data="files/thumbs/hreben-modry-x.jpg">Modrý hřeben, velikost X</object>
+        <img src="files/thumbs/hreben-modry-x.jpg" alt="Modrý hřeben, velikost X"/>
       </a>
     </image>
   </product>
