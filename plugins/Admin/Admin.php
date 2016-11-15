@@ -548,10 +548,12 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     if(is_null($this->scheme) && file_exists($this->dataFile)) {
       $this->scheme = $this->getScheme($this->dataFile);
     }
+    $htmlId = normalize(pathinfo($this->dataFile, PATHINFO_FILENAME));
     if(!$this->isPost() && $this->dataFileStatus == self::STATUS_NEW) {
       if($this->type == "html") {
         $doc = new HTMLPlus();
         $doc->load(CMS_FOLDER."/".INDEX_HTML);
+        $doc->documentElement->firstElement->setAttribute("id", $htmlId);
       } else {
         $doc = new DOMDocumentPlus();
         $doc->formatOutput = true;
@@ -565,6 +567,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       if($this->type == "html") {
         $doc = new HTMLPlus();
         $doc->defaultAuthor = Cms::getVariable("cms-author");
+        $doc->defaultId = $htmlId;
       } else $doc = new DOMDocumentPlus();
       $doc->loadXML($this->contentValue);
     }
