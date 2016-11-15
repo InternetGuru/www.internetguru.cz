@@ -129,9 +129,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach($contentPlus->getElementsByTagName("a") as $e) {
       $this->processLinks($e, "href");
     }
-    foreach($contentPlus->getElementsByTagName("object") as $e) {
-      $this->processLinks($e, "data");
-    }
     foreach($contentPlus->getElementsByTagName("form") as $e) {
       $this->processLinks($e, "action", false);
     }
