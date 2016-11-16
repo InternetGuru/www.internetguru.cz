@@ -55,12 +55,12 @@ class ImgList extends AgregatorList {
       $v["name"] = $file;
       $v["type"] = $mimeType;
       $v["mtime"] = filemtime($fullFilePath);
-      $v["url"] = $filePath;
+      $v["url"] = ROOT_URL.$filePath;
       $v["url-images"] = $v["url"]; // alias for $v["url"]
-      $v["url-thumbs"] = FILES_DIR."/thumbs$path/$file";
-      $v["url-preview"] = FILES_DIR."/preview$path/$file";
-      $v["url-big"] = FILES_DIR."/big$path/$file";
-      $v["url-full"] = FILES_DIR."/full$path/$file";
+      $v["url-thumbs"] = ROOT_URL.FILES_DIR."/thumbs$path/$file";
+      $v["url-preview"] = ROOT_URL.FILES_DIR."/preview$path/$file";
+      $v["url-big"] = ROOT_URL.FILES_DIR."/big$path/$file";
+      $v["url-full"] = ROOT_URL.FILES_DIR."/full$path/$file";
       $vars[$filePath] = $v;
     }
     if(empty($vars)) {
