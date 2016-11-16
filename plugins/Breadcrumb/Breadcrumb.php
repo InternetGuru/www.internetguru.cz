@@ -107,16 +107,11 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
    */
   private function insertLogo(DOMElementPlus $logo, DOMElementPlus $a, $id) {
     $doc = $a->ownerDocument;
-    $o = $doc->createElement("object");
-    $o->nodeValue = HTMLPlusBuilder::getIdToHeading($id);
-    $o->setAttribute("data", $logo->nodeValue);
-    try {
-      $o->setAttribute("type", $logo->getRequiredAttribute("type"));
-    } catch(Exception $e) {
-      Logger::user_warning($e->getMessage());
-    }
+    $img = $doc->createElement("img");
+    $img->setAttribute("alt", HTMLPlusBuilder::getIdToHeading($id));
+    $img->setAttribute("src", $logo->nodeValue);
     $a->addClass("logo");
-    $a->appendChild($o);
+    $a->appendChild($img);
   }
 
 }

@@ -36,8 +36,9 @@ class ErrorPage {
    * ErrorPage constructor.
    * @param string $message
    * @param int $code
+   * @param bool $forceExtended
    */
-  public function __construct($message, $code) {
+  public function __construct($message, $code, $forceExtended=false) {
     http_response_code($code);
     $dir = LIB_FOLDER."/".$this->relDir;
     $tt = array(
@@ -47,7 +48,7 @@ class ErrorPage {
       "@VERSION@" => CMS_NAME
     );
     $msg = get_class($this).": $message ($code)";
-    if($code < 500) {
+    if($code < 500 && !$forceExtended) {
       Logger::info($msg);
       $html = file_get_contents($dir."/".$this->errSimpleFile);
     } else {

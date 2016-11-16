@@ -1,0 +1,48 @@
+body {
+  counter-reset: par section;
+}
+body h2 {
+  counter-reset: par subsection;
+  text-align: left;
+}
+body h3 {
+  counter-reset: par subsubsection;
+}
+body h2:before {
+  counter-increment: section;
+  content: counter(section) ") ";
+}
+body.par h2:before {
+  counter-increment: section;
+  content: "§ " counter(section) ", ";
+}
+body.kap h2:before {
+  counter-increment: section;
+  content: "Kapitola " counter(section) ": ";
+}
+body.chapter h2:before {
+  counter-increment: section;
+  content: "Chapter " counter(section) ": ";
+}
+body h3:before {
+  counter-increment: subsection;
+  content: counter(section) "." counter(subsection) " ";
+}
+body h4:before {
+  counter-increment: subsubsection;
+  content: counter(section) "." counter(subsection) "." counter(subsubsection) " ";
+}
+body div.section p:before {
+  counter-increment: par;
+  content: counter(par, lower-alpha) ") ";
+  font-size: 1.1em;
+}
+body div.paragraph > ol,
+body div.list > ol {
+  list-style-type: lower-roman;
+}
+body label > span {
+  display: inline-block;
+  width: 14em;
+  max-width: 100%;
+}

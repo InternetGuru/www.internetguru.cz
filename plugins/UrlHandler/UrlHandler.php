@@ -6,6 +6,7 @@ use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\ErrorPage;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -132,11 +133,11 @@ class UrlHandler extends Plugin implements SplObserver {
       $linkId = $this->findSimilarLinkId($links, $path);
       if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    if(!HTMLPlusBuilder::isLink($path) || $path == $links[0]) $path = "";
+    if(!HTMLPlusBuilder::isLink($path)) new ErrorPage(sprintf(_("Page '%s' Not Found"), $path), 404, true);
+    elseif($path == $links[0]) $path = "";
     if($path == getCurLink()) return;
-    $code = 404;
     if(self::DEBUG) die("Redirecting to '$path'");
-    redirTo(buildLocalUrl(Array("path" => $path, "query" => getCurQuery())), $code);
+    redirTo(buildLocalUrl(Array("path" => $path, "query" => getCurQuery())), 303);
   }
 
   /**

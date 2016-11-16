@@ -267,7 +267,9 @@ class Cms {
     $tmpContent = clone $content;
     try {
       /** @var HTMLPlus $tmpContent */
-      $tmpContent = $tmpContent->processVariables(self::$variables);
+      $dataVariables = HTMLPlusBuilder::getIdToData(HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile()));
+      $vars = is_null($dataVariables) ? self::$variables : array_merge(self::$variables, $dataVariables);
+      $tmpContent = $tmpContent->processVariables($vars);
       $tmpContent->validatePlus(true);
       return $tmpContent;
     } catch(Exception $e) {

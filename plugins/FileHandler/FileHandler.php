@@ -40,6 +40,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private static $legalMime = array(
     "inode/x-empty" => array("css", "js"),
     "text/plain" => array("css", "js"),
+    "text/troff" => array("css"),
     "text/html" => array("js"),
     "text/x-c" => array("js"),
     "application/x-elc" => array("js"),
@@ -208,15 +209,14 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       if(!$isResDir || getRealResDir() == RESOURCES_DIR)
         $this->doCheckResources($sourceFolder, $sourceFolder, $isResDir);
     }
-    if(count($this->error))
-      Logger::critical(sprintf(_("Failed to delete cache files: %s"), implode(", ", $this->error)));
-    elseif(count($this->update)) {
-      if($this->deleteCache)
-        Logger::user_success(sprintf(_("Outdated file cache successfully removed: %s"), implode(", ", array_keys($this->update))));
-      else
-        Logger::user_warning(sprintf(_("Outdated file cache: %s"), implode(", ", array_keys($this->update))));
-    } elseif($this->deleteCache) {
-      Logger::user_notice(_("File cache already uptodate"));
+    if(count($this->error)) {
+      Logger::critical(sprintf(_("Unable to update file cache: %s"), implode(", ", $this->error)));
+    } elseif(count($this->update)) {
+      if($this->deleteCache) {
+        Logger::user_success(sprintf(_("File cache successfully updated: %s"), implode(", ", array_keys($this->update))));
+      } else {
+        Logger::user_notice(sprintf(_("Outdated file cache: %s"), implode(", ", array_keys($this->update))));
+      }
     }
   }
 

@@ -1,0 +1,114 @@
+@charset "UTF-8";
+
+body {
+  word-wrap: break-word;
+  line-height: 1.4;
+}
+
+a {
+  text-decoration: none;
+}
+
+a[href] {
+  border-bottom: thin solid;
+}
+
+body, input, button {
+  letter-spacing: 0.01em;
+}
+
+button[disabled] {
+  opacity: 0.6;
+  color: inherit;
+}
+
+object, img, picture {
+  max-width: 100%;
+  width: auto;
+}
+
+p object, p img, p picture {
+  display: block;
+  margin: 1em auto;
+}
+
+input {
+  vertical-align: middle;
+}
+
+pre > code {
+  border: none;
+}
+
+samp, pre, textarea, code {
+  box-sizing: border-box;
+  white-space: pre-wrap;
+}
+
+code, samp {
+  font-family: "Emilbus Mono", "Lucida Console", monospace;
+}
+
+li, dd {
+  margin-left: 2em;
+}
+
+ul ul, ul ol, ul dl,
+ol ul, ol ol, ol dl,
+dl ul, dl ol, dl dl {
+  margin: 0.5em 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+li li {
+  margin-left: 1rem;
+}
+
+div.list > ul,
+div.list > ol,
+div.list > dl {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+div.paragraph > p,
+div.paragraph > ul,
+div.paragraph > ol,
+div.paragraph > dl {
+  padding-left: 0;
+  padding-right: 0;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ol ol {
+  list-style-type: lower-alpha;
+}
+
+textarea {
+  width: 100%;
+  height: 60%;
+  vertical-align: top;
+  background: none;
+}
+
+fieldset {
+  min-width: initial;
+  border: none;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+fieldset > *:last-child {
+  margin-bottom: 0;
+}
+
+ol.img li, ul.img li {
+  display: inline-block;
+  list-style-type: none;
+}
+
+.print {
+  display: none;
+}

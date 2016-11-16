@@ -14,6 +14,21 @@
           <param name="pattern">(localhost/[a-z0-9-]+)|(([a-z0-9-]+\.)+[a-z]+)</param>
         </data>
       </attribute>
+      <zeroOrMore>
+        <attribute>
+          <anyName>
+            <except>
+              <name>id</name>
+              <name>class</name>
+              <name>title</name>
+              <name>fn</name>
+              <name>var</name>
+              <name>xml:lang</name>
+              <name>ns</name>
+            </except>
+          </anyName>
+        </attribute>
+      </zeroOrMore>
       <ref name="contentBlock"/>
     </element>
   </start>
@@ -279,6 +294,77 @@
   <define name="Flow.model" combine="interleave">
     <optional>
       <ref name="htmlplus.blockcode"/>
+    </optional>
+  </define>
+
+  <!--http://w3c.github.io/html/semantics-embedded-content.html#elementdef-picture-->
+  <define name="htmlplus.picture">
+    <element name="picture">
+      <zeroOrMore>
+        <ref name="htmlplus.source"/>
+      </zeroOrMore>
+      <ref name="htmlplus.img"/>
+    </element>
+  </define>
+
+  <!--http://w3c.github.io/html/semantics-embedded-content.html#elementdef-picture-picture-source-->
+  <define name="htmlplus.source">
+    <element name="source">
+      <optional>
+        <attribute name="srcset"/>
+      </optional>
+      <optional>
+        <attribute name="sizes"/>
+      </optional>
+      <optional>
+        <attribute name="media"/>
+      </optional>
+      <optional>
+        <attribute name="type"/>
+      </optional>
+    </element>
+  </define>
+
+  <!--http://w3c.github.io/html/semantics-embedded-content.html#the-img-element-->
+  <define name="htmlplus.img">
+    <element name="img">
+      <attribute name="alt"/>
+      <optional>
+        <attribute name="src"/>
+      </optional>
+      <optional>
+        <attribute name="srcset"/>
+      </optional>
+      <optional>
+        <attribute name="sizes"/>
+      </optional>
+      <optional>
+        <attribute name="crossorigin"/>
+      </optional>
+      <optional>
+        <attribute name="usemap"/>
+      </optional>
+      <optional>
+        <attribute name="ismap"/>
+      </optional>
+      <optional>
+        <attribute name="width"/>
+      </optional>
+      <optional>
+        <attribute name="height"/>
+      </optional>
+      <optional>
+        <attribute name="longdesc"/>
+      </optional>
+    </element>
+  </define>
+
+  <define name="Inline.model" combine="interleave">
+    <optional>
+      <ref name="htmlplus.picture"/>
+    </optional>
+    <optional>
+      <ref name="htmlplus.img"/>
     </optional>
   </define>
 

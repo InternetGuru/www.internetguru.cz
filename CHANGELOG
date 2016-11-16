@@ -1,4 +1,17 @@
 
+2.3 | 2016-11-16
+
+Breadcrumb: zobrazuje logo pomocí elemetu <img>, nikoli <object>
+HTML+: podpora elemetů <img> a <picture>
+UrlHandler: zobrazení chybové stránky při nenalezení zadané URL nebo URL jí podobné
+Agregator: podpora lokálních proměnných v sestavách z uživatelských atributů
+Podpora lokálních proměnných v souborech HTML+ z uživatelských atributů
+HTML+: podpora uživatelských atributů data-* (alá HTML5) v elementu body
+Ikonky u systémových hlášení
+Granularizace výchozích stylů
+Nové výchozí písmo roboto a font-awesome
+ContentBalancer: nastavitelný název třídy elementu body souboru, který se nevyvažuje
+
 2.2 | 2016-10-16
 
 Agregátor: podpora uživatelského filtrování seznamů

@@ -1,0 +1,107 @@
+@charset "UTF-8";
+
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('/lib/font-awesome/fonts/fontawesome-webfont.eot?v=4.6.3');
+  src: url('/lib/font-awesome/fonts/fontawesome-webfont.eot?#iefix&v=4.6.3') format('embedded-opentype'), url('/lib/font-awesome/fonts/fontawesome-webfont.woff2?v=4.6.3') format('woff2'), url('/lib/font-awesome/fonts/fontawesome-webfont.woff?v=4.6.3') format('woff'), url('/lib/font-awesome/fonts/fontawesome-webfont.ttf?v=4.6.3') format('truetype'), url('/lib/font-awesome/fonts/fontawesome-webfont.svg?v=4.6.3#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+#messages {
+  padding: 1em 0;
+  background: white;
+}
+
+#messages > * {
+  padding: 0 1em;
+}
+
+#messages ul {
+  margin: 0;
+  list-style: none;
+}
+
+#messages > span {
+  display: block;
+}
+
+#messages li {
+  margin: 0.5em 0 0.5em 0.3em;
+  padding: 0.3em 0;
+  border-left: medium solid;
+  background: transparent;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+}
+#messages li:before,
+#messages .switch:before {
+  font-family: FontAwesome;
+  font-size: 1.25em;
+  line-height: 1em;
+  padding: 0 0.4em;
+  text-rendering: auto;
+  display: inline-block;
+  text-align: center;
+  width: 1em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#messages li label {
+  cursor: pointer;
+}
+
+#messages.hidden {
+  width: 100%;
+}
+
+#messages li.notice {
+  border-color: #3949AB;
+}
+#messages li.notice:before {
+  content: "\f129";
+  color: #303F9F;
+}
+
+#messages li.warning {
+  border-color: #FF8F00;
+}
+#messages li.warning:before {
+  content: "\f071";
+  color: #FF8F00;
+}
+
+#messages li.error {
+  border-color: #D32F2F;
+}
+#messages li.error:before {
+  content: "\f06d";
+  color: #C62828;
+}
+
+#messages li.success {
+  border-color: #43A047;
+}
+#messages li.success:before {
+  content: "\f00c";
+  color: #388E3C;
+}
+
+#messages .switch {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  overflow: hidden;
+}
+
+#messages .switch:before {
+  content: "\f0d7";
+  padding: 0;
+  line-height: 0;
+}
+
+#messages.hidden .switch:before {
+  content: "\f0d8";
+}
