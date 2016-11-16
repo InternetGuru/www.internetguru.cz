@@ -1,3 +1,6 @@
+
+2.3 | 2016-11-16
+
 Breadcrumb: zobrazuje logo pomocí elemetu <img>, nikoli <object>
 HTML+: podpora elemetů <img> a <picture>
 UrlHandler: zobrazení chybové stránky při nenalezení zadané URL nebo URL jí podobné
