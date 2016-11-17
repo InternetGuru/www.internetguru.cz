@@ -46,6 +46,8 @@ class ImgList extends AgregatorList {
     }
     foreach(scandir($fileFolder) as $file) {
       if(strpos($file, ".") === 0) continue;
+      $ext = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+      if(!in_array($ext, array("jpg", "jpeg", "png", "gif"))) continue;
       $filePath = "$fileDir/$file";
       $fullFilePath = "$fileFolder/$file";
       if(is_dir($fullFilePath)) continue;
