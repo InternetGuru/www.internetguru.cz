@@ -14,23 +14,7 @@ class ErrorPage {
   /**
    * @var string
    */
-  private $headingFile = "headings.txt";
-  /**
-   * @var string
-   */
-  private $msgFile = "messages.txt";
-  /**
-   * @var string
-   */
   private $errFile = "error.html";
-  /**
-   * @var string
-   */
-  private $errSimpleFile = "error-simple.html";
-  /**
-   * @var string
-   */
-  private $whatnowFile = "whatnow.txt";
 
   /**
    * ErrorPage constructor.
@@ -39,30 +23,42 @@ class ErrorPage {
    * @param bool $forceExtended
    */
   public function __construct($message, $code, $forceExtended=false) {
+    // log
+    $logMessage = get_class($this).": $message ($code)";
+    $code < 500 ? Logger::info($logMessage) : Logger::alert($logMessage);
+    // set status code
     http_response_code($code);
-    $dir = LIB_FOLDER."/".$this->relDir;
+    $status = $this->getStatusMessage($code);
+    // set output variables
     $tt = array(
-      "@CODE@" => $code,
-      "@STATUS@" => $this->getStatusMessage($code),
-      "@ERROR@" => $message,
-      "@VERSION@" => CMS_NAME
+      "@LANGUAGE@" => "cs",
+      "@TITLE@" => "$code $status",
+      "@GENERATOR@" => CMS_NAME,
+      "@STYLE@" => "body {font-family: Tahoma, sans-serif; line-height: 1.4; margin: 0} "
+        ."#content {padding: 0 0.5em; max-width: 35em} ",
+      "@CLASS@" => "na",
+      "@HEADING@" => "$code $status",
+      "@SUMMARY@" => $message,
+      "@CONTENT@" => "",
     );
-    $msg = get_class($this).": $message ($code)";
-    $code < 500 ? Logger::info($msg) : Logger::alert($msg);
-    if($code < 500 && !$forceExtended) {
-      $html = file_get_contents($dir."/".$this->errSimpleFile);
-    } else {
-      $html = file_get_contents($dir."/".$this->errFile);
-      $headings = file($dir."/".$this->headingFile, FILE_SKIP_EMPTY_LINES);
-      $tt["@HEADING@"] = $headings[array_rand($headings)];
-      $messages = file($dir."/".$this->msgFile, FILE_SKIP_EMPTY_LINES);
-      $tt["@MESSAGE@"] = $messages[array_rand($messages)];
-      $whatnow = file($dir."/".$this->whatnowFile, FILE_SKIP_EMPTY_LINES);
-      $tt["@WHATNOW@"] = array_shift($whatnow);
-      $tt["@TIPS@"] = implode("</dd>\n      <dd>", $whatnow);
+    // get file
+    $dir = LIB_FOLDER."/".$this->relDir;
+    $html = file_get_contents($dir."/".$this->errFile);
+    if($code >= 500 || $forceExtended) {
+      $whatnow = array(
+        _("Try again lager."),
+        _("Try to return to previous page (Back button)."),
+        "<a href='/'>"._("Go to home page.")."</a>",
+        _("Contact webmaster."),
+      );
       $images = $this->getImages($dir);
-      $tt["@IMAGE@"] = $images[array_rand($images)];
-      $tt["@ROOT@"] = ROOT_URL;
+      $tt["@CLASS@"] = "img".array_rand($images);
+      $tt["@CONTENT@"] = "<ul><li>".implode("</li><li>", $whatnow)."</li></ul>";
+      $tt["@STYLE@"] .= "#content {padding-bottom: 12em; background-repeat: no-repeat;"
+        ." background-position: right bottom; background-size: 15em} ";
+      foreach($images as $id => $img) {
+        $tt["@STYLE@"] .= "#content.img$id {background-image: url('$img')} ";
+      }
     }
     echo str_replace(array_keys($tt), $tt, $html);
     exit();
@@ -76,6 +72,7 @@ class ErrorPage {
     $i = array();
     // http://xkcd.com/1350/#p:10e7f9b6-b9b8-11e3-8003-002590d77bdd
     foreach(scandir($dir) as $img) {
+      if(strpos($img, ".") === 0) continue;
       if(pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") continue;
       $i[] = ROOT_URL.LIB_DIR."/".$this->relDir."/$img";
     }

@@ -199,7 +199,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $link = basename(getCurLink());
     if($this->isRoot($link)) return $content;
     $h1 = $content->getElementById($link, "h");
-    if(is_null($h1)) new ErrorPage(sprintf(_("Page '%s' not found"), getCurLink()), 404);
+    if(is_null($h1)) new ErrorPage(_("Unable to find requested section"), 500);
     $this->handleAttribute($h1, "ctime");
     $this->handleAttribute($h1, "mtime");
     $this->handleAttribute($h1, "author");

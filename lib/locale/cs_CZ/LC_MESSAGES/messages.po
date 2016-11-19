@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-11-15 23:10+0100\n"
-"PO-Revision-Date: 2016-11-15 23:13+0100\n"
+"POT-Creation-Date: 2016-11-19 16:05+0100\n"
+"PO-Revision-Date: 2016-11-19 16:07+0100\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.8\n"
+"X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -150,6 +150,22 @@ msgstr "Nepodařilo se změnit atribut %s v elementu %s"
 #, php-format
 msgid "Attribute %s stripped"
 msgstr "Odstraněn atribut %s"
+
+#: core/ErrorPage.php:49
+msgid "Try again lager."
+msgstr "Opakujte akci později."
+
+#: core/ErrorPage.php:50
+msgid "Try to return to previous page (Back button)."
+msgstr "Zkuste se vrátit (tlačítko Zpět)."
+
+#: core/ErrorPage.php:51
+msgid "Go to home page."
+msgstr "Přejděte na domovskou stránku webu."
+
+#: core/ErrorPage.php:52
+msgid "Contact webmaster."
+msgstr "Kontaktujte správce webu."
 
 #: core/HTMLPlus.php:98
 msgid "Unknown"
@@ -773,7 +789,7 @@ msgstr "Editovat"
 msgid "Path '%s' not found"
 msgstr "Cesta  '%s' nebyla nalezena"
 
-#: plugins/Agregator/ImgList.php:67
+#: plugins/Agregator/ImgList.php:70
 #, php-format
 msgid "No images found in '%s'"
 msgstr "Nenalezeny žádné obrázky v '%s'"
@@ -857,9 +873,8 @@ msgid "No sets found"
 msgstr "Nebyly nalezeny žádné sestavy"
 
 #: plugins/ContentBalancer/ContentBalancer.php:202
-#, php-format
-msgid "Page '%s' not found"
-msgstr "Stránka '%s' nebyla nalezena"
+msgid "Unable to find requested section"
+msgstr "Nepodařilo se nalézt požadovanou sekci"
 
 #: plugins/ContentBalancer/ContentBalancer.php:294
 #, php-format
@@ -1027,52 +1042,52 @@ msgstr "Nepodařilo se načíst rozměry obrázku"
 msgid "GA disabled (ga_id = %s)"
 msgstr "GA je vypnutý (ga_id = %s)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:234
+#: plugins/HtmlOutput/HtmlOutput.php:233
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:272
+#: plugins/HtmlOutput/HtmlOutput.php:271
 #, php-format
 msgid "Empty attribute '%s' stripped"
 msgstr "Odstraněn prázdný atribut '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:299
+#: plugins/HtmlOutput/HtmlOutput.php:298
 #, php-format
 msgid "Link '%s' not found"
 msgstr "Odkaz '%s' nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:309
+#: plugins/HtmlOutput/HtmlOutput.php:308
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:390
+#: plugins/HtmlOutput/HtmlOutput.php:389
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:425
+#: plugins/HtmlOutput/HtmlOutput.php:424
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:464
+#: plugins/HtmlOutput/HtmlOutput.php:463
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:480
+#: plugins/HtmlOutput/HtmlOutput.php:479
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:482
+#: plugins/HtmlOutput/HtmlOutput.php:481
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:649
+#: plugins/HtmlOutput/HtmlOutput.php:648
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1169,9 +1184,8 @@ msgid "Unable to redirect to %s: %s"
 msgstr "Nepodařilo se přesměrovat na %s: %s"
 
 #: plugins/UrlHandler/UrlHandler.php:136
-#, php-format
-msgid "Page '%s' Not Found"
-msgstr "Stránka '%s' nebyla nalezena"
+msgid "Requested page not found"
+msgstr "Požadovaná stránka nebyla nalezena"
 
 #: plugins/ValidateForm/ValidateForm.php:112
 msgid "Honeypot check failed"
@@ -1227,6 +1241,12 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:336
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "Page '%s' not found"
+#~ msgstr "Stránka '%s' nebyla nalezena"
+
+#~ msgid "Page '%s' Not Found"
+#~ msgstr "Stránka '%s' nebyla nalezena"
 
 #~ msgid "Element item missing id"
 #~ msgstr "Element item postrádá atribut id"

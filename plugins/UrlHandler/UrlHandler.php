@@ -133,7 +133,7 @@ class UrlHandler extends Plugin implements SplObserver {
       $linkId = $this->findSimilarLinkId($links, $path);
       if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    if(!HTMLPlusBuilder::isLink($path)) new ErrorPage(sprintf(_("Page '%s' Not Found"), $path), 404, true);
+    if(!HTMLPlusBuilder::isLink($path)) new ErrorPage(_("Requested page not found"), 404, true);
     elseif($path == $links[0]) $path = "";
     if($path == getCurLink()) return;
     if(self::DEBUG) die("Redirecting to '$path'");
