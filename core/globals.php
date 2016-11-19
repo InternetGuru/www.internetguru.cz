@@ -414,7 +414,7 @@ function update_file($src, $dest, $hash=false) {
   try {
     copy_plus($src, $dest);
   } finally {
-    unlock_file($fp);
+    unlock_file($fp, $dest);
   }
   return true;
 }
