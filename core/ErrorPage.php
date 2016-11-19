@@ -48,11 +48,10 @@ class ErrorPage {
       "@VERSION@" => CMS_NAME
     );
     $msg = get_class($this).": $message ($code)";
+    $code < 500 ? Logger::info($msg) : Logger::alert($msg);
     if($code < 500 && !$forceExtended) {
-      Logger::info($msg);
       $html = file_get_contents($dir."/".$this->errSimpleFile);
     } else {
-      Logger::alert($msg);
       $html = file_get_contents($dir."/".$this->errFile);
       $headings = file($dir."/".$this->headingFile, FILE_SKIP_EMPTY_LINES);
       $tt["@HEADING@"] = $headings[array_rand($headings)];
