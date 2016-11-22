@@ -118,7 +118,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $html = $this->addRoot($doc, $lang);
 
     // final validation
-    $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
+    $contentPlus->processFunctions(Cms::getAllFunctions());
     $xPath = new DOMXPath($contentPlus);
     $this->addHead($doc, $html, $h1, $xPath);
 
