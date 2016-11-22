@@ -47,7 +47,7 @@ class UrlHandler extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_PREINIT) return;
     $this->cfg = $this->getXML();
-    if(!IS_LOCALHOST) $this->httpsRedir();
+    $this->httpsRedir();
     $this->cfgRedir();
     if(getCurLink() == "") {
       $subject->detach($this);

@@ -336,7 +336,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   private static function handleResource($src, $dest, $ext, $isRoot) {
     if($isRoot) {
-      if(!IS_LOCALHOST && strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
+      if(strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
         $log = true;
         $src = CMSRES_FOLDER."/".getCurLink();
       } else {

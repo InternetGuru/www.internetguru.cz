@@ -20,7 +20,6 @@ class DOMBuilder {
    * @return bool
    */
   public static function isCacheOutdated() {
-    if(IS_LOCALHOST) return false;
     if(is_null(self::getNewestCacheMtime())) return false;
     return self::$newestFileMtime > self::getNewestCacheMtime();
   }
