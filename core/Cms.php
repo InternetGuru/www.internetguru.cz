@@ -396,7 +396,7 @@ class Cms {
       Logger::error(sprintf(_("Unable to set function %s: not a function"), $name));
       return null;
     }
-    $varId = self::getVarId($name, "fn");
+    $varId = self::getVarId($name);
     self::$functions[$varId] = $value;
     return $varId;
   }

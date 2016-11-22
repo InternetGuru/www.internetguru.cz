@@ -99,10 +99,9 @@ class DOMElementPlus extends DOMElement {
 
   /**
    * @param array $functions
-   * @param array $variables
    * @param array $ignore
    */
-  public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array()) {
+  public function processFunctions(Array $functions, Array $ignore = array()) {
     foreach($this->getVariables("fn", $ignore) as list($vName, $aName, $fn)) {
       try {
         $f = array_key_exists($vName, $functions) ? $functions[$vName] : null;

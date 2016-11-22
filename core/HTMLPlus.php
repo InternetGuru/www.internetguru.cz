@@ -161,7 +161,7 @@ class HTMLPlus extends DOMDocumentPlus {
    * @param array $ignore
    */
   public function processFunctions(Array $functions, Array $variables=array(), $ignore=array("h" => array("id"))) {
-    parent::processFunctions($functions, $variables, $ignore);
+    parent::processFunctions($functions, $ignore);
   }
 
   public function applySyntax() {
