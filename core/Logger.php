@@ -70,7 +70,7 @@ class Logger {
    * Log format for TYPE_MAIL_LOG.
    * @var string
    */
-  const EMAIL_FORMAT = "[%datetime%] %extra.ip% %extra_request% %extra.user%: %message%\n";
+  const EMAIL_FORMAT = "[%datetime%] %extra.ip% %extra.request% %extra.user%: %message%\n";
 
   /**
    * Monolog system logger instance.
