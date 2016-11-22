@@ -229,7 +229,6 @@ class Cms {
    * @return bool
    */
   public static function isSuperUser() {
-    if(IS_LOCALHOST) return true;
     if(self::getLoggedUser() == "admin") return true;
     if(self::getLoggedUser() == ADMIN_ID) return true;
     if(isset($_SERVER["REMOTE_ADDR"])
@@ -241,7 +240,6 @@ class Cms {
    * @return null|string
    */
   public static function getLoggedUser() {
-    if(IS_LOCALHOST) return ADMIN_ID;
     if(isset($_SERVER["REMOTE_ADDR"])
       && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return SERVER_USER;
     if(isset($_SERVER['REMOTE_USER']) && strlen($_SERVER['REMOTE_USER']))
@@ -255,7 +253,6 @@ class Cms {
    * @return bool
    */
   public static function isActive() {
-    if(IS_LOCALHOST) return true;
     return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
   }
 

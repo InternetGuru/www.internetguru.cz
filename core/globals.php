@@ -651,7 +651,6 @@ function apc_is_valid_cache($cacheKey, $value) {
  * @throws Exception
  */
 function clearNginxCache() {
-  if(IS_LOCALHOST) return;
   foreach(getNginxCacheFiles() as $fPath) {
     if(!unlink($fPath)) throw new Exception(_("Failed to purge cache"));
   }

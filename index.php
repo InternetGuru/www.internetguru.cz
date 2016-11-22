@@ -40,7 +40,7 @@ try {
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
   Cms::checkAuth();
   if(Cms::isSuperUser()) {
-    if(!IS_LOCALHOST) initIndexFiles();
+    initIndexFiles();
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
       try {
         clearNginxCache();

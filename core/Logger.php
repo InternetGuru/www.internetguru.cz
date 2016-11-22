@@ -198,17 +198,15 @@ class Logger {
       ? new LineFormatter(self::LOG_FORMAT)
       : new LineFormatter(self::EMAIL_FORMAT);
 
-    if(!IS_LOCALHOST) {
-      foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
-        $mailHandler = new NativeMailerHandler(
-          self::EMAIL_ALERT_TO,
-          "IGCMS $type at ".HOST,
-          self::EMAIL_ALERT_FROM,
-          constant("Monolog\\Logger::$type"),
-          false);
-        $mailHandler->setFormatter($formatter);
-        $logger->pushHandler($mailHandler);
-      }
+    foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
+      $mailHandler = new NativeMailerHandler(
+        self::EMAIL_ALERT_TO,
+        "IGCMS $type at ".HOST,
+        self::EMAIL_ALERT_FROM,
+        constant("Monolog\\Logger::$type"),
+        false);
+      $mailHandler->setFormatter($formatter);
+      $logger->pushHandler($mailHandler);
     }
 
     $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
