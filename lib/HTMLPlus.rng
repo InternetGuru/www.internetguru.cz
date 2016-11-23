@@ -310,6 +310,7 @@
   <!--http://w3c.github.io/html/semantics-embedded-content.html#elementdef-picture-picture-source-->
   <define name="htmlplus.source">
     <element name="source">
+      <ref name="Core.attrib"/>
       <optional>
         <attribute name="srcset"/>
       </optional>
@@ -328,6 +329,7 @@
   <!--http://w3c.github.io/html/semantics-embedded-content.html#the-img-element-->
   <define name="htmlplus.img">
     <element name="img">
+      <ref name="Core.attrib"/>
       <attribute name="alt"/>
       <optional>
         <attribute name="src"/>
