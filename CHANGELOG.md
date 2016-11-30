@@ -35,7 +35,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 - Logo tag in breadcrumb changed from ``object`` to ``img``.
-- Show 404 Not Found page when UrlHandler finds no similar page.
+- Redirection 303 when UrlHandler finds similar page, else 404 Not Found.
 - Split and reorganize default scheme files.
 - Default font-family is ``Roboto`` and ``Font-Awsome``.
 
