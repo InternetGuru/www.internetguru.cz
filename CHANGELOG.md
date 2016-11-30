@@ -122,20 +122,20 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/gf_test/compare/dev..master
-[2.3.4]: https://bitbucket.org/igwr/gf_test/compare/v2.3.4..v2.3.3
-[2.3.3]: https://bitbucket.org/igwr/gf_test/compare/v2.3.3..v2.3.2
-[2.3.2]: https://bitbucket.org/igwr/gf_test/compare/v2.3.2..v2.3.1
-[2.3.1]: https://bitbucket.org/igwr/gf_test/compare/v2.3.1..v2.3.0
-[2.3.0]: https://bitbucket.org/igwr/gf_test/compare/v2.3.0..v2.2.6
-[2.2.6]: https://bitbucket.org/igwr/gf_test/compare/v2.2.6..v2.2.5
-[2.2.5]: https://bitbucket.org/igwr/gf_test/compare/v2.2.5..v2.2.4
-[2.2.4]: https://bitbucket.org/igwr/gf_test/compare/v2.2.4..v2.2.3
-[2.2.3]: https://bitbucket.org/igwr/gf_test/compare/v2.2.3..v2.2.2
-[2.2.2]: https://bitbucket.org/igwr/gf_test/compare/v2.2.2..v2.2.1
-[2.2.1]: https://bitbucket.org/igwr/gf_test/compare/v2.2.1..v2.2.0
-[2.2.0]: https://bitbucket.org/igwr/gf_test/compare/v2.2.0..v2.0.1
-[2.0.1]: https://bitbucket.org/igwr/gf_test/compare/v2.0.1..v2.1.0
-[2.1.0]: https://bitbucket.org/igwr/gf_test/compare/v2.1.0..v2.0.1
-[2.0.1]: https://bitbucket.org/igwr/gf_test/compare/v2.0.1..v2.0.0
-[2.0.0]: https://bitbucket.org/igwr/gf_test/compare/v2.0.0..v1.12.10
+[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.3.4]: https://bitbucket.org/igwr/cms/compare/v2.3.4..v2.3.3
+[2.3.3]: https://bitbucket.org/igwr/cms/compare/v2.3.3..v2.3.2
+[2.3.2]: https://bitbucket.org/igwr/cms/compare/v2.3.2..v2.3.1
+[2.3.1]: https://bitbucket.org/igwr/cms/compare/v2.3.1..v2.3.0
+[2.3.0]: https://bitbucket.org/igwr/cms/compare/v2.3.0..v2.2.6
+[2.2.6]: https://bitbucket.org/igwr/cms/compare/v2.2.6..v2.2.5
+[2.2.5]: https://bitbucket.org/igwr/cms/compare/v2.2.5..v2.2.4
+[2.2.4]: https://bitbucket.org/igwr/cms/compare/v2.2.4..v2.2.3
+[2.2.3]: https://bitbucket.org/igwr/cms/compare/v2.2.3..v2.2.2
+[2.2.2]: https://bitbucket.org/igwr/cms/compare/v2.2.2..v2.2.1
+[2.2.1]: https://bitbucket.org/igwr/cms/compare/v2.2.1..v2.2.0
+[2.2.0]: https://bitbucket.org/igwr/cms/compare/v2.2.0..v2.0.1
+[2.0.1]: https://bitbucket.org/igwr/cms/compare/v2.0.1..v2.1.0
+[2.1.0]: https://bitbucket.org/igwr/cms/compare/v2.1.0..v2.0.1
+[2.0.1]: https://bitbucket.org/igwr/cms/compare/v2.0.1..v2.0.0
+[2.0.0]: https://bitbucket.org/igwr/cms/compare/v2.0.0..v1.12.10
