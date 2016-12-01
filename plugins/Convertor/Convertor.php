@@ -334,7 +334,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
    */
   private function transform($xslFile, DOMDocument $content, $vars = array()) {
     try {
-      $xsl = XMLBuilder::build($xslFile, false);
+      $xsl = XMLBuilder::build($this->pluginDir."/$xslFile", false);
     } catch(Exception $e) {
       throw new Exception(sprintf(_("Unable to load transformation file %s: %s"), $xslFile, $e->getMessage()));
     }
