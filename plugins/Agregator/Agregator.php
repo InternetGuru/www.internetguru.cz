@@ -98,8 +98,12 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     if($doclist != $for) {
       $ref->removeChildNodes();
       $toAppend = array();
-      foreach($this->docLists[$doclist]->childNodes as $childNode) { $toAppend[] = $childNode; }
-      foreach($toAppend as $childNode) { $ref->appendChild($childNode); }
+      foreach($this->docLists[$doclist]->childNodes as $childNode) {
+        $toAppend[] = clone $childNode;
+      }
+      foreach($toAppend as $childNode) {
+        $ref->appendChild($ref->ownerDocument->importNode($childNode, true));
+      }
     }
     foreach($filter->attributes as $attrName => $attrNode) {
       if(in_array($attrName, array("id", "doclist", "for"))) continue;
