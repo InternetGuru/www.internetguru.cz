@@ -10,6 +10,7 @@ use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Plugins\Agregator\AgregatorList;
+use IGCMS\Plugins\Agregator\DocList;
 use SplObserver;
 use SplSubject;
 
@@ -69,7 +70,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->registerFiles(USER_FOLDER);
     $this->setVars();
     foreach($this->docLists as $id => $docList) {
-      $this->modifyElementAttributes($docList, $id);
+      $this->filterDoclist($id);
+    }
+    foreach($this->docLists as $id => $docList) {
       $this->createList(self::DOCLIST_CLASS, $id, $docList);
     }
     foreach($this->imgLists as $id => $imgList) {
@@ -78,18 +81,28 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
   /**
-   * @param DOMElementPlus $ref
    * @param string $id
    */
-  private function modifyElementAttributes(DOMElementPlus $ref, $id) {
+  private function filterDoclist($id) {
     if(!array_key_exists($id, $_GET)) return;
     if(!array_key_exists($_GET[$id], $this->filters)) return;
-    /** @var DOMElementPlus $ref */
     $filter = $this->filters[$_GET[$id]];
     $doclist = $filter->getAttribute("doclist");
-    if(strlen($doclist) && $doclist != $id) return;
+    $for = $filter->getAttribute("for");
+    if(!strlen($for)) $for = $doclist;
+    if(!strlen($doclist)) $doclist = $for;
+    if(!strlen($for) || $for != $id) return;
+    if(!array_key_exists($for, $this->docLists)) return;
+    /** @var DOMElementPlus $ref */
+    $ref = $this->docLists[$for];
+    if($doclist != $for) {
+      $ref->removeChildNodes();
+      $toAppend = array();
+      foreach($this->docLists[$doclist]->childNodes as $childNode) { $toAppend[] = $childNode; }
+      foreach($toAppend as $childNode) { $ref->appendChild($childNode); }
+    }
     foreach($filter->attributes as $attrName => $attrNode) {
-      if($attrName == "id" || $attrName == "doclist") continue;
+      if(in_array($attrName, array("id", "doclist", "for"))) continue;
       $ref->setAttribute($attrName, $attrNode->nodeValue);
     }
   }
