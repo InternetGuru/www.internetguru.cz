@@ -267,8 +267,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       }
       return;
     }
-    if(is_file($this->dataFile) && (!is_file(getRealResDir($this->defaultFile))
-      || isUptodate($this->dataFile, getRealResDir($this->defaultFile)))) {
+    if(!is_file($this->dataFile)) return;
+    if(!is_file(getRealResDir($this->defaultFile))
+      || isUptodate($this->dataFile, getRealResDir($this->defaultFile))) {
       if(getRealResDir() != RESOURCES_DIR) return;
       if(!is_file($this->defaultFile)
         || isUptodate($this->dataFile, $this->defaultFile)) return;
