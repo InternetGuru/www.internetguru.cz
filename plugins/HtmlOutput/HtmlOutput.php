@@ -667,7 +667,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param DOMElement $e
    * @return DOMElement
    */
-  function nextElementSibling(DOMElement $e) {
+  private function nextElementSibling(DOMElement $e) {
     while($e && ($e = $e->nextSibling)) {
       if($e instanceof DOMElement) break;
     }
@@ -678,7 +678,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param DOMElement $e
    * @return DOMElement
    */
-  function previousElementSibling(DOMElement $e) {
+  private function previousElementSibling(DOMElement $e) {
     while($e && ($e = $e->previousSibling)) {
       if($e instanceof DOMElement) break;
     }
@@ -692,7 +692,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   private function removeEmptyElement(DOMElement $e, $comment) {
     $parent = $e->parentNode;
-    if(strlen($parent->nodeValue)) {
+    if(strlen(trim($parent->nodeValue))) {
       if(Cms::isSuperUser()) {
         $cmt = $e->ownerDocument->createComment(" $comment ");
         $parent->insertBefore($cmt, $e);
