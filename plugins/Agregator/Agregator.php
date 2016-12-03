@@ -32,10 +32,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
    */
   private $docLists = array();
   /**
-   * @var DOMElementPlus[]
-   */
-  private $filters = array();
-  /**
    * @var array
    */
   private $lists = array();
@@ -70,44 +66,10 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->registerFiles(USER_FOLDER);
     $this->setVars();
     foreach($this->docLists as $id => $docList) {
-      $this->filterDoclist($id);
-    }
-    foreach($this->docLists as $id => $docList) {
       $this->createList(self::DOCLIST_CLASS, $id, $docList);
     }
     foreach($this->imgLists as $id => $imgList) {
       $this->createList(self::IMGLIST_CLASS, $id, $imgList);
-    }
-  }
-
-  /**
-   * @param string $id
-   */
-  private function filterDoclist($id) {
-    if(!array_key_exists($id, $_GET)) return;
-    if(!array_key_exists($_GET[$id], $this->filters)) return;
-    $filter = $this->filters[$_GET[$id]];
-    $doclist = $filter->getAttribute("doclist");
-    $for = $filter->getAttribute("for");
-    if(!strlen($for)) $for = $doclist;
-    if(!strlen($doclist)) $doclist = $for;
-    if(!strlen($for) || $for != $id) return;
-    if(!array_key_exists($for, $this->docLists)) return;
-    /** @var DOMElementPlus $ref */
-    $ref = $this->docLists[$for];
-    if($doclist != $for) {
-      $ref->removeChildNodes();
-      $toAppend = array();
-      foreach($this->docLists[$doclist]->childNodes as $childNode) {
-        $toAppend[] = clone $childNode;
-      }
-      foreach($toAppend as $childNode) {
-        $ref->appendChild($ref->ownerDocument->importNode($childNode, true));
-      }
-    }
-    foreach($filter->attributes as $attrName => $attrNode) {
-      if(in_array($attrName, array("id", "doclist", "for"))) continue;
-      $ref->setAttribute($attrName, $attrNode->nodeValue);
     }
   }
 
@@ -128,8 +90,6 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
         case "doclist":
           $this->docLists[$id] = $child;
           break;
-        case "filter":
-          $this->filters[$id] = $child;
       }
     }
   }

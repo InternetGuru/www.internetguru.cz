@@ -15,6 +15,7 @@
 
       id (povinné)    identifikátor proměnné s názvem doclist-[id]
       doclist         id existujícího elementu doclist, jehož předpis se má použít
+      for             id existujícího elementu doclist, pro
       path            soubory uvedeného adresáře (výchozí je kořenový adresář)
       kw              dokumenty s klíčovými slovy oddělenými čárkou (výchozí všechny)
       wrapper         obalí sestavu elementem uvedeného názvu
