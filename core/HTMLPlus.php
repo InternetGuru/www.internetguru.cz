@@ -614,14 +614,12 @@ class HTMLPlus extends DOMDocumentPlus {
   private function validateDl($repair) {
     $dts = array();
     foreach($this->getElementsByTagName("dt") as $dt) $dts[] = $dt;
+    /** @var DOMElementPlus $dt */
     foreach($dts as $dt) {
       $nextElement = $dt->nextElement;
       if(!is_null($nextElement) && $nextElement->tagName == "dd") continue;
       $this->errorHandler(_("Element dt following sibling must be dd"), $repair);
-      $dd = $this->createElement("dd");
-      $dd->appendChild($this->newDOMComment(_("Created empty element dd")));
-      if(is_null($nextElement)) $dt->parentNode->appendChild($dd);
-      else $dt->parentNode->insertBefore($dd, $nextElement);
+      $dt->stripElement(_("Removed element dt missing dd"));
     }
   }
 
