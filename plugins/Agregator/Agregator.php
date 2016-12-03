@@ -65,7 +65,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->registerFiles(ADMIN_FOLDER);
     $this->registerFiles(USER_FOLDER);
     $this->setVars();
-    $msg = _("%s '%s' not created: %s");
+    $msg = _("Unable to create %s id '%s': %s");
     foreach($this->docLists as $id => $docList) {
       try {
         /** @var DOMElementPlus $docListId $id or id of referenced $docList */
@@ -118,7 +118,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->doclistExists($listClass, $for, "for");
     if($doclistId != $_GET[$for]) return $doclistId;
     if(!array_key_exists($for, $this->lists[$listClass])) {
-      throw new Exception(sprintf(_("Undefined %s '%s'"), $docList->nodeName, $for));
+      throw new Exception(sprintf(_("Undefined %s id '%s'"), $docList->nodeName, $for));
     }
     if(!$docList->hasAttribute($docList->nodeName)) {
       $docList->setAttribute($docList->nodeName, $for);
@@ -145,7 +145,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       return;
     }
     if(!strlen($ref)) {
-      throw new Exception(sprintf(_("No content for '%s'"), $templateId));
+      throw new Exception(sprintf(_("No content"), $templateId));
     }
     $this->doclistExists($listClass, $ref, $template->nodeName);
     new $listClass($template, $this->lists[$listClass][$ref]);
@@ -160,7 +160,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   private function doclistExists($listClass, $doclistId, $for) {
     if(!strlen($doclistId)) return;
     if(array_key_exists($doclistId, $this->lists[$listClass])) return;
-    throw new Exception(sprintf(_("Reference id '%s' not found for attribute '%s'"), $doclistId, $for));
+    throw new Exception(sprintf(_("Reference id '%s' not found"), $doclistId));
   }
 
   /**
