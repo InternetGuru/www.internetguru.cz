@@ -4,6 +4,7 @@ namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use Exception;
@@ -110,11 +111,11 @@ class UrlHandler extends Plugin implements SplObserver {
       $linkId = $this->findSimilarLinkId($links, $path);
       if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
     }
-    if(!DOMBuilder::isLink($path) || $path == $links[0]) $path = "";
+    if(!DOMBuilder::isLink($path)) new ErrorPage(sprintf(_("Page '%s' Not Found"), $path), 404, true);
+    elseif($path == $links[0]) $path = "";
     if($path == getCurLink()) return;
-    $code = 404;
     if(self::DEBUG) die("Redirecting to '$path'");
-    redirTo(buildLocalUrl(Array("path" => $path, "query" => getCurQuery())), $code);
+    redirTo(buildLocalUrl(Array("path" => $path, "query" => getCurQuery())), 303);
   }
 
   private function getBestId(Array $links, Array $found) {
