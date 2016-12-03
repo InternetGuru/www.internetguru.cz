@@ -15,6 +15,8 @@
 
       id (povinné)    identifikátor proměnné s názvem doclist-[id]
       doclist         id existujícího elementu doclist, jehož předpis se má použít
+      for             id existujícího elementu doclist, pro který se má předpis použít
+                      to platí pouze pokud je ve query stringu URL for=id (např. koutek/?tema=bolest)
       path            soubory uvedeného adresáře (výchozí je kořenový adresář)
       kw              dokumenty s klíčovými slovy oddělenými čárkou (výchozí všechny)
       wrapper         obalí sestavu elementem uvedeného názvu
@@ -23,7 +25,7 @@
       skip            přeskočí prvních <n> souborů (výchozí 0)
       limit           zahrne maximálně <n> souborů (výchozí 0 pro neomezený počet)
 
-    Například:
+    Příklady sestav:
 
     <doclist id="ul" wrapper="ul">
       <li><span class="noprint" var="editlink">n/a</span> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
@@ -38,14 +40,28 @@
       <dd><span class="noprint" var="editlink">n/a</span> <a var="link@href desc@title heading">n/a</a>, naposledy upraveno <span fn="inputvar-dateformat" var="mtime">n/a</span></dd>
     </doclist>
 
-    Příklad s uživatelským filtrem
+    Příklady sestav s atributem for
 
     <doclist id="tema" wrapper="ul" path="koutek" limit="10">
       <li><span class="noprint" var="editlink">n/a</span> <a title="Autor: %s" var="link@href author@title heading">n/a</a>, vytvořeno <em fn="inputvar-dateformat" var="ctime">n/a</em></li>
     </doclist>
-    <filter doclist="tema" limit="0" id="nemoci" kw="nemoci" />
-    <filter doclist="tema" limit="0" id="urazy" kw="úrazy" />
-    <filter doclist="tema" limit="0" id="zlomeniny" kw="zlomeniny" />
+    <doclist id="tema-odkazy" wrapper="ul" path="koutek" limit="10">
+      <li><a title="Autor: %s" var="link@href author@title heading">n/a</a></li>
+    </doclist>
+
+    Příklad 1:
+      Query tema=bolest filtruje doclist@id=tema na klíčové slovo bolest a nastaví limit na 0.
+      <doclist id="bolest" for="tema" limit="0" kw="bolest"/>
+
+    Příklad 2:
+      Navíc od příkladu 1 pro doclist@id=tema použije předpis doclist@id=tema-odkazy.
+      <doclist id="bolest" for="tema" doclist="tema-odkazy" limit="0" kw="bolest"/>
+
+    Příklad 3:
+      Navíc od příkladu 1 pro doclist@id=tema použije vlastní předpis.
+      <doclist id="bolest" for="tema" doclist="tema-odkazy" limit="0" kw="bolest">
+        <li><span var="heading">n/a</span></li>
+      </doclist>
 
   -->
 
