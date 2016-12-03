@@ -65,17 +65,22 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->registerFiles(ADMIN_FOLDER);
     $this->registerFiles(USER_FOLDER);
     $this->setVars();
+    $msg = _("%s '%s' not created: %s");
     foreach($this->docLists as $id => $docList) {
       try {
         /** @var DOMElementPlus $docListId $id or id of referenced $docList */
         $docListId = $this->processFor(self::DOCLIST_CLASS, $id, $docList);
         $this->createList(self::DOCLIST_CLASS, $docListId, $docList);
       } catch(Exception $e) {
-        Logger::user_warning(sprintf(_("DocList '%s' not created: %s"), $id, $e->getMessage()));
+        Logger::user_warning(sprintf($msg, self::DOCLIST_CLASS, $id, $e->getMessage()));
       }
     }
     foreach($this->imgLists as $id => $imgList) {
-      $this->createList(self::IMGLIST_CLASS, $id, $imgList);
+      try {
+        $this->createList(self::IMGLIST_CLASS, $id, $imgList);
+      } catch(Exception $e) {
+        Logger::user_warning(sprintf($msg, self::IMGLIST_CLASS, $id, $e->getMessage()));
+      }
     }
   }
 
