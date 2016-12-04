@@ -13,6 +13,10 @@ a[href] {
   border-bottom: thin solid;
 }
 
+a[href^="/files/"] {
+  border-bottom: none;
+}
+
 body, input, button {
   letter-spacing: 0.01em;
 }
