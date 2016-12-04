@@ -1,3 +1,4 @@
+ImgList: výchozí alt zahrnuje cestu k obrázku
 HtmlOutput: odstranění elementu dt, pokud následuje prázdný element dd
 Agregator: element filter nahrazen atributem for v elementu doclistu
 Insert instead of replace input variable if match or not block.

@@ -63,7 +63,8 @@ class ImgList extends AgregatorList {
       $v["url-preview"] = ROOT_URL.FILES_DIR."/preview$path/$file";
       $v["url-big"] = ROOT_URL.FILES_DIR."/big$path/$file";
       $v["url-full"] = ROOT_URL.FILES_DIR."/full$path/$file";
-      $v["alt"] = pathinfo($file, PATHINFO_FILENAME);
+      $altPath = ltrim("$path/".pathinfo($file, PATHINFO_FILENAME), "/");
+      $v["alt"] = str_replace(array("-", "_", "/"), array("_", " ", " / "), $altPath);
       $vars[$filePath] = $v;
     }
     if(empty($vars)) {
