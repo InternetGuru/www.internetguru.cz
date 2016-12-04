@@ -21,6 +21,14 @@ use Exception;
  */
 class DOMElementPlus extends DOMElement {
   /**
+   * @var int
+   */
+  public $varRecursionLevel = 0;
+  /**
+   * @var int
+   */
+   const MAX_VAR_RECURSION_LEVEL = 3;
+  /**
    * @param string $aName
    * @return string
    * @throws Exception

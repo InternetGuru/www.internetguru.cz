@@ -139,6 +139,11 @@ class DOMDocumentPlus extends DOMDocument {
           else return null;
         }
         $res = $this->insertVariable($element, $variables[$vName], $aName);
+        if($aName == "var") {
+          if(++$element->varRecursionLevel >= DOMElementPlus::MAX_VAR_RECURSION_LEVEL)
+            throw new Exception(_("Max variable recursion level exceeded"));
+          $res = $this->doProcessVariables($variables, $ignore, $element, false, $toRemove);
+        }
       } catch(Exception $e) {
         Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()));
       }

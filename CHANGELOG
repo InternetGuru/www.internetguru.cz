@@ -1,3 +1,4 @@
+Podpora rekurzivního vkládání proměnných
 ImgList: výchozí alt zahrnuje cestu k obrázku
 HtmlOutput: odstranění elementu dt, pokud následuje prázdný element dd
 Agregator: element filter nahrazen atributem for v elementu doclistu
