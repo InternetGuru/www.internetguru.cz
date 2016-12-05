@@ -11,7 +11,6 @@ div.list.multiple div > * {
   box-sizing: border-box;
   margin: 0.5em 0;
   padding: 1em;
-  word-break: break-all;
 }
 
 @media screen and (min-width: 22em) {
