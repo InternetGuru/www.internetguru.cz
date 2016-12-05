@@ -4,6 +4,7 @@ namespace IGCMS\Plugins;
 
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
@@ -42,6 +43,10 @@ class Sitemap extends Plugin implements SplObserver {
   public function update(SplSubject $subject) {
     if($subject->getStatus() != STATUS_POSTPROCESS) return;
     if(is_file(self::SITEMAP) && filemtime(self::SITEMAP) == HTMLPlusBuilder::getNewestFileMtime()) return;
+    if(DOMBuilder::isCacheOutdated()) {
+      Logger::warning(_("Clear nginx cache to regenerate sitemap"));
+      return;
+    }
     try {
       $cfg = self::getXML();
       $links = self::getLinks();

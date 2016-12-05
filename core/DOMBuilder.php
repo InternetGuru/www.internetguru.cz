@@ -42,7 +42,7 @@ class DOMBuilder {
   /**
    * @return int|null
    */
-  protected static function getNewestCacheMtime() {
+  public static function getNewestCacheMtime() {
     if(!is_null(self::$newestCacheMtime)) return self::$newestCacheMtime;
     foreach(getNginxCacheFiles() as $cacheFilePath) {
       $cacheMtime = filemtime($cacheFilePath);
