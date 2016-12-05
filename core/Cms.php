@@ -197,7 +197,7 @@ class Cms {
         Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
       }
     }
-    if(self::getLoggedUser() != SERVER_USER) self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
+    if(self::getLoggedUser() != SERVER_USER) self::setVariable("mtime", timestamptToW3C(HTMLPlusBuilder::getNewestFileMtime()));
     return $content;
   }
 
