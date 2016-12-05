@@ -127,8 +127,9 @@ class UrlHandler extends Plugin implements SplObserver {
 
   private function proceed() {
     $links = array_keys(HTMLPlusBuilder::getLinkToId());
-    $path = normalize(getCurLink(), "a-zA-Z0-9/_-");
+    $path = getCurLink();
     if(!HTMLPlusBuilder::isLink($path)) {
+      $path = normalize($path, "a-zA-Z0-9/_-");
       if(self::DEBUG) var_dump($links);
       $linkId = $this->findSimilarLinkId($links, $path);
       if(!is_null($linkId) && !$linkId == $links[0]) $path = $links[$linkId];
