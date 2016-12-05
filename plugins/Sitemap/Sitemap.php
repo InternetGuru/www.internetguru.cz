@@ -44,7 +44,7 @@ class Sitemap extends Plugin implements SplObserver {
     if($subject->getStatus() != STATUS_POSTPROCESS) return;
     if(is_file(self::SITEMAP) && filemtime(self::SITEMAP) == HTMLPlusBuilder::getNewestFileMtime()) return;
     if(DOMBuilder::isCacheOutdated()) {
-      Logger::warning(_("Clear nginx cache to regenerate sitemap"));
+      Logger::warning(_("Clear server cache to update sitemap"));
       return;
     }
     try {
@@ -60,7 +60,7 @@ class Sitemap extends Plugin implements SplObserver {
       $sitemap = self::createSitemap($links, $cfgLinks, $cfgDefaults);
       $sitemap->save(self::SITEMAP);
       touch(self::SITEMAP, HTMLPlusBuilder::getNewestFileMtime());
-      Logger::info(_("Sitemap was successfully updated"));
+      Logger::info(_("Sitemap updated"));
     } catch(Exception $e) {
       Logger::user_warning($e->getMessage());
     }
