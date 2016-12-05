@@ -28,7 +28,7 @@ class DOMBuilder {
    * @return string
    */
   public static function getNewestFileMtime() {
-    return timestamptToW3C(self::$newestFileMtime);
+    return self::$newestFileMtime;
   }
 
   /**
