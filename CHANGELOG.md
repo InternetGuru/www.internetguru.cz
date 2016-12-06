@@ -5,8 +5,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+- Recursive variable insertion.
+
 ### Changed
-- Simplified error pages (such as 404 Not Found)
+- CHANGELOG format changed to Markdown since v2.0.
+- CHANGELOG language changed to English since v2.0.
+- Default variable ``alt`` includes relative path within ImageList.
+- Remove element ``dt`` followed by empty ``dd`` instead of creating empty ``dd``.
+- Attribute for instead of element filter in DocList including content fallback.
+- Insert instead of replace input variable if match or not block.
+- Simplified error pages (such as 404 Not Found).
 
 ## [2.3.4] - 2016-11-23
 ### Added
