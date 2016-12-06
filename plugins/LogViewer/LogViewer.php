@@ -52,7 +52,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->usrFiles = $this->getFiles(LOG_FOLDER, 15, "usr.log");
     $this->sysFiles = $this->getFiles(LOG_FOLDER, 15, "sys.log");
     $this->emlFiles = $this->getFiles(LOG_FOLDER, 15, "eml.log");
-    $this->histFiles = array(CMS_CHANGELOG_FILENAME => CMS_FOLDER."/".CMS_CHANGELOG_FILENAME);
+    $this->histFiles = $this->getFiles(CMS_FOLDER, 15, "md");
   }
 
   /**
@@ -74,7 +74,8 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     $vars["sys_files"] = empty($sysFiles) ? null : $sysFiles;
     $emlFiles = $this->makeLink($this->emlFiles);
     $vars["eml_files"] = empty($emlFiles) ? null : $emlFiles;
-    $vars["history_file"] = $this->makeLink($this->histFiles);
+    $histFiles = $this->makeLink($this->histFiles);
+    $vars["history_file"] = empty($histFiles) ? null : $histFiles;
     $content->processVariables($vars);
     return $content;
   }
@@ -86,8 +87,8 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
    */
   private function getCurFilePath($fName) {
     switch($fName) {
-      case CMS_CHANGELOG_FILENAME:
-      return $this->histFiles[$fName];
+      case "CHANGELOG":
+      $this->redirTo(CMS_CHANGELOG_FILENAME);
       case "":
       case "usr":
       if(empty($this->usrFiles)) $this->redirTo(CMS_CHANGELOG_FILENAME);
@@ -104,6 +105,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
       default:
       if(is_file(LOG_FOLDER."/$fName")) return LOG_FOLDER."/$fName";
       if(is_file(LOG_FOLDER."/$fName.zip")) return LOG_FOLDER."/$fName.zip";
+      if(array_key_exists($fName, $this->histFiles)) return $this->histFiles[$fName];
       throw new Exception (sprintf(_("File or extension '%s' not found"), $fName));
     }
   }
@@ -147,7 +149,9 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     foreach(scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {
       if(!is_file("$dir/$f")) continue;
       $id = (substr($f, -4) == ".zip") ? substr($f, 0, -4) : $f;
-      if(!is_null($ext) && substr($id, strpos($id, ".") + 1) != $ext) continue;
+      if(!is_null($ext)
+        && substr($id, strpos($id, ".") + 1) != $ext
+        && pathinfo($id, PATHINFO_EXTENSION) != $ext) continue;
       $files[$id] = "$dir/$f";
       if(count($files) == $limit) break;
     }

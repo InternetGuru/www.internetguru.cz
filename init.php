@@ -75,7 +75,7 @@ define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
 define('THEMES_FOLDER', USER_FOLDER."/".THEMES_DIR);
 define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
 define('CMS_VERSION_FILENAME', "VERSION");
-define('CMS_CHANGELOG_FILENAME', "CHANGELOG");
+define('CMS_CHANGELOG_FILENAME', "CHANGELOG.md");
 define('CMS_VERSION', trim(file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME)));
 $verfile = getcwd()."/".CMS_VERSION_FILENAME;
 define('DEFAULT_RELEASE', is_file($verfile) ? trim(file_get_contents($verfile)) : CMS_RELEASE);
