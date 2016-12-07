@@ -252,7 +252,7 @@ class Logger {
    * @return array
    */
   public static function appendVersion(Array $record) {
-    $record["extra"]["ver"] = CMS_NAME;
+    $record["extra"]["ver"] = CMS_RELEASE."/".CMS_VERSION;
     return $record;
   }
 
