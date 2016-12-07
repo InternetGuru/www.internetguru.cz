@@ -212,9 +212,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
       $body->setAttribute($attNode->nodeName, $attNode->nodeValue);
     }
     $elements = $this->getUntilSame($h1);
-    foreach($body->childElementsArray as $child) {
-      $body->removeChild($child);
-    }
+//    $body->removeChildNodes(); # not working
+    $r = array();
+    foreach($body->childNodes as $n) $r[] = $n;
+    foreach($r as $n) $body->removeChild($n);
     foreach($elements as $e) {
       $body->appendChild($e);
     }
