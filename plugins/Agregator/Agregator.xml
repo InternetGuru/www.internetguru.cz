@@ -88,7 +88,7 @@
     Například:
 
     <imglist id="gallery" wrapper="ul" class="gallery">
-      <li><a var="url-big@href"><img var="url-thumbs@src alt@alt"/></a></li>
+      <li><a var="url-big@href"><img var="url-thumbs@src alt@alt alt@title"/></a></li>
     </imglist>
 
   -->
