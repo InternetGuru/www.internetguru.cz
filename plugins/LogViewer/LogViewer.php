@@ -76,6 +76,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     $vars["eml_files"] = empty($emlFiles) ? null : $emlFiles;
     $histFiles = $this->makeLink($this->histFiles);
     $vars["history_file"] = empty($histFiles) ? null : $histFiles;
+    $vars["type"] = strpos($fName, "CHANGELOG") === 0 ? "markdown" : "accesslog";
     $content->processVariables($vars);
     return $content;
   }
