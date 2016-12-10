@@ -428,9 +428,12 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $vars["cache_value"] = $cache ? $_GET[CACHE_PARAM] : "";
     $vars["filepicker_options"] = $this->createFilepicker();
     $content->processVariables($vars);
-    if(is_null($this->defaultFile)) $this->title = $vars["heading"];
-    else $this->title = sprintf(_("%s (%s) - Administration"),
-      basename($this->defaultFile), ROOT_URL.$this->defaultFile);
+    if(is_null($this->defaultFile)) {
+      $this->title = $vars["heading"];
+    } else {
+      $this->title = strlen($this->defaultFile) ? sprintf("%s (%s) - ", basename($this->defaultFile), ROOT_URL.$this->defaultFile) : ""
+        ._("Administration");
+    }
     return $content;
   }
 
