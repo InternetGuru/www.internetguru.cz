@@ -336,8 +336,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   private static function handleResource($src, $dest, $ext, $isRoot) {
     if($isRoot) {
+      $log = true;
       if(strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
-        $log = true;
         $src = CMSRES_FOLDER."/".getCurLink();
       } else {
         switch($ext) {
@@ -347,10 +347,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
           case "js":
           self::buildJs($src, $dest);
           return;
-          default: $log=false;
+          default: $log = false;
         }
-        if($log) Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
       }
+      if($log) Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
     }
     copy_plus($src, $dest);
   }
