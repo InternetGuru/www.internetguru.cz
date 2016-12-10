@@ -335,22 +335,28 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @param bool $isRoot
    */
   private static function handleResource($src, $dest, $ext, $isRoot) {
-    if($isRoot) {
-      $log = true;
-      if(strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
-        $src = CMSRES_FOLDER."/".getCurLink();
-      } else {
-        switch($ext) {
-          case "css":
+    if(!$isRoot) {
+      copy_plus($src, $dest);
+      return;
+    }
+    if(strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
+      $src = CMSRES_FOLDER."/".getCurLink();
+    } else {
+      $log = false;
+      switch($ext) {
+        case "css":
+          $log = true;
           self::buildCss($src, $dest);
-          return;
-          case "js":
+        break;
+        case "js":
+          $log = true;
           self::buildJs($src, $dest);
-          return;
-          default: $log = false;
-        }
+        break;
       }
-      if($log) Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
+      if($log) {
+        Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
+        return;
+      }
     }
     copy_plus($src, $dest);
   }
