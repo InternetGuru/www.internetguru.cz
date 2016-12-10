@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Recursive variable insertion.
 
 ### Changed
+- Log including CMS version.
+- Logs viewed in appropriate syntax highlight.
 - CHANGELOG format changed to Markdown since v2.0.
 - CHANGELOG language changed to English since v2.0.
 - Default variable ``alt`` includes relative path within ImageList.
@@ -16,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Attribute for instead of element filter in DocList including content fallback.
 - Insert instead of replace input variable if match or not block.
 - Simplified error pages (such as 404 Not Found).
+
+### Fixed
+- Removed tabindex from Admin default page.
+- Content balancing including comments.
 
 ## [2.3.4] - 2016-11-23
 ### Added
