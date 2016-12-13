@@ -42,16 +42,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [2.3.0] - 2016-11-16
 ### Added
 - HTML+ supports tags ``img``, ``source`` and ``picture``.
-- Agregator templates support local document variables.
-- Local document variables from user attributes.
-- HTML+ user attributes support (as in HTML5) in element ``body``.
-- Icons in system warning messages in default scheme.
+- Agregator templates support local variables from ``data-`` attributes.
+- Local document variables from ``data-`` attributes.
+- HTML+ ``data-`` attributes support (as in HTML5) in element ``body``.
 - Configurable ``body`` attribute to disable balancing (default ``nobalance``).
 
 ### Changed
+- System messages redesigned containing icons in default scheme.
 - Logo tag in breadcrumb changed from ``object`` to ``img``.
-- Redirection 303 when UrlHandler finds similar page, else 404 Not Found.
-- Split and reorganize default scheme files.
+- Redirection 303 when similar URL found, else 404 (Not Found).
+- Default scheme CSS files split and reorganized.
 - Default font-family is ``Roboto`` and ``Font-Awsome``.
 
 ## [2.2.6] - 2016-11-13
