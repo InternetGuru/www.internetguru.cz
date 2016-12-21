@@ -20,7 +20,6 @@ class DOMBuilder {
    * @return bool
    */
   public static function isCacheOutdated() {
-    if(IS_LOCALHOST) return false;
     if(is_null(self::getNewestCacheMtime())) return false;
     return self::$newestFileMtime > self::getNewestCacheMtime();
   }
@@ -29,7 +28,7 @@ class DOMBuilder {
    * @return string
    */
   public static function getNewestFileMtime() {
-    return timestamptToW3C(self::$newestFileMtime);
+    return self::$newestFileMtime;
   }
 
   /**
@@ -43,7 +42,7 @@ class DOMBuilder {
   /**
    * @return int|null
    */
-  protected static function getNewestCacheMtime() {
+  public static function getNewestCacheMtime() {
     if(!is_null(self::$newestCacheMtime)) return self::$newestCacheMtime;
     foreach(getNginxCacheFiles() as $cacheFilePath) {
       $cacheMtime = filemtime($cacheFilePath);

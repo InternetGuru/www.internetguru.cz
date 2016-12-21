@@ -10,8 +10,9 @@ try {
     if(strpos($plugin, ".") === 0) continue;
     if(!is_dir(PLUGINS_FOLDER."/$plugin")) continue;
     if(is_dir(PLUGINS_FOLDER."/.$plugin")) continue;
-    $pluginClass = "IGCMS\Plugins\\$plugin";
-    if(!in_array("IGCMS\Core\ResourceInterface", class_implements($pluginClass))) continue;
+    $pluginClass = "IGCMS\\Plugins\\$plugin";
+    if(!in_array("IGCMS\\Core\\ResourceInterface", class_implements($pluginClass))) continue;
+    /** @var $pluginClass \IGCMS\Core\ResourceInterface */
     if(!$pluginClass::isSupportedRequest()) continue;
     $pluginClass::handleRequest();
   }

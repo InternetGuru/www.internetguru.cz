@@ -197,7 +197,7 @@ class Cms {
         Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
       }
     }
-    if(self::getLoggedUser() != SERVER_USER) self::setVariable("mtime", HTMLPlusBuilder::getNewestFileMtime());
+    if(self::getLoggedUser() != SERVER_USER) self::setVariable("mtime", timestamptToW3C(HTMLPlusBuilder::getNewestFileMtime()));
     return $content;
   }
 
@@ -229,7 +229,6 @@ class Cms {
    * @return bool
    */
   public static function isSuperUser() {
-    if(IS_LOCALHOST) return true;
     if(self::getLoggedUser() == "admin") return true;
     if(self::getLoggedUser() == ADMIN_ID) return true;
     if(isset($_SERVER["REMOTE_ADDR"])
@@ -241,7 +240,6 @@ class Cms {
    * @return null|string
    */
   public static function getLoggedUser() {
-    if(IS_LOCALHOST) return ADMIN_ID;
     if(isset($_SERVER["REMOTE_ADDR"])
       && $_SERVER["REMOTE_ADDR"] == $_SERVER['SERVER_ADDR']) return SERVER_USER;
     if(isset($_SERVER['REMOTE_USER']) && strlen($_SERVER['REMOTE_USER']))
@@ -255,7 +253,6 @@ class Cms {
    * @return bool
    */
   public static function isActive() {
-    if(IS_LOCALHOST) return true;
     return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
   }
 
@@ -396,7 +393,7 @@ class Cms {
       Logger::error(sprintf(_("Unable to set function %s: not a function"), $name));
       return null;
     }
-    $varId = self::getVarId($name, "fn");
+    $varId = self::getVarId($name);
     self::$functions[$varId] = $value;
     return $varId;
   }

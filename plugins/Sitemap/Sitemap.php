@@ -4,6 +4,7 @@ namespace IGCMS\Plugins;
 
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
@@ -18,10 +19,9 @@ use SplSubject;
  * Class Sitemap
  * @package IGCMS\Plugins
  *
- * Unlogged user (on root url) generate SITEMAP from all loaded files and save it to the root of current domain
  * @see http://www.sitemaps.org/protocol.html Sitemap definition
  */
-class Sitemap extends Plugin implements SplObserver, ResourceInterface {
+class Sitemap extends Plugin implements SplObserver {
   /**
    * @var string
    */
@@ -38,20 +38,15 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
   private static $changefreqVals = array("always", "hourly", "daily", "weekly", "monthly", "yearly", "never", "");
 
   /**
-   * @param string|null $filePath
-   * @return bool
-   */
-  public static function isSupportedRequest($filePath=null) {
-    if(is_null($filePath)) $filePath = getCurLink();
-    return $filePath == self::SITEMAP;
-  }
-
-  /**
    * @param Plugins|SplSubject $subject
    */
-  public function update(SplSubject $subject) {}
-
-  public static function handleRequest() {
+  public function update(SplSubject $subject) {
+    if($subject->getStatus() != STATUS_POSTPROCESS) return;
+    if(is_file(self::SITEMAP) && filemtime(self::SITEMAP) == HTMLPlusBuilder::getNewestFileMtime()) return;
+    if(DOMBuilder::isCacheOutdated()) {
+      Logger::warning(_("Clear server cache to update sitemap"));
+      return;
+    }
     try {
       $cfg = self::getXML();
       $links = self::getLinks();
@@ -63,15 +58,16 @@ class Sitemap extends Plugin implements SplObserver, ResourceInterface {
       }
       $cfgDefaults = self::getConfigDefaults($cfg);
       $sitemap = self::createSitemap($links, $cfgLinks, $cfgDefaults);
-      echo $sitemap->saveXML();
-      exit;
+      $sitemap->save(self::SITEMAP);
+      touch(self::SITEMAP, HTMLPlusBuilder::getNewestFileMtime());
+      Logger::info(_("Sitemap updated"));
     } catch(Exception $e) {
       Logger::user_warning($e->getMessage());
     }
   }
 
   /**
-   * Get links from all included files + root link "/"
+   * Get links from all included files
    * @return array links Asociative array of links => mtime in W3C format
    */
   private static function getLinks() {

@@ -7,6 +7,5 @@ define('LIB_FOLDER', CMS_FOLDER.'/lib');
 define('ADMIN_FOLDER', 'tests/tmp/admin');
 define('USER_FOLDER', 'tests/tmp/user');
 define('APC_PREFIX', 'test');
-define('IS_LOCALHOST', true);
 define('CMS_DEBUG', false);
 define('ADMIN_ID', 'localhost');

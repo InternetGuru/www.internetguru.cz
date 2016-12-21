@@ -118,7 +118,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $html = $this->addRoot($doc, $lang);
 
     // final validation
-    $contentPlus->processFunctions(Cms::getAllFunctions(), Cms::getAllVariables());
+    $contentPlus->processFunctions(Cms::getAllFunctions());
     $xPath = new DOMXPath($contentPlus);
     $this->addHead($doc, $html, $h1, $xPath);
 
@@ -641,13 +641,50 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $toDelete[] = $e;
     }
     foreach($toExpand as $e) $e->appendChild($doc->createTextNode(""));
+    /** @var DOMElement $e */
     foreach($toDelete as $e) {
       if(!property_exists($e, "ownerDocument")) continue; // already deleted
       $eInfo = $e->nodeName;
       foreach($e->attributes as $a) $eInfo .= ".".$a->nodeName."=".$a->nodeValue;
+      $this->removePrevDt($e);
       $this->removeEmptyElement($e, sprintf(_("Removed empty element %s"), $eInfo));
     }
   }
+
+  /**
+   * @param DOMElement $e
+   */
+  private function removePrevDt(DOMElement $e) {
+    if($e->nodeName != "dd") return;
+    $prev = $this->previousElementSibling($e);
+    $next = $this->nextElementSibling($e);
+    if($prev->nodeName != "dt") return;
+    if(!is_null($next) && $next->nodeName == "dd") return;
+    $e->parentNode->removeChild($prev);
+  }
+
+  /**
+   * @param DOMElement $e
+   * @return DOMElement
+   */
+  private function nextElementSibling(DOMElement $e) {
+    while($e && ($e = $e->nextSibling)) {
+      if($e instanceof DOMElement) break;
+    }
+    return $e;
+  }
+
+  /**
+   * @param DOMElement $e
+   * @return DOMElement
+   */
+  private function previousElementSibling(DOMElement $e) {
+    while($e && ($e = $e->previousSibling)) {
+      if($e instanceof DOMElement) break;
+    }
+    return $e;
+  }
+
 
   /**
    * @param DOMElement $e
@@ -655,7 +692,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   private function removeEmptyElement(DOMElement $e, $comment) {
     $parent = $e->parentNode;
-    if(strlen($parent->nodeValue)) {
+    if(strlen(trim($parent->nodeValue))) {
       if(Cms::isSuperUser()) {
         $cmt = $e->ownerDocument->createComment(" $comment ");
         $parent->insertBefore($cmt, $e);

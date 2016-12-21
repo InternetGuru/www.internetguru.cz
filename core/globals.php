@@ -335,9 +335,12 @@ function copy_plus($src, $dest, $keepSrc=true) {
  * @throws Exception
  */
 function mkdir_plus($dir, $mode=0775, $recursive=true) {
-  if(is_dir($dir)) return;
-  @mkdir($dir, $mode, $recursive); // race condition
-  if(!is_dir($dir)) throw new Exception(_("Unable to create directory"));
+  for($i=0; $i<10; $i++) {
+    if(is_dir($dir)) return;
+    if(mkdir($dir, $mode, $recursive)) return;
+    usleep(20000);
+  }
+  throw new Exception(_("Unable to create directory"));
 }
 
 /**
@@ -411,7 +414,7 @@ function update_file($src, $dest, $hash=false) {
   try {
     copy_plus($src, $dest);
   } finally {
-    unlock_file($fp);
+    unlock_file($fp, $dest);
   }
   return true;
 }
@@ -648,7 +651,6 @@ function apc_is_valid_cache($cacheKey, $value) {
  * @throws Exception
  */
 function clearNginxCache() {
-  if(IS_LOCALHOST) return;
   foreach(getNginxCacheFiles() as $fPath) {
     if(!unlink($fPath)) throw new Exception(_("Failed to purge cache"));
   }

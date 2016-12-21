@@ -29,7 +29,7 @@ class DOMDocumentPlus extends DOMDocument {
   /**
    * @param string $name
    * @param string|null $value
-   * @return DOMElementPlus
+   * @return DOMElementPlus|DOMElement
    */
   public function createElement($name, $value=null) {
     if(is_null($value)) return parent::createElement($name);
@@ -139,6 +139,11 @@ class DOMDocumentPlus extends DOMDocument {
           else return null;
         }
         $res = $this->insertVariable($element, $variables[$vName], $aName);
+        if($aName == "var") {
+          if(++$element->varRecursionLevel >= DOMElementPlus::MAX_VAR_RECURSION_LEVEL)
+            throw new Exception(_("Max variable recursion level exceeded"));
+          $res = $this->doProcessVariables($variables, $ignore, $element, false, $toRemove);
+        }
       } catch(Exception $e) {
         Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()));
       }
@@ -187,18 +192,17 @@ class DOMDocumentPlus extends DOMDocument {
 
   /**
    * @param array $functions
-   * @param array $variables
    * @param array $ignore
    */
-  public function processFunctions(Array $functions, Array $variables = Array(), $ignore = array()) {
+  public function processFunctions(Array $functions, $ignore = array()) {
     $xpath = new DOMXPath($this);
     $elements = array();
     foreach($xpath->query("//*[@fn]") as $e) $elements[] = $e;
     /** @var DOMElementPlus $e */
     foreach(array_reverse($elements) as $e) {
       if(isset($ignore[$e->nodeName]))
-        $e->processFunctions($functions, $variables, $ignore[$e->nodeName]);
-      else $e->processFunctions($functions, $variables, array());
+        $e->processFunctions($functions, $ignore[$e->nodeName]);
+      else $e->processFunctions($functions, array());
     }
   }
 

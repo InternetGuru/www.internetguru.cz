@@ -21,6 +21,14 @@ use Exception;
  */
 class DOMElementPlus extends DOMElement {
   /**
+   * @var int
+   */
+  public $varRecursionLevel = 0;
+  /**
+   * @var int
+   */
+   const MAX_VAR_RECURSION_LEVEL = 3;
+  /**
    * @param string $aName
    * @return string
    * @throws Exception
@@ -99,10 +107,9 @@ class DOMElementPlus extends DOMElement {
 
   /**
    * @param array $functions
-   * @param array $variables
    * @param array $ignore
    */
-  public function processFunctions(Array $functions, Array $variables = array(), Array $ignore = array()) {
+  public function processFunctions(Array $functions, Array $ignore = array()) {
     foreach($this->getVariables("fn", $ignore) as list($vName, $aName, $fn)) {
       try {
         $f = array_key_exists($vName, $functions) ? $functions[$vName] : null;
@@ -232,12 +239,17 @@ class DOMElementPlus extends DOMElement {
     if(!is_null($aName)) {
       return $this->insertVarString($element->nodeValue, $aName);
     }
-    $res = null;
     $var = $this->ownerDocument->importNode(clone $element, true);
-    $attributes = array();
-    foreach($this->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     $nodes = array();
     foreach($var->childNodes as $n) $nodes[] = $n;
+    if($this->toInsert($element)) {
+      $this->removeChildNodes();
+      foreach($nodes as $n) $this->appendChild($n);
+      return $this;
+    }
+    $res = null;
+    $attributes = array();
+    foreach($this->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     #todo: already checked?
     #if(is_null($this->parentNode)) return $element;
     foreach($nodes as $n) {
@@ -250,6 +262,20 @@ class DOMElementPlus extends DOMElement {
       }
     }
     return $res;
+  }
+
+  /**
+   * @param DOMElement $element
+   * @return bool
+   */
+  private function toInsert(DOMElement $element) {
+    $first = $element->firstChild;
+    if($first->nodeType == XML_TEXT_NODE && trim($first->nodeValue) == "") $first = $first->nextSibling;
+    if($first->nodeType != XML_ELEMENT_NODE) return true;
+    if($this->nodeName == $first->nodeName) return false;
+    $blockElements = array("p", "ul", "ol", "dl", "blockcode", "blockquote", "form");
+    if(in_array($first->nodeName, $blockElements)) return false;
+    return true;
   }
 
   /**

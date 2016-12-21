@@ -316,13 +316,13 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     try {
       if(is_file($dest)) return;
       self::checkMime($src, $ext);
-      if($isRoot && !$resDir) {
-        if(self::isImage($ext)) self::handleImage($src, $dest, $imgmode);
-        else copy_plus($src, $dest);
-      } else { // resDir
-        self::handleResource($src, $dest, $ext, $isRoot);
+      if($isRoot && $resDir) {
+        self::handleResource($src, $dest, $ext);
+      } elseif($isRoot && !$resDir && self::isImage($ext)) {
+        self::handleImage($src, $dest, $imgmode);
+      } else {
+        copy_plus($src, $dest);
       }
-      touch($dest, filemtime($src));
     } finally {
       unlock_file($fp, $dest);
     }
@@ -332,27 +332,25 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @param string $src
    * @param string $dest
    * @param string $ext
-   * @param bool $isRoot
    */
-  private static function handleResource($src, $dest, $ext, $isRoot) {
-    if($isRoot) {
-      if(!IS_LOCALHOST && strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
-        $log = true;
-        $src = CMSRES_FOLDER."/".getCurLink();
-      } else {
-        switch($ext) {
-          case "css":
-          self::buildCss($src, $dest);
-          return;
-          case "js":
-          self::buildJs($src, $dest);
-          return;
-          default: $log=false;
-        }
-        if($log) Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
-      }
+  private static function handleResource($src, $dest, $ext) {
+    if(strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
+      copy_plus(CMSRES_FOLDER . "/" . getCurLink(), $dest);
+      return;
     }
-    copy_plus($src, $dest);
+    switch($ext) {
+      case "css":
+        self::buildCss($src, $dest);
+      break;
+      case "js":
+        self::buildJs($src, $dest);
+      break;
+      default:
+        copy_plus($src, $dest);
+        return;
+    }
+    touch($dest, filemtime($src));
+    Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
   }
 
   /**

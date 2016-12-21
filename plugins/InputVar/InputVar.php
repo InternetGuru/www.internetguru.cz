@@ -98,10 +98,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
 
   private function loadVars() {
     foreach($this->cfg->documentElement->childElementsArray as $e) {
-      if($e->nodeName == "var") $this->vars[$e->getAttribute("id")] = $e;
-      if(!IS_LOCALHOST && $e->nodeName == "passwd") $this->passwd = $e->nodeValue;
+      if($e->nodeName == "var") $this->vars[$e->getRequiredAttribute("id")] = $e;
+      if($e->nodeName == "passwd") $this->passwd = $e->nodeValue;
     }
-
   }
 
   /**

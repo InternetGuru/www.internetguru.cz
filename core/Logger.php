@@ -64,13 +64,13 @@ class Logger {
    * Log format for TYPE_SYS_LOG and TYPE_USER_LOG.
    * @var string
    */
-  const LOG_FORMAT = "[%datetime%] %extra.ip% %extra.request% %extra.user% %level_name%: %message% %extra.backtrace%\n";
+  const LOG_FORMAT = "[%datetime%] %extra.ip% %extra.request% %extra.user% %extra.ver% %level_name%: %message% %extra.backtrace%\n";
 
   /**
    * Log format for TYPE_MAIL_LOG.
    * @var string
    */
-  const EMAIL_FORMAT = "[%datetime%] %extra.ip% %extra_request% %extra.user%: %message%\n";
+  const EMAIL_FORMAT = "[%datetime%] %extra.ip% %extra.request% %extra.user% %extra.ver%: %message%\n";
 
   /**
    * Monolog system logger instance.
@@ -181,6 +181,7 @@ class Logger {
     $logger->pushProcessor("IGCMS\\Core\\Logger::appendIP");
     $logger->pushProcessor("IGCMS\\Core\\Logger::appendRequest");
     $logger->pushProcessor("IGCMS\\Core\\Logger::appendUserID");
+    $logger->pushProcessor("IGCMS\\Core\\Logger::appendVersion");
     $logger->pushProcessor("IGCMS\\Core\\Logger::appendDebugTrace");
     self::pushHandlers($logger, $type);
     self::${"monolog$type"} = $logger;
@@ -198,17 +199,15 @@ class Logger {
       ? new LineFormatter(self::LOG_FORMAT)
       : new LineFormatter(self::EMAIL_FORMAT);
 
-    if(!IS_LOCALHOST) {
-      foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
-        $mailHandler = new NativeMailerHandler(
-          self::EMAIL_ALERT_TO,
-          "IGCMS $type at ".HOST,
-          self::EMAIL_ALERT_FROM,
-          constant("Monolog\\Logger::$type"),
-          false);
-        $mailHandler->setFormatter($formatter);
-        $logger->pushHandler($mailHandler);
-      }
+    foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
+      $mailHandler = new NativeMailerHandler(
+        self::EMAIL_ALERT_TO,
+        "IGCMS $type at ".HOST,
+        self::EMAIL_ALERT_FROM,
+        constant("Monolog\\Logger::$type"),
+        false);
+      $mailHandler->setFormatter($formatter);
+      $logger->pushHandler($mailHandler);
     }
 
     $streamHandler = new StreamHandler($logFile, MonologLogger::DEBUG);
@@ -245,6 +244,15 @@ class Logger {
       $request = $_SERVER["SERVER_PROTOCOL"]." ".$_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"];
     }
     $record["extra"]["request"] = $request;
+    return $record;
+  }
+
+  /**
+   * @param array $record
+   * @return array
+   */
+  public static function appendVersion(Array $record) {
+    $record["extra"]["ver"] = CMS_RELEASE."/".CMS_VERSION;
     return $record;
   }
 

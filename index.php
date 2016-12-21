@@ -40,7 +40,7 @@ try {
   if(!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) touch(FORBIDDEN_FILE);
   Cms::checkAuth();
   if(Cms::isSuperUser()) {
-    if(!IS_LOCALHOST) initIndexFiles();
+    initIndexFiles();
     if(isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
       try {
         clearNginxCache();
@@ -98,7 +98,7 @@ try {
   $m = $e->getMessage();
   if(CMS_DEBUG) $m = sprintf(_("%s in %s on line %s"), $m, $e->getFile(), $e->getLine());
   $m = sprintf(_("IGCMS failed to finish: %s"), $m);
-  if(class_exists("IGCMS\Core\ErrorPage")) new ErrorPage($m, $errno);
+  if(class_exists("IGCMS\\Core\\ErrorPage")) new ErrorPage($m, $errno);
 
   Logger::alert($m);
   http_response_code($errno);
