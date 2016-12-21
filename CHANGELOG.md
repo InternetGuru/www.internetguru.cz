@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.4.0] - 2016-12-21
 ### Added
 - Recursive variable insertion.
 
@@ -137,7 +137,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.4.0]: https://bitbucket.org/igwr/cms/compare/v2.4.0..v2.3.8
 [2.3.4]: https://bitbucket.org/igwr/cms/compare/v2.3.4..v2.3.3
 [2.3.3]: https://bitbucket.org/igwr/cms/compare/v2.3.3..v2.3.2
 [2.3.2]: https://bitbucket.org/igwr/cms/compare/v2.3.2..v2.3.1
