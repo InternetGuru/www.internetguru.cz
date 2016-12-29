@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
- - Fix SyntaxCodeMirror fullscreen to be over the scrolltop arrow"
+ - SyntaxCodeMirror fullscreen overlay scrolltop arrow"
 
 ## [2.4.0] - 2016-12-21
 ### Added
