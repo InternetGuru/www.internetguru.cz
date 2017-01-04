@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContactForm>
+  <var id="adminaddr" modifyonly="modifyonly">info@internetguru.cz</var>
+<!--   <var id="adminaddr" modifyonly="modifyonly">pavel@petrzela.eu</var> -->
+  <var id="servername" modifyonly="modifyonly">InternetGuru.cz</var>
+  <var id="subject" modifyonly="modifyonly">New Message from internetguru.cz</var>
+  <var id="success" modifyonly="modifyonly">Thank you, message has been sent!</var>
+
+  <message for="tel">
+Someone just entered following telephone number into contact form
+
+    $tel
+
+--
+Sent from IP address $cms-ip
+$inputvar-service_plain
+  </message>
+  <form id="tel" class="addtolist">
+    <div class="list multiple"><div>
+    <dl>
+      <dt>Type</dt>
+      <dd>Quick Contact</dd>
+      <dt><label for="tel">Should we call you?</label></dt>
+      <dd>Enter your telephone number below</dd>
+      <dd><input type="text" id="tel" required="required" placeholder="+420 123456789" pattern="\D*(\d\D*){9,}" value="+420 "/></dd>
+      <dd><input type="submit" id="submit" value="Call Me"/></dd>
+    </dl>
+    <dl>
+      <dt>Type</dt>
+      <dd>Company Info</dd>
+      <dt>InternetGuru</dt>
+      <dd><ul class="logo">
+        <li><a href="mailto:info@internetguru.cz" var="inputvar-email@class"><span>info@internetguru.cz</span></a></li>
+        <li><a href="https://www.linkedin.com/company/internetguru/en" var="inputvar-linkedin@class"><span>linkedin.com/company/internetguru</span></a></li>
+        <li><a href="https://www.facebook.com/internetguru.cz" var="inputvar-facebook@class"><span>facebook.com/internetguru.cz</span></a></li>
+<!--         <li><a href="https://plus.google.com/b/105762234819973683704/105762234819973683704" var="inputvar-google@class"><span>plus.google.com/internetguru</span></a></li> -->
+        <li><a href="https://github.com/InternetGuru" var="inputvar-github@class"><span>github.com/InternetGuru</span></a></li>
+      </ul></dd>
+      <dt>Address</dt>
+      <dd><ul class="logo">
+        <li><a href="https://www.google.cz/maps/place/Bro%C5%BE%C3%ADkova+15%2F1,+150+00+Praha+5-Ko%C5%A1%C3%AD%C5%99e/@50.0711549,14.3862536,17z/data=!3m1!4b1!4m5!3m4!1s0x470b95aba6630ab5:0xd73a1479f9dfb046!8m2!3d50.0711515!4d14.3884476?hl=en" var="inputvar-map@class"><span>Brožíkova 1, 150 00 Prague 5, Czech Republic</span></a></li>
+        <li><a href="https://www.google.cz/maps/place/Th%C3%A1kurova+9,+160+00+Praha+6/@50.1047496,14.3875576,17z/data=!3m1!4b1!4m5!3m4!1s0x470b953a13eadb29:0xc5f7771c23fd33ff!8m2!3d50.1047462!4d14.3897516?hl=en" var="inputvar-map@class"><span>Thákurova 9, 160 00 Prague 6, Czech Republic</span></a>
+        </li></ul>
+      </dd>
+    </dl>
+    <dl>
+      <dt>Type</dt>
+      <dd>People</dd>
+      <dt>Martin Línek</dt>
+      <dd>Sales Representative</dd>
+      <dd><ul class="logo">
+        <li><a href="tel:+420731300421" var="inputvar-phone@class"><span>+420 731 300 421</span></a></li>
+        <li><a href="mailto:martin.linek@internetguru.cz" var="inputvar-email@class"><span>martin.linek@internetguru.cz</span></a></li>
+        <li><a href="https://www.linkedin.com/in/martin-linek" var="inputvar-linkedin@class"><span>linkedin.com/in/martin-linek</span></a></li>
+      </ul></dd>
+      <dt>Lucie Zdeňková</dt>
+      <dd>Webdesign and Sales</dd>
+      <dd><ul class="logo">
+        <li><a href="mailto:lucie.zdenkova@internetguru.cz" var="inputvar-email@class"><span>lucie.zdenkova@internetguru.cz</span></a></li>
+        <li><a href="https://www.linkedin.com/in/lucie-zdenkova/en" var="inputvar-linkedin@class"><span>linkedin.com/in/lucie-zdenkova</span></a></li>
+      </ul></dd>
+      <dt>Pavel Petržela</dt>
+      <dd>IT Support and Development</dd>
+      <dd><ul class="logo">
+        <li><a href="tel:+420604412983" var="inputvar-phone@class"><span>+420 604 412 983</span></a></li>
+        <li><a href="mailto:pavel.petrzela@internetguru.cz" var="inputvar-email@class"><span>pavel.petrzela@internetguru.cz</span></a></li>
+<!--         <li><a href="https://plus.google.com/+PavelPetrzela" var="inputvar-google@class"><span>plus.google.com/+PavelPetrzela</span></a></li> -->
+<!--         <li><a href="skype:poulikpetrzela" var="inputvar-skype@class"><span>poulikpetrzela</span></a></li> -->
+        <li><a href="https://www.linkedin.com/in/pavelpetrzela/en" var="inputvar-linkedin@class"><span>linkedin.com/in/pavelpetrzela</span></a></li>
+      </ul></dd>
+    </dl>
+    <dl>
+      <dt>Type</dt>
+      <dd>Management</dd>
+      <dt>David Myslil</dt>
+      <dd>Sales Manager and Trainer</dd>
+      <dd><ul class="logo">
+        <li><a href="mailto:david.myslil@internetguru.cz" var="inputvar-email@class"><span>david.myslil@internetguru.cz</span></a></li>
+        <li><a href="https://www.linkedin.com/in/david-myslil-18889414" var="inputvar-linkedin@class"><span>linkedin.com/in/david-myslil-18889414</span></a></li>
+      </ul></dd>
+      <dt>Jan Pospíšil</dt>
+      <dd>Accounting</dd>
+      <dd><ul class="logo">
+        <li><a href="mailto:jan.pospisil@internetguru.cz" var="inputvar-email@class"><span>jan.pospisil@internetguru.cz</span></a></li>
+        <li><a href="https://www.linkedin.com/in/jan-pospisil/en" var="inputvar-linkedin@class"><span>linkedin.com/in/jan-pospisil</span></a></li>
+      </ul></dd>
+      <dt>Jiří Pavelka</dt>
+      <dd>Business Owner</dd>
+      <dd><ul class="logo">
+        <li><a href="tel:+420603307905" var="inputvar-phone@class"><span>+420 603 307 905</span></a></li>
+<!--         <li><a href="https://www.facebook.com/jiri.pavelka123" var="inputvar-facebook@class"><span>facebook.com/jiri.pavelka123</span></a></li> -->
+<!--         <li><a href="https://plus.google.com/+JiriPavelka" var="inputvar-google@class"><span>plus.google.com/+JiriPavelka</span></a></li> -->
+<!--         <li><a href="skype:pavelkajiri" var="inputvar-skype@class"><span>pavelkajiri</span></a></li> -->
+        <li><a href="mailto:jiri.pavelka@internetguru.cz" var="inputvar-email@class"><span>jiri.pavelka@internetguru.cz</span></a></li>
+        <li><a href="https://www.linkedin.com/in/jiripavelka/en" var="inputvar-linkedin@class"><span>linkedin.com/in/jiripavelka</span></a></li>
+      </ul></dd>
+    </dl>
+      </div></div>
+  </form>
+
+  <message for="collaboration">
+Name: $name
+E-mail or phone: $mailorphone
+Level: $lvl
+
+Message:
+$msg
+
+--
+Sent from IP address $cms-ip
+$inputvar-service_plain
+  </message>
+  <form id="collaboration">
+    <dl>
+      <dt><label for="name">Name <em>(required)</em></label></dt>
+      <dd><input type="text" pattern=".*\S+.*" id="name" required="required" placeholder="Josef Novák"/></dd>
+      <dt><label for="mailorphone">E-mail or phone number <em>(required)</em></label></dt>
+      <dd><input type="text" id="mailorphone" required="required" placeholder="josef.novak@seznam.cz 604123456"/></dd>
+      <dt><label for="reference">Learned about InternetGuru</label></dt>
+      <dd><input type="text" id="reference" value="personally from " placeholder="personally from…"/></dd>
+      <dt><label for="msg">Message <em>(required)</em></label></dt>
+      <dd><textarea id="msg" required="required">I am interested in mutual cooperation. Please contact me.</textarea></dd>
+      <dt><label for="lvl">My web skills are</label></dt>
+      <dd>
+        <select id="lvl">
+          <option>expert or company</option>
+          <option>advanced</option>
+          <option>beginner</option>
+        </select>
+      </dd>
+      <dt>Sending the form</dt>
+      <dd><input type="submit" id="submit" value="Submit"/></dd>
+    </dl>
+  </form>
+
+</ContactForm>

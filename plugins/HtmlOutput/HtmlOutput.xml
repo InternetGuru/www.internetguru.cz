@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<HtmlOutput>
+  <themes>
+    <theme id="ig">
+      <stylesheet>themes/cms-default.css</stylesheet>
+      <stylesheet media="print">themes/cms-print.css</stylesheet>
+      <stylesheet>lib/opensans/opensans.css</stylesheet>
+      <stylesheet>lib/flaticon/flaticon.css</stylesheet>
+      <stylesheet>lib/font-awesome/css/font-awesome.css</stylesheet>
+      <xslt>themes/lists.xsl</xslt>
+      <xslt>themes/basicLayout.xsl</xslt>
+      <xslt>themes/footer.xsl</xslt>
+      <xslt>themes/ielte7.xsl</xslt>
+      <xslt>themes/adminmenu.xsl</xslt>
+      <xslt>themes/default/messages.xsl</xslt>
+      <stylesheet>themes/basic.css</stylesheet>
+    </theme>
+  </themes>
+  <var id="theme">ig</var>
+  <stylesheet append="head">themes/ig.css</stylesheet>
+  <stylesheet>themes/ig.media.css</stylesheet>
+  <favicon>themes/ig.ico</favicon>
+  <xslt>themes/h1desc.xsl</xslt>
+</HtmlOutput>

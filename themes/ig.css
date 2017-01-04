@@ -1,0 +1,274 @@
+@charset "UTF-8";
+
+a[href] {
+    border-bottom: thin solid;
+}
+a[href] {
+  text-decoration: none;
+  color: #BF342F;
+  border-color: #D37B78;
+}
+
+a:visited {
+  color: #5b0358;
+  border-color: #a277a0;
+}
+
+.hdesc a[href],
+.hdesc a:visited {
+  color: #ffdcce;
+  border-color: #fccfb9;
+}
+
+#contactform-collaboration ul {
+  list-style: none;
+}
+
+#contactform-collaboration ul li {
+  margin-left: 0;
+}
+
+dt {
+  font-weight: 600;
+  /* color: #B92D2D; */
+  /* font-size: 1.2em; */
+  /* font-weight: 100; */
+}
+
+div.list.multiple dtQ {
+  padding: 0 0 0.25em 0;
+  font-size: 1.15em;
+}
+
+h1 {
+  padding: 2rem 1rem 0.5em 1rem;
+  margin: 0;
+}
+
+h2 {
+  /* margin: 1em 0; */
+  font-size: 2em;
+  /* margin-top: 3rem; */
+  /* margin-bottom: 2rem; */
+  /* background: #ffdfc2; */
+  border-bottom: medium solid #e6e6e6;
+  border-bottom: thin solid #999999;
+  padding: 0;
+  padding-bottom: 0.1em;
+  margin: 3rem 1rem 2rem;
+}
+
+h1, h2, h3, h4 {
+  color: #424242;
+  font-weight: normal;
+}
+
+ol.contentlink-bc {
+  list-style: none;
+  padding: 0;
+  margin: 0 auto;
+  padding-left: 1em;
+  padding-left: 1rem;
+  max-width: 61em;
+  max-width: 61rem;
+}
+
+ol.contentlink-bc li {
+  display: inline-block;
+  margin: 0;
+}
+
+ol.contentlink-bc > li+li:before {
+    content: "›";
+    font-size: 2em;
+    font-weight: 100;
+    margin-left: .3em;
+    margin-right: .3em;
+    line-height: 0;
+    vertical-align: -.1em;
+    color: #f9fafa;
+}
+
+ol.contentlink-bc li a {
+  display: inline-block;
+}
+
+ol.contentlink-bc li a:first-child {
+  padding-left: 0;
+}
+
+#content div.hdesc {
+    max-width: 100%;
+    background: red;
+    background-color: rgb(223, 86, 16);
+    background: linear-gradient(135deg,#E27814,#DB310B);
+    color: white;
+}
+
+p.description {
+    padding: 0 1em 2rem 1em;
+    margin: 0;
+}
+
+#header {
+  background-position: 0 0%;
+  background-color: #C84F12;
+  background: linear-gradient(135deg,#B96319,#DB380B);
+  padding: 1em 0;
+}
+
+#header > div {
+  max-width: 100% !important;
+  background-color: rgba(0, 0, 0, 0.1);
+  padding-top: 1em;
+  background: linear-gradient(135deg,#B96319,#DB380B);
+  /* color: white; */
+}
+
+#header > * {
+  max-width: 62em !important;
+  max-width: 62rem !important;
+  box-sizing: border-box;
+  color:  white;
+}
+
+p.description {
+  /* margin-bottom: 1em; */
+}
+
+form#contactform-collaboration:after {
+  content: "";
+  display: block;
+  clear: both;
+  padding: 1em;
+}
+
+ol.contentlink-bc,
+ol.contentlink-bc a {
+    color: #E8E8E8;
+    border-color: #d5ad94;
+}
+
+#pref {
+  min-height: 0.1em;
+  margin-top: 2em;
+  background-position: 0% 100%;
+  background: #252525;
+}
+
+input[type="submit"] {
+  padding: 0.5rem 1rem;
+  background: #DB630B;
+  color: white;
+  font-weight: 600;
+  border: none;
+}
+
+#contactform-tel {
+  margin: 1.5em 0;
+}
+
+#contactform-tel p {
+  margin: 0;
+}
+
+#contactform-tel input {
+  border: 0;
+  padding: 0.7rem 1rem;
+  height: 100%;
+}
+
+#contactform-tel input[type="text"] {
+  /* border-bottom: thin solid #CA7976; */
+  width: 100%;
+  text-align: center;
+  font-size: 1.5em;
+  /* background: #ddd; */
+}
+
+#contactform-tel input[type="text"]::placeholder {
+  color: #6a6a6a;
+}
+
+#contactform-tel input {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+ul.logo {
+  list-style: none;
+}
+ul.logo li {
+  margin-left: 0;
+  border: none;
+}
+ul.logo li a {
+  border-bottom: none;
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+ul.logo li a:before {
+  font-size: 1.5em;
+  width: 1.5em;
+  color: #de540f;
+  flex: 0 0 1.5em;
+}
+a.logo {
+  border-bottom: none;
+  display: inline-block;
+  vertical-align: sub;
+  line-height: 1;
+}
+a object {
+  pointer-events: none;
+  margin: 0;
+}
+ul.logo li a object {
+  max-width: 1.5em;
+  flex: 2em 0 0;
+  margin-right: 0.5em;
+}
+ul.logo li a > span {
+  width: calc(100% - 1.5em);
+  line-height: 1;
+}
+
+#footer {
+  padding: 1em;
+}
+
+#footer,
+#footer a {
+    color: #D5D5D5;
+    border-color: #A5A5A5;
+}
+
+#footer > ul.globalmenu > li a.current {
+  color: #E02000;
+}
+
+@media all and (min-width: 150em) {
+    #pref,
+    #header {
+        background-size: 100%;
+    }
+}
+
+form dd > input[type="text"], form dd > input[type="email"], form dd > textarea, select {
+    border-color: #AAA;
+    box-sizing: border-box;
+}
+
+h1 {
+    /* margin: 0.8em 0; */
+    /* font-size: 2em; */
+}
+
+a#scrolltop {
+    border: none;
+}
+
+h1 {
+    color: #FFFFFF;
+}

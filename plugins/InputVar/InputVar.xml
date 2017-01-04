@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<InputVar>
+
+  <fn id="monthen" fn="replace">
+    <data name="leden">January</data>
+    <data name="únor">February</data>
+    <data name="březen">March</data>
+    <data name="duben">April</data>
+    <data name="květen">May</data>
+    <data name="červen">June</data>
+    <data name="červenec">July</data>
+    <data name="srpen">August</data>
+    <data name="září">September</data>
+    <data name="říjen">October</data>
+    <data name="listopad">November</data>
+    <data name="prosinec">December</data>
+  </fn>
+  <fn id="yearformat" fn="strftime" format="%Y"/>
+  <fn id="tmpdateformat" fn="strftime" format="%B %e, %Y"/>
+  <fn id="dateformat" fn="sequence">
+    <call>tmpdateformat</call>
+    <call>monthen</call>
+  </fn>
+
+  <var id="service_plain">E-Základna, www.e-zakladna.cz</var>
+  <var id="service">Powered by: <a href="https://www.e-zakladna.cz">E-Základna</a></var>
+  <var id="mtime">Edited: <span var="cms-mtime" fn="inputvar-dateformat">n/a</span></var>
+  <var id="ielt7">
+    <div class="ielte7" style="background: yellow; margin: 0; border: 0.3em solid red;">
+      <dl>
+        <dt>You are using outdated browser!</dt>
+        <dd><a href="http://windows.microsoft.com/cs-cz/internet-explorer/download-ie">Update</a> to newer version,</dd>
+        <dd>install <a href="https://www.google.com/chrome">different browser</a> or</dd>
+        <dd>contact your system administrator.</dd>
+      </dl>
+    </div>
+  </var>
+  
+  <var id="linkedin">fa fa-linkedin-square</var>
+  <var id="skype">fa fa-skype</var>
+  <var id="email">fa fa-envelope</var>
+  <var id="facebook">fa fa-facebook-official</var>
+  <var id="github">fa fa-github</var>
+  <var id="google">fa fa-google-plus-square</var>
+  <var id="phone">fa fa-phone-square</var>
+  <var id="twitter">fa fa-twitter-square</var>
+  <var id="map">fa fa-map</var>
+  
+</InputVar>

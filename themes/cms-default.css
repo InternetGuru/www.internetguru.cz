@@ -1,0 +1,339 @@
+html {
+  -webkit-text-size-adjust: none; /* Never autoresize text */
+}
+
+body {
+  word-wrap: break-word;
+}
+
+p {
+  line-height: 1.4;
+}
+
+code, samp {
+  font-family: "Emilbus Mono", "Lucida Console", monospace;
+}
+
+li, dd, dt {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+select,
+input:not([type="radio"]) {
+  font-size: inherit;
+  padding: 0.15em 0.3em;
+}
+
+form dt {
+  /* font-size: 1em; */
+  /* font-size: 1rem; */
+  max-width: 15em;
+  width: 100%;
+  display: inline-block;
+}
+
+form dt, form dd {
+  /* margin: 0.5em 0; */
+  /* margin: 0.5rem 0; */
+}
+
+form dt, form dt+dd {
+  float: none;
+}
+
+form dt, form dt+dd+dd {
+  clear:left;
+}
+
+form dd > input[type="text"],
+form dd > input[type="email"] {
+  border: none;
+  /* background: #EAF2F5; */
+  width: 100%;
+  max-width: 25em;
+  border-bottom: 0.1em solid;
+}
+
+form fieldset {
+  border-top: 0.15em solid rgb(204, 217, 226);
+}
+
+form dd > textarea {
+  width: 100%;
+  max-width: 25em;
+  font: inherit;
+  box-sizing: content-box;
+}
+
+@media screen and (min-width: 32em) {
+  form dd > input[type="text"],
+  form dd > input[type="email"],
+  form dd > textarea {
+    width: 80vw;
+  }
+  form dt, form dt+dd {
+    float: left;
+  }
+}
+
+@media screen {
+form dd {
+    margin-left: 0;
+}
+}
+
+samp, pre, textarea,
+p code, li code, dt code, dd code {
+  border: 0.15em solid #e5e5e5;
+  box-sizing: border-box;
+  background:#f0f0f0;
+  font-size: inherit;
+  color: black;
+  white-space: pre-wrap;
+}
+
+input:not([type='submit']),
+pre, textarea, select {
+  border: 0.1em solid #AAA;
+  padding: 0.2em 0.4em;
+  line-height: 1.5em;
+}
+
+input {
+  vertical-align: middle;
+}
+
+samp, p code, li code, dt code, dd code {
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+}
+
+fieldset {
+  min-width: initial;
+  border: none;
+  margin-top: 1em;
+  margin-bottom: 1em;
+}
+
+fieldset > *:last-child {
+  margin-bottom: 0;
+}
+
+textarea {
+  width: 100%;
+  height: 60%;
+  vertical-align: top;
+  background: none;
+}
+
+ol ol {
+  list-style-type: lower-alpha;
+}
+
+ol.img li, ul.img li {
+  display: inline-block;
+  list-style-type: none;
+}
+
+object {
+  max-width: 100%;
+  width: auto;
+}
+
+p object {
+  display: block;
+  margin: 1em auto;
+}
+
+#messages {
+  background: rgb(37,37,37);
+}
+#messages ul {
+  margin-top: 0;
+  margin-bottom: 0;
+  padding: 1em;
+  padding: 1rem;
+  list-style: none;
+}
+#messages li {
+  margin: 0.5em 0;
+  color: #fff;
+  padding: 0.5em;
+}
+#messages > span,
+#messages a {
+  color: #ccc;
+}
+#messages li.info {
+  background: rgb(0, 66, 131);
+}
+#messages li.warning {
+  background: rgb(166, 120, 0);
+}
+#messages li.error {
+  background: rgb(187, 33, 33);
+}
+#messages li.success {
+  background: rgb(53, 144, 61);
+}
+#messages li a,
+#messages li label {
+  color: white;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#messages.hidden {
+  float: left;
+  background: transparent;
+}
+.warning {
+  border-color: #E78181;
+  background-color: #F99F9F;
+}
+
+.print {
+  display: none;
+}
+
+/**
+ * 1. Set default font family to sans-serif.
+ * 2. Prevent iOS and IE text size adjust after device orientation change,
+ *    without disabling user zoom.
+ */
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit; /* 1 */
+  font: inherit; /* 2 */
+  margin: 0; /* 3 */
+}
+
+/**
+ * Address `overflow` set to `hidden` in IE 8/9/10/11.
+ */
+
+button {
+  overflow: visible;
+}
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Firefox, IE 8/9/10/11, and Opera.
+ * Correct `select` style inheritance in Firefox.
+ */
+
+button,
+select {
+  text-transform: none;
+}
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ */
+
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+  cursor: pointer; /* 3 */
+}
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+
+/**
+ * Remove inner padding and border in Firefox 4+.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+
+/**
+ * Address Firefox 4+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+
+input {
+  line-height: normal;
+}
+
+/**
+ * It's recommended that you don't attempt to style these elements.
+ * Firefox's implementation doesn't respect box-sizing, padding, or width.
+ *
+ * 1. Address box sizing set to `content-box` in IE 8/9/10.
+ * 2. Remove excess padding in IE 8/9/10.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+
+/**
+ * Fix the cursor style for Chrome's increment/decrement buttons. For certain
+ * `font-size` values of the `input`, it causes the cursor style of the
+ * decrement button to change from `default` to `text`.
+ */
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari and Chrome.
+ */
+
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  box-sizing: content-box; /* 2 */
+}
+
+/**
+ * Remove inner padding and search cancel button in Safari and Chrome on OS X.
+ * Safari (but not Chrome) clips the cancel button when the search input has
+ * padding (and `textfield` appearance).
+ */
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/**
+ * Remove default vertical scrollbar in IE 8/9/10/11.
+ */
+
+textarea {
+  overflow: auto;
+}
+
+/**
+ * Don't inherit the `font-weight` (applied by a rule above).
+ * NOTE: the default cannot safely be changed in Chrome and Safari on OS X.
+ */
+
+optgroup {
+  font-weight: bold;
+}
