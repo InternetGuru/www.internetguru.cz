@@ -1,0 +1,6 @@
+*[0-9]
+.*
+/plugins/ValidateForm/
+/plugins/Convertor/
+/plugins/ContactForm/*
+!/plugins/ContactForm/*.xml
