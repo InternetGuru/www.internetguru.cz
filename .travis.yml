@@ -1,0 +1,19 @@
+language: ruby
+dist: trusty
+sudo: false
+
+install: true
+script: true
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: chmod +x ./deploy.sh && ./deploy.sh
+  on:
+    branch: master
+
+env:
+  global:
+    - WEBSITE=www.internetguru.cz
+    - secure: "RCq3I5/1rfYg+oySQ0bNCYXyKAvzcIUYsZ0rtzoQBJ77VoZOi4rd5Li7Jax+vlmJkJw7Tpxwi8uB+oVdLvSFWDMTqqzuT9vQA260uu109wBcIr9H23AkLrBzyyzMvyKlfZisuxvcGU4MfudQTJBJxGH5LJ9G2ja2M86fkESMpoKJ4a/X+zTifgyoP5R3xEmqQPoRNLRcNpqUks0ggPCDzTzIiuuAzgnSeURIyHwi7HEj641Q7T5tknJ03t5KJkYa1IFMDQcRs+uCYVbqUZGd9SwW2iGFnukgPfgZpuYyKx5WbWgkS/qm5c63f+8IX8HmJJWKAS3joXj/tjwqCfB76FdTueM5xRiNEnRoWiiHLKdjKZJeAF42W7bCL510RAIi+UqYuwPT8XmJniXvDL0flrA6Lo42+H/qaYMLfMArhdIqR4EolTOBPuoW52dwcS+hEyvOU3lIe8GwO0zZwrX5ilZTHCuA+0lR7ndr88H9dI+OKuACR0HpA8Z8aTy2S8TT3ftpbVLf8KD0U3YxompxGpAUngohUrB2SBKkkAcEO/uD9ANcLZtuehOO3uWVd4sxm0d2ttTWpx2ZAOGFRCc8xQqiYIJ4pwWid0eX8lLIbZskSarYRaNJ8MJRWz9p8yhgumosXxKggRrHQLO0+X3E4HPJdcFIsT/f/GbvHwHzRxQ="
+    - secure: "NvtG/mFRilpUSn741qoUcTW7BJTJVusaJ/ooWOm3tm/T71XRakAovTduJ/3KBaoDLgw2GnbSmYCdCjA9Ud/stf3cMExA7Ce0+Pt7JkrzaANaaAGrCYGyEUZVngMOBPqXqwjpsE0hIi05M7Kfv55UEhQPgLVxsCQiJJnoquPTuYynM6c5FNf0vuGQSR8f/H/0hhHoYGroLyB82/Je1Q6887h0pwDgsChk46nbHLQkLZBLqBTfxdRd2lb5inGhUYwJik/w58t9SAyEnTIYnhuaV4oj+nJoovJojGt5VyG/+hH+B6Uu7yjShGzOrYRwJzg+WUtmymev3rfit0ZwLXku3dzfhFHU/tXuRTrKnWQtmdLjRRQSIdKcCW0SsQcjae4W55XFOF2uUiWE0YfKQ5lMwzce0Exq0sNMi7ZFNZaT93/fdyxY9jrhjVUvV5dOHAwyyqk4nN1eo1cRUGwMA6E1Upd/ce8tXqA+McgTHv0kwXE4LU8BSNx39vcgvjzTJhFLqnQE06Dd+yj+corC7yhofinY3f4xjZSFnLJO9g/wX2E1KYv0FmwDHVgx59Ng2LLWLKZ7rzRq5V7PPBkgBM6iA2uPlHgkyamHqUBgZ2I/yEGanYiIAZH+QcuaszgNrt1raec4CaiV0JQZJQCaUF0GF1gHtPv1uPM8V73iiYWF4bc=" 
