@@ -79,6 +79,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
    * @param array $libs
    */
   private function addSources(Array $libs) {
+    /** @var HtmlOutput $os */
     $os = Cms::getOutputStrategy();
 
     $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.css");
@@ -108,7 +109,8 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
     $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
 
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/cminit.js", 10, "body");
-    $os->addJsFile($this->pluginDir.'/SyntaxCodeMirror.js', 10, "body");
+    $os->addJsFile($this->pluginDir.'/'.$this->className.'.js', 10, "body");
+    $os->addCssFile($this->pluginDir.'/'.$this->className.'.css');
   }
 
 }
