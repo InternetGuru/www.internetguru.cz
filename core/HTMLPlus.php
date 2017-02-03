@@ -338,7 +338,7 @@ class HTMLPlus extends DOMDocumentPlus {
         case 11: $this->validateFirstHeadingCtime($repair); $i++;
         case 12: $this->validateHid($repair); $i++;
         case 13: $this->validateBodyNs($repair); $i++;
-        case 14: $this->validateDesc(); $i++;
+        case 14: $this->validateDesc($repair); $i++;
         case 15: $this->relaxNGValidatePlus(); $i++;
       }
     } catch(Exception $e) {
@@ -362,7 +362,10 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->errors[] = $message;
   }
 
-  private function validateDesc() {
+  /**
+   * @param bool $repair
+   */
+  private function validateDesc($repair) {
     $invalid = array();
     /** @var DOMElementPlus $h */
     foreach($this->headings as $h) {
@@ -370,12 +373,29 @@ class HTMLPlus extends DOMDocumentPlus {
       if(is_null($desc)
         || $desc->nodeName != "desc"
         || !strlen(trim($desc->nodeValue))) {
-        $invalid[] = $h->getAttribute("id");
+        $invalid[$h->getAttribute('id')] = $h;
       }
     }
     if(empty($invalid)) return;
-    $message = sprintf(_("Heading description missing or empty: %s"), implode(", ", $invalid));
-    $this->errorHandler($message, false);
+    $message = sprintf(_("Heading description missing or empty: %s"), implode(", ", array_keys($invalid)));
+    $this->errorHandler($message, $repair);
+    foreach($invalid as $headingId => $h) {
+      $this->repairDesc($h);
+    }
+  }
+
+  /**
+   * @param DOMElementPlus $h
+   */
+  private function repairDesc(DOMElementPlus $h) {
+    $next = $h->nextElement;
+    if($next->nodeName == 'p') {
+      $next->rename('desc');
+      return;
+    }
+    $desc = new DOMElementPlus('desc');
+    $desc->nodeValue = 'n/a';
+    $h->parentNode->insertBefore($desc, $next);
   }
 
   /**
