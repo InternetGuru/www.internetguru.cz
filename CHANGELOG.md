@@ -6,10 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
- - přidán výchozí formulář `tel` pro rychlý kontakt
+ - Contactform ``tel`` for quick contact.
 
 ### Fixed
- - SyntaxCodeMirror fullscreen overlay scrolltop arrow"
+ - SyntaxCodeMirror fullscreen overlays scrolltop arrow.
 
 ## [2.4.0] - 2016-12-21
 ### Added
