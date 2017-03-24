@@ -8,8 +8,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - Recursive file cache check
 
-## [2.5.1] - 2017-06-11
-
 ## [2.5.1] - 2017-06-08
 ### Fixed
  - Repair link balancing and current menu item https://trello.com/c/qRMfTh8E
@@ -213,7 +211,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [2.5.2]: https://bitbucket.org/igwr/cms/compare/v2.5.2..v2.5.1
-[2.5.1]: https://bitbucket.org/igwr/cms/compare/v2.5.1..v2.5.0
 [2.5.1]: https://bitbucket.org/igwr/cms/compare/v2.5.1..v2.5.0
 [2.5.0]: https://bitbucket.org/igwr/cms/compare/v2.5.0..v2.4.11
 [2.4.11]: https://bitbucket.org/igwr/cms/compare/v2.4.11..v2.4.10
