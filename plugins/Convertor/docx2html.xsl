@@ -281,7 +281,7 @@
               <xsl:when test="count(.//t) = count(.//r/rPr/b[@val = 1])">·
   <xsl:copy-of select="$pIndent"/><dl>·
     <xsl:copy-of select="$pIndent"/><dt>
-                   <xsl:apply-templates select="node()">
+                  <xsl:apply-templates select="node()">
                       <xsl:with-param name="nostrong" select="1"/>
                     </xsl:apply-templates>
                     <!-- <xsl:copy-of select="r/t/text()"/> -->
