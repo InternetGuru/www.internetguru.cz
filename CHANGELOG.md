@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+ - Form input width relative to parent
+
 ## [2.4.2] - 2017-04-08
 ### Security
  - Inactive system version disables QSA
@@ -145,6 +149,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
 [2.4.2]: https://bitbucket.org/igwr/cms/compare/v2.4.2..v2.4.1
 [2.4.1]: https://bitbucket.org/igwr/cms/compare/v2.4.1..v2.4.0
 [2.4.0]: https://bitbucket.org/igwr/cms/compare/v2.4.0..v2.3.8
