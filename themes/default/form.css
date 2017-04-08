@@ -12,6 +12,14 @@ form dt {
   display: inline-block;
 }
 
+form input[type="text"],
+form input[type="email"],
+form dd > textarea,
+form dd {
+  max-width: 24em;
+  width: 100%;
+}
+
 form dt, form dd {
   margin: 0.5rem 0;
 }
@@ -29,8 +37,6 @@ form input[type="email"] {
   border-top: none;
   border-right: none;
   border-left: none;
-  width: 100%;
-  max-width: 25em;
   box-sizing: border-box;
 }
 
@@ -39,18 +45,11 @@ form fieldset {
 }
 
 form dd > textarea {
-  width: 100%;
-  max-width: 25em;
   font: inherit;
   box-sizing: border-box;
 }
 
 @media screen and (min-width: 32em) {
-  form dd > input[type="text"],
-  form dd > input[type="email"],
-  form dd > textarea {
-    width: 80vw;
-  }
   form dt, form dt+dd {
     float: left;
   }
