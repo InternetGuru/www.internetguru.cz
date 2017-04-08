@@ -619,7 +619,7 @@ class HTMLPlus extends DOMDocumentPlus {
       $nextElement = $dt->nextElement;
       if(!is_null($nextElement) && $nextElement->tagName == "dd") continue;
       $this->errorHandler(_("Element dt following sibling must be dd"), $repair);
-      $dt->stripElement(_("Removed element dt missing dd"));
+      $dt->parentNode->insertBefore($dt->ownerDocument->createElement("dd", "n/a"), $nextElement);
     }
   }
 
