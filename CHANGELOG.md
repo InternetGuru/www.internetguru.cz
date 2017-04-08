@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - Contactform `tel` for quick contact
  - Automatic repair creates missing descriptions
  - New variable cms-stage (beta, stable...)
 
