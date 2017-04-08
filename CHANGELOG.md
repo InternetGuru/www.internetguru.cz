@@ -14,6 +14,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - SyntaxCodeMirror fullscreen overlay scrolltop arrow
 
+## [2.4.4] - 2017-04-08
+### Changed
+ - Scrolltop square shape
+
+### Fixed
+ - Scrolltop arrow centered
+
 ## [2.4.3] - 2017-04-08
 ### Fixed
  - Form input width relative to parent
@@ -162,10 +169,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
 =======
 =======
 =======
+=======
+[2.4.4]: https://bitbucket.org/igwr/cms/compare/v2.4.4..v2.4.3
+>>>>>>> hotfix-scrolltop-arrow
 [2.4.3]: https://bitbucket.org/igwr/cms/compare/v2.4.3..v2.4.2
 >>>>>>> hotfix-form-css
 [2.4.2]: https://bitbucket.org/igwr/cms/compare/v2.4.2..v2.4.1
