@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - SyntaxCodeMirror fullscreen overlay scrolltop arrow
 
+## [2.4.3] - 2017-04-08
+### Fixed
+ - Form input width relative to parent
+
 ## [2.4.2] - 2017-04-08
 ### Security
  - Inactive system version disables QSA
@@ -157,9 +161,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
 =======
 =======
+=======
+[2.4.3]: https://bitbucket.org/igwr/cms/compare/v2.4.3..v2.4.2
+>>>>>>> hotfix-form-css
 [2.4.2]: https://bitbucket.org/igwr/cms/compare/v2.4.2..v2.4.1
 >>>>>>> hotfix-inactive-cms-disable-get
 [2.4.1]: https://bitbucket.org/igwr/cms/compare/v2.4.1..v2.4.0
