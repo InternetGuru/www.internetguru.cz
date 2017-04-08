@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-08 13:27+0200\n"
-"PO-Revision-Date: 2017-04-08 13:27+0200\n"
+"POT-Creation-Date: 2017-04-08 20:57+0200\n"
+"PO-Revision-Date: 2017-04-08 20:57+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -558,29 +558,41 @@ msgstr "Argument[%s] chybí nebo je prázdný"
 msgid "Unsupported request"
 msgstr "Nepodporovaný požadavek"
 
-#: index.php:26
-#, php-format
-msgid "%s disallowed on inactive CMS version"
-msgstr "Neaktivní verze CMS neumožňuje %s"
+#: index.php:18
+msgid "Query string"
+msgstr "Formulářová data (query string)"
 
-#: index.php:36
+#: index.php:22
+msgid "POST request"
+msgstr "Požadavek POST"
+
+#: index.php:26
+msgid "Login"
+msgstr "Přihlášení"
+
+#: index.php:30
+#, php-format
+msgid "Not supported by inactive system version: %s"
+msgstr "Nepodporováno neaktivní verzí systému: %s"
+
+#: index.php:40
 msgid "Invalid session cookies removed"
 msgstr "Odstraněna neplatná proměnná session z cookies"
 
-#: index.php:47
+#: index.php:51
 msgid "Cache successfully purged"
 msgstr "Mezipaměť (cache) byla úspěšně vymazána"
 
-#: index.php:88
+#: index.php:92
 msgid "Server cache (nginx) is outdated"
 msgstr "Mezipaměť serveru (nginx cache) je zastaralá"
 
-#: index.php:99
+#: index.php:103
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: index.php:100
+#: index.php:104
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -1268,6 +1280,9 @@ msgstr "Hodnota položky neodpovídá požadovanému formátu"
 #: plugins/ValidateForm/ValidateForm.php:351
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
+
+#~ msgid "%s disallowed on inactive CMS version"
+#~ msgstr "Nepodporováno neaktivní verzí systému: %s"
 
 #~ msgid "Maximum length exceeded (%s of %s)"
 #~ msgstr "Překročena maximální délka (%s z %s)"

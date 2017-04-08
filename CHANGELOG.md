@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - SyntaxCodeMirror fullscreen overlay scrolltop arrow
 
+## [2.4.2] - 2017-04-08
+### Security
+ - Inactive system version disables QSA
+
 ## [2.4.1] - 2017-04-08
 ### Fixed
  - Limit maximum length of form inputs
@@ -152,8 +156,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
 =======
+=======
+[2.4.2]: https://bitbucket.org/igwr/cms/compare/v2.4.2..v2.4.1
+>>>>>>> hotfix-inactive-cms-disable-get
 [2.4.1]: https://bitbucket.org/igwr/cms/compare/v2.4.1..v2.4.0
 >>>>>>> ad5f9d1e978efe78d66904ed6f40759a6dd40722
 [2.4.0]: https://bitbucket.org/igwr/cms/compare/v2.4.0..v2.3.8
