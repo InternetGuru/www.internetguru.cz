@@ -48,6 +48,7 @@
             }
           }, 50);
         };
+        win.onload = win.onscroll;
       },
       createButton = function() {
         button = document.createElement("a");
