@@ -6,7 +6,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
- - SyntaxCodeMirror fullscreen overlay scrolltop arrow"
+ - SyntaxCodeMirror fullscreen overlay scrolltop arrow
+
+## [2.4.1] - 2017-04-08
+### Fixed
+ - Limit maximum length of form inputs
 
 ## [2.4.0] - 2016-12-21
 ### Added
@@ -141,7 +145,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+<<<<<<< HEAD
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
+=======
+[2.4.1]: https://bitbucket.org/igwr/cms/compare/v2.4.1..v2.4.0
+>>>>>>> ad5f9d1e978efe78d66904ed6f40759a6dd40722
 [2.4.0]: https://bitbucket.org/igwr/cms/compare/v2.4.0..v2.3.8
 [2.3.4]: https://bitbucket.org/igwr/cms/compare/v2.3.4..v2.3.3
 [2.3.3]: https://bitbucket.org/igwr/cms/compare/v2.3.3..v2.3.2
