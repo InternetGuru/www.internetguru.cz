@@ -93,6 +93,7 @@ class Cms {
     self::setVariable("version", CMS_VERSION);
     self::setVariable("default_release", DEFAULT_RELEASE);
     self::setVariable("name", CMS_NAME);
+    self::setVariable("stage", CMS_STAGE);
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
