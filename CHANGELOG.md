@@ -5,6 +5,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+### Added
+ - New variable cms-stage (beta, stable...)
+
+### Changed
+ - CMS name format shows cms stage, e. g. `IGCMS 2.1.1-stable-debug`
+
 ### Fixed
  - SyntaxCodeMirror fullscreen overlay scrolltop arrow
 
