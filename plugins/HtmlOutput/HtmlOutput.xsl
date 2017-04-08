@@ -26,14 +26,12 @@
     </xsl:element>
   </xsl:template>
 
-  <xsl:template match="//desc[string-length(text()) > 0]">
+  <xsl:template match="//desc">
       <p class="description">
       <xsl:copy-of select="@*[name() != 'kw']"/>
         <xsl:apply-templates/>
       </p>
   </xsl:template>
-
-  <xsl:template match="//desc[string-length(text()) = 0]"/>
 
   <xsl:template match="//ul[contains(@class,'contentbalancer')]">
     <xsl:element name="div">

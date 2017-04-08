@@ -14,16 +14,20 @@ try {
   if(!Cms::isActive()) {
     $error = null;
     $errno = 0;
+    if (count($_GET) > 1) {
+      $error = _("Query string");
+      $errno = 403;
+    }
     if (!empty($_POST)) {
-      $error = "POST";
+      $error = _("POST request");
       $errno = 405;
     }
     if(!is_null(Cms::getLoggedUser())) {
-      $error = "Login";
+      $error = _("Login");
       $errno = 403;
     }
     if(!is_null($error))
-      new ErrorPage(sprintf(_("%s disallowed on inactive CMS version"), $error), $errno);
+      new ErrorPage(sprintf(_("Not supported by inactive system version: %s"), $error), $errno);
   }
 
   // prevent unauthorized no-cached requests
