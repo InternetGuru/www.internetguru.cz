@@ -47,7 +47,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
   /**
    * @var int Default textarea max-length
    */
-  const TEXTAREA_MAX_LEN = 512;
+  const TEXTAREA_MAX_LEN = 1024;
 
   /**
    * ValidateForm constructor.
@@ -323,13 +323,13 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
    */
   private function verifyText($value, $pattern, $required, $maxlen) {
     if(is_null($value)) throw new Exception(_("Value missing"));
-    $length = strlen(trim($value));
+    $length = mb_strlen(trim($value), "UTF-8");
     if(!$length) {
       if(!$required) return;
       throw new Exception(_("Item is required"));
     }
     if($length > $maxlen) {
-      throw new Exception(_("Maximum value length exceeded"));
+      throw new Exception(sprintf(_("Maximal number of characters exceeded (%s of %s)"), $length, $maxlen));
     }
     if(!strlen($pattern)) return;
     $res = @preg_match("/^(?:$pattern)$/", $value);
