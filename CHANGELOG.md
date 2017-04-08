@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Changed
+ - Create missing dd instead of deleting dt
+
 ## [2.4.5] - 2017-04-08
 ### Fixed
  - Display scrolltop arrow onload if page loads scrolled
@@ -160,6 +164,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
 [2.4.5]: https://bitbucket.org/igwr/cms/compare/v2.4.5..v2.4.4
 [2.4.4]: https://bitbucket.org/igwr/cms/compare/v2.4.4..v2.4.3
 [2.4.3]: https://bitbucket.org/igwr/cms/compare/v2.4.3..v2.4.2
