@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - Automatic repair creates missing descriptions
  - New variable cms-stage (beta, stable...)
 
 ### Changed
@@ -170,27 +171,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
-=======
-=======
-=======
-=======
-=======
 [2.4.5]: https://bitbucket.org/igwr/cms/compare/v2.4.5..v2.4.4
->>>>>>> hotfix-scrolltop-onload
 [2.4.4]: https://bitbucket.org/igwr/cms/compare/v2.4.4..v2.4.3
->>>>>>> hotfix-scrolltop-arrow
 [2.4.3]: https://bitbucket.org/igwr/cms/compare/v2.4.3..v2.4.2
->>>>>>> hotfix-form-css
 [2.4.2]: https://bitbucket.org/igwr/cms/compare/v2.4.2..v2.4.1
->>>>>>> hotfix-inactive-cms-disable-get
 [2.4.1]: https://bitbucket.org/igwr/cms/compare/v2.4.1..v2.4.0
->>>>>>> ad5f9d1e978efe78d66904ed6f40759a6dd40722
 [2.4.0]: https://bitbucket.org/igwr/cms/compare/v2.4.0..v2.3.8
 [2.3.4]: https://bitbucket.org/igwr/cms/compare/v2.3.4..v2.3.3
 [2.3.3]: https://bitbucket.org/igwr/cms/compare/v2.3.3..v2.3.2
