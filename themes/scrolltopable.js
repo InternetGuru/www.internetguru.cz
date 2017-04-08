@@ -73,9 +73,27 @@
         init : function(cfg) {
           IGCMS.initCfg(Config, cfg);
           var css = '/* scrolltopable.js */'
-          + 'a#' + Config.wrapperId + ' { font-family: "Times new roman", serif; position: fixed; right: 0; bottom: 0; text-decoration: none; background: rgba(0, 0, 0, 0.45); padding: 0.5em; font-size: 1.75rem; margin: 0.75rem; display: block; color: white; width: 1em; text-align: center; height: 1em; border-radius: 1em; z-index: 100; cursor: pointer }'
+          + 'a#' + Config.wrapperId + ' { '
+          + '  font-family: "Times new roman", serif;'
+          + '  position: fixed;'
+          + '  right: 0;'
+          + '  bottom: 0;'
+          + '  text-decoration: none;'
+          + '  background: rgba(0, 0, 0, 0.45);'
+          + '  padding: 0.4em;'
+          + '  font-size: 1.75rem;'
+          + '  margin: 0.75rem;'
+          + '  display: block;'
+          + '  color: white;'
+          + '  width: 1em;'
+          + '  text-align: center;'
+          + '  height: 1em;'
+          + '  z-index: 100;'
+          + '  cursor: pointer;'
+          + '  line-height: 1;'
+          + '}'
           + 'a#' + Config.wrapperId + ':hover { background: rgba(0, 0, 0, 0.65) }'
-          + 'a#' + Config.wrapperId + ' span { position: relative; top: -0.05em; font-size: 2.3rem; }'
+          + 'a#' + Config.wrapperId + ' span { font-size: 2.3rem; }'
           + 'a#' + Config.wrapperId + '.' + Config.scrollhideClass + ' { display: none; }';
           IGCMS.appendStyle(css);
           setScrollEvent();
