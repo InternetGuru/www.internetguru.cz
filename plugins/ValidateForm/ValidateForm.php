@@ -40,6 +40,16 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
   const WAIT = 120;
 
   /**
+   * @var int Default input max-length
+   */
+  const INPUT_MAX_LEN = 128;
+
+  /**
+   * @var int Default textarea max-length
+   */
+  const TEXTAREA_MAX_LEN = 512;
+
+  /**
    * ValidateForm constructor.
    * @param Plugins|SplSubject $s
    */
@@ -244,12 +254,12 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     $req = $e->hasAttribute("required");
     switch($e->nodeName) {
       case "textarea":
-      $this->verifyText($value, $pattern, $req);
+      $this->verifyText($value, $pattern, $req, self::TEXTAREA_MAX_LEN);
       break;
       case "input":
       switch($e->getAttribute("type")) {
         case "number":
-        $this->verifyText($value, $pattern, $req);
+        $this->verifyText($value, $pattern, $req, self::INPUT_MAX_LEN);
         $min = $e->getAttribute("min");
         $max = $e->getAttribute("max");
         $this->verifyNumber($value, $min, $max);
@@ -258,7 +268,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
         if(!strlen($pattern)) $pattern = EMAIL_PATTERN;
         case "text":
         case "search":
-        $this->verifyText($value, $pattern, $req);
+        $this->verifyText($value, $pattern, $req, self::INPUT_MAX_LEN);
         break;
         case "checkbox":
         case "radio":
@@ -272,7 +282,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
         $this->verifySelect($e, $value);
       } catch (Exception $ex) {
         if(!strlen($pattern)) throw $ex;
-        $this->verifyText($value, $pattern, $req);
+        $this->verifyText($value, $pattern, $req, self::INPUT_MAX_LEN);
       }
       break;
     }
@@ -308,13 +318,18 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
    * @param mixed $value
    * @param string $pattern
    * @param bool $required
+   * @param string $maxlen
    * @throws Exception
    */
-  private function verifyText($value, $pattern, $required) {
+  private function verifyText($value, $pattern, $required, $maxlen) {
     if(is_null($value)) throw new Exception(_("Value missing"));
-    if(!strlen(trim($value))) {
+    $length = strlen(trim($value));
+    if(!$length) {
       if(!$required) return;
       throw new Exception(_("Item is required"));
+    }
+    if($length > $maxlen) {
+      throw new Exception(_("Maximum value length exceeded"));
     }
     if(!strlen($pattern)) return;
     $res = @preg_match("/^(?:$pattern)$/", $value);
