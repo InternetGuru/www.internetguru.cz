@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - SyntaxCodeMirror fullscreen overlay scrolltop arrow
 
+## [2.4.6] - 2017-04-08
+### Changed
+ - Create missing dd instead of deleting dt
+
 ## [2.4.5] - 2017-04-08
 ### Fixed
  - Display scrolltop arrow onload if page loads scrolled
@@ -173,6 +177,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
+[2.4.6]: https://bitbucket.org/igwr/cms/compare/v2.4.6..v2.4.5
 [2.4.5]: https://bitbucket.org/igwr/cms/compare/v2.4.5..v2.4.4
 [2.4.4]: https://bitbucket.org/igwr/cms/compare/v2.4.4..v2.4.3
 [2.4.3]: https://bitbucket.org/igwr/cms/compare/v2.4.3..v2.4.2
