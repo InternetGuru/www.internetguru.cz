@@ -35,7 +35,7 @@ define('PAGESPEED_PARAM', "PageSpeed");
 define('PAGESPEED_OFF', "off");
 define('DEBUG_PARAM', "Debug");
 define('DEBUG_ON', "on");
-define("FORBIDDEN_FILE", "FORBIDDEN");
+define("PROTECTED_FILE", "PROTECTED");
 define("ADMIN_ROOT_DIR", "admin");
 define("USER_ROOT_DIR", "user");
 define("FILE_LOCK_WAIT_SEC", 4);
