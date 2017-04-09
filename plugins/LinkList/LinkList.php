@@ -65,8 +65,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
       $a->nodeValue = $count;
       $a->setAttribute("class", "{$this->cssClass}-href print");
       $a->setAttribute("href", "#{$this->cssClass}-$count");
-      if(!is_null($l->nextSibling)) $l->parentNode->insertBefore($a, $l->nextSibling);
-      else $l->parentNode->appendChild($a);
+      $l->parentNode->insertBefore($a, $l->nextSibling);
       $count++;
     }
     if($count == 1) return;
