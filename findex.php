@@ -16,7 +16,7 @@ try {
     if(!$pluginClass::isSupportedRequest()) continue;
     $pluginClass::handleRequest();
   }
-  throw new Exception(_("Unsupported request"), 415);
+  throw new Exception(_("File not found"), 404);
 
 } catch(Exception $e) {
 
