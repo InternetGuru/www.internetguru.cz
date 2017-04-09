@@ -10,12 +10,12 @@ interface ResourceInterface {
    * @param string|null $filePath
    * @return bool
    */
-  public static function isSupportedRequest($filePath=null);
+  public static function isSupportedRequest ($filePath = null);
 
   /**
    * @return void
    */
-  public static function handleRequest();
+  public static function handleRequest ();
 }
 
 ?>
