@@ -10,7 +10,7 @@ interface ModifyContentStrategyInterface {
   /**
    * @param HTMLPlus $content
    */
-  public function modifyContent(HTMLPlus $content);
+  public function modifyContent (HTMLPlus $content);
 }
 
 ?>

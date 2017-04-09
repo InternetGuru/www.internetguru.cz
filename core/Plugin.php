@@ -12,11 +12,11 @@ class Plugin {
   /**
    * @var array
    */
-  private static $xml = array();
+  private static $xml = [];
   /**
    * @var array
    */
-  private static $html = array();
+  private static $html = [];
   /**
    * @var Plugins|SplSubject
    */
@@ -34,16 +34,56 @@ class Plugin {
    * Plugin constructor.
    * @param SplSubject $s
    */
-  public function __construct(SplSubject $s) {
+  public function __construct (SplSubject $s) {
     $this->subject = $s;
     $this->className = (new \ReflectionClass($this))->getShortName();
     $this->pluginDir = PLUGINS_DIR."/".$this->className;
   }
 
   /**
+   * @param string|null $fileName
+   * @return HTMLPlus
+   */
+  public static function getHTMLPlus ($fileName = null) {
+    if (array_key_exists($fileName, self::$html)) {
+      return self::$html[$fileName];
+    }
+    $pluginName = self::getCallerName();
+    if (is_null($fileName)) {
+      $fileName = "$pluginName.html";
+    }
+    self::$html[$fileName] = HTMLPlusBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    return self::$html[$fileName];
+  }
+
+  /**
+   * @return string
+   */
+  private static function getCallerName () {
+    $backtrace = debug_backtrace();
+    return basename(dirname($backtrace[1]["file"]));
+  }
+
+  /**
+   * @param string|null $fileName
+   * @return DOMDocumentPlus
+   */
+  public static function getXML ($fileName = null) {
+    if (array_key_exists($fileName, self::$xml)) {
+      return self::$xml[$fileName];
+    }
+    $pluginName = self::getCallerName();
+    if (is_null($fileName)) {
+      $fileName = "$pluginName.xml";
+    }
+    self::$xml[$fileName] = XMLBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    return self::$xml[$fileName];
+  }
+
+  /**
    * @return bool
    */
-  public function isDebug() {
+  public function isDebug () {
     return defined('static::DEBUG') ? static::DEBUG : false;
   }
 
@@ -51,11 +91,15 @@ class Plugin {
    * @param string $pluginName
    * @return bool
    */
-  protected function detachIfNotAttached($pluginName) {
-    if(!is_array($pluginName)) $pluginName = array($pluginName);
-    foreach($pluginName as $p) {
+  protected function detachIfNotAttached ($pluginName) {
+    if (!is_array($pluginName)) {
+      $pluginName = [$pluginName];
+    }
+    foreach ($pluginName as $p) {
       global $plugins;
-      if($plugins->isAttachedPlugin($p)) continue;
+      if ($plugins->isAttachedPlugin($p)) {
+        continue;
+      }
       $this->subject->detach($p);
       Logger::user_warning(sprintf(_("Detaching '%s' due to '%s' dependency"), get_class($this), $p));
       return true;
@@ -63,41 +107,11 @@ class Plugin {
     return false;
   }
 
-  protected function requireActiveCms() {
-    if(Cms::isActive()) return;
+  protected function requireActiveCms () {
+    if (Cms::isActive()) {
+      return;
+    }
     new ErrorPage(sprintf(_("Active CMS version required for plugin %s"), get_class($this)), 403);
-  }
-
-  /**
-   * @return string
-   */
-  private static function getCallerName() {
-    $backtrace = debug_backtrace();
-    return basename(dirname($backtrace[1]["file"]));
-  }
-
-  /**
-   * @param string|null $fileName
-   * @return HTMLPlus
-   */
-  public static function getHTMLPlus($fileName=null) {
-    if(array_key_exists($fileName, self::$html)) return self::$html[$fileName];
-    $pluginName = self::getCallerName();
-    if(is_null($fileName)) $fileName = "$pluginName.html";
-    self::$html[$fileName] = HTMLPlusBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
-    return self::$html[$fileName];
-  }
-
-  /**
-   * @param string|null $fileName
-   * @return DOMDocumentPlus
-   */
-  public static function getXML($fileName=null) {
-    if(array_key_exists($fileName, self::$xml)) return self::$xml[$fileName];
-    $pluginName = self::getCallerName();
-    if(is_null($fileName)) $fileName = "$pluginName.xml";
-    self::$xml[$fileName] = XMLBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
-    return self::$xml[$fileName];
   }
 
 }
