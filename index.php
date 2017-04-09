@@ -49,8 +49,8 @@ try {
   if (!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) {
     touch(".".DEBUG_FILE);
   }
-  if (!file_exists(FORBIDDEN_FILE) && !file_exists(".".FORBIDDEN_FILE)) {
-    touch(FORBIDDEN_FILE);
+  if (!file_exists(PROTECTED_FILE) && !file_exists(".".PROTECTED_FILE)) {
+    touch(PROTECTED_FILE);
   }
   Cms::checkAuth();
   if (Cms::isSuperUser()) {

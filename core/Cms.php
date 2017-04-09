@@ -358,7 +358,7 @@ class Cms {
       self::setLoggedUser($loggedUser);
       return;
     }
-    if (!file_exists(FORBIDDEN_FILE) && SCRIPT_NAME == "index.php") {
+    if (!file_exists(PROTECTED_FILE) && SCRIPT_NAME == "index.php") {
       return;
     }
     loginRedir();
