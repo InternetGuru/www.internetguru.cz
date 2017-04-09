@@ -5,5 +5,5 @@
 *.old
 tests/_output/*
 vendor/*
-!/.gitignore
-!/.idea/codeStyleSettings.xml
+!.gitignore
+!.idea/codeStyleSettings.xml
