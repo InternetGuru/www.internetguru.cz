@@ -7,10 +7,10 @@ namespace IGCMS\Core;
  */
 interface ResourceInterface {
   /**
-   * @param string|null $filePath
+   * @param string $filePath
    * @return bool
    */
-  public static function isSupportedRequest ($filePath = null);
+  public static function isSupportedRequest ($filePath);
 
   /**
    * @return void

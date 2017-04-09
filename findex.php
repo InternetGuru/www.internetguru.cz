@@ -20,7 +20,7 @@ try {
       continue;
     }
     /** @var $pluginClass \IGCMS\Core\ResourceInterface */
-    if (!$pluginClass::isSupportedRequest()) {
+    if (!$pluginClass::isSupportedRequest(getCurLink())) {
       continue;
     }
     $pluginClass::handleRequest();

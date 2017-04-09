@@ -85,14 +85,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     $this->deleteCache = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE;
   }
 
-  /**
-   * @param string|null $filePath
-   * @return bool
-   */
-  public static function isSupportedRequest ($filePath = null) {
-    if (is_null($filePath)) {
-      $filePath = getCurLink();
-    }
+  public static function isSupportedRequest ($filePath) {
     $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
     foreach (self::$legalMime as $extensions) {
       if (in_array($ext, $extensions)) {
@@ -102,9 +95,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return false;
   }
 
-  /**
-   * @throws Exception
-   */
   public static function handleRequest () {
     try {
       $dest = getCurLink();

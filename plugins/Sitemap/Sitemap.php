@@ -49,6 +49,13 @@ class Sitemap extends Plugin implements SplObserver {
       Logger::warning(_("Clear server cache to update sitemap"));
       return;
     }
+    $this->createSitemap();
+  }
+
+  /**
+   * Create sitemap file and touch newest filemtime
+   */
+  private static function createSitemap () {
     try {
       $cfg = self::getXML();
       $links = self::getLinks();
@@ -61,7 +68,7 @@ class Sitemap extends Plugin implements SplObserver {
         $cfgLinks[$link]["lastmod"] = $links[$link];
       }
       $cfgDefaults = self::getConfigDefaults($cfg);
-      $sitemap = self::createSitemap($links, $cfgLinks, $cfgDefaults);
+      $sitemap = self::generateSitemap($links, $cfgLinks, $cfgDefaults);
       $sitemap->save(self::SITEMAP);
       touch(self::SITEMAP, HTMLPlusBuilder::getNewestFileMtime());
       Logger::info(_("Sitemap updated"));
@@ -136,7 +143,7 @@ class Sitemap extends Plugin implements SplObserver {
    * @return DOMDocumentPlus
    * @throws Exception
    */
-  private static function createSitemap (Array $links, Array $cfgLinks, Array $cfgDefaults) {
+  private static function generateSitemap (Array $links, Array $cfgLinks, Array $cfgDefaults) {
     $sitemap = new DOMDocumentPlus();
     $sitemap->formatOutput = true;
     $urlset = $sitemap->createElement("urlset");
