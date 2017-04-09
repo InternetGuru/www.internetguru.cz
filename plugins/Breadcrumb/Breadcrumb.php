@@ -7,7 +7,6 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\TitleStrategyInterface;
@@ -22,7 +21,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
   /**
    * @var array
    */
-  private $vars = array();
+  private $vars = [];
   /**
    * @var string|null
    */
@@ -31,32 +30,31 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
   /**
    * @param Plugins|SplSubject $subject
    */
-  public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_POSTPROCESS) return;
-    foreach($this->getXML()->documentElement->childElementsArray as $e) {
-      if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
+  public function update (SplSubject $subject) {
+    if ($subject->getStatus() != STATUS_POSTPROCESS) {
+      return;
+    }
+    foreach ($this->getXML()->documentElement->childElementsArray as $e) {
+      if ($e->nodeName != "var" || !$e->hasAttribute("id")) {
+        continue;
+      }
       $this->vars[$e->getAttribute("id")] = $e;
     }
     $this->generateBc();
   }
 
   /**
-   * @return string|null
-   */
-  public function getTitle() {
-    return $this->title;
-  }
-
-  /**
    * @throws Exception
    */
-  private function generateBc() {
+  private function generateBc () {
     #var_dump(HTMLPlusBuilder::getLinkToId());
     $parentId = HTMLPlusBuilder::getLinkToId(getCurLink());
-    if(is_null($parentId)) throw new Exception(sprintf(_("Link %s not found"), getCurLink()));
+    if (is_null($parentId)) {
+      throw new Exception(sprintf(_("Link %s not found"), getCurLink()));
+    }
     $bcLang = HTMLPlusBuilder::getIdToLang($parentId);
-    $path = array();
-    while(!is_null($parentId)) {
+    $path = [];
+    while (!is_null($parentId)) {
       $path[] = $parentId;
       $parentId = HTMLPlusBuilder::getIdToParentId($parentId);
     }
@@ -67,22 +65,25 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
     $root->appendChild($ol);
     $ol->setAttribute("class", "contentlink-bc"); // TODO: rename
     $ol->setAttribute("lang", $bcLang);
-    $title = array();
+    $title = [];
     $id = $a = null;
-    foreach(array_reverse($path) as $id) {
+    foreach (array_reverse($path) as $id) {
       $li = $bc->createElement("li");
       $ol->appendChild($li);
       $lang = HTMLPlusBuilder::getIdToLang($id);
-      if($lang != $bcLang) $li->setAttribute("lang", $lang);
+      if ($lang != $bcLang) {
+        $li->setAttribute("lang", $lang);
+      }
       $a = $bc->createElement("a");
       $li->appendChild($a);
       $a->setAttribute("href", $id);
       $values = HTMLPlusBuilder::getHeadingValues($id, !strlen(getCurLink()));
       $aValue = $values[0];
-      if(empty($title) && array_key_exists("logo", $this->vars)) {
+      if (empty($title) && array_key_exists("logo", $this->vars)) {
         $this->insertLogo($this->vars["logo"], $a, $id);
-        if(!strlen(getCurLink()))
+        if (!strlen(getCurLink())) {
           $a->parentNode->appendChild($bc->createElement("span", $aValue));
+        }
       } else {
         $a->nodeValue = $aValue;
       }
@@ -93,7 +94,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
     $title[] = HTMLPlusBuilder::getIdToHeading($id);
     $pLink["path"] = HTMLPlusBuilder::getIdToLink($a->getAttribute("href"));
     addPermParams($pLink);
-    if(implodeLink($pLink) != getCurLink(true)) {
+    if (implodeLink($pLink) != getCurLink(true)) {
       $a->setAttribute("title", $this->vars["reset"]->nodeValue);
     }
     $this->title = implode(" - ", array_reverse($title));
@@ -105,13 +106,20 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
    * @param DOMElementPlus $a
    * @param string $id
    */
-  private function insertLogo(DOMElementPlus $logo, DOMElementPlus $a, $id) {
+  private function insertLogo (DOMElementPlus $logo, DOMElementPlus $a, $id) {
     $doc = $a->ownerDocument;
     $img = $doc->createElement("img");
     $img->setAttribute("alt", HTMLPlusBuilder::getIdToHeading($id));
     $img->setAttribute("src", $logo->nodeValue);
     $a->addClass("logo");
     $a->appendChild($img);
+  }
+
+  /**
+   * @return string|null
+   */
+  public function getTitle () {
+    return $this->title;
   }
 
 }

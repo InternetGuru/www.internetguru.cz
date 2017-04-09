@@ -35,7 +35,10 @@ define("FORBIDDEN_FILE", "FORBIDDEN");
 define("ADMIN_ROOT_DIR", "admin");
 define("USER_ROOT_DIR", "user");
 define("FILE_LOCK_WAIT_SEC", 4);
-define('W3C_DATETIME_PATTERN', '(19|20)\d\d(-(0[1-9]|1[012])(-(0[1-9]|[12]\d|3[01])(T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00)?)?)?');
+define(
+  'W3C_DATETIME_PATTERN',
+  '(19|20)\d\d(-(0[1-9]|1[012])(-(0[1-9]|[12]\d|3[01])(T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00)?)?)?'
+);
 define('EMAIL_PATTERN', '([_a-zA-Z0-9-]+(?:\.[_a-zA-Z0-9-]+)*)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)\.([a-zA-Z]{2,})');
 define('SUBDOM_PATTERN', '[a-z][a-z0-9]*');
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z0-9_-]+');
@@ -50,8 +53,8 @@ define('STATUS_POSTPROCESS', 'postprocess');
 define('APC_PREFIX', 2); // change if APC structure changes
 define('HOST', basename(getcwd()));
 $hostArr = explode(".", HOST);
-define('DOMAIN', $hostArr[count($hostArr)-2].".".$hostArr[count($hostArr)-1]);
-define('CURRENT_SUBDOM', substr(HOST, 0, -(strlen(DOMAIN)+1)));
+define('DOMAIN', $hostArr[count($hostArr) - 2].".".$hostArr[count($hostArr) - 1]);
+define('CURRENT_SUBDOM', substr(HOST, 0, -(strlen(DOMAIN) + 1)));
 define('ROOT_URL', "/");
 define('CMS_RELEASE', basename(dirname(__FILE__)));
 define("WWW_FOLDER", "/var/www");
@@ -85,7 +88,7 @@ define('CMS_NAME', "IGCMS ".CMS_VERSION."-".CMS_STAGE.(CMS_DEBUG ? "-debug" : ""
 date_default_timezone_set("Europe/Prague");
 #todo: localize lang
 
-if(CMS_DEBUG) {
+if (CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
   setlocale(LC_ALL, "en_US.UTF-8");
@@ -99,11 +102,16 @@ if(CMS_DEBUG) {
 }
 
 define('METHOD_NA', _("Method %s is no longer available"));
-if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
+if (is_null(ADMIN_ID)) {
+  die(_("Domain is ready to be acquired"));
+}
 require_once(CORE_FOLDER.'/globals.php');
-if(isset($_GET["login"]) && SCHEME == "http") loginRedir();
-if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
-  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)) {
+if (isset($_GET["login"]) && SCHEME == "http") {
+  loginRedir();
+}
+if (update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
+  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)
+) {
   redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
 initDirs();

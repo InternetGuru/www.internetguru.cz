@@ -18,13 +18,13 @@ class GlobalMenu extends Plugin implements SplObserver {
   /**
    * @var array
    */
-  private $vars = array();
+  private $vars = [];
 
   /**
    * GlobalMenu constructor.
    * @param Plugins|SplSubject $s
    */
-  public function __construct(SplSubject $s) {
+  public function __construct (SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 5);
   }
@@ -32,33 +32,39 @@ class GlobalMenu extends Plugin implements SplObserver {
   /**
    * @param Plugins|SplSubject $subject
    */
-  public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_PROCESS) return;
-    foreach($this->getXML()->documentElement->childElementsArray as $e) {
-      if($e->nodeName != "var" || !$e->hasAttribute("id")) continue;
+  public function update (SplSubject $subject) {
+    if ($subject->getStatus() != STATUS_PROCESS) {
+      return;
+    }
+    foreach ($this->getXML()->documentElement->childElementsArray as $e) {
+      if ($e->nodeName != "var" || !$e->hasAttribute("id")) {
+        continue;
+      }
       $this->vars[$e->getAttribute("id")] = $e;
     }
     $this->generateMenu();
   }
 
-  private function generateMenu() {
+  private function generateMenu () {
     $menu = new DOMDocumentPlus();
     $root = $menu->createElement("root");
     $menu->appendChild($root);
     $curLink = getCurLink();
-    $idToLi = array();
-    $idToLevel = array();
-    foreach(HTMLPlusBuilder::getIdToFile() as $id => $file) {
-      if($file != INDEX_HTML) break;
+    $idToLi = [];
+    $idToLevel = [];
+    foreach (HTMLPlusBuilder::getIdToFile() as $id => $file) {
+      if ($file != INDEX_HTML) {
+        break;
+      }
       $parentId = HTMLPlusBuilder::getIdToParentId($id);
-      if(is_null($parentId)) {
+      if (is_null($parentId)) {
         $idToLi[$id] = $root;
         $idToLevel[$id] = 0;
         continue;
       }
       $values = HTMLPlusBuilder::getHeadingValues($id);
       $parentUl = $idToLi[$parentId]->lastElement;
-      if(is_null($parentUl) || $parentUl->nodeName != "ul") {
+      if (is_null($parentUl) || $parentUl->nodeName != "ul") {
         $parentUl = $menu->createElement("ul");
         $idToLi[$parentId]->appendChild($parentUl);
       }
@@ -67,26 +73,36 @@ class GlobalMenu extends Plugin implements SplObserver {
       $a = $menu->createElement("a", $values[0]);
       $li->appendChild($a);
       $link = HTMLPlusBuilder::getIdToLink($id);
-      if($link == $curLink) {
+      if ($link == $curLink) {
         $p = $li;
-        while(!is_null($p)) {
-          if($p->nodeName == "li") $p->firstElement->setAttribute("class", "current"); // TODO: li.current
+        while (!is_null($p)) {
+          if ($p->nodeName == "li") {
+            $p->firstElement->setAttribute("class", "current");
+          } // TODO: li.current
           $p = $p->parentNode->parentNode;
         }
       }
       $a->setAttribute("href", $id);
       #$a->setAttribute("title", $values[1]);
       $idToLi[$id] = $li;
-      $idToLevel[$id] = $idToLevel[$parentId]+1;
+      $idToLevel[$id] = $idToLevel[$parentId] + 1;
     }
     $maxLevel = $this->vars["menudepth"]->nodeValue;
-    if(!is_numeric($maxLevel)) $maxLevel = 1;
-    foreach($idToLi as $id => $li) {
-      if($idToLevel[$id] != $maxLevel) continue;
-      $ul = $li->lastElement;
-      if($ul->nodeName == "ul") $li->removeChild($ul);
+    if (!is_numeric($maxLevel)) {
+      $maxLevel = 1;
     }
-    if(is_null($root->firstElement)) return;
+    foreach ($idToLi as $id => $li) {
+      if ($idToLevel[$id] != $maxLevel) {
+        continue;
+      }
+      $ul = $li->lastElement;
+      if ($ul->nodeName == "ul") {
+        $li->removeChild($ul);
+      }
+    }
+    if (is_null($root->firstElement)) {
+      return;
+    }
     $root->firstElement->setAttribute("class", "globalmenu noprint");
     Cms::setVariable("", $menu->documentElement);
   }

@@ -26,7 +26,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
    * SyntaxCodeMirror constructor.
    * @param Plugins|SplSubject $s
    */
-  public function __construct(SplSubject $s) {
+  public function __construct (SplSubject $s) {
     parent::__construct($s);
     $s->setPriority($this, 100);
   }
@@ -34,8 +34,8 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
   /**
    * @param Plugins|SplSubject $subject
    */
-  public function update(SplSubject $subject) {
-    if($subject->getStatus() == STATUS_INIT) {
+  public function update (SplSubject $subject) {
+    if ($subject->getStatus() == STATUS_INIT) {
       $this->detachIfNotAttached("HtmlOutput");
       return;
     }
@@ -44,41 +44,45 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
   /**
    * @param HTMLPlus $content
    */
-  public function modifyContent(HTMLPlus $content) {
+  public function modifyContent (HTMLPlus $content) {
     // supported syntax only
     $xml = VENDOR_DIR."/".self::CM_DIR."/mode/xml/xml.js";
     $css = VENDOR_DIR."/".self::CM_DIR."/mode/css/css.js";
     $js = VENDOR_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
     $html = VENDOR_DIR."/".self::CM_DIR."/mode/htmlmixed/htmlmixed.js";
-    $modes = array(
-      "xml" => array($xml),
-      "css" => array($css),
-      "javascript" => array($js),
-      "htmlmixed" => array($xml, $css, $js, $html),
-      );
+    $modes = [
+      "xml" => [$xml],
+      "css" => [$css],
+      "javascript" => [$js],
+      "htmlmixed" => [$xml, $css, $js, $html],
+    ];
     // return if no textarea containing class "codemirror"
-    $libs = array();
+    $libs = [];
     $codemirror = false;
     /** @var DOMElementPlus $t */
-    foreach($content->getElementsByTagName("textarea") as $t) {
+    foreach ($content->getElementsByTagName("textarea") as $t) {
       $classes = explode(" ", $t->getAttribute("class"));
-      if(!in_array("codemirror", $classes)) continue;
+      if (!in_array("codemirror", $classes)) {
+        continue;
+      }
       $codemirror = true;
-      foreach($classes as $c) {
-        if(array_key_exists($c, $modes)) {
+      foreach ($classes as $c) {
+        if (array_key_exists($c, $modes)) {
           $libs = array_merge($libs, $modes[$c]);
           break;
         }
       }
     }
     // add sources and return
-    if($codemirror) $this->addSources($libs);
+    if ($codemirror) {
+      $this->addSources($libs);
+    }
   }
 
   /**
    * @param array $libs
    */
-  private function addSources(Array $libs) {
+  private function addSources (Array $libs) {
     /** @var HtmlOutput $os */
     $os = Cms::getOutputStrategy();
 
@@ -87,7 +91,7 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
     $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/cminit.css");
 
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.js");
-    foreach($libs as $l) $os->addJsFile($l);
+    foreach ($libs as $l) $os->addJsFile($l);
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/keymap/sublime.js");
 
     $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");

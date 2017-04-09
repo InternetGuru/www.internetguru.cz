@@ -27,7 +27,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
    * LinkList constructor.
    * @param Plugins|SplSubject $s
    */
-  public function __construct(SplSubject $s) {
+  public function __construct (SplSubject $s) {
     parent::__construct($s);
     $this->cssClass = strtolower($this->className);
     $s->setPriority($this, 200);
@@ -36,30 +36,40 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
   /**
    * @param Plugins|SplSubject $subject
    */
-  public function update(SplSubject $subject) {}
+  public function update (SplSubject $subject) {
+  }
 
   /**
    * @param HTMLPlus $content
    */
-  public function modifyContent(HTMLPlus $content) {
-    if(!$content->documentElement->hasClass($this->cssClass)) return;
+  public function modifyContent (HTMLPlus $content) {
+    if (!$content->documentElement->hasClass($this->cssClass)) {
+      return;
+    }
     $this->createLinkList($content->documentElement);
   }
 
   /**
    * @param DOMElementPlus $wrapper
    */
-  private function createLinkList(DOMElementPlus $wrapper) {
+  private function createLinkList (DOMElementPlus $wrapper) {
     $count = 1;
-    $links = array();
-    $linksArray = array();
+    $links = [];
+    $linksArray = [];
     $list = $wrapper->ownerDocument->createElement("ol");
-    foreach($wrapper->getElementsByTagName("a") as $l) { $links[] = $l; }
+    foreach ($wrapper->getElementsByTagName("a") as $l) {
+      $links[] = $l;
+    }
     /** @var DOMElementPlus $l */
-    foreach($links as $l) {
-      if(!$l->hasAttribute("href")) continue;
-      if(!isset($linksArray[$l->getAttribute("href")])
-        && !$this->addLi($list, $l, $count)) continue;
+    foreach ($links as $l) {
+      if (!$l->hasAttribute("href")) {
+        continue;
+      }
+      if (!isset($linksArray[$l->getAttribute("href")])
+        && !$this->addLi($list, $l, $count)
+      ) {
+        continue;
+      }
       $linksArray[$l->getAttribute("href")] = $l;
       $a = $l->ownerDocument->createElement("a");
       $a->nodeValue = $count;
@@ -68,7 +78,9 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
       $l->parentNode->insertBefore($a, $l->nextSibling);
       $count++;
     }
-    if($count == 1) return;
+    if ($count == 1) {
+      return;
+    }
     $var = $wrapper->ownerDocument->createElement("var");
     $var->appendChild($list);
     Cms::setVariable($this->cssClass, $var);
@@ -81,24 +93,36 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
    * @param int $i
    * @return bool
    */
-  private function addLi(DOMElementPlus $list, DOMElementPlus $link, $i) {
+  private function addLi (DOMElementPlus $list, DOMElementPlus $link, $i) {
     $href = $link->getAttribute("href");
-    if(strpos($href, "#") === 0) return false; // local fragment
-    if(preg_match('/^\w+:/', $href)) return false; // external
-    if(preg_match("/".FILEPATH_PATTERN."$/", $href)) return false; // file
+    if (strpos($href, "#") === 0) {
+      return false;
+    } // local fragment
+    if (preg_match('/^\w+:/', $href)) {
+      return false;
+    } // external
+    if (preg_match("/".FILEPATH_PATTERN."$/", $href)) {
+      return false;
+    } // file
     $li = $list->ownerDocument->createElement("li");
     $list->appendChild($li);
     $a = $li->ownerDocument->createElement("a");
     $li->appendChild($a);
-    if(is_null(HTMLPlusBuilder::getLinkToId($href))) {
-      if(is_null(Cms::getLoggedUser())) return false; // nonexist local link
+    if (is_null(HTMLPlusBuilder::getLinkToId($href))) {
+      if (is_null(Cms::getLoggedUser())) {
+        return false;
+      } // nonexist local link
       $a->setAttribute("class", "invalid-local-link");
     }
     $a->setAttribute("id", "{$this->cssClass}-$i");
     $a->setAttribute("href", $link->getAttribute("href"));
     $text = HTMLPlusBuilder::getIdToTitle($href);
-    if(!strlen($text)) $text = $link->getAttribute("title");
-    if(!strlen($text)) $text = getShortString($href, 25, 35, "/");
+    if (!strlen($text)) {
+      $text = $link->getAttribute("title");
+    }
+    if (!strlen($text)) {
+      $text = getShortString($href, 25, 35, "/");
+    }
     $a->nodeValue = trim($text, "/");
     return true;
   }

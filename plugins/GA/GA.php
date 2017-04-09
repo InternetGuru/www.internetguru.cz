@@ -17,20 +17,28 @@ class GA extends Plugin implements SplObserver {
   /**
    * @param Plugins|SplSubject $subject
    */
-  public function update(SplSubject $subject) {
-    if($subject->getStatus() != STATUS_PROCESS) return;
-    if($this->detachIfNotAttached("HtmlOutput")) return;
+  public function update (SplSubject $subject) {
+    if ($subject->getStatus() != STATUS_PROCESS) {
+      return;
+    }
+    if ($this->detachIfNotAttached("HtmlOutput")) {
+      return;
+    }
     $this->init();
   }
 
-  private function init() {
+  private function init () {
     $cfg = $this->getXML();
     $idel = $cfg->getElementById("ga_id", "var");
-    if(!strlen($idel->nodeValue)) $idel = $cfg->getElementById(DOMAIN, "group");
-    if(is_null($idel)) $idel = $cfg->getElementById("other", "group");
+    if (!strlen($idel->nodeValue)) {
+      $idel = $cfg->getElementById(DOMAIN, "group");
+    }
+    if (is_null($idel)) {
+      $idel = $cfg->getElementById("other", "group");
+    }
     $ga_id = $idel->nodeValue;
     // disable if superadmin
-    if(Cms::isSuperUser()) {
+    if (Cms::isSuperUser()) {
       Cms::getOutputStrategy()->addJs("// ".sprintf(_("GA disabled (ga_id = %s)"), $ga_id), 1, "body");
       return;
     }
