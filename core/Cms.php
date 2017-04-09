@@ -270,6 +270,8 @@ class Cms {
     }
     if (self::getLoggedUser() == SERVER_USER) {
       self::setVariable("server", SERVER_USER);
+      self::setVariable("uri", SERVER_USER);
+      self::setVariable("mtime", 0);
       return;
     }
     self::setVariable("mtime", HTMLPlusBuilder::getIdToMtime($id));
