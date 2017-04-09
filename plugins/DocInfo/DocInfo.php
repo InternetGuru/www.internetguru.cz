@@ -78,15 +78,12 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
           $before = $before->nextElement;
         }
       }
-      if(is_null($info)) return;
+      if(is_null($info)) continue;
       /** @var DOMElementPlus $info */
       $info = $doc->importNode($info, true);
-      if(is_null($before)) {
-        $section = $doc->getElementsByTagName("section")->item(0);
-        foreach($info->childElementsArray as $child) $section->appendChild($child);
-        return;
+      foreach($info->childElementsArray as $child) {
+        $h->parentNode->insertBefore($child, $before);
       }
-      foreach($info->childElementsArray as $child) $before->parentNode->insertBefore($child, $before);
     }
   }
 
