@@ -1,6 +1,6 @@
 ~*
 *~
-.*
+.*/
 *.bak
 *.old
 tests/_output/*
