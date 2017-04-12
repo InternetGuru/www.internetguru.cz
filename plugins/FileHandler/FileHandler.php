@@ -498,6 +498,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @return bool
    */
   private function deleteCache ($cacheFilePath, $fileName) {
+    if (!is_file($cacheFilePath)) {
+      return true;
+    }
     if (!unlink($cacheFilePath)) {
       $this->error[] = $cacheFilePath;
       return false;

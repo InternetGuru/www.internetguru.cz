@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - SyntaxCodeMirror fullscreen overlay scrolltop arrow
 
+## [2.4.9] - 2017-04-12
+### Fixed
+ - Check file existence before deleting chache
+
 ## [2.4.8] - 2017-04-09
 ### Changed
  - Status code 404 (Not Found) instead of 415 (Unsupported Request) if unknown URL
@@ -188,6 +192,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
+[2.4.9]: https://bitbucket.org/igwr/cms/compare/v2.4.9..v2.4.8
 [2.4.8]: https://bitbucket.org/igwr/cms/compare/v2.4.8..v2.4.7
 [2.4.7]: https://bitbucket.org/igwr/cms/compare/v2.4.7..v2.4.6
 [2.4.6]: https://bitbucket.org/igwr/cms/compare/v2.4.6..v2.4.5
