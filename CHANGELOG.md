@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+ - Update external links with redirect
+
 ## [2.4.9] - 2017-04-12
 ### Fixed
  - Check file existence before deleting chache
@@ -176,6 +180,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
 [2.4.9]: https://bitbucket.org/igwr/cms/compare/v2.4.9..v2.4.8
 [2.4.8]: https://bitbucket.org/igwr/cms/compare/v2.4.8..v2.4.7
 [2.4.7]: https://bitbucket.org/igwr/cms/compare/v2.4.7..v2.4.6
