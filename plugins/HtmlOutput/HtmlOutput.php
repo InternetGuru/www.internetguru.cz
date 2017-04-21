@@ -182,7 +182,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   private function addRoot(DOMDocument $doc, $lang) {
     $html = $doc->createElement("html");
-    $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+    $html->setAttribute("xmlns", "https://www.w3.org/1999/xhtml/");
     #$html->setAttribute("xml:lang", $lang);
     $html->setAttribute("lang", $lang);
     $doc->appendChild($html);
