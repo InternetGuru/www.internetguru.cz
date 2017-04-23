@@ -442,17 +442,19 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     ) {
       if (is_file("$folder/".INOTIFY)) {
         $timestamps[$folder] = filemtime("$folder/".INOTIFY);
-      } elseif (!is_dir($folder)) {
+      } elseif (is_dir($folder)) {
+        $timestamps[$folder] = null;
+      } else {
         continue;
       }
-      $timestamps[$folder] = null;
-      if (is_null($refTimestamp)) {
-        if (is_null($timestamps[$folder])) {
-          $refTimestamp = time();
-          continue;
-        }
-        $refTimestamp = $timestamps[$folder];
+      if (!is_null($refTimestamp)) {
+        continue;
       }
+      if (is_null($timestamps[$folder])) {
+        $refTimestamp = time();
+        continue;
+      }
+      $refTimestamp = $timestamps[$folder];
     }
     // redundant dir if only one
     if (count($timestamps) == 1) {
