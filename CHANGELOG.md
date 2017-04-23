@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - New variable cms-stage (beta, stable...)
 
 ### Changed
+ - Improve check resources logic and performance
  - Not public system instance with file PROTECTED instead of FORBIDDEN
  - Coding style refactor, crlf to lf
  - CMS name format shows cms stage, e. g. `IGCMS 2.1.1-stable-debug`

@@ -419,6 +419,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   /**
+   *
+   *
    * @param string $cacheFolder
    * @param string $sourceFolder
    * @param bool $isResDir
@@ -427,20 +429,60 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if (!is_dir($cacheFolder)) {
       return;
     }
-    $inotifyCache = $cacheFolder."/".INOTIFY;
-    $inotifySource = USER_FOLDER."/".$sourceFolder."/".INOTIFY;
-    $folderUptodate = true;
-    $skipFolder = false;
-    if (is_file($inotifyCache) && is_file($inotifySource)) {
-      $skipFolder = filemtime($inotifyCache) == filemtime($inotifySource);
+    // check for .inotify in cms/admin/user/domain
+    $refTimestamp = null;
+    $timestamps = [];
+    foreach (
+      [
+        CMS_FOLDER."/$sourceFolder",
+        ADMIN_FOLDER."/$sourceFolder",
+        USER_FOLDER."/$sourceFolder",
+        $cacheFolder,
+      ] as $folder
+    ) {
+      if (is_file("$folder/".INOTIFY)) {
+        $timestamps[$folder] = filemtime("$folder/".INOTIFY);
+      } elseif (is_dir($folder)) {
+        $timestamps[$folder] = null;
+      } else {
+        continue;
+      }
+      if (!is_null($refTimestamp)) {
+        continue;
+      }
+      if (is_null($timestamps[$folder])) {
+        $refTimestamp = time();
+        continue;
+      }
+      $refTimestamp = $timestamps[$folder];
     }
+    // redundant dir if only one
+    if (count($timestamps) == 1) {
+      if ($this->deleteCache) {
+        rmdir_plus($cacheFolder);
+        if (is_dir($cacheFolder)) {
+          $this->error[] = $cacheFolder;
+          return;
+        }
+      }
+      $this->update[$cacheFolder] = $cacheFolder;
+      return;
+    }
+    $skipFolder = true;
+    if (count(array_unique($timestamps)) > 1) {
+      $skipFolder = false;
+      if (CMS_DEBUG) {
+        Logger::debug("Checking cache folder $cacheFolder");
+      }
+    }
+    $folderUptodate = true;
     foreach (scandir($cacheFolder) as $f) {
       if (strpos($f, ".") === 0) {
         continue;
       }
       $cacheFilePath = "$cacheFolder/$f";
       $sourceFilePath = "$sourceFolder/$f";
-      if (is_dir($cacheFilePath)) {
+      if (!is_file($cacheFilePath)) {
         $this->doCheckResources($cacheFilePath, $sourceFilePath, $isResDir);
         if (count(scandir($cacheFilePath)) == 2) {
           rmdir($cacheFilePath);
@@ -455,10 +497,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         $folderUptodate = false;
       }
     }
-    if (!$folderUptodate || !is_file($inotifySource)) {
+    if (!$folderUptodate) {
       return;
     }
-    touch($inotifyCache, filemtime($inotifySource)); // current folder is uptodate
+    foreach ($timestamps as $folder => $timestamp) {
+      touch("$folder/".INOTIFY, $refTimestamp);
+    }
   }
 
   /**
@@ -473,23 +517,18 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
       $sourceFilePath = self::findFile($sourceFilePath);
     }
-    if (!is_file($sourceFilePath)) { // file is redundant
+    if (!is_file($sourceFilePath)) {
       return $this->deleteCache($cacheFilePath, $fileName);
     }
     if (isUptodate($sourceFilePath, $cacheFilePath)) {
       return true;
     }
-    if ($this->deleteCache) {
-      return $this->deleteCache($cacheFilePath, $fileName);
-    }
     if (self::DEBUG) {
       Cms::notice(
         sprintf("%s@%s | %s@%s", $cacheFilePath, filemtime($cacheFilePath), $sourceFilePath, filemtime($sourceFilePath))
       );
-    } else {
-      $this->update[$fileName] = $cacheFilePath;
     }
-    return false;
+    return $this->deleteCache($cacheFilePath, $fileName);
   }
 
   /**
@@ -501,12 +540,15 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if (!is_file($cacheFilePath)) {
       return true;
     }
-    if (!unlink($cacheFilePath)) {
-      $this->error[] = $cacheFilePath;
-      return false;
+    if ($this->deleteCache) {
+      @unlink($cacheFilePath);
+      if (is_file($cacheFilePath)) {
+        $this->error[] = $cacheFilePath;
+        return false;
+      }
     }
     $this->update[$fileName] = $cacheFilePath;
-    return true;
+    return $this->deleteCache;
   }
 
 }
