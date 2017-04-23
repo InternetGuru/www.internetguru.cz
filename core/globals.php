@@ -948,3 +948,15 @@ function validate_callStatic ($methodName, Array $arguments, Array $functions, $
     throw new Exception(sprintf(_("Argument[%s] empty or missing"), $i));
   }
 }
+
+function rmdir_plus ($dir) {
+  $files = new RecursiveIteratorIterator(
+    new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+    RecursiveIteratorIterator::CHILD_FIRST
+  );
+  foreach ($files as $fileinfo) {
+    $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+    $todo($fileinfo->getRealPath());
+  }
+  rmdir($dir);
+}
