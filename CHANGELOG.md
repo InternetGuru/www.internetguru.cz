@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
  - SyntaxCodeMirror fullscreen overlay scrolltop arrow
 
+## [2.4.11] - 2017-04-24
+### Fixed
+ - Set proper xmlns
+
 ## [2.4.10] - 2017-04-20
 ### Fixed
  - Update external links with redirect
@@ -196,6 +200,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
+[2.4.11]: https://bitbucket.org/igwr/cms/compare/v2.4.11..v2.4.10
 [2.4.10]: https://bitbucket.org/igwr/cms/compare/v2.4.10..v2.4.9
 [2.4.9]: https://bitbucket.org/igwr/cms/compare/v2.4.9..v2.4.8
 [2.4.8]: https://bitbucket.org/igwr/cms/compare/v2.4.8..v2.4.7
