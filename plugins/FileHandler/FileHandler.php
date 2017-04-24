@@ -10,6 +10,8 @@ use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\ResourceInterface;
 use Imagick;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use SplObserver;
 use SplSubject;
 use UglifyPHP\JS;
@@ -418,19 +420,58 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
   }
 
-  /**
-   *
-   *
-   * @param string $cacheFolder
-   * @param string $sourceFolder
-   * @param bool $isResDir
-   */
   private function doCheckResources ($cacheFolder, $sourceFolder, $isResDir) {
-    if (!is_dir($cacheFolder)) {
+    if (!stream_resolve_include_path($cacheFolder)) {
       return;
     }
+    $iter = new RecursiveIteratorIterator(
+      new RecursiveDirectoryIterator($cacheFolder, RecursiveDirectoryIterator::SKIP_DOTS),
+      RecursiveIteratorIterator::SELF_FIRST
+    #RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+    );
+    $dirs = [''];
+    $files[''] = [];
+    /** @var \SplFileInfo $splfi */
+    foreach ($iter as $path => $splfi) {
+      if ($splfi->isDir()) {
+        $dir = substr($path, strlen($cacheFolder) + 1);
+        $dirs[] = $dir;
+        $files[$dir] = [];
+        continue;
+      }
+      $relDir = substr($splfi->getPath(), strlen($cacheFolder) + 1);
+      $files[$relDir ? $relDir : ""][] = $splfi->getFilename();
+    }
+    foreach ($dirs as $dir) {
+      $cf = "$cacheFolder".($dir ? "/$dir" : "");
+      $sf = "$sourceFolder".($dir ? "/$dir" : "");
+      $timestamps = $this->getInotifyTs($cf, $sf, $refTs);
+      // redundant dir if only one
+      if (count($timestamps) == 1) {
+        if ($this->deleteCache) {
+          rmdir_plus($cf);
+          if (stream_resolve_include_path($cf)) {
+            $this->error[] = $cf;
+            continue;
+          }
+        }
+        $this->update[$cf] = $cf;
+        continue;
+      }
+      if (count(array_unique($timestamps)) == 1
+        || !$this->folderUpToDate($cf, $sf, $isResDir, $files[$dir])
+      ) {
+        continue;
+      }
+      foreach ($timestamps as $folder => $timestamp) {
+        touch("$folder/".INOTIFY, $refTs);
+      }
+    }
+  }
+
+  private function getInotifyTs ($cacheFolder, $sourceFolder, &$refTs) {
     // check for .inotify in cms/admin/user/domain
-    $refTimestamp = null;
+    $refTs = null;
     $timestamps = [];
     foreach (
       [
@@ -440,69 +481,46 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         $cacheFolder,
       ] as $folder
     ) {
-      if (is_file("$folder/".INOTIFY)) {
+      if (stream_resolve_include_path("$folder/".INOTIFY)) {
         $timestamps[$folder] = filemtime("$folder/".INOTIFY);
-      } elseif (is_dir($folder)) {
+      } elseif (stream_resolve_include_path($folder)) {
         $timestamps[$folder] = null;
       } else {
         continue;
       }
-      if (!is_null($refTimestamp)) {
+      if (!is_null($refTs)) {
         continue;
       }
       if (is_null($timestamps[$folder])) {
-        $refTimestamp = time();
+        $refTs = time();
         continue;
       }
-      $refTimestamp = $timestamps[$folder];
+      $refTs = $timestamps[$folder];
     }
-    // redundant dir if only one
-    if (count($timestamps) == 1) {
-      if ($this->deleteCache) {
-        rmdir_plus($cacheFolder);
-        if (is_dir($cacheFolder)) {
-          $this->error[] = $cacheFolder;
-          return;
-        }
-      }
-      $this->update[$cacheFolder] = $cacheFolder;
-      return;
-    }
-    $skipFolder = true;
-    if (count(array_unique($timestamps)) > 1) {
-      $skipFolder = false;
-      if (CMS_DEBUG) {
-        Logger::debug("Checking cache folder $cacheFolder");
-      }
-    }
+    return $timestamps;
+  }
+
+  /**
+   * @param string $cacheFolder
+   * @param string $sourceFolder
+   * @param bool $isResDir
+   * @param array $files
+   * @return bool
+   */
+  private function folderUpToDate ($cacheFolder, $sourceFolder, $isResDir, Array $files) {
     $folderUptodate = true;
-    foreach (scandir($cacheFolder) as $f) {
-      if (strpos($f, ".") === 0) {
-        continue;
-      }
+    foreach ($files as $f) {
       $cacheFilePath = "$cacheFolder/$f";
       $sourceFilePath = "$sourceFolder/$f";
-      if (!is_file($cacheFilePath)) {
-        $this->doCheckResources($cacheFilePath, $sourceFilePath, $isResDir);
-        if (count(scandir($cacheFilePath)) == 2) {
-          rmdir($cacheFilePath);
-        }
-        continue;
-      }
-      if ($skipFolder) {
-        continue;
-      }
       $fileUptodate = $this->updateCacheFile($sourceFilePath, $cacheFilePath, $isResDir);
       if (!$fileUptodate) {
         $folderUptodate = false;
       }
     }
-    if (!$folderUptodate) {
-      return;
+    if (CMS_DEBUG) {
+      Logger::debug("Cache folder $cacheFolder uptodate: ".($folderUptodate ? "YES" : "NO"));
     }
-    foreach ($timestamps as $folder => $timestamp) {
-      touch("$folder/".INOTIFY, $refTimestamp);
-    }
+    return $folderUptodate;
   }
 
   /**

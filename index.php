@@ -46,10 +46,10 @@ try {
     redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
-  if (!file_exists(DEBUG_FILE) && !file_exists(".".DEBUG_FILE)) {
+  if (!stream_resolve_include_path(DEBUG_FILE) && !stream_resolve_include_path(".".DEBUG_FILE)) {
     touch(".".DEBUG_FILE);
   }
-  if (!file_exists(PROTECTED_FILE) && !file_exists(".".PROTECTED_FILE)) {
+  if (!stream_resolve_include_path(PROTECTED_FILE) && !stream_resolve_include_path(".".PROTECTED_FILE)) {
     touch(PROTECTED_FILE);
   }
   Cms::checkAuth();

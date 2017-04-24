@@ -29,10 +29,10 @@ function findFile ($filePath, $user = true, $admin = true) {
     array_unshift($dirs, USER_FOLDER);
   }
   foreach ($dirs as $d) {
-    if (!is_file("$d/$filePath")) {
+    if (!stream_resolve_include_path("$d/$filePath")) {
       continue;
     }
-    if (is_file("$d/$inactiveFilePath")) {
+    if (stream_resolve_include_path("$d/$inactiveFilePath")) {
       continue;
     }
     $path = realpath("$d/$filePath");
@@ -456,14 +456,14 @@ function mkdir_plus ($dir, $mode = 0775, $recursive = true) {
  * @throws Exception
  */
 function incrementalRename ($src, $dest = null) {
-  if (!file_exists($src)) {
+  if (!stream_resolve_include_path($src)) {
     throw new Exception(sprintf(_("Source file '%s' not found"), basename($src)));
   }
   if (is_null($dest)) {
     $dest = $src;
   }
   $i = 0;
-  while (file_exists($dest.$i)) {
+  while (stream_resolve_include_path($dest.$i)) {
     $i++;
   }
   if (!rename($src, $dest.$i)) {
@@ -489,7 +489,7 @@ function initIndexFiles () {
     if (!is_dir(CMS_ROOT_FOLDER."/$f")) {
       continue;
     }
-    if (file_exists(CMS_ROOT_FOLDER."/.$f")) {
+    if (stream_resolve_include_path(CMS_ROOT_FOLDER."/.$f")) {
       continue;
     }
     if (!is_file(CMS_ROOT_FOLDER."/$f/index.php")) {
@@ -768,7 +768,7 @@ function loginRedir () {
 
 if (!function_exists("apc_exists")) {
   function apc_exists ($key) {
-    return file_exists(apc_get_path($key));
+    return stream_resolve_include_path(apc_get_path($key));
   }
 }
 

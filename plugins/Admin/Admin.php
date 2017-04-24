@@ -276,10 +276,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     } catch (Exception $e) {
       Logger::user_warning($e->getMessage());
     }
-    if (file_exists($this->dataFile)) {
+    if (stream_resolve_include_path($this->dataFile)) {
       $this->dataFileStatus = self::STATUS_ENABLED;
     }
-    if (file_exists($this->dataFileDisabled)) {
+    if (stream_resolve_include_path($this->dataFileDisabled)) {
       $this->dataFileStatus = self::STATUS_DISABLED;
     }
   }
@@ -335,9 +335,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
    */
   private function setContent () {
     $f = $this->dataFile;
-    if (!file_exists($f)) {
+    if (!stream_resolve_include_path($f)) {
       $f = $this->dataFileDisabled;
-      if (!file_exists($f)) {
+      if (!stream_resolve_include_path($f)) {
         return;
       }
     }
@@ -366,7 +366,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       $df = false;
     }
     // get user schema if default schema not exists
-    if (is_null($this->scheme) && file_exists($this->dataFile)) {
+    if (is_null($this->scheme) && stream_resolve_include_path($this->dataFile)) {
       $this->scheme = $this->getScheme($this->dataFile);
     }
     $htmlId = normalize(pathinfo($this->dataFile, PATHINFO_FILENAME));

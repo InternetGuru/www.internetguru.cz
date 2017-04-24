@@ -98,13 +98,13 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     switch ($workingDir) {
       case CMS_FOLDER:
         if (is_dir(ADMIN_FOLDER."/".$this->pluginDir."/$folder")
-          && !file_exists(ADMIN_FOLDER."/".$this->pluginDir."/.$folder")
+          && !stream_resolve_include_path(ADMIN_FOLDER."/".$this->pluginDir."/.$folder")
         ) {
           return;
         }
       case ADMIN_FOLDER:
         if (is_dir(USER_FOLDER."/".$this->pluginDir."/$folder")
-          && !file_exists(USER_FOLDER."/".$this->pluginDir."/.$folder")
+          && !stream_resolve_include_path(USER_FOLDER."/".$this->pluginDir."/.$folder")
         ) {
           return;
         }
@@ -113,7 +113,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       if (strpos($file, ".") === 0) {
         continue;
       }
-      if (file_exists("$cwd/.$file")) {
+      if (stream_resolve_include_path("$cwd/.$file")) {
         continue;
       }
       $filePath = is_null($folder) ? $file : "$folder/$file";
