@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.4.11] - 2017-04-24
 ### Fixed
  - Set proper xmlns
 
@@ -186,7 +186,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.4.11]: https://bitbucket.org/igwr/cms/compare/v2.4.11..v2.4.10
 [2.4.10]: https://bitbucket.org/igwr/cms/compare/v2.4.10..v2.4.9
 [2.4.10]: https://bitbucket.org/igwr/cms/compare/v2.4.10..v2.4.9
 [2.4.9]: https://bitbucket.org/igwr/cms/compare/v2.4.9..v2.4.8
