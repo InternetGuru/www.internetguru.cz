@@ -360,7 +360,7 @@ class Cms {
       self::setLoggedUser($loggedUser);
       return;
     }
-    if (!file_exists(PROTECTED_FILE) && SCRIPT_NAME == "index.php") {
+    if (!stream_resolve_include_path(PROTECTED_FILE) && SCRIPT_NAME == "index.php") {
       return;
     }
     loginRedir();
@@ -388,7 +388,7 @@ class Cms {
    * @return bool
    */
   public static function isActive () {
-    return !file_exists(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
+    return !stream_resolve_include_path(CMS_ROOT_FOLDER."/.".CMS_RELEASE);
   }
 
   /**

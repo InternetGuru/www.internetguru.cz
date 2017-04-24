@@ -46,10 +46,10 @@ class Plugins implements SplSubject {
       if (!is_dir(PLUGINS_FOLDER."/$p")) {
         continue;
       }
-      if (file_exists(PLUGINS_FOLDER."/.$p")) {
+      if (stream_resolve_include_path(PLUGINS_FOLDER."/.$p")) {
         continue;
       }
-      if (file_exists(".PLUGIN.$p")) {
+      if (stream_resolve_include_path(".PLUGIN.$p")) {
         continue;
       }
       $p = "IGCMS\\Plugins\\$p";

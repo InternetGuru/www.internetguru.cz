@@ -46,7 +46,7 @@ class DOMDocumentPlus extends DOMDocument {
    * @throws NoFileException
    */
   public function load ($filePath, $options = 0) {
-    if (!is_file($filePath) || file_exists(dirname($filePath)."/.".basename($filePath))) {
+    if (!stream_resolve_include_path($filePath) || stream_resolve_include_path(dirname($filePath)."/.".basename($filePath))) {
       throw new NoFileException(_("File not found or disabled"));
     }
     if (!@parent::load($filePath, $options)) {
@@ -261,7 +261,7 @@ class DOMDocumentPlus extends DOMDocument {
    * @throws Exception
    */
   public function relaxNGValidatePlus ($f) {
-    if (!file_exists($f)) {
+    if (!stream_resolve_include_path($f)) {
       throw new Exception(sprintf(_("Unable to find HTML+ RNG schema '%s'"), $f));
     }
     try {

@@ -44,7 +44,7 @@ class DOMBuilderTest extends \PHPUnit_Framework_TestCase {
     mkdir_plus(USER_FOLDER);
     mkdir_plus(ADMIN_FOLDER);
     $this->xml = [$xml, ADMIN_FOLDER."/$xml", USER_FOLDER."/$xml"];
-    foreach ($this->xml as $xml) if (file_exists($xml)) {
+    foreach ($this->xml as $xml) if (stream_resolve_include_path($xml)) {
       $this->xml = [];
       throw new Exception("Test file '$xml' exists");
     }
@@ -59,7 +59,7 @@ class DOMBuilderTest extends \PHPUnit_Framework_TestCase {
 
     $html = "testHtmlPlus.xml";
     $this->html = [$html, ADMIN_FOLDER."/$html", USER_FOLDER."/$html"];
-    foreach ($this->html as $html) if (file_exists($html)) {
+    foreach ($this->html as $html) if (stream_resolve_include_path($html)) {
       $this->html = [];
       throw new Exception("Test file '$html' exists");
     }
