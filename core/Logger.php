@@ -208,7 +208,7 @@ class Logger {
     $logger->pushHandler($streamHandler);
 
     if (CMS_DEBUG) {
-      $chromeHandler = new ChromePHPHandler(MonologLogger::DEBUG, false);
+      $chromeHandler = new ChromePHPHandler(MonologLogger::DEBUG);
       $logger->pushHandler($chromeHandler);
     }
   }
