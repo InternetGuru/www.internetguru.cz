@@ -445,42 +445,56 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     foreach ($dirs as $dir) {
       $cf = "$cacheFolder".($dir ? "/$dir" : "");
       $sf = "$sourceFolder".($dir ? "/$dir" : "");
-      $timestamps = $this->getInotifyTs($cf, $sf, $refTs);
+      if(!$isResDir && !stream_resolve_include_path(USER_FOLDER."/$sf")) {
+        mkdir(USER_FOLDER."/$sf");
+      }
+      $timestamps = $this->getInotifyTs($cf, $sf, $isResDir, $refTs);
       // redundant dir if only one
       if (count($timestamps) == 1) {
         if ($this->deleteCache) {
-          rmdir_plus($cf);
+          @rmdir_plus($cf);
           if (stream_resolve_include_path($cf)) {
             $this->error[] = $cf;
             continue;
+          }
+          if (CMS_DEBUG) {
+            Logger::debug("Removed cache folder $cf");
           }
         }
         $this->update[$cf] = $cf;
         continue;
       }
+      // is uptodate or was not updated
       if (count(array_unique($timestamps)) == 1
+        && !is_null(current($timestamps))
         || !$this->folderUpToDate($cf, $sf, $isResDir, $files[$dir])
       ) {
         continue;
       }
+      // was updated
       foreach ($timestamps as $folder => $timestamp) {
         touch("$folder/".INOTIFY, $refTs);
       }
     }
   }
 
-  private function getInotifyTs ($cacheFolder, $sourceFolder, &$refTs) {
+  private function getInotifyTs ($cacheFolder, $sourceFolder, $isResDir, &$refTs) {
     // check for .inotify in cms/admin/user/domain
     $refTs = null;
     $timestamps = [];
-    foreach (
-      [
-        CMS_FOLDER."/$sourceFolder",
-        ADMIN_FOLDER."/$sourceFolder",
-        USER_FOLDER."/$sourceFolder",
-        $cacheFolder,
-      ] as $folder
-    ) {
+    $adeptFolders = [
+      CMS_FOLDER."/$sourceFolder",
+      ADMIN_FOLDER."/$sourceFolder",
+      USER_FOLDER."/$sourceFolder",
+      $cacheFolder,
+    ];
+    if (!$isResDir) {
+      $rawSourceFolder = $this->getImageSource($cacheFolder, self::getImageMode($cacheFolder));
+      $adeptFolders[] = CMS_FOLDER."/$rawSourceFolder";
+      $adeptFolders[] = ADMIN_FOLDER."/$rawSourceFolder";
+      $adeptFolders[] = USER_FOLDER."/$rawSourceFolder";
+    }
+    foreach ($adeptFolders as $folder) {
       if (stream_resolve_include_path("$folder/".INOTIFY)) {
         $timestamps[$folder] = filemtime("$folder/".INOTIFY);
       } elseif (stream_resolve_include_path($folder)) {
