@@ -42,6 +42,9 @@ class Sitemap extends Plugin implements SplObserver {
     if ($subject->getStatus() != STATUS_POSTPROCESS) {
       return;
     }
+    if (isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) {
+      return;
+    }
     if (is_file(self::SITEMAP) && filemtime(self::SITEMAP) == HTMLPlusBuilder::getNewestFileMtime()) {
       return;
     }
