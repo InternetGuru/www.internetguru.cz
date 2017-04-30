@@ -3,6 +3,7 @@
 namespace IGCMS\Plugins;
 
 use Autoprefixer;
+use DirectoryIterator;
 use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
@@ -10,8 +11,6 @@ use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\ResourceInterface;
 use Imagick;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use SplObserver;
 use SplSubject;
 use UglifyPHP\JS;
@@ -194,7 +193,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   private static function getImageMode ($filePath) {
     foreach (self::$imageModes as $mode => $null) {
-      if (strpos($filePath, FILES_DIR."/$mode/") === 0) {
+      if (strpos("$filePath/", FILES_DIR."/$mode/") === 0) {
         return $mode;
       }
     }
@@ -420,65 +419,66 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
   }
 
+  /**
+   * @param $cacheFolder
+   * @param $sourceFolder
+   * @param $isResDir
+   */
   private function doCheckResources ($cacheFolder, $sourceFolder, $isResDir) {
     if (!stream_resolve_include_path($cacheFolder)) {
       return;
     }
-    $iter = new RecursiveIteratorIterator(
-      new RecursiveDirectoryIterator($cacheFolder, RecursiveDirectoryIterator::SKIP_DOTS),
-      RecursiveIteratorIterator::SELF_FIRST
-      #RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
-    );
-    $dirs = [''];
-    $files[''] = [];
-    /** @var \SplFileInfo $splfi */
-    foreach ($iter as $path => $splfi) {
-      if ($splfi->isDir()) {
-        $dir = substr($path, strlen($cacheFolder) + 1);
-        $dirs[] = $dir;
-        $files[$dir] = [];
-        continue;
+    $timestamps = $this->getInotifyTs($cacheFolder, $sourceFolder, $isResDir, $refTs);
+    // redundant dir if only one
+    if (count($timestamps) == 1) {
+      if ($this->deleteCache) {
+        @rmdir_plus($cacheFolder);
+        if (stream_resolve_include_path($cacheFolder)) {
+          $this->error[] = $cacheFolder;
+          return;
+        }
+        if (CMS_DEBUG) {
+          Logger::debug("Removed cache folder $cacheFolder");
+        }
       }
-      $relDir = substr($splfi->getPath(), strlen($cacheFolder) + 1);
-      $files[$relDir ? $relDir : ""][] = $splfi->getFilename();
+      $this->update[$cacheFolder] = $cacheFolder;
+      return;
     }
-    foreach ($dirs as $dir) {
-      $cf = "$cacheFolder".($dir ? "/$dir" : "");
-      $sf = "$sourceFolder".($dir ? "/$dir" : "");
-      $timestamps = $this->getInotifyTs($cf, $sf, $isResDir, $refTs);
-      if(!$isResDir && !stream_resolve_include_path(USER_FOLDER."/$sf")) {
-        try {
-          mkdir_plus(USER_FOLDER."/$sf");
-          touch(USER_FOLDER."/$sf/".INOTIFY, $refTs);
-        } catch(Exception $e) {
-          Logger::error(sprintf(_("Unable to create user folder %s"), $sf));
-        }
+    // create user files folder if not exists
+    if (!$isResDir && !stream_resolve_include_path(USER_FOLDER."/$sourceFolder")) {
+      try {
+        mkdir_plus(USER_FOLDER."/$sourceFolder");
+        touch(USER_FOLDER."/$sourceFolder/".INOTIFY, $refTs);
+      } catch (Exception $e) {
+        Logger::error(sprintf(_("Unable to create user folder %s"), $sourceFolder));
       }
-      // redundant dir if only one
-      if (count($timestamps) == 1) {
-        if ($this->deleteCache) {
-          @rmdir_plus($cf);
-          if (stream_resolve_include_path($cf)) {
-            $this->error[] = $cf;
-            continue;
-          }
-          if (CMS_DEBUG) {
-            Logger::debug("Removed cache folder $cf");
-          }
-        }
-        $this->update[$cf] = $cf;
+    }
+    // all folder .inotify files uptodate
+    if (count(array_unique($timestamps)) == 1 && !is_null(current($timestamps))) {
+      return;
+    }
+    $iter = new DirectoryIterator($cacheFolder);
+    $files = [];
+    foreach ($iter as $splfi) {
+      if ($splfi->isDot() || $splfi->getFilename() == INOTIFY) {
         continue;
       }
-      // is uptodate or was not updated
-      if (count(array_unique($timestamps)) == 1
-        && !is_null(current($timestamps))
-        || !$this->folderUpToDate($cf, $sf, $isResDir, $files[$dir])
-      ) {
+      if ($splfi->isDir()) {
+        $this->doCheckResources(
+          ($cacheFolder ? "$cacheFolder/" : "").$splfi->getFilename(),
+          ($sourceFolder ? "$sourceFolder/" : "").$splfi->getFilename(),
+          $isResDir
+        );
         continue;
       }
-      // was updated
+      $files[] = $splfi->getFilename();
+    }
+    // touch .inotify files if folder gets to be uptodate
+    if ($this->folderUpToDate($cacheFolder, $sourceFolder, $isResDir, $files)) {
       foreach ($timestamps as $folder => $timestamp) {
-        touch("$folder/".INOTIFY, $refTs);
+        if (!touch("$folder/".INOTIFY, $refTs) && CMS_DEBUG) {
+          Logger::debug("Unable to touch $folder/".INOTIFY);
+        }
       }
     }
   }
@@ -487,19 +487,18 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     // check for .inotify in cms/admin/user/domain
     $refTs = null;
     $timestamps = [];
-    $adeptFolders = [
-      CMS_FOLDER."/$sourceFolder",
-      ADMIN_FOLDER."/$sourceFolder",
-      USER_FOLDER."/$sourceFolder",
-      $cacheFolder,
-    ];
-    if (!$isResDir) {
+    $adeptFolders = [];
+    if ($isResDir) {
+      $adeptFolders[CMS_FOLDER."/$sourceFolder"] = null;
+    } else {
       $rawSourceFolder = $this->getImageSource($cacheFolder, self::getImageMode($cacheFolder));
-      $adeptFolders[] = CMS_FOLDER."/$rawSourceFolder";
-      $adeptFolders[] = ADMIN_FOLDER."/$rawSourceFolder";
-      $adeptFolders[] = USER_FOLDER."/$rawSourceFolder";
+      $adeptFolders[ADMIN_FOLDER."/$rawSourceFolder"] = null;
+      $adeptFolders[USER_FOLDER."/$rawSourceFolder"] = null;
     }
-    foreach ($adeptFolders as $folder) {
+    $adeptFolders[ADMIN_FOLDER."/$sourceFolder"] = null;
+    $adeptFolders[USER_FOLDER."/$sourceFolder"] = null;
+    $adeptFolders[$cacheFolder] = null;
+    foreach ($adeptFolders as $folder => $void) {
       if (stream_resolve_include_path("$folder/".INOTIFY)) {
         $timestamps[$folder] = filemtime("$folder/".INOTIFY);
       } elseif (stream_resolve_include_path($folder)) {
