@@ -441,7 +441,7 @@ function mkdir_plus ($dir, $mode = 0775, $recursive = true) {
     if (is_dir($dir)) {
       return;
     }
-    if (mkdir($dir, $mode, $recursive)) {
+    if (@mkdir($dir, $mode, $recursive)) {
       return;
     }
     usleep(20000);

@@ -427,7 +427,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     $iter = new RecursiveIteratorIterator(
       new RecursiveDirectoryIterator($cacheFolder, RecursiveDirectoryIterator::SKIP_DOTS),
       RecursiveIteratorIterator::SELF_FIRST
-    #RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+      #RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
     );
     $dirs = [''];
     $files[''] = [];
@@ -445,10 +445,15 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     foreach ($dirs as $dir) {
       $cf = "$cacheFolder".($dir ? "/$dir" : "");
       $sf = "$sourceFolder".($dir ? "/$dir" : "");
-      if(!$isResDir && !stream_resolve_include_path(USER_FOLDER."/$sf")) {
-        mkdir(USER_FOLDER."/$sf");
-      }
       $timestamps = $this->getInotifyTs($cf, $sf, $isResDir, $refTs);
+      if(!$isResDir && !stream_resolve_include_path(USER_FOLDER."/$sf")) {
+        try {
+          mkdir_plus(USER_FOLDER."/$sf");
+          touch(USER_FOLDER."/$sf/".INOTIFY, $refTs);
+        } catch(Exception $e) {
+          Logger::error(sprintf(_("Unable to create user folder %s"), $sf));
+        }
+      }
       // redundant dir if only one
       if (count($timestamps) == 1) {
         if ($this->deleteCache) {
