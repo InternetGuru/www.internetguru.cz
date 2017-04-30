@@ -42,14 +42,12 @@ class Sitemap extends Plugin implements SplObserver {
     if ($subject->getStatus() != STATUS_POSTPROCESS) {
       return;
     }
-    if (isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) {
-      return;
-    }
+    // do not update if uptodate
     if (is_file(self::SITEMAP) && filemtime(self::SITEMAP) == HTMLPlusBuilder::getNewestFileMtime()) {
       return;
     }
+    // do not update if cache is outdated
     if (DOMBuilder::isCacheOutdated()) {
-      Logger::warning(_("Clear server cache to update sitemap"));
       return;
     }
     $this->createSitemap();
