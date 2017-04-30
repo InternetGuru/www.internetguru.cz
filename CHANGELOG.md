@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - New variable cms-stage (beta, stable...)
 
 ### Changed
+ - File cache check refactor to recursive to increase performance
  - Global filesystem refactor to increase overal performance
  - Improve check resources logic and performance
  - Not public system instance with file PROTECTED instead of FORBIDDEN
