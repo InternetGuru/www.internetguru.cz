@@ -14,8 +14,8 @@
   Config.hiddenClass = "hidden";
   Config.switchClass = "switch";
   Config.noprintClass = "noprint";
-  Config.expandTitle = "Rozbalit";
-  Config.collapseTitle = "Sbalit";
+  Config.expandTitle = "Expand";
+  Config.collapseTitle = "Collapse";
 
    var Hideable = function() {
 
