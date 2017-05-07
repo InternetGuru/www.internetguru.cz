@@ -6,14 +6,16 @@
 
   var Config = {};
 
-  Config.expand = "[+]";
-  Config.collapse = "[–]";
+  Config.expand = "►";
+  Config.collapse = "▼";
   Config.hideableClass = "hideable";
   Config.hideClass = "hide";
   Config.noHideClass = "nohide";
   Config.hiddenClass = "hidden";
   Config.switchClass = "switch";
   Config.noprintClass = "noprint";
+  Config.expandTitle = "Rozbalit";
+  Config.collapseTitle = "Sbalit";
 
    var Hideable = function() {
 
@@ -34,6 +36,7 @@
         var firstElement = hideables[i].children[0];
         var link = document.createElement("a");
         link.href = "Javascript:void(0);";
+        link.title = Config.collapseTitle;
         link.innerHTML = Config.collapse;
         link.classList.add(Config.switchClass);
         link.classList.add(Config.noprintClass);
@@ -57,21 +60,23 @@
       if(e.classList.contains(Config.noHideClass)) {
         e.classList.remove(Config.noHideClass);
         e.classList.add(Config.hiddenClass);
+        link.innerHTML = Config.expand;
+        link.title = Config.expandTitle;
       } else {
         e.classList.remove(Config.hiddenClass);
         e.classList.add(Config.noHideClass);
+        link.innerHTML = Config.collapse;
+        link.title = Config.collapseTitle;
       }
       for(var i = 0; i < e.childNodes.length; i++) {
         var ch = e.childNodes[i];
         if(ch.nodeType != 1) continue;
         if(ch == link.parentNode) continue;
+        if(ch.classList.contains(Config.noHideClass)) continue;
         if(ch.classList.contains(Config.hideClass)) {
           ch.classList.remove(Config.hideClass);
-          link.innerHTML = Config.collapse;
-        }
-        else {
+        } else {
           ch.classList.add(Config.hideClass);
-          link.innerHTML = Config.expand;
         }
       }
     };
