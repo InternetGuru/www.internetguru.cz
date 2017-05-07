@@ -35,8 +35,7 @@
   display: -ms-flexbox;
   display: flex;
 }
-#messages li:before,
-#messages .switch:before {
+#messages li:before {
   font-family: FontAwesome;
   font-size: 1.25em;
   line-height: 1em;
@@ -87,21 +86,4 @@
 #messages li.success:before {
   content: "\f00c";
   color: #388E3C;
-}
-
-#messages .switch {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  overflow: hidden;
-}
-
-#messages .switch:before {
-  content: "\f0d7";
-  padding: 0;
-  line-height: 0;
-}
-
-#messages.hidden .switch:before {
-  content: "\f0da";
 }
