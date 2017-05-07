@@ -4,11 +4,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.0] - 2017-05-07
+### Added
+ - Set locale and system messages language using LANG file
+ - Contactform `tel` for quick contact
+ - Automatic repair creates missing descriptions
+ - New variable cms-stage (beta, stable...)
+
+### Changed
+ - File cache check refactor to recursive to increase performance
+ - Global filesystem refactor to increase overal performance
+ - Improve check resources logic and performance
+ - Not public system instance with file PROTECTED instead of FORBIDDEN
+ - Coding style refactor, crlf to lf
+ - CMS name format shows cms stage, e. g. `IGCMS 2.1.1-stable-debug`
+
+### Fixed
+ - SyntaxCodeMirror fullscreen overlay scrolltop arrow
+
 ## [2.4.11] - 2017-04-24
 ### Fixed
- - Set proper xmlns
-
-## [2.4.10] - 2017-04-21
+ - Set proper xmlns
 
 ## [2.4.10] - 2017-04-20
 ### Fixed
@@ -91,16 +107,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [2.3.0] - 2016-11-16
 ### Added
 - HTML+ supports tags ``img``, ``source`` and ``picture``.
-- Agregator templates support local document variables.
-- Local document variables from user attributes.
-- HTML+ user attributes support (as in HTML5) in element ``body``.
-- Icons in system warning messages in default scheme.
+- Agregator templates support local variables from ``data-`` attributes.
+- Local document variables from ``data-`` attributes.
+- HTML+ ``data-`` attributes support (as in HTML5) in element ``body``.
 - Configurable ``body`` attribute to disable balancing (default ``nobalance``).
 
 ### Changed
+- System messages redesigned containing icons in default scheme.
 - Logo tag in breadcrumb changed from ``object`` to ``img``.
-- Redirection 303 when UrlHandler finds similar page, else 404 Not Found.
-- Split and reorganize default scheme files.
+- Redirection 303 when similar URL found, else 404 (Not Found).
+- Default scheme CSS files split and reorganized.
 - Default font-family is ``Roboto`` and ``Font-Awsome``.
 
 ## [2.2.6] - 2016-11-13
@@ -186,8 +202,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[2.5.0]: https://bitbucket.org/igwr/cms/compare/v2.5.0..v2.4.11
 [2.4.11]: https://bitbucket.org/igwr/cms/compare/v2.4.11..v2.4.10
-[2.4.10]: https://bitbucket.org/igwr/cms/compare/v2.4.10..v2.4.9
 [2.4.10]: https://bitbucket.org/igwr/cms/compare/v2.4.10..v2.4.9
 [2.4.9]: https://bitbucket.org/igwr/cms/compare/v2.4.9..v2.4.8
 [2.4.8]: https://bitbucket.org/igwr/cms/compare/v2.4.8..v2.4.7

@@ -1,7 +1,10 @@
 ~*
 *~
-.*
+.*/
 *.bak
 *.old
 tests/_output/*
 vendor/*
+!.gitignore
+!.idea/codeStyleSettings.xml
+.inotify

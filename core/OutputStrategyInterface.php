@@ -10,7 +10,7 @@ interface OutputStrategyInterface {
    * @param HTMLPlus $content
    * @return string
    */
-  public function getOutput(HTMLPlus $content);
+  public function getOutput (HTMLPlus $content);
 }
 
 ?>

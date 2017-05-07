@@ -9,7 +9,7 @@ interface TitleStrategyInterface {
   /**
    * @return string
    */
-  public function getTitle();
+  public function getTitle ();
 }
 
 ?>

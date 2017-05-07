@@ -1,6 +1,5 @@
 <?php
 
-
 namespace IGCMS\Core;
 
 use Exception;
@@ -34,7 +33,7 @@ class Logger {
   /**
    * @var string
    */
-  const TYPE_SYS_LOG  = "sys";
+  const TYPE_SYS_LOG = "sys";
   /**
    * @var string
    */
@@ -47,7 +46,7 @@ class Logger {
   /**
    * @var string
    */
-  const EMAIL_ALERT_TO   = "pavel.petrzela@internetguru.cz jiri.pavelka@internetguru.cz";
+  const EMAIL_ALERT_TO = "pavel.petrzela@internetguru.cz jiri.pavelka@internetguru.cz";
   /**
    * @var string
    */
@@ -96,39 +95,39 @@ class Logger {
    * @var array
    */
   private static $levels = [
-    'debug'       => MonologLogger::DEBUG,
-    'info'        => MonologLogger::INFO,
-    'user_info'   => MonologLogger::INFO,
-    'user_success'=> MonologLogger::INFO,
-    'mail'        => MonologLogger::INFO,
-    'notice'      => MonologLogger::NOTICE,
+    'debug' => MonologLogger::DEBUG,
+    'info' => MonologLogger::INFO,
+    'user_info' => MonologLogger::INFO,
+    'user_success' => MonologLogger::INFO,
+    'mail' => MonologLogger::INFO,
+    'notice' => MonologLogger::NOTICE,
     'user_notice' => MonologLogger::NOTICE,
-    'warning'     => MonologLogger::WARNING,
-    'user_warning'=> MonologLogger::WARNING,
-    'error'       => MonologLogger::ERROR,
-    'user_error'  => MonologLogger::ERROR,
-    'critical'    => MonologLogger::CRITICAL,
-    'alert'       => MonologLogger::ALERT,
-    'emergency'   => MonologLogger::EMERGENCY,
+    'warning' => MonologLogger::WARNING,
+    'user_warning' => MonologLogger::WARNING,
+    'error' => MonologLogger::ERROR,
+    'user_error' => MonologLogger::ERROR,
+    'critical' => MonologLogger::CRITICAL,
+    'alert' => MonologLogger::ALERT,
+    'emergency' => MonologLogger::EMERGENCY,
   ];
 
   /**
    * @param string $methodName
    * @param array $arguments
    */
-  public static function __callStatic($methodName, $arguments) {
+  public static function __callStatic ($methodName, $arguments) {
     validate_callStatic($methodName, $arguments, self::$levels, 1);
     $type = self::TYPE_SYS_LOG;
-    if(strpos($methodName, "user_") === 0) {
+    if (strpos($methodName, "user_") === 0) {
       $methodName = substr($methodName, strlen("user_"));
       $type = self::TYPE_USER_LOG;
     }
-    if($methodName == "success") {
+    if ($methodName == "success") {
       Cms::success($arguments[0]);
       $methodName = "info";
       $type = self::TYPE_USER_LOG;
     }
-    if($methodName == "mail") {
+    if ($methodName == "mail") {
       $methodName = "info";
       $type = self::TYPE_MAIL_LOG;
     }
@@ -141,42 +140,35 @@ class Logger {
    * @param string $message
    * @param string $type
    */
-  private static function writeLog($level, $message, $type = self::TYPE_SYS_LOG) {
+  private static function writeLog ($level, $message, $type = self::TYPE_SYS_LOG) {
     $logger = self::getMonolog($type);
     $monologLevel = self::parseLevel($level);
     $logger->{'add'.$level}($message);
-    if(!Cms::isSuperUser()) return;
-    switch($monologLevel) {
+    if (!Cms::isSuperUser()) {
+      return;
+    }
+    switch ($monologLevel) {
       case MonologLogger::DEBUG:
       case MonologLogger::INFO:
-      return;
+        return;
       case MonologLogger::NOTICE:
       case MonologLogger::WARNING:
-      Cms::$level($message);
-      return;
+        Cms::$level($message);
+        return;
       default:
-      Cms::error($message);
+        Cms::error($message);
     }
   }
 
   /**
-   * Parse the string level into a Monolog constant.
-   * @param  string  $level
-   * @return int
-   * @throws Exception
-   */
-  private static function parseLevel($level) {
-      if(isset(self::$levels[$level])) return self::$levels[$level];
-      throw new Exception(sprintf(_('Invalid log level %s'), $level));
-  }
-
-  /**
    * Get or create (if not exists) monolog instance for given type.
-   * @param  string  $type self::TYPE_SYS_LOG or self::TYPE_MAIL_LOG
+   * @param  string $type self::TYPE_SYS_LOG or self::TYPE_MAIL_LOG
    * @return MonologLogger
    */
-  private static function getMonolog($type) {
-    if(!is_null(self::${"monolog$type"})) return self::${"monolog$type"};
+  private static function getMonolog ($type) {
+    if (!is_null(self::${"monolog$type"})) {
+      return self::${"monolog$type"};
+    }
     $logger = new MonologLogger(self::LOGGER_NAME."_$type");
     $logger->pushProcessor("IGCMS\\Core\\Logger::appendIP");
     $logger->pushProcessor("IGCMS\\Core\\Logger::appendRequest");
@@ -193,19 +185,20 @@ class Logger {
    * @param MonologLogger $logger
    * @param string $logType
    */
-  private static function pushHandlers(MonologLogger $logger, $logType) {
+  private static function pushHandlers (MonologLogger $logger, $logType) {
     $logFile = LOG_FOLDER."/".date("Ymd").".$logType.log";
     $formatter = $logType != self::TYPE_MAIL_LOG
       ? new LineFormatter(self::LOG_FORMAT)
       : new LineFormatter(self::EMAIL_FORMAT);
 
-    foreach(array("CRITICAL", "ALERT", "EMERGENCY") as $type) {
+    foreach (["CRITICAL", "ALERT", "EMERGENCY"] as $type) {
       $mailHandler = new NativeMailerHandler(
         self::EMAIL_ALERT_TO,
         "IGCMS $type at ".HOST,
         self::EMAIL_ALERT_FROM,
         constant("Monolog\\Logger::$type"),
-        false);
+        false
+      );
       $mailHandler->setFormatter($formatter);
       $logger->pushHandler($mailHandler);
     }
@@ -214,20 +207,33 @@ class Logger {
     $streamHandler->setFormatter($formatter);
     $logger->pushHandler($streamHandler);
 
-    if(CMS_DEBUG) {
-      $chromeHandler = new ChromePHPHandler(MonologLogger::DEBUG, false);
+    if (CMS_DEBUG) {
+      $chromeHandler = new ChromePHPHandler(MonologLogger::DEBUG);
       $logger->pushHandler($chromeHandler);
     }
   }
 
   /**
+   * Parse the string level into a Monolog constant.
+   * @param  string $level
+   * @return int
+   * @throws Exception
+   */
+  private static function parseLevel ($level) {
+    if (isset(self::$levels[$level])) {
+      return self::$levels[$level];
+    }
+    throw new Exception(sprintf(_('Invalid log level %s'), $level));
+  }
+
+  /**
    * Append backtrace to extra field in given log record.
-   * @param  array  $record
+   * @param  array $record
    * @return array
    */
-  public static function appendDebugTrace(Array $record) {
+  public static function appendDebugTrace (Array $record) {
     $backtrace = "";
-    if(CMS_DEBUG || $record['level'] >= MonologLogger::CRITICAL) {
+    if (CMS_DEBUG || $record['level'] >= MonologLogger::CRITICAL) {
       $record["extra"]["backtrace"] = array_slice(debug_backtrace(), 6);
     }
     $record["extra"]["backtrace"] = $backtrace;
@@ -238,9 +244,9 @@ class Logger {
    * @param array $record
    * @return array
    */
-  public static function appendRequest(Array $record) {
+  public static function appendRequest (Array $record) {
     $request = "UNKNOWN";
-    if(isset($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], $_SERVER["SERVER_PROTOCOL"])) {
+    if (isset($_SERVER["REQUEST_METHOD"], $_SERVER["REQUEST_URI"], $_SERVER["SERVER_PROTOCOL"])) {
       $request = $_SERVER["SERVER_PROTOCOL"]." ".$_SERVER["REQUEST_METHOD"]." ".$_SERVER["REQUEST_URI"];
     }
     $record["extra"]["request"] = $request;
@@ -251,7 +257,7 @@ class Logger {
    * @param array $record
    * @return array
    */
-  public static function appendVersion(Array $record) {
+  public static function appendVersion (Array $record) {
     $record["extra"]["ver"] = CMS_RELEASE."/".CMS_VERSION;
     return $record;
   }
@@ -260,9 +266,9 @@ class Logger {
    * @param array $record
    * @return array
    */
-  public static function appendIP(Array $record) {
+  public static function appendIP (Array $record) {
     $ip = "0.0.0.0:0000";
-    if(isset($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_PORT"])) {
+    if (isset($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_PORT"])) {
       $ip = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
     }
     $record["extra"]["ip"] = $ip;
@@ -273,7 +279,7 @@ class Logger {
    * @param array $record
    * @return array
    */
-  public static function appendUserID(Array $record) {
+  public static function appendUserID (Array $record) {
     $user = is_null(Cms::getLoggedUser()) ? "unknown" : Cms::getLoggedUser();
     $record["extra"]["user"] = $user;
     return $record;

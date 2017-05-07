@@ -19,25 +19,38 @@ class Auth extends Plugin implements SplObserver {
    * Auth constructor.
    * @param Plugins|SplSubject $s
    */
-  public function __construct(SplSubject $s) {
+  public function __construct (SplSubject $s) {
     parent::__construct($s);
-    if(Cms::isSuperUser()) return;
+    if (Cms::isSuperUser()) {
+      return;
+    }
     $cfg = $this->getXML();
     $url = ROOT_URL.getCurLink(true);
     $access = null;
     /** @var DOMElementPlus $e */
-    foreach($cfg->getElementsByTagName('url') as $e) {
-      if(strpos($url, $e->nodeValue) === false) continue;
-      if($e->getAttribute("access") == "allow") $access = true;
-      elseif($e->getAttribute("access") == "denyall") $access = false;
-      else $access = !is_null(Cms::getLoggedUser()); // default = deny for anonymous users
+    foreach ($cfg->getElementsByTagName('url') as $e) {
+      if (strpos($url, $e->nodeValue) === false) {
+        continue;
+      }
+      if ($e->getAttribute("access") == "allow") {
+        $access = true;
+      } elseif ($e->getAttribute("access") == "denyall") {
+        $access = false;
+      } else {
+        $access = !is_null(Cms::getLoggedUser());
+      } // default = deny for anonymous users
     }
-    if($access !== false) return;
-    if(is_null(Cms::getLoggedUser())) loginRedir();
+    if ($access !== false) {
+      return;
+    }
+    if (is_null(Cms::getLoggedUser())) {
+      loginRedir();
+    }
     new ErrorPage(_("Insufficient rights to view this content"), 403);
   }
 
-  public function update(SplSubject $subject) {}
+  public function update (SplSubject $subject) {
+  }
 
 }
 

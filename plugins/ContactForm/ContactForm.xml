@@ -60,4 +60,22 @@ $inputvar-service_plain
     </dl>
   </form>
 
+  <message for="tel">
+    Do rychlého kontaktu bylo zadáno následující telefonní číslo:
+
+    $tel
+
+    --
+    Odesláno z IP adresy $cms-ip
+    $inputvar-service_plain
+  </message>
+  <form id="tel">
+    <dl>
+      <dt>Rychlý kontakt</dt>
+      <dd><input type="text" id="tel" required="required" placeholder="+420 123456789" pattern="\D*(\d\D*){9,}"/></dd>
+      <dd><label for="tel">Uveďte telefonní číslo na které Vám máme zavolat.</label></dd>
+      <dd><input type="submit" id="submit" value="Zavolejte mi"/></dd>
+    </dl>
+  </form>
+
 </ContactForm>

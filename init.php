@@ -22,6 +22,10 @@ define("FILES_DIR", "files");
 define("SERVER_FILES_DIR", "_server");
 define("LOG_DIR", "log");
 define("DEBUG_FILE", "DEBUG");
+define('CMS_VERSION_FILENAME', "VERSION");
+define('CMS_CHANGELOG_FILENAME', "CHANGELOG.md");
+define("DEFAULT_LANG", "en_US");
+define("LANG_FILE", "LANG");
 define("HTTPS_FILE", "HTTPS");
 define('CACHE_PARAM', "Cache");
 define('CACHE_IGNORE', "ignore");
@@ -31,11 +35,14 @@ define('PAGESPEED_PARAM', "PageSpeed");
 define('PAGESPEED_OFF', "off");
 define('DEBUG_PARAM', "Debug");
 define('DEBUG_ON', "on");
-define("FORBIDDEN_FILE", "FORBIDDEN");
+define("PROTECTED_FILE", "PROTECTED");
 define("ADMIN_ROOT_DIR", "admin");
 define("USER_ROOT_DIR", "user");
 define("FILE_LOCK_WAIT_SEC", 4);
-define('W3C_DATETIME_PATTERN', '(19|20)\d\d(-(0[1-9]|1[012])(-(0[1-9]|[12]\d|3[01])(T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00)?)?)?');
+define(
+  'W3C_DATETIME_PATTERN',
+  '(19|20)\d\d(-(0[1-9]|1[012])(-(0[1-9]|[12]\d|3[01])(T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00)?)?)?'
+);
 define('EMAIL_PATTERN', '([_a-zA-Z0-9-]+(?:\.[_a-zA-Z0-9-]+)*)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)\.([a-zA-Z]{2,})');
 define('SUBDOM_PATTERN', '[a-z][a-z0-9]*');
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z0-9_-]+');
@@ -50,8 +57,8 @@ define('STATUS_POSTPROCESS', 'postprocess');
 define('APC_PREFIX', 2); // change if APC structure changes
 define('HOST', basename(getcwd()));
 $hostArr = explode(".", HOST);
-define('DOMAIN', $hostArr[count($hostArr)-2].".".$hostArr[count($hostArr)-1]);
-define('CURRENT_SUBDOM', substr(HOST, 0, -(strlen(DOMAIN)+1)));
+define('DOMAIN', $hostArr[count($hostArr) - 2].".".$hostArr[count($hostArr) - 1]);
+define('CURRENT_SUBDOM', substr(HOST, 0, -(strlen(DOMAIN) + 1)));
 define('ROOT_URL', "/");
 define('CMS_RELEASE', basename(dirname(__FILE__)));
 define("WWW_FOLDER", "/var/www");
@@ -74,35 +81,37 @@ define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
 define('VER_FOLDER', CMS_FOLDER."/".VER_DIR);
 define('THEMES_FOLDER', USER_FOLDER."/".THEMES_DIR);
 define('FILES_FOLDER', USER_FOLDER."/".FILES_DIR);
-define('CMS_VERSION_FILENAME', "VERSION");
-define('CMS_CHANGELOG_FILENAME', "CHANGELOG.md");
 define('CMS_VERSION', trim(file_get_contents(CMS_FOLDER."/".CMS_VERSION_FILENAME)));
 $verfile = getcwd()."/".CMS_VERSION_FILENAME;
 define('DEFAULT_RELEASE', is_file($verfile) ? trim(file_get_contents($verfile)) : CMS_RELEASE);
-define('CMS_NAME', "IGCMS ".CMS_RELEASE."/".CMS_VERSION.(CMS_DEBUG ? " DEBUG" : ""));
+define('CMS_LANG', is_file(LANG_FILE) ? trim(file_get_contents(LANG_FILE)) : DEFAULT_LANG);
+define('CMS_STAGE', strpos(CMS_VERSION, CMS_RELEASE) === 0 ? "stable" : CMS_RELEASE);
+define('CMS_NAME', "IGCMS ".CMS_VERSION."-".CMS_STAGE.(CMS_DEBUG ? "-debug" : ""));
 #print_r(get_defined_constants(true)); die();
 date_default_timezone_set("Europe/Prague");
-#todo: localize lang
 
-if(CMS_DEBUG) {
+if (CMS_DEBUG) {
   error_reporting(E_ALL);
   ini_set("display_errors", 1);
-  setlocale(LC_ALL, "en_US.UTF-8");
-  putenv("LANG=en_US.UTF-8"); // for gettext
+  setlocale(LC_ALL, DEFAULT_LANG.".UTF-8");
 } else {
-  setlocale(LC_ALL, "cs_CZ.UTF-8");
-  #else setlocale(LC_ALL, "czech");
-  putenv("LANG=cs_CZ.UTF-8"); // for gettext
+  setlocale(LC_ALL, CMS_LANG.".UTF-8");
+  putenv("LANG=".CMS_LANG.".UTF-8"); // for gettext
   bindtextdomain("messages", LIB_FOLDER."/locale");
   textdomain("messages");
 }
 
 define('METHOD_NA', _("Method %s is no longer available"));
-if(is_null(ADMIN_ID)) die(_("Domain is ready to be acquired"));
+if (is_null(ADMIN_ID)) {
+  die(_("Domain is ready to be acquired"));
+}
 require_once(CORE_FOLDER.'/globals.php');
-if(isset($_GET["login"]) && SCHEME == "http") loginRedir();
-if(update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
-  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)) {
+if (isset($_GET["login"]) && SCHEME == "http") {
+  loginRedir();
+}
+if (update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
+  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)
+) {
   redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
 initDirs();
