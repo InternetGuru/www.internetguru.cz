@@ -6,10 +6,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - Highlightable.js
  - Hideable Expand/Collapse switch title attribute
  - Hideable does not hide elements with nohide class
 
 ### Changed
+ - Always load default *able
  - Hideable default Expand/Collapse arrows as triangles
 
 ## [2.5.0] - 2017-05-07
