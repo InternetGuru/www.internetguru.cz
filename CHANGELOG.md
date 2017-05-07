@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.5.0] - 2017-05-07
 ### Added
  - Set locale and system messages language using LANG file
  - Contactform `tel` for quick contact
@@ -202,7 +202,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/master..dev
+[2.5.0]: https://bitbucket.org/igwr/cms/compare/v2.5.0..v2.4.11
 [2.4.11]: https://bitbucket.org/igwr/cms/compare/v2.4.11..v2.4.10
 [2.4.10]: https://bitbucket.org/igwr/cms/compare/v2.4.10..v2.4.9
 [2.4.9]: https://bitbucket.org/igwr/cms/compare/v2.4.9..v2.4.8
