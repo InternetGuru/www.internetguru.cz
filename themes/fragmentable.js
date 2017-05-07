@@ -24,19 +24,18 @@
       var h = IGCMS.findParentBySelector(event.target, "h1, h2, h3, h4, h5, h6");
       if(h === null) return;
       if(h.nodeName.toLowerCase() == "h1") {
-        window.history.replaceState("", "", window.location.href.split('#')[0]);
-        return;
+        win.history.replaceState("", "", win.location.href.split('#')[0]);
+      } else {
+        win.history.replaceState("", "", "#"+h.id);
       }
-      window.history.replaceState("", "", "#"+h.id);
+      win.dispatchEvent(new HashChangeEvent("hashchange"));
     };
 
     return {
       /**
-       * Works only for body with class=[Config.ns]
        * @param  {Object} cfg custom configuration
        */
       init: function(cfg) {
-        if(!document.body.classList.contains(Config.ns)) throw "Element body missing "+Config.ns+" class";
         IGCMS.initCfg(Config, cfg);
         fireEvents();
       }
