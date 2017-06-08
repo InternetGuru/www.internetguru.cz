@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.5.1] - 2017-06-08
 ### Fixed
- - Repair link balancing and current menu current menu item https://trello.com/c/qRMfTh8E
+ - Repair link balancing and current menu item https://trello.com/c/qRMfTh8E
 
 ## [2.5.0] - 2017-05-07
 ### Added
