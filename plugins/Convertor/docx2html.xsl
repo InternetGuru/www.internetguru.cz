@@ -480,6 +480,7 @@
   -->
   <!-- Template for hyperlinks -->
   <xsl:template match="hyperlink">
+    <xsl:param name="nostrong" select="''"/>
     <xsl:variable name="relationships" select="document($relationsFile)"/>
     <xsl:element name="a">
         <xsl:attribute name="href">
@@ -495,6 +496,7 @@
         </xsl:choose>
         </xsl:attribute>
         <xsl:apply-templates select="node()">
+          <xsl:with-param name="nostrong" select="$nostrong"/>
           <xsl:with-param name="nosamp" select="1"/>
         </xsl:apply-templates>
         <!-- <xsl:copy-of select="node()//t/text()"/> -->
