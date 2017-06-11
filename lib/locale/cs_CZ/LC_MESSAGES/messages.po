@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-30 17:59+0200\n"
-"PO-Revision-Date: 2017-04-30 17:59+0200\n"
+"POT-Creation-Date: 2017-06-11 14:13+0200\n"
+"PO-Revision-Date: 2017-06-11 14:14+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.11\n"
+"X-Generator: Poedit 1.8.6\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -890,15 +890,15 @@ msgstr "Formulář s id '%s' nebyl nalezen"
 msgid "Missing message for form id '%s'"
 msgstr "Formulář '%s' nemá definovanou zprávu"
 
-#: plugins/ContentBalancer/ContentBalancer.php:196
+#: plugins/ContentBalancer/ContentBalancer.php:195
 msgid "No sets found"
 msgstr "Nebyly nalezeny žádné sestavy"
 
-#: plugins/ContentBalancer/ContentBalancer.php:225
+#: plugins/ContentBalancer/ContentBalancer.php:224
 msgid "Unable to find requested section"
 msgstr "Nepodařilo se nalézt požadovanou sekci"
 
-#: plugins/ContentBalancer/ContentBalancer.php:333
+#: plugins/ContentBalancer/ContentBalancer.php:332
 #, php-format
 msgid "Item id %s not found, using default"
 msgstr "Nebyl nalezen element item s id %s, zvolen výchozí"
@@ -1040,22 +1040,22 @@ msgstr "Nepodařilo se vytvořit soubor"
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
-#: plugins/FileHandler/FileHandler.php:410
+#: plugins/FileHandler/FileHandler.php:411
 #, php-format
 msgid "Unable to update file cache: %s"
 msgstr "Nepodařilo se aktualizovat souborovou mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:414
+#: plugins/FileHandler/FileHandler.php:415
 #, php-format
 msgid "File cache successfully updated: %s"
 msgstr "Souborová mezipaměť byla úspěšně aktualizovaná: %s"
 
-#: plugins/FileHandler/FileHandler.php:417
+#: plugins/FileHandler/FileHandler.php:418
 #, php-format
 msgid "Outdated file cache: %s"
 msgstr "Neaktuální souborová mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:453
+#: plugins/FileHandler/FileHandler.php:452
 #, php-format
 msgid "Unable to create user folder %s"
 msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
@@ -1095,22 +1095,27 @@ msgstr "Neúspěšná kompilace transformace '%s'"
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:550
+#: plugins/HtmlOutput/HtmlOutput.php:526
+#, php-format
+msgid "Invalid xPath query '%s'"
+msgstr "Neplatný xPath '%s'"
+
+#: plugins/HtmlOutput/HtmlOutput.php:554
 #, php-format
 msgid "Empty attribute '%s' stripped"
 msgstr "Odstraněn prázdný atribut '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:585
+#: plugins/HtmlOutput/HtmlOutput.php:589
 #, php-format
 msgid "Link '%s' not found"
 msgstr "Odkaz '%s' nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:597
+#: plugins/HtmlOutput/HtmlOutput.php:601
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:768
+#: plugins/HtmlOutput/HtmlOutput.php:772
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1182,29 +1187,25 @@ msgstr "Nepodařilo se vytvořit fieldset pro %s"
 msgid "File or extension '%s' not found"
 msgstr "Soubor nebo typ souboru '%s' nebyl nalezen"
 
-#: plugins/Sitemap/Sitemap.php:49
-msgid "Clear server cache to update sitemap"
-msgstr "Pro aktualizaci mapy stránek smažte mezipaměť serveru"
-
-#: plugins/Sitemap/Sitemap.php:74
+#: plugins/Sitemap/Sitemap.php:75
 msgid "Sitemap updated"
 msgstr "Mapa stránek aktualizována"
 
-#: plugins/Sitemap/Sitemap.php:110
+#: plugins/Sitemap/Sitemap.php:111
 msgid "Element url missing attribute link"
 msgstr "Element url postrádá atribut link"
 
-#: plugins/Sitemap/Sitemap.php:164
+#: plugins/Sitemap/Sitemap.php:165
 #, php-format
 msgid "Invalid element changefreq value: %s"
 msgstr "Neplatná hodnota elementu changefreq: %s"
 
-#: plugins/Sitemap/Sitemap.php:172
+#: plugins/Sitemap/Sitemap.php:173
 #, php-format
 msgid "Invalid element priority value: %s"
 msgstr "Neplatná hodnota elementu priority: %s"
 
-#: plugins/Sitemap/Sitemap.php:180
+#: plugins/Sitemap/Sitemap.php:181
 #, php-format
 msgid "Invalid element lastmod value: %s"
 msgstr "Neplatná hodnota elementu lastmod: %s"
@@ -1277,6 +1278,9 @@ msgstr "Počkejte %s sekund před dalším odesláním"
 #: plugins/ValidateForm/ValidateForm.php:397
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
+
+#~ msgid "Clear server cache to update sitemap"
+#~ msgstr "Pro aktualizaci mapy stránek smažte mezipaměť serveru"
 
 #~ msgid "Removed element dt missing dd"
 #~ msgstr "Odstraněn element dt postrádající dd"
