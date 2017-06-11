@@ -31,6 +31,10 @@
       },
       createEmailLink = function(span, addr) {
         var a = document.createElement("a");
+        for (var i = 0; i < span.attributes.length; i++) {
+          var attr = span.attributes.item(i);
+          a.setAttribute(attr.nodeName, attr.nodeValue);
+        }
         a.className = span.className;
         var email = addr.textContent;
         for(var i = 0; i < Config.rep.length; i++) {
