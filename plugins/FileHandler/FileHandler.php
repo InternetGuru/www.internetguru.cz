@@ -399,10 +399,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       return;
     }
     foreach (self::$fileFolders as $sourceFolder => $isResDir) {
-      if ($isResDir) {
-        $this->doCheckResources(getRealResDir($sourceFolder), $sourceFolder, $isResDir);
+      $folder = getRealResDir($sourceFolder);
+      if ($isResDir && stream_resolve_include_path($folder)) {
+        $this->doCheckResources($folder, $sourceFolder, $isResDir);
       }
-      if (!$isResDir || getRealResDir() == RESOURCES_DIR) {
+      if (stream_resolve_include_path($sourceFolder) && !$isResDir || getRealResDir() == RESOURCES_DIR) {
         $this->doCheckResources($sourceFolder, $sourceFolder, $isResDir);
       }
     }
@@ -423,11 +424,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @param $cacheFolder
    * @param $sourceFolder
    * @param $isResDir
+   * @return bool
    */
   private function doCheckResources ($cacheFolder, $sourceFolder, $isResDir) {
-    if (!stream_resolve_include_path($cacheFolder)) {
-      return;
-    }
     $timestamps = $this->getInotifyTs($cacheFolder, $sourceFolder, $isResDir, $refTs);
     // redundant dir if only one
     if (count($timestamps) == 1) {
@@ -435,14 +434,14 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         @rmdir_plus($cacheFolder);
         if (stream_resolve_include_path($cacheFolder)) {
           $this->error[] = $cacheFolder;
-          return;
+          return false;
         }
         if (CMS_DEBUG) {
           Logger::debug("Removed cache folder $cacheFolder");
         }
       }
       $this->update[$cacheFolder] = $cacheFolder;
-      return;
+      return false;
     }
     // create user files folder if not exists
     if (!$isResDir && !stream_resolve_include_path(USER_FOLDER."/$sourceFolder")) {
@@ -455,34 +454,50 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     }
     // all folder .inotify files uptodate
     if (count(array_unique($timestamps)) == 1 && !is_null(current($timestamps))) {
-      return;
+      return true;
     }
     $iter = new DirectoryIterator($cacheFolder);
     $files = [];
+    $doTouch = true;
     foreach ($iter as $splfi) {
       if ($splfi->isDot() || $splfi->getFilename() == INOTIFY) {
         continue;
       }
       if ($splfi->isDir()) {
-        $this->doCheckResources(
+        $childUpToDate = $this->doCheckResources(
           ($cacheFolder ? "$cacheFolder/" : "").$splfi->getFilename(),
           ($sourceFolder ? "$sourceFolder/" : "").$splfi->getFilename(),
           $isResDir
         );
+        if (!$childUpToDate) {
+          $doTouch = false;
+        }
         continue;
       }
       $files[] = $splfi->getFilename();
     }
+    if (!$doTouch) {
+      return false;
+    }
     // touch .inotify files if folder gets to be uptodate
-    if ($this->folderUpToDate($cacheFolder, $sourceFolder, $isResDir, $files)) {
+    $upToDate = $this->folderUpToDate($cacheFolder, $sourceFolder, $isResDir, $files);
+    if ($upToDate) {
       foreach ($timestamps as $folder => $timestamp) {
         if (!touch("$folder/".INOTIFY, $refTs) && CMS_DEBUG) {
           Logger::debug("Unable to touch $folder/".INOTIFY);
         }
       }
     }
+    return $upToDate;
   }
 
+  /**
+   * @param string $cacheFolder
+   * @param string $sourceFolder
+   * @param bool $isResDir
+   * @param int $refTs
+   * @return array
+   */
   private function getInotifyTs ($cacheFolder, $sourceFolder, $isResDir, &$refTs) {
     // check for .inotify in cms/admin/user/domain
     $refTs = null;
