@@ -144,19 +144,18 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
 
   /**
    * @param string $id
-   * @param int $siblings
    * @return int
    */
-  private function balanceLinks ($id, $siblings = 1) {
+  private function balanceLinks ($id) {
     $deep = 0;
     foreach ($this->tree[$id] as $childId) {
-      $d = $this->balanceLinks($childId, count($this->tree[$id]));
+      $d = $this->balanceLinks($childId);
       if ($d > $deep) {
         $deep = $d;
       }
     }
     $link = $this->idToLink[$id];
-    if ($deep + 1 >= $this->level && $siblings >= $this->limit) {
+    if ($deep + 1 >= $this->level && count($this->tree[$id]) >= $this->limit) {
       if (strpos($link, "#") === 0) {
         $link = substr($link, 1);
       }
