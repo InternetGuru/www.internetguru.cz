@@ -252,7 +252,10 @@
     <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;sub></xsl:text></xsl:if>
     <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;sup></xsl:text></xsl:if>
 
-    <xsl:apply-templates/>
+    <xsl:apply-templates select="node()">
+      <xsl:with-param name="nostrong" select="$nostrong"/>
+      <xsl:with-param name="nosamp" select="$nosamp"/>
+    </xsl:apply-templates>
 
     <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;/sup></xsl:text></xsl:if>
     <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;/sub></xsl:text></xsl:if>
