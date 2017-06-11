@@ -252,7 +252,10 @@
     <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;sub></xsl:text></xsl:if>
     <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;sup></xsl:text></xsl:if>
 
-    <xsl:apply-templates/>
+    <xsl:apply-templates select="node()">
+      <xsl:with-param name="nostrong" select="$nostrong"/>
+      <xsl:with-param name="nosamp" select="$nosamp"/>
+    </xsl:apply-templates>
 
     <xsl:if test="$sup"><xsl:text disable-output-escaping="yes">&lt;/sup></xsl:text></xsl:if>
     <xsl:if test="$sub"><xsl:text disable-output-escaping="yes">&lt;/sub></xsl:text></xsl:if>
@@ -276,11 +279,12 @@
             <!-- unreliable -->
             <!-- or (not(preceding-sibling::p[1]/pPr/numPr/numId/@val = pPr/numPr/numId/@val) and pPr/numPr/ilvl/@val = 0) -->
             <xsl:choose>
-              <!-- definition list if first is bold -->
-              <xsl:when test="count(r) = count(r/rPr/b[@val = 1])">·
+              <!-- definition list if first item is bold -->
+              <!-- => all text nodes of current element are bold -->
+              <xsl:when test="count(.//t) = count(.//r/rPr/b[@val = 1])">·
   <xsl:copy-of select="$pIndent"/><dl>·
     <xsl:copy-of select="$pIndent"/><dt>
-                    <xsl:apply-templates select="node()">
+                  <xsl:apply-templates select="node()">
                       <xsl:with-param name="nostrong" select="1"/>
                     </xsl:apply-templates>
                     <!-- <xsl:copy-of select="r/t/text()"/> -->
@@ -476,6 +480,7 @@
   -->
   <!-- Template for hyperlinks -->
   <xsl:template match="hyperlink">
+    <xsl:param name="nostrong" select="''"/>
     <xsl:variable name="relationships" select="document($relationsFile)"/>
     <xsl:element name="a">
         <xsl:attribute name="href">
@@ -491,6 +496,7 @@
         </xsl:choose>
         </xsl:attribute>
         <xsl:apply-templates select="node()">
+          <xsl:with-param name="nostrong" select="$nostrong"/>
           <xsl:with-param name="nosamp" select="1"/>
         </xsl:apply-templates>
         <!-- <xsl:copy-of select="node()//t/text()"/> -->

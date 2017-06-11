@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Always load default *able
  - Hideable default Expand/Collapse arrows as triangles
 
+## [2.5.3] - 2017-06-11
+### Fixed
+ - Correct definition list detection in Convertor plugin
+
 ## [2.5.2] - 2017-06-11
 ### Fixed
  - Recursive file cache check
@@ -221,6 +225,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.5.3]: https://bitbucket.org/igwr/cms/compare/v2.5.3..v2.5.2
 [2.5.2]: https://bitbucket.org/igwr/cms/compare/v2.5.2..v2.5.1
 [2.5.1]: https://bitbucket.org/igwr/cms/compare/v2.5.1..v2.5.0
 [2.5.0]: https://bitbucket.org/igwr/cms/compare/v2.5.0..v2.4.11
