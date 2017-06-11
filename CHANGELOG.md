@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Always load default *able
  - Hideable default Expand/Collapse arrows as triangles
 
+## [2.5.6] - 2017-06-11
+### Fixed
+ - Uppercase URL does not match
+
 ## [2.5.5] - 2017-06-11
 ### Fixed
  - EmailBreaker removes original anchor attributes
@@ -233,6 +237,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.5.6]: https://bitbucket.org/igwr/cms/compare/v2.5.6..v2.5.5
 [2.5.5]: https://bitbucket.org/igwr/cms/compare/v2.5.5..v2.5.4
 [2.5.4]: https://bitbucket.org/igwr/cms/compare/v2.5.4..v2.5.3
 [2.5.3]: https://bitbucket.org/igwr/cms/compare/v2.5.3..v2.5.2
