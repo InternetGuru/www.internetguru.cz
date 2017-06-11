@@ -521,8 +521,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach ($this->cssFilesPriority as $k => $v) {
       $ifXpath = isset($this->cssFiles[$k]["ifXpath"]) ? $this->cssFiles[$k]["ifXpath"] : false;
       if ($ifXpath !== false) {
-        $r = $xPath->query($ifXpath);
-        if ($r === false || $r->length === 0) {
+        $r = @$xPath->query($ifXpath);
+        if ($r === false) {
+          Logger::user_warning(sprintf(_("Invalid xPath query '%s'"), $ifXpath));
+          continue;
+        }
+        if ($r->length === 0) {
           continue;
         }
       }
