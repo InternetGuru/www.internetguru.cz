@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.5] - 2017-06-11
+### Fixed
+ - EmailBreaker removes original anchor attributes
+
 ## [2.5.4] - 2017-06-11
 ### Fixed
  - Catch HtmlOutput invalid xPath error
@@ -218,6 +222,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[2.5.5]: https://bitbucket.org/igwr/cms/compare/v2.5.5..v2.5.4
 [2.5.4]: https://bitbucket.org/igwr/cms/compare/v2.5.4..v2.5.3
 [2.5.3]: https://bitbucket.org/igwr/cms/compare/v2.5.3..v2.5.2
 [2.5.2]: https://bitbucket.org/igwr/cms/compare/v2.5.2..v2.5.1
