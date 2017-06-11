@@ -183,6 +183,7 @@ class UrlHandler extends Plugin implements SplObserver {
   private function minPos (Array $links, $link, $max = null) {
     $linkpos = [];
     foreach ($links as $k => $l) {
+      $l = strtolower($l);
       $pos = strpos($l, $link);
       if ($pos === false || (!is_null($max) && $pos > $max)) {
         continue;
@@ -195,6 +196,7 @@ class UrlHandler extends Plugin implements SplObserver {
     }
     $sublinks = [];
     foreach ($links as $k => $l) {
+      $l = strtolower($l);
       $l = str_replace(["_", "-"], "/", $l);
       if (strpos($l, "/") === false) {
         continue;
