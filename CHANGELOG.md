@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Always load default *able
  - Hideable default Expand/Collapse arrows as triangles
 
+### Fixed
+ - Invalid file cache detection
+
 ## [2.5.6] - 2017-06-11
 ### Fixed
  - Uppercase URL does not match
