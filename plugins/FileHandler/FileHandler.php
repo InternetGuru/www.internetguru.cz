@@ -427,9 +427,15 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @return bool
    */
   private function doCheckResources ($cacheFolder, $sourceFolder, $isResDir) {
-    $timestamps = $this->getInotifyTs($cacheFolder, $sourceFolder, $isResDir, $refTs);
+    $existingFolders = $this->getSrcFolders(
+      $cacheFolder,
+      $sourceFolder,
+      $isResDir,
+      $refTs,
+      $inotifyUpToDate
+    );
     // redundant dir if only one
-    if (count($timestamps) == 1) {
+    if (count($existingFolders) == 1) {
       if ($this->deleteCache) {
         @rmdir_plus($cacheFolder);
         if (stream_resolve_include_path($cacheFolder)) {
@@ -453,7 +459,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       }
     }
     // all folder .inotify files uptodate
-    if (count(array_unique($timestamps)) == 1 && !is_null(current($timestamps))) {
+    if ($inotifyUpToDate) {
       return true;
     }
     $iter = new DirectoryIterator($cacheFolder);
@@ -476,61 +482,73 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       }
       $files[] = $splfi->getFilename();
     }
-    if (!$doTouch) {
-      return false;
-    }
     // touch .inotify files if folder gets to be uptodate
-    $upToDate = $this->folderUpToDate($cacheFolder, $sourceFolder, $isResDir, $files);
-    if ($upToDate) {
-      foreach ($timestamps as $folder => $timestamp) {
+    $upToDate = $this->folderUpToDate(
+      $cacheFolder,
+      $sourceFolder,
+      $isResDir,
+      $files
+    );
+    if ($doTouch && $upToDate) {
+      foreach ($existingFolders as $folder => $isCmsFolder) {
+        if ($isCmsFolder) {
+          continue;
+        }
         if (!touch("$folder/".INOTIFY, $refTs) && CMS_DEBUG) {
           Logger::debug("Unable to touch $folder/".INOTIFY);
         }
       }
     }
-    return $upToDate;
+    return $upToDate && $doTouch;
   }
 
   /**
    * @param string $cacheFolder
    * @param string $sourceFolder
    * @param bool $isResDir
-   * @param int $refTs
+   * @param int $newestFilemtime
+   * @param bool $upToDate
    * @return array
    */
-  private function getInotifyTs ($cacheFolder, $sourceFolder, $isResDir, &$refTs) {
+  private function getSrcFolders (
+    $cacheFolder, $sourceFolder, $isResDir, &$newestFilemtime, &$upToDate) {
     // check for .inotify in cms/admin/user/domain
-    $refTs = null;
-    $timestamps = [];
+    $newestFilemtime = null;
+    $existingFolders = [];
     $adeptFolders = [];
+    // files folder has no defaults
     if ($isResDir) {
-      $adeptFolders[CMS_FOLDER."/$sourceFolder"] = null;
+      $adeptFolders[CMS_FOLDER . "/$sourceFolder"] = true;
     } else {
-      $rawSourceFolder = $this->getImageSource($cacheFolder, self::getImageMode($cacheFolder));
-      $adeptFolders[ADMIN_FOLDER."/$rawSourceFolder"] = null;
-      $adeptFolders[USER_FOLDER."/$rawSourceFolder"] = null;
+      $rawSourceFolder = $this->getImageSource(
+        $cacheFolder, self::getImageMode($cacheFolder)
+      );
+      $adeptFolders[ADMIN_FOLDER . "/$rawSourceFolder"] = false;
+      $adeptFolders[USER_FOLDER . "/$rawSourceFolder"] = false;
     }
-    $adeptFolders[ADMIN_FOLDER."/$sourceFolder"] = null;
-    $adeptFolders[USER_FOLDER."/$sourceFolder"] = null;
-    $adeptFolders[$cacheFolder] = null;
-    foreach ($adeptFolders as $folder => $void) {
-      if (stream_resolve_include_path("$folder/".INOTIFY)) {
-        $timestamps[$folder] = filemtime("$folder/".INOTIFY);
-      } elseif (stream_resolve_include_path($folder)) {
-        $timestamps[$folder] = null;
-      } else {
-        continue;
+    $adeptFolders[ADMIN_FOLDER . "/$sourceFolder"] = false;
+    $adeptFolders[USER_FOLDER . "/$sourceFolder"] = false;
+    $adeptFolders[$cacheFolder] = false;
+    $upToDate = true;
+    foreach ($adeptFolders as $folder => $isCmsFolder) {
+      if (stream_resolve_include_path("$folder/" . INOTIFY)) {
+        $filemtime = filemtime("$folder/" . INOTIFY);
+        if (is_null($newestFilemtime)) {
+          $newestFilemtime = $filemtime;
+          continue;
+        }
+        if ($filemtime != $newestFilemtime) {
+          $upToDate = false;
+        }
+        if ($filemtime > $newestFilemtime) {
+          $newestFilemtime = $filemtime;
+        }
       }
-      if (!is_null($refTs)) {
-        continue;
+      if (stream_resolve_include_path($folder)) {
+        $existingFolders[$folder] = $isCmsFolder;
       }
-      if (is_null($timestamps[$folder])) {
-        $refTs = time();
-        continue;
-      }
-      $refTs = $timestamps[$folder];
     }
-    return $timestamps;
+    return $existingFolders;
   }
 
   /**
@@ -545,7 +563,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     foreach ($files as $f) {
       $cacheFilePath = "$cacheFolder/$f";
       $sourceFilePath = "$sourceFolder/$f";
-      $fileUptodate = $this->updateCacheFile($sourceFilePath, $cacheFilePath, $isResDir);
+      $fileUptodate = $this->updateCacheFile(
+        $sourceFilePath, $cacheFilePath, $isResDir
+      );
       if (!$fileUptodate) {
         $folderUptodate = false;
       }
