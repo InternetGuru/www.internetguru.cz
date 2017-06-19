@@ -86,7 +86,7 @@ $verfile = getcwd()."/".CMS_VERSION_FILENAME;
 define('DEFAULT_RELEASE', is_file($verfile) ? trim(file_get_contents($verfile)) : CMS_RELEASE);
 define('CMS_LANG', is_file(LANG_FILE) ? trim(file_get_contents(LANG_FILE)) : DEFAULT_LANG);
 define('CMS_STAGE', strpos(CMS_VERSION, CMS_RELEASE) === 0 ? "stable" : CMS_RELEASE);
-define('CMS_NAME', "IGCMS ".CMS_VERSION."-".CMS_STAGE.(CMS_DEBUG ? "-debug" : ""));
+define('CMS_NAME', "IGCMS ".CMS_VERSION."-".CMS_STAGE."-".CMS_LANG.(CMS_DEBUG ? "-debug" : ""));
 #print_r(get_defined_constants(true)); die();
 date_default_timezone_set("Europe/Prague");
 
