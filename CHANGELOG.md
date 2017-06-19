@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - CMS_NAME includes system language
+ - Missing lang file generates warning
  - Highlightable.js
  - Hideable Expand/Collapse switch title attribute
  - Hideable does not hide elements with nohide class
