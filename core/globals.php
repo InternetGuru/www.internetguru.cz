@@ -237,7 +237,7 @@ function buildLocalUrl (Array $pLink, $ignoreCyclic = false, $addPermParam = tru
     $pLink["path"] = ROOT_URL.$path;
   }
   #if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  if (SCRIPT_NAME == "index.php" || strpos($path, FILES_DIR) === 0) {
+  if (SCRIPT_NAME == FINDEX_PHP || SCRIPT_NAME == "index.php" || strpos($path, FILES_DIR) === 0) {
     return implodeLink($pLink);
   }
   $pLink["path"] = ROOT_URL.SCRIPT_NAME;
