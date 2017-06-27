@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - User redirect supports files
  - CMS_NAME includes system language
  - Missing lang file generates warning
  - Highlightable.js

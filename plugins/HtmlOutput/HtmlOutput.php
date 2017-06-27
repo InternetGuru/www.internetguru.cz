@@ -17,6 +17,7 @@ use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\XMLBuilder;
+use IGCMS\Plugins\FileHandler;
 use SplObserver;
 use SplSubject;
 use XSLTProcessor;
@@ -85,6 +86,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param Plugins|SplSubject $subject
    */
   public function update (SplSubject $subject) {
+    if ($this->detachIfNotAttached("FileHandler")) {
+      return;
+    }
     if ($subject->getStatus() != STATUS_PROCESS) {
       return;
     }
@@ -562,13 +566,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $isLink = true;
       if (array_key_exists("path", $pLink)) {
         // link to supported file
-        global $plugins;
-        foreach ($plugins->getIsInterface("IGCMS\\Core\\ResourceInterface") as $ri) {
-          if (!$ri::isSupportedRequest($pLink["path"])) {
-            continue;
-          }
+        if (FileHandler::isSupportedRequest($pLink["path"])) {
           $isLink = false;
-          break;
         }
         // link to existing file
         if ($isLink && is_file($pLink["path"])) {

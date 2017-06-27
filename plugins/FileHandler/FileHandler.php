@@ -82,7 +82,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 1);
+    $s->setPriority($this, 5);
     $this->deleteCache = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE;
   }
 
