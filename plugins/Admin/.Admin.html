@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<body xml:lang="cs" ns="beta.internetguru.cz">
+  <h var="heading" id="h.n4d" author="InternetGuru" link="admin" ctime="2015-05-14T13:15:59+02:00">Administrace</h>
+  <desc kw="administrace, plugin, soubory">Administrace souboru <samp var="filename">n/a</samp> ve formátu <samp var="schema">n/a</samp></desc>
+  <form class="editable fillable" action="/" method="post" var="linkadmin@action">
+    <fieldset class="hideable nohide"><legend>Rychlá navigace</legend>
+      <input type="text" class="navigation"/><input type="hidden" name="placeholder" value="Hledaný soubor"/>
+    </fieldset>
+    <fieldset class="hideable nohide"><legend>Uživatelský soubor, mód <samp var="mode">n/a</samp>, stav <samp var="status warning@class">n/a</samp></legend>
+      <textarea cols="40" name="content" rows="20" var="content classtype@class"/>
+    </fieldset>
+    <fieldset><legend>Ovládací panel</legend>
+      <input name="userfilehash" type="hidden" value="" var="userfilehash@value"/>
+      <ul>
+        <li><label>Uložit do souboru <input name="filename" type="text" var="filename@value"/></label></li>
+        <li><label><input name="overwrite" type="checkbox"/> Přepsat soubor, pokud existuje</label></li>
+        <li><label><input name="disabled" type="checkbox" var="checked@checked"/> Deaktivovat editovaný soubor <samp var="filename">n/a</samp></label></li>
+        <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
+        <li><input name="saveandgo" type="submit" value="Uložit a přejít" title="Ctrl+Shift+S"/></li>
+      </ul>
+    </fieldset>
+    <fieldset class="hideable" var="nohide@class"><legend>Výchozí soubor</legend>
+      <blockcode class="selectable" var="defaultcontent">n/a</blockcode>
+    </fieldset>
+    <fieldset class="hideable"><legend>Výsledek, mód <samp var="mode">n/a</samp></legend>
+      <blockcode class="selectable" var="resultcontent">n/a</blockcode>
+    </fieldset>
+    <fieldset class="hideable nohide"><legend>Seznamy proměnných a souborů</legend>
+      <dl>
+        <dt>Globální proměnné (proměnná <samp>cms-variables</samp>)</dt>
+        <dd><samp var="cms-variables">žádné</samp></dd>
+        <dt>Soubory HTML+ včetně importů (proměnná <samp>dombuilder-html</samp>)</dt>
+        <dd class="links"><samp var="dombuilder-html">žádné</samp></dd>
+        <dt>XML a HTML+ konfigurace rozšíření (proměnná <samp>cms-plugins</samp>)</dt>
+        <dd class="links plugin-xml"><samp var="cms-plugins">žádné</samp></dd>
+        <dd class="links plugin-html"><samp var="cms-plugins">žádné</samp></dd>
+        <dt>Transformace (proměnná <samp>xhtml11-transformations</samp>)</dt>
+        <dd class="links"><samp var="xhtml11-transformations">žádné</samp></dd>
+        <dt>Soubory CSS (proměnná <samp>xhtml11-styles</samp>)</dt>
+        <dd class="links"><samp var="xhtml11-styles">žádné</samp></dd>
+        <dt>Soubory JS (proměnná <samp>xhtml11-javascripts</samp>)</dt>
+        <dd class="links"><samp var="xhtml11-javascripts">žádné</samp></dd>
+      </dl>
+    </fieldset>
+  </form>
+</body>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<body xml:lang="cs">
+  <h id="h.a3f" ctime="2014-11-24T12:40:01+01:00">Tvorba webu v IGCMS</h>
+  <desc>Toto je výchozí obsah webu psaný v HTML+. Je navržen tak, aby dal správcům webu základní přehled o procesu jeho vytvoření. V druhé části obsahu je několik ukázek typických prvků, které se při vytváření webu mohou hodit.</desc>
+  <p>Před začátkem práce se systémem je potřeba získat přehled o jeho fungování. Především je potřeba připravit kvalitní strukturovaný obsah vytvářeného webu. Technologie a vzhled výsledného webu jsou z hlediska tvorby až na druhém místě.</p>
+  <section>
+    <h id="h.463">Jak začít s IGCMS</h>
+    <desc>Proces vytvoření webu na systému IGCMS rozdělený do několika kroků. Především jde o vytvoření obsahu se strukturou následované seznámením se systémem. V další fázi je možné dokument do systému naimportovat a v posledních fázích obsah doupravit a nastavit vzhled.</desc>
+    <ol>
+      <li>Připravte si dobře strukturovaný koncept (dokument) o tom, čeho chcete dosáhnout. Zaměřte se na strukturu a obsah (ne jen obsah).
+        <ul>
+          <li>Každý koncept má pouze jeden hlavní nadpis.</li>
+          <li>Po každém nadpisu by mělo následovat shrnutí následující pod/kapitoly (pro účely importu je shrnutí jako vycentrovaný odstavec za nadpisem).</li>
+          <li>Následuje samotný obsah, který by měl být členitý – kromě odstavců také seznamy apod. Delší kapitoly je dobré členit na podkapitoly – nadpisy nižší úrovně.</li>
+          <li>Obsah jako celek by měl být vyvážený tak, aby neobsahoval příliš mnoho ale ani příliš málo prvků stejného typu za sebou.</li>
+        </ul></li>
+      <li>Před používáním systému si projděte <a href="http://partner.internetguru.cz/igcms">Specifikaci IGCMS</a>.
+        <ul>
+          <li>Login: <samp>partner</samp> / <samp>igpartner</samp></li>
+          <li>Nejdříve se ujistěte, že chápete <em>základní pojmy</em>.</li>
+          <li>Kdykoli si nevíte rady, čtěte manuál.</li>
+        </ul></li>
+      <li><a href="http://localhost/ig?import">Importujte dokumenty</a> do IGMS.
+        <ul>
+          <li>Nezapomeňte, že importovaný soubor je uložený odděleně, aby se zabránilo nežádoucímu přepsání.</li>
+          <li>Pokud chcete použít importovaný obsah (nebo jeho část), zkopírujte jej do souboru s obsahem. V této fázi stačí soubor zkopírovat do schránky.</li>
+          <li>Importovaný dokument je možné k obsahu připojit přímo pomocí atributu <samp>import</samp>. Případné další změny importovaného souboru se projeví okamžitě v obsahu webu.</li>
+        </ul></li>
+      <li>Pro vytvoření obsahu <a href="http://localhost/ig?admin">vstupte do administrace</a> nebo soubory modifikujte přímo přes FTP.
+        <ul>
+          <li>Do výchozího dokumentu <samp>Content.html</samp> vložte obsah ve formátu HTML+. Např. ten ze schránky – zkopírovaný v předchozím kroku z importovaného dokumentu.</li>
+        </ul></li>
+      <li>Vzhled a další nastavení
+        <ul>
+          <li>V rámci odkazů ve spodní části administrace můžete procházet a měnit datové a konfigurační soubory jednotlivých rozšíření dle libosti.</li>
+          <li>Každý vytvořený soubor je možné deaktivovat a tím obnovit výchozí hodnoty.</li>
+        </ul></li>
+    </ol>
+    <h id="h.e0f">Ukázky použití</h>
+    <desc>Několik příkladů typického použití systému při tvorbě webu. Použití definičního seznamu s několika řádkovými prvky a ukázkou zobrazení systémové proměnné.</desc>
+    <dl>
+      <dt>Formátování textu</dt>
+      <dd>Text odstavce (nebo jiného prvku) může být <strong>zdůrazněný</strong> (typicky tučně), <em>méně důrazný</em> (typicky kurzívou), může se jednat o <samp>příklad</samp> a další.</dd>
+      <dt>Používání proměnných</dt>
+      <dd>Zobrazit hodnotu globální proměnné <samp>cms-version</samp>: <em var="cms-version"/></dd>
+      <dd>Zobrazit hodnotu globální proměnné <samp>cms-version</samp>: <strong var="cms-version"></strong></dd>
+      <dd>Zobrazit hodnotu globální proměnné <samp>cms-version</samp>: $cms-version</dd>
+      <dd>Zobrazit hodnotu globální proměnné <samp>cms-version</samp>: <strong>$cms-version</strong></dd>
+      <dd>Předchozí proměnná se zobrazí pomocí kódu <code>&lt;em var="cms-version"/&gt;</code></dd>
+      <dd>Předchozí proměnná se zobrazí pomocí kódu <code>&lt;em var="cms-version"/&gt;</code></dd>
+      <dd>Předchozí proměnná se zobrazí pomocí kódu <code class="xml">&lt;em var="cms-version"/&gt;</code></dd>
+      <dd>Předchozí proměnná se zobrazí pomocí kódu <code class="xml">&lt;em var="cms-version"/&gt;</code></dd>
+    </dl>
+    <p>CODE#1</p>
+    <p>  function keywords(str) {</p>
+    <p>    var obj = {}, words = str.split(" ");</p>
+    <p>    for (var i = 0; i &lt; words.length; ++i) obj[words[i]] = true;</p>
+    <p>    return obj;</p>
+    <p>  }</p>
+    <p>  function heredoc(delim) {</p>
+    <p>    return function(stream, state) {</p>
+    <p>      if (stream.match(delim)) state.tokenize = null;</p>
+    <p>      else stream.skipToEnd();</p>
+    <p>      return "string";</p>
+    <p>    };</p>
+    <p>  }</p>
+    <p>CODE#2</p>
+    <p>  function keywords(str) {<br/>    var obj = {}, words = str.split(" ");<br/>    for (var i = 0; i &lt; words.length; ++i) obj[words[i]] = true;<br/>    return obj;<br/>  }<br/><br/>  function heredoc(delim) {<br/>    return function(stream, state) {<br/>      if (stream.match(delim)) state.tokenize = null;<br/>      else stream.skipToEnd();<br/>      return "string";<br/>    };<br/>  }</p>
+    <p>CODE#3</p>
+    <p>  function keywords(str) {<br/>    var obj = {}, words = str.split(" ");<br/>    for (var i = 0; i &lt; words.length; ++i) obj[words[i]] = true;<br/>    return obj;<br/>  }</p>
+    <p>  function heredoc(delim) {<br/>    return function(stream, state) {<br/>      if (stream.match(delim)) state.tokenize = null;<br/>      else stream.skipToEnd();<br/>      return "string";<br/>    };<br/>  }</p>
+    <p>CODE#4</p>
+    <p>  function keywords(str) {<br/>  var obj = {}, words = str.split(" ");<br/>  for (var i = 0; i &lt; words.length; ++i) obj[words[i]] = true;<br/>  return obj;<br/>}<br/><br/>function heredoc(delim) {<br/>  return function(stream, state) {<br/>    if (stream.match(delim)) state.tokenize = null;<br/>    else stream.skipToEnd();<br/>    return "string";<br/>  };<br/>}</p>
+    <p>That’s it</p>
+  </section>
+</body>

@@ -1,0 +1,102 @@
+@charset "UTF-8";
+
+div.list.multiple > div {
+  display: flex;
+}
+div.list.multiple > div {
+  justify-content: center;
+}
+div.list.multiple dl {
+  flex: 0 1 100%;
+  max-width: 19em;
+  box-sizing: border-box;
+  padding: 1em;
+  margin: 0;
+  overflow: hidden;
+}
+
+form div.list.multiple dl {
+  max-width: 27em;
+}
+@media screen and (min-width: 22em) {
+  div.list.multiple dl {
+    box-shadow: 0.1em 0.1em 0.7em #C4C4C4;
+    background-color: white;
+    margin-bottom: 1em;
+  }
+}
+@media (min-width: 33em) {
+  div.list.multiple {
+    padding-left: 1em;
+    padding-right: 1em;
+    max-width: 39em;
+    margin: 0 auto;
+  }
+  div.section > div.list.multiple > div {
+    justify-content: space-between;
+  }
+  div.section > div.list.multiple dl {
+    flex: 0 1 50%;
+  }
+}
+@media (min-width: 52em) {
+  form > div.list.multiple dl {
+    flex: 0 1 50%;
+  }
+  form div.list.multiple {
+    max-width: 55em;
+  }
+  form div.list.multiple > div {
+    justify-content: space-between;
+  }
+  div.section > div.list.multiple dl {
+    flex: 0 1 33.33%;
+  }
+  div.section > div.list.multiple {
+    max-width: 59em;
+  }
+}
+div.list.multiple dt:first-child {
+  display: none;
+}
+div.list.multiple dl.adv a,
+div.list.multiple dl.adv dt:first-child + dd,
+form#contactform-tel div.list.multiple dt:first-child + dd {
+  display: block;
+  font-size: 1.8em;
+  color: #BF342F;
+  border-bottom: thin solid #CA7976;
+  padding-bottom: 0.1em;
+}
+form#contactform-tel dd {
+  float: none;
+}
+form#contactform-tel dt, div.list.multiple dl.adv dt {
+  margin-top: 1.5em;
+  margin-bottom: 0;
+  /* color: #C79896; */
+  font-weight: 400;
+  float: none;
+  /* font-style: italic; */
+  /* text-transform: uppercase; */
+  /* border-left: 0.5em solid #db630b; */
+}
+form#contactform-tel dt:not(:first-child) {
+  font-weight: 600;
+}
+form#contactform-tel dt:fist-child,
+div.list.multiple dl.adv dt:fist-child {
+  margin-top: 0;
+}
+div.list.multiple dl.adv dd {
+  margin-left: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+}
+div.list.multiple dl.adv dd~dd {
+  font-weight: 600;
+}
+form#contactform-tel dd {
+  margin-top: 0.15em;
+  margin-bottom: 0;
+}
