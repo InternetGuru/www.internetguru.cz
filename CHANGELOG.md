@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Invalid file cache detection
+ - XMLBuilder::updateDOM inline user data
 
 ## [2.5.6] - 2017-06-11
 ### Fixed
