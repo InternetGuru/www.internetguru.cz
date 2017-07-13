@@ -72,7 +72,7 @@ class XMLBuilder extends DOMBuilder {
     $docId = null;
     foreach ($newDoc->documentElement->childElementsArray as $n) {
       if (!$n->hasAttribute("id")) {
-        $doc->documentElement->appendChild($doc->importNode($n, true));
+        self::appendChildFormat($doc->documentElement, $n);
         continue;
       }
       if (is_null($docId)) {
@@ -80,7 +80,7 @@ class XMLBuilder extends DOMBuilder {
       }
       $curId = $n->getAttribute("id");
       if (!array_key_exists($curId, $docId)) {
-        $doc->documentElement->appendChild($doc->importNode($n, true));
+        self::appendChildFormat($doc->documentElement, $n);
         continue;
       }
       if ($docId[$curId]->nodeName != $n->nodeName) {
@@ -95,6 +95,16 @@ class XMLBuilder extends DOMBuilder {
       }
       $doc->documentElement->replaceChild($doc->importNode($n, true), $docId[$curId]);
     }
+  }
+
+  /**
+   * @param DOMElementPlus $parent
+   * @param DOMElementPlus $child
+   */
+  private static function appendChildFormat (DOMElementPlus $parent, DOMElementPlus $child) {
+    $parent->appendChild($parent->ownerDocument->createTextNode("  "));
+    $parent->appendChild($parent->ownerDocument->importNode($child, true));
+    $parent->appendChild($parent->ownerDocument->createTextNode("\n"));
   }
 
   /**
