@@ -271,6 +271,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       }
       if (isset($_GET[self::FILE_DISABLE])) {
         $this->disableDataFile();
+        $this->clearResCache();
         Logger::user_success(sprintf(_("File '%s' disabled"), $this->defaultFile));
       }
     } catch (Exception $e) {
@@ -514,7 +515,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
   }
 
-  private function updateCache () {
+  private function clearResCache () {
     if ($this->isResource($this->type)) {
       $resFile = getRealResDir($this->defaultFile);
       if (is_file($resFile)) {
@@ -528,6 +529,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       }
       return;
     }
+  }
+
+  private function updateCache () {
+    $this->clearResCache();
     #if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     try {
       clearNginxCache();
