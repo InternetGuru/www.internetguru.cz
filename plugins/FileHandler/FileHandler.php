@@ -234,6 +234,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       } else {
         copy_plus($src, $dest);
       }
+    } catch (Exception $ex) {
+      Logger::error(sprintf(_("Unable to handle resource: %s"), $ex->getMessage()));
+      self::outputFile($src, "text/$ext");
+      exit;
     } finally {
       unlock_file($fp, $dest);
     }
@@ -372,8 +376,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   /**
    * @param string $file
    * @param string $mime
+   * @throws Exception
    */
   private static function outputFile ($file, $mime) {
+    if (!stream_resolve_include_path($file)) {
+      throw new Exception(sprintf(_("File %s does not exists"), $file));
+    }
     header("Content-type: $mime");
     echo file_get_contents($file);
   }
@@ -496,7 +504,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       return false;
     }
     $cacheMtime = filemtime("$cacheFolder/".INOTIFY);
-    $folders = []; 
+    $folders = [];
     // files folder has no defaults
     if ($isResDir) {
       $folders[CMS_FOLDER."/$sourceFolder"] = true;
