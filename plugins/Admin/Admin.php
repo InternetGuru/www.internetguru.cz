@@ -759,11 +759,11 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       if (is_file(ADMIN_FOLDER."/$f")) {
         $v .= " #admin";
       }
-      if (is_file(USER_FOLDER."/$f")) {
-        $v .= " #user";
-      }
       if (is_file(USER_FOLDER."/".dirname($f)."/.".basename($f))) {
         $v .= " #user #disabled";
+      }
+      else if (is_file(USER_FOLDER."/$f")) {
+        $v .= " #user";
       }
       $option->nodeValue = $v;
       $var->appendChild($option);
