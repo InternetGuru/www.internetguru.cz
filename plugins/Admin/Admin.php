@@ -375,6 +375,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       if ($this->type == "html") {
         $doc = new HTMLPlus();
         $doc->load(CMS_FOLDER."/".INDEX_HTML);
+        $doc->validatePlus(true);
         $doc->documentElement->firstElement->setAttribute("id", $htmlId);
       } else {
         $doc = new DOMDocumentPlus();
