@@ -221,6 +221,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
     $h1 = $content->getElementById($link, "h");
     if (is_null($h1)) {
+      // Redirect encoded # (%23) in url to decoded url
+      if (strpos($link, "#") != -1) {
+        redirTo($link);
+      }
       new ErrorPage(_("Unable to find requested section"), 500);
     }
     $this->handleAttribute($h1, "ctime");
