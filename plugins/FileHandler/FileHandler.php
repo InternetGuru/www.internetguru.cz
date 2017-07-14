@@ -235,7 +235,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         copy_plus($src, $dest);
       }
     } catch (Exception $ex) {
-      Logger::error(sprintf(_("Unable to handle resource: %s"), $ex->getMessage()));
+      Logger::error(sprintf(_("Unable to handle resource '%s': %s"), $dest, $ex->getMessage()));
       self::outputFile($src, "text/$ext");
       exit;
     } finally {
