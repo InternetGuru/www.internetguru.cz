@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-11 14:13+0200\n"
-"PO-Revision-Date: 2017-06-11 14:14+0200\n"
+"POT-Creation-Date: 2017-07-14 11:25+0200\n"
+"PO-Revision-Date: 2017-07-14 11:26+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 2.0.2\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -550,7 +550,7 @@ msgstr "Neznámý název metody %s"
 msgid "Argument[%s] empty or missing"
 msgstr "Argument[%s] chybí nebo je prázdný"
 
-#: findex.php:28 plugins/FileHandler/FileHandler.php:165
+#: findex.php:18 plugins/FileHandler/FileHandler.php:165
 msgid "File not found"
 msgstr "Soubor nenalezen"
 
@@ -575,20 +575,20 @@ msgstr "Nepodporováno neaktivní verzí systému: %s"
 msgid "Invalid session cookies removed"
 msgstr "Odstraněna neplatná proměnná session z cookies"
 
-#: index.php:61
+#: index.php:67
 msgid "Cache successfully purged"
 msgstr "Mezipaměť (cache) byla úspěšně vymazána"
 
-#: index.php:103
+#: index.php:109
 msgid "Server cache (nginx) is outdated"
 msgstr "Mezipaměť serveru (nginx cache) je zastaralá"
 
-#: index.php:115
+#: index.php:121
 #, php-format
 msgid "%s in %s on line %s"
 msgstr "%s v %s na řádku %s"
 
-#: index.php:117
+#: index.php:123
 #, php-format
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
@@ -654,111 +654,111 @@ msgstr "Nepodporovaný formát souboru '%s'"
 msgid "File '%s' enabled"
 msgstr "Soubor '%s' aktivován"
 
-#: plugins/Admin/Admin.php:274
+#: plugins/Admin/Admin.php:275
 #, php-format
 msgid "File '%s' disabled"
 msgstr "Soubor '%s' deaktivován"
 
-#: plugins/Admin/Admin.php:300
+#: plugins/Admin/Admin.php:301
 msgid "Failed to enable file"
 msgstr "Nepodařilo se aktivovat soubor"
 
-#: plugins/Admin/Admin.php:312
+#: plugins/Admin/Admin.php:313
 msgid "Failed to disable file"
 msgstr "Nepodařilo se deaktivovat soubor"
 
-#: plugins/Admin/Admin.php:345
+#: plugins/Admin/Admin.php:346
 #, php-format
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:387
+#: plugins/Admin/Admin.php:388
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:411
+#: plugins/Admin/Admin.php:412
 msgid "Repairable error(s) occurred"
 msgstr "Nastaly opravitelné chyby"
 
-#: plugins/Admin/Admin.php:442
+#: plugins/Admin/Admin.php:443
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
 
-#: plugins/Admin/Admin.php:460
+#: plugins/Admin/Admin.php:461
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:492
+#: plugins/Admin/Admin.php:493
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:496
+#: plugins/Admin/Admin.php:497
 msgid "Unable to enable destination file"
 msgstr "Nepodařilo se aktivovat cílový soubor"
 
-#: plugins/Admin/Admin.php:501
+#: plugins/Admin/Admin.php:502
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:508
+#: plugins/Admin/Admin.php:509
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:511 plugins/InputVar/InputVar.php:74
+#: plugins/Admin/Admin.php:512 plugins/InputVar/InputVar.php:74
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:542
+#: plugins/Admin/Admin.php:547
 msgid "Saving changes will clear server cache"
 msgstr "Uložení změn vyčistí serverovou mezipaměť"
 
-#: plugins/Admin/Admin.php:561
+#: plugins/Admin/Admin.php:566
 msgid "Saving changes will remove outdated file cache"
 msgstr "Uložení změn odstraní neaktuální soubor z mezipaměti"
 
-#: plugins/Admin/Admin.php:574
+#: plugins/Admin/Admin.php:579
 msgid "null value"
 msgstr "hodnota null"
 
-#: plugins/Admin/Admin.php:580
+#: plugins/Admin/Admin.php:585
 msgid "empty value"
 msgstr "prázná hodnota"
 
-#: plugins/Admin/Admin.php:623
+#: plugins/Admin/Admin.php:628
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:644
+#: plugins/Admin/Admin.php:649
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:644
+#: plugins/Admin/Admin.php:649
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:664
+#: plugins/Admin/Admin.php:669
 msgid "Administration"
 msgstr "Administrace"
 
-#: plugins/Admin/Admin.php:666
+#: plugins/Admin/Admin.php:671
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:667
+#: plugins/Admin/Admin.php:672
 #, php-format
 msgid "%s (%s) - Administration"
 msgstr "%s (%s) - Administrace"
 
-#: plugins/Admin/Admin.php:687
+#: plugins/Admin/Admin.php:692
 msgid "enable"
 msgstr "aktivovat"
 
-#: plugins/Admin/Admin.php:687
+#: plugins/Admin/Admin.php:692
 msgid "disable"
 msgstr "deaktivovat"
 
@@ -1000,62 +1000,72 @@ msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 msgid "File illegal path"
 msgstr "Neplatná cesta souboru"
 
-#: plugins/FileHandler/FileHandler.php:252
+#: plugins/FileHandler/FileHandler.php:238
+#, php-format
+msgid "Unable to handle resource '%s': %s"
+msgstr "Nepodařilo se zpracovat požadavek na soubor %s: %s"
+
+#: plugins/FileHandler/FileHandler.php:256
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:277
+#: plugins/FileHandler/FileHandler.php:281
 #, php-format
 msgid "File %s was successfully built"
 msgstr "Soubor %s byl úspěšně postaven"
 
-#: plugins/FileHandler/FileHandler.php:298
+#: plugins/FileHandler/FileHandler.php:302
 msgid "UglifyJS not installed"
 msgstr "UglifyJS není nainstalovaný"
 
-#: plugins/FileHandler/FileHandler.php:304
+#: plugins/FileHandler/FileHandler.php:308
 msgid "Unable to minify JS"
 msgstr "Nepodařilo se minifikovat JS"
 
-#: plugins/FileHandler/FileHandler.php:321
+#: plugins/FileHandler/FileHandler.php:325
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:341
+#: plugins/FileHandler/FileHandler.php:345
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:346
+#: plugins/FileHandler/FileHandler.php:350
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:355
+#: plugins/FileHandler/FileHandler.php:359
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:369
+#: plugins/FileHandler/FileHandler.php:373
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
-#: plugins/FileHandler/FileHandler.php:411
+#: plugins/FileHandler/FileHandler.php:383
+#, php-format
+msgid "File %s does not exists"
+msgstr "Soubor %s neexistuje"
+
+#: plugins/FileHandler/FileHandler.php:419
 #, php-format
 msgid "Unable to update file cache: %s"
 msgstr "Nepodařilo se aktualizovat souborovou mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:415
+#: plugins/FileHandler/FileHandler.php:423
 #, php-format
 msgid "File cache successfully updated: %s"
 msgstr "Souborová mezipaměť byla úspěšně aktualizovaná: %s"
 
-#: plugins/FileHandler/FileHandler.php:418
+#: plugins/FileHandler/FileHandler.php:426
 #, php-format
 msgid "Outdated file cache: %s"
 msgstr "Neaktuální souborová mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:452
+#: plugins/FileHandler/FileHandler.php:450
 #, php-format
 msgid "Unable to create user folder %s"
 msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
@@ -1065,57 +1075,57 @@ msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
 msgid "GA disabled (ga_id = %s)"
 msgstr "GA je vypnutý (ga_id = %s)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:112
+#: plugins/HtmlOutput/HtmlOutput.php:116
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:175
+#: plugins/HtmlOutput/HtmlOutput.php:179
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:306
+#: plugins/HtmlOutput/HtmlOutput.php:310
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:333
+#: plugins/HtmlOutput/HtmlOutput.php:337
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:368
+#: plugins/HtmlOutput/HtmlOutput.php:372
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:371
+#: plugins/HtmlOutput/HtmlOutput.php:375
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:526
+#: plugins/HtmlOutput/HtmlOutput.php:530
 #, php-format
 msgid "Invalid xPath query '%s'"
 msgstr "Neplatný xPath '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:554
+#: plugins/HtmlOutput/HtmlOutput.php:558
 #, php-format
 msgid "Empty attribute '%s' stripped"
 msgstr "Odstraněn prázdný atribut '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:589
+#: plugins/HtmlOutput/HtmlOutput.php:588
 #, php-format
 msgid "Link '%s' not found"
 msgstr "Odkaz '%s' nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:601
+#: plugins/HtmlOutput/HtmlOutput.php:600
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:772
+#: plugins/HtmlOutput/HtmlOutput.php:771
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1210,11 +1220,11 @@ msgstr "Neplatná hodnota elementu priority: %s"
 msgid "Invalid element lastmod value: %s"
 msgstr "Neplatná hodnota elementu lastmod: %s"
 
-#: plugins/UrlHandler/UrlHandler.php:104
+#: plugins/UrlHandler/UrlHandler.php:115
 msgid "Requested page not found"
 msgstr "Požadovaná stránka nebyla nalezena"
 
-#: plugins/UrlHandler/UrlHandler.php:330
+#: plugins/UrlHandler/UrlHandler.php:343
 #, php-format
 msgid "Unable to redirect to %s: %s"
 msgstr "Nepodařilo se přesměrovat na %s: %s"
@@ -1741,9 +1751,6 @@ msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
 #~ msgid "Unable to save imported file '%s.html' into temp folder"
 #~ msgstr "Nepodařilo se uložit importovaný soubor '%s.html' do složky dočasných souborů."
 
-#~ msgid "File does not exist"
-#~ msgstr "Soubor neexistuje"
-
 #~ msgid "Unable to save changes: %s"
 #~ msgstr "Nepodařilo se uložit změny: %s"
 
@@ -1914,9 +1921,6 @@ msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
 
 #~ msgid "Unable to create symlink '%s' for '%s'"
 #~ msgstr "Nelze vytvořit symbolický odkaz '%s' pro '%s'"
-
-#~ msgid "Unable to handle image %s: %s"
-#~ msgstr "Nepodařilo se zpracovat obrázek %s: %s"
 
 #~ msgid "The requested URL '%s' was not found on this server."
 #~ msgstr "Požadovaná URL adresa '%s' nebyla na serveru nalezena"

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Relativize breadcrumb padding top / bottom.
 
 ### Fixed
+ - Handling broken resource reports error and outputs raw resource
  - Disabling css/js file do not clear cache
 
 ## [2.6.0] - 2017-07-04
