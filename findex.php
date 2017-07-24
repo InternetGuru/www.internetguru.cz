@@ -1,29 +1,16 @@
 <?php
 
 use IGCMS\Core\Logger;
+use IGCMS\Core\Plugins;
 
 try {
   include("init.php");
 
-  foreach (scandir(PLUGINS_FOLDER) as $plugin) {
-    if (strpos($plugin, ".") === 0) {
-      continue;
+  $plugins = new Plugins();
+  foreach ($plugins->getIsInterface("IGCMS\\Core\\ResourceInterface") as $ri) {
+    if ($ri::isSupportedRequest(getCurLink())) {
+      $ri::handleRequest();
     }
-    if (!is_dir(PLUGINS_FOLDER."/$plugin")) {
-      continue;
-    }
-    if (is_dir(PLUGINS_FOLDER."/.$plugin")) {
-      continue;
-    }
-    $pluginClass = "IGCMS\\Plugins\\$plugin";
-    if (!in_array("IGCMS\\Core\\ResourceInterface", class_implements($pluginClass))) {
-      continue;
-    }
-    /** @var $pluginClass \IGCMS\Core\ResourceInterface */
-    if (!$pluginClass::isSupportedRequest(getCurLink())) {
-      continue;
-    }
-    $pluginClass::handleRequest();
   }
   throw new Exception(_("File not found"), 404);
 

@@ -11,6 +11,7 @@ use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
+use IGCMS\Core\ResourceInterface;
 use SplObserver;
 use SplSubject;
 
@@ -18,19 +19,15 @@ use SplSubject;
  * Class UrlHandler
  * @package IGCMS\Plugins
  */
-class UrlHandler extends Plugin implements SplObserver {
+class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
   /**
    * @var bool
    */
   const DEBUG = false;
   /**
-   * @var DOMDocumentPlus|null
-   */
-  private $cfg = null;
-  /**
    * @var array
    */
-  private $newReg = [];
+  private static $newReg = [];
 
   /**
    * UrlHandler constructor.
@@ -41,6 +38,17 @@ class UrlHandler extends Plugin implements SplObserver {
     $s->setPriority($this, 2);
   }
 
+  public static function isSupportedRequest ($filePath) {
+    $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
+    return $ext !== "php";
+  }
+
+  public static function handleRequest () {
+    $cfg = self::getXML();
+    self::httpsRedir();
+    self::cfgRedir($cfg);
+  }
+
   /**
    * @param Plugins|SplSubject $subject
    */
@@ -48,17 +56,17 @@ class UrlHandler extends Plugin implements SplObserver {
     if ($subject->getStatus() != STATUS_PREINIT) {
       return;
     }
-    $this->cfg = $this->getXML();
-    $this->httpsRedir();
-    $this->cfgRedir();
+    $cfg = self::getXML();
+    self::httpsRedir();
+    self::cfgRedir($cfg);
     if (getCurLink() == "") {
       $subject->detach($this);
       return;
     }
-    $this->proceed();
+    self::proceed();
   }
 
-  private function httpsRedir () {
+  private static function httpsRedir () {
     $protocol = is_file(HTTPS_FILE) ? "https" : "http";
     Cms::setVariable("default_protocol", $protocol);
     if (SCHEME == $protocol) {
@@ -70,24 +78,27 @@ class UrlHandler extends Plugin implements SplObserver {
     redirTo("$protocol://".HOST.$_SERVER["REQUEST_URI"]);
   }
 
-  private function cfgRedir () {
-    $this->newReg = HTMLPlusBuilder::getIdToLink();
-    foreach ($this->cfg->documentElement->childNodes as $e) {
+  /**
+   * @param DOMDocumentPlus $cfg
+   */
+  private static function cfgRedir (DOMDocumentPlus $cfg) {
+    self::$newReg = HTMLPlusBuilder::getIdToLink();
+    foreach ($cfg->documentElement->childNodes as $e) {
       switch ($e->nodeName) {
         case 'redir':
         case 'rewrite':
-          $this->{$e->nodeName}($e);
+          self::{$e->nodeName}($e);
           break;
         default:
           continue;
       }
     }
-    if (!empty($this->newReg)) {
-      HTMLPlusBuilder::setIdToLink($this->newReg);
+    if (!empty(self::$newReg)) {
+      HTMLPlusBuilder::setIdToLink(self::$newReg);
     }
   }
 
-  private function proceed () {
+  private static function proceed () {
     $links = array_keys(HTMLPlusBuilder::getLinkToId());
     $path = getCurLink();
     if (!HTMLPlusBuilder::isLink($path)) {
@@ -95,7 +106,7 @@ class UrlHandler extends Plugin implements SplObserver {
       if (self::DEBUG) {
         var_dump($links);
       }
-      $linkId = $this->findSimilarLinkId($links, $path);
+      $linkId = self::findSimilarLinkId($links, $path);
       if (!is_null($linkId) && !$linkId == $links[0]) {
         $path = $links[$linkId];
       }
@@ -135,25 +146,25 @@ class UrlHandler extends Plugin implements SplObserver {
    * @param string $link
    * @return null|string
    */
-  private function findSimilarLinkId (Array $links, $link) {
+  private static function findSimilarLinkId (Array $links, $link) {
     if (!strlen($link)) {
       return null;
     }
     // zero pos substring
-    $found = $this->minPos($links, $link);
+    $found = self::minPos($links, $link);
     if (self::DEBUG) {
       var_dump($found);
     }
     if (count($found)) {
-      return $this->getBestId($links, $found);
+      return self::getBestId($links, $found);
     }
     // low levenstein first
-    $found = $this->minLev($links, $link, 2);
+    $found = self::minLev($links, $link, 2);
     if (self::DEBUG) {
       var_dump($found);
     }
     if (count($found)) {
-      return $this->getBestId($links, $found);
+      return self::getBestId($links, $found);
     }
     // first "directory" search
     $parts = explode("/", $link);
@@ -161,7 +172,7 @@ class UrlHandler extends Plugin implements SplObserver {
       return null;
     }
     $first = array_shift($parts);
-    $foundId = $this->findSimilarLinkId($links, $first);
+    $foundId = self::findSimilarLinkId($links, $first);
     if (is_null($foundId)) {
       return null;
     }
@@ -170,7 +181,7 @@ class UrlHandler extends Plugin implements SplObserver {
     if ($newLink == $link) {
       return $foundId;
     }
-    $foundId = $this->findSimilarLinkId($links, $newLink);
+    $foundId = self::findSimilarLinkId($links, $newLink);
     return $foundId;
   }
 
@@ -180,7 +191,7 @@ class UrlHandler extends Plugin implements SplObserver {
    * @param null $max
    * @return array
    */
-  private function minPos (Array $links, $link, $max = null) {
+  private static function minPos (Array $links, $link, $max = null) {
     $linkpos = [];
     foreach ($links as $k => $l) {
       $l = strtolower($l);
@@ -206,7 +217,7 @@ class UrlHandler extends Plugin implements SplObserver {
     if (empty($sublinks)) {
       return [];
     }
-    return $this->minPos($sublinks, $link, $max);
+    return self::minPos($sublinks, $link, $max);
   }
 
   /**
@@ -214,7 +225,7 @@ class UrlHandler extends Plugin implements SplObserver {
    * @param array $found
    * @return string
    */
-  private function getBestId (Array $links, Array $found) {
+  private static function getBestId (Array $links, Array $found) {
     if (count($found) == 1) {
       return key($found);
     }
@@ -256,7 +267,7 @@ class UrlHandler extends Plugin implements SplObserver {
    * @param int $limit
    * @return array
    */
-  private function minLev (Array $links, $link, $limit) {
+  private static function minLev (Array $links, $link, $limit) {
     $leven = [];
     foreach ($links as $k => $l) {
       $lVal = levenshtein($l, $link);
@@ -280,26 +291,26 @@ class UrlHandler extends Plugin implements SplObserver {
     if (empty($sublinks)) {
       return [];
     }
-    return $this->minLev($sublinks, $link, $limit);
+    return self::minLev($sublinks, $link, $limit);
   }
 
-  private function rewrite (DOMElementPlus $rewrite) {
+  private static function rewrite (DOMElementPlus $rewrite) {
     $match = $rewrite->getRequiredAttribute("match");
-    foreach ($this->newReg as $id => $link) {
+    foreach (self::$newReg as $id => $link) {
       if (strpos($link, $match) === false) {
         continue;
       }
-      $this->newReg[$id] = str_replace($match, $rewrite->nodeValue, $link);
+      self::$newReg[$id] = str_replace($match, $rewrite->nodeValue, $link);
     }
   }
 
-  private function redir (DOMElementPlus $redir) {
+  private static function redir (DOMElementPlus $redir) {
     if ($redir->hasAttribute("link") && $redir->getAttribute("link") != getCurLink()) {
       return;
     }
     $pNam = $redir->hasAttribute("parName") ? $redir->getAttribute("parName") : null;
     $pVal = $redir->hasAttribute("parValue") ? $redir->getAttribute("parValue") : null;
-    if (!$this->queryMatch($pNam, $pVal)) {
+    if (!self::queryMatch($pNam, $pVal)) {
       return;
     }
     try {
@@ -338,7 +349,7 @@ class UrlHandler extends Plugin implements SplObserver {
    * @param string $pVal
    * @return bool
    */
-  private function queryMatch ($pNam, $pVal) {
+  private static function queryMatch ($pNam, $pVal) {
     foreach (explode("&", getCurQuery()) as $q) {
       if (is_null($pVal) && strpos("$q=", "$pNam=") === 0) {
         return true;

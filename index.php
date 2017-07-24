@@ -52,7 +52,13 @@ try {
   if (!stream_resolve_include_path(PROTECTED_FILE) && !stream_resolve_include_path(".".PROTECTED_FILE)) {
     touch(PROTECTED_FILE);
   }
+
   Cms::checkAuth();
+
+  if (!stream_resolve_include_path(LANG_FILE)) {
+    Logger::warning(sprintf("%s file not found, using default lang %s", LANG_FILE, DEFAULT_LANG));
+  }
+
   if (Cms::isSuperUser()) {
     initIndexFiles();
     if (isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
