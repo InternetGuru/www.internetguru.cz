@@ -39,11 +39,15 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @var string
    */
   const FAVICON = "favicon.ico";
-/**
+  /**
+   * @var int
+   */
+  const DEFAULT_PRIORITY = 50;
+  /**
    * @var array
    */
   private $jsFiles = [];
-/**
+  /**
    * @var array
    */
   private $jsFilesPriority = [];
@@ -127,7 +131,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string $filePath
    * @param int $priority
    */
-  public function addTransformation ($filePath, $priority = 10) {
+  public function addTransformation ($filePath, $priority = self::DEFAULT_PRIORITY) {
     if (isset($this->transformations[$filePath])) {
       return;
     }
@@ -155,7 +159,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           case "jsFile":
             $user = !$n->hasAttribute("readonly");
             $append = self::APPEND_HEAD;
-            $priority = 10;
+            $priority = self::DEFAULT_PRIORITY;
             if ($n->hasAttribute("append")) {
               $append = $n->getAttribute("append");
             }
@@ -170,7 +174,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
             $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
             $ieIfComment = ($n->hasAttribute("if") ? $n->getAttribute("if") : null);
             $ifXpath = ($n->hasAttribute("if-xpath") ? $n->getAttribute("if-xpath") : false);
-            $this->addCssFile($n->nodeValue, $media, 10, true, $ieIfComment, $ifXpath);
+            $this->addCssFile($n->nodeValue, $media, self::DEFAULT_PRIORITY, true, $ieIfComment, $ifXpath);
             break;
           case "favicon":
             $this->favIcon = findFile($n->nodeValue);
@@ -189,7 +193,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param null $ieIfComment
    * @param bool $ifXpath
    */
-  public function addJsFile ($filePath, $priority = 10, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
+  public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->jsFiles[$filePath])) {
       return;
     }
@@ -214,7 +218,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string|null $ieIfComment
    * @param bool $ifXpath
    */
-  public function addCssFile ($filePath, $media = false, $priority = 10, $user = true, $ieIfComment = null, $ifXpath = false) {
+  public function addCssFile ($filePath, $media = false, $priority = self::DEFAULT_PRIORITY, $user = true, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->cssFiles[$filePath])) {
       return;
     }
@@ -838,7 +842,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param int $priority
    * @param string $append
    */
-  public function addJs ($content, $priority = 10, $append = self::APPEND_BODY) {
+  public function addJs ($content, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_BODY) {
     $key = "k".count($this->jsFiles);
     $this->jsFiles[$key] = [
       "file" => null,
