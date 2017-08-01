@@ -49,7 +49,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 5);
+    $s->setPriority($this, 70);
     $this->tmpFolder = USER_FOLDER."/".$this->pluginDir;
     mkdir_plus($this->tmpFolder);
   }

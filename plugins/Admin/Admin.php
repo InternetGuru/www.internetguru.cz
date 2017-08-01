@@ -110,7 +110,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 2);
+    $s->setPriority($this, 100);
     $this->dataFileStatuses = [
       _("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"),

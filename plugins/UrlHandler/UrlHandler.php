@@ -35,7 +35,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 2);
+    $s->setPriority($this, 100);
   }
 
   public static function isSupportedRequest ($filePath) {

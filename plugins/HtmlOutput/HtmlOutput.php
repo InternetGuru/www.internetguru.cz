@@ -78,7 +78,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 1000);
+    $s->setPriority($this, 0);
     Cms::setOutputStrategy($this);
   }
 

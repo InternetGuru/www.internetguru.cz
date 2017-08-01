@@ -29,7 +29,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 210);
+    $s->setPriority($this, 10);
   }
 
   /**
