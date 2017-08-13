@@ -47,7 +47,7 @@ $inputvar-service_plain
       <dt>Type</dt>
       <dd>People</dd>
       <dt>Martin Línek</dt>
-      <dd>Sales Representative</dd>
+      <dd>Sales, Customer Care</dd>
       <dd><ul class="logo">
         <li><a href="tel:+420731300421" var="inputvar-phone@class"><span>+420 731 300 421</span></a></li>
         <li><a href="mailto:martin.linek@internetguru.cz" var="inputvar-email@class"><span>martin.linek@internetguru.cz</span></a></li>
@@ -62,7 +62,7 @@ $inputvar-service_plain
       </ul></dd>
 -->
       <dt>Pavel Petržela</dt>
-      <dd>IT Support and Development</dd>
+      <dd>IT Support, Development</dd>
       <dd><ul class="logo">
         <li><a href="tel:+420604412983" var="inputvar-phone@class"><span>+420 604 412 983</span></a></li>
         <li><a href="mailto:pavel.petrzela@internetguru.cz" var="inputvar-email@class"><span>pavel.petrzela@internetguru.cz</span></a></li>
@@ -81,7 +81,7 @@ $inputvar-service_plain
       <dt>Type</dt>
       <dd>Management</dd>
       <dt>David Myslil</dt>
-      <dd>Sales Manager and Trainer</dd>
+      <dd>Sales Training</dd>
       <dd><ul class="logo">
         <li><a href="mailto:david.myslil@internetguru.cz" var="inputvar-email@class"><span>david.myslil@internetguru.cz</span></a></li>
         <li><a href="https://www.linkedin.com/in/david-myslil-18889414" var="inputvar-linkedin@class"><span>linkedin.com/in/david-myslil-18889414</span></a></li>
@@ -89,12 +89,12 @@ $inputvar-service_plain
       <dt>Jiri (George) Pavelka</dt>
       <dd>Business Owner, CEO</dd>
       <dd><ul class="logo">
-        <li><a href="tel:+420603307905" var="inputvar-phone@class"><span>+420 603 307 905</span></a></li>
-        <li><a href="tel:+13054870703" var="inputvar-phone@class"><span>+1 (305) 487-0703</span></a></li>
+        <li><a href="tel:+420603307905" var="inputvar-phone@class"><span>+420 603 307 905 (CR, WhatsApp)</span></a></li>
+        <li><a href="tel:+13054870703" var="inputvar-phone@class"><span>+1 (305) 487-0703 (US)</span></a></li>
 <!--         <li><a href="https://www.facebook.com/jiri.pavelka123" var="inputvar-facebook@class"><span>facebook.com/jiri.pavelka123</span></a></li> -->
 <!--         <li><a href="https://plus.google.com/+JiriPavelka" var="inputvar-google@class"><span>plus.google.com/+JiriPavelka</span></a></li> -->
-        <li><a href="skype:pavelkajiri" var="inputvar-skype@class"><span>Skype:pavelkajiri</span></a></li>
-        <li><a href="mailto:jiri.pavelka@internetguru.cz" var="inputvar-email@class"><span>jiri.pavelka@internetguru.cz</span></a></li>
+        <li><a href="skype:pavelkajiri?call" var="inputvar-skype@class"><span>pavelkajiri (Skype)</span></a></li>
+        <li><a href="mailto:jiri.pavelka@internetguru.cz" var="inputvar-email@class"><span>jiri.pavelka@internetguru.cz (Google Talk)</span></a></li>
         <li><a href="https://www.linkedin.com/in/jiripavelka" var="inputvar-linkedin@class"><span>linkedin.com/in/jiripavelka</span></a></li>
       </ul></dd>
     </dl>
