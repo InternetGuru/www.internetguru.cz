@@ -27,32 +27,16 @@ $inputvar-service_plain
     </dl>
     <dl>
       <dt>Type</dt>
-      <dd>Company Info</dd>
-      <dt>InternetGuru</dt>
-      <dd><ul class="logo">
-        <li><a href="mailto:info@internetguru.cz" var="inputvar-email@class"><span>info@internetguru.cz</span></a></li>
-        <li><a href="https://www.linkedin.com/company/internetguru" var="inputvar-linkedin@class"><span>linkedin.com/company/internetguru</span></a></li>
-        <li><a href="https://www.facebook.com/internetguru.cz" var="inputvar-facebook@class"><span>facebook.com/internetguru.cz</span></a></li>
-<!--         <li><a href="https://plus.google.com/b/105762234819973683704/105762234819973683704" var="inputvar-google@class"><span>plus.google.com/internetguru</span></a></li> -->
-        <li><a href="https://github.com/InternetGuru" var="inputvar-github@class"><span>github.com/InternetGuru</span></a></li>
-      </ul></dd>
-      <dt>Address</dt>
-      <dd><ul class="logo">
-        <li><a href="https://www.google.cz/maps/place/Bro%C5%BE%C3%ADkova+15%2F1,+150+00+Praha+5-Ko%C5%A1%C3%AD%C5%99e/@50.0711549,14.3862536,17z/data=!3m1!4b1!4m5!3m4!1s0x470b95aba6630ab5:0xd73a1479f9dfb046!8m2!3d50.0711515!4d14.3884476?hl=en" var="inputvar-map@class"><span>Brožíkova 1, 150 00 Prague 5, Czech Republic</span></a></li>
-        <li><a href="https://www.google.cz/maps/place/Th%C3%A1kurova+9,+160+00+Praha+6/@50.1047496,14.3875576,17z/data=!3m1!4b1!4m5!3m4!1s0x470b953a13eadb29:0xc5f7771c23fd33ff!8m2!3d50.1047462!4d14.3897516?hl=en" var="inputvar-map@class"><span>Thákurova 9, 160 00 Prague 6, Czech Republic</span></a>
-        </li></ul>
-      </dd>
-    </dl>
-    <dl>
-      <dt>Type</dt>
       <dd>People</dd>
+<!-- 
       <dt>Martin Línek</dt>
       <dd>Sales, Customer Care</dd>
       <dd><ul class="logo">
         <li><a href="tel:+420731300421" var="inputvar-phone@class"><span>+420 731 300 421</span></a></li>
         <li><a href="mailto:martin.linek@internetguru.cz" var="inputvar-email@class"><span>martin.linek@internetguru.cz</span></a></li>
-        <li><a href="https://www.linkedin.com/in/martin-linek" var="inputvar-linkedin@class"><span>linkedin.com/in/martin-linek</span></a></li>
+        <li><a href="https://www.linkedin.com/in/martin-linek" var="inputvar-linkedin@class"><span>martin-linek (LinkedIn)</span></a></li>
       </ul></dd>
+-->
 <!--
       <dt>Lucie Zdeňková</dt>
       <dd>Webdesign and Sales</dd>
@@ -66,15 +50,37 @@ $inputvar-service_plain
       <dd><ul class="logo">
         <li><a href="tel:+420604412983" var="inputvar-phone@class"><span>+420 604 412 983</span></a></li>
         <li><a href="mailto:pavel.petrzela@internetguru.cz" var="inputvar-email@class"><span>pavel.petrzela@internetguru.cz</span></a></li>
-<!--         <li><a href="https://plus.google.com/+PavelPetrzela" var="inputvar-google@class"><span>plus.google.com/+PavelPetrzela</span></a></li> -->
 <!--         <li><a href="skype:poulikpetrzela" var="inputvar-skype@class"><span>poulikpetrzela</span></a></li> -->
-        <li><a href="https://www.linkedin.com/in/pavelpetrzela" var="inputvar-linkedin@class"><span>linkedin.com/in/pavelpetrzela</span></a></li>
+        <li><a href="https://www.linkedin.com/in/pavelpetrzela" var="inputvar-linkedin@class"><span>pavelpetrzela (LinkedIn)</span></a></li>
       </ul></dd>
       <dt>Jan Pospíšil</dt>
       <dd>Internet Marketing, Accounting</dd>
       <dd><ul class="logo">
         <li><a href="mailto:jan.pospisil@internetguru.cz" var="inputvar-email@class"><span>jan.pospisil@internetguru.cz</span></a></li>
-        <li><a href="https://www.linkedin.com/in/jan-pospisil" var="inputvar-linkedin@class"><span>linkedin.com/in/jan-pospisil</span></a></li>
+        <li><a href="https://www.linkedin.com/in/jan-pospisil" var="inputvar-linkedin@class"><span>jan-pospisil (LinkedIn)</span></a></li>
+      </ul></dd>
+    </dl>
+    <dl>
+      <dt>Type</dt>
+      <dd>Company Info</dd>
+      <dt>InternetGuru</dt>
+      <dd><ul class="logo">
+        <li><a href="mailto:info@internetguru.cz" var="inputvar-email@class"><span>info@internetguru.cz</span></a></li>
+        <li><a href="https://www.linkedin.com/company/internetguru" var="inputvar-linkedin@class"><span>internetguru (LinkedIn)</span></a></li>
+        <li><a href="https://www.facebook.com/internetguru.cz" var="inputvar-facebook@class"><span>facebook.com/internetguru.cz</span></a></li>
+<!--         <li><a href="https://plus.google.com/b/105762234819973683704/105762234819973683704" var="inputvar-google@class"><span>plus.google.com/internetguru</span></a></li> -->
+        <li><a href="https://github.com/InternetGuru" var="inputvar-github@class"><span>github.com/InternetGuru</span></a></li>
+      </ul></dd>
+      <dt>Address</dt>
+      <dd><ul class="logo">
+        <li><a href="https://www.google.cz/maps/place/Bro%C5%BE%C3%ADkova+15%2F1,+150+00+Praha+5-Ko%C5%A1%C3%AD%C5%99e/@50.0711549,14.3862536,17z/data=!3m1!4b1!4m5!3m4!1s0x470b95aba6630ab5:0xd73a1479f9dfb046!8m2!3d50.0711515!4d14.3884476?hl=en" var="inputvar-map@class"><span>Brožíkova 1, 150 00 Prague 5, Czech Republic</span></a></li>
+        <li><a href="https://www.google.cz/maps/place/Th%C3%A1kurova+9,+160+00+Praha+6/@50.1047496,14.3875576,17z/data=!3m1!4b1!4m5!3m4!1s0x470b953a13eadb29:0xc5f7771c23fd33ff!8m2!3d50.1047462!4d14.3897516?hl=en" var="inputvar-map@class"><span>Thákurova 9, 160 00 Prague 6, Czech Republic</span></a>
+        </li>
+      </ul></dd>
+      <dt>Bank Account</dt>
+      <dd><ul class="logo">
+        <li><a var="inputvar-cc@class">670100-2201433979/6210 (mBank)</a></li>
+        <li><a var="inputvar-cc@class">2800426615/2010 (FIO)</a></li>
       </ul></dd>
     </dl>
     <dl>
@@ -84,18 +90,16 @@ $inputvar-service_plain
       <dd>Sales Training</dd>
       <dd><ul class="logo">
         <li><a href="mailto:david.myslil@internetguru.cz" var="inputvar-email@class"><span>david.myslil@internetguru.cz</span></a></li>
-        <li><a href="https://www.linkedin.com/in/david-myslil-18889414" var="inputvar-linkedin@class"><span>linkedin.com/in/david-myslil-18889414</span></a></li>
+        <li><a href="https://www.linkedin.com/in/david-myslil-18889414" var="inputvar-linkedin@class"><span>david-myslil-18889414 (LinkedIn)</span></a></li>
       </ul></dd>
-      <dt>Jiri (George) Pavelka</dt>
+      <dt>Jiří George Pavelka</dt>
       <dd>Business Owner, CEO</dd>
       <dd><ul class="logo">
         <li><a href="tel:+420603307905" var="inputvar-phone@class"><span>+420 603 307 905 (CR, WhatsApp)</span></a></li>
         <li><a href="tel:+13054870703" var="inputvar-phone@class"><span>+1 (305) 487-0703 (US)</span></a></li>
-<!--         <li><a href="https://www.facebook.com/jiri.pavelka123" var="inputvar-facebook@class"><span>facebook.com/jiri.pavelka123</span></a></li> -->
-<!--         <li><a href="https://plus.google.com/+JiriPavelka" var="inputvar-google@class"><span>plus.google.com/+JiriPavelka</span></a></li> -->
         <li><a href="skype:pavelkajiri?call" var="inputvar-skype@class"><span>pavelkajiri (Skype)</span></a></li>
         <li><a href="mailto:jiri.pavelka@internetguru.cz" var="inputvar-email@class"><span>jiri.pavelka@internetguru.cz (Google Talk)</span></a></li>
-        <li><a href="https://www.linkedin.com/in/jiripavelka" var="inputvar-linkedin@class"><span>linkedin.com/in/jiripavelka</span></a></li>
+        <li><a href="https://www.linkedin.com/in/jiripavelka" var="inputvar-linkedin@class"><span>jiripavelka (LinkedIn)</span></a></li>
       </ul></dd>
     </dl>
       </div></div>

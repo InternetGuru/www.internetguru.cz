@@ -45,5 +45,8 @@
   <var id="phone">fa fa-phone-square</var>
   <var id="twitter">fa fa-twitter-square</var>
   <var id="map">fa fa-map</var>
+  <var id="usd">fa fa-usd</var>
+  <var id="cc">fa fa-credit-card</var>
+  <var id="money">fa fa-money</var>
   
 </InputVar>
