@@ -201,18 +201,20 @@ ul.logo {
 ul.logo li {
   margin-left: 0;
   border: none;
-}
-ul.logo li a {
-  border-bottom: none;
   display: flex;
   width: 100%;
   align-items: center;
+  word-break: break-all;
 }
-ul.logo li a:before {
+ul.logo li:before {
   font-size: 1.5em;
   width: 1.5em;
   color: #de540f;
   flex: 0 0 1.5em;
+}
+ul.logo li a {
+  border-bottom: none;
+  display: inline-block;
 }
 a.logo {
   border-bottom: none;
@@ -228,10 +230,6 @@ ul.logo li a object {
   max-width: 1.5em;
   flex: 2em 0 0;
   margin-right: 0.5em;
-}
-ul.logo li a > span {
-  width: calc(100% - 1.5em);
-  line-height: 1;
 }
 
 #footer {
