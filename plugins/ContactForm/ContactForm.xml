@@ -51,7 +51,7 @@ $inputvar-service_plain
         <li var="inputvar-phone@class"><a href="tel:+420604412983">+420 604 412 983</a></li>
         <li var="inputvar-email@class"><a href="mailto:pavel.petrzela@internetguru.cz">pavel.petrzela@internetguru.cz</a></li>
 <!--         <li><a href="skype:poulikpetrzela" var="inputvar-skype@class"><span>poulikpetrzela</span></a></li> -->
-        <li var="inputvar-linkedin@class"><a href="https://www.linkedin.com/in/pavelpetrzela">pavelpetrzela</a> <span>(LinkedIn)</span></li>
+        <li var="inputvar-linkedin@class"><a href="https://www.linkedin.com/in/pavelpetrzela">pavelpetrzela (LinkedIn)</a></li>
       </ul></dd>
       <dt>Jan Pospíšil</dt>
       <dd>Internet Marketing, Accounting</dd>

@@ -179,7 +179,7 @@ input[type="submit"] {
 }
 
 #contactform-tel input[type="text"] {
-  /* border-bottom: thin solid #CA7976; */
+  border: thin solid #c8c8c8;
   width: 100%;
   text-align: center;
   font-size: 1.5em;
