@@ -94,8 +94,8 @@ $inputvar-service_plain
       <dt>Jiří George Pavelka</dt>
       <dd>Business Owner, CEO</dd>
       <dd><ul class="logo">
-        <li var="inputvar-phone@class"><a href="tel:+420603307905">+420 603 307 905 (CR, WhatsApp)</a></li>
-        <li var="inputvar-phone@class"><a href="tel:+13054870703">+1 (305) 487-0703 (US)</a></li>
+        <li var="inputvar-phone@class"><a href="tel:+420603307905">+420 603 307 905 (WhatsApp, Viber)</a></li>
+        <li var="inputvar-phone@class"><a href="tel:+13054870703">+1 (305) 487-0703 (iMessage, FaceTime)</a></li>
         <li var="inputvar-skype@class"><a href="skype:pavelkajiri?call">pavelkajiri (Skype)</a></li>
         <li var="inputvar-email@class"><a href="mailto:jiri.pavelka@internetguru.cz">jiri.pavelka@internetguru.cz (Google Talk)</a></li>
         <li var="inputvar-linkedin@class"><a href="https://www.linkedin.com/in/jiripavelka">jiripavelka (LinkedIn)</a></li>
