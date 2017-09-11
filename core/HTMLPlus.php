@@ -6,6 +6,7 @@ use DateTime;
 use DOMComment;
 use DOMXPath;
 use Exception;
+use XSLTProcessor;
 
 /**
  * Class HTMLPlus
@@ -39,6 +40,10 @@ class HTMLPlus extends DOMDocumentPlus {
    * @var string
    */
   const RNG_FILE = "HTMLPlus.rng";
+  /**
+   * @var string
+   */
+  const PREPARE_TO_VALIDATE_FILE = "prepareToValidate.xsl";
   /**
    * @var bool
    */
@@ -818,11 +823,22 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   /**
-   * @param string $f
+   * @param string|null $f
+   * @param DOMElementPlus|null $doc
    * @return bool
+   * @throws Exception
    */
-  public function relaxNGValidatePlus ($f = null) {
-    return parent::relaxNGValidatePlus(LIB_FOLDER."/".self::RNG_FILE);
+  public function relaxNGValidatePlus ($f = null, $doc=null) {
+    $proc = new XSLTProcessor();
+    $xsl = XMLBuilder::load(LIB_DIR."/".self::PREPARE_TO_VALIDATE_FILE);
+    if (!@$proc->importStylesheet($xsl)) {
+      throw new Exception(sprintf(_("System XSLT '%s' is invalid"), self::PREPARE_TO_VALIDATE_FILE));
+    }
+    $docToValidation = is_null($doc) ? $this : $doc;
+    if (($preparedDoc = @$proc->transformToDoc($docToValidation)) === false) {
+      throw new Exception(sprintf(_("System XSLT '%s' transformation fail"), self::PREPARE_TO_VALIDATE_FILE));
+    }
+    return parent::relaxNGValidatePlus(LIB_FOLDER."/".self::RNG_FILE, $preparedDoc);
   }
 
   public function repairIds () {
