@@ -117,10 +117,11 @@ class Cms {
   /**
    * @param string $name
    * @param mixed $value
+   * @param bool $local
    * @return string
    */
-  public static function setVariable ($name, $value) {
-    $varId = self::getVarId($name);
+  public static function setVariable ($name, $value, $local=false) {
+    $varId = $local ? $name : self::getVarId($name);
     if (!array_key_exists($varId, self::$variables)) {
       self::addVariableItem("variables", $varId);
     }
