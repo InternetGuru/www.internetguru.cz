@@ -299,15 +299,14 @@ function addPermParams (Array &$pLink) {
 
 /**
  * @param array $a
- * @param bool $asc
+ * @param int $order
  */
-function stableSort (Array &$a, $asc = true) {
+function stableSort (Array &$a, $order = SORT_ASC) {
   if (count($a) < 2) {
     return;
   }
-  $order = range(1, count($a));
-  $sort = $asc ? SORT_ASC : SORT_DESC;
-  array_multisort($a, $sort, $order, $sort);
+  $orderArray = range(1, count($a));
+  array_multisort($a, $order, $orderArray, $order);
 }
 
 /**
