@@ -824,19 +824,19 @@ class HTMLPlus extends DOMDocumentPlus {
 
   /**
    * @param string|null $f
-   * @param DOMElementPlus|null $doc
+   * @param DOMDocumentPlus|null $doc
    * @return bool
    * @throws Exception
    */
-  public function relaxNGValidatePlus ($f = null, $doc=null) {
+  public function relaxNGValidatePlus ($f = null, DOMDocumentPlus $doc = null) {
     $proc = new XSLTProcessor();
     $xsl = XMLBuilder::load(LIB_DIR."/".self::PREPARE_TO_VALIDATE_FILE);
     if (!@$proc->importStylesheet($xsl)) {
-      throw new Exception(sprintf(_("System XSLT '%s' is invalid"), self::PREPARE_TO_VALIDATE_FILE));
+      throw new Exception(sprintf("File '%s' is invalid", self::PREPARE_TO_VALIDATE_FILE));
     }
     $docToValidation = is_null($doc) ? $this : $doc;
     if (($preparedDoc = @$proc->transformToDoc($docToValidation)) === false) {
-      throw new Exception(sprintf(_("System XSLT '%s' transformation fail"), self::PREPARE_TO_VALIDATE_FILE));
+      throw new Exception(sprintf("File '%s' transformation fail", self::PREPARE_TO_VALIDATE_FILE));
     }
     return parent::relaxNGValidatePlus(LIB_FOLDER."/".self::RNG_FILE, $preparedDoc);
   }
