@@ -41,7 +41,7 @@ class DocList extends AgregatorList {
     }
     $list = $this->createList($pattern, $vars);
     foreach (current($vars) as $name => $value) {
-      Cms::setVariable($name, $value, true);
+      Cms::setVariable($name, $value, "");
     }
     Cms::setVariable($this->id, $list);
   }
