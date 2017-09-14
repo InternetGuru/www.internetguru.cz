@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+ - Add other svg mime-type
+
 ## [2.6.0] - 2017-07-04
 ### Added
  - User redirect supports files
@@ -243,6 +247,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
 [2.6.0]: https://bitbucket.org/igwr/cms/compare/v2.6.0..v2.5.6
 [2.5.6]: https://bitbucket.org/igwr/cms/compare/v2.5.6..v2.5.5
 [2.5.5]: https://bitbucket.org/igwr/cms/compare/v2.5.5..v2.5.4
