@@ -42,7 +42,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "inode/x-empty" => ["css", "js"],
     "text/plain" => ["css", "js"],
     "text/troff" => ["css"],
-    "text/html" => ["js"],
+    "text/html" => ["js", "svg"],
     "text/x-c" => ["js"],
     "application/x-elc" => ["js"],
     "application/x-empty" => ["css", "js"],
@@ -496,7 +496,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       return false;
     }
     $cacheMtime = filemtime("$cacheFolder/".INOTIFY);
-    $folders = []; 
+    $folders = [];
     // files folder has no defaults
     if ($isResDir) {
       $folders[CMS_FOLDER."/$sourceFolder"] = true;
