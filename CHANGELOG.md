@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
  - Fix HTMLOutput css and js priorities
+ - Register Agregator local varaibles
  - Handling broken resource reports error and outputs raw resource
  - Disabling css/js file do not clear cache
 
