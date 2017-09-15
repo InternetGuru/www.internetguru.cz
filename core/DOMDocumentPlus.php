@@ -257,17 +257,19 @@ class DOMDocumentPlus extends DOMDocument {
 
   /**
    * @param string $f
+   * @param DOMDocumentPlus|null $doc
    * @return bool
    * @throws Exception
    */
-  public function relaxNGValidatePlus ($f) {
+  public function relaxNGValidatePlus ($f, DOMDocumentPlus $doc = null) {
     if (!stream_resolve_include_path($f)) {
       throw new Exception(sprintf(_("Unable to find HTML+ RNG schema '%s'"), $f));
     }
+    $docToValidate = is_null($doc) ? $this : $doc;
     try {
       libxml_use_internal_errors(true);
       libxml_clear_errors();
-      if (!$this->relaxNGValidate($f)) {
+      if (!$docToValidate->relaxNGValidate($f)) {
         throw new Exception(_("relaxNGValidate() internal error occurred"));
       }
     } catch (Exception $e) {
