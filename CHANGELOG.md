@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Support HTML5 data-* attributes
 
 ### Changed
- - Relativize breadcrumb padding top / bottom.
+ - Relativize breadcrumb padding top / bottom
 
 ### Fixed
  - Fix HTMLOutput css and js priorities
  - Register Agregator local varaibles
  - Handling broken resource reports error and outputs raw resource
+ - New .html file has wrong ctime and ns attributes
  - Disabling css/js file do not clear cache
 
 ## [2.6.0] - 2017-07-04
