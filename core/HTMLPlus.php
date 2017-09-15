@@ -4,6 +4,7 @@ namespace IGCMS\Core;
 
 use DateTime;
 use DOMComment;
+use DOMDocument;
 use DOMXPath;
 use Exception;
 use XSLTProcessor;
@@ -824,11 +825,11 @@ class HTMLPlus extends DOMDocumentPlus {
 
   /**
    * @param string|null $f
-   * @param DOMDocumentPlus|null $doc
+   * @param DOMDocument|null $doc
    * @return bool
    * @throws Exception
    */
-  public function relaxNGValidatePlus ($f = null, DOMDocumentPlus $doc = null) {
+  public function relaxNGValidatePlus ($f = null, DOMDocument $doc = null) {
     $proc = new XSLTProcessor();
     $xsl = XMLBuilder::load(LIB_DIR."/".self::PREPARE_TO_VALIDATE_FILE);
     if (!@$proc->importStylesheet($xsl)) {

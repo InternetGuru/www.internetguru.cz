@@ -122,6 +122,21 @@ class Cms {
    * @throws Exception
    */
   public static function setVariable ($name, $value, $prefix = null) {
+    $varId = self::getVarId($name, $prefix);
+    // if (!array_key_exists($varId, self::$variables)) {
+    //   self::addVariableItem("variables", $varId);
+    // }
+    self::$variables[$varId] = $value;
+    return $varId;
+  }
+
+  /**
+   * @param $name
+   * @param string|null $prefix
+   * @return string
+   * @throws Exception
+   */
+  private static function getVarId ($name, $prefix = null) {
     $name = normalize($name);
     if (is_null($prefix)) {
       $prefix = self::getCaller();
@@ -130,15 +145,9 @@ class Cms {
       if (!strlen($name)) {
         throw new Exception("Unable to set variable: name and prefix are empty");
       }
-      $varId = $name;
-    } else {
-      $varId = $prefix.(strlen($name) ? "-$name" : "");
+      return $name;
     }
-    if (!array_key_exists($varId, self::$variables)) {
-      self::addVariableItem("variables", $varId);
-    }
-    self::$variables[$varId] = $value;
-    return $varId;
+    return $prefix.(strlen($name) ? "-$name" : "");
   }
 
   /**
@@ -147,10 +156,10 @@ class Cms {
    */
   private static function getCaller () {
     $d = debug_backtrace();
-    if (!isset($d[2]["class"])) {
+    if (!isset($d[3]["class"])) {
       throw new Exception(_("Unknown caller class"));
     }
-    return strtolower((new \ReflectionClass($d[2]["class"]))->getShortName());
+    return strtolower((new \ReflectionClass($d[3]["class"]))->getShortName());
   }
 
   /**
