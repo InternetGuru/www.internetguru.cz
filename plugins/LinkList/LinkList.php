@@ -30,7 +30,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
   public function __construct (SplSubject $s) {
     parent::__construct($s);
     $this->cssClass = strtolower($this->className);
-    $s->setPriority($this, 200);
+    $s->setPriority($this, 20);
   }
 
   /**
