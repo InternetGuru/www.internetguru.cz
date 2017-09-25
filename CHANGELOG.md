@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - New domain file AUTOCORRECT for automatic saving autocorrected HTML+ files
  - Support HTML5 data-* attributes
 
 ### Changed
