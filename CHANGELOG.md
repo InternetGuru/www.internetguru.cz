@@ -6,12 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - LinkLint generates warning for invalid local links
  - Support HTML5 data-* attributes
 
 ### Changed
  - Relativize breadcrumb padding top / bottom
 
 ### Fixed
+ - LinkList use the old way to get link titles
  - Fix HTMLOutput css and js priorities
  - Register Agregator local varaibles
  - Handling broken resource reports error and outputs raw resource
