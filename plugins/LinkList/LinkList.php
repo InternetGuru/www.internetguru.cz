@@ -113,17 +113,12 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
         return false;
       } // nonexist local link
       $a->setAttribute("class", "invalid-local-link");
+      Logger::info(sprintf(_("Invalid local link '%s'"), $href));
     }
     $a->setAttribute("id", "{$this->cssClass}-$i");
     $a->setAttribute("href", $link->getAttribute("href"));
-    $text = HTMLPlusBuilder::getIdToTitle($href);
-    if (!strlen($text)) {
-      $text = $link->getAttribute("title");
-    }
-    if (!strlen($text)) {
-      $text = getShortString($href, 25, 35, "/");
-    }
-    $a->nodeValue = trim($text, "/");
+    $values = HTMLPlusBuilder::getHeadingValues($href);
+    $a->nodeValue = $values[0];
     return true;
   }
 
