@@ -6,7 +6,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
- - LinkLint generates warning for invalid local links
  - Support HTML5 data-* attributes
 
 ### Changed
