@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Relativize breadcrumb padding top / bottom
 
 ### Fixed
- - LinkList use the old way to get link titles
+ - LinkList contains ids instead of headings
  - Fix HTMLOutput css and js priorities
  - Register Agregator local varaibles
  - Handling broken resource reports error and outputs raw resource
