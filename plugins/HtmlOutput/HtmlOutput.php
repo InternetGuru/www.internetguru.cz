@@ -589,6 +589,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         if ($this->isLocalFragment($pLink)) {
           return;
         }
+        Logger::warning(sprintf(_("Invalid local link '%s'"), $url));
         throw new Exception(sprintf(_("Link '%s' not found"), $url));
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
