@@ -6,7 +6,6 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
-use IGCMS\Core\Logger;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
@@ -109,12 +108,8 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
     $list->appendChild($li);
     $a = $li->ownerDocument->createElement("a");
     $li->appendChild($a);
-    if (is_null(HTMLPlusBuilder::getLinkToId($href))) {
-      if (is_null(Cms::getLoggedUser())) {
-        return false;
-      } // nonexist local link
-      $a->setAttribute("class", "invalid-local-link");
-      Logger::warning(sprintf(_("Invalid local link '%s'"), $href));
+    if (is_null(HTMLPlusBuilder::getLinkToId($href)) && is_null(Cms::getLoggedUser())) {
+      return false;
     }
     $a->setAttribute("id", "{$this->cssClass}-$i");
     $a->setAttribute("href", $link->getAttribute("href"));
