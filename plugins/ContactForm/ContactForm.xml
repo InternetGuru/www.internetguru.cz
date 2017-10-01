@@ -53,8 +53,8 @@ $inputvar-service_plain
 <!--         <li><a href="skype:poulikpetrzela" var="inputvar-skype@class"><span>poulikpetrzela</span></a></li> -->
         <li var="inputvar-linkedin@class"><a href="https://www.linkedin.com/in/pavelpetrzela">pavelpetrzela (LinkedIn)</a></li>
       </ul></dd>
-      <dt>Jan Pospíšil</dt>
-      <dd>Internet Marketing, Accounting</dd>
+      <dt class="hideable-nohide hideable-here">Jan Pospíšil</dt>
+      <dd class="hideable-nohide">Internet Marketing, Accounting</dd>
       <dd><ul class="logo">
         <li var="inputvar-email@class"><a href="mailto:jan.pospisil@internetguru.cz">jan.pospisil@internetguru.cz</a></li>
         <li var="inputvar-linkedin@class"><a href="https://www.linkedin.com/in/jan-pospisil">jan-pospisil (LinkedIn)</a></li>
