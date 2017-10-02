@@ -6,8 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
- - FileHandler automatically generates `data-origin-width` and `data-origin-height` attributes for links leading into image
- - FileHandler automatically generates image `width` and `height` attributes.
+ - Auto attribute `data-target-width` and `data-target-height` for links to images
+ - Auto attribute `width` and `height` for images
  - Saving autocorrected HTML+ files (if is file AUTOCORRECT)
  - Support HTML5 data-* attributes
 
