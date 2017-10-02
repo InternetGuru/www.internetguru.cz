@@ -315,17 +315,17 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   public static function calculateImageSize ($src) {
     $finfo = self::getFileInfo($src);
-    $sizes = self::$imageModes[$finfo["imgmode"]];
-    list($originalWidth, $originalHeight) = getimagesize($finfo["src"]);
-    $ratio = $originalWidth / $originalHeight;
-    $targetWidth = min($sizes[0], $originalWidth);
-    $targetHeight = min($sizes[1], $originalHeight);
+    list($maxWidth, $maxHeight) = self::$imageModes[$finfo["imgmode"]];
+    list($origWidth, $origHeight) = getimagesize($finfo["src"]);
+    $ratio = $origWidth / $origHeight;
     if ($ratio < 1) {
-      $targetWidth = $targetHeight * $ratio;
+      $imgHeight = min($maxHeight, $origHeight);
+      $imgWidth = $imgHeight * $ratio;
     } else {
-      $targetHeight = $targetWidth / $ratio;
+      $imgWidth = min($maxWidth, $origWidth);
+      $imgHeight = $imgWidth / $ratio;
     }
-    return [round($targetWidth), round($targetHeight)];
+    return [round($imgWidth), round($imgHeight)];
   }
 
   /**
