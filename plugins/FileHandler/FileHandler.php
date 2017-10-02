@@ -121,11 +121,20 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   /**
+   * @param string $ext
+   * @return bool
+   */
+  public static function isImage ($ext) {
+    return in_array(strtolower($ext), ["jpg", "png", "gif", "jpeg"]);
+  }
+
+  /**
    * @param string $reqFilePath
    * @return array
    * @throws Exception
    */
   private static function getFileInfo ($reqFilePath) {
+    $reqFilePath = trim($reqFilePath, "/");
     $fInfo["src"] = null;
     $fInfo["imgmode"] = null;
     $fInfo["ext"] = strtolower(pathinfo($reqFilePath, PATHINFO_EXTENSION));
@@ -177,14 +186,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     } catch (Exception $e) {
       return null;
     }
-  }
-
-  /**
-   * @param string $ext
-   * @return bool
-   */
-  private static function isImage ($ext) {
-    return in_array(strtolower($ext), ["jpg", "png", "gif", "jpeg"]);
   }
 
   /**
@@ -306,6 +307,25 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       return;
     }
     throw new Exception(_("Unable to minify JS"));
+  }
+
+  /**
+   * @param $src
+   * @return array [targetWidth, targetHeight]
+   */
+  public static function calculateImageSize ($src) {
+    $finfo = self::getFileInfo($src);
+    $sizes = self::$imageModes[$finfo["imgmode"]];
+    list($originalWidth, $originalHeight) = getimagesize($finfo["src"]);
+    $ratio = $originalWidth / $originalHeight;
+    $targetWidth = min($sizes[0], $originalWidth);
+    $targetHeight = min($sizes[1], $originalHeight);
+    if ($ratio < 1) {
+      $targetWidth = $targetHeight * $ratio;
+    } else {
+      $targetHeight = $targetWidth / $ratio;
+    }
+    return [round($targetWidth), round($targetHeight)];
   }
 
   /**

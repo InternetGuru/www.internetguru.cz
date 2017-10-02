@@ -276,6 +276,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach ($contentPlus->getElementsByTagName("form") as $e) {
       $this->processLinks($e, "action", false);
     }
+    $this->processImages($contentPlus);
     foreach ($xPath->query("//*[@xml:lang]") as $a) {
       if (!$a->hasAttribute("lang")) {
         $a->setAttribute("lang", $a->getAttribute("xml:lang"));
@@ -573,9 +574,17 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         if (FileHandler::isSupportedRequest($pLink["path"])) {
           $isLink = false;
         }
+        $ext = pathinfo($pLink["path"], PATHINFO_EXTENSION);
+        $isFile = is_file($pLink["path"]);
+        // link to image
+        if (!$isLink && FileHandler::isImage($ext)) {
+          list($targetWidth, $targetHeight) = self::getImageDimensions($pLink['path']);
+          $e->setAttribute("data-origin-width", $targetWidth);
+          $e->setAttribute("data-origin-height", $targetHeight);
+        }
         // link to existing file
-        if ($isLink && is_file($pLink["path"])) {
-          if (pathinfo($pLink["path"], PATHINFO_EXTENSION) == "php") {
+        if ($isLink && $isFile) {
+          if ($ext == "php") {
             return;
           }
           $isLink = false;
@@ -675,6 +684,32 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $a->setAttribute("title", $value);
       return;
+    }
+  }
+
+  /**
+   * @param DOMDocumentPlus $doc
+   */
+  private function processImages (DOMDocumentPlus $doc) {
+    /** @var DOMElementPlus $img */
+    foreach ($doc->getElementsByTagName("img") as $img) {
+      if (!$img->hasAttribute("width") || !$img->hasAttribute("height")) {
+        list($targetWidth, $targetHeight) = $this->getImageDimensions($img->getAttribute("src"));
+        $img->setAttribute("width", $targetWidth);
+        $img->setAttribute("height", $targetHeight);
+      }
+    }
+  }
+
+  /**
+   * @param string $src
+   * @return array
+   */
+  private function getImageDimensions ($src) {
+    if (stream_resolve_include_path($src)) {
+      return getimagesize(realpath($src));
+    } else {
+      return FileHandler::calculateImageSize($src);
     }
   }
 
