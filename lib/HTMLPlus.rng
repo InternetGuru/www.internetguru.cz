@@ -94,12 +94,16 @@
           </data>
         </attribute>
       </optional>
-      <attribute name="mtime">
-        <ref name="datetime"/>
-      </attribute>
-      <attribute name="ctime">
-        <ref name="datetime"/>
-      </attribute>
+      <optional>
+        <attribute name="mtime">
+          <ref name="datetime"/>
+        </attribute>
+      </optional>
+      <optional>
+        <attribute name="ctime">
+          <ref name="datetime"/>
+        </attribute>
+      </optional>
       <oneOrMore>
         <text/>
       </oneOrMore>
