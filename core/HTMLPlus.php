@@ -48,7 +48,7 @@ class HTMLPlus extends DOMDocumentPlus {
   /**
    * @var bool
    */
-  const USE_APC = false;
+  const USE_APC = true;
   /**
    * @var \DOMNodeList
    */
