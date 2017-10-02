@@ -579,8 +579,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         // link to image
         if (!$isLink && FileHandler::isImage($ext)) {
           list($targetWidth, $targetHeight) = self::getImageDimensions($pLink['path']);
-          $e->setAttribute("data-origin-width", $targetWidth);
-          $e->setAttribute("data-origin-height", $targetHeight);
+          $e->setAttribute("data-target-width", $targetWidth);
+          $e->setAttribute("data-target-height", $targetHeight);
         }
         // link to existing file
         if ($isLink && $isFile) {
@@ -752,7 +752,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $ieIfComment = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : null;
       if (!is_null($ieIfComment)) {
-        #$e->nodeValue = "Â ";
+        #$e->nodeValue = " ";
         $parent->appendChild(
           $parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]")
         );
