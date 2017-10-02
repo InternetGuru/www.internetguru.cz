@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Support HTML5 data-* attributes
 
 ### Changed
+ - Efective HTML+ validation
  - Relativize breadcrumb padding top / bottom
 
 ### Fixed
