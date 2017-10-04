@@ -589,7 +589,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         if ($this->isLocalFragment($pLink)) {
           return;
         }
-        throw new Exception(sprintf(_("Link '%s' not found"), $url));
+        $linkNotFound=sprintf(_("Link '%s' not found"), $url);
+        Logger::warning($linkNotFound);
+        throw new Exception($linkNotFound);
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
       if ($linkType && array_key_exists("id", $pLink)) {
@@ -717,7 +719,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $ieIfComment = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : null;
       if (!is_null($ieIfComment)) {
-        #$e->nodeValue = "Â ";
+        #$e->nodeValue = " ";
         $parent->appendChild(
           $parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]")
         );
