@@ -88,6 +88,13 @@
         </attribute>
       </optional>
       <optional>
+        <attribute name="src">
+          <data type="string">
+            <param name="pattern">[a-z][a-z0-9_/.-]*\.html</param>
+          </data>
+        </attribute>
+      </optional>
+      <optional>
         <attribute name="mtime">
           <ref name="datetime"/>
         </attribute>
@@ -97,19 +104,9 @@
           <ref name="datetime"/>
         </attribute>
       </optional>
-      <optional>
-        <attribute name="src">
-          <data type="string">
-            <param name="pattern">[a-z][a-z0-9_/.-]*\.html</param>
-          </data>
-        </attribute>
-      </optional>
-      <zeroOrMore>
-        <choice>
-          <text/>
-          <ref name="span"/>
-        </choice>
-      </zeroOrMore>
+      <oneOrMore>
+        <text/>
+      </oneOrMore>
     </element>
   </define>
 
