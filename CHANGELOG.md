@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - Auto attribute `data-target-width` and `data-target-height` for links to images
+ - Auto attribute `width` and `height` for images
  - Saving autocorrected HTML+ files (if is file AUTOCORRECT)
  - Support HTML5 data-* attributes
 
