@@ -29,6 +29,7 @@ button[disabled] {
 object, img, picture {
   max-width: 100%;
   width: auto;
+  height: auto;
 }
 
 p object, p img, p picture {
