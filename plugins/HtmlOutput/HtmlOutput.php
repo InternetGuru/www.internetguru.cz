@@ -754,7 +754,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $ieIfComment = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : null;
       if (!is_null($ieIfComment)) {
-        #$e->nodeValue = " ";
+        #$e->nodeValue = "ï¿½";
         $parent->appendChild(
           $parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]")
         );
