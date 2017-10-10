@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.2] - 2017-10-10
+
+## [2.6.2] - 2017-10-06
+### Fixed
+ - Findex required authorization"
+
 ## [2.6.1] - 2017-09-14
 ### Fixed
  - Add other svg mime-type
@@ -247,6 +253,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[2.6.2]: https://bitbucket.org/igwr/cms/compare/v2.6.2..v2.6.1
+[2.6.2]: https://bitbucket.org/igwr/cms/compare/v2.6.2..v2.6.1
 [2.6.1]: https://bitbucket.org/igwr/cms/compare/v2.6.1..v2.6.0
 [2.6.0]: https://bitbucket.org/igwr/cms/compare/v2.6.0..v2.5.6
 [2.5.6]: https://bitbucket.org/igwr/cms/compare/v2.5.6..v2.5.5

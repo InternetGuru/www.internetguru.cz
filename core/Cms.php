@@ -360,7 +360,7 @@ class Cms {
       self::setLoggedUser($loggedUser);
       return;
     }
-    if (!stream_resolve_include_path(PROTECTED_FILE) && SCRIPT_NAME == "index.php") {
+    if (!stream_resolve_include_path(PROTECTED_FILE) && (SCRIPT_NAME == "index.php" || SCRIPT_NAME == FINDEX_PHP)) {
       return;
     }
     loginRedir();
