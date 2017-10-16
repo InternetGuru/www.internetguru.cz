@@ -44,30 +44,35 @@ class Photoswipe extends Plugin implements SplObserver, ModifyContentStrategyInt
   public function modifyContent (HTMLPlus $content) {
     $config = $this->getXML();
     $galleryClasses = $config->getElementsByTagName("galleryClass");
+    $xpath = new DOMXPath($content);
+    $found = false;
     $selector = [];
     /** @var DOMElementPlus $el */
     foreach ($galleryClasses as $el) {
+      $r = @$xpath->query("*[contains(@class, '".$el->nodeValue."')]");
+      if ($r === false) {
+        Logger::user_warning(sprintf(_("Invalid galleryClass '%s'"), $el->nodeValue));
+        return;
+      }
       $selector[] = ".".$el->nodeValue;
+      $found = true; // do not break => check all galleryClass elements
     }
-    $selector = implode(",", $selector);
-    $xpath = new DOMXPath($content);
-    $r = @$xpath->query($selector);
-    if ($r === false) {
-      Logger::user_warning(sprintf(_("Invalid galleryClass '%s'"), $selector));
-      return;
-    }
-    if ($r->length === 0) {
+    if (!$found) {
       return;
     }
     $libDir = $this->pluginDir . "/lib";
     $os = Cms::getOutputStrategy();
-    $os->addCssFile("$libDir/lib/photoswipe/photoswipe.css");
-    $os->addCssFile("$libDir/lib/photoswipe/default-skin.css");
-    $os->addJsFile("$libDir/lib/photoswipe/photoswipe.min.js", 1, "body");
-    $os->addJsFile("$libDir/lib/photoswipe/photoswipe-ui-default.min.js", 1, "body");
+    $os->addCssFile("$libDir/photoswipe.css");
+    $os->addCssFile("$libDir/default-skin.css");
+    $os->addJsFile("$libDir/photoswipe.min.js", 1, "body");
+    $os->addJsFile("$libDir/photoswipe-ui-default.min.js", 1, "body");
     $os->addJsFile($this->pluginDir."/Photoswipe.js", 1, "body");
+    $selector = implode(",", $selector);
+    $os->addJs("if(typeof IGCMS === \"undefined\") throw \"IGCMS is not defined\";
+IGCMS.Pswp.init({
+  galleryClassSelector: \"$selector\"
+});", 1, "body");
   }
-
 }
 
 ?>
