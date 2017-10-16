@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Photoswipe>
+  <!-- Class of gallery root element; It can be used multiple times -->
+  <galleryClass modifyonly="modifyonly">gallery</galleryClass>
+  <galleryClass modifyonly="modifyonly">gallery2</galleryClass>
+</Photoswipe>
