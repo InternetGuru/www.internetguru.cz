@@ -43,21 +43,9 @@ class Photoswipe extends Plugin implements SplObserver, ModifyContentStrategyInt
    */
   public function modifyContent (HTMLPlus $content) {
     $config = $this->getXML();
-    $galleryClasses = $config->getElementsByTagName("galleryClass");
     $xpath = new DOMXPath($content);
-    $found = false;
-    $selector = [];
-    /** @var DOMElementPlus $el */
-    foreach ($galleryClasses as $el) {
-      $r = @$xpath->query("*[contains(@class, '".$el->nodeValue."')]");
-      if ($r === false) {
-        Logger::user_warning(sprintf(_("Invalid galleryClass '%s'"), $el->nodeValue));
-        return;
-      }
-      $selector[] = ".".$el->nodeValue;
-      $found = true; // do not break => check all galleryClass elements
-    }
-    if (!$found) {
+    $r = @$xpath->query("*[contains(@class, ".strtolower($this->className).")]");
+    if (!$r->length) {
       return;
     }
     $libDir = $this->pluginDir . "/lib";
@@ -67,10 +55,12 @@ class Photoswipe extends Plugin implements SplObserver, ModifyContentStrategyInt
     $os->addJsFile("$libDir/photoswipe.min.js", 1, "body");
     $os->addJsFile("$libDir/photoswipe-ui-default.min.js", 1, "body");
     $os->addJsFile($this->pluginDir."/Photoswipe.js", 1, "body");
-    $selector = implode(",", $selector);
+    $socialEl = $config->getElementById("social", "var");
+    $social = $socialEl && $socialEl->nodeValue == "enabled" ? "true" : "false";
     $os->addJs("if(typeof IGCMS === \"undefined\") throw \"IGCMS is not defined\";
 IGCMS.Pswp.init({
-  galleryClassSelector: \"$selector\"
+  galleryClassSelector: \".".strtolower($this->className)."\",
+  shareEl: ".$social."
 });", 1, "body");
   }
 }

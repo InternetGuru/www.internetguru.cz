@@ -4,7 +4,7 @@
 
   var Config = {};
   Config.ns = "pswp";
-  Config.galleryClassSelector = ".gallery";
+  Config.galleryClassSelector = ".photoswipe";
   Config.shareEl = false;
   Config.pswpElement = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">'
     + '    <div class="pswp__bg"></div>'
