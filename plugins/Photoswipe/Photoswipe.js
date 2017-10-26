@@ -6,6 +6,7 @@
   Config.ns = "pswp";
   Config.galleryClassSelector = ".photoswipe";
   Config.shareEl = false;
+  Config.history = false;
   Config.pswpElement = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">'
     + '    <div class="pswp__bg"></div>'
     + '    <div class="pswp__scroll-wrap">'
@@ -56,6 +57,7 @@
       var options = {
         index: index,
         shareEl: Config.shareEl,
+        history: Config.history,
       }
       var items = []
       for (var j = 0; j < links.length; j++) {
