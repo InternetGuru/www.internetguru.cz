@@ -590,12 +590,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           $isLink = false;
         }
       }
+      $localFragment = $this->isLocalFragment($pLink);
       if ($isLink) {
         $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
         $pLink = $this->getLink($pLink, $rootId);
       }
       if (empty($pLink)) {
-        if ($this->isLocalFragment($pLink)) {
+        if ($localFragment) {
           return;
         }
         $linkNotFound=sprintf(_("Link '%s' not found"), $url);
