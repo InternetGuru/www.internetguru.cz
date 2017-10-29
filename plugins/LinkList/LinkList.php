@@ -113,8 +113,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
     }
     $a->setAttribute("id", "{$this->cssClass}-$i");
     $a->setAttribute("href", $link->getAttribute("href"));
-    $values = HTMLPlusBuilder::getHeadingValues($href);
-    $a->nodeValue = $values[0];
+    $a->nodeValue = HTMLPlusBuilder::getIdToHeading($href);
     return true;
   }
 

@@ -62,7 +62,6 @@ class GlobalMenu extends Plugin implements SplObserver {
         $idToLevel[$id] = 0;
         continue;
       }
-      $values = HTMLPlusBuilder::getHeadingValues($id);
       $parentUl = $idToLi[$parentId]->lastElement;
       if (is_null($parentUl) || $parentUl->nodeName != "ul") {
         $parentUl = $menu->createElement("ul");
@@ -70,7 +69,7 @@ class GlobalMenu extends Plugin implements SplObserver {
       }
       $parentUl->appendChild($menu->createTextNode("\n"));
       $li = $parentUl->appendChild($menu->createElement("li"));
-      $a = $menu->createElement("a", $values[0]);
+      $a = $menu->createElement("a", HTMLPlusBuilder::getHeading($id));
       $li->appendChild($a);
       $link = HTMLPlusBuilder::getIdToLink($id);
       if ($link === $curLink) {

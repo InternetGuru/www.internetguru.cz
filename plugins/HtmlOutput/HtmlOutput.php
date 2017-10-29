@@ -590,12 +590,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           $isLink = false;
         }
       }
+      $localFragment = $this->isLocalFragment($pLink);
       if ($isLink) {
         $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
         $pLink = $this->getLink($pLink, $rootId);
       }
       if (empty($pLink)) {
-        if ($this->isLocalFragment($pLink)) {
+        if ($localFragment) {
           return;
         }
         $linkNotFound=sprintf(_("Link '%s' not found"), $url);
@@ -605,7 +606,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
       if ($linkType && array_key_exists("id", $pLink)) {
         if (!array_key_exists("query", $pLink)) {
-          $this->insertTitle($e, $pLink["id"]);
+          if ($e->hasAttribute("title")) {
+            if (!strlen(trim($e->getAttribute("title")))) {
+              $e->stripAttr("title");
+            }
+          } else {
+            $this->insertTitle($e, $pLink["id"]);
+          }
         }
         $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
       }
@@ -674,19 +681,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string $id
    */
   private function insertTitle (DOMElementPlus $a, $id) {
-    if ($a->hasAttribute("title")) {
-      if (!strlen($a->getAttribute("title"))) {
-        $a->stripAttr("title");
+    $title = HTMLPlusBuilder::getIdToTitle($id);
+    if (!strlen($title) || $title == $a->nodeValue) {
+      $title = HTMLPlusBuilder::getIdToHeading($id);
+      if (!strlen($title) || $title == $a->nodeValue) {
+        $title = getShortString(HTMLPlusBuilder::getIdToDesc($id));
       }
-      return;
     }
-    foreach (HTMLPlusBuilder::getHeadingValues($id, true) as $value) {
-      if ($value == $a->nodeValue) {
-        continue;
-      }
-      $a->setAttribute("title", $value);
-      return;
-    }
+    $a->setAttribute("title", $title);
   }
 
   /**

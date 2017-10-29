@@ -356,8 +356,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $vars = [];
     $vars['heading'] = HTMLPlusBuilder::getIdToHeading($id);
     $vars['link'] = $id;
-    $values = HTMLPlusBuilder::getHeadingValues($id);
-    $vars['headingplus'] = $values[0];
+    $vars['headingplus'] = HTMLPlusBuilder::getHeading($id);
     $vars['short'] = HTMLPlusBuilder::getIdToShort($id);
     $vars['desc'] = HTMLPlusBuilder::getIdToDesc($id);
     $vars['kw'] = HTMLPlusBuilder::getIdToKw($id);

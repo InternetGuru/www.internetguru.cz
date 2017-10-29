@@ -77,8 +77,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       $a = $bc->createElement("a");
       $li->appendChild($a);
       $a->setAttribute("href", $id);
-      $values = HTMLPlusBuilder::getHeadingValues($id, !strlen(getCurLink()));
-      $aValue = $values[0];
+      $aValue = HTMLPlusBuilder::getHeading($id, !strlen(getCurLink()));
       if (empty($title) && array_key_exists("logo", $this->vars)) {
         $this->insertLogo($this->vars["logo"], $a, $id);
         if (!strlen(getCurLink())) {
@@ -87,8 +86,7 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       } else {
         $a->nodeValue = $aValue;
       }
-      $headings = HTMLPlusBuilder::getHeadingValues($id, false);
-      $title[] = $headings[0];
+      $title[] = HTMLPlusBuilder::getHeading($id);
     }
     array_pop($title);
     $title[] = HTMLPlusBuilder::getIdToHeading($id);
