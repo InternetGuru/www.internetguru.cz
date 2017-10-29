@@ -571,21 +571,18 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   /**
-   * @param string $id
+   * @param $id
    * @param bool $title
-   * @return array
+   * @return string
    */
-  public static function getHeadingValues ($id, $title = false) {
-    $values = [];
-    if ($title && strlen(self::getIdToTitle($id))) {
-      $values[] = self::getIdToTitle($id);
+  public static function getHeading ($id, $title = false) {
+    if ($title && strlen(HTMLPlusBuilder::getIdToTitle($id))) {
+      return HTMLPlusBuilder::getIdToTitle($id);
     }
-    if (strlen(self::getIdToShort($id))) {
-      $values[] = self::getIdToShort($id);
+    if (strlen(HTMLPlusBuilder::getIdToShort($id))) {
+      return HTMLPlusBuilder::getIdToShort($id);
     }
-    $values[] = self::getIdToHeading($id);
-    $values[] = getShortString(self::getIdToDesc($id));
-    return $values;
+    return HTMLPlusBuilder::getIdToHeading($id);
   }
 
 }
