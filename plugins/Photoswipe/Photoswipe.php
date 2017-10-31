@@ -42,12 +42,12 @@ class Photoswipe extends Plugin implements SplObserver, ModifyContentStrategyInt
    * @param HTMLPlus $content
    */
   public function modifyContent (HTMLPlus $content) {
-    $config = $this->getXML();
     $xpath = new DOMXPath($content);
-    $r = @$xpath->query("*[contains(@class, ".strtolower($this->className).")]");
+    $r = @$xpath->query("//*[contains(@class, '".strtolower($this->className)."')]");
     if (!$r->length) {
       return;
     }
+    $config = $this->getXML();
     $libDir = $this->pluginDir . "/lib";
     $os = Cms::getOutputStrategy();
     $os->addCssFile("$libDir/photoswipe.css");
