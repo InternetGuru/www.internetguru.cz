@@ -13,8 +13,7 @@
   <var modifyonly="modifyonly" id="created">Autorem obsahu je <a href="" var="authorid@href author">n/a</a> ze dne <span var="ctime" fn="inputvar-dateformat">n/a</span></var>
   <var modifyonly="modifyonly" id="modified">Obsah dokumentu byl naposledy změněn dne <span fn="inputvar-dateformat" var="mtime">n/a</span></var>
   <var modifyonly="modifyonly" id="responsible">Za obsah zodpovídá <a href="" var="respid@href resp">n/a</a></var>
-  <var modifyonly="modifyonly" id="edit"><a href="" var="editurl@href" class="edit noprint">Editovat</a></var>
-
+  <var modifyonly="modifyonly" id="edit">Zdrojový soubor: <code var="file">n/a</code> (<a href="?Admin=%s" title="" var="file@href file@title" class="edit noprint">Editovat</a>)</var>
   <var modifyonly="modifyonly" id="partinfo">
     <ul class="partinfo nomultiple partial">
       <li><span var="part_created">n/a</span></li>
