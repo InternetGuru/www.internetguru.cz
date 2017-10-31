@@ -61,14 +61,16 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
     }
     /** @var DOMElementPlus $link */
     foreach ($links as $link) {
-      if (!$this->isLocalLink($link->getAttribute("href"))) {
+      // remove fragment
+      $href = strtok($link->getAttribute("href"), "#");
+      if (!$this->isLocalLink($href)) {
         continue;
       }
-      if (!isset($linksArray[$link->getAttribute("href")])) {
-        $linksArray[$link->getAttribute("href")] = ++$count;
+      if (!isset($linksArray[$href])) {
+        $linksArray[$href] = ++$count;
       }
       $a = $link->ownerDocument->createElement("a");
-      $a->nodeValue = $linksArray[$link->getAttribute("href")];
+      $a->nodeValue = $linksArray[$href];
       $a->setAttribute("class", "{$this->cssClass}-href print");
       $a->setAttribute("href", "#{$this->cssClass}-".$a->nodeValue);
       $link->parentNode->insertBefore($a, $link->nextSibling);
@@ -93,10 +95,6 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
   private function isLocalLink ($href) {
     // empty
     if (!strlen(trim($href))) {
-      return false;
-    }
-    // local fragment
-    if (strpos($href, "#") === 0) {
       return false;
     }
     // external
