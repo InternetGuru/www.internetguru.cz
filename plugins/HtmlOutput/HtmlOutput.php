@@ -558,16 +558,20 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param bool $linkType
    */
   private function processLinks (DOMElementPlus $e, $aName, $linkType = true) {
-    $url = $e->getAttribute($aName);
-    if (!strlen($url)) {
-      $e->stripAttr($aName, sprintf(_("Empty attribute '%s' stripped"), $aName));
+    if (!$e->hasAttribute($aName)) {
       return;
     }
+    $url = trim($e->getAttribute($aName));
     try {
+      // link is empty
+      if (!strlen($url)) {
+        throw new Exception(_("Empty value"));
+      }
       $pLink = parseLocalLink($url);
+      // link is external
       if (is_null($pLink)) {
         return;
-      } # external
+      }
       $isLink = true;
       if (array_key_exists("path", $pLink)) {
         // link to supported file
@@ -599,17 +603,13 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         if ($localFragment) {
           return;
         }
-        $linkNotFound=sprintf(_("Link '%s' not found"), $url);
-        Logger::warning($linkNotFound);
-        throw new Exception($linkNotFound);
+        throw new Exception(_("Target not found"));
       }
       #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
       if ($linkType && array_key_exists("id", $pLink)) {
         if (!array_key_exists("query", $pLink)) {
-          if ($e->hasAttribute("title")) {
-            if (!strlen(trim($e->getAttribute("title")))) {
-              $e->stripAttr("title");
-            }
+          if (!strlen(trim($e->getAttribute("title")))) {
+            $e->stripAttr("title");
           } else {
             $this->insertTitle($e, $pLink["id"]);
           }
@@ -620,6 +620,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $e->setAttribute($aName, $link);
     } catch (Exception $ex) {
       $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $url, $ex->getMessage()));
+      $e->stripAttr("title");
+      #Logger::warning($message);
     }
   }
 

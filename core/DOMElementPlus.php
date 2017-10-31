@@ -412,6 +412,7 @@ class DOMElementPlus extends DOMElement {
     if (!Cms::isSuperUser() && !CMS_DEBUG) {
       return;
     }
+    $this->addClass("stripped");
     if (is_null($comment)) {
       $comment = sprintf(_("Attribute %s stripped"), "$attr='$aVal'");
     }
