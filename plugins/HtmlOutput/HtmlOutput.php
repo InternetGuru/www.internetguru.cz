@@ -590,8 +590,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $this->insertTitle($e, $pLink["id"]);
     } catch (Exception $ex) {
-      $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $ex->getMessage()));
-      $e->stripAttr("title");
+      $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $ex->getMessage());
+      $e->stripAttr($aName, $message);
+      $e->setClass("title", $message);
+      $e->addClass("stripped");
     }
   }
 
