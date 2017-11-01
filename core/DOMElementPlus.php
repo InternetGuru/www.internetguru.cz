@@ -409,7 +409,7 @@ class DOMElementPlus extends DOMElement {
     if ($comment === "") {
       return;
     }
-    if (!Cms::isLoggedUser()) {
+    if (is_null(Cms::getLoggedUser())) {
       return;
     }
     if (is_null($comment)) {
