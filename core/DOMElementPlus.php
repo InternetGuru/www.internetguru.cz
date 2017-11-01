@@ -406,11 +406,10 @@ class DOMElementPlus extends DOMElement {
     }
     $aVal = $this->getAttribute($attr);
     $this->removeAttribute($attr);
-    if (!Cms::isSuperUser()) {
+    if ($comment === "") {
       return;
     }
-    $this->addClass("stripped");
-    if ($comment === "") {
+    if (is_null(Cms::getLoggedUser())) {
       return;
     }
     if (is_null($comment)) {

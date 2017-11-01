@@ -7,15 +7,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-07-14 11:25+0200\n"
-"PO-Revision-Date: 2017-07-14 11:26+0200\n"
+"POT-Creation-Date: 2017-10-31 22:26-0400\n"
+"PO-Revision-Date: 2017-10-31 22:27-0400\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 2.0.2\n"
+"X-Generator: Poedit 1.8.11\n"
 "X-Poedit-Basepath: ../../../..\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Poedit-SourceCharset: UTF-8\n"
@@ -39,40 +39,40 @@ msgstr "Varování"
 msgid "Error"
 msgstr "Error"
 
-#: core/Cms.php:139 core/globals.php:55
+#: core/Cms.php:160 core/globals.php:55
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: core/Cms.php:304
+#: core/Cms.php:321
 #, php-format
 msgid "Plugin %s exception: %s"
 msgstr "Chyba rozšíření %s: %s"
 
-#: core/Cms.php:348
+#: core/Cms.php:365
 #, php-format
 msgid "Content must be an instance of HTML+ (%s given)"
 msgstr "Obsah musí být instancí HTML+ (nikoli %s)"
 
-#: core/Cms.php:353
+#: core/Cms.php:370
 #, php-format
 msgid "Invalid HTML+ content: %s"
 msgstr "Nevalidní HTML+ obsah: %s"
 
-#: core/Cms.php:383
+#: core/Cms.php:400
 msgid "Unable to re/generate session ID"
 msgstr "Nepodařilo se vygenerovat session ID"
 
-#: core/Cms.php:408
+#: core/Cms.php:425
 #, php-format
 msgid "Invalid HTML+: %s"
 msgstr "Nevalidní HTML+: %s"
 
-#: core/Cms.php:448
+#: core/Cms.php:465
 #, php-format
 msgid "Unable to set function %s: not a function"
 msgstr "Není možné vytvořit funkci %s: nejedná se o funkci"
 
-#: core/Cms.php:508
+#: core/Cms.php:525
 #, php-format
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
@@ -112,16 +112,16 @@ msgstr "Nepodporovaný formát proměnné %s"
 msgid "Readonly element hidden"
 msgstr "Skrytý element s atributem 'readonly'"
 
-#: core/DOMDocumentPlus.php:265
+#: core/DOMDocumentPlus.php:266
 #, php-format
 msgid "Unable to find HTML+ RNG schema '%s'"
 msgstr "Nepodařilo se nalézt HTML+ RNG schéma '%s'"
 
-#: core/DOMDocumentPlus.php:271
+#: core/DOMDocumentPlus.php:273
 msgid "relaxNGValidate() internal error occurred"
 msgstr "Došlo k vnitřní chybě funkce relaxNGValidate()"
 
-#: core/DOMDocumentPlus.php:276
+#: core/DOMDocumentPlus.php:278
 msgid "Caution: this message may be misleading"
 msgstr "Upozornění: tato informace může být zavádějící"
 
@@ -171,159 +171,159 @@ msgstr "Přejděte na domovskou stránku webu."
 msgid "Contact webmaster."
 msgstr "Kontaktujte správce webu."
 
-#: core/HTMLPlus.php:98
+#: core/HTMLPlus.php:104
 msgid "Unknown"
 msgstr "Není"
 
-#: core/HTMLPlus.php:98
+#: core/HTMLPlus.php:104
 msgid "Valid"
 msgstr "Validní"
 
-#: core/HTMLPlus.php:98
+#: core/HTMLPlus.php:104
 msgid "Invalid"
 msgstr "Nevalidní"
 
-#: core/HTMLPlus.php:98
+#: core/HTMLPlus.php:104
 msgid "Repaired"
 msgstr "Opraveno"
 
-#: core/HTMLPlus.php:112
+#: core/HTMLPlus.php:118
 msgid "Variable value must be non-empty string or null"
 msgstr "Hodnota proměnné musí být neprázdný řetězec nebo null"
 
-#: core/HTMLPlus.php:416
+#: core/HTMLPlus.php:441
 msgid "Root element not found"
 msgstr "Nebyl nalezen kořenový element"
 
-#: core/HTMLPlus.php:420
+#: core/HTMLPlus.php:445
 msgid "Root element must be 'body'"
 msgstr "Kořenový element musí být 'body'"
 
-#: core/HTMLPlus.php:427
+#: core/HTMLPlus.php:452
 msgid "Attribute 'xml:lang' is missing in element body"
 msgstr "V elementu body chybí atribut 'xml:lang'"
 
 # Hodnota atributu xml:lang v elementu body nového HTML+ dokumentu
-#: core/HTMLPlus.php:429
+#: core/HTMLPlus.php:454
 msgid "en"
 msgstr "cs"
 
-#: core/HTMLPlus.php:433
+#: core/HTMLPlus.php:458
 msgid "Element section cannot be empty"
 msgstr "Element section nesmí být prázdný"
 
-#: core/HTMLPlus.php:449
+#: core/HTMLPlus.php:474
 msgid "There must be exactly one heading in body element"
 msgstr "V elementu body musí být právě jeden nadpis"
 
-#: core/HTMLPlus.php:457
+#: core/HTMLPlus.php:482
 msgid "Missing heading in body element"
 msgstr "V elementu body chybí nadpis"
 
-#: core/HTMLPlus.php:490
+#: core/HTMLPlus.php:515
 msgid "Web title"
 msgstr "Titulek webu"
 
-#: core/HTMLPlus.php:492
+#: core/HTMLPlus.php:517
 msgid "Web description"
 msgstr "Popisek webu"
 
-#: core/HTMLPlus.php:505
+#: core/HTMLPlus.php:527
 #, php-format
 msgid "Invalid body attribute '%s'"
 msgstr "Neplatný atribut elementu body '%s'"
 
-#: core/HTMLPlus.php:524
+#: core/HTMLPlus.php:543
 msgid "Empty section(s) found"
 msgstr "Nalezen jeden nebo více prázdných elementů section"
 
-#: core/HTMLPlus.php:526
+#: core/HTMLPlus.php:545
 msgid "Empty section deleted"
 msgstr "Byl smazán prázdný element section"
 
-#: core/HTMLPlus.php:538
+#: core/HTMLPlus.php:554
 msgid "Lang attribute without XML namespace"
 msgstr "Atribut lang postrádá jmenný prostor xml"
 
-#: core/HTMLPlus.php:564
+#: core/HTMLPlus.php:580
 #, php-format
 msgid "Invalid src format: %s"
 msgstr "Neplatný formát atributu src: %s"
 
-#: core/HTMLPlus.php:576
+#: core/HTMLPlus.php:589
 msgid "Heading content must not be empty"
 msgstr "Nadpis nesmí být prázdný"
 
-#: core/HTMLPlus.php:594
+#: core/HTMLPlus.php:604
 msgid "Element dt following sibling must be dd"
 msgstr "Element následující dt musí být dd"
 
-#: core/HTMLPlus.php:620
+#: core/HTMLPlus.php:631
 msgid "Attribute 'mtime' requires 'ctime'"
 msgstr "Atribut 'mtime' vyžaduje 'ctime'"
 
-#: core/HTMLPlus.php:626
+#: core/HTMLPlus.php:637
 msgid "Invalid 'ctime' attribute format"
 msgstr "Neplatný formát atributu 'ctime'"
 
-#: core/HTMLPlus.php:627
+#: core/HTMLPlus.php:638
 #, php-format
 msgid "Removed attribute ctime '%s'"
 msgstr "Odstraněn atribut ctime '%s'"
 
-#: core/HTMLPlus.php:635
+#: core/HTMLPlus.php:646
 msgid "Invalid 'mtime' attribute format"
 msgstr "Neplatný formát atributu 'mtime'"
 
-#: core/HTMLPlus.php:636 core/HTMLPlus.php:641
+#: core/HTMLPlus.php:647 core/HTMLPlus.php:652
 #, php-format
 msgid "Removed attribute mtime '%s'"
 msgstr "Odstraněn atribut mtime '%s'"
 
-#: core/HTMLPlus.php:640
+#: core/HTMLPlus.php:651
 msgid "Attribute 'mtime' cannot be lower than 'ctime'"
 msgstr "Atribut 'mtime' nemůže být menší než 'ctime'"
 
-#: core/HTMLPlus.php:681
+#: core/HTMLPlus.php:689
 msgid "Attribute 'author' cannot be empty"
 msgstr "Atribut 'author' nemůže být prázdný"
 
-#: core/HTMLPlus.php:682
+#: core/HTMLPlus.php:690
 msgid "Removed empty attribute 'author'"
 msgstr "Odstraněn prázdný atribut 'author'"
 
-#: core/HTMLPlus.php:696
+#: core/HTMLPlus.php:704
 msgid "First heading attribute 'author' missing"
 msgstr "V prvním nadpisu chybí atribut 'author'"
 
-#: core/HTMLPlus.php:710
+#: core/HTMLPlus.php:715
 msgid "First heading attribute 'id' missing"
 msgstr "První nadpis postrádá atribut 'id'"
 
-#: core/HTMLPlus.php:724
+#: core/HTMLPlus.php:726
 msgid "First heading attribute 'ctime' missing"
 msgstr "V prvním nadpisu chybí atribut 'ctime'"
 
-#: core/HTMLPlus.php:740
+#: core/HTMLPlus.php:742
 #, php-format
 msgid "Heading attribute id empty or missing: %s"
 msgstr "Prázdný nebo chybějící atribut id nadpisu: %s"
 
-#: core/HTMLPlus.php:742
+#: core/HTMLPlus.php:744
 #, php-format
 msgid "Invalid heading attribute id '%s'"
 msgstr "Neplatný atribut id '%s' nadpisu"
 
-#: core/HTMLPlus.php:744
+#: core/HTMLPlus.php:746
 #, php-format
 msgid "Duplicit heading attribute id '%s'"
 msgstr "Duplicitní atribut id '%s' nadpisu"
 
-#: core/HTMLPlus.php:776
+#: core/HTMLPlus.php:775
 msgid "Body attribute 'ns' missing"
 msgstr "V elementu body chybí atribut 'ns'"
 
-#: core/HTMLPlus.php:799
+#: core/HTMLPlus.php:795
 #, php-format
 msgid "Heading description missing or empty: %s"
 msgstr "Chybějící nebo prázdný popis nadpisu: %s"
@@ -338,27 +338,27 @@ msgstr "Neznámý odkaz '%s'"
 msgid "Unable to load %s: %s"
 msgstr "Nepodařilo se načíst %s: %s"
 
-#: core/HTMLPlusBuilder.php:361
+#: core/HTMLPlusBuilder.php:362
 #, php-format
 msgid "File %s invalid syntax caused by includes fixed %s times"
 msgstr "Nevalidní syntaxe souboru %s způsobená importem opravena %s krát"
 
-#: core/HTMLPlusBuilder.php:363
+#: core/HTMLPlusBuilder.php:364
 #, php-format
 msgid "File %s invalid syntax fixed %s times"
 msgstr "Nevalidní syntaxe souboru %s opravena %s krát"
 
-#: core/HTMLPlusBuilder.php:378
+#: core/HTMLPlusBuilder.php:384
 #, php-format
 msgid "Unable to import: %s"
 msgstr "Nepodařilo se importovat: %s"
 
-#: core/HTMLPlusBuilder.php:422
+#: core/HTMLPlusBuilder.php:428
 #, php-format
 msgid "Included file '%s' extension must be .html"
 msgstr "Přípona importovaného souboru '%s' musí být .html"
 
-#: core/HTMLPlusBuilder.php:429
+#: core/HTMLPlusBuilder.php:435
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
@@ -460,97 +460,97 @@ msgstr "Nepodařilo se zpracovat atribut href '%s'"
 msgid "Link is cyclic"
 msgstr "Odkaz je cyklický"
 
-#: core/globals.php:383
+#: core/globals.php:384
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: core/globals.php:396
+#: core/globals.php:397
 msgid "Unable to save content"
 msgstr "Nepodařilo se uložit obsah"
 
-#: core/globals.php:409
+#: core/globals.php:410
 msgid "Source file is a link"
 msgstr "Zdrojový soubor je symbolický odkaz (link)"
 
-#: core/globals.php:412
+#: core/globals.php:413
 msgid "Source file not found"
 msgstr "Zdrojový soubor nebyl nalezen"
 
-#: core/globals.php:416
+#: core/globals.php:417
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: core/globals.php:421
+#: core/globals.php:422
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zkopírovat zdrojový soubor"
 
-#: core/globals.php:426
+#: core/globals.php:427
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepodařilo přejmenovat"
 
-#: core/globals.php:429
+#: core/globals.php:430
 msgid "Unable to set new file modification time"
 msgstr "Nepodařilo se nastavit čas modifikace"
 
-#: core/globals.php:449
+#: core/globals.php:450
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: core/globals.php:460
+#: core/globals.php:461
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: core/globals.php:470
+#: core/globals.php:471
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: core/globals.php:571
+#: core/globals.php:572
 #, php-format
 msgid "Unable to open file %s"
 msgstr "Nepodařilo se otevřít soubor %s"
 
-#: core/globals.php:580
+#: core/globals.php:581
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: core/globals.php:639 core/globals.php:663
+#: core/globals.php:640 core/globals.php:664
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: core/globals.php:668
+#: core/globals.php:669
 msgid "Unable to read file"
 msgstr "Nepodařilo se přečíst soubor"
 
-#: core/globals.php:680
+#: core/globals.php:681
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: core/globals.php:766
+#: core/globals.php:767
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:818
+#: core/globals.php:819
 #, php-format
 msgid "Unable to cache variable %s"
 msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
 
-#: core/globals.php:843
+#: core/globals.php:844
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
-#: core/globals.php:942
+#: core/globals.php:943
 #, php-format
 msgid "Undefined method name %s"
 msgstr "Neznámý název metody %s"
 
-#: core/globals.php:948
+#: core/globals.php:949
 #, php-format
 msgid "Argument[%s] empty or missing"
 msgstr "Argument[%s] chybí nebo je prázdný"
 
-#: findex.php:18 plugins/FileHandler/FileHandler.php:165
+#: findex.php:18 plugins/FileHandler/FileHandler.php:174
 msgid "File not found"
 msgstr "Soubor nenalezen"
 
@@ -593,16 +593,16 @@ msgstr "%s v %s na řádku %s"
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
 
-#: init.php:104
+#: init.php:106
 #, php-format
 msgid "Method %s is no longer available"
 msgstr "Metoda %s již není k dispozici"
 
-#: init.php:106
+#: init.php:108
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: init.php:115
+#: init.php:117
 msgid "Root file(s) updated"
 msgstr "Došlo k aktualizaci kořenových souborů"
 
@@ -672,93 +672,93 @@ msgstr "Nepodařilo se deaktivovat soubor"
 msgid "Unable to get contents from '%s'"
 msgstr "Nepodařilo se načíst obsah ze souboru '%s'"
 
-#: plugins/Admin/Admin.php:388
+#: plugins/Admin/Admin.php:391
 msgid "user content"
 msgstr "uživatelský obsah"
 
-#: plugins/Admin/Admin.php:412
+#: plugins/Admin/Admin.php:415
 msgid "Repairable error(s) occurred"
 msgstr "Nastaly opravitelné chyby"
 
-#: plugins/Admin/Admin.php:443
+#: plugins/Admin/Admin.php:446
 #, php-format
 msgid "Schema file '%s' not found"
 msgstr "Schéma souboru '%s' nebylo nalezeno"
 
-#: plugins/Admin/Admin.php:461
+#: plugins/Admin/Admin.php:464
 #, php-format
 msgid "Unsupported schema '%s'"
 msgstr "Nepodporované schéma '%s'"
 
-#: plugins/Admin/Admin.php:493
+#: plugins/Admin/Admin.php:496
 msgid "Destination file already exists"
 msgstr "Cílový soubor již existuje"
 
-#: plugins/Admin/Admin.php:497
+#: plugins/Admin/Admin.php:500
 msgid "Unable to enable destination file"
 msgstr "Nepodařilo se aktivovat cílový soubor"
 
-#: plugins/Admin/Admin.php:502
+#: plugins/Admin/Admin.php:505
 #, php-format
 msgid "Unable to save changes to %s: %s"
 msgstr "Nepodařilo se uložit změny do %s: %s"
 
-#: plugins/Admin/Admin.php:509
+#: plugins/Admin/Admin.php:512
 #, php-format
 msgid "Unable to backup %s: %s"
 msgstr "Nepodařilo se zálohovat %s: %s"
 
-#: plugins/Admin/Admin.php:512 plugins/InputVar/InputVar.php:74
+#: plugins/Admin/Admin.php:515 plugins/InputVar/InputVar.php:74
 msgid "Changes successfully saved"
 msgstr "Změny byly úspěšně uloženy"
 
-#: plugins/Admin/Admin.php:547
+#: plugins/Admin/Admin.php:550
 msgid "Saving changes will clear server cache"
 msgstr "Uložení změn vyčistí serverovou mezipaměť"
 
-#: plugins/Admin/Admin.php:566
+#: plugins/Admin/Admin.php:569
 msgid "Saving changes will remove outdated file cache"
 msgstr "Uložení změn odstraní neaktuální soubor z mezipaměti"
 
-#: plugins/Admin/Admin.php:579
+#: plugins/Admin/Admin.php:582
 msgid "null value"
 msgstr "hodnota null"
 
-#: plugins/Admin/Admin.php:585
+#: plugins/Admin/Admin.php:588
 msgid "empty value"
 msgstr "prázná hodnota"
 
-#: plugins/Admin/Admin.php:628
+#: plugins/Admin/Admin.php:631
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:649
+#: plugins/Admin/Admin.php:652
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:649
+#: plugins/Admin/Admin.php:652
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:669
+#: plugins/Admin/Admin.php:672
 msgid "Administration"
 msgstr "Administrace"
 
-#: plugins/Admin/Admin.php:671
+#: plugins/Admin/Admin.php:674
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:672
+#: plugins/Admin/Admin.php:675
 #, php-format
 msgid "%s (%s) - Administration"
 msgstr "%s (%s) - Administrace"
 
-#: plugins/Admin/Admin.php:692
+#: plugins/Admin/Admin.php:695
 msgid "enable"
 msgstr "aktivovat"
 
-#: plugins/Admin/Admin.php:692
+#: plugins/Admin/Admin.php:695
 msgid "disable"
 msgstr "deaktivovat"
 
@@ -792,17 +792,17 @@ msgstr "Žádný obsah"
 msgid "Sort variable %s not found; using default"
 msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
 
-#: plugins/Agregator/DocList.php:76
+#: plugins/Agregator/DocList.php:83
 #, php-format
 msgid "No documents registered in '%s'"
 msgstr "V '%s' nejsou žádné dokumenty"
 
-#: plugins/Agregator/DocList.php:78
+#: plugins/Agregator/DocList.php:85
 #, php-format
 msgid "No files matching attribute kw '%s'"
 msgstr "Žádný soubor neobsahuje v atributu kw hodnotu '%s'"
 
-#: plugins/Agregator/DocList.php:98
+#: plugins/Agregator/DocList.php:105
 msgid "Edit"
 msgstr "Editovat"
 
@@ -894,11 +894,11 @@ msgstr "Formulář '%s' nemá definovanou zprávu"
 msgid "No sets found"
 msgstr "Nebyly nalezeny žádné sestavy"
 
-#: plugins/ContentBalancer/ContentBalancer.php:224
+#: plugins/ContentBalancer/ContentBalancer.php:228
 msgid "Unable to find requested section"
 msgstr "Nepodařilo se nalézt požadovanou sekci"
 
-#: plugins/ContentBalancer/ContentBalancer.php:332
+#: plugins/ContentBalancer/ContentBalancer.php:336
 #, php-format
 msgid "Item id %s not found, using default"
 msgstr "Nebyl nalezen element item s id %s, zvolen výchozí"
@@ -996,76 +996,76 @@ msgstr "Chyba serveru"
 msgid "Unable to handle file request: %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 
-#: plugins/FileHandler/FileHandler.php:153
+#: plugins/FileHandler/FileHandler.php:162
 msgid "File illegal path"
 msgstr "Neplatná cesta souboru"
 
-#: plugins/FileHandler/FileHandler.php:238
+#: plugins/FileHandler/FileHandler.php:239
 #, php-format
 msgid "Unable to handle resource '%s': %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor %s: %s"
 
-#: plugins/FileHandler/FileHandler.php:256
+#: plugins/FileHandler/FileHandler.php:257
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:281
+#: plugins/FileHandler/FileHandler.php:282
 #, php-format
 msgid "File %s was successfully built"
 msgstr "Soubor %s byl úspěšně postaven"
 
-#: plugins/FileHandler/FileHandler.php:302
+#: plugins/FileHandler/FileHandler.php:303
 msgid "UglifyJS not installed"
 msgstr "UglifyJS není nainstalovaný"
 
-#: plugins/FileHandler/FileHandler.php:308
+#: plugins/FileHandler/FileHandler.php:309
 msgid "Unable to minify JS"
 msgstr "Nepodařilo se minifikovat JS"
 
-#: plugins/FileHandler/FileHandler.php:325
+#: plugins/FileHandler/FileHandler.php:345
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:345
+#: plugins/FileHandler/FileHandler.php:365
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:350
+#: plugins/FileHandler/FileHandler.php:370
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:359
+#: plugins/FileHandler/FileHandler.php:379
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:373
+#: plugins/FileHandler/FileHandler.php:393
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
-#: plugins/FileHandler/FileHandler.php:383
+#: plugins/FileHandler/FileHandler.php:403
 #, php-format
 msgid "File %s does not exists"
 msgstr "Soubor %s neexistuje"
 
-#: plugins/FileHandler/FileHandler.php:419
+#: plugins/FileHandler/FileHandler.php:439
 #, php-format
 msgid "Unable to update file cache: %s"
 msgstr "Nepodařilo se aktualizovat souborovou mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:423
+#: plugins/FileHandler/FileHandler.php:443
 #, php-format
 msgid "File cache successfully updated: %s"
 msgstr "Souborová mezipaměť byla úspěšně aktualizovaná: %s"
 
-#: plugins/FileHandler/FileHandler.php:426
+#: plugins/FileHandler/FileHandler.php:446
 #, php-format
 msgid "Outdated file cache: %s"
 msgstr "Neaktuální souborová mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:450
+#: plugins/FileHandler/FileHandler.php:470
 #, php-format
 msgid "Unable to create user folder %s"
 msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
@@ -1075,57 +1075,55 @@ msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
 msgid "GA disabled (ga_id = %s)"
 msgstr "GA je vypnutý (ga_id = %s)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:116
+#: plugins/HtmlOutput/HtmlOutput.php:119
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:179
+#: plugins/HtmlOutput/HtmlOutput.php:182
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:310
+#: plugins/HtmlOutput/HtmlOutput.php:314
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:337
+#: plugins/HtmlOutput/HtmlOutput.php:341
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:372
+#: plugins/HtmlOutput/HtmlOutput.php:376
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:375
+#: plugins/HtmlOutput/HtmlOutput.php:379
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:530
+#: plugins/HtmlOutput/HtmlOutput.php:534
 #, php-format
 msgid "Invalid xPath query '%s'"
 msgstr "Neplatný xPath '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:558
-#, php-format
-msgid "Empty attribute '%s' stripped"
-msgstr "Odstraněn prázdný atribut '%s'"
+#: plugins/HtmlOutput/HtmlOutput.php:567
+msgid "Empty value"
+msgstr "Prázdná hodnota"
 
-#: plugins/HtmlOutput/HtmlOutput.php:588
-#, php-format
-msgid "Link '%s' not found"
-msgstr "Odkaz '%s' nebyl nalezen"
-
-#: plugins/HtmlOutput/HtmlOutput.php:600
+#: plugins/HtmlOutput/HtmlOutput.php:593
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:771
+#: plugins/HtmlOutput/HtmlOutput.php:638
+msgid "Target not found"
+msgstr "Cíl nebyl nalezen"
+
+#: plugins/HtmlOutput/HtmlOutput.php:833
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1288,6 +1286,12 @@ msgstr "Počkejte %s sekund před dalším odesláním"
 #: plugins/ValidateForm/ValidateForm.php:397
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
+
+#~ msgid "Empty attribute '%s' stripped"
+#~ msgstr "Odstraněn prázdný atribut '%s'"
+
+#~ msgid "Link '%s' not found"
+#~ msgstr "Odkaz '%s' nebyl nalezen"
 
 #~ msgid "Clear server cache to update sitemap"
 #~ msgstr "Pro aktualizaci mapy stránek smažte mezipaměť serveru"
