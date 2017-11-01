@@ -592,7 +592,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     } catch (Exception $ex) {
       $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $ex->getMessage());
       $e->stripAttr($aName, $message);
-      $e->setClass("title", $message);
+      $e->setAttribute("title", $message);
       $e->addClass("stripped");
     }
   }
