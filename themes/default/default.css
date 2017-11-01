@@ -9,8 +9,8 @@ a {
   text-decoration: none;
 }
 
-a.stripped {
-  text-decoration: underline;
+#content a.stripped {
+  border-bottom: thin solid;
   color: red;
 }
 
