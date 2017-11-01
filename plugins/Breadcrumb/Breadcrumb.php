@@ -76,7 +76,14 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       }
       $a = $bc->createElement("a");
       $li->appendChild($a);
-      $a->setAttribute("href", $id);
+      $pLink["path"] = HTMLPlusBuilder::getIdToLink($id);
+      addPermParams($pLink);
+      if (implodeLink($pLink) != getCurLink(true)) {
+        $a->setAttribute("href", $id);
+        if ($pLink["path"] == getCurLink()) {
+          $a->setAttribute("title", $this->vars["reset"]->nodeValue);
+        }
+      }
       $aValue = HTMLPlusBuilder::getHeading($id, !strlen(getCurLink()));
       if (empty($title) && array_key_exists("logo", $this->vars)) {
         $this->insertLogo($this->vars["logo"], $a, $id);
@@ -90,11 +97,6 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
     }
     array_pop($title);
     $title[] = HTMLPlusBuilder::getIdToHeading($id);
-    $pLink["path"] = HTMLPlusBuilder::getIdToLink($a->getAttribute("href"));
-    addPermParams($pLink);
-    if (implodeLink($pLink) != getCurLink(true)) {
-      $a->setAttribute("title", $this->vars["reset"]->nodeValue);
-    }
     $this->title = implode(" - ", array_reverse($title));
     Cms::setVariable("", $bc->documentElement);
   }
