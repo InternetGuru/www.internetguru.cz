@@ -7,8 +7,8 @@ body {
   line-height: 1.4;
 }
 
-a.stripped {
-  text-decoration: underline;
+#content a.stripped {
+  border-bottom: thin solid;
   color: red;
 }
 
