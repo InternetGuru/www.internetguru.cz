@@ -17,7 +17,6 @@ use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\XMLBuilder;
-use IGCMS\Plugins\FileHandler;
 use SplObserver;
 use SplSubject;
 use XSLTProcessor;
@@ -271,10 +270,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach ($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
     foreach ($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
     foreach ($contentPlus->getElementsByTagName("a") as $e) {
-      $this->processLinks($e, "href");
+      $this->processElement($e, "href");
     }
     foreach ($contentPlus->getElementsByTagName("form") as $e) {
-      $this->processLinks($e, "action", false);
+      $this->processElement($e, "action");
     }
     $this->processImages($contentPlus);
     foreach ($xPath->query("//*[@xml:lang]") as $a) {
@@ -555,74 +554,90 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   /**
    * @param DOMElementPlus $e
    * @param string $aName
-   * @param bool $linkType
    */
-  private function processLinks (DOMElementPlus $e, $aName, $linkType = true) {
+  private function processElement (DOMElementPlus $e, $aName) {
+    // no target, no check, no title manipulation
     if (!$e->hasAttribute($aName)) {
       return;
     }
-    $url = trim($e->getAttribute($aName));
+    $target = trim($e->getAttribute($aName));
     try {
       // link is empty
-      if (!strlen($url)) {
+      if (!strlen($target)) {
         throw new Exception(_("Empty value"));
       }
-      $pLink = parseLocalLink($url);
+      // throws unable to parse exception
+      $pLink = parseLocalLink($target);
       // link is external
       if (is_null($pLink)) {
         return;
       }
-      $isLink = true;
-      if (array_key_exists("path", $pLink)) {
-        // link to supported file
-        if (FileHandler::isSupportedRequest($pLink["path"])) {
-          $isLink = false;
-        }
-        $ext = pathinfo($pLink["path"], PATHINFO_EXTENSION);
-        $isFile = is_file($pLink["path"]);
-        // link to image
-        if (!$isLink && FileHandler::isImage($ext)) {
-          list($targetWidth, $targetHeight) = self::getImageDimensions($pLink['path']);
-          $e->setAttribute("data-target-width", $targetWidth);
-          $e->setAttribute("data-target-height", $targetHeight);
-        }
-        // link to existing file
-        if ($isLink && $isFile) {
-          if ($ext == "php") {
-            return;
-          }
-          $isLink = false;
-        }
+      // build local url iff local url
+      $this->processLink($e, $aName, $pLink);
+      if ($e->nodeName != "a") {
+        return;
       }
-      $localFragment = $this->isLocalFragment($pLink);
-      if ($isLink) {
-        $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
-        $pLink = $this->getLink($pLink, $rootId);
+      if (!array_key_exists("id", $pLink)) {
+        return;
       }
-      if (empty($pLink)) {
-        if ($localFragment) {
+      $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
+      // generate title if not exists
+      if ($e->hasAttribute("title")) {
+        return;
+      }
+      if (array_key_exists("query", $pLink)) {
+        return;
+      }
+      $this->insertTitle($e, $pLink["id"]);
+    } catch (Exception $ex) {
+      $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $ex->getMessage()));
+      $e->stripAttr("title");
+    }
+  }
+
+  /**
+   * @param DOMElementPlus $e
+   * @param String $aName
+   * @param array $pLink
+   * @throws Exception
+   */
+  private function processLink (DOMElementPlus $e, $aName, Array &$pLink) {
+    $isLink = true;
+    if (array_key_exists("path", $pLink)) {
+      // link to supported file
+      if (FileHandler::isSupportedRequest($pLink["path"])) {
+        $isLink = false;
+      }
+      $ext = pathinfo($pLink["path"], PATHINFO_EXTENSION);
+      $isFile = is_file($pLink["path"]);
+      // link to image
+      if (!$isLink && FileHandler::isImage($ext)) {
+        list($targetWidth, $targetHeight) = self::getImageDimensions($pLink['path']);
+        $e->setAttribute("data-target-width", $targetWidth);
+        $e->setAttribute("data-target-height", $targetHeight);
+      }
+      // link to existing file
+      if ($isLink && $isFile) {
+        if ($ext == "php") {
           return;
         }
-        throw new Exception(_("Target not found"));
+        $isLink = false;
       }
-      #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
-      if ($linkType && array_key_exists("id", $pLink)) {
-        if (!array_key_exists("query", $pLink)) {
-          if (!strlen(trim($e->getAttribute("title")))) {
-            $e->stripAttr("title");
-          } else {
-            $this->insertTitle($e, $pLink["id"]);
-          }
-        }
-        $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
-      }
-      $link = buildLocalUrl($pLink, !$linkType, $isLink);
-      $e->setAttribute($aName, $link);
-    } catch (Exception $ex) {
-      $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $url, $ex->getMessage()));
-      $e->stripAttr("title");
-      #Logger::warning($message);
     }
+    $localFragment = $this->isLocalFragment($pLink);
+    if ($isLink) {
+      $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
+      $pLink = $this->getLink($pLink, $rootId);
+    }
+    if (empty($pLink)) {
+      if ($localFragment) {
+        return;
+      }
+      throw new Exception(_("Target not found"));
+    }
+    $ignoreCyclic = $e->nodeName != "a";
+    $link = buildLocalUrl($pLink, $ignoreCyclic, $isLink);
+    $e->setAttribute($aName, $link);
   }
 
   /**
