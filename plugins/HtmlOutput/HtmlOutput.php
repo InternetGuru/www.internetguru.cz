@@ -275,7 +275,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach ($contentPlus->getElementsByTagName("form") as $e) {
       $this->processElement($e, "action");
     }
-    $this->processImages($contentPlus);
+    $ids = [];
+    foreach ($xPath->query("//*/@id") as $e) {
+      $ids[$e->nodeValue] = null;
+    }
+    $this->processImages($contentPlus, $ids);
     foreach ($xPath->query("//*[@xml:lang]") as $a) {
       if (!$a->hasAttribute("lang")) {
         $a->setAttribute("lang", $a->getAttribute("xml:lang"));
@@ -715,15 +719,35 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   /**
-   * @param DOMDocumentPlus $doc
+   * @param string $text
+   * @param array $register
+   * @param int $attempt
+   * @return mixed
    */
-  private function processImages (DOMDocumentPlus $doc) {
+  private function getUniqueHash ($text, Array &$register, $attempt = 0) {
+    $suffix = $attempt > 0 ? "-$attempt" : "";
+    $hash = substr(hash("sha256", $text), 0, 4).$suffix;
+    if (array_key_exists($hash, $register)) {
+      return $this->getUniqueHash($text, $register, ++$attempt);
+    }
+    $register[$hash] = null;
+    return $hash;
+  }
+
+  /**
+   * @param DOMDocumentPlus $doc
+   * @param array $ids
+   */
+  private function processImages (DOMDocumentPlus $doc, Array &$ids) {
     /** @var DOMElementPlus $img */
     foreach ($doc->getElementsByTagName("img") as $img) {
       if (!$img->hasAttribute("width") || !$img->hasAttribute("height")) {
         list($targetWidth, $targetHeight) = $this->getImageDimensions($img->getAttribute("src"));
         $img->setAttribute("width", $targetWidth);
         $img->setAttribute("height", $targetHeight);
+        if (!strlen($img->getAttribute("id"))) {
+          $img->setAttribute("id", self::getUniqueHash($img->getAttribute("src"), $ids));
+        }
       }
     }
   }
