@@ -58,10 +58,6 @@ class Cms {
    * @var bool
    */
   private static $success = false;
-  /**
-   * @var string|null
-   */
-  private static $requestToken = null;
 
   /**
    * @param string $methodName
@@ -96,15 +92,12 @@ class Cms {
     if (is_null(self::$flashList)) {
       self::createFlashList();
     }
-    if (is_null(self::$requestToken)) {
-      self::$requestToken = rand();
-    }
     if (self::isSuperUser()) {
       $_SESSION["cms"]["flash"][$type][hash(FILE_HASH_ALGO, $message)] = $message;
-      $_SESSION["cms"]["request"][$type][hash(FILE_HASH_ALGO, $message)][] = self::$requestToken;
+      $_SESSION["cms"]["request"][$type][hash(FILE_HASH_ALGO, $message)][] = REQUEST_TOKEN;
       return;
     }
-    self::addFlashItem($message, $type, [self::$requestToken]);
+    self::addFlashItem($message, $type, [REQUEST_TOKEN]);
   }
 
   private static function createFlashList () {
