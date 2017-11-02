@@ -597,6 +597,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $e->setAttribute("title", $message);
       $e->addClass("stripped");
+      $e->addClass(REQUEST_TOKEN); // make it always show in webdiff
     }
   }
 
