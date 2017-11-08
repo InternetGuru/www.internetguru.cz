@@ -746,7 +746,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
         $img->setAttribute("width", $targetWidth);
         $img->setAttribute("height", $targetHeight);
         if (!strlen($img->getAttribute("id"))) {
-          $img->setAttribute("id", "img-".self::getUniqueHash($img->getAttribute("src"), $ids));
+          $img->setAttribute("id", "img".self::getUniqueHash($img->getAttribute("src"), $ids));
         }
       }
     }
