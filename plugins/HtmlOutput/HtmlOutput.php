@@ -741,14 +741,16 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   private function processImages (DOMDocumentPlus $doc, Array &$ids) {
     /** @var DOMElementPlus $img */
     foreach ($doc->getElementsByTagName("img") as $img) {
-      if (!$img->hasAttribute("width") || !$img->hasAttribute("height")) {
-        list($targetWidth, $targetHeight) = $this->getImageDimensions($img->getAttribute("src"));
-        $img->setAttribute("width", $targetWidth);
-        $img->setAttribute("height", $targetHeight);
-        if (!strlen($img->getAttribute("id"))) {
-          $img->setAttribute("id", "img".self::getUniqueHash($img->getAttribute("src"), $ids));
-        }
+      if ($img->hasAttribute("width") && $img->hasAttribute("height")) {
+        continue;
       }
+      list($targetWidth, $targetHeight) = $this->getImageDimensions($img->getAttribute("src"));
+      $img->setAttribute("width", $targetWidth);
+      $img->setAttribute("height", $targetHeight);
+      if ($img->hasAttribute("id")) {
+        continue;
+      }
+      $img->setAttribute("id", "img".self::getUniqueHash($img->getAttribute("src"), $ids));
     }
   }
 
