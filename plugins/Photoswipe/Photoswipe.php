@@ -52,7 +52,7 @@ class Photoswipe extends Plugin implements SplObserver, ModifyContentStrategyInt
     $os = Cms::getOutputStrategy();
     $os->addCssFile("$vendorDir/photoswipe.css");
     $os->addCssFile("$vendorDir/default-skin/default-skin.css");
-    $os->addJsFile("$vendorDir/photoswipe.js", 1, "body");
+    $os->addJsFile("$vendorDir/photoswipe.min.js", 1, "body");
     $os->addJsFile("$vendorDir/photoswipe-ui-default.min.js", 1, "body");
     $os->addJsFile($this->pluginDir."/Photoswipe.js", 1, "body");
     $socialEl = $config->getElementById("social", "var");
