@@ -6,7 +6,7 @@
   Config.ns = "pswp";
   Config.galleryClassSelector = ".photoswipe";
   Config.shareEl = false;
-  Config.history = false;
+  Config.history = true;
   Config.pswpElement = '<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">'
     + '    <div class="pswp__bg"></div>'
     + '    <div class="pswp__scroll-wrap">'
@@ -62,10 +62,15 @@
       var items = []
       for (var j = 0; j < links.length; j++) {
         var link = links[j]
+        var img = link.getElementsByTagName("img")[0]
+        if (!img) {
+          continue
+        }
         var item = {
           src: link.href,
           w: link.getAttribute("data-target-width"),
-          h: link.getAttribute("data-target-height")
+          h: link.getAttribute("data-target-height"),
+          pid: img.getAttribute("id"),
         }
         items.push(item)
       }
@@ -94,6 +99,11 @@
             }
             link.addEventListener("click", openPswp.bind(params), false)
           }
+        }
+        var hash = window.location.hash.substring(1)
+        var el = document.getElementById(hash)
+        if (el) {
+          el.click()
         }
       }
     }

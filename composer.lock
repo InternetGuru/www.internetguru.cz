@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "d0749c82bc1d7528aa73338d688b38c7",
-    "content-hash": "5320d5b14cd821578c14f91d8521744c",
+    "content-hash": "e7a2a3981558e9c4d4549ac2ee80eae0",
     "packages": [
         {
             "name": "components/highlightjs",
@@ -47,7 +46,7 @@
                 }
             ],
             "description": "Highlight.js highlights syntax in code examples on blogs, forums and in fact on any web pages.",
-            "time": "2016-03-05 17:39:56"
+            "time": "2016-03-05T17:39:56+00:00"
         },
         {
             "name": "internetguru/codemirror",
@@ -74,6 +73,32 @@
                 "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.1.4"
             },
             "time": "2016-06-06 18:56:07"
+        },
+        {
+            "name": "internetguru/photoswipe",
+            "version": "dev-dev",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/InternetGuru/PhotoSwipe.git",
+                "reference": "eadb0478b5e5bf82ad57d2f3b9aa036af65d7b1d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/InternetGuru/PhotoSwipe/zipball/eadb0478b5e5bf82ad57d2f3b9aa036af65d7b1d",
+                "reference": "eadb0478b5e5bf82ad57d2f3b9aa036af65d7b1d",
+                "shasum": ""
+            },
+            "type": "library",
+            "authors": [
+                {
+                    "name": "petrzpav",
+                    "email": "pavel@petrzela.eu"
+                }
+            ],
+            "support": {
+                "source": "https://github.com/InternetGuru/PhotoSwipe/tree/dev"
+            },
+            "time": "2017-11-08 17:28:00"
         },
         {
             "name": "monolog/monolog",
@@ -151,7 +176,7 @@
                 "logging",
                 "psr-3"
             ],
-            "time": "2016-04-12 18:29:35"
+            "time": "2016-04-12T18:29:35+00:00"
         },
         {
             "name": "phpmailer/phpmailer",
@@ -212,7 +237,7 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
-            "time": "2015-11-01 10:15:28"
+            "time": "2015-11-01T10:15:28+00:00"
         },
         {
             "name": "psr/log",
@@ -250,7 +275,7 @@
                 "psr",
                 "psr-3"
             ],
-            "time": "2012-12-21 11:40:51"
+            "time": "2012-12-21T11:40:51+00:00"
         },
         {
             "name": "smallhadroncollider/uglify-php",
@@ -300,7 +325,7 @@
                 "uglifyjs"
             ],
             "abandoned": true,
-            "time": "2013-07-15 12:41:45"
+            "time": "2013-07-15T12:41:45+00:00"
         },
         {
             "name": "vladkens/autoprefixer",
@@ -350,7 +375,8 @@
     "minimum-stability": "stable",
     "stability-flags": {
         "vladkens/autoprefixer": 20,
-        "internetguru/codemirror": 20
+        "internetguru/codemirror": 20,
+        "internetguru/photoswipe": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

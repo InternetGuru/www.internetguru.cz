@@ -3,6 +3,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/InternetGuru/CodeMirror"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/InternetGuru/PhotoSwipe"
         }
     ],
     "require": {
@@ -11,7 +15,8 @@
         "components/highlightjs": "^9.1",
         "smallhadroncollider/uglify-php": "^1.0",
         "phpmailer/phpmailer": "^5.2",
-        "InternetGuru/CodeMirror": "dev-master"
+        "InternetGuru/CodeMirror": "dev-master",
+        "InternetGuru/PhotoSwipe": "dev-dev"
     },
     "autoload": {
         "psr-4": {
