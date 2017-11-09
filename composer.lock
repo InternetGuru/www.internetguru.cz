@@ -80,12 +80,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/InternetGuru/PhotoSwipe.git",
-                "reference": "eadb0478b5e5bf82ad57d2f3b9aa036af65d7b1d"
+                "reference": "2436262cc1e6b008fb672ef6e391fb3e66f5cf33"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InternetGuru/PhotoSwipe/zipball/eadb0478b5e5bf82ad57d2f3b9aa036af65d7b1d",
-                "reference": "eadb0478b5e5bf82ad57d2f3b9aa036af65d7b1d",
+                "url": "https://api.github.com/repos/InternetGuru/PhotoSwipe/zipball/2436262cc1e6b008fb672ef6e391fb3e66f5cf33",
+                "reference": "2436262cc1e6b008fb672ef6e391fb3e66f5cf33",
                 "shasum": ""
             },
             "type": "library",
@@ -98,7 +98,7 @@
             "support": {
                 "source": "https://github.com/InternetGuru/PhotoSwipe/tree/dev"
             },
-            "time": "2017-11-08 17:28:00"
+            "time": "2017-11-09 19:48:52"
         },
         {
             "name": "monolog/monolog",
