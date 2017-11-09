@@ -487,6 +487,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       if ($filePath == INDEX_HTML) {
         $link = "";
       } else {
+        reset(self::$fileToId);
         $parentId = current(self::$fileToId);
       }
     }
