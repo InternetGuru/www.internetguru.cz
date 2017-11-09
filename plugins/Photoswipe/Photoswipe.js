@@ -77,6 +77,11 @@
       // Initializes and opens PhotoSwipe
       var gallery = new PhotoSwipe(this.pswpElement, PhotoSwipeUI_Default, items, options)
       gallery.init()
+      gallery.listen('parseVerticalMargin', function (item) {
+        var gap = item.vGap
+        gap.top = 0
+        gap.bottom = 0
+      })
       return false
     }
 
