@@ -58,6 +58,7 @@
         index: index,
         shareEl: Config.shareEl,
         history: Config.history,
+        barsSize: {top:0, bottom:0},
       }
       var items = []
       for (var j = 0; j < links.length; j++) {
@@ -77,11 +78,6 @@
       // Initializes and opens PhotoSwipe
       var gallery = new PhotoSwipe(this.pswpElement, PhotoSwipeUI_Default, items, options)
       gallery.init()
-      gallery.listen('parseVerticalMargin', function (item) {
-        var gap = item.vGap
-        gap.top = 0
-        gap.bottom = 0
-      })
       return false
     }
 
