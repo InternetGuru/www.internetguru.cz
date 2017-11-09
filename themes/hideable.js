@@ -13,7 +13,6 @@
   Config.noHideClass = "nohide";
   Config.hiddenClass = "hidden";
   Config.switchClass = "switch";
-  Config.noprintClass = "noprint";
   Config.expandTitle = "Expand";
   Config.collapseTitle = "Collapse";
 
@@ -39,7 +38,6 @@
         link.title = Config.collapseTitle;
         link.innerHTML = Config.collapse;
         link.classList.add(Config.switchClass);
-        link.classList.add(Config.noprintClass);
         link.addEventListener("click", toggle, false);
         firstElement.innerHTML = " " + firstElement.innerHTML;
         firstElement.insertBefore(link, firstElement.firstChild);
