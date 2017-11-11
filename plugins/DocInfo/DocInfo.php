@@ -114,7 +114,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     if (strlen($globalInfo["resp"])) {
       $lists["responsible"] = $this->vars["responsible"];
     }
-    if (Cms::isSuperUser()) {
+    if (!is_null(Cms::getLoggedUser())) {
       $globalInfo["file"] = $filePath;
       $lists["edit"] = $this->vars["edit"];
     }
