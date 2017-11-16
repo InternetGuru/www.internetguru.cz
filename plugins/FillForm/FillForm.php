@@ -28,7 +28,7 @@ class FillForm extends Plugin implements SplObserver, ModifyContentStrategyInter
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 30);
+    $s->setPriority($this, 10);
     $this->prefix = strtolower($this->className)."-";
   }
 
