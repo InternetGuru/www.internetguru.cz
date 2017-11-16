@@ -53,7 +53,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 40);
+    $s->setPriority($this, 10);
   }
 
   /**
