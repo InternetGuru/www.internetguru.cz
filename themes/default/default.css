@@ -18,8 +18,12 @@ a[href] {
   border-bottom: thin solid;
 }
 
-a[href^="/files/"] {
+a[data-target-width] {
   border-bottom: none;
+}
+
+label {
+  cursor: pointer;
 }
 
 body, input, button {
