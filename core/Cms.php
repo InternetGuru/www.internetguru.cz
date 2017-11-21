@@ -233,7 +233,7 @@ class Cms {
     $li = self::$flashList->ownerDocument->createElement("li");
     $span = $li->ownerDocument->createElement("span");
     $li->appendChild($span);
-    self::$flashList->firstElement->appendChild($span);
+    self::$flashList->firstElement->appendChild($li);
     $li->setAttribute("class", strtolower($type)." ".implode(" ", $requests));
     $doc = new DOMDocumentPlus();
     try {
