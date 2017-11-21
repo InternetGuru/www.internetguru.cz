@@ -231,16 +231,18 @@ class Cms {
       $message = self::$types[$type].": $message";
     }
     $li = self::$flashList->ownerDocument->createElement("li");
-    self::$flashList->firstElement->appendChild($li);
+    $span = $li->ownerDocument->createElement("span");
+    $li->appendChild($span);
+    self::$flashList->firstElement->appendChild($span);
     $li->setAttribute("class", strtolower($type)." ".implode(" ", $requests));
     $doc = new DOMDocumentPlus();
     try {
       $doc->loadXML("<var>$message</var>");
       foreach ($doc->documentElement->childNodes as $ch) {
-        $li->appendChild($li->ownerDocument->importNode($ch, true));
+        $span->appendChild($li->ownerDocument->importNode($ch, true));
       }
     } catch (Exception $e) {
-      $li->nodeValue = htmlspecialchars($message);
+      $span->nodeValue = htmlspecialchars($message);
     }
   }
 
