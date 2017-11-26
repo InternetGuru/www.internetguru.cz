@@ -476,7 +476,7 @@ function incrementalRename ($src, $dest = null) {
 function initDirs () {
   $dirs = [
     USER_FOLDER, LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER,
-    LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR,
+    LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR, VENDOR_DIR,
   ];
   foreach ($dirs as $d) mkdir_plus($d);
 }
