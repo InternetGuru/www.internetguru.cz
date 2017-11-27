@@ -279,7 +279,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach ($xPath->query("//*/@id") as $e) {
       $ids[$e->nodeValue] = null;
     }
-    $this->processImages($contentPlus, $ids);
+    /** @var DOMElementPlus $img */
+    foreach ($contentPlus->getElementsByTagName("img") as $img) {
+      $this->processImage($img, $ids);
+    }
     foreach ($xPath->query("//*[@xml:lang]") as $a) {
       if (!$a->hasAttribute("lang")) {
         $a->setAttribute("lang", $a->getAttribute("xml:lang"));
@@ -735,23 +738,38 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
   /**
-   * @param DOMDocumentPlus $doc
+   * @param DOMElementPlus $img
    * @param array $ids
    */
-  private function processImages (DOMDocumentPlus $doc, Array &$ids) {
-    /** @var DOMElementPlus $img */
-    foreach ($doc->getElementsByTagName("img") as $img) {
-      if ($img->hasAttribute("width") && $img->hasAttribute("height")) {
-        continue;
-      }
-      list($targetWidth, $targetHeight) = $this->getImageDimensions($img->getAttribute("src"));
-      $img->setAttribute("width", $targetWidth);
-      $img->setAttribute("height", $targetHeight);
-      if ($img->hasAttribute("id")) {
-        continue;
-      }
-      $img->setAttribute("id", "img".self::getUniqueHash($img->getAttribute("src"), $ids));
+  private function processImage (DOMElementPlus $img, Array &$ids) {
+    if ($img->hasAttribute("width") && $img->hasAttribute("height")) {
+      return;
     }
+    $src = $img->getAttribute("src");
+    // external
+    if (is_null(parseLocalLink($src))) {
+      return;
+    }
+    try {
+      list($targetWidth, $targetHeight) = $this->getImageDimensions($src);
+    } catch (Exception $ex) {
+      if (is_null(Cms::getLoggedUser())) {
+        $img->stripElement();
+        return;
+      }
+      $message = sprintf(_("Attribute src=%s removed: %s"), $src, $ex->getMessage());
+      $img->setAttribute('src', "/".LIB_DIR."/".NOT_FOUND_IMG_FILENAME);
+      list($targetWidth, $targetHeight) = getimagesize(LIB_FOLDER."/".NOT_FOUND_IMG_FILENAME);
+      $img->setAttribute("title", $message);
+      $img->addClass("stripped");
+      $img->addClass(REQUEST_TOKEN); // make it always show in webdiff
+    }
+    $img->setAttribute("width", $targetWidth);
+    $img->setAttribute("height", $targetHeight);
+    if ($img->hasAttribute("id")) {
+      return;
+    }
+    $img->setAttribute("id", "img".self::getUniqueHash($img->getAttribute("src"), $ids));
   }
 
   /**
