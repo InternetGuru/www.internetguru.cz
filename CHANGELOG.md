@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.7.0] - 2017-10-18
 ### Added
+ - Not found image support
  - New plugin Photoswipe for interactive image galleries
  - Auto attribute `data-target-width` and `data-target-height` for links to images
  - Auto attribute `width` and `height` for images
