@@ -24,6 +24,7 @@ define("LOG_DIR", "log");
 define("DEBUG_FILE", "DEBUG");
 define('CMS_VERSION_FILENAME', "VERSION");
 define('CMS_CHANGELOG_FILENAME', "CHANGELOG.md");
+define('NOT_FOUND_IMG_FILENAME', "notfound.png");
 define("DEFAULT_LANG", "en_US");
 define("LANG_FILE", "LANG");
 define("HTTPS_FILE", "HTTPS");
