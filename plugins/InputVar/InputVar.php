@@ -54,7 +54,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   public function __construct (SplSubject $s) {
     parent::__construct($s);
     $this->userCfgPath = USER_FOLDER."/".$this->pluginDir."/".$this->className.".xml";
-    $s->setPriority($this, 70);
+    $s->setPriority($this, 60);
   }
 
   /**
