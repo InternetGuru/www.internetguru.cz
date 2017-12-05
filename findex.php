@@ -1,12 +1,15 @@
 <?php
 
+use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugins;
 
 try {
   include("init.php");
 
+  Cms::checkAuth();
   $plugins = new Plugins();
+
   foreach ($plugins->getIsInterface("IGCMS\\Core\\ResourceInterface") as $ri) {
     if ($ri::isSupportedRequest(getCurLink())) {
       $ri::handleRequest();

@@ -12,7 +12,7 @@
       -->
       <stylesheet>lib/roboto/roboto.css</stylesheet>
       <!--<stylesheet>lib/opensans/opensans.css</stylesheet>-->
-      <!--<stylesheet>lib/font-awesome/css/font-awesome.css</stylesheet>-->
+      <!--<stylesheet if-xpath="//*[contains(@class, 'fa')]">lib/font-awesome/css/font-awesome.css</stylesheet>-->
       <!--
         Styles
       -->
@@ -77,11 +77,11 @@
 
   <!-- Browser compatibility -->
   <jsFile>themes/modernizer.js</jsFile>
-  <jsFile if="lte IE 8" priority="1">themes/events.js</jsFile>
-  <jsFile if="lte IE 8" priority="1">themes/indexof.js</jsFile>
-  <jsFile if="lte IE 8" priority="1">themes/textcontent.js</jsFile>
-  <jsFile if="lte IE 9" priority="1">themes/classlist.js</jsFile>
-  <jsFile if="lt IE 9" priority="1">themes/ie9.js</jsFile>
+  <jsFile if="lte IE 8" priority="100">themes/events.js</jsFile>
+  <jsFile if="lte IE 8" priority="100">themes/indexof.js</jsFile>
+  <jsFile if="lte IE 8" priority="100">themes/textcontent.js</jsFile>
+  <jsFile if="lte IE 9" priority="100">themes/classlist.js</jsFile>
+  <jsFile if="lt IE 9" priority="100">themes/ie9.js</jsFile>
   <jsFile append="body">themes/iefixes.js</jsFile>
   <jsFile append="body">themes/browserdetect.js</jsFile>
 
@@ -91,15 +91,15 @@
   <jsFile append="body">themes/fragmentableinit.js</jsFile>
   <jsFile append="body">themes/scrolltopable.js</jsFile>
   <jsFile append="body">themes/scrolltopableinit.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="10">themes/hideable.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="10">themes/hideableinit.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="5">themes/tocable.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="5">themes/tocableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="70">themes/tocable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="70">themes/tocableinit.js</jsFile>
   <jsFile append="body" if-xpath="//code[not(contains(@class, 'nohighlight'))]">themes/syntaxhighlightjs.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'filterable')]" priority="5">themes/filterable.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'filterable')]" priority="5">themes/filterableinit.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'selectable')]" priority="5">themes/selectable.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'selectable')]" priority="5">themes/selectableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'filterable')]" priority="70">themes/filterable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'filterable')]" priority="70">themes/filterableinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'selectable')]" priority="70">themes/selectable.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'selectable')]" priority="70">themes/selectableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'eventable')]">themes/eventable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'eventable')]">themes/eventableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'addressable')]">themes/addressable.js</jsFile>

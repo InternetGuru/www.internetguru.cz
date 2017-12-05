@@ -29,7 +29,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 210);
+    $s->setPriority($this, 10);
   }
 
   /**
@@ -114,8 +114,8 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     if (strlen($globalInfo["resp"])) {
       $lists["responsible"] = $this->vars["responsible"];
     }
-    if (Cms::isSuperUser()) {
-      $globalInfo["editurl"] = "?Admin=".$filePath;
+    if (!is_null(Cms::getLoggedUser())) {
+      $globalInfo["file"] = $filePath;
       $lists["edit"] = $this->vars["edit"];
     }
     $doc = $this->createDOM($this->vars["docinfo"]);

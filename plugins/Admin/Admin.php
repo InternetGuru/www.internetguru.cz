@@ -110,7 +110,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 2);
+    $s->setPriority($this, 150);
     $this->dataFileStatuses = [
       _("new file"), _("active file"),
       _("inactive file"), _("invalid file"), _("unknown status"),
@@ -271,6 +271,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       }
       if (isset($_GET[self::FILE_DISABLE])) {
         $this->disableDataFile();
+        $this->clearResCache();
         Logger::user_success(sprintf(_("File '%s' disabled"), $this->defaultFile));
       }
     } catch (Exception $e) {
@@ -374,7 +375,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       if ($this->type == "html") {
         $doc = new HTMLPlus();
         $doc->load(CMS_FOLDER."/".INDEX_HTML);
+        $doc->documentElement->removeAttribute("ns");
+        $doc->documentElement->firstElement->removeAttribute("ctime");
         $doc->documentElement->firstElement->setAttribute("id", $htmlId);
+        $doc->validatePlus(true);
       } else {
         $doc = new DOMDocumentPlus();
         $doc->formatOutput = true;
@@ -514,7 +518,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
   }
 
-  private function updateCache () {
+  private function clearResCache () {
     if ($this->isResource($this->type)) {
       $resFile = getRealResDir($this->defaultFile);
       if (is_file($resFile)) {
@@ -528,6 +532,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       }
       return;
     }
+  }
+
+  private function updateCache () {
+    $this->clearResCache();
     #if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     try {
       clearNginxCache();
@@ -754,11 +762,11 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       if (is_file(ADMIN_FOLDER."/$f")) {
         $v .= " #admin";
       }
-      if (is_file(USER_FOLDER."/$f")) {
-        $v .= " #user";
-      }
       if (is_file(USER_FOLDER."/".dirname($f)."/.".basename($f))) {
         $v .= " #user #disabled";
+      }
+      else if (is_file(USER_FOLDER."/$f")) {
+        $v .= " #user";
       }
       $option->nodeValue = $v;
       $var->appendChild($option);

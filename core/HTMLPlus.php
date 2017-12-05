@@ -4,8 +4,10 @@ namespace IGCMS\Core;
 
 use DateTime;
 use DOMComment;
+use DOMDocument;
 use DOMXPath;
 use Exception;
+use XSLTProcessor;
 
 /**
  * Class HTMLPlus
@@ -39,6 +41,10 @@ class HTMLPlus extends DOMDocumentPlus {
    * @var string
    */
   const RNG_FILE = "HTMLPlus.rng";
+  /**
+   * @var string
+   */
+  const PREPARE_TO_VALIDATE_FILE = "prepareToValidate.xsl";
   /**
    * @var bool
    */
@@ -335,7 +341,7 @@ class HTMLPlus extends DOMDocumentPlus {
   public function validatePlus ($repair = false) {
     $i = 0;
     $hash = hash(FILE_HASH_ALGO, $this->saveXML());
-    $version = 5; // increment if validatePlus changes
+    $version = 6; // increment if validatePlus changes
     $cacheKey = apc_get_key("HTMLPlus/validatePlus/$hash/$version");
     if (self::USE_APC && apc_exists($cacheKey)) {
       $i = apc_fetch($cacheKey);
@@ -347,49 +353,71 @@ class HTMLPlus extends DOMDocumentPlus {
     try {
       switch ($i) {
         case 0:
-          $this->validateRoot($repair);
+          if ($repair) {
+            $this->validateRoot();
+          }
           $i++;
         case 1:
-          $this->validateBodyAttributes($repair);
+          if ($repair) {
+            $this->validateBodyAttributes();
+          }
           $i++;
         case 2:
-          $this->validateSections($repair);
+          if ($repair) {
+            $this->validateSections();
+          }
           $i++;
         case 3:
-          $this->validateLang($repair);
+          if ($repair) {
+            $this->validateLang();
+          }
           $i++;
         case 4:
-          $this->validateHsrc();
+          // $this->validateHsrc();
           $i++;
         case 5:
-          $this->validateHempty($repair);
+          if ($repair) {
+            $this->validateHempty();
+          }
           $i++;
         case 6:
-          $this->validateDl($repair);
+          if ($repair) {
+            $this->validateDl();
+          }
           $i++;
         case 7:
           $this->validateDates($repair);
           $i++;
         case 8:
-          $this->validateAuthor($repair);
+          // if ($repair) {
+          //   $this->validateAuthor();
+          // }
           $i++;
         case 9:
           $this->validateFirstHeadingAuthor($repair);
           $i++;
         case 10:
-          $this->validateFirstHeadingId($repair);
+          if ($repair) {
+            $this->validateFirstHeadingId();
+          }
           $i++;
         case 11:
-          $this->validateFirstHeadingCtime($repair);
+          if ($repair) {
+            $this->validateFirstHeadingCtime();
+          }
           $i++;
         case 12:
           $this->validateHid($repair);
           $i++;
         case 13:
-          $this->validateBodyNs($repair);
+          if ($repair) {
+            $this->validateBodyNs();
+          }
           $i++;
         case 14:
-          $this->validateDesc($repair);
+          if ($repair) {
+            $this->validateDesc();
+          }
           $i++;
         case 15:
           $this->relaxNGValidatePlus();
@@ -408,30 +436,27 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateRoot ($repair) {
+  private function validateRoot () {
     if (is_null($this->documentElement)) {
       $message = _("Root element not found");
       $this->errorHandler($message, false);
     }
     if ($this->documentElement->nodeName != "body") {
       $message = _("Root element must be 'body'");
-      $this->errorHandler($message, $repair);
+      $this->errorHandler($message, true);
       $this->documentElement->rename("body");
     }
     if (!$this->documentElement->hasAttribute("lang")
       && !$this->documentElement->hasAttribute("xml:lang")
     ) {
       $message = _("Attribute 'xml:lang' is missing in element body");
-      $this->errorHandler($message, $repair);
+      $this->errorHandler($message, true);
       $this->documentElement->setAttribute("xml:lang", _("en"));
     }
     $fe = $this->documentElement->firstElement;
     if (!is_null($fe) && $fe->nodeName == "section") {
       $message = _("Element section cannot be empty");
-      $this->errorHandler($message, $repair);
+      $this->errorHandler($message, true);
       $this->addTitleElements($this->documentElement);
       return;
     }
@@ -447,7 +472,7 @@ class HTMLPlus extends DOMDocumentPlus {
         continue;
       }
       $message = _("There must be exactly one heading in body element");
-      $this->errorHandler($message, $repair);
+      $this->errorHandler($message, true);
       break;
     }
     if ($hRoot == 1) {
@@ -455,7 +480,7 @@ class HTMLPlus extends DOMDocumentPlus {
     }
     if ($hRoot == 0) {
       $message = _("Missing heading in body element");
-      $this->errorHandler($message, $repair);
+      $this->errorHandler($message, true);
       $this->documentElement->appendChild($this->createElement("h"));
       return;
     }
@@ -493,25 +518,19 @@ class HTMLPlus extends DOMDocumentPlus {
     $el->insertBefore($this->createTextNode("\n  "), $first);
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateBodyAttributes ($repair) {
+  private function validateBodyAttributes () {
     $validAttributes = ["id", "class", "title", "fn", "var", "xml:lang", "lang", "ns"];
     foreach ($this->documentElement->attributes as $attrName => $attr) {
       if (in_array($attrName, $validAttributes) || strpos($attrName, "data-") === 0) {
         continue;
       }
       $message = sprintf(_("Invalid body attribute '%s'"), $attrName);
-      $this->errorHandler($message, $repair);
+      $this->errorHandler($message, true);
       $this->documentElement->stripAttr($attrName);
     }
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateSections ($repair) {
+  private function validateSections () {
     $emptySect = [];
     foreach ($this->getElementsByTagName("section") as $s) {
       if (!count($s->childElementsArray)) {
@@ -522,21 +541,18 @@ class HTMLPlus extends DOMDocumentPlus {
       return;
     }
     $message = _("Empty section(s) found");
-    $this->errorHandler($message, $repair);
+    $this->errorHandler($message, true);
     foreach ($emptySect as $s) $s->stripTag(_("Empty section deleted"));
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateLang ($repair) {
+  private function validateLang () {
     $xpath = new DOMXPath($this);
     $langs = $xpath->query("//*[@lang]");
     if (!$langs->length) {
       return;
     }
     $message = _("Lang attribute without XML namespace");
-    $this->errorHandler($message, $repair);
+    $this->errorHandler($message, true);
     /** @var DOMElementPlus $n */
     foreach ($langs as $n) {
       if (!$n->hasAttribute("xml:lang")) {
@@ -565,24 +581,18 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->errorHandler($message, false);
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateHempty ($repair) {
+  private function validateHempty () {
     foreach ($this->headings as $h) {
       if (strlen(trim($h->nodeValue))) {
         continue;
       }
       $message = _("Heading content must not be empty");
-      $this->errorHandler($message, $repair && !is_null($this->defaultHeading));
+      $this->errorHandler($message, !is_null($this->defaultHeading));
       $h->nodeValue = $this->defaultHeading;
     }
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateDl ($repair) {
+  private function validateDl () {
     $dts = [];
     foreach ($this->getElementsByTagName("dt") as $dt) $dts[] = $dt;
     /** @var DOMElementPlus $dt */
@@ -591,12 +601,13 @@ class HTMLPlus extends DOMDocumentPlus {
       if (!is_null($nextElement) && $nextElement->tagName == "dd") {
         continue;
       }
-      $this->errorHandler(_("Element dt following sibling must be dd"), $repair);
+      $this->errorHandler(_("Element dt following sibling must be dd"), true);
       $dt->parentNode->insertBefore($dt->ownerDocument->createElement("dd", "n/a"), $nextElement);
     }
   }
 
   /**
+   * TODO refactor Attribute 'mtime' requires 'ctime'
    * @param bool $repair
    */
   private function validateDates ($repair) {
@@ -666,10 +677,7 @@ class HTMLPlus extends DOMDocumentPlus {
     return new DOMComment(" $comment ");
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateAuthor ($repair) {
+  private function validateAuthor () {
     /** @var DOMElementPlus $h */
     foreach ($this->headings as $h) {
       if (!$h->hasAttribute("author")) {
@@ -678,7 +686,7 @@ class HTMLPlus extends DOMDocumentPlus {
       if (strlen(trim($h->getAttribute("author")))) {
         continue;
       }
-      $this->errorHandler(_("Attribute 'author' cannot be empty"), $repair);
+      $this->errorHandler(_("Attribute 'author' cannot be empty"), true);
       $h->parentNode->insertBefore($this->newDOMComment(_("Removed empty attribute 'author'")), $h);
       $h->removeAttribute("author");
     }
@@ -698,31 +706,25 @@ class HTMLPlus extends DOMDocumentPlus {
     $h->setAttribute("author", $this->defaultAuthor);
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateFirstHeadingId ($repair) {
+  private function validateFirstHeadingId () {
     /** @var DOMElementPlus $h */
     $h = $this->headings->item(0);
     if ($h->hasAttribute("id")) {
       return;
     }
     $message = _("First heading attribute 'id' missing");
-    $this->errorHandler($message, $repair && !is_null($this->defaultId));
+    $this->errorHandler($message, !is_null($this->defaultId));
     $h->setAttribute("id", $this->defaultId);
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateFirstHeadingCtime ($repair) {
+  private function validateFirstHeadingCtime () {
     /** @var DOMElementPlus $h */
     $h = $this->headings->item(0);
     if ($h->hasAttribute("ctime")) {
       return;
     }
     $message = _("First heading attribute 'ctime' missing");
-    $this->errorHandler($message, $repair && !is_null($this->defaultCtime));
+    $this->errorHandler($message, !is_null($this->defaultCtime));
     $h->setAttribute("ctime", $this->defaultCtime);
   }
 
@@ -759,10 +761,7 @@ class HTMLPlus extends DOMDocumentPlus {
     }
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateBodyNs ($repair) {
+  private function validateBodyNs () {
     $b = $this->documentElement;
     if ($b->hasAttribute("ns")) {
       return;
@@ -774,14 +773,11 @@ class HTMLPlus extends DOMDocumentPlus {
       $h->removeAttribute("ns");
     }
     $message = _("Body attribute 'ns' missing");
-    $this->errorHandler($message, $repair && !is_null($this->defaultNs));
+    $this->errorHandler($message, !is_null($this->defaultNs));
     $b->setAttribute("ns", $this->defaultNs);
   }
 
-  /**
-   * @param bool $repair
-   */
-  private function validateDesc ($repair) {
+  private function validateDesc () {
     $invalid = [];
     /** @var DOMElementPlus $h */
     foreach ($this->headings as $h) {
@@ -797,7 +793,7 @@ class HTMLPlus extends DOMDocumentPlus {
       return;
     }
     $message = sprintf(_("Heading description missing or empty: %s"), implode(", ", array_keys($invalid)));
-    $this->errorHandler($message, $repair);
+    $this->errorHandler($message, true);
     foreach ($invalid as $headingId => $h) {
       $this->repairDesc($h);
     }
@@ -818,11 +814,22 @@ class HTMLPlus extends DOMDocumentPlus {
   }
 
   /**
-   * @param string $f
+   * @param string|null $f
+   * @param DOMDocument|null $doc
    * @return bool
+   * @throws Exception
    */
-  public function relaxNGValidatePlus ($f = null) {
-    return parent::relaxNGValidatePlus(LIB_FOLDER."/".self::RNG_FILE);
+  public function relaxNGValidatePlus ($f = null, DOMDocument $doc = null) {
+    $proc = new XSLTProcessor();
+    $xsl = XMLBuilder::load(LIB_DIR."/".self::PREPARE_TO_VALIDATE_FILE);
+    if (!@$proc->importStylesheet($xsl)) {
+      throw new Exception(sprintf("File '%s' is invalid", self::PREPARE_TO_VALIDATE_FILE));
+    }
+    $docToValidation = is_null($doc) ? $this : $doc;
+    if (($preparedDoc = @$proc->transformToDoc($docToValidation)) === false) {
+      throw new Exception(sprintf("File '%s' transformation fail", self::PREPARE_TO_VALIDATE_FILE));
+    }
+    return parent::relaxNGValidatePlus(LIB_FOLDER."/".self::RNG_FILE, $preparedDoc);
   }
 
   public function repairIds () {

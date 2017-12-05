@@ -306,12 +306,12 @@
 </define>
 
 <define name="Inline.model">
-  <zeroOrMore>
+  <oneOrMore>
     <choice>
       <text/>
       <ref name="Inline.class"/>
     </choice>
-  </zeroOrMore>
+  </oneOrMore>
 </define>
 
 <!-- This is redefined by the legacy module to include inlines. -->

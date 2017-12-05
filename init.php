@@ -24,6 +24,7 @@ define("LOG_DIR", "log");
 define("DEBUG_FILE", "DEBUG");
 define('CMS_VERSION_FILENAME', "VERSION");
 define('CMS_CHANGELOG_FILENAME', "CHANGELOG.md");
+define('NOT_FOUND_IMG_FILENAME', "notfound.png");
 define("DEFAULT_LANG", "en_US");
 define("LANG_FILE", "LANG");
 define("HTTPS_FILE", "HTTPS");
@@ -36,6 +37,7 @@ define('PAGESPEED_OFF', "off");
 define('DEBUG_PARAM', "Debug");
 define('DEBUG_ON', "on");
 define("PROTECTED_FILE", "PROTECTED");
+define("AUTOCORRECT_FILE", "AUTOCORRECT");
 define("ADMIN_ROOT_DIR", "admin");
 define("USER_ROOT_DIR", "user");
 define("FILE_LOCK_WAIT_SEC", 4);
@@ -87,6 +89,8 @@ define('DEFAULT_RELEASE', is_file($verfile) ? trim(file_get_contents($verfile)) 
 define('CMS_LANG', is_file(LANG_FILE) ? trim(file_get_contents(LANG_FILE)) : DEFAULT_LANG);
 define('CMS_STAGE', strpos(CMS_VERSION, CMS_RELEASE) === 0 ? "stable" : CMS_RELEASE);
 define('CMS_NAME', "IGCMS ".CMS_VERSION."-".CMS_STAGE."-".CMS_LANG.(CMS_DEBUG ? "-debug" : ""));
+define('AUTOCORRECT', stream_resolve_include_path(AUTOCORRECT_FILE));
+define('REQUEST_TOKEN', "rt".rand());
 #print_r(get_defined_constants(true)); die();
 date_default_timezone_set("Europe/Prague");
 

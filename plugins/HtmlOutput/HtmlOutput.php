@@ -17,7 +17,6 @@ use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\XMLBuilder;
-use IGCMS\Plugins\FileHandler;
 use SplObserver;
 use SplSubject;
 use XSLTProcessor;
@@ -39,11 +38,15 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @var string
    */
   const FAVICON = "favicon.ico";
-/**
+  /**
+   * @var int
+   */
+  const DEFAULT_PRIORITY = 50;
+  /**
    * @var array
    */
   private $jsFiles = [];
-/**
+  /**
    * @var array
    */
   private $jsFilesPriority = [];
@@ -78,7 +81,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 1000);
+    $s->setPriority($this, 0);
     Cms::setOutputStrategy($this);
   }
 
@@ -127,7 +130,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string $filePath
    * @param int $priority
    */
-  public function addTransformation ($filePath, $priority = 10) {
+  public function addTransformation ($filePath, $priority = self::DEFAULT_PRIORITY) {
     if (isset($this->transformations[$filePath])) {
       return;
     }
@@ -155,7 +158,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           case "jsFile":
             $user = !$n->hasAttribute("readonly");
             $append = self::APPEND_HEAD;
-            $priority = 10;
+            $priority = self::DEFAULT_PRIORITY;
             if ($n->hasAttribute("append")) {
               $append = $n->getAttribute("append");
             }
@@ -170,7 +173,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
             $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
             $ieIfComment = ($n->hasAttribute("if") ? $n->getAttribute("if") : null);
             $ifXpath = ($n->hasAttribute("if-xpath") ? $n->getAttribute("if-xpath") : false);
-            $this->addCssFile($n->nodeValue, $media, 10, true, $ieIfComment, $ifXpath);
+            $this->addCssFile($n->nodeValue, $media, self::DEFAULT_PRIORITY, true, $ieIfComment, $ifXpath);
             break;
           case "favicon":
             $this->favIcon = findFile($n->nodeValue);
@@ -189,7 +192,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param null $ieIfComment
    * @param bool $ifXpath
    */
-  public function addJsFile ($filePath, $priority = 10, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
+  public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->jsFiles[$filePath])) {
       return;
     }
@@ -214,7 +217,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string|null $ieIfComment
    * @param bool $ifXpath
    */
-  public function addCssFile ($filePath, $media = false, $priority = 10, $user = true, $ieIfComment = null, $ifXpath = false) {
+  public function addCssFile ($filePath, $media = false, $priority = self::DEFAULT_PRIORITY, $user = true, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->cssFiles[$filePath])) {
       return;
     }
@@ -267,10 +270,18 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach ($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
     foreach ($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
     foreach ($contentPlus->getElementsByTagName("a") as $e) {
-      $this->processLinks($e, "href");
+      $this->processElement($e, "href");
     }
     foreach ($contentPlus->getElementsByTagName("form") as $e) {
-      $this->processLinks($e, "action", false);
+      $this->processElement($e, "action");
+    }
+    $ids = [];
+    foreach ($xPath->query("//*/@id") as $e) {
+      $ids[$e->nodeValue] = null;
+    }
+    /** @var DOMElementPlus $img */
+    foreach ($contentPlus->getElementsByTagName("img") as $img) {
+      $this->processImage($img, $ids);
     }
     foreach ($xPath->query("//*[@xml:lang]") as $a) {
       if (!$a->hasAttribute("lang")) {
@@ -550,55 +561,96 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   /**
    * @param DOMElementPlus $e
    * @param string $aName
-   * @param bool $linkType
    */
-  private function processLinks (DOMElementPlus $e, $aName, $linkType = true) {
-    $url = $e->getAttribute($aName);
-    if (!strlen($url)) {
-      $e->stripAttr($aName, sprintf(_("Empty attribute '%s' stripped"), $aName));
+  private function processElement (DOMElementPlus $e, $aName) {
+    // no target, no check, no title manipulation
+    if (!$e->hasAttribute($aName)) {
       return;
     }
+    $target = trim($e->getAttribute($aName));
     try {
-      $pLink = parseLocalLink($url);
+      // link is empty
+      if (!strlen($target)) {
+        throw new Exception(_("Empty value"));
+      }
+      // throws unable to parse exception
+      $pLink = parseLocalLink($target);
+      // link is external
       if (is_null($pLink)) {
         return;
-      } # external
-      $isLink = true;
-      if (array_key_exists("path", $pLink)) {
-        // link to supported file
-        if (FileHandler::isSupportedRequest($pLink["path"])) {
-          $isLink = false;
-        }
-        // link to existing file
-        if ($isLink && is_file($pLink["path"])) {
-          if (pathinfo($pLink["path"], PATHINFO_EXTENSION) == "php") {
-            return;
-          }
-          $isLink = false;
-        }
       }
-      if ($isLink) {
-        $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
-        $pLink = $this->getLink($pLink, $rootId);
+      // build local url iff local url
+      $this->processLink($e, $aName, $pLink);
+      if ($e->nodeName != "a") {
+        return;
       }
-      if (empty($pLink)) {
-        if ($this->isLocalFragment($pLink)) {
+      if (!array_key_exists("id", $pLink)) {
+        return;
+      }
+      $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
+      // generate title if not exists
+      if ($e->hasAttribute("title")) {
+        return;
+      }
+      if (array_key_exists("query", $pLink)) {
+        return;
+      }
+      $this->insertTitle($e, $pLink["id"]);
+    } catch (Exception $ex) {
+      $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $ex->getMessage());
+      $e->stripAttr($aName, $message);
+      if (is_null(Cms::getLoggedUser())) {
+        return;
+      }
+      $e->setAttribute("title", $message);
+      $e->addClass("stripped");
+      $e->addClass(REQUEST_TOKEN); // make it always show in webdiff
+    }
+  }
+
+  /**
+   * @param DOMElementPlus $e
+   * @param String $aName
+   * @param array $pLink
+   * @throws Exception
+   */
+  private function processLink (DOMElementPlus $e, $aName, Array &$pLink) {
+    $isLink = true;
+    if (array_key_exists("path", $pLink)) {
+      // link to supported file
+      if (FileHandler::isSupportedRequest($pLink["path"])) {
+        $isLink = false;
+      }
+      $ext = pathinfo($pLink["path"], PATHINFO_EXTENSION);
+      $isFile = is_file($pLink["path"]);
+      // link to image
+      if (!$isLink && FileHandler::isImage($ext)) {
+        list($targetWidth, $targetHeight) = self::getImageDimensions($pLink['path']);
+        $e->setAttribute("data-target-width", $targetWidth);
+        $e->setAttribute("data-target-height", $targetHeight);
+      }
+      // link to existing file
+      if ($isLink && $isFile) {
+        if ($ext == "php") {
           return;
         }
-        throw new Exception(sprintf(_("Link '%s' not found"), $url));
+        $isLink = false;
       }
-      #if(!array_key_exists("path", $pLink)) $pLink["path"] = "/";
-      if ($linkType && array_key_exists("id", $pLink)) {
-        if (!array_key_exists("query", $pLink)) {
-          $this->insertTitle($e, $pLink["id"]);
-        }
-        $e->setAttribute("lang", HTMLPlusBuilder::getIdToLang($pLink["id"]));
-      }
-      $link = buildLocalUrl($pLink, !$linkType, $isLink);
-      $e->setAttribute($aName, $link);
-    } catch (Exception $ex) {
-      $e->stripAttr($aName, sprintf(_("Attribute %s='%s' removed: %s"), $aName, $url, $ex->getMessage()));
     }
+    $localFragment = $this->isLocalFragment($pLink);
+    if ($isLink) {
+      $rootId = HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile());
+      $pLink = $this->getLink($pLink, $rootId);
+    }
+    if (empty($pLink)) {
+      if ($localFragment) {
+        return;
+      }
+      throw new Exception(_("Target not found"));
+    }
+    $ignoreCyclic = $e->nodeName != "a";
+    $link = buildLocalUrl($pLink, $ignoreCyclic, $isLink);
+    $e->setAttribute($aName, $link);
   }
 
   /**
@@ -659,18 +711,76 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param string $id
    */
   private function insertTitle (DOMElementPlus $a, $id) {
-    if ($a->hasAttribute("title")) {
-      if (!strlen($a->getAttribute("title"))) {
-        $a->stripAttr("title");
+    $title = HTMLPlusBuilder::getIdToTitle($id);
+    if (!strlen($title) || $title == $a->nodeValue) {
+      $title = HTMLPlusBuilder::getIdToHeading($id);
+      if (!strlen($title) || $title == $a->nodeValue) {
+        $title = getShortString(HTMLPlusBuilder::getIdToDesc($id));
       }
+    }
+    $a->setAttribute("title", $title);
+  }
+
+  /**
+   * @param string $text
+   * @param array $register
+   * @param int $attempt
+   * @return mixed
+   */
+  private function getUniqueHash ($text, Array &$register, $attempt = 0) {
+    $suffix = $attempt > 0 ? "-$attempt" : "";
+    $hash = substr(hash("sha256", $text), 0, 4).$suffix;
+    if (array_key_exists($hash, $register)) {
+      return $this->getUniqueHash($text, $register, ++$attempt);
+    }
+    $register[$hash] = null;
+    return $hash;
+  }
+
+  /**
+   * @param DOMElementPlus $img
+   * @param array $ids
+   */
+  private function processImage (DOMElementPlus $img, Array &$ids) {
+    if ($img->hasAttribute("width") && $img->hasAttribute("height")) {
       return;
     }
-    foreach (HTMLPlusBuilder::getHeadingValues($id, true) as $value) {
-      if ($value == $a->nodeValue) {
-        continue;
-      }
-      $a->setAttribute("title", $value);
+    $src = $img->getAttribute("src");
+    // external
+    if (is_null(parseLocalLink($src))) {
       return;
+    }
+    try {
+      list($targetWidth, $targetHeight) = $this->getImageDimensions($src);
+    } catch (Exception $ex) {
+      if (is_null(Cms::getLoggedUser())) {
+        $img->stripElement();
+        return;
+      }
+      $message = sprintf(_("Attribute src=%s removed: %s"), $src, $ex->getMessage());
+      $img->setAttribute('src', "/".LIB_DIR."/".NOT_FOUND_IMG_FILENAME);
+      list($targetWidth, $targetHeight) = getimagesize(LIB_FOLDER."/".NOT_FOUND_IMG_FILENAME);
+      $img->setAttribute("title", $message);
+      $img->addClass("stripped");
+      $img->addClass(REQUEST_TOKEN); // make it always show in webdiff
+    }
+    $img->setAttribute("width", $targetWidth);
+    $img->setAttribute("height", $targetHeight);
+    if ($img->hasAttribute("id")) {
+      return;
+    }
+    $img->setAttribute("id", "img".self::getUniqueHash($img->getAttribute("src"), $ids));
+  }
+
+  /**
+   * @param string $src
+   * @return array
+   */
+  private function getImageDimensions ($src) {
+    if (stream_resolve_include_path($src)) {
+      return getimagesize(realpath($src));
+    } else {
+      return FileHandler::calculateImageSize($src);
     }
   }
 
@@ -713,7 +823,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $ieIfComment = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : null;
       if (!is_null($ieIfComment)) {
-        #$e->nodeValue = " ";
+        #$e->nodeValue = "�";
         $parent->appendChild(
           $parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]")
         );
@@ -838,7 +948,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param int $priority
    * @param string $append
    */
-  public function addJs ($content, $priority = 10, $append = self::APPEND_BODY) {
+  public function addJs ($content, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_BODY) {
     $key = "k".count($this->jsFiles);
     $this->jsFiles[$key] = [
       "file" => null,

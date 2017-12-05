@@ -331,12 +331,12 @@ class HTMLPlusBuilder extends DOMBuilder {
     $fp = findFile($filePath, $user, $admin);
     try {
       $doc->load($fp);
-      self::validateHtml($doc, $filePath, false);
+      self::validateHtml($doc, $fp, $filePath, false);
       self::insertIncludes($doc, dirname($filePath));
       if (array_key_exists("fileToMtime", self::$currentFileTo)
         && count(self::$currentFileTo["fileToMtime"]) > 1
       ) {
-        self::validateHtml($doc, $filePath, true);
+        self::validateHtml($doc, $fp, $filePath, true);
       }
     } catch (Exception $e) {
       self::$storeCache = false;
@@ -349,10 +349,11 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   /**
    * @param HTMLPlus $doc
+   * @param string $fileRealPath
    * @param string $filePath
    * @param bool $included
    */
-  private static function validateHtml (HTMLPlus $doc, $filePath, $included) {
+  private static function validateHtml (HTMLPlus $doc, $fileRealPath, $filePath, $included) {
     $doc->validatePlus(true);
     if (empty($doc->getErrors())) {
       return;
@@ -363,6 +364,11 @@ class HTMLPlusBuilder extends DOMBuilder {
       $msg = _("File %s invalid syntax fixed %s times");
     }
     Logger::user_notice(sprintf($msg, $filePath, count($doc->getErrors())));
+    if (AUTOCORRECT) {
+      incrementalRename($fileRealPath);
+      file_put_contents($fileRealPath, $doc->saveXML());
+      return;
+    }
     self::$storeCache = false;
   }
 
@@ -481,6 +487,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       if ($filePath == INDEX_HTML) {
         $link = "";
       } else {
+        reset(self::$fileToId);
         $parentId = current(self::$fileToId);
       }
     }
@@ -565,21 +572,18 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   /**
-   * @param string $id
+   * @param $id
    * @param bool $title
-   * @return array
+   * @return string
    */
-  public static function getHeadingValues ($id, $title = false) {
-    $values = [];
-    if ($title && strlen(self::getIdToTitle($id))) {
-      $values[] = self::getIdToTitle($id);
+  public static function getHeading ($id, $title = false) {
+    if ($title && strlen(HTMLPlusBuilder::getIdToTitle($id))) {
+      return HTMLPlusBuilder::getIdToTitle($id);
     }
-    if (strlen(self::getIdToShort($id))) {
-      $values[] = self::getIdToShort($id);
+    if (strlen(HTMLPlusBuilder::getIdToShort($id))) {
+      return HTMLPlusBuilder::getIdToShort($id);
     }
-    $values[] = self::getIdToHeading($id);
-    $values[] = getShortString(self::getIdToDesc($id));
-    return $values;
+    return HTMLPlusBuilder::getIdToHeading($id);
   }
 
 }

@@ -14,21 +14,6 @@
           <param name="pattern">(localhost/[a-z0-9-]+)|(([a-z0-9-]+\.)+[a-z]+)</param>
         </data>
       </attribute>
-      <zeroOrMore>
-        <attribute>
-          <anyName>
-            <except>
-              <name>id</name>
-              <name>class</name>
-              <name>title</name>
-              <name>fn</name>
-              <name>var</name>
-              <name>xml:lang</name>
-              <name>ns</name>
-            </except>
-          </anyName>
-        </attribute>
-      </zeroOrMore>
       <ref name="contentBlock"/>
     </element>
   </start>
@@ -103,6 +88,13 @@
         </attribute>
       </optional>
       <optional>
+        <attribute name="src">
+          <data type="string">
+            <param name="pattern">[a-z][a-z0-9_/.-]*\.html</param>
+          </data>
+        </attribute>
+      </optional>
+      <optional>
         <attribute name="mtime">
           <ref name="datetime"/>
         </attribute>
@@ -112,19 +104,9 @@
           <ref name="datetime"/>
         </attribute>
       </optional>
-      <optional>
-        <attribute name="src">
-          <data type="string">
-            <param name="pattern">[a-z][a-z0-9_/.-]*\.html</param>
-          </data>
-        </attribute>
-      </optional>
-      <zeroOrMore>
-        <choice>
-          <text/>
-          <ref name="span"/>
-        </choice>
-      </zeroOrMore>
+      <oneOrMore>
+        <text/>
+      </oneOrMore>
     </element>
   </define>
 

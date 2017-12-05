@@ -58,10 +58,6 @@ class Cms {
    * @var bool
    */
   private static $success = false;
-  /**
-   * @var string|null
-   */
-  private static $requestToken = null;
 
   /**
    * @param string $methodName
@@ -96,15 +92,12 @@ class Cms {
     if (is_null(self::$flashList)) {
       self::createFlashList();
     }
-    if (is_null(self::$requestToken)) {
-      self::$requestToken = rand();
-    }
     if (self::isSuperUser()) {
       $_SESSION["cms"]["flash"][$type][hash(FILE_HASH_ALGO, $message)] = $message;
-      $_SESSION["cms"]["request"][$type][hash(FILE_HASH_ALGO, $message)][] = self::$requestToken;
+      $_SESSION["cms"]["request"][$type][hash(FILE_HASH_ALGO, $message)][] = REQUEST_TOKEN;
       return;
     }
-    self::addFlashItem($message, $type, [self::$requestToken]);
+    self::addFlashItem($message, $type, [REQUEST_TOKEN]);
   }
 
   private static function createFlashList () {
@@ -117,32 +110,49 @@ class Cms {
   /**
    * @param string $name
    * @param mixed $value
+   * @param string|null $prefix
    * @return string
+   * @throws Exception
    */
-  public static function setVariable ($name, $value) {
-    $varId = self::getVarId($name);
-    if (!array_key_exists($varId, self::$variables)) {
-      self::addVariableItem("variables", $varId);
-    }
+  public static function setVariable ($name, $value, $prefix = null) {
+    $varId = self::getVarId($name, $prefix);
+    // if (!array_key_exists($varId, self::$variables)) {
+    //   self::addVariableItem("variables", $varId);
+    // }
     self::$variables[$varId] = $value;
     return $varId;
   }
 
   /**
-   * @param string $name
+   * @param $name
+   * @param string|null $prefix
    * @return string
    * @throws Exception
    */
-  private static function getVarId ($name) {
+  private static function getVarId ($name, $prefix = null) {
+    $name = normalize($name);
+    if (is_null($prefix)) {
+      $prefix = self::getCaller();
+    }
+    if ($prefix == $name || !strlen($prefix)) {
+      if (!strlen($name)) {
+        throw new Exception("Unable to set variable: name and prefix are empty");
+      }
+      return $name;
+    }
+    return $prefix.(strlen($name) ? "-$name" : "");
+  }
+
+  /**
+   * @return string
+   * @throws Exception
+   */
+  private static function getCaller () {
     $d = debug_backtrace();
-    if (!isset($d[2]["class"])) {
+    if (!isset($d[3]["class"])) {
       throw new Exception(_("Unknown caller class"));
     }
-    $varId = strtolower((new \ReflectionClass($d[2]["class"]))->getShortName());
-    if ($varId == $name) {
-      return $varId;
-    }
-    return $varId.(strlen($name) ? "-".normalize($name) : "");
+    return strtolower((new \ReflectionClass($d[3]["class"]))->getShortName());
   }
 
   /**
@@ -221,16 +231,18 @@ class Cms {
       $message = self::$types[$type].": $message";
     }
     $li = self::$flashList->ownerDocument->createElement("li");
+    $span = $li->ownerDocument->createElement("span");
+    $li->appendChild($span);
     self::$flashList->firstElement->appendChild($li);
     $li->setAttribute("class", strtolower($type)." ".implode(" ", $requests));
     $doc = new DOMDocumentPlus();
     try {
       $doc->loadXML("<var>$message</var>");
       foreach ($doc->documentElement->childNodes as $ch) {
-        $li->appendChild($li->ownerDocument->importNode($ch, true));
+        $span->appendChild($li->ownerDocument->importNode($ch, true));
       }
     } catch (Exception $e) {
-      $li->nodeValue = htmlspecialchars($message);
+      $span->nodeValue = htmlspecialchars($message);
     }
   }
 

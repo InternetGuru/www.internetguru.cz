@@ -48,8 +48,8 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-#messages li label {
-  cursor: pointer;
+#messages label {
+  border-bottom: thin solid;
 }
 
 #messages.hidden {

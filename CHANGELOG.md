@@ -4,7 +4,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.6.2] - 2017-10-10
+## [2.7.0] - 2017-10-18
+### Added
+ - Not found image support
+ - New plugin Photoswipe for interactive image galleries
+ - Auto attribute `data-target-width` and `data-target-height` for links to images
+ - Auto attribute `width` and `height` for images
+ - Saving autocorrected HTML+ files (if is file AUTOCORRECT)
+ - Support HTML5 data-* attributes
+
+### Changed
+ - Effective HTML+ validation
+ - Relativize breadcrumb padding top / bottom
+
+### Fixed
+ - LinkList contains ids instead of headings
+ - Fix HTMLOutput css and js priorities
+ - Register Agregator local varaibles
+ - Handling broken resource reports error and outputs raw resource
+ - New .html file has wrong ctime and ns attributes
+ - Disabling css/js file do not clear cache
 
 ## [2.6.2] - 2017-10-06
 ### Fixed
@@ -253,7 +272,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[2.6.2]: https://bitbucket.org/igwr/cms/compare/v2.6.2..v2.6.1
+[2.7.0]: https://bitbucket.org/igwr/cms/compare/v2.7.0..v2.6.2
 [2.6.2]: https://bitbucket.org/igwr/cms/compare/v2.6.2..v2.6.1
 [2.6.1]: https://bitbucket.org/igwr/cms/compare/v2.6.1..v2.6.0
 [2.6.0]: https://bitbucket.org/igwr/cms/compare/v2.6.0..v2.5.6

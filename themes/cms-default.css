@@ -7,6 +7,11 @@ body {
   line-height: 1.4;
 }
 
+#content a.stripped {
+  border-bottom: thin solid;
+  color: red;
+}
+
 code, samp {
   font-family: "Emilbus Mono", "Lucida Console", monospace;
 }
@@ -72,21 +77,15 @@ form dd > textarea {
 
 @media screen {
   form dd {
-      margin-left: 0;
+    margin-left: 0;
   }
 }
 
 samp, pre, textarea, code {
-  border: 0.15em solid #e5e5e5;
   box-sizing: border-box;
-  background:#f0f0f0;
   font-size: inherit;
   color: black;
   white-space: pre-wrap;
-}
-
-pre > code {
-  border: none;
 }
 
 input:not([type='submit']),

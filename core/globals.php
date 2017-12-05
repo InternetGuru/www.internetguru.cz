@@ -299,13 +299,14 @@ function addPermParams (Array &$pLink) {
 
 /**
  * @param array $a
+ * @param int $order
  */
-function stableSort (Array &$a) {
+function stableSort (Array &$a, $order = SORT_ASC) {
   if (count($a) < 2) {
     return;
   }
-  $order = range(1, count($a));
-  array_multisort($a, SORT_ASC, $order, SORT_ASC);
+  $orderArray = range(1, count($a));
+  array_multisort($a, $order, $orderArray, $order);
 }
 
 /**
@@ -475,7 +476,7 @@ function incrementalRename ($src, $dest = null) {
 function initDirs () {
   $dirs = [
     USER_FOLDER, LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER,
-    LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR,
+    LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR, VENDOR_DIR,
   ];
   foreach ($dirs as $d) mkdir_plus($d);
 }

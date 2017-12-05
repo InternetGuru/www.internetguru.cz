@@ -61,7 +61,7 @@ class Plugins implements SplSubject {
    * @param Plugin|SplObserver $observer
    * @param int $priority
    */
-  public function attach (SplObserver $observer, $priority = 10) {
+  public function attach (SplObserver $observer, $priority = 50) {
     $o = (new \ReflectionClass($observer))->getShortName();
     $this->observers[$o] = $observer;
     if (!array_key_exists($o, $this->observerPriority)) {
@@ -86,7 +86,7 @@ class Plugins implements SplSubject {
   }
 
   public function notify () {
-    stableSort($this->observerPriority);
+    stableSort($this->observerPriority, SORT_DESC);
     foreach ($this->observerPriority as $key => $value) {
       $this->observers[$key]->update($this);
     }
@@ -109,7 +109,7 @@ class Plugins implements SplSubject {
   }
 
   public function printObservers () {
-    stableSort($this->observerPriority);
+    stableSort($this->observerPriority, SORT_DESC);
     print_r($this->observerPriority);
   }
 
@@ -143,7 +143,7 @@ class Plugins implements SplSubject {
    */
   public function getIsInterface ($itf) {
     $contentStrategies = [];
-    stableSort($this->observerPriority);
+    stableSort($this->observerPriority, SORT_DESC);
     foreach ($this->observerPriority as $key => $p) {
       if (!$this->observers[$key] instanceOf $itf) {
         continue;
