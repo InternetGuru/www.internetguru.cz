@@ -315,23 +315,32 @@ function stableSort (Array &$a, $order = SORT_ASC) {
  * @return string
  */
 function getCurLink ($query = false) {
-  $link = isset($_GET["q"]) ? $_GET["q"] : "";
-  return $link.($query ? getCurQuery(true) : "");
+  return getCurQuery($query, true);
 }
 
 /**
  * @param bool $questionMark
+ * @param bool $link
  * @return string
  */
-function getCurQuery ($questionMark = false) {
+function getCurQuery ($questionMark = false, $link = false) {
   if (!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) {
     return "";
   }
   parse_str($_SERVER['QUERY_STRING'], $pQuery);
+  $curLink = "";
   if (isset($pQuery["q"])) {
+    $curLink = $pQuery["q"];
     unset($pQuery["q"]);
   }
-  return buildQuery($pQuery, $questionMark);
+  $query = buildQuery($pQuery, $questionMark);
+  if (!$link) {
+    return $query; // no link with/without questionmark (true/false, false)
+  }
+  if (!$questionMark) {
+    return $link; // just a link (false, true)
+  }
+  return $curLink.$query; // link and query (true, true)
 }
 
 /**
