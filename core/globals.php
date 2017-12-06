@@ -265,7 +265,8 @@ function isCyclicLink (Array $pLink) {
   if (isset($pLink["fragment"])) {
     return false;
   }
-  if (isset($pLink["path"]) && $pLink["path"] != getCurLink() && SCRIPT_NAME != $pLink["path"]) {
+  if (isset($pLink["path"]) && $pLink["path"] != urlencode(getCurLink())
+    && SCRIPT_NAME != $pLink["path"]) {
     return false;
   }
   if (!isset($pLink["query"]) && getCurQuery() != "") {

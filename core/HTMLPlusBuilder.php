@@ -481,7 +481,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    */
   private static function registerElement (DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
     $id = $e->getAttribute("id");
-    $link = strlen($linkPrefix) ? "$linkPrefix/$id" : $id;
+    $link = strlen($linkPrefix) ? urlencode($linkPrefix)."/" : "" . urlencode($id);
     if (!strlen($parentId)) {
       $parentId = null;
       if ($filePath == INDEX_HTML) {
@@ -492,7 +492,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       }
     }
     if ($id != $prefixId) {
-      $link = self::$currentIdTo["idToLink"][$prefixId]."#$id";
+      $link = urlencode(self::$currentIdTo["idToLink"][$prefixId]) . "#" . urlencode($id);
       $id = "$prefixId/$id";
     }
     if ($e->nodeName == "h") {
