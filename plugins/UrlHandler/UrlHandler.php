@@ -104,6 +104,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     if (!HTMLPlusBuilder::isLink($path)) {
       $path = normalize($path, "a-zA-Z0-9/_-");
       if (self::DEBUG) {
+        var_dump($path);
         var_dump($links);
       }
       $linkId = self::findSimilarLinkId($links, $path);
