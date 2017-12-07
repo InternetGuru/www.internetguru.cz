@@ -265,7 +265,7 @@ function isCyclicLink (Array $pLink) {
   if (isset($pLink["fragment"])) {
     return false;
   }
-  if (isset($pLink["path"]) && $pLink["path"] != urlencode(getCurLink())
+  if (isset($pLink["path"]) && $pLink["path"] != getCurLink()
     && SCRIPT_NAME != $pLink["path"]) {
     return false;
   }
@@ -338,7 +338,7 @@ function getCurQuery ($questionMark = false, $link = false) {
     return $query; // no link with/without questionmark (true/false, false)
   }
   if (!$questionMark) {
-    return $link; // just a link (false, true)
+    return $curLink; // just a link (false, true)
   }
   return $curLink.$query; // link and query (true, true)
 }
