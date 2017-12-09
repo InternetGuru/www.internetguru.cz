@@ -324,6 +324,9 @@ class DOMElementPlus extends DOMElement {
    */
   private function toInsert (DOMElement $element) {
     $first = $element->firstChild;
+    if (is_null($first)) {
+      return false;
+    }
     if ($first->nodeType == XML_TEXT_NODE && trim($first->nodeValue) == "") {
       $first = $first->nextSibling;
     }
