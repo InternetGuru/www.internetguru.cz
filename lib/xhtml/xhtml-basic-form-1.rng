@@ -20,7 +20,7 @@
     <!-- Don't use Block.model, because this gets redefined by the
    legacy module. -->
     <oneOrMore>
-      <ref name="Block.class"/>
+      <ref name="contentElements"/>
     </oneOrMore>
   </element>
 </define>
