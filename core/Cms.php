@@ -268,7 +268,7 @@ class Cms {
     self::setVariable("url", URL);
     self::setVariable("cache_nginx", getCurLink()."?".CACHE_PARAM."=".CACHE_NGINX);
     self::setVariable("cache_ignore", getCurLink()."?".CACHE_PARAM."=".CACHE_IGNORE);
-    self::setVariable("link", getCurLink());
+    self::setVariable("link", "/".getCurLink());
     self::setVariable(
       "url_debug_on",
       getCurLink()."/?".PAGESPEED_PARAM."=".PAGESPEED_OFF."&".DEBUG_PARAM."=".DEBUG_ON."&".CACHE_PARAM
