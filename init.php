@@ -58,8 +58,7 @@ define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
 define('APC_PREFIX', 2); // change if APC structure changes
 define('HOST', basename(getcwd()));
-$hostArr = explode(".", HOST);
-define('DOMAIN', $hostArr[count($hostArr) - 2].".".$hostArr[count($hostArr) - 1]);
+define('DOMAIN', $_SERVER["SERVER_NAME"]);
 define('CURRENT_SUBDOM', substr(HOST, 0, -(strlen(DOMAIN) + 1)));
 define('ROOT_URL', "/");
 define('CMS_RELEASE', basename(dirname(__FILE__)));
