@@ -453,7 +453,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           continue;
         }
         $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $d);
-        if (!preg_match("/^$pattern$/",DOMAIN)) {
+        if (!preg_match("/^$pattern$/", HOST)) {
           continue;
         }
       }

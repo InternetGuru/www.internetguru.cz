@@ -46,7 +46,6 @@ define(
   '(19|20)\d\d(-(0[1-9]|1[012])(-(0[1-9]|[12]\d|3[01])(T([01]\d|2[0-3]):[0-5]\d:[0-5]\d[+-][01]\d:00)?)?)?'
 );
 define('EMAIL_PATTERN', '([_a-zA-Z0-9-]+(?:\.[_a-zA-Z0-9-]+)*)@([a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*)\.([a-zA-Z]{2,})');
-define('SUBDOM_PATTERN', '[a-z][a-z0-9]*');
 define('VARIABLE_PATTERN', '(?:[a-z]+-)?[a-z0-9_-]+');
 #define('FILEPATH_PATTERN', '(?:[a-zA-Z0-9_-][a-zA-Z0-9._-]*\/)*[a-zA-Z0-9_-][a-zA-Z0-9._-]*\.[a-zA-Z0-9]{2,4}');
 define('FILEPATH_PATTERN', '(?:[.a-zA-Z0-9_-]+\/)*[a-zA-Z0-9._-]+\.[a-zA-Z0-9]{2,4}');
@@ -57,9 +56,8 @@ define('STATUS_INIT', 'init');
 define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
 define('APC_PREFIX', 2); // change if APC structure changes
-define('HOST', basename(getcwd()));
-define('DOMAIN', $_SERVER["SERVER_NAME"]);
-define('CURRENT_SUBDOM', substr(HOST, 0, -(strlen(DOMAIN) + 1)));
+define('HOST', $_SERVER["HTTP_HOST"]);
+define('DOMAIN', substr(HOST, strpos(HOST, ".")+1));
 define('ROOT_URL', "/");
 define('CMS_RELEASE', basename(dirname(__FILE__)));
 define("WWW_FOLDER", "/var/www");
@@ -75,7 +73,7 @@ define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HOST);
 define('CMS_DEBUG', is_file(DEBUG_FILE));
 define("SCHEME", (@$_SERVER["HTTPS"] == "on" ? "https" : "http"));
 define("URL", SCHEME."://".HOST);
-define("URI", URL.(isset($_SERVER["REQUEST_URI"]) ? $_SERVER["REQUEST_URI"] : ""));
+define("URI", URL.@$_SERVER["REQUEST_URI"]);
 define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
 define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
 define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
