@@ -278,12 +278,8 @@
 
 <define name="Block.class">
   <choice>
-    <ref name="address"/>
-    <ref name="blockquote"/>
     <ref name="div"/>
-    <ref name="p"/>
     <ref name="pre"/>
-    <ref name="Heading.class"/>
   </choice>
 </define>
 

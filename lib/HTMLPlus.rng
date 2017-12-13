@@ -363,4 +363,8 @@
   <include href="xhtml/edit.rng"/>
   <include href="xhtml/indexes.rng"/>
 
+  <define name="Block.model" combine="choice">
+    <ref name="contentElements"/>
+  </define>
+
 </grammar>
