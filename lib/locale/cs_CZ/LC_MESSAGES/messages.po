@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-31 22:26-0400\n"
-"PO-Revision-Date: 2017-10-31 22:27-0400\n"
+"POT-Creation-Date: 2017-12-12 23:58-0500\n"
+"PO-Revision-Date: 2017-12-13 00:00-0500\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -23,56 +23,56 @@ msgstr ""
 "X-Poedit-SearchPathExcluded-0: lib\n"
 "X-Poedit-SearchPathExcluded-1: vendor\n"
 
-#: core/Cms.php:83
+#: core/Cms.php:79
 msgid "Success"
 msgstr "Úspěch"
 
-#: core/Cms.php:84
+#: core/Cms.php:80
 msgid "Notice"
 msgstr "Upozornění"
 
-#: core/Cms.php:85
+#: core/Cms.php:81
 msgid "Warning"
 msgstr "Varování"
 
-#: core/Cms.php:86
+#: core/Cms.php:82
 msgid "Error"
 msgstr "Error"
 
-#: core/Cms.php:160 core/globals.php:55
+#: core/Cms.php:153 core/globals.php:55
 msgid "Unknown caller class"
 msgstr "Neznámá volající třída"
 
-#: core/Cms.php:321
+#: core/Cms.php:316
 #, php-format
 msgid "Plugin %s exception: %s"
 msgstr "Chyba rozšíření %s: %s"
 
-#: core/Cms.php:365
+#: core/Cms.php:360
 #, php-format
 msgid "Content must be an instance of HTML+ (%s given)"
 msgstr "Obsah musí být instancí HTML+ (nikoli %s)"
 
-#: core/Cms.php:370
+#: core/Cms.php:365
 #, php-format
 msgid "Invalid HTML+ content: %s"
 msgstr "Nevalidní HTML+ obsah: %s"
 
-#: core/Cms.php:400
+#: core/Cms.php:395
 msgid "Unable to re/generate session ID"
 msgstr "Nepodařilo se vygenerovat session ID"
 
-#: core/Cms.php:425
+#: core/Cms.php:420
 #, php-format
 msgid "Invalid HTML+: %s"
 msgstr "Nevalidní HTML+: %s"
 
-#: core/Cms.php:465
+#: core/Cms.php:460
 #, php-format
 msgid "Unable to set function %s: not a function"
 msgstr "Není možné vytvořit funkci %s: nejedná se o funkci"
 
-#: core/Cms.php:525
+#: core/Cms.php:520
 #, php-format
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
@@ -145,12 +145,12 @@ msgstr "Nepodařilo se změnit atribut %s v elementu %s"
 msgid "Unable to insert array into '%s'"
 msgstr "Do '%s' nelze vložit proměnnou typu pole"
 
-#: core/DOMElementPlus.php:355
+#: core/DOMElementPlus.php:358
 #, php-format
 msgid "Invalid class name '%s'"
 msgstr "Neplatný název třídy '%s'"
 
-#: core/DOMElementPlus.php:416
+#: core/DOMElementPlus.php:419
 #, php-format
 msgid "Attribute %s stripped"
 msgstr "Odstraněn atribut %s"
@@ -460,92 +460,92 @@ msgstr "Nepodařilo se zpracovat atribut href '%s'"
 msgid "Link is cyclic"
 msgstr "Odkaz je cyklický"
 
-#: core/globals.php:384
+#: core/globals.php:394
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: core/globals.php:397
+#: core/globals.php:407
 msgid "Unable to save content"
 msgstr "Nepodařilo se uložit obsah"
 
-#: core/globals.php:410
+#: core/globals.php:420
 msgid "Source file is a link"
 msgstr "Zdrojový soubor je symbolický odkaz (link)"
 
-#: core/globals.php:413
+#: core/globals.php:423
 msgid "Source file not found"
 msgstr "Zdrojový soubor nebyl nalezen"
 
-#: core/globals.php:417
+#: core/globals.php:427
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: core/globals.php:422
+#: core/globals.php:432
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zkopírovat zdrojový soubor"
 
-#: core/globals.php:427
+#: core/globals.php:437
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepodařilo přejmenovat"
 
-#: core/globals.php:430
+#: core/globals.php:440
 msgid "Unable to set new file modification time"
 msgstr "Nepodařilo se nastavit čas modifikace"
 
-#: core/globals.php:450
+#: core/globals.php:460
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: core/globals.php:461
+#: core/globals.php:471
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: core/globals.php:471
+#: core/globals.php:481
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: core/globals.php:572
+#: core/globals.php:582
 #, php-format
 msgid "Unable to open file %s"
 msgstr "Nepodařilo se otevřít soubor %s"
 
-#: core/globals.php:581
+#: core/globals.php:591
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: core/globals.php:640 core/globals.php:664
+#: core/globals.php:650 core/globals.php:674
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: core/globals.php:669
+#: core/globals.php:679
 msgid "Unable to read file"
 msgstr "Nepodařilo se přečíst soubor"
 
-#: core/globals.php:681
+#: core/globals.php:691
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: core/globals.php:767
+#: core/globals.php:777
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:819
+#: core/globals.php:829
 #, php-format
 msgid "Unable to cache variable %s"
 msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
 
-#: core/globals.php:844
+#: core/globals.php:854
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
-#: core/globals.php:943
+#: core/globals.php:953
 #, php-format
 msgid "Undefined method name %s"
 msgstr "Neznámý název metody %s"
 
-#: core/globals.php:949
+#: core/globals.php:959
 #, php-format
 msgid "Argument[%s] empty or missing"
 msgstr "Argument[%s] chybí nebo je prázdný"
@@ -593,16 +593,16 @@ msgstr "%s v %s na řádku %s"
 msgid "IGCMS failed to finish: %s"
 msgstr "IGCMS byl nestandardně ukončen: %s"
 
-#: init.php:106
+#: init.php:107
 #, php-format
 msgid "Method %s is no longer available"
 msgstr "Metoda %s již není k dispozici"
 
-#: init.php:108
+#: init.php:109
 msgid "Domain is ready to be acquired"
 msgstr "Doména je připravená k převzetí"
 
-#: init.php:117
+#: init.php:118
 msgid "Root file(s) updated"
 msgstr "Došlo k aktualizaci kořenových souborů"
 
@@ -1085,45 +1085,59 @@ msgstr "Téma '%s' nebylo nalezeno"
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:314
+#: plugins/HtmlOutput/HtmlOutput.php:321
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:341
+#: plugins/HtmlOutput/HtmlOutput.php:348
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:376
+#: plugins/HtmlOutput/HtmlOutput.php:383
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:379
+#: plugins/HtmlOutput/HtmlOutput.php:386
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:534
+#: plugins/HtmlOutput/HtmlOutput.php:452
+#, php-format
+msgid "Invalid attribute domain value '%s'"
+msgstr "Neplatná hodnota atributu domain '%s'"
+
+#: plugins/HtmlOutput/HtmlOutput.php:466
+msgid "Using meta robots value with no domain match"
+msgstr "Používá se výchozí hodnota meta elementu robots"
+
+#: plugins/HtmlOutput/HtmlOutput.php:566
 #, php-format
 msgid "Invalid xPath query '%s'"
 msgstr "Neplatný xPath '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:567
+#: plugins/HtmlOutput/HtmlOutput.php:599
 msgid "Empty value"
 msgstr "Prázdná hodnota"
 
-#: plugins/HtmlOutput/HtmlOutput.php:593
+#: plugins/HtmlOutput/HtmlOutput.php:625
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:638
+#: plugins/HtmlOutput/HtmlOutput.php:674
 msgid "Target not found"
 msgstr "Cíl nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:833
+#: plugins/HtmlOutput/HtmlOutput.php:785
+#, php-format
+msgid "Attribute src=%s removed: %s"
+msgstr "Odstraněn atribut src=%s: %s"
+
+#: plugins/HtmlOutput/HtmlOutput.php:906
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1218,11 +1232,11 @@ msgstr "Neplatná hodnota elementu priority: %s"
 msgid "Invalid element lastmod value: %s"
 msgstr "Neplatná hodnota elementu lastmod: %s"
 
-#: plugins/UrlHandler/UrlHandler.php:115
+#: plugins/UrlHandler/UrlHandler.php:116
 msgid "Requested page not found"
 msgstr "Požadovaná stránka nebyla nalezena"
 
-#: plugins/UrlHandler/UrlHandler.php:343
+#: plugins/UrlHandler/UrlHandler.php:344
 #, php-format
 msgid "Unable to redirect to %s: %s"
 msgstr "Nepodařilo se přesměrovat na %s: %s"
