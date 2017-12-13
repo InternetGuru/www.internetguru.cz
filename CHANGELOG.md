@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Added
+ - Domain specific meta robots values support
+
 ## [2.7.2] - 2017-12-09
 ### Fixed
  - Empty element <var> does not delete
@@ -280,6 +284,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
 [2.7.2]: https://bitbucket.org/igwr/cms/compare/v2.7.2..v2.7.1
 [2.7.1]: https://bitbucket.org/igwr/cms/compare/v2.7.1..v2.7.0
 [2.7.0]: https://bitbucket.org/igwr/cms/compare/v2.7.0..v2.6.2
