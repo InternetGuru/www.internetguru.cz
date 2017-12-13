@@ -277,10 +277,7 @@
 </define>
 
 <define name="Block.class">
-  <choice>
-    <ref name="div"/>
-    <ref name="pre"/>
-  </choice>
+  <ref name="div"/>
 </define>
 
 <define name="Inline.class">
