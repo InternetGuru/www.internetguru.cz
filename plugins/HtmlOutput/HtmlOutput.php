@@ -448,7 +448,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     foreach ($mrs as $mr) {
       if ($mr->hasAttribute("domain")) {
         $d = $mr->getAttribute("domain");
-        if (!preg_match("/^[a-z.*]+$/", $d)) {
+        if (!preg_match("/^[a-z0-9.*-]+$/", $d)) {
           Logger::user_error(sprintf(_("Invalid attribute domain value '%s'"), $d));
           continue;
         }
