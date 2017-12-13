@@ -452,7 +452,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
           Logger::user_error(sprintf(_("Invalid attribute domain value '%s'"), $d));
           continue;
         }
-        $pattern = str_replace([".", "*"], ["\.", "[a-z]+"], $d);
+        $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $d);
         if (!preg_match("/^$pattern$/",DOMAIN)) {
           continue;
         }
