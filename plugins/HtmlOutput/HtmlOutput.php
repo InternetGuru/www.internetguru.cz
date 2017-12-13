@@ -433,14 +433,39 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    $robots = $this->cfg->getElementById("robots");
-    $this->appendMeta($head, "robots", $robots->nodeValue);
+    $this->appendMeta($head, "robots", $this->getMetaRobots());
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
     update_file(findFile($this->pluginDir."/robots.txt"), "robots.txt"); // hash?
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
+  }
+
+  private function getMetaRobots () {
+    $mrs = $this->cfg->getElementsByTagName("metarobots");
+    $lastMatch = null;
+    foreach ($mrs as $mr) {
+      if ($mr->hasAttribute("domain")) {
+        $d = $mr->getAttribute("domain");
+        if (!preg_match("/^[a-z0-9.*-]+$/", $d)) {
+          Logger::user_error(sprintf(_("Invalid attribute domain value '%s'"), $d));
+          continue;
+        }
+        $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $d);
+        if (!preg_match("/^$pattern$/",DOMAIN)) {
+          continue;
+        }
+      }
+      $lastMatch = $mr;
+    }
+    if (is_null($lastMatch)) {
+      throw new Exception("Element 'metarobots' not found");
+    }
+    if (!$lastMatch->hasAttribute("domain")) {
+      Logger::user_warning(_("Using meta robots value with no domain match"));
+    }
+    return $lastMatch->nodeValue;
   }
 
   /**
