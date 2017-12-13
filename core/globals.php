@@ -237,7 +237,7 @@ function buildLocalUrl (Array $pLink, $ignoreCyclic = false, $addPermParam = tru
     $pLink["path"] = ROOT_URL.$path;
   }
   #if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
-  if (SCRIPT_NAME == FINDEX_PHP || SCRIPT_NAME == "index.php" || strpos($path, FILES_DIR) === 0) {
+  if (SCRIPT_NAME == FINDEX_PHP || SCRIPT_NAME == INDEX_PHP || strpos($path, FILES_DIR) === 0) {
     return implodeLink($pLink);
   }
   $pLink["path"] = ROOT_URL.SCRIPT_NAME;
@@ -503,10 +503,10 @@ function initIndexFiles () {
     if (stream_resolve_include_path(CMS_ROOT_FOLDER."/.$f")) {
       continue;
     }
-    if (!is_file(CMS_ROOT_FOLDER."/$f/index.php")) {
+    if (!is_file(CMS_ROOT_FOLDER."/$f/".INDEX_PHP)) {
       continue;
     }
-    $links["$f.php"] = CMS_ROOT_FOLDER."/$f/index.php";
+    $links["$f.php"] = CMS_ROOT_FOLDER."/$f/".INDEX_PHP;
   }
   foreach (scandir(getcwd()) as $f) {
     if (!is_link($f)) {
@@ -902,7 +902,7 @@ function getIP () {
  */
 function getRealResDir ($file = "") {
   $resDir = RESOURCES_DIR;
-  if (basename(SCRIPT_NAME) != "index.php") {
+  if (basename(SCRIPT_NAME) != INDEX_PHP) {
     $resDir = pathinfo(SCRIPT_NAME, PATHINFO_FILENAME);
   }
   return $resDir.(strlen($file) ? "/$file" : "");

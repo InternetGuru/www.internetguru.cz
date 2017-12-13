@@ -6,6 +6,7 @@ session_cache_limiter("");
 
 define("SERVER_USER", "server");
 define("INDEX_HTML", "index.html");
+define("INDEX_PHP", "index.php");
 define("FINDEX_PHP", "findex.php");
 define("INOTIFY", ".inotify");
 define("NGINX_CACHE_FOLDER", "/var/cache/nginx");
