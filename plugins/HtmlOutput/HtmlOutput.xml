@@ -110,11 +110,15 @@
 
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
-  <!-- Meta Robots -->
-  <metarobots modifyonly="modifyonly">noindex, nofollow</metarobots>
-  <metarobots domain="*.*.local" modifyonly="modifyonly">noindex, nofollow</metarobots>
-  <metarobots domain="*.internetguru.cz" modifyonly="modifyonly">noindex, nofollow</metarobots>
-  <metarobots domain="www.*.*" modifyonly="modifyonly">all</metarobots>
+  <!-- robots.txt and meta robots -->
+  <robots modifyonly="modifyonly" meta="noindex, nofollow">User-agent: *
+Disallow: /</robots>
+  <robots domain="*.*.local" modifyonly="modifyonly" meta="noindex, nofollow">User-agent: *
+Disallow: /</robots>
+  <robots domain="*.internetguru.cz" modifyonly="modifyonly" meta="noindex, nofollow">User-agent: *
+Disallow: /</robots>
+  <robots domain="www.*.*" modifyonly="modifyonly" meta="all">User-agent: *
+Disallow:</robots>
 
   <!-- Favicons -->
   <var id="error" modifyonly="modifyonly">data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%02%00%00%00%90%91h6%00%00%00%19IDAT(%91c%BCd%AB%C2%40%0A%60%22I%F5%A8%86Q%0DCJ%03%00%DE%B5%01S%07%88%8FG%00%00%00%00IEND%AEB%60%82</var>
