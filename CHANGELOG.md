@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Domain specific meta robots values support
 
+### Changed
+ - domain specific meta robots and robots.txt in cfg
+
 ## [2.7.2] - 2017-12-09
 ### Fixed
  - Empty element <var> does not delete
