@@ -575,7 +575,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $varlist = $doc->createElement("dl");
     $varListVar->appendChild($varlist);
     foreach (Cms::getAllVariables() as $name => $value) {
+      $varlist->appendChild($doc->createTextNode("\n  "));
       $varlist->appendChild($doc->createElement("dt", "$name"));
+      $varlist->appendChild($doc->createTextNode("\n  "));
       $dd = $varlist->appendChild($doc->createElement("dd"));
       switch (gettype($value)) {
         case "NULL":
