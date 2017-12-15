@@ -75,6 +75,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @var DOMDocumentPlus|null
    */
   private $cfg = null;
+  /**
+   * @var string|null
+   */
+  private $metaRobots = null;
 
   /**
    * HtmlOutput constructor.
@@ -98,6 +102,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
+    $this->metaRobots = $this->getRobots($this->cfg)->getAttribute("meta");
     if (is_null($this->favIcon)) {
       $this->favIcon = findFile($this->pluginDir."/".self::FAVICON);
     }
@@ -444,7 +449,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    $this->appendMeta($head, "robots", $this->getRobots($this->cfg)->getAttribute("meta"));
+    $this->appendMeta($head, "robots", $this->metaRobots);
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
     $this->appendCssFiles($head, $xPath);
