@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Domain specific meta robots values support
 
 ### Changed
- - domain specific meta robots and robots.txt in cfg
+ - Domain specific Google Analytics ID in cfg
+ - Domain specific meta robots and robots.txt values in cfg
 
 ## [2.7.2] - 2017-12-09
 ### Fixed
