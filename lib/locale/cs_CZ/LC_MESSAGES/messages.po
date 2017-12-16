@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-12 23:58-0500\n"
-"PO-Revision-Date: 2017-12-13 00:00-0500\n"
+"POT-Creation-Date: 2017-12-14 17:17-0500\n"
+"PO-Revision-Date: 2017-12-14 17:18-0500\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -720,45 +720,45 @@ msgstr "Uložení změn vyčistí serverovou mezipaměť"
 msgid "Saving changes will remove outdated file cache"
 msgstr "Uložení změn odstraní neaktuální soubor z mezipaměti"
 
-#: plugins/Admin/Admin.php:582
+#: plugins/Admin/Admin.php:584
 msgid "null value"
 msgstr "hodnota null"
 
-#: plugins/Admin/Admin.php:588
+#: plugins/Admin/Admin.php:590
 msgid "empty value"
 msgstr "prázná hodnota"
 
-#: plugins/Admin/Admin.php:631
+#: plugins/Admin/Admin.php:633
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:652
+#: plugins/Admin/Admin.php:654
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:652
+#: plugins/Admin/Admin.php:654
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:672
+#: plugins/Admin/Admin.php:674
 msgid "Administration"
 msgstr "Administrace"
 
-#: plugins/Admin/Admin.php:674
+#: plugins/Admin/Admin.php:676
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:675
+#: plugins/Admin/Admin.php:677
 #, php-format
 msgid "%s (%s) - Administration"
 msgstr "%s (%s) - Administrace"
 
-#: plugins/Admin/Admin.php:695
+#: plugins/Admin/Admin.php:697
 msgid "enable"
 msgstr "aktivovat"
 
-#: plugins/Admin/Admin.php:695
+#: plugins/Admin/Admin.php:697
 msgid "disable"
 msgstr "deaktivovat"
 
@@ -1075,69 +1075,69 @@ msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
 msgid "GA disabled (ga_id = %s)"
 msgstr "GA je vypnutý (ga_id = %s)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:119
+#: plugins/HtmlOutput/HtmlOutput.php:120
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:182
+#: plugins/HtmlOutput/HtmlOutput.php:193
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:321
+#: plugins/HtmlOutput/HtmlOutput.php:332
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:348
+#: plugins/HtmlOutput/HtmlOutput.php:359
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:383
+#: plugins/HtmlOutput/HtmlOutput.php:394
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:386
+#: plugins/HtmlOutput/HtmlOutput.php:397
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:452
+#: plugins/HtmlOutput/HtmlOutput.php:462
 #, php-format
 msgid "Invalid attribute domain value '%s'"
 msgstr "Neplatná hodnota atributu domain '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:466
-msgid "Using meta robots value with no domain match"
-msgstr "Používá se výchozí hodnota meta elementu robots"
+#: plugins/HtmlOutput/HtmlOutput.php:476
+msgid "Using robots value with no domain match"
+msgstr "Používá se výchozí hodnota robots bez odpovídající domény"
 
-#: plugins/HtmlOutput/HtmlOutput.php:566
+#: plugins/HtmlOutput/HtmlOutput.php:576
 #, php-format
 msgid "Invalid xPath query '%s'"
 msgstr "Neplatný xPath '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:599
+#: plugins/HtmlOutput/HtmlOutput.php:609
 msgid "Empty value"
 msgstr "Prázdná hodnota"
 
-#: plugins/HtmlOutput/HtmlOutput.php:625
+#: plugins/HtmlOutput/HtmlOutput.php:635
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:674
+#: plugins/HtmlOutput/HtmlOutput.php:684
 msgid "Target not found"
 msgstr "Cíl nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:785
+#: plugins/HtmlOutput/HtmlOutput.php:795
 #, php-format
 msgid "Attribute src=%s removed: %s"
 msgstr "Odstraněn atribut src=%s: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:906
+#: plugins/HtmlOutput/HtmlOutput.php:916
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1300,6 +1300,9 @@ msgstr "Počkejte %s sekund před dalším odesláním"
 #: plugins/ValidateForm/ValidateForm.php:397
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
+
+#~ msgid "Using meta robots value with no domain match"
+#~ msgstr "Používá se výchozí hodnota meta elementu robots"
 
 #~ msgid "Empty attribute '%s' stripped"
 #~ msgstr "Odstraněn prázdný atribut '%s'"

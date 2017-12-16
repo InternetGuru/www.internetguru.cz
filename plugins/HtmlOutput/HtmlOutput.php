@@ -16,6 +16,7 @@ use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
+use IGCMS\Core\ResourceInterface;
 use IGCMS\Core\XMLBuilder;
 use SplObserver;
 use SplSubject;
@@ -25,12 +26,12 @@ use XSLTProcessor;
  * Class HtmlOutput
  * @package IGCMS\Plugins
  */
-class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
-    /**
+class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface, ResourceInterface {
+  /**
    * @var string
    */
   const APPEND_HEAD = "head"; // String filename => Int priority
-    /**
+  /**
    * @var string
    */
   const APPEND_BODY = "body"; // String filename => Int priority
@@ -74,6 +75,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @var DOMDocumentPlus|null
    */
   private $cfg = null;
+  /**
+   * @var string|null
+   */
+  private $metaRobots = null;
 
   /**
    * HtmlOutput constructor.
@@ -97,6 +102,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
     $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
+    $this->metaRobots = $this->getRobots($this->cfg)->getAttribute("meta");
     if (is_null($this->favIcon)) {
       $this->favIcon = findFile($this->pluginDir."/".self::FAVICON);
     }
@@ -124,6 +130,16 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
+  }
+
+  public static function isSupportedRequest ($filePath) {
+    return $filePath === ROBOTS_TXT;
+  }
+
+  public static function handleRequest () {
+    header('Content-Type: text/plain');
+    echo self::getRobots(self::getXML())->nodeValue;
+    exit;
   }
 
   /**
@@ -433,17 +449,16 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    $this->appendMeta($head, "robots", $this->getMetaRobots());
+    $this->appendMeta($head, "robots", $this->metaRobots);
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
-    update_file(findFile($this->pluginDir."/robots.txt"), "robots.txt"); // hash?
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
   }
 
-  private function getMetaRobots () {
-    $mrs = $this->cfg->getElementsByTagName("metarobots");
+  private static function getRobots (DOMDocumentPlus $cfg) {
+    $mrs = $cfg->getElementsByTagName("robots");
     $lastMatch = null;
     foreach ($mrs as $mr) {
       if ($mr->hasAttribute("domain")) {
@@ -460,12 +475,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $lastMatch = $mr;
     }
     if (is_null($lastMatch)) {
-      throw new Exception("Element 'metarobots' not found");
+      throw new Exception("Element 'robots' not found");
     }
     if (!$lastMatch->hasAttribute("domain")) {
-      Logger::user_warning(_("Using meta robots value with no domain match"));
+      Logger::user_warning(_("Using robots value with no domain match"));
     }
-    return $lastMatch->nodeValue;
+    return $lastMatch;
   }
 
   /**
