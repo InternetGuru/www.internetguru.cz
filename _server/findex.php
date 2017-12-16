@@ -29,10 +29,10 @@ try {
   }
   include($findex);
 
-} catch (Exception $e) {
+} catch (Exception $exc) {
 
   http_response_code(500);
-  echo "File fatal exception: ".$e->getMessage();
+  echo "File fatal exception: ".$exc->getMessage();
 
 }
 

@@ -73,15 +73,15 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
         /** @var DOMElementPlus $docListId $id or id of referenced $docList */
         $docListId = $this->processFor(self::DOCLIST_CLASS, $id, $docList);
         $this->createList(self::DOCLIST_CLASS, $docListId, $docList);
-      } catch (Exception $e) {
-        Logger::user_warning(sprintf($msg, self::DOCLIST_CLASS, $id, $e->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf($msg, self::DOCLIST_CLASS, $id, $exc->getMessage()));
       }
     }
     foreach ($this->imgLists as $id => $imgList) {
       try {
         $this->createList(self::IMGLIST_CLASS, $id, $imgList);
-      } catch (Exception $e) {
-        Logger::user_warning(sprintf($msg, self::IMGLIST_CLASS, $id, $e->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf($msg, self::IMGLIST_CLASS, $id, $exc->getMessage()));
       }
     }
   }
@@ -127,8 +127,8 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       try {
         HTMLPlusBuilder::register($this->pluginDir."/$filePath", $folder);
         $this->registered[$this->pluginDir."/$filePath"] = null;
-      } catch (Exception $e) {
-        Logger::user_warning(sprintf(_("Unable to register '%s': %s"), $filePath, $e->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("Unable to register '%s': %s"), $filePath, $exc->getMessage()));
       }
     }
   }
@@ -141,8 +141,8 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       }
       try {
         $id = $child->getRequiredAttribute("id");
-      } catch (Exception $e) {
-        Logger::user_warning($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::user_warning($exc->getMessage());
         continue;
       }
       switch ($child->nodeName) {

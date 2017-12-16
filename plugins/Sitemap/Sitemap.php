@@ -73,8 +73,8 @@ class Sitemap extends Plugin implements SplObserver {
       $sitemap->save(self::SITEMAP);
       touch(self::SITEMAP, HTMLPlusBuilder::getNewestFileMtime());
       Logger::info(_("Sitemap updated"));
-    } catch (Exception $e) {
-      Logger::user_warning($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::user_warning($exc->getMessage());
     }
   }
 

@@ -103,8 +103,8 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
           $e->getRequiredAttribute("wrapper"); // only check
           $this->sets[$id] = $e;
         }
-      } catch (Exception $ex) {
-        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $exc->getMessage()));
       }
     }
   }

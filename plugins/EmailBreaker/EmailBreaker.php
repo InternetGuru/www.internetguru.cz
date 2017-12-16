@@ -42,8 +42,8 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     foreach ($cfg->getElementsByTagName("replace") as $replace) {
       try {
         $pattern = $replace->getRequiredAttribute("pattern");
-      } catch (Exception $e) {
-        Logger::user_warning($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::user_warning($exc->getMessage());
         continue;
       }
       if (!strlen($replace->nodeValue)) {

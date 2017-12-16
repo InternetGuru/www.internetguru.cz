@@ -76,8 +76,8 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
       if (strlen($_GET[$this->className])) {
         $this->processImport($_GET[$this->className]);
       }
-    } catch (Exception $e) {
-      Logger::user_error($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::user_error($exc->getMessage());
     }
     $this->getImportedFiles();
   }
@@ -222,12 +222,12 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
       foreach ($doc->getErrors() as $error) {
         Logger::user_notice(_("Autocorrected").":$error");
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       Cms::notice(_("Use @ to specify short attribute for heading"));
       Cms::notice(_("Eg. This Is Long Heading @ Short Heading"));
       Cms::notice(_("Use @ to specify kw attribute for description"));
       Cms::notice(_("Eg. This is description @ these, are, some, keywords"));
-      throw $e;
+      throw $exc;
     }
     $doc->applySyntax();
     $this->html = $doc->saveXML();
@@ -239,18 +239,18 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     try {
       try {
         file_put_contents_plus($dest, $this->html);
-      } catch (Exception $e) {
-        throw new Exception(sprintf(_("Unable to save file %s: %s"), $this->file, $e->getMessage()));
+      } catch (Exception $exc) {
+        throw new Exception(sprintf(_("Unable to save file %s: %s"), $this->file, $exc->getMessage()));
       }
       try {
         if (is_file("$dest.old")) {
           incrementalRename("$dest.old", "$dest.");
         }
-      } catch (Exception $e) {
-        throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $e->getMessage()));
+      } catch (Exception $exc) {
+        throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $exc->getMessage()));
       }
-    } catch (Exception $e) {
-      Logger::critical($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::critical($exc->getMessage());
     } finally {
       unlock_file($fp, $dest);
     }
@@ -307,8 +307,8 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
   private function transform ($xslFile, DOMDocument $content, $vars = []) {
     try {
       $xsl = XMLBuilder::build($this->pluginDir."/$xslFile", false);
-    } catch (Exception $e) {
-      throw new Exception(sprintf(_("Unable to load transformation file %s: %s"), $xslFile, $e->getMessage()));
+    } catch (Exception $exc) {
+      throw new Exception(sprintf(_("Unable to load transformation file %s: %s"), $xslFile, $exc->getMessage()));
     }
     $proc = new XSLTProcessor();
     $proc->importStylesheet($xsl);

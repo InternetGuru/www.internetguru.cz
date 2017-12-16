@@ -65,8 +65,8 @@ try {
       try {
         clearNginxCache();
         Logger::user_success(_("Cache successfully purged"));
-      } catch (Exception $e) {
-        Logger::critical($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::critical($exc->getMessage());
       }
     }
   }
@@ -113,12 +113,12 @@ try {
   $content = Cms::contentProcessVars($content);
   echo Cms::getOutput($content);
 
-} catch (Exception $e) {
+} catch (Exception $exc) {
 
-  $errno = $e->getCode() ? $e->getCode() : 500;
-  $m = $e->getMessage();
+  $errno = $exc->getCode() ? $exc->getCode() : 500;
+  $m = $exc->getMessage();
   if (CMS_DEBUG) {
-    $m = sprintf(_("%s in %s on line %s"), $m, $e->getFile(), $e->getLine());
+    $m = sprintf(_("%s in %s on line %s"), $m, $exc->getFile(), $exc->getLine());
   }
   $m = sprintf(_("IGCMS failed to finish: %s"), $m);
   if (class_exists("IGCMS\\Core\\ErrorPage")) {

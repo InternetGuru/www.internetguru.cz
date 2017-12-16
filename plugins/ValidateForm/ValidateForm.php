@@ -86,8 +86,8 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     }
     try {
       $id = $form->getRequiredAttribute("id");
-    } catch (Exception $e) {
-      Logger::user_warning($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::user_warning($exc->getMessage());
       return;
     }
     $time = $this->getWaitTime($form);
@@ -129,8 +129,8 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       if (!Cms::isSuperUser() && !is_null($items)) {
         $this->ipCheck($time);
       }
-    } catch (Exception $e) {
-      Cms::error($e->getMessage());
+    } catch (Exception $exc) {
+      Cms::error($exc->getMessage());
       return;
     }
     Cms::setVariable($id, $items);
@@ -216,12 +216,12 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
         $value = isset($request[$name]) ? $request[$name] : null;
         $this->verifyItem($field, $value);
         $values[$name] = is_array($value) ? implode(", ", $value) : $value;
-      } catch (Exception $e) {
+      } catch (Exception $exc) {
         if (!$field->hasAttribute("id")) {
           $field->setUniqueId();
         }
         $id = $field->getAttribute("id");
-        $error = $e->getMessage();
+        $error = $exc->getMessage();
         if (isset($this->labels[$id][0])) {
           $name = $this->labels[$id][0];
         }
@@ -280,9 +280,9 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       case "select":
         try {
           $this->verifySelect($e, $value);
-        } catch (Exception $ex) {
+        } catch (Exception $exc) {
           if (!strlen($pattern)) {
-            throw $ex;
+            throw $exc;
           }
           $this->verifyText($value, $pattern, $req, self::INPUT_MAX_LEN);
         }

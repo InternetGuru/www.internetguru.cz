@@ -112,9 +112,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         exit;
       }
       redirTo(ROOT_URL.$dest);
-    } catch (Exception $e) {
-      $errno = $e->getCode() ? $e->getCode() : 500;
-      $msg = strlen($e->getMessage()) ? $e->getMessage() : _("Server error");
+    } catch (Exception $exc) {
+      $errno = $exc->getCode() ? $exc->getCode() : 500;
+      $msg = strlen($exc->getMessage()) ? $exc->getMessage() : _("Server error");
       throw new Exception(sprintf(_("Unable to handle file request: %s"), $msg), $errno);
     }
     exit;
@@ -183,7 +183,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private static function findFile ($filePath) {
     try {
       return findFile($filePath);
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       return null;
     }
   }
@@ -235,8 +235,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       } else {
         copy_plus($src, $dest);
       }
-    } catch (Exception $ex) {
-      Logger::error(sprintf(_("Unable to handle resource '%s': %s"), $dest, $ex->getMessage()));
+    } catch (Exception $exc) {
+      Logger::error(sprintf(_("Unable to handle resource '%s': %s"), $dest, $exc->getMessage()));
       self::outputFile($src, "text/$ext");
       exit;
     } finally {
@@ -466,7 +466,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       try {
         mkdir_plus(USER_FOLDER."/$sourceFolder");
         touch(USER_FOLDER."/$sourceFolder/".INOTIFY, $refTs);
-      } catch (Exception $e) {
+      } catch (Exception $exc) {
         Logger::error(sprintf(_("Unable to create user folder %s"), $sourceFolder));
       }
     }

@@ -143,8 +143,8 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
             $this->messages[$id] = $e->nodeValue;
             break;
         }
-      } catch (Exception $ex) {
-        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $exc->getMessage()));
       }
     }
     if (self::DEBUG) {
@@ -201,8 +201,8 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       if ($e->nodeName == "input") {
         try {
           $type = $e->getRequiredAttribute("type");
-        } catch (Exception $ex) {
-          Logger::user_warning($ex->getMessage());
+        } catch (Exception $exc) {
+          Logger::user_warning($exc->getMessage());
           continue;
         }
       }
@@ -367,12 +367,12 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
         var_dump($this->formVars);
         var_dump($this->formValues);
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       $message = sprintf(
         _("Unable to send form %s: %s"),
         "<a href='#".strtolower($this->className)."-".$formIdToSend."'>"
         .$formToSend->getAttribute("id")."</a>",
-        $e->getMessage()
+        $exc->getMessage()
       );
       Logger::user_error($message);
     }

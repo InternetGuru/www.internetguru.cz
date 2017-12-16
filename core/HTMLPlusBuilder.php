@@ -239,7 +239,7 @@ class HTMLPlusBuilder extends DOMBuilder {
         if ($mtime == filemtime(findFile($file))) {
           continue;
         }
-      } catch (Exception $e) {
+      } catch (Exception $exc) {
       }
       return false;
     }
@@ -284,15 +284,15 @@ class HTMLPlusBuilder extends DOMBuilder {
           apc_store_cache($cacheKey, $value, $filePath);
         }
         return $doc;
-      } catch (Exception $e) {
-        Logger::error($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::error($exc->getMessage());
         if (apc_exists($cacheKey)) {
           $cache = apc_fetch($cacheKey);
           $useCache = true;
         } else {
           try {
             return self::doBuild($filePath, false);
-          } catch (Exception $e) {
+          } catch (Exception $exc) {
             return self::doBuild($filePath, false, false);
           }
         }
@@ -338,9 +338,9 @@ class HTMLPlusBuilder extends DOMBuilder {
       ) {
         self::validateHtml($doc, $fp, $filePath, true);
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       self::$storeCache = false;
-      throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $e->getMessage()));
+      throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $exc->getMessage()));
     }
     self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
     self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
@@ -380,8 +380,8 @@ class HTMLPlusBuilder extends DOMBuilder {
       }
       try {
         self::insert($h, $workingDir);
-      } catch (Exception $e) {
-        $msg = sprintf(_("Unable to import: %s"), $e->getMessage());
+      } catch (Exception $exc) {
+        $msg = sprintf(_("Unable to import: %s"), $exc->getMessage());
         Logger::user_error($msg);
         self::$storeCache = false;
       }

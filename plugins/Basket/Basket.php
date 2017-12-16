@@ -104,8 +104,8 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
       $this->createBasketVar();
       // create basket-empty var
       Cms::setVariable('empty', (count($this->cookieProducts) ? null : ''));
-    } catch (Exception $e) {
-      Logger::user_warning($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::user_warning($exc->getMessage());
     }
   }
 

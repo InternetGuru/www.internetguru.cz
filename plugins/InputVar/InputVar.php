@@ -84,8 +84,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         }
         try {
           $e->getRequiredAttribute("id"); // only check
-        } catch (Exception $ex) {
-          Logger::user_warning($ex->getMessage());
+        } catch (Exception $exc) {
+          Logger::user_warning($exc->getMessage());
           continue;
         }
         switch ($e->nodeName) {
@@ -104,11 +104,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
             Logger::user_warning(sprintf(_("Unknown element name %s"), $e->nodeName));
         }
       }
-    } catch (Exception $ex) {
-      if ($ex->getCode() === 1) {
-        Logger::user_error($ex->getMessage());
+    } catch (Exception $exc) {
+      if ($exc->getCode() === 1) {
+        Logger::user_error($exc->getMessage());
       } else {
-        Logger::critical($ex->getMessage());
+        Logger::critical($exc->getMessage());
       }
     }
   }
@@ -192,8 +192,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if ($el->hasAttribute("fn") && !is_null($result)) {
       try {
         $result = Cms::applyUserFn($f, $el);
-      } catch (Exception $e) {
-        Logger::user_warning(sprintf(_("Unable to apply function: %s"), $e->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("Unable to apply function: %s"), $exc->getMessage()));
         return;
       }
     }
@@ -203,8 +203,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     }
     try {
       $fn = $this->register($el);
-    } catch (Exception $e) {
-      Logger::user_warning(sprintf(_("Unable to register function %s: %s"), $el->getAttribute("fn"), $e->getMessage()));
+    } catch (Exception $exc) {
+      Logger::user_warning(sprintf(_("Unable to register function %s: %s"), $el->getAttribute("fn"), $exc->getMessage()));
       return;
     }
     if ($el->nodeName == "fn") {
@@ -259,8 +259,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
           }
           try {
             $name = $d->getRequiredAttribute("name");
-          } catch (Exception $e) {
-            Logger::user_warning($e->getMessage());
+          } catch (Exception $exc) {
+            Logger::user_warning($exc->getMessage());
             continue;
           }
           $tr[$name] = $this->parse($d->nodeValue);
@@ -418,8 +418,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         }
         try {
           $node = new DOMElement("any", Cms::applyUserFn($f, $node));
-        } catch (Exception $e) {
-          Logger::user_warning(sprintf(_("Sequence call skipped: %s"), $e->getMessage()));
+        } catch (Exception $exc) {
+          Logger::user_warning(sprintf(_("Sequence call skipped: %s"), $exc->getMessage()));
         }
       }
       return $node->nodeValue;
@@ -442,8 +442,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     foreach ($this->cfg->getElementsByTagName("set") as $e) {
       try {
         $e->getRequiredAttribute("type"); // only check
-      } catch (Exception $ex) {
-        Logger::user_warning($ex->getMessage());
+      } catch (Exception $exc) {
+        Logger::user_warning($exc->getMessage());
         continue;
       }
       $this->createFieldset($newContent, $fieldset, $e);
@@ -581,8 +581,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $id = normalize($this->className."-".$v->getAttribute("id"));
       try {
         $select = $this->createSelect($inputDoc, $dataListArray, $v->getAttribute("id"));
-      } catch (Exception $e) {
-        Logger::critical($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::critical($exc->getMessage());
         continue;
       }
       $dt = $inputDoc->createElement("dt");

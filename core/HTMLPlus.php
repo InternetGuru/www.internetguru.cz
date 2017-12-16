@@ -423,9 +423,9 @@ class HTMLPlus extends DOMDocumentPlus {
           $this->relaxNGValidatePlus();
           $i++;
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       $this->status = self::STATUS_INVALID;
-      throw $e;
+      throw $exc;
     } finally {
       if (self::USE_APC && !count($this->errors)) {
         apc_store_cache($cacheKey, $i, "validatePlus");

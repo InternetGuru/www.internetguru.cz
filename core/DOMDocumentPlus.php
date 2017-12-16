@@ -199,8 +199,8 @@ class DOMDocumentPlus extends DOMDocument {
           }
           $result = $this->doProcessVariables($variables, $ignore, $element, false, $toRemove);
         }
-      } catch (Exception $exception) {
-        Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $exception->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $exc->getMessage()));
       }
     }
     if ($deep) {
@@ -309,13 +309,13 @@ class DOMDocumentPlus extends DOMDocument {
       if (!$docToValidate->relaxNGValidate($f)) {
         throw new Exception(_("relaxNGValidate() internal error occurred"));
       }
-    } catch (Exception $exception) {
+    } catch (Exception $exc) {
       $internal_errors = libxml_get_errors();
       if (count($internal_errors)) {
         $note = " ["._("Caution: this message may be misleading")."]";
         throw new Exception(current($internal_errors)->message.$note);
       }
-      throw $exception;
+      throw $exc;
     } finally {
       libxml_clear_errors();
       libxml_use_internal_errors(false);

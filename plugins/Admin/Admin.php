@@ -142,8 +142,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->requireActiveCms();
     try {
       $this->process();
-    } catch (Exception $e) {
-      Logger::user_error($this->className.": ".$e->getMessage());
+    } catch (Exception $exc) {
+      Logger::user_error($this->className.": ".$exc->getMessage());
       return;
     }
     if (!$this->isPost()) {
@@ -274,8 +274,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         $this->clearResCache();
         Logger::user_success(sprintf(_("File '%s' disabled"), $this->defaultFile));
       }
-    } catch (Exception $e) {
-      Logger::user_warning($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::user_warning($exc->getMessage());
     }
     if (stream_resolve_include_path($this->dataFile)) {
       $this->dataFileStatus = self::STATUS_ENABLED;
@@ -363,7 +363,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     try {
       $df = findFile($this->defaultFile, false);
       $this->scheme = $this->getScheme($df);
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       $df = false;
     }
     // get user schema if default schema not exists
@@ -406,7 +406,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       if ($this->type == "html") {
         $doc->validatePlus();
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       $doc->validatePlus(true);
       foreach ($doc->getErrors() as $error) {
         Logger::user_notice("$error".($repair ? " (".$doc->getStatus().")" : ""));
@@ -442,7 +442,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
     try {
       $scheme = findFile($m[1], false, false);
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       throw new Exception(sprintf(_("Schema file '%s' not found"), $scheme));
     }
     return $scheme;
@@ -501,15 +501,15 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
           }
         }
         file_put_contents_plus($this->destFile, $this->contentValue);
-      } catch (Exception $e) {
-        throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $e->getMessage()));
+      } catch (Exception $exc) {
+        throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $exc->getMessage()));
       }
       try {
         if (is_file($this->destFile.".old")) {
           incrementalRename($this->destFile.".old", $this->destFile.".");
         }
-      } catch (Exception $e) {
-        throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $e->getMessage()));
+      } catch (Exception $exc) {
+        throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $exc->getMessage()));
       }
       $this->redir = true;
       Logger::user_success(_("Changes successfully saved"));
@@ -539,8 +539,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     #if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     try {
       clearNginxCache();
-    } catch (Exception $e) {
-      Logger::critical($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::critical($exc->getMessage());
     }
   }
 
@@ -726,7 +726,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     }
     try {
       $df = findFile($this->defaultFile, $user, true);
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       return null;
     }
     if ($this->replace) {

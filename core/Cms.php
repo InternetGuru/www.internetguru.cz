@@ -248,7 +248,7 @@ class Cms {
       foreach ($doc->documentElement->childNodes as $node) {
         $span->appendChild($lItem->ownerDocument->importNode($node, true));
       }
-    } catch (Exception $exception) {
+    } catch (Exception $exc) {
       $span->nodeValue = htmlspecialchars($message);
     }
   }
@@ -337,8 +337,8 @@ class Cms {
         }
         self::validateContent($content);
         break;
-      } catch (Exception $exception) {
-        Logger::error(sprintf($exceptionMsg, get_class($plugin), $exception->getMessage()));
+      } catch (Exception $exc) {
+        Logger::error(sprintf($exceptionMsg, get_class($plugin), $exc->getMessage()));
         $content = null;
       }
     }
@@ -353,8 +353,8 @@ class Cms {
         $plugin->modifyContent($tmpContent);
         self::validateContent($tmpContent);
         $content = $tmpContent;
-      } catch (Exception $exception) {
-        Logger::error(sprintf($exceptionMsg, get_class($plugin), $exception->getMessage()));
+      } catch (Exception $exc) {
+        Logger::error(sprintf($exceptionMsg, get_class($plugin), $exc->getMessage()));
       }
     }
     if (self::getLoggedUser() != SERVER_USER) {
@@ -375,8 +375,8 @@ class Cms {
     }
     try {
       $content->validatePlus();
-    } catch (Exception $exception) {
-      throw new Exception(sprintf(_("Invalid HTML+ content: %s"), $exception->getMessage()));
+    } catch (Exception $exc) {
+      throw new Exception(sprintf(_("Invalid HTML+ content: %s"), $exc->getMessage()));
     }
   }
 
@@ -433,8 +433,8 @@ class Cms {
       $tmpContent = $tmpContent->processVariables($vars);
       $tmpContent->validatePlus(true);
       return $tmpContent;
-    } catch (Exception $exception) {
-      Logger::user_error(sprintf(_("Invalid HTML+: %s"), $exception->getMessage()));
+    } catch (Exception $exc) {
+      Logger::user_error(sprintf(_("Invalid HTML+: %s"), $exc->getMessage()));
       return $content;
     }
   }

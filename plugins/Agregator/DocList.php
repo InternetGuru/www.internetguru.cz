@@ -104,8 +104,8 @@ class DocList extends AgregatorList {
         if (Cms::isSuperUser()) {
           $vars[$file]["editlink"] = "<a href='?Admin=$file' title='$file' class='fa fa-edit'>"._("Edit")."</a>";
         }
-      } catch (Exception $e) {
-        Logger::critical($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::critical($exc->getMessage());
         continue;
       }
     }

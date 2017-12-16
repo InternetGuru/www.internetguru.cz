@@ -38,10 +38,10 @@ class XMLBuilder extends DOMBuilder {
       $adminDoc->load($fp);
       self::updateDOM($doc, $adminDoc);
       self::setNewestFileMtime(filemtime($fp));
-    } catch (NoFileException $e) {
+    } catch (NoFileException $exc) {
       // skip
-    } catch (Exception $e) {
-      Logger::error(sprintf(_("Unable load admin XML file %s: %s"), $fileName, $e->getMessage()));
+    } catch (Exception $exc) {
+      Logger::error(sprintf(_("Unable load admin XML file %s: %s"), $fileName, $exc->getMessage()));
     }
 
     if (!$user) {
@@ -54,10 +54,10 @@ class XMLBuilder extends DOMBuilder {
       $userDoc->load($fp);
       self::updateDOM($doc, $userDoc);
       self::setNewestFileMtime(filemtime($fp));
-    } catch (NoFileException $e) {
+    } catch (NoFileException $exc) {
       // skip
-    } catch (Exception $e) {
-      Logger::error(sprintf(_("Unable load user XML file %s: %s"), $fileName, $e->getMessage()));
+    } catch (Exception $exc) {
+      Logger::error(sprintf(_("Unable load user XML file %s: %s"), $fileName, $exc->getMessage()));
     }
 
     return $doc;

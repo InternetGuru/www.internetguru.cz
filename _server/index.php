@@ -24,10 +24,10 @@ try {
   }
   include($index);
 
-} catch (Exception $e) {
+} catch (Exception $exc) {
 
   http_response_code(500);
-  echo "Core fatal exception: ".$e->getMessage();
+  echo "Core fatal exception: ".$exc->getMessage();
 
 }
 

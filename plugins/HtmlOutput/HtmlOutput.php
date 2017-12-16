@@ -216,7 +216,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
           case "favicon":
             $this->favIcon = findFile($node->nodeValue);
         }
-      } catch (Exception $exception) {
+      } catch (Exception $exc) {
         Logger::user_warning(sprintf(_("File %s of type %s not found"), $node->nodeValue, $node->nodeName));
       }
     }
@@ -368,8 +368,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         }
         #todo: validate HTML5 validity
         $content = $newContent;
-      } catch (Exception $exception) {
-        Logger::user_error($exception->getMessage());
+      } catch (Exception $exc) {
+        Logger::user_error($exc->getMessage());
       }
     }
     return $content;
@@ -648,8 +648,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         return;
       }
       $this->insertTitle($e, $pLink["id"]);
-    } catch (Exception $exception) {
-      $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $exception->getMessage());
+    } catch (Exception $exc) {
+      $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $exc->getMessage());
       $e->stripAttr($aName, $message);
       if (is_null(Cms::getLoggedUser())) {
         return;
@@ -805,12 +805,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     try {
       list($targetWidth, $targetHeight) = $this->getImageDimensions($src);
-    } catch (Exception $exception) {
+    } catch (Exception $exc) {
       if (is_null(Cms::getLoggedUser())) {
         $img->stripElement();
         return;
       }
-      $message = sprintf(_("Attribute src=%s removed: %s"), $src, $exception->getMessage());
+      $message = sprintf(_("Attribute src=%s removed: %s"), $src, $exc->getMessage());
       $img->setAttribute('src', "/".LIB_DIR."/".NOT_FOUND_IMG_FILENAME);
       list($targetWidth, $targetHeight) = getimagesize(LIB_FOLDER."/".NOT_FOUND_IMG_FILENAME);
       $img->setAttribute("title", $message);
