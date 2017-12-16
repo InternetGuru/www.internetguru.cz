@@ -102,7 +102,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
-    $this->metaRobots = $this->getRobots($this->cfg)->getAttribute("meta");
+    $robots = $this->cfg->match_element("robots", "domain", HOST);
+    if (is_null($robots)) {
+      throw new Exception("Unable to match robots element to domain");
+    }
+    if (!$robots->hasAttribute("domain")) {
+      Logger::user_warning(_("Using default robots value (without domain match)"));
+    }
+    $this->metaRobots = $robots->getAttribute("meta");
     if (is_null($this->favIcon)) {
       $this->favIcon = findFile($this->pluginDir."/".self::FAVICON);
     }
@@ -455,32 +462,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
-  }
-
-  private static function getRobots (DOMDocumentPlus $cfg) {
-    $mrs = $cfg->getElementsByTagName("robots");
-    $lastMatch = null;
-    foreach ($mrs as $mr) {
-      if ($mr->hasAttribute("domain")) {
-        $d = $mr->getAttribute("domain");
-        if (!preg_match("/^[a-z0-9.*-]+$/", $d)) {
-          Logger::user_error(sprintf(_("Invalid attribute domain value '%s'"), $d));
-          continue;
-        }
-        $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $d);
-        if (!preg_match("/^$pattern$/", HOST)) {
-          continue;
-        }
-      }
-      $lastMatch = $mr;
-    }
-    if (is_null($lastMatch)) {
-      throw new Exception("Element 'robots' not found");
-    }
-    if (!$lastMatch->hasAttribute("domain")) {
-      Logger::user_warning(_("Using robots value with no domain match"));
-    }
-    return $lastMatch;
   }
 
   /**

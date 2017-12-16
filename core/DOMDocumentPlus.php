@@ -26,6 +26,25 @@ class DOMDocumentPlus extends DOMDocument {
     parent::registerNodeClass("DOMElement", "IGCMS\\Core\\DOMElementPlus");
   }
 
+  public function match_element ($eName, $aMatch, $to) {
+    $lastMatch = null;
+    foreach ($this->getElementsByTagName($eName) as $element) {
+      if ($element->hasAttribute($aMatch)) {
+        $d = $element->getAttribute($aMatch);
+        if (!preg_match("/^[a-z0-9.*-]+$/", $d)) {
+          Logger::user_error(sprintf(_("Invalid attribute %s value '%s'"), $aMatch, $d));
+          continue;
+        }
+        $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $d);
+        if (!preg_match("/^$pattern$/", $to)) {
+          continue;
+        }
+      }
+      $lastMatch = $element;
+    }
+    return $lastMatch;
+  }
+
   /**
    * @param string $name
    * @param string|null $value
