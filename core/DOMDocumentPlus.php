@@ -37,12 +37,12 @@ class DOMDocumentPlus extends DOMDocument {
     /** @var DOMElementPlus $element */
     foreach ($this->getElementsByTagName($eName) as $element) {
       if ($element->hasAttribute($aMatch)) {
-        $d = $element->getAttribute($aMatch);
-        if (!preg_match("/^[a-z0-9.*-]+$/", $d)) {
-          Logger::user_error(sprintf(_("Invalid attribute %s value '%s'"), $aMatch, $d));
+        $aValue = $element->getAttribute($aMatch);
+        if (!preg_match("/^[a-z0-9.*-]+$/", $aValue)) {
+          Logger::user_error(sprintf(_("Invalid attribute %s value '%s'"), $aMatch, $aValue));
           continue;
         }
-        $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $d);
+        $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $aValue);
         if (!preg_match("/^$pattern$/", $to)) {
           continue;
         }
@@ -75,6 +75,7 @@ class DOMDocumentPlus extends DOMDocument {
     if (!stream_resolve_include_path($filePath) || stream_resolve_include_path(dirname($filePath)."/.".basename($filePath))) {
       throw new NoFileException(_("File not found or disabled"));
     }
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (!@parent::load($filePath, $options)) {
       throw new Exception(_("Invalid XML file"));
     }
@@ -87,6 +88,7 @@ class DOMDocumentPlus extends DOMDocument {
    * @throws Exception
    */
   public function loadXML ($xml, $options = 0) {
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (!@parent::loadXML($xml, $options)) {
       throw new Exception(_("Invalid XML"));
     }
@@ -103,32 +105,34 @@ class DOMDocumentPlus extends DOMDocument {
     try {
       if (!is_null($eName)) {
         $element = null;
-        /** @var DOMElementPlus $e */
-        foreach ($this->getElementsByTagName($eName) as $e) {
-          if (!$e->hasAttribute($aName)) {
+        /** @var DOMElementPlus $candidate */
+        foreach ($this->getElementsByTagName($eName) as $candidate) {
+          if (!$candidate->hasAttribute($aName)) {
             continue;
           }
-          if ($e->getAttribute($aName) != $id) {
+          if ($candidate->getAttribute($aName) != $id) {
             continue;
           }
           if (!is_null($element)) {
             throw new Exception();
           }
-          $element = $e;
+          $element = $candidate;
         }
         return $element;
-      } else {
-        $xpath = new DOMXPath($this);
-        $q = $xpath->query("//*[@$aName='$id']");
-        if ($q->length == 0) {
-          return null;
-        }
-        if ($q->length > 1) {
-          throw new Exception();
-        }
-        return $q->item(0);
       }
-    } catch (Exception $e) {
+      $xpath = new DOMXPath($this);
+      /** @var \DOMNodeList $candidate */
+      $candidate = $xpath->query("//*[@$aName='$id']");
+      if ($candidate->length == 0) {
+        return null;
+      }
+      if ($candidate->length > 1) {
+        throw new Exception();
+      }
+      /** @var DOMElementPlus $element */
+      $element = $candidate->item(0);
+      return $element;
+    } catch (Exception $candidate) {
       throw new Exception(sprintf(_("Duplicit %s found for value '%s'"), $aName, $id));
     }
   }
@@ -140,7 +144,7 @@ class DOMDocumentPlus extends DOMDocument {
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
   public function processVariables (Array $variables, $ignore = []) {
-    return $this->elementProcessVariables($variables, $ignore, $this->documentElement, true);
+    return $this->elementProcessVars($variables, $ignore, $this->documentElement, true);
   }
 
   /**
@@ -151,14 +155,16 @@ class DOMDocumentPlus extends DOMDocument {
    * @param bool $deep
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
-  public function elementProcessVariables (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
+  public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
     $toRemove = [];
-    $res = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
-    if (is_null($res) || !$res->isSameNode($element)) {
+    $result = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
+    if (is_null($result) || !$result->isSameNode($element)) {
       $toRemove[] = $element;
     }
-    foreach ($toRemove as $e) $e->emptyRecursive();
-    return $res;
+    foreach ($toRemove as $eToRemove) {
+      $eToRemove->emptyRecursive();
+    }
+    return $result;
   }
 
   /**
@@ -171,14 +177,14 @@ class DOMDocumentPlus extends DOMDocument {
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
   private function doProcessVariables (Array $variables, $ignore, DOMElementPlus $element, $deep, Array &$toRemove) {
-    $res = $element;
+    $result = $element;
     $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : [];
-    foreach ($element->getVariables("var", $ignoreAttr) as list($vName, $aName, $var)) {
+    foreach ($element->getVariables("var", $ignoreAttr) as list($vName, $aName, $vValue)) {
       if (!isset($variables[$vName])) {
         continue;
       }
       try {
-        $element->removeAttrVal("var", $var);
+        $element->removeAttrVal("var", $vValue);
         if (!is_null($variables[$vName]) && !count($variables[$vName])) {
           if (!is_null($aName)) {
             $element->removeAttribute($aName);
@@ -186,30 +192,30 @@ class DOMDocumentPlus extends DOMDocument {
             return null;
           }
         }
-        $res = $this->insertVariable($element, $variables[$vName], $aName);
+        $result = $this->insertVariable($element, $variables[$vName], $aName);
         if ($aName == "var") {
           if (++$element->varRecursionLevel >= DOMElementPlus::MAX_VAR_RECURSION_LEVEL) {
             throw new Exception(_("Max variable recursion level exceeded"));
           }
-          $res = $this->doProcessVariables($variables, $ignore, $element, false, $toRemove);
+          $result = $this->doProcessVariables($variables, $ignore, $element, false, $toRemove);
         }
-      } catch (Exception $e) {
-        Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $e->getMessage()));
+      } catch (Exception $exception) {
+        Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $exception->getMessage()));
       }
     }
-    /** @var DOMElementPlus $e */
     if ($deep) {
-      foreach ($element->childNodes as $e) {
-        if ($e->nodeType != XML_ELEMENT_NODE) {
+      /** @var DOMElementPlus $element */
+      foreach ($element->childNodes as $element) {
+        if ($element->nodeType != XML_ELEMENT_NODE) {
           continue;
         }
-        $r = $this->doProcessVariables($variables, $ignore, $e, $deep, $toRemove);
-        if (is_null($r) || !$e->isSameNode($r)) {
-          $toRemove[] = $e;
+        $deepResult = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
+        if (is_null($deepResult) || !$element->isSameNode($deepResult)) {
+          $toRemove[] = $element;
         }
       }
     }
-    return $res;
+    return $result;
   }
 
   /**
@@ -228,6 +234,7 @@ class DOMDocumentPlus extends DOMDocument {
       case "NULL":
         return $element;
       case "integer":
+      /** @noinspection PhpMissingBreakStatementInspection */
       case "boolean":
         $value = (string) $value;
       case "string":
@@ -256,13 +263,15 @@ class DOMDocumentPlus extends DOMDocument {
   public function processFunctions (Array $functions, $ignore = []) {
     $xpath = new DOMXPath($this);
     $elements = [];
-    foreach ($xpath->query("//*[@fn]") as $e) $elements[] = $e;
-    /** @var DOMElementPlus $e */
-    foreach (array_reverse($elements) as $e) {
-      if (isset($ignore[$e->nodeName])) {
-        $e->processFunctions($functions, $ignore[$e->nodeName]);
+    foreach ($xpath->query("//*[@fn]") as $element) {
+      $elements[] = $element;
+    }
+    /** @var DOMElementPlus $element */
+    foreach (array_reverse($elements) as $element) {
+      if (isset($ignore[$element->nodeName])) {
+        $element->processFunctions($functions, $ignore[$element->nodeName]);
       } else {
-        $e->processFunctions($functions, []);
+        $element->processFunctions($functions, []);
       }
     }
   }
@@ -274,9 +283,11 @@ class DOMDocumentPlus extends DOMDocument {
   public function removeNodes ($query) {
     $xpath = new DOMXPath($this);
     $toRemove = [];
-    foreach ($xpath->query($query) as $n) $toRemove[] = $n;
-    foreach ($toRemove as $n) {
-      $n->stripElement(_("Readonly element hidden"));
+    foreach ($xpath->query($query) as $node) {
+      $toRemove[] = $node;
+    }
+    foreach ($toRemove as $node) {
+      $node->stripElement(_("Readonly element hidden"));
     }
     return count($toRemove);
   }
@@ -298,13 +309,13 @@ class DOMDocumentPlus extends DOMDocument {
       if (!$docToValidate->relaxNGValidate($f)) {
         throw new Exception(_("relaxNGValidate() internal error occurred"));
       }
-    } catch (Exception $e) {
+    } catch (Exception $exception) {
       $internal_errors = libxml_get_errors();
       if (count($internal_errors)) {
         $note = " ["._("Caution: this message may be misleading")."]";
         throw new Exception(current($internal_errors)->message.$note);
       }
-      throw $e;
+      throw $exception;
     } finally {
       libxml_clear_errors();
       libxml_use_internal_errors(false);

@@ -86,7 +86,7 @@ class DOMElementPlus extends DOMElement {
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
   public function processVariables (Array $variables, $ignore = [], $deep = false) {
-    return $this->ownerDocument->elementProcessVariables($variables, $ignore, $this, $deep);
+    return $this->ownerDocument->elementProcessVars($variables, $ignore, $this, $deep);
   }
 
   /**
