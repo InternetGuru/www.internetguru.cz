@@ -250,8 +250,8 @@ class HTMLPlus extends DOMDocumentPlus {
       } else {
         $s = ["&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;"];
         $r = ['"', '"', '"', "'", "'"];
-        $v = str_replace($s, $r, translateUtf8Entities($v, true));
-        $newNode = $this->createElement("code", translateUtf8Entities($v));
+        $v = str_replace($s, $r, to_utf8($v, true));
+        $newNode = $this->createElement("code", to_utf8($v));
         if (preg_match("/<code ([a-z]+)>/", $defaultValue, $match)) {
           $newNode->setAttribute("class", $match[1]);
         }
@@ -265,7 +265,7 @@ class HTMLPlus extends DOMDocumentPlus {
    */
   private function parseSyntaxCode (DOMElementPlus $n) {
     $pat = "/(?:&lsquo;|&rsquo;|'){2}(.+?)(?:&lsquo;|&rsquo;|'){2}/";
-    $src = translateUtf8Entities($n->nodeValue, true);
+    $src = to_utf8($n->nodeValue, true);
     $p = preg_split($pat, $src, -1, PREG_SPLIT_DELIM_CAPTURE);
     if (count($p) < 2) {
       return;
@@ -278,7 +278,7 @@ class HTMLPlus extends DOMDocumentPlus {
         $s = ["&bdquo;", "&ldquo;", "&rdquo;", "&lsquo;", "&rsquo;"];
         $r = ['"', '"', '"', "'", "'"];
         $v = str_replace($s, $r, $v);
-        $newNode = $this->createElement("code", translateUtf8Entities($v));
+        $newNode = $this->createElement("code", to_utf8($v));
         $n->appendChild($newNode);
       }
     }
@@ -740,7 +740,7 @@ class HTMLPlus extends DOMDocumentPlus {
       $message = null;
       if (!strlen($id)) {
         $message = sprintf(_("Heading attribute id empty or missing: %s"), $h->nodeValue);
-      } elseif (!isValidId($id)) {
+      } elseif (!is_valid_id($id)) {
         $message = sprintf(_("Invalid heading attribute id '%s'"), $id);
       } elseif (array_key_exists($id, $hIds)) {
         $message = sprintf(_("Duplicit heading attribute id '%s'"), $id);

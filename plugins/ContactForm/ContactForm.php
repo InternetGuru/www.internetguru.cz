@@ -165,7 +165,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $formId = $htmlForm->getAttribute("id");
     $htmlForm->removeAllAttributes(["id", "class"]);
     $htmlForm->setAttribute("method", "post");
-    $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(getCurLink()));
+    $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(get_link()));
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
     return $doc;
@@ -355,10 +355,10 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       }
       $variables = array_merge($this->formValues, Cms::getAllVariables());
       foreach ($this->formVars as $k => $v) {
-        $this->formVars[$k] = replaceVariables($v, $variables);
+        $this->formVars[$k] = replace_vars($v, $variables);
       }
       if (array_key_exists($formIdToSend, $this->messages) && strlen($this->messages[$formIdToSend])) {
-        $msg = replaceVariables($this->messages[$formIdToSend], $variables);
+        $msg = replace_vars($this->messages[$formIdToSend], $variables);
       } else {
         $msg = $this->createMessage();
       }
@@ -454,7 +454,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       $bcc = "";
       $this->sendMail($email, $name, $adminaddr, $adminname, $msg, $bcc);
     }
-    redirTo(buildLocalUrl(["path" => getCurLink(), "query" => "cfok=".$formIdToSend]));
+    redir_to(build_local_url(["path" => get_link(), "query" => "cfok=".$formIdToSend]));
   }
 
   /**

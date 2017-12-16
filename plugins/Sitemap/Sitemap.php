@@ -89,7 +89,7 @@ class Sitemap extends Plugin implements SplObserver {
         continue;
       }
       $file = HTMLPlusBuilder::getIdToFile($id);
-      $mtime = timestamptToW3C(HTMLPlusBuilder::getFileToMtime($file));
+      $mtime = w3c_timestamp(HTMLPlusBuilder::getFileToMtime($file));
       $links[$link] = $mtime;
     }
     return $links;

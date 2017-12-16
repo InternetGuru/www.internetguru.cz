@@ -116,7 +116,7 @@ class Logger {
    * @param array $arguments
    */
   public static function __callStatic ($methodName, $arguments) {
-    validate_callStatic($methodName, $arguments, self::$levels, 1);
+    validate_callstatic($methodName, $arguments, self::$levels, 1);
     $type = self::TYPE_SYS_LOG;
     if (strpos($methodName, "user_") === 0) {
       $methodName = substr($methodName, strlen("user_"));

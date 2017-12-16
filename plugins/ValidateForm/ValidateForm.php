@@ -379,7 +379,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     if ($time == 0) {
       return;
     }
-    $IP = getIP();
+    $IP = get_ip();
     $IPFile = str_replace(":", "-", $IP);
     $IPFilePath = USER_FOLDER."/".$this->pluginDir."/$IPFile";
     $bannedIPFilePath = USER_FOLDER."/".$this->pluginDir."/.$IPFile";

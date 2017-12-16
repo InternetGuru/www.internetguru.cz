@@ -13,5 +13,3 @@ interface FinalContentStrategyInterface {
    */
   public function getContent (DOMDocumentPlus $content);
 }
-
-?>

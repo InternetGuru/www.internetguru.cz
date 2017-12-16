@@ -48,9 +48,9 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
    */
   private function generateBc () {
     #var_dump(HTMLPlusBuilder::getLinkToId());
-    $parentId = HTMLPlusBuilder::getLinkToId(getCurLink());
+    $parentId = HTMLPlusBuilder::getLinkToId(get_link());
     if (is_null($parentId)) {
-      throw new Exception(sprintf(_("Link %s not found"), getCurLink()));
+      throw new Exception(sprintf(_("Link %s not found"), get_link()));
     }
     $bcLang = HTMLPlusBuilder::getIdToLang($parentId);
     $path = [];
@@ -77,17 +77,17 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       $a = $bc->createElement("a");
       $li->appendChild($a);
       $pLink["path"] = HTMLPlusBuilder::getIdToLink($id);
-      addPermParams($pLink);
-      if (implodeLink($pLink) != getCurLink(true)) {
+      add_perm_param($pLink);
+      if (implode_link($pLink) != get_link(true)) {
         $a->setAttribute("href", $id);
-        if ($pLink["path"] == getCurLink()) {
+        if ($pLink["path"] == get_link()) {
           $a->setAttribute("title", $this->vars["reset"]->nodeValue);
         }
       }
-      $aValue = HTMLPlusBuilder::getHeading($id, !strlen(getCurLink()));
+      $aValue = HTMLPlusBuilder::getHeading($id, !strlen(get_link()));
       if (empty($title) && array_key_exists("logo", $this->vars)) {
         $this->insertLogo($this->vars["logo"], $a, $id);
-        if (!strlen(getCurLink())) {
+        if (!strlen(get_link())) {
           $a->parentNode->appendChild($bc->createElement("span", $aValue));
         }
       } else {

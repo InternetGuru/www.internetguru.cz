@@ -636,15 +636,15 @@ class DOMElementPlus extends DOMElement {
    */
   private function getValidId () {
     $validId = normalize($this->getAttribute("name"));
-    if (isValidId($validId)) {
+    if (is_valid_id($validId)) {
       return $validId;
     }
     $validId = normalize($this->getAttribute("short"));
-    if (isValidId($validId)) {
+    if (is_valid_id($validId)) {
       return $validId;
     }
     $validId = normalize($this->nodeValue);
-    if (isValidId($validId)) {
+    if (is_valid_id($validId)) {
       return $validId;
     }
     return $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);

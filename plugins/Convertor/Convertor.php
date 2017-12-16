@@ -92,7 +92,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
     $f = $this->getFile($fileUrl);
     $this->docName = pathinfo($f, PATHINFO_FILENAME);
-    $mime = getFileMime($this->tmpFolder."/$f");
+    $mime = get_mime($this->tmpFolder."/$f");
     switch ($mime) {
       case "application/zip":
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
@@ -238,13 +238,13 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     $fp = lock_file($dest);
     try {
       try {
-        file_put_contents_plus($dest, $this->html);
+        fput_contents($dest, $this->html);
       } catch (Exception $exc) {
         throw new Exception(sprintf(_("Unable to save file %s: %s"), $this->file, $exc->getMessage()));
       }
       try {
         if (is_file("$dest.old")) {
-          incrementalRename("$dest.old", "$dest.");
+          rename_incr("$dest.old", "$dest.");
         }
       } catch (Exception $exc) {
         throw new Exception(sprintf(_("Unable to backup file %s: %s"), $this->file, $exc->getMessage()));
@@ -274,7 +274,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     foreach ($varFiles as $varName => $p) {
       $fileSuffix = pathinfo($p, PATHINFO_BASENAME);
       $file = $f."_$fileSuffix";
-      $xml = readZippedFile($f, $p);
+      $xml = read_zip($f, $p);
       if (is_null($xml)) {
         continue;
       }
@@ -285,7 +285,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
       $variables[$varName] = str_replace("\\", '/', realpath($file));
     }
     $wordDoc = "word/document.xml";
-    $xml = readZippedFile($f, $wordDoc);
+    $xml = read_zip($f, $wordDoc);
     if (is_null($xml)) {
       throw new Exception(sprintf(_("Unable to locate '%s' in '%s'"), "word/document.xml", $f));
     }

@@ -124,7 +124,7 @@ class AgregatorList {
     if (strlen($this->wrapper)) {
       /** @var DOMElementPlus $root */
       $root = $root->appendChild($doc->createElement($this->wrapper));
-      $root->setAttribute("class", "agregator ".strtolower(getCallerClass(2))." ".$this->id);
+      $root->setAttribute("class", "agregator ".strtolower(get_caller_class(2))." ".$this->id);
     }
     $i = 0;
     foreach ($vars as $k => $v) {

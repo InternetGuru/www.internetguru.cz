@@ -215,7 +215,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    * @return HTMLPlus
    */
   private function strip (HTMLPlus $content) {
-    $link = basename(getCurLink());
+    $link = basename(get_link());
     if ($this->isRoot($link)) {
       return $content;
     }
@@ -223,7 +223,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     if (is_null($h1)) {
       // Redirect encoded # (%23) in url to decoded url
       if (strpos($link, "#") != -1) {
-        redirTo($link);
+        redir_to($link);
       }
       new ErrorPage(_("Unable to find requested section"), 500);
     }

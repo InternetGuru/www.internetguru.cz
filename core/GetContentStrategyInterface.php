@@ -13,5 +13,3 @@ interface GetContentStrategyInterface {
    */
   public function getContent ();
 }
-
-?>

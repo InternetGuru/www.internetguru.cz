@@ -65,7 +65,7 @@ class Cms {
    * @throws Exception
    */
   public static function __callStatic ($methodName, $arguments) {
-    validate_callStatic($methodName, $arguments, self::getTypes(), 1);
+    validate_callstatic($methodName, $arguments, self::getTypes(), 1);
     self::addMessage($methodName, $arguments[0]);
   }
 
@@ -276,16 +276,16 @@ class Cms {
     self::setVariable("lang", HTMLPlusBuilder::getIdToLang($fileId));
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
-    self::setVariable("cache_nginx", getCurLink()."?".CACHE_PARAM."=".CACHE_NGINX);
-    self::setVariable("cache_ignore", getCurLink()."?".CACHE_PARAM."=".CACHE_IGNORE);
-    self::setVariable("link", "/".getCurLink());
+    self::setVariable("cache_nginx", get_link()."?".CACHE_PARAM."=".CACHE_NGINX);
+    self::setVariable("cache_ignore", get_link()."?".CACHE_PARAM."=".CACHE_IGNORE);
+    self::setVariable("link", "/".get_link());
     self::setVariable(
       "url_debug_on",
-      getCurLink()."/?".PAGESPEED_PARAM."=".PAGESPEED_OFF."&".DEBUG_PARAM."=".DEBUG_ON."&".CACHE_PARAM
+      get_link()."/?".PAGESPEED_PARAM."=".PAGESPEED_OFF."&".DEBUG_PARAM."=".DEBUG_ON."&".CACHE_PARAM
       ."=".CACHE_IGNORE
     );
     if (isset($_GET[PAGESPEED_PARAM]) || isset($_GET[DEBUG_PARAM]) || isset($_GET[CACHE_PARAM])) {
-      self::setVariable("url_debug_off", getCurLink()."/?".PAGESPEED_PARAM."&".DEBUG_PARAM."&".CACHE_PARAM);
+      self::setVariable("url_debug_off", get_link()."/?".PAGESPEED_PARAM."&".DEBUG_PARAM."&".CACHE_PARAM);
     }
     if (isset($_GET[PAGESPEED_PARAM])) {
       self::setVariable(PAGESPEED_PARAM, $_GET[PAGESPEED_PARAM]);
@@ -358,7 +358,7 @@ class Cms {
       }
     }
     if (self::getLoggedUser() != SERVER_USER) {
-      self::setVariable("mtime", timestamptToW3C(HTMLPlusBuilder::getNewestFileMtime()));
+      self::setVariable("mtime", w3c_timestamp(HTMLPlusBuilder::getNewestFileMtime()));
     }
     return $content;
   }
@@ -392,7 +392,7 @@ class Cms {
     if (!stream_resolve_include_path(PROTECTED_FILE) && (SCRIPT_NAME == INDEX_PHP || SCRIPT_NAME == FINDEX_PHP)) {
       return;
     }
-    loginRedir();
+    login_redir();
   }
 
   /**

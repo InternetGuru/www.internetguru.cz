@@ -59,7 +59,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     $cfg = self::getXML();
     self::httpsRedir();
     self::cfgRedir($cfg);
-    if (getCurLink() == "") {
+    if (get_link() == "") {
       $subject->detach($this);
       return;
     }
@@ -75,7 +75,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     if (SCHEME == "https" && !is_null(Cms::getLoggedUser())) {
       return;
     }
-    redirTo("$protocol://".HOST.$_SERVER["REQUEST_URI"]);
+    redir_to("$protocol://".HOST.$_SERVER["REQUEST_URI"]);
   }
 
   /**
@@ -100,7 +100,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
 
   private static function proceed () {
     $links = array_keys(HTMLPlusBuilder::getLinkToId());
-    $path = getCurLink();
+    $path = get_link();
     if (!HTMLPlusBuilder::isLink($path)) {
       $path = normalize($path, "a-zA-Z0-9/_-");
       if (self::DEBUG) {
@@ -117,13 +117,13 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     } elseif ($path == $links[0]) {
       $path = "";
     }
-    if ($path == getCurLink()) {
+    if ($path == get_link()) {
       return;
     }
     if (self::DEBUG) {
       die("Redirecting to '$path'");
     }
-    redirTo(buildLocalUrl(["path" => $path, "query" => getCurQuery()]), 303);
+    redir_to(build_local_url(["path" => $path, "query" => get_query()]), 303);
   }
 
   /**
@@ -306,7 +306,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
   private static function redir (DOMElementPlus $redir) {
-    if ($redir->hasAttribute("link") && $redir->getAttribute("link") != getCurLink()) {
+    if ($redir->hasAttribute("link") && $redir->getAttribute("link") != get_link()) {
       return;
     }
     $pNam = $redir->hasAttribute("parName") ? $redir->getAttribute("parName") : null;
@@ -316,25 +316,25 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     }
     try {
       if ($redir->nodeValue == "/") {
-        redirTo(["path" => ""]);
+        redir_to(["path" => ""]);
       }
-      $pLink = parseLocalLink($redir->nodeValue);
+      $pLink = parse_local_link($redir->nodeValue);
       if (is_null($pLink)) {
-        redirTo($redir->nodeValue);
+        redir_to($redir->nodeValue);
       } // external redir
       $silent = !isset($pLink["path"]);
       if ($silent) {
-        $pLink["path"] = getCurLink();
+        $pLink["path"] = get_link();
       } // no path = keep current path
       if (strpos($redir->nodeValue, "?") === false) {
-        $pLink["query"] = getCurQuery();
+        $pLink["query"] = get_query();
       } // no query = keep current query
       #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
       try {
         # TODO
         #$pLink = DOMBuilder::normalizeLink($pLink);
         #todo: configurable status code
-        redirTo(buildLocalUrl($pLink));
+        redir_to(build_local_url($pLink));
       } catch (Exception $exc) {
         if (!$silent) {
           throw $exc;
@@ -351,7 +351,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    * @return bool
    */
   private static function queryMatch ($pNam, $pVal) {
-    foreach (explode("&", getCurQuery()) as $q) {
+    foreach (explode("&", get_query()) as $q) {
       if (is_null($pVal) && strpos("$q=", "$pNam=") === 0) {
         return true;
       }

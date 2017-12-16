@@ -60,7 +60,7 @@ class ImgList extends AgregatorList {
       if (is_dir($fullFilePath)) {
         continue;
       }
-      $mimeType = getFileMime($fullFilePath);
+      $mimeType = get_mime($fullFilePath);
       if ($mimeType != "image/svg+xml" && strpos($mimeType, "image/") !== 0) {
         continue;
       }

@@ -158,7 +158,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
    * @param string $fName
    */
   private function redirTo ($fName) {
-    redirTo(buildLocalUrl(["path" => getCurLink(), "query" => $this->className."=$fName"]));
+    redir_to(build_local_url(["path" => get_link(), "query" => $this->className."=$fName"]));
   }
 
   /**
@@ -169,7 +169,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     if (substr($file, -4) != ".zip") {
       return file_get_contents($file);
     } else {
-      return readZippedFile($file, substr(pathinfo($file, PATHINFO_BASENAME), 0, -4));
+      return read_zip($file, substr(pathinfo($file, PATHINFO_BASENAME), 0, -4));
     }
   }
 
@@ -180,7 +180,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
   private function makeLink (Array $array) {
     $links = [];
     foreach ($array as $name => $path) {
-      $links[] = "<a href='".getCurLink()."?".$this->className."=$name'>$name</a>";
+      $links[] = "<a href='".get_link()."?".$this->className."=$name'>$name</a>";
     }
     return $links;
   }

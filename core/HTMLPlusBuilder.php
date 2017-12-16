@@ -236,7 +236,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     foreach ($fileCache["fileToMtime"] as $file => $mtime) {
       try {
-        if ($mtime == filemtime(findFile($file))) {
+        if ($mtime == filemtime(find_file($file))) {
           continue;
         }
       } catch (Exception $exc) {
@@ -328,7 +328,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    */
   private static function load ($filePath, $user = true, $admin = true) {
     $doc = new HTMLPlus();
-    $fp = findFile($filePath, $user, $admin);
+    $fp = find_file($filePath, $user, $admin);
     try {
       $doc->load($fp);
       self::validateHtml($doc, $fp, $filePath, false);
@@ -365,7 +365,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     Logger::user_notice(sprintf($msg, $filePath, count($doc->getErrors())));
     if (AUTOCORRECT) {
-      incrementalRename($fileRealPath);
+      rename_incr($fileRealPath);
       file_put_contents($fileRealPath, $doc->saveXML());
       return;
     }
@@ -427,7 +427,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     if (pathinfo($src, PATHINFO_EXTENSION) != "html") {
       throw new Exception(sprintf(_("Included file '%s' extension must be .html"), $src));
     }
-    $file = findFile("$workingDir/$src");
+    $file = find_file("$workingDir/$src");
     if ($workingDir == ".") {
       return $src;
     }
@@ -561,7 +561,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @return string|null
    */
   public static function getCurFile () {
-    return self::getIdToFile(self::getLinkToId(getCurLink()));
+    return self::getIdToFile(self::getLinkToId(get_link()));
   }
 
   /**

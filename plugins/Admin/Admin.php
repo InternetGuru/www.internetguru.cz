@@ -152,11 +152,11 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     if (!$this->redir) {
       return;
     }
-    $pLink["path"] = getCurLink();
+    $pLink["path"] = get_link();
     if (!isset($_POST["saveandgo"])) {
       $pLink["query"] = $this->className."=".$_POST["filename"];
     }
-    redirTo(buildLocalUrl($pLink, true));
+    redir_to(build_local_url($pLink, true));
   }
 
   /**
@@ -213,10 +213,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->defaultFile = $this->getFilepath($fileName);
     $fLink = HTMLPlusBuilder::getIdToLink(HTMLPlusBuilder::getFileToId($this->defaultFile));
     if (is_null($fLink)) {
-      $fLink = getCurLink();
+      $fLink = get_link();
     }
-    if ($this->defaultFile != $fileName || $fLink != getCurLink()) {
-      redirTo(buildLocalUrl(["path" => $fLink, "query" => $this->className."=".$this->defaultFile]));
+    if ($this->defaultFile != $fileName || $fLink != get_link()) {
+      redir_to(build_local_url(["path" => $fLink, "query" => $this->className."=".$this->defaultFile]));
     }
     $this->type = pathinfo($this->defaultFile, PATHINFO_EXTENSION);
     if (!in_array($this->type, $this->allowedTypes)) {
@@ -232,16 +232,16 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
    */
   private function getFilepath ($f) {
     if (!strlen($f)) {
-      if (getCurLink() == "") {
+      if (get_link() == "") {
         return INDEX_HTML;
       }
-      $path = HTMLPlusBuilder::getIdToFile(HTMLPlusBuilder::getLinkToId(getCurLink()));
+      $path = HTMLPlusBuilder::getIdToFile(HTMLPlusBuilder::getLinkToId(get_link()));
       if (!is_null($path)) {
         return $path;
       }
       return INDEX_HTML;
     }
-    $f = stripDataFolder($f);
+    $f = strip_data_dir($f);
     if (preg_match('~^[\w-]+$~', $f)) {
       $pluginFile = PLUGINS_DIR."/$f/$f.xml";
       if (is_file(CMS_FOLDER."/$pluginFile")) {
@@ -326,9 +326,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
    */
   private function getDataFileHash () {
     if (is_file($this->dataFile)) {
-      return getFileHash($this->dataFile);
+      return file_hash($this->dataFile);
     }
-    return getFileHash($this->dataFileDisabled);
+    return file_hash($this->dataFileDisabled);
   }
 
   /**
@@ -361,7 +361,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   private function processXml () {
     // get default schema
     try {
-      $df = findFile($this->defaultFile, false);
+      $df = find_file($this->defaultFile, false);
       $this->scheme = $this->getScheme($df);
     } catch (Exception $exc) {
       $df = false;
@@ -441,7 +441,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return $scheme;
     }
     try {
-      $scheme = findFile($m[1], false, false);
+      $scheme = find_file($m[1], false, false);
     } catch (Exception $exc) {
       throw new Exception(sprintf(_("Schema file '%s' not found"), $scheme));
     }
@@ -500,13 +500,13 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
             throw new Exception(_("Unable to enable destination file"));
           }
         }
-        file_put_contents_plus($this->destFile, $this->contentValue);
+        fput_contents($this->destFile, $this->contentValue);
       } catch (Exception $exc) {
         throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $exc->getMessage()));
       }
       try {
         if (is_file($this->destFile.".old")) {
-          incrementalRename($this->destFile.".old", $this->destFile.".");
+          rename_incr($this->destFile.".old", $this->destFile.".");
         }
       } catch (Exception $exc) {
         throw new Exception(sprintf(_("Unable to backup %s: %s"), $_POST["filename"], $exc->getMessage()));
@@ -520,11 +520,11 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
 
   private function clearResCache () {
     if ($this->isResource($this->type)) {
-      $resFile = getRealResDir($this->defaultFile);
+      $resFile = get_real_resdir($this->defaultFile);
       if (is_file($resFile)) {
         unlink($resFile);
       }
-      if (getRealResDir() != RESOURCES_DIR) {
+      if (get_real_resdir() != RESOURCES_DIR) {
         return;
       }
       if (is_file($this->defaultFile)) {
@@ -538,7 +538,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->clearResCache();
     #if(isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON) return;
     try {
-      clearNginxCache();
+      clear_nginx();
     } catch (Exception $exc) {
       Logger::critical($exc->getMessage());
     }
@@ -554,14 +554,14 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     if (!is_file($this->dataFile)) {
       return;
     }
-    if (!is_file(getRealResDir($this->defaultFile))
-      || isUptodate($this->dataFile, getRealResDir($this->defaultFile))
+    if (!is_file(get_real_resdir($this->defaultFile))
+      || is_uptodate($this->dataFile, get_real_resdir($this->defaultFile))
     ) {
-      if (getRealResDir() != RESOURCES_DIR) {
+      if (get_real_resdir() != RESOURCES_DIR) {
         return;
       }
       if (!is_file($this->defaultFile)
-        || isUptodate($this->dataFile, $this->defaultFile)
+        || is_uptodate($this->dataFile, $this->defaultFile)
       ) {
         return;
       }
@@ -608,7 +608,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
           $dd->nodeValue = gettype($value);
           continue 2;
       }
-      $dd->appendChild($doc->createElement("samp", getShortString($value)));
+      $dd->appendChild($doc->createElement("samp", shorten($value)));
     }
     Cms::setVariable("varlist", $varListVar);
   }
@@ -678,7 +678,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     } else {
       $this->title = $vars["heading"];
     }
-    $vars["link"] = getCurLink();
+    $vars["link"] = get_link();
     $vars["linkadmin"] = $la;
     if ($this->contentValue !== "") {
       $vars["content"] = htmlspecialchars($this->contentValue);
@@ -725,7 +725,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return null;
     }
     try {
-      $df = findFile($this->defaultFile, $user, true);
+      $df = find_file($this->defaultFile, $user, true);
     } catch (Exception $exc) {
       return null;
     }

@@ -79,13 +79,13 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
       $this->validateConfigCache();
       $this->loadVariables();
       // after submitting form delete cookies
-      if (getCurLink(true) == $this->vars['formpage']."?cfok=".$this->vars['formid']) {
+      if (get_link(true) == $this->vars['formpage']."?cfok=".$this->vars['formid']) {
         $this->removeBasketCookies();
       }
       // delete basket
       if (isset($_GET["btdel"])) {
         $this->removeBasketCookies();
-        redirTo(buildLocalUrl(['path' => getCurLink(), 'query' => 'btdelok'], true));
+        redir_to(build_local_url(['path' => get_link(), 'query' => 'btdelok'], true));
       }
       $this->products = $this->loadProducts();
       if (!count($this->products)) {
@@ -97,7 +97,7 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
       // create product variables
       $this->createProductVars();
       // fill order form
-      if (getCurLink() == $this->vars['formpage']) {
+      if (get_link() == $this->vars['formpage']) {
         $this->createFormVar();
       }
       // create basket var
@@ -110,9 +110,9 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
   }
 
   private function validateConfigCache () {
-    $userConfig = findFile($this->pluginDir."/".$this->className.".xml");
-    $adminConfig = findFile($this->pluginDir."/".$this->className.".xml", false);
-    $defaultConfig = findFile($this->pluginDir."/".$this->className.".xml", false, false);
+    $userConfig = find_file($this->pluginDir."/".$this->className.".xml");
+    $adminConfig = find_file($this->pluginDir."/".$this->className.".xml", false);
+    $defaultConfig = find_file($this->pluginDir."/".$this->className.".xml", false, false);
     $mtimes = filemtime($userConfig).filemtime($adminConfig).filemtime($defaultConfig);
     $cacheKey = apc_get_key(__FUNCTION__);
     if (!apc_is_valid_cache($cacheKey, $mtimes)) {
@@ -258,7 +258,7 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
    * @param DOMDocumentPlus $doc
    */
   private function insertAction (DOMDocumentPlus $doc) {
-    $var = ["action" => getCurLink(true) == "" ? "/" : getCurLink(true)];
+    $var = ["action" => get_link(true) == "" ? "/" : get_link(true)];
     $doc->processVariables($var, []);
   }
 
@@ -299,14 +299,14 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
           'summary-ammount' => $value,
         ]
       );
-      $summary .= replaceVariables($summaryProduct, $vars)."\n";
+      $summary .= replace_vars($summaryProduct, $vars)."\n";
       $p = gettype($product['price']) == 'object' ? $product['price']->documentElement->nodeValue : $product['price'];
       $price = (int) $price + (int) $p * (int) $value;
     }
     if (strlen($summary)) {
       $summary .= "$summarySeparator\n";
       if (!is_null($price)) {
-        $summary .= replaceVariables(
+        $summary .= replace_vars(
             $summaryTotal,
             ['summary-total' => (string) $price, 'currency' => $this->vars['currency']]
           )."\n";
@@ -316,7 +316,7 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
   }
 
   private function createBasketVar () {
-    if (getCurLink() == $this->vars['formpage']) {
+    if (get_link() == $this->vars['formpage']) {
       return;
     }
     $vars = array_merge(
@@ -363,7 +363,7 @@ class Basket extends Plugin implements SplObserver, ModifyContentStrategyInterfa
       $cnt += (int) ($_COOKIE[$id]);
     }
     setcookie($id, $cnt, time() + (86400 * 30), "/"); // 30 days
-    redirTo(buildLocalUrl(['path' => getCurLink(), 'query' => 'btok='.$_POST['id']], true));
+    redir_to(build_local_url(['path' => get_link(), 'query' => 'btok='.$_POST['id']], true));
   }
 
 }

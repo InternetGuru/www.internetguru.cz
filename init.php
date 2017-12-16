@@ -110,13 +110,17 @@ if (is_null(ADMIN_ID)) {
 }
 require_once(CORE_FOLDER.'/globals.php');
 if (isset($_GET["login"]) && SCHEME == "http") {
-  loginRedir();
+  login_redir();
 }
 if (update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
   || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)
 ) {
-  redirTo($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
+  redir_to($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }
-initDirs();
-
-?>
+$dirs = [
+  USER_FOLDER, LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER,
+  LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR, VENDOR_DIR,
+];
+foreach ($dirs as $dir) {
+  mkdir_plus($dir);
+}

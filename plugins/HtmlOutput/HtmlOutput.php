@@ -113,7 +113,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->metaRobots = $robots->getAttribute("meta");
     if (is_null($this->favIcon)) {
-      $this->favIcon = findFile($this->pluginDir."/".self::FAVICON);
+      $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
     }
   }
 
@@ -214,7 +214,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
             $this->addCssFile($node->nodeValue, $media, self::DEFAULT_PRIORITY, true, $ieIfComment, $ifXpath);
             break;
           case "favicon":
-            $this->favIcon = findFile($node->nodeValue);
+            $this->favIcon = find_file($node->nodeValue);
         }
       } catch (Exception $exc) {
         Logger::user_warning(sprintf(_("File %s of type %s not found"), $node->nodeValue, $node->nodeName));
@@ -279,8 +279,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @throws Exception
    */
   public function getOutput (HTMLPlus $content) {
-    stableSort($this->cssFilesPriority);
-    stableSort($this->jsFilesPriority);
+    stable_sort($this->cssFilesPriority);
+    stable_sort($this->jsFilesPriority);
     $heading = $content->documentElement->firstElement;
     $lang = $content->documentElement->getAttribute("xml:lang");
 
@@ -356,7 +356,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $proc = new XSLTProcessor();
     /** @noinspection PhpParamsInspection */
     $proc->setParameter('', $this->getProcParams());
-    stableSort($this->xsltPriority);
+    stable_sort($this->xsltPriority);
     foreach ($this->xsltPriority as $xslt => $priority) {
       try {
         $newContent = $this->transform($content, $xslt, $proc);
@@ -409,10 +409,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         echo html_entity_decode($value)."\n";
         echo utf8_decode(html_entity_decode($value))."\n";
         echo htmlentities(utf8_decode(html_entity_decode($value)), ENT_XHTML)."\n";
-        echo translateUtf8Entities($value)."\n";
+        echo to_utf8($value)."\n";
         die();
       }
-      $output[$key] = str_replace("'", '"', translateUtf8Entities($string));
+      $output[$key] = str_replace("'", '"', to_utf8($string));
     }
     return $output;
   }
@@ -597,7 +597,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         }
       }
       $ieIfComment = isset($this->cssFiles[$key]["if"]) ? $this->cssFiles[$key]["if"] : null;
-      $filePath = ROOT_URL.getResDir($this->cssFiles[$key]["file"]);
+      $filePath = ROOT_URL.get_resdir($this->cssFiles[$key]["file"]);
       $this->appendLinkElement(
         $parent,
         $filePath,
@@ -626,7 +626,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         throw new Exception(_("Empty value"));
       }
       // throws unable to parse exception
-      $pLink = parseLocalLink($target);
+      $pLink = parse_local_link($target);
       // link is external
       if (is_null($pLink)) {
         return;
@@ -701,7 +701,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       throw new Exception(_("Target not found"));
     }
     $ignoreCyclic = $e->nodeName != "a";
-    $link = buildLocalUrl($pLink, $ignoreCyclic, $isLink);
+    $link = build_local_url($pLink, $ignoreCyclic, $isLink);
     $e->setAttribute($aName, $link);
   }
 
@@ -767,7 +767,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     if (!strlen($title) || $title == $a->nodeValue) {
       $title = HTMLPlusBuilder::getIdToHeading($id);
       if (!strlen($title) || $title == $a->nodeValue) {
-        $title = getShortString(HTMLPlusBuilder::getIdToDesc($id));
+        $title = shorten(HTMLPlusBuilder::getIdToDesc($id));
       }
     }
     $a->setAttribute("title", $title);
@@ -800,7 +800,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $src = $img->getAttribute("src");
     // external
-    if (is_null(parseLocalLink($src))) {
+    if (is_null(parse_local_link($src))) {
       return;
     }
     try {
@@ -870,7 +870,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $element = $parent->ownerDocument->createElement("script");
       $this->appendCdata($element, $this->jsFiles[$key]["content"]);
       $element->setAttribute("type", "text/javascript");
-      $filePath = ROOT_URL.getResDir($this->jsFiles[$key]["file"]);
+      $filePath = ROOT_URL.get_resdir($this->jsFiles[$key]["file"]);
       if (!is_null($this->jsFiles[$key]["file"])) {
         $element->setAttribute("src", $filePath);
       }

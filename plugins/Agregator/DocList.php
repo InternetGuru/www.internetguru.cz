@@ -40,7 +40,7 @@ class DocList extends AgregatorList {
       $pattern = $doclist;
     }
     $list = $this->createList($pattern, $vars);
-    $linkParts = explode("/", getCurLink());
+    $linkParts = explode("/", get_link());
     $curFile = HTMLPlusBuilder::getIdToFile(end($linkParts));
     if (array_key_exists($curFile, $vars)) {
       foreach ($vars[$curFile] as $name => $value) {

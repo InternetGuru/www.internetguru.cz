@@ -25,7 +25,7 @@ class Auth extends Plugin implements SplObserver {
       return;
     }
     $cfg = $this->getXML();
-    $url = ROOT_URL.getCurLink(true);
+    $url = ROOT_URL.get_link(true);
     $access = null;
     /** @var DOMElementPlus $e */
     foreach ($cfg->getElementsByTagName('url') as $e) {
@@ -44,7 +44,7 @@ class Auth extends Plugin implements SplObserver {
       return;
     }
     if (is_null(Cms::getLoggedUser())) {
-      loginRedir();
+      login_redir();
     }
     new ErrorPage(_("Insufficient rights to view this content"), 403);
   }

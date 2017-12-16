@@ -16,7 +16,7 @@ class XMLBuilder extends DOMBuilder {
    */
   public static function load ($fileName) {
     $doc = new DOMDocumentPlus();
-    $filePath = findFile($fileName);
+    $filePath = find_file($fileName);
     $doc->load($filePath);
     self::setNewestFileMtime(filemtime($filePath));
     return $doc;

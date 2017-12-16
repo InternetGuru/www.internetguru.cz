@@ -11,7 +11,7 @@ try {
   $plugins = new Plugins();
 
   foreach ($plugins->getIsInterface("IGCMS\\Core\\ResourceInterface") as $ri) {
-    if ($ri::isSupportedRequest(getCurLink())) {
+    if ($ri::isSupportedRequest(get_link())) {
       $ri::handleRequest();
     }
   }

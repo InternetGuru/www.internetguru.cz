@@ -142,8 +142,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(_("Unable to save user config"));
     }
     #if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON)
-    clearNginxCache();
-    redirTo(buildLocalUrl(["path" => getCurLink(), "query" => $this->className."&".$this->getOk], true));
+    clear_nginx();
+    redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
   }
 
   private function loadVars () {
@@ -305,7 +305,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @return string
    */
   private function parse ($value) {
-    return replaceVariables($value, Cms::getAllVariables(), strtolower($this->className."-"));
+    return replace_vars($value, Cms::getAllVariables(), strtolower($this->className."-"));
   }
 
   /**

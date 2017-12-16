@@ -43,7 +43,7 @@ try {
       $params["secure"],
       $params["httponly"]
     );
-    redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
+    redir_to($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
   if (!stream_resolve_include_path(DEBUG_FILE) && !stream_resolve_include_path(".".DEBUG_FILE)) {
@@ -60,10 +60,10 @@ try {
   }
 
   if (Cms::isSuperUser()) {
-    initIndexFiles();
+    init_index_files();
     if (isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
       try {
-        clearNginxCache();
+        clear_nginx();
         Logger::user_success(_("Cache successfully purged"));
       } catch (Exception $exc) {
         Logger::critical($exc->getMessage());
@@ -76,7 +76,7 @@ try {
     parse_str($_SERVER['QUERY_STRING'], $query);
     unset($query["login"]);
     unset($query["q"]);
-    redirTo(buildLocalUrl(["path" => getCurLink(), "query" => buildQuery($query, false)]));
+    redir_to(build_local_url(["path" => get_link(), "query" => build_query($query, false)]));
   }
 
   $plugins = new Plugins();
