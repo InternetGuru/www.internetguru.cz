@@ -3,6 +3,7 @@
 namespace IGCMS\Plugins;
 
 use IGCMS\Core\Cms;
+use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use SplObserver;
@@ -29,22 +30,25 @@ class GA extends Plugin implements SplObserver {
 
   private function init () {
     $cfg = $this->getXML();
-    $idel = $cfg->getElementById("ga_id", "var");
-    if (!strlen($idel->nodeValue)) {
-      $idel = $cfg->getElementById(DOMAIN, "group");
+    $ga_id = $cfg->match_element("ga_id", "domain", HOST);
+    if (is_null($ga_id)) {
+      throw new Exception("Unable to match ga_id element to domain");
     }
-    if (is_null($idel)) {
-      $idel = $cfg->getElementById("other", "group");
+    if (!$ga_id->hasAttribute("domain")) {
+      Logger::user_warning(_("Using default Google Analytics ID value (without domain match)"));
     }
-    $ga_id = $idel->nodeValue;
-    // disable if superadmin
-    if (Cms::isSuperUser()) {
-      Cms::getOutputStrategy()->addJs("// ".sprintf(_("GA disabled (ga_id = %s)"), $ga_id), 1, "body");
+    if (!preg_match("/^UA-\d+-\d+$/", $ga_id->nodeValue)) {
+      Logger::user_error(_("Google Analytics ID does not match typical pattern"));
+    }
+    // disable if logged user
+    if (is_null(Cms::getLoggedUser())) {
+      Cms::getOutputStrategy()->addJs("// ".sprintf(_("GA is disabled for logged users (ga_id = %s)"), $ga_id->nodeValue), 1, "body");
       return;
     }
-    $jsfile = $this->pluginDir."/".$cfg->getElementById("jsfile", "var")->nodeValue;
-    Cms::getOutputStrategy()->addJs("var ga_id = '$ga_id';", 1, "body");
-    Cms::getOutputStrategy()->addJsFile($jsfile, 1, "body");
+    Cms::getOutputStrategy()->addJs(sprintf("var ga_id = '%s';", $ga_id->nodeValue), 1, "body");
+    foreach ($cfg->getElementsByTagName("jsfile") as $jsfile) {
+      Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".$jsfile->nodeValue, 1, "body");
+    }
   }
 
 }
