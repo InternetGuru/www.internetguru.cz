@@ -62,6 +62,7 @@ class Cms {
   /**
    * @param string $methodName
    * @param array $arguments
+   * @throws Exception
    */
   public static function __callStatic ($methodName, $arguments) {
     validate_callStatic($methodName, $arguments, self::getTypes(), 1);
@@ -87,6 +88,7 @@ class Cms {
   /**
    * @param string $type
    * @param string $message
+   * @throws Exception
    */
   private static function addMessage ($type, $message) {
     if (is_null(self::$flashList)) {
@@ -100,6 +102,9 @@ class Cms {
     self::addFlashItem($message, $type, [REQUEST_TOKEN]);
   }
 
+  /**
+   * @throws Exception
+   */
   private static function createFlashList () {
     $doc = new DOMDocumentPlus();
     self::$flashList = $doc->appendChild($doc->createElement("root"));
@@ -148,16 +153,17 @@ class Cms {
    * @throws Exception
    */
   private static function getCaller () {
-    $d = debug_backtrace();
-    if (!isset($d[3]["class"])) {
+    $debug_backtrace = debug_backtrace();
+    if (!isset($debug_backtrace[3]["class"])) {
       throw new Exception(_("Unknown caller class"));
     }
-    return strtolower((new \ReflectionClass($d[3]["class"]))->getShortName());
+    return strtolower((new \ReflectionClass($debug_backtrace[3]["class"]))->getShortName());
   }
 
   /**
    * @param string $name
    * @param mixed $value
+   * @throws Exception
    */
   public static function addVariableItem ($name, $value) {
     $varId = self::getVarId($name);
@@ -178,11 +184,11 @@ class Cms {
    * @return mixed|null
    */
   public static function getVariable ($name) {
-    $id = strtolower($name);
-    if (!array_key_exists($id, self::$variables)) {
+    $varId = strtolower($name);
+    if (!array_key_exists($varId, self::$variables)) {
       return null;
     }
-    return self::$variables[$id];
+    return self::$variables[$varId];
   }
 
   /**
@@ -226,26 +232,30 @@ class Cms {
    * @param array $requests
    */
   private static function addFlashItem ($message, $type, Array $requests) {
+    /** @noinspection PhpVariableVariableInspection */
     self::$$type = true;
     if (!is_null(self::getLoggedUser())) {
       $message = self::$types[$type].": $message";
     }
-    $li = self::$flashList->ownerDocument->createElement("li");
-    $span = $li->ownerDocument->createElement("span");
-    $li->appendChild($span);
-    self::$flashList->firstElement->appendChild($li);
-    $li->setAttribute("class", strtolower($type)." ".implode(" ", $requests));
+    $lItem = self::$flashList->ownerDocument->createElement("li");
+    $span = $lItem->ownerDocument->createElement("span");
+    $lItem->appendChild($span);
+    self::$flashList->firstElement->appendChild($lItem);
+    $lItem->setAttribute("class", strtolower($type)." ".implode(" ", $requests));
     $doc = new DOMDocumentPlus();
     try {
       $doc->loadXML("<var>$message</var>");
-      foreach ($doc->documentElement->childNodes as $ch) {
-        $span->appendChild($li->ownerDocument->importNode($ch, true));
+      foreach ($doc->documentElement->childNodes as $node) {
+        $span->appendChild($lItem->ownerDocument->importNode($node, true));
       }
-    } catch (Exception $e) {
+    } catch (Exception $exception) {
       $span->nodeValue = htmlspecialchars($message);
     }
   }
 
+  /**
+   * @throws Exception
+   */
   public static function init () {
     global $plugins;
     self::setVariable("messages", self::$flashList);
@@ -257,13 +267,13 @@ class Cms {
     self::setVariable("ip", $_SERVER["REMOTE_ADDR"]);
     self::setVariable("admin_id", ADMIN_ID);
     self::setVariable("plugins", array_keys($plugins->getObservers()));
-    $id = HTMLPlusBuilder::getFileToId(INDEX_HTML);
-    self::setVariable("author", HTMLPlusBuilder::getIdToAuthor($id));
-    self::setVariable("authorid", HTMLPlusBuilder::getIdToAuthorId($id));
-    self::setVariable("resp", HTMLPlusBuilder::getIdToResp($id));
-    self::setVariable("respid", HTMLPlusBuilder::getIdToRespId($id));
-    self::setVariable("ctime", HTMLPlusBuilder::getIdToCtime($id));
-    self::setVariable("lang", HTMLPlusBuilder::getIdToLang($id));
+    $fileId = HTMLPlusBuilder::getFileToId(INDEX_HTML);
+    self::setVariable("author", HTMLPlusBuilder::getIdToAuthor($fileId));
+    self::setVariable("authorid", HTMLPlusBuilder::getIdToAuthorId($fileId));
+    self::setVariable("resp", HTMLPlusBuilder::getIdToResp($fileId));
+    self::setVariable("respid", HTMLPlusBuilder::getIdToRespId($fileId));
+    self::setVariable("ctime", HTMLPlusBuilder::getIdToCtime($fileId));
+    self::setVariable("lang", HTMLPlusBuilder::getIdToLang($fileId));
     self::setVariable("host", HOST);
     self::setVariable("url", URL);
     self::setVariable("cache_nginx", getCurLink()."?".CACHE_PARAM."=".CACHE_NGINX);
@@ -286,10 +296,13 @@ class Cms {
       self::setVariable("mtime", 0);
       return;
     }
-    self::setVariable("mtime", HTMLPlusBuilder::getIdToMtime($id));
+    self::setVariable("mtime", HTMLPlusBuilder::getIdToMtime($fileId));
     self::setVariable("uri", URI);
   }
 
+  /**
+   * @throws Exception
+   */
   public static function getMessages () {
     if (!isset($_SESSION["cms"]["flash"]) || !count($_SESSION["cms"]["flash"])) {
       return;
@@ -309,11 +322,12 @@ class Cms {
 
   /**
    * @return HTMLPlus|null
+   * @throws Exception
    */
   public static function buildContent () {
     global $plugins;
     $content = null;
-    $pluginExceptionMessage = _("Plugin %s exception: %s");
+    $exceptionMsg = _("Plugin %s exception: %s");
     /** @var GetContentStrategyInterface $plugin */
     foreach ($plugins->getIsInterface("IGCMS\\Core\\GetContentStrategyInterface") as $plugin) {
       try {
@@ -323,8 +337,8 @@ class Cms {
         }
         self::validateContent($content);
         break;
-      } catch (Exception $e) {
-        Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
+      } catch (Exception $exception) {
+        Logger::error(sprintf($exceptionMsg, get_class($plugin), $exception->getMessage()));
         $content = null;
       }
     }
@@ -339,8 +353,8 @@ class Cms {
         $plugin->modifyContent($tmpContent);
         self::validateContent($tmpContent);
         $content = $tmpContent;
-      } catch (Exception $e) {
-        Logger::error(sprintf($pluginExceptionMessage, get_class($plugin), $e->getMessage()));
+      } catch (Exception $exception) {
+        Logger::error(sprintf($exceptionMsg, get_class($plugin), $exception->getMessage()));
       }
     }
     if (self::getLoggedUser() != SERVER_USER) {
@@ -361,11 +375,14 @@ class Cms {
     }
     try {
       $content->validatePlus();
-    } catch (Exception $e) {
-      throw new Exception(sprintf(_("Invalid HTML+ content: %s"), $e->getMessage()));
+    } catch (Exception $exception) {
+      throw new Exception(sprintf(_("Invalid HTML+ content: %s"), $exception->getMessage()));
     }
   }
 
+  /**
+   * @throws Exception
+   */
   public static function checkAuth () {
     $loggedUser = self::getLoggedUser();
     if (!is_null($loggedUser)) {
@@ -407,7 +424,7 @@ class Cms {
    * @param HTMLPlus $content
    * @return HTMLPlus
    */
-  public static function contentProcessVariables (HTMLPlus $content) {
+  public static function contentProcessVars (HTMLPlus $content) {
     $tmpContent = clone $content;
     try {
       /** @var HTMLPlus $tmpContent */
@@ -416,8 +433,8 @@ class Cms {
       $tmpContent = $tmpContent->processVariables($vars);
       $tmpContent->validatePlus(true);
       return $tmpContent;
-    } catch (Exception $e) {
-      Logger::user_error(sprintf(_("Invalid HTML+: %s"), $e->getMessage()));
+    } catch (Exception $exception) {
+      Logger::user_error(sprintf(_("Invalid HTML+: %s"), $exception->getMessage()));
       return $content;
     }
   }
@@ -454,6 +471,7 @@ class Cms {
    * @param string $name
    * @param Closure $value
    * @return null|string
+   * @throws Exception
    */
   public static function setFunction ($name, Closure $value) {
     if (!$value instanceof Closure) {
@@ -515,25 +533,23 @@ class Cms {
    * @throws Exception
    */
   public static function applyUserFn ($fName, DOMNode $node) {
-    $fn = self::getFunction($fName);
-    if (is_null($fn)) {
+    $function = self::getFunction($fName);
+    if (is_null($function)) {
       throw new Exception(sprintf(_("Function %s does not exist"), $fName));
     }
-    return $fn($node);
+    return $function($node);
   }
 
   /**
-   * @param $name
+   * @param $fName
    * @return Closure|null
    */
-  public static function getFunction ($name) {
-    $id = strtolower($name);
-    if (!array_key_exists($id, self::$functions)) {
+  public static function getFunction ($fName) {
+    $functionId = strtolower($fName);
+    if (!array_key_exists($functionId, self::$functions)) {
       return null;
     }
-    return self::$functions[$id];
+    return self::$functions[$functionId];
   }
 
 }
-
-?>

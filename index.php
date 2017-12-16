@@ -98,7 +98,7 @@ try {
   #var_dump(HTMLPlusBuilder::getIntToParentInt());
   #die("die");
 
-  $content = Cms::contentProcessVariables($content);
+  $content = Cms::contentProcessVars($content);
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
@@ -110,7 +110,7 @@ try {
   }
 
   Cms::getMessages();
-  $content = Cms::contentProcessVariables($content);
+  $content = Cms::contentProcessVars($content);
   echo Cms::getOutput($content);
 
 } catch (Exception $e) {
