@@ -26,8 +26,15 @@ class DOMDocumentPlus extends DOMDocument {
     parent::registerNodeClass("DOMElement", "IGCMS\\Core\\DOMElementPlus");
   }
 
-  public function match_element ($eName, $aMatch, $to) {
+  /**
+   * @param string $eName
+   * @param string $aMatch
+   * @param string $to
+   * @return DOMElementPlus|null
+   */
+  public function matchElement ($eName, $aMatch, $to) {
     $lastMatch = null;
+    /** @var DOMElementPlus $element */
     foreach ($this->getElementsByTagName($eName) as $element) {
       if ($element->hasAttribute($aMatch)) {
         $d = $element->getAttribute($aMatch);

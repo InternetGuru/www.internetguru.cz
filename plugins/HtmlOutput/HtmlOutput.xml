@@ -111,13 +111,13 @@
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
   <!-- robots.txt and meta robots -->
-  <robots modifyonly="modifyonly" meta="noindex, nofollow">User-agent: *
+  <robots readonly="readonly" meta="noindex, nofollow">User-agent: *
 Disallow: /</robots>
-  <robots domain="*.internetguru.cz" modifyonly="modifyonly" meta="noindex, nofollow">User-agent: *
+  <robots domain="*.internetguru.cz" readonly="readonly" meta="noindex, nofollow">User-agent: *
 Disallow: /</robots>
-  <robots domain="www.*.*" modifyonly="modifyonly" meta="all">User-agent: *
+  <robots domain="www.*.*" readonly="readonly" meta="all">User-agent: *
 Disallow:</robots>
-  <robots domain="*.*.local" modifyonly="modifyonly" meta="noindex, nofollow">User-agent: *
+  <robots domain="*.*.local" readonly="readonly" meta="noindex, nofollow">User-agent: *
 Disallow: /</robots>
 
   <!-- Favicons -->

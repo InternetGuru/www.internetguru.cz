@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -17,6 +18,7 @@ class GA extends Plugin implements SplObserver {
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if ($subject->getStatus() != STATUS_PROCESS) {
@@ -28,9 +30,12 @@ class GA extends Plugin implements SplObserver {
     $this->init();
   }
 
+  /**
+   * @throws Exception
+   */
   private function init () {
     $cfg = $this->getXML();
-    $ga_id = $cfg->match_element("ga_id", "domain", HOST);
+    $ga_id = $cfg->matchElement("ga_id", "domain", HOST);
     if (is_null($ga_id)) {
       throw new Exception("Unable to match ga_id element to domain");
     }
@@ -52,5 +57,3 @@ class GA extends Plugin implements SplObserver {
   }
 
 }
-
-?>

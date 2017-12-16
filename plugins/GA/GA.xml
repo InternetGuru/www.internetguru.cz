@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <GA>
   <jsfile modifyonly="modifyonly">GA.js</jsfile>
-  <ga_id modifyonly="modifyonly">UA-52883188-5</ga_id>
-  <ga_id modifyonly="modifyonly" domain="*.internetguru.cz" readonly="readonly">UA-52883188-3</ga_id>
-  <ga_id modifyonly="modifyonly" domain="*.e-zakladna.cz" readonly="readonly">UA-52883188-4</ga_id>
-  <ga_id modifyonly="modifyonly" domain="*.*.local">UA-00000000-0</ga_id>
+  <ga_id readonly="readonly">UA-52883188-5</ga_id>
+  <ga_id readonly="readonly" domain="*.internetguru.cz">UA-52883188-3</ga_id>
+  <ga_id readonly="readonly" domain="*.e-zakladna.cz">UA-52883188-4</ga_id>
+  <ga_id readonly="readonly" domain="*.*.local">UA-52883188-5</ga_id>
 </GA>

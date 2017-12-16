@@ -10,6 +10,7 @@ use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\ErrorPage;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
@@ -92,6 +93,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if ($this->detachIfNotAttached("FileHandler")) {
@@ -102,7 +104,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
-    $robots = $this->cfg->match_element("robots", "domain", HOST);
+    $robots = $this->cfg->matchElement("robots", "domain", HOST);
     if (is_null($robots)) {
       throw new Exception("Unable to match robots element to domain");
     }
@@ -117,6 +119,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
 
   /**
    * @param DOMDocumentPlus $cfg
+   * @throws Exception
    */
   private function registerThemes (DOMDocumentPlus $cfg) {
 
@@ -144,8 +147,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   }
 
   public static function handleRequest () {
+    $robots = self::getXML()->matchElement("robots", "domain", HOST);
+    if (is_null($robots)) {
+      new ErrorPage("No matching robots element", 404);
+    }
     header('Content-Type: text/plain');
-    echo self::getRobots(self::getXML())->nodeValue;
+    echo $robots->nodeValue;
     exit;
   }
 
@@ -261,6 +268,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * Create HTML 5 output from HTML+ content and own registers (JS/CSS)
    * @param HTMLPlus $content
    * @return string
+   * @throws Exception
    */
   public function getOutput (HTMLPlus $content) {
     stableSort($this->cssFilesPriority);
@@ -446,6 +454,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param DOMElementPlus $h1
    * @param DOMXPath $xPath
    * @return DOMElement
+   * @throws Exception
    */
   private function addHead (DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath) {
     $head = $doc->createElement("head");
@@ -530,6 +539,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
 
   /**
    * @return string
+   * @throws Exception
    */
   private function getFavIcon () {
     if (Cms::hasErrorMessage()) {
@@ -582,6 +592,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @param DOMElementPlus $e
    * @param string $aName
+   * @throws Exception
    */
   private function processElement (DOMElementPlus $e, $aName) {
     // no target, no check, no title manipulation
@@ -761,6 +772,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @param DOMElementPlus $img
    * @param array $ids
+   * @throws Exception
    */
   private function processImage (DOMElementPlus $img, Array &$ids) {
     if ($img->hasAttribute("width") && $img->hasAttribute("height")) {
@@ -980,5 +992,3 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   }
 
 }
-
-?>
