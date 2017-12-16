@@ -27,7 +27,7 @@ class DOMElementPlus extends DOMElement {
   /**
    * @var int
    */
-  public $varRecursionLevel = 0;
+  public $varRecursionLvl = 0;
 
   /**
    * @param string $aName
@@ -67,14 +67,14 @@ class DOMElementPlus extends DOMElement {
    */
   public function removeAllAttributes (Array $except = []) {
     $toRemove = [];
-    foreach ($this->attributes as $a) {
-      if (in_array($a->nodeName, $except)) {
+    foreach ($this->attributes as $attr) {
+      if (in_array($attr->nodeName, $except)) {
         continue;
       }
-      $toRemove[] = $a;
+      $toRemove[] = $attr;
     }
-    foreach ($toRemove as $a) {
-      $this->removeAttribute($a->nodeName);
+    foreach ($toRemove as $attr) {
+      $this->removeAttribute($attr->nodeName);
     }
   }
 
@@ -94,20 +94,20 @@ class DOMElementPlus extends DOMElement {
    * @param array $ignore
    */
   public function processFunctions (Array $functions, Array $ignore = []) {
-    foreach ($this->getVariables("fn", $ignore) as list($vName, $aName, $fn)) {
+    foreach ($this->getVariables("fn", $ignore) as list($vName, $aName, $fName)) {
       try {
-        $f = array_key_exists($vName, $functions) ? $functions[$vName] : null;
-        if (is_null($f)) {
+        $func = array_key_exists($vName, $functions) ? $functions[$vName] : null;
+        if (is_null($func)) {
           continue;
         }
-        $this->removeAttrVal("fn", $fn);
-        $v = call_user_func($f, is_null($aName) ? $this : $this->getAttributeNode($aName));
-        $res = $this->ownerDocument->insertVariable($this, $v, $aName);
+        $this->removeAttrVal("fn", $fName);
+        $value = call_user_func($func, is_null($aName) ? $this : $this->getAttributeNode($aName));
+        $res = $this->ownerDocument->insertVariable($this, $value, $aName);
         if (!$res->isSameNode($this)) {
           $this->emptyRecursive();
         }
-      } catch (Exception $e) {
-        Logger::user_error(sprintf(_("Unable to insert function %s: %s"), $vName, $e->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_error(sprintf(_("Unable to insert function %s: %s"), $vName, $exc->getMessage()));
       }
       if (is_null($aName)) {
         return;
@@ -149,9 +149,9 @@ class DOMElementPlus extends DOMElement {
       return;
     }
     $attrs = explode(" ", $this->getAttribute($aName));
-    foreach ($attrs as $k => $v) {
-      if ($v == $aValue) {
-        unset($attrs[$k]);
+    foreach ($attrs as $key => $value) {
+      if ($value == $aValue) {
+        unset($attrs[$key]);
       }
     }
     if (empty($attrs)) {
@@ -162,18 +162,18 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function emptyRecursive () {
-    $p = $this->parentNode;
-    if (is_null($p)) {
+    $pNode = $this->parentNode;
+    if (is_null($pNode)) {
       return;
     }
-    $p->removeChild($this);
-    if ($p->nodeType != XML_ELEMENT_NODE) {
+    $pNode->removeChild($this);
+    if ($pNode->nodeType != XML_ELEMENT_NODE) {
       return;
     }
-    if ($p->childNodes->length) {
+    if ($pNode->childNodes->length) {
       return;
     }
-    $p->emptyRecursive();
+    $pNode->emptyRecursive();
   }
 
   /**
@@ -205,9 +205,9 @@ class DOMElementPlus extends DOMElement {
       case "ul":
       case "ol":
         $this->removeChildNodes();
-        $e = $this->ownerDocument->createElement("li");
-        $this->appendChild($e);
-        return $e->insertInnerHTML($value, $sep);
+        $lItem = $this->ownerDocument->createElement("li");
+        $this->appendChild($lItem);
+        return $lItem->insertInnerHTML($value, $sep);
       #case "body":
       #case "section":
       #case "dl":
@@ -224,6 +224,7 @@ class DOMElementPlus extends DOMElement {
    * @param string $value
    * @param string $aName
    * @return DOMElementPlus|mixed|null
+   * @throws Exception
    */
   public function insertVarString ($value, $aName) {
     if (is_null($aName)) {
@@ -237,6 +238,7 @@ class DOMElementPlus extends DOMElement {
       }
       return $this;
     }
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     $temp = @sprintf($this->getAttribute($aName), $value);
     if ($temp !== false && $temp != $this->getAttribute($aName)) {
       $this->setAttribute($aName, $temp);
@@ -259,6 +261,7 @@ class DOMElementPlus extends DOMElement {
    * @param $html
    * @param string $sep
    * @return mixed|null
+   * @throws Exception
    */
   private function insertInnerHTML ($html, $sep) {
     if (!is_array($html)) {
@@ -269,11 +272,11 @@ class DOMElementPlus extends DOMElement {
     $xml = "<var><$eNam>".implode("</$eNam>$sep<$eNam>", $html)."</$eNam></var>";
     try {
       $dom->loadXML($xml);
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       $var = $dom->appendChild($dom->createElement("var"));
-      foreach ($html as $k => $v) {
-        $e = $var->appendChild($dom->createElement($eNam));
-        $e->nodeValue = htmlspecialchars($html[$k]);
+      foreach ($html as $key => $value) {
+        $exc = $var->appendChild($dom->createElement($eNam));
+        $exc->nodeValue = htmlspecialchars($html[$key]);
       }
     }
     return $this->insertVarDOMElement($dom->documentElement, null);
@@ -284,6 +287,7 @@ class DOMElementPlus extends DOMElement {
    * @param DOMElement $element
    * @param string $aName
    * @return DOMElementPlus|mixed|null
+   * @throws Exception
    */
   public function insertVarDOMElement (DOMElement $element, $aName) {
     if (!is_null($aName)) {
@@ -291,28 +295,32 @@ class DOMElementPlus extends DOMElement {
     }
     $var = $this->ownerDocument->importNode(clone $element, true);
     $nodes = [];
-    foreach ($var->childNodes as $n) $nodes[] = $n;
+    foreach ($var->childNodes as $node) {
+      $nodes[] = $node;
+    }
     if ($this->toInsert($element)) {
       $this->removeChildNodes();
-      foreach ($nodes as $n) $this->appendChild($n);
+      foreach ($nodes as $node) $this->appendChild($node);
       return $this;
     }
     $res = null;
     $attributes = [];
-    foreach ($this->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
+    foreach ($this->attributes as $attr) {
+      $attributes[$attr->nodeName] = $attr->nodeValue;
+    }
     #todo: already checked?
     #if(is_null($this->parentNode)) return $element;
-    foreach ($nodes as $n) {
-      $res = $n;
-      $this->parentNode->insertBefore($n, $this);
-      if ($n->nodeType != XML_ELEMENT_NODE) {
+    foreach ($nodes as $node) {
+      $res = $node;
+      $this->parentNode->insertBefore($node, $this);
+      if ($node->nodeType != XML_ELEMENT_NODE) {
         continue;
       }
       foreach ($attributes as $aName => $aValue) {
-        if ($n->hasAttribute($aName)) {
+        if ($node->hasAttribute($aName)) {
           continue;
         }
-        $n->setAttribute($aName, $aValue);
+        $node->setAttribute($aName, $aValue);
       }
     }
     return $res;
@@ -344,9 +352,13 @@ class DOMElementPlus extends DOMElement {
   }
 
   public function removeChildNodes () {
-    $r = [];
-    foreach ($this->childNodes as $n) $r[] = $n;
-    foreach ($r as $n) $this->removeChild($n);
+    $toRemove = [];
+    foreach ($this->childNodes as $node) {
+      $toRemove[] = $node;
+    }
+    foreach ($toRemove as $node) {
+      $this->removeChild($node);
+    }
   }
 
   /**
@@ -393,8 +405,12 @@ class DOMElementPlus extends DOMElement {
     }
     if ($keepContent) {
       $children = [];
-      foreach ($this->childNodes as $n) $children[] = $n;
-      foreach ($children as $n) $this->parentNode->insertBefore($n, $this);
+      foreach ($this->childNodes as $node) {
+        $children[] = $node;
+      }
+      foreach ($children as $node) {
+        $this->parentNode->insertBefore($node, $this);
+      }
     }
     $this->parentNode->removeChild($this);
   }
@@ -491,30 +507,34 @@ class DOMElementPlus extends DOMElement {
    * @return DOMElement|DOMElementPlus|null
    */
   public function getPreviousElement ($eName = null) {
-    $e = $this->previousElement;
-    if (is_null($e)) {
-      $e = $this->parentNode;
+    $prevElement = $this->previousElement;
+    if (is_null($prevElement)) {
+      $prevElement = $this->parentNode;
     }
-    while ($e instanceof DOMElement) {
-      if (is_null($eName) || $e->nodeName == $eName) {
-        return $e;
+    while ($prevElement instanceof DOMElement) {
+      if (is_null($eName) || $prevElement->nodeName == $eName) {
+        return $prevElement;
       }
-      if (!is_null($e->previousElement)) {
-        $e = $e->previousElement;
+      if (!is_null($prevElement->previousElement)) {
+        $prevElement = $prevElement->previousElement;
       } else {
-        $e = $e->parentNode;
+        $prevElement = $prevElement->parentNode;
       }
     }
     return null;
   }
 
+  /**
+   * @param $name
+   * @return DOMElementPlus|DOMElementPlus[]|null
+   */
   public function __get ($name) {
     switch ($name) {
       case "nextElement":
-        return $this->getNextSiblingElement();
+        return $this->getNextSibElement();
         break;
       case "previousElement":
-        return $this->getPreviousSiblingElement();
+        return $this->getPrevSibElement();
         break;
       case "childElementsArray":
         return $this->getChildElementsArray();
@@ -533,23 +553,23 @@ class DOMElementPlus extends DOMElement {
   /**
    * @return DOMElementPlus
    */
-  private function getNextSiblingElement () {
-    $e = $this->nextSibling;
-    while (!is_null($e) && $e->nodeType != XML_ELEMENT_NODE) {
-      $e = $e->nextSibling;
+  private function getNextSibElement () {
+    $nextSibling = $this->nextSibling;
+    while (!is_null($nextSibling) && $nextSibling->nodeType != XML_ELEMENT_NODE) {
+      $nextSibling = $nextSibling->nextSibling;
     }
-    return $e;
+    return $nextSibling;
   }
 
   /**
    * @return DOMElementPlus
    */
-  private function getPreviousSiblingElement () {
-    $e = $this->previousSibling;
-    while (!is_null($e) && $e->nodeType != XML_ELEMENT_NODE) {
-      $e = $e->previousSibling;
+  private function getPrevSibElement () {
+    $prevSibling = $this->previousSibling;
+    while (!is_null($prevSibling) && $prevSibling->nodeType != XML_ELEMENT_NODE) {
+      $prevSibling = $prevSibling->previousSibling;
     }
-    return $e;
+    return $prevSibling;
   }
 
   /**
@@ -557,11 +577,11 @@ class DOMElementPlus extends DOMElement {
    */
   private function getChildElementsArray () {
     $elements = [];
-    foreach ($this->childNodes as $n) {
-      if ($n->nodeType != XML_ELEMENT_NODE) {
+    foreach ($this->childNodes as $node) {
+      if ($node->nodeType != XML_ELEMENT_NODE) {
         continue;
       }
-      $elements[] = $n;
+      $elements[] = $node;
     }
     return $elements;
   }
@@ -570,11 +590,11 @@ class DOMElementPlus extends DOMElement {
    * @return DOMElementPlus|null
    */
   private function getFirstElement () {
-    foreach ($this->childNodes as $n) {
-      if ($n->nodeType != XML_ELEMENT_NODE) {
+    foreach ($this->childNodes as $node) {
+      if ($node->nodeType != XML_ELEMENT_NODE) {
         continue;
       }
-      return $n;
+      return $node;
     }
     return null;
   }
@@ -591,43 +611,43 @@ class DOMElementPlus extends DOMElement {
   }
 
   /**
-   * @param int $i
+   * @param int $iter
    * @return string
+   * @throws Exception
    */
-  public function setUniqueId ($i = 0) {
-    $id = $this->getValidId();
-    if ($i != 0) {
-      $id .= $i;
+  public function setUniqueId ($iter = 0) {
+    $uniqueId = $this->getValidId();
+    if ($iter != 0) {
+      $uniqueId .= $iter;
     }
     try {
-      if (is_null($this->ownerDocument->getElementById($id))) {
-        $this->setAttribute("id", $id);
-        return $id;
+      if (is_null($this->ownerDocument->getElementById($uniqueId))) {
+        $this->setAttribute("id", $uniqueId);
+        return $uniqueId;
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
     }
-    return $this->setUniqueId(++$i);
+    return $this->setUniqueId(++$iter);
   }
 
   /**
    * @return string
+   * @throws Exception
    */
   private function getValidId () {
-    $id = normalize($this->getAttribute("name"));
-    if (isValidId($id)) {
-      return $id;
+    $validId = normalize($this->getAttribute("name"));
+    if (isValidId($validId)) {
+      return $validId;
     }
-    $id = normalize($this->getAttribute("short"));
-    if (isValidId($id)) {
-      return $id;
+    $validId = normalize($this->getAttribute("short"));
+    if (isValidId($validId)) {
+      return $validId;
     }
-    $id = normalize($this->nodeValue);
-    if (isValidId($id)) {
-      return $id;
+    $validId = normalize($this->nodeValue);
+    if (isValidId($validId)) {
+      return $validId;
     }
     return $this->nodeName.".".substr(md5(microtime().rand()), 0, 3);
   }
 
 }
-
-?>
