@@ -274,8 +274,8 @@ class Cms {
     self::setVariable("respid", HTMLPlusBuilder::getIdToRespId($fileId));
     self::setVariable("ctime", HTMLPlusBuilder::getIdToCtime($fileId));
     self::setVariable("lang", HTMLPlusBuilder::getIdToLang($fileId));
-    self::setVariable("host", HOST);
-    self::setVariable("url", URL);
+    self::setVariable("host", HTTP_HOST);
+    self::setVariable("url", HTTP_URL);
     self::setVariable("cache_nginx", get_link()."?".CACHE_PARAM."=".CACHE_NGINX);
     self::setVariable("cache_ignore", get_link()."?".CACHE_PARAM."=".CACHE_IGNORE);
     self::setVariable("link", "/".get_link());
@@ -297,7 +297,7 @@ class Cms {
       return;
     }
     self::setVariable("mtime", HTMLPlusBuilder::getIdToMtime($fileId));
-    self::setVariable("uri", URI);
+    self::setVariable("uri", HTTP_URI);
   }
 
   /**

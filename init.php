@@ -58,8 +58,8 @@ define('STATUS_INIT', 'init');
 define('STATUS_PROCESS', 'process');
 define('STATUS_POSTPROCESS', 'postprocess');
 define('APC_PREFIX', 2); // change if APC structure changes
-define('HOST', $_SERVER["HTTP_HOST"]);
-define('DOMAIN', substr(HOST, strpos(HOST, ".")+1));
+define('HTTP_HOST', $_SERVER["HTTP_HOST"]);
+define('DOMAIN', substr(HTTP_HOST, strpos(HTTP_HOST, ".")+1));
 define('ROOT_URL', "/");
 define('CMS_RELEASE', basename(dirname(__FILE__)));
 define("WWW_FOLDER", "/var/www");
@@ -69,13 +69,13 @@ define("CMSRES_FOLDER", WWW_FOLDER."/".CMSRES_DIR."/".CMS_RELEASE);
 define('ADMIN_ID', is_file("ADMIN") ? trim(file_get_contents("ADMIN")) : null);
 define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
 define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
-define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HOST);
-define('USER_FOLDER', USER_ROOT_FOLDER."/".ADMIN_ID."/".HOST);
-define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HOST);
+define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HTTP_HOST);
+define('USER_FOLDER', USER_ROOT_FOLDER."/".ADMIN_ID."/".HTTP_HOST);
+define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HTTP_HOST);
 define('CMS_DEBUG', is_file(DEBUG_FILE));
 define("SCHEME", (@$_SERVER["HTTPS"] == "on" ? "https" : "http"));
-define("URL", SCHEME."://".HOST);
-define("URI", URL.@$_SERVER["REQUEST_URI"]);
+define("HTTP_URL", SCHEME."://".HTTP_HOST);
+define("HTTP_URI", HTTP_URL.@$_SERVER["REQUEST_URI"]);
 define("CORE_FOLDER", CMS_FOLDER."/".CORE_DIR);
 define('PLUGINS_FOLDER', CMS_FOLDER."/".PLUGINS_DIR);
 define('LIB_FOLDER', CMS_FOLDER."/".LIB_DIR);
@@ -108,7 +108,7 @@ define('METHOD_NA', _("Method %s is no longer available"));
 if (is_null(ADMIN_ID)) {
   die(_("Domain is ready to be acquired"));
 }
-require_once(CORE_FOLDER.'/globals.php');
+require_once CORE_FOLDER.'/globals.php';
 if (isset($_GET["login"]) && SCHEME == "http") {
   login_redir();
 }

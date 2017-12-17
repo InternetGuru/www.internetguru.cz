@@ -476,7 +476,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $mail->setFrom("no-reply@".DOMAIN, $this->formVars["servername"]);
     $mail->addAddress($mailto, $mailtoname);
     $mail->Body = $msg;
-    $mail->Subject = sprintf(_("New massage from %s"), HOST);
+    $mail->Subject = sprintf(_("New massage from %s"), HTTP_HOST);
     if (strlen($replyto)) {
       $mail->addReplyTo($replyto, $replytoname);
       $mail->Subject .= " [$replyto]";

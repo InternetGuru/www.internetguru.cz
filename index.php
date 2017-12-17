@@ -116,23 +116,21 @@ try {
 } catch (Exception $exc) {
 
   $errno = $exc->getCode() ? $exc->getCode() : 500;
-  $m = $exc->getMessage();
+  $msg = $exc->getMessage();
   if (CMS_DEBUG) {
-    $m = sprintf(_("%s in %s on line %s"), $m, $exc->getFile(), $exc->getLine());
+    $msg = sprintf(_("%s in %s on line %s"), $msg, $exc->getFile(), $exc->getLine());
   }
-  $m = sprintf(_("IGCMS failed to finish: %s"), $m);
+  $msg = sprintf(_("IGCMS failed to finish: %s"), $msg);
   if (class_exists("IGCMS\\Core\\ErrorPage")) {
-    new ErrorPage($m, $errno);
+    new ErrorPage($msg, $errno);
   }
 
-  Logger::alert($m);
+  Logger::alert($msg);
   http_response_code($errno);
-  echo $m;
+  echo $msg;
 
 } finally {
 
   session_write_close();
 
 }
-
-?>

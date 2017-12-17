@@ -75,7 +75,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     if (SCHEME == "https" && !is_null(Cms::getLoggedUser())) {
       return;
     }
-    redir_to("$protocol://".HOST.$_SERVER["REQUEST_URI"]);
+    redir_to("$protocol://".HTTP_HOST.$_SERVER["REQUEST_URI"]);
   }
 
   /**

@@ -157,7 +157,7 @@ class Sitemap extends Plugin implements SplObserver {
       if (is_null($scheme)) {
         $scheme = "http";
       }
-      $url->appendChild($sitemap->createElement("loc", "$scheme://".HOST."/".$link));
+      $url->appendChild($sitemap->createElement("loc", "$scheme://".HTTP_HOST."/".$link));
       // changefreq
       $changefreq = self::getValue("changefreq", $link, $cfgLinks, $cfgDefaults);
       if (!is_null($changefreq)) {

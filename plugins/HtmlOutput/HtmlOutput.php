@@ -104,7 +104,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->cfg = self::getXML();
     $this->registerThemes($this->cfg);
-    $robots = $this->cfg->matchElement("robots", "domain", HOST);
+    $robots = $this->cfg->matchElement("robots", "domain", HTTP_HOST);
     if (is_null($robots)) {
       throw new Exception("Unable to match robots element to domain");
     }
@@ -154,7 +154,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @return void
    */
   public static function handleRequest () {
-    $robots = self::getXML()->matchElement("robots", "domain", HOST);
+    $robots = self::getXML()->matchElement("robots", "domain", HTTP_HOST);
     if (is_null($robots)) {
       new ErrorPage("No matching robots element", 404);
     }

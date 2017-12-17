@@ -194,7 +194,7 @@ class Logger {
     foreach (["CRITICAL", "ALERT", "EMERGENCY"] as $type) {
       $mailHandler = new NativeMailerHandler(
         self::EMAIL_ALERT_TO,
-        "IGCMS $type at ".HOST,
+        "IGCMS $type at ".HTTP_HOST,
         self::EMAIL_ALERT_FROM,
         constant("Monolog\\Logger::$type"),
         false

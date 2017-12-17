@@ -35,7 +35,7 @@ class GA extends Plugin implements SplObserver {
    */
   private function init () {
     $cfg = $this->getXML();
-    $ga_id = $cfg->matchElement("ga_id", "domain", HOST);
+    $ga_id = $cfg->matchElement("ga_id", "domain", HTTP_HOST);
     if (is_null($ga_id)) {
       throw new Exception("Unable to match ga_id element to domain");
     }

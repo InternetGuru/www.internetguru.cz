@@ -105,7 +105,7 @@ class HTMLPlus extends DOMDocumentPlus {
     $this->status = self::STATUS_UNKNOWN;
     $ctime = new DateTime("now");
     $this->defaultCtime = $ctime->format(DateTime::W3C);
-    $this->defaultNs = HOST;
+    $this->defaultNs = HTTP_HOST;
   }
 
   /**

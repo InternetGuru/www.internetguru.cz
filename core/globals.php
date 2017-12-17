@@ -162,7 +162,7 @@ function redir_to ($link, $code = null, $msg = null) {
 function implode_link (Array $pLink, $query = true) {
   $url = "";
   if (isset($pLink["scheme"])) {
-    $url .= $pLink["scheme"]."://".HOST."/";
+    $url .= $pLink["scheme"]."://".HTTP_HOST."/";
     if (isset($pLink["path"])) {
       $pLink["path"] = ltrim($pLink["path"], "/");
     }
@@ -205,7 +205,7 @@ function parse_local_link ($link, $host = null) {
     unset($pLink["scheme"]);
   }
   if (isset($pLink["host"])) {
-    if ($pLink["host"] != (is_null($host) ? HOST : $host)) {
+    if ($pLink["host"] != (is_null($host) ? HTTP_HOST : $host)) {
       return null;
     } // different ns
     unset($pLink["host"]);
@@ -838,7 +838,7 @@ function apc_get_key ($key) {
   if (isset($callers[1]['class'])) {
     $class = $callers[1]['class'];
   }
-  return APC_PREFIX."/".HOST."/".$class."/".Cms::isSuperUser()."/".$key;
+  return APC_PREFIX."/".HTTP_HOST."/".$class."/".Cms::isSuperUser()."/".$key;
 }
 
 /**
@@ -900,7 +900,7 @@ function get_nginx_files ($folder = null, $link = "") {
       $fPaths = array_merge($fPaths, get_nginx_files($filepath, $link));
       continue;
     }
-    if (empty(preg_grep("/KEY: https?".HOST."/$link", file($filepath)))) {
+    if (empty(preg_grep("/KEY: https?".HTTP_HOST."/$link", file($filepath)))) {
       continue;
     }
     $fPaths[] = $filepath;
