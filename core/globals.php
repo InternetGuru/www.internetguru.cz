@@ -89,13 +89,13 @@ function replace_vars ($string, Array $variables, $varPrefix = null) {
   if (!strlen($string)) {
     return $string;
   }
-  $pattern = '/(@?\$'.VARIABLE_PATTERN.')/i';
-  $stringArray = preg_split($pattern, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
-  if (count($stringArray) < 2) {
+  $pat = '/(@?\$'.VARIABLE_PATTERN.')/i';
+  $arr = preg_split($pat, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+  if (count($arr) < 2) {
     return $string;
   }
   $newString = "";
-  foreach ($stringArray as $pos => $chunk) {
+  foreach ($arr as $pos => $chunk) {
     if ($pos % 2 == 0) {
       $newString .= $chunk;
       continue;
