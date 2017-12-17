@@ -71,7 +71,7 @@
     <ref name="li.attlist"/>
     <ref name="Flow.model"/>
   </element>
-</define>  
+</define>
 
 <define name="li.attlist">
   <ref name="Common.attrib"/>
@@ -83,10 +83,6 @@
     <ref name="ol"/>
     <ref name="dl"/>
   </choice>
-</define>
-
-<define name="Block.class" combine="choice">
-  <ref name="List.class"/>
 </define>
 
 </grammar>

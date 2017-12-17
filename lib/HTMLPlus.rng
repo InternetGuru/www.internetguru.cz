@@ -256,11 +256,6 @@
     </element>
   </define>
 
-  <define name="Core.attrib" combine="interleave">
-    <ref name="htmlplus.fn"/>
-    <ref name="htmlplus.var"/>
-  </define>
-
   <define name="htmlplus.fn">
     <optional>
       <attribute name="fn"/>
@@ -270,12 +265,6 @@
   <define name="htmlplus.var">
     <optional>
       <attribute name="var"/>
-    </optional>
-  </define>
-
-  <define name="Flow.model" combine="interleave">
-    <optional>
-      <ref name="htmlplus.blockcode"/>
     </optional>
   </define>
 
@@ -343,15 +332,6 @@
     </element>
   </define>
 
-  <define name="Inline.model" combine="interleave">
-    <optional>
-      <ref name="htmlplus.picture"/>
-    </optional>
-    <optional>
-      <ref name="htmlplus.img"/>
-    </optional>
-  </define>
-
   <include href="xhtml/param.rng"/>
   <include href="xhtml/object.rng"/>
   <include href="xhtml/list.rng"/>
@@ -362,5 +342,33 @@
   <include href="xhtml/xhtml-form-1.rng"/>
   <include href="xhtml/edit.rng"/>
   <include href="xhtml/indexes.rng"/>
+
+  <define name="Core.attrib" combine="interleave">
+    <ref name="htmlplus.fn"/>
+    <ref name="htmlplus.var"/>
+  </define>
+
+  <define name="Flow.model" combine="interleave">
+    <optional>
+      <ref name="htmlplus.blockcode"/>
+    </optional>
+  </define>
+
+  <define name="Inline.model" combine="interleave">
+    <optional>
+      <ref name="htmlplus.picture"/>
+    </optional>
+    <optional>
+      <ref name="htmlplus.img"/>
+    </optional>
+  </define>
+
+  <define name="Block.class" combine="choice">
+    <ref name="htmlplus.list"/>
+  </define>
+
+  <define name="Block.model" combine="choice">
+    <ref name="contentElements"/>
+  </define>
 
 </grammar>

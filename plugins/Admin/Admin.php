@@ -420,9 +420,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return;
     }
     $this->replace = false;
-    if ($df && $doc->removeNodes("//*[@readonly]")) {
-      $this->contentValue = $doc->saveXML();
-    }
+    #if ($df && $doc->removeNodes("//*[@readonly]")) {
+    #  $this->contentValue = $doc->saveXML();
+    #}
     $this->validateXml($doc);
   }
 
@@ -575,7 +575,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $varlist = $doc->createElement("dl");
     $varListVar->appendChild($varlist);
     foreach (Cms::getAllVariables() as $name => $value) {
+      $varlist->appendChild($doc->createTextNode("\n  "));
       $varlist->appendChild($doc->createElement("dt", "$name"));
+      $varlist->appendChild($doc->createTextNode("\n  "));
       $dd = $varlist->appendChild($doc->createElement("dd"));
       switch (gettype($value)) {
         case "NULL":
@@ -731,7 +733,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return file_get_contents($df);
     }
     $doc = XMLBuilder::build($this->defaultFile, $user);
-    $doc->removeNodes("//*[@readonly]");
+    #$doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();
   }

@@ -10,12 +10,14 @@ use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\ErrorPage;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\OutputStrategyInterface;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
+use IGCMS\Core\ResourceInterface;
 use IGCMS\Core\XMLBuilder;
 use SplObserver;
 use SplSubject;
@@ -25,12 +27,12 @@ use XSLTProcessor;
  * Class HtmlOutput
  * @package IGCMS\Plugins
  */
-class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
-    /**
+class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface, ResourceInterface {
+  /**
    * @var string
    */
   const APPEND_HEAD = "head"; // String filename => Int priority
-    /**
+  /**
    * @var string
    */
   const APPEND_BODY = "body"; // String filename => Int priority
@@ -74,6 +76,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @var DOMDocumentPlus|null
    */
   private $cfg = null;
+  /**
+   * @var string|null
+   */
+  private $metaRobots = null;
 
   /**
    * HtmlOutput constructor.
@@ -87,6 +93,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if ($this->detachIfNotAttached("FileHandler")) {
@@ -97,6 +104,17 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     }
     $this->cfg = $this->getXML();
     $this->registerThemes($this->cfg);
+    $robots = $this->cfg->matchElement("robots", "domain", HOST);
+    if (is_null($robots)) {
+      throw new Exception("Unable to match robots element to domain");
+    }
+    if (!$robots->hasAttribute("domain")) {
+      Logger::user_warning(_("Using default robots value (without domain match)"));
+    }
+    $this->metaRobots = $robots->getAttribute("meta");
+    if (stream_resolve_include_path(ROBOTS_TXT) && !@unlink(ROBOTS_TXT)) {
+      Logger::error(sprintf(_("Unable to delete %s file"), ROBOTS_TXT));
+    }
     if (is_null($this->favIcon)) {
       $this->favIcon = findFile($this->pluginDir."/".self::FAVICON);
     }
@@ -104,6 +122,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   /**
    * @param DOMDocumentPlus $cfg
+   * @throws Exception
    */
   private function registerThemes (DOMDocumentPlus $cfg) {
 
@@ -124,6 +143,20 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
+  }
+
+  public static function isSupportedRequest ($filePath) {
+    return $filePath === ROBOTS_TXT;
+  }
+
+  public static function handleRequest () {
+    $robots = self::getXML()->matchElement("robots", "domain", HOST);
+    if (is_null($robots)) {
+      new ErrorPage("No matching robots element", 404);
+    }
+    header('Content-Type: text/plain');
+    echo $robots->nodeValue;
+    exit;
   }
 
   /**
@@ -238,6 +271,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * Create HTML 5 output from HTML+ content and own registers (JS/CSS)
    * @param HTMLPlus $content
    * @return string
+   * @throws Exception
    */
   public function getOutput (HTMLPlus $content) {
     stableSort($this->cssFilesPriority);
@@ -423,6 +457,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    * @param DOMElementPlus $h1
    * @param DOMXPath $xPath
    * @return DOMElement
+   * @throws Exception
    */
   private function addHead (DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath) {
     $head = $doc->createElement("head");
@@ -433,11 +468,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
-    $robots = $this->cfg->getElementById("robots");
-    $this->appendMeta($head, "robots", $robots->nodeValue);
+    $this->appendMeta($head, "robots", $this->metaRobots);
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
-    update_file(findFile($this->pluginDir."/robots.txt"), "robots.txt"); // hash?
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
@@ -509,6 +542,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
 
   /**
    * @return string
+   * @throws Exception
    */
   private function getFavIcon () {
     if (Cms::hasErrorMessage()) {
@@ -561,6 +595,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   /**
    * @param DOMElementPlus $e
    * @param string $aName
+   * @throws Exception
    */
   private function processElement (DOMElementPlus $e, $aName) {
     // no target, no check, no title manipulation
@@ -740,6 +775,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   /**
    * @param DOMElementPlus $img
    * @param array $ids
+   * @throws Exception
    */
   private function processImage (DOMElementPlus $img, Array &$ids) {
     if ($img->hasAttribute("width") && $img->hasAttribute("height")) {
@@ -959,5 +995,3 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
   }
 
 }
-
-?>
