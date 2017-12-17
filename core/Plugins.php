@@ -27,6 +27,7 @@ class Plugins implements SplSubject {
 
   /**
    * Plugins constructor.
+   * @throws Exception
    */
   public function __construct () {
     $this->attachPlugins();
@@ -39,21 +40,21 @@ class Plugins implements SplSubject {
     if (!is_dir(PLUGINS_FOLDER)) {
       throw new Exception(sprintf(_("Missing plugin folder '%s'"), PLUGINS_FOLDER));
     }
-    foreach (scandir(PLUGINS_FOLDER) as $p) {
-      if (strpos($p, ".") === 0) {
+    foreach (scandir(PLUGINS_FOLDER) as $plugin) {
+      if (strpos($plugin, ".") === 0) {
         continue;
       }
-      if (!is_dir(PLUGINS_FOLDER."/$p")) {
+      if (!is_dir(PLUGINS_FOLDER."/$plugin")) {
         continue;
       }
-      if (stream_resolve_include_path(PLUGINS_FOLDER."/.$p")) {
+      if (stream_resolve_include_path(PLUGINS_FOLDER."/.$plugin")) {
         continue;
       }
-      if (stream_resolve_include_path(".PLUGIN.$p")) {
+      if (stream_resolve_include_path(".PLUGIN.$plugin")) {
         continue;
       }
-      $p = "IGCMS\\Plugins\\$p";
-      $this->attach(new $p($this));
+      $plugin = "IGCMS\\Plugins\\$plugin";
+      $this->attach(new $plugin($this));
     }
   }
 
@@ -62,13 +63,13 @@ class Plugins implements SplSubject {
    * @param int $priority
    */
   public function attach (SplObserver $observer, $priority = 50) {
-    $o = (new \ReflectionClass($observer))->getShortName();
-    $this->observers[$o] = $observer;
-    if (!array_key_exists($o, $this->observerPriority)) {
-      $this->observerPriority[$o] = $priority;
+    $oId = (new \ReflectionClass($observer))->getShortName();
+    $this->observers[$oId] = $observer;
+    if (!array_key_exists($oId, $this->observerPriority)) {
+      $this->observerPriority[$oId] = $priority;
     }
     if ($observer->isDebug()) {
-      Logger::notice(sprintf(_("Plugin %s debug mode is enabled"), $o));
+      Logger::notice(sprintf(_("Plugin %s debug mode is enabled"), $oId));
     }
   }
 
@@ -76,12 +77,12 @@ class Plugins implements SplSubject {
    * @param Plugin|SplObserver $observer
    */
   public function detach (SplObserver $observer) {
-    $o = (new \ReflectionClass($observer))->getShortName();
-    if (array_key_exists($o, $this->observers)) {
-      $this->observers[$o] = null;
+    $oId = (new \ReflectionClass($observer))->getShortName();
+    if (array_key_exists($oId, $this->observers)) {
+      $this->observers[$oId] = null;
     }
-    if (array_key_exists($o, $this->observerPriority)) {
-      unset($this->observerPriority[$o]);
+    if (array_key_exists($oId, $this->observerPriority)) {
+      unset($this->observerPriority[$oId]);
     }
   }
 
@@ -142,17 +143,15 @@ class Plugins implements SplSubject {
    * @return Plugins[]|SplObserver[]|GetContentStrategyInterface[]|ModifyContentStrategyInterface[]|FinalContentStrategyInterface[]|ResourceInterface[]|TitleStrategyInterface[]
    */
   public function getIsInterface ($itf) {
-    $contentStrategies = [];
+    $contentStrats = [];
     stable_sort($this->observerPriority, SORT_DESC);
-    foreach ($this->observerPriority as $key => $p) {
+    foreach ($this->observerPriority as $key => $priority) {
       if (!$this->observers[$key] instanceOf $itf) {
         continue;
       }
-      $contentStrategies[$key] = $this->observers[$key];
+      $contentStrats[$key] = $this->observers[$key];
     }
-    return $contentStrategies;
+    return $contentStrats;
   }
 
 }
-
-?>
