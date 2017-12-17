@@ -12,5 +12,3 @@ interface ModifyContentStrategyInterface {
    */
   public function modifyContent (HTMLPlus $content);
 }
-
-?>

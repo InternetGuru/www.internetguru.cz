@@ -43,6 +43,7 @@ class Plugin {
   /**
    * @param string|null $fileName
    * @return HTMLPlus
+   * @throws \Exception
    */
   public static function getHTMLPlus ($fileName = null) {
     if (array_key_exists($fileName, self::$html)) {
@@ -67,6 +68,7 @@ class Plugin {
   /**
    * @param string|null $fileName
    * @return DOMDocumentPlus
+   * @throws \Exception
    */
   public static function getXML ($fileName = null) {
     if (array_key_exists($fileName, self::$xml)) {
@@ -84,6 +86,7 @@ class Plugin {
    * @return bool
    */
   public function isDebug () {
+    /** @noinspection PhpUndefinedClassConstantInspection */
     return defined('static::DEBUG') ? static::DEBUG : false;
   }
 
@@ -95,13 +98,13 @@ class Plugin {
     if (!is_array($pluginName)) {
       $pluginName = [$pluginName];
     }
-    foreach ($pluginName as $p) {
+    foreach ($pluginName as $plugin) {
       global $plugins;
-      if ($plugins->isAttachedPlugin($p)) {
+      if ($plugins->isAttachedPlugin($plugin)) {
         continue;
       }
-      $this->subject->detach($p);
-      Logger::user_warning(sprintf(_("Detaching '%s' due to '%s' dependency"), get_class($this), $p));
+      $this->subject->detach($plugin);
+      Logger::user_warning(sprintf(_("Detaching '%s' due to '%s' dependency"), get_class($this), $plugin));
       return true;
     }
     return false;
@@ -115,5 +118,3 @@ class Plugin {
   }
 
 }
-
-?>
