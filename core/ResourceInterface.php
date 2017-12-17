@@ -17,5 +17,3 @@ interface ResourceInterface {
    */
   public static function handleRequest ();
 }
-
-?>

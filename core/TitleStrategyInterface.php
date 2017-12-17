@@ -11,5 +11,3 @@ interface TitleStrategyInterface {
    */
   public function getTitle ();
 }
-
-?>
