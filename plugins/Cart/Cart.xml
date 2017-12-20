@@ -29,18 +29,14 @@
 
     - cart-order
       order summary, typical usage is <textarea var='cart-order'>Type your order</textarea>
-
     - cart-delete
       value of user varibale id="delete"
-
     - cart-button
       value of user varibale id="button"
-
     - cart-delete-href
       typical usage is <a var="cart-delete cart-delete-href@href">n/a</a>
-
     - cart-status-img
-      automatically generated image ()
+      automatically generated image (full/empty)
   -->
 
 </Cart>

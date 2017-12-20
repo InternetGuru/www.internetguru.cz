@@ -4,7 +4,6 @@ namespace IGCMS\Plugins;
 
 use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
@@ -96,8 +95,9 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
       'delete-href' => '?'.self::DEL_PARAM,
       'status-img' => self::STATUS_IMG,
     ];
+    /** @var DOMElementPlus $button */
     $button = $this->vars['button']->processVariables($this->vars, [], true);
-    $button = $this->vars['button']->processVariables($toSet, [], true);
+    $button = $button->processVariables($toSet, [], true);
     Cms::setVariable('button', $button);
     foreach ($toSet as $name => $value) {
       Cms::setVariable($name, $value);
@@ -170,7 +170,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     }
     $cookieId = self::PLUGIN_NAME.'-'.$id;
     if (isset($_COOKIE[$cookieId])) {
-       $count += (int) ($_COOKIE[$cookieId]);
+      $count += (int) ($_COOKIE[$cookieId]);
     }
     setcookie($cookieId, $count, time() + (86400 * 30), "/"); // 30 days
     redirTo(buildLocalUrl(['path' => getCurLink(), 'query' => self::OK_PARAM."=$id"], true));
@@ -225,7 +225,6 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
    */
   public static function handleRequest () {
     $cfg = self::getXML();
-    $src = "";
     if (empty(self::getCartCookie())) {
       $src = $cfg->getElementById('status-img-empty')->nodeValue;
     } else {
@@ -233,15 +232,13 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     }
     $src = findFile($src);
     $im = new Imagick($src);
-    $output = $im->getimageblob();
-    $outputtype = $im->getFormat();
-    header("Content-type: $outputtype");
+    header("Content-type: {$im->getFormat()}");
     header('Pragma-Directive', 'no-cache');
     header('Cache-Directive', 'no-cache');
     header('Cache-Control', 'no-cache, no-store, must-revalidate');
     header('Pragma', 'no-cache');
     header('Expires', '0');
-    echo $output;
+    echo $im->getimageblob();
     exit();
   }
 }
