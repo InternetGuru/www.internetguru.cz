@@ -14,9 +14,15 @@
   <var id="summary-product" modifyonly="modifyonly">– $name ($product-id) … $summary-ammount ks * $price $currency</var>
   <var id="summary-separator" modifyonly="modifyonly">=====</var>
   <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var>
-  <!--<div id="basket-wrapper" var="status@class" modifyonly="modifyonly">-->
-    <!--<a class="basket-button" var="title@title formpage@href"><span class="fa fa-shopping-cart" var="gotoorder"/></a>-->
-  <!--</div>-->
+
+  <var id="status-img-empty" modifyonly="modifyonly=">/lib/cart/empty.png</var>
+  <var id="status-img-full" modifyonly="modifyonly=">/lib/cart/full.png</var>
+
+  <var id="button" modifyonly="modifyonly=">
+    <div id="wrapper" modifyonly="modifyonly">
+      <a var="gotoorder@title formpage@href"><img var="status-img@src gotoorder@alt" alt="n/a"/></a>
+    </div>
+  </var>
 
   <!--
   Automatically generated variables:
@@ -27,8 +33,14 @@
     - cart-delete
       value of user varibale id="delete"
 
+    - cart-button
+      value of user varibale id="button"
+
     - cart-delete-href
       typical usage is <a var="cart-delete cart-delete-href@href">n/a</a>
+
+    - cart-status-img
+      automatically generated image ()
   -->
 
 </Cart>

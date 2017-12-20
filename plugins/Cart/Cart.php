@@ -11,6 +11,7 @@ use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\ResourceInterface;
+use Imagick;
 use SplObserver;
 use SplSubject;
 
@@ -23,6 +24,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
   const PLUGIN_NAME = 'cart';
   const OK_PARAM = self::PLUGIN_NAME.'-ok';
   const DEL_PARAM = self::PLUGIN_NAME.'-del';
+  const STATUS_IMG = LIB_DIR.'/'.self::PLUGIN_NAME.'/status.png';
 
   /**
    * @var array
@@ -46,11 +48,12 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
       return;
     }
     try {
+      $this->loadVariables();
+      $this->createVariables();
       // add to cart
       if (!empty($_POST)) {
         $this->addToCart();
       }
-      $this->loadVariables();
       // after submitting form delete cookies
       if (getCurLink(true) == "{$this->vars['formpage']}?cfok={$this->vars['formid']}") {
         $this->removeCartCookie();
@@ -68,7 +71,6 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
         Cms::success($this->vars['deletesuccess']);
         return;
       }
-      $this->createVariables();
     } catch (Exception $e) {
       Logger::error($e->getMessage());
     }
@@ -79,13 +81,27 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     /** @var DOMElementPlus $var */
     foreach ($cfg->getElementsByTagName("var") as $var) {
       $id = $var->getRequiredAttribute('id');
-      $this->vars[$id] = $var->nodeValue;
+      $childElements = $var->childElementsArray;
+      if (!count($childElements)) {
+        $this->vars[$id] = $var->nodeValue;
+        continue;
+      }
+      $this->vars[$id] = $var;
     }
   }
 
   private function createVariables () {
-    Cms::setVariable('delete', $this->vars['delete']);
-    Cms::setVariable('delete-href', '?'.self::DEL_PARAM);
+    $toSet = [
+      'delete' => $this->vars['delete'],
+      'delete-href' => '?'.self::DEL_PARAM,
+      'status-img' => self::STATUS_IMG,
+    ];
+    $button = $this->vars['button']->processVariables($this->vars, [], true);
+    $button = $this->vars['button']->processVariables($toSet, [], true);
+    Cms::setVariable('button', $button);
+    foreach ($toSet as $name => $value) {
+      Cms::setVariable($name, $value);
+    }
     $this->createOrderVariable();
   }
 
@@ -174,7 +190,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
   /**
    * @return array
    */
-  private function getCartCookie () {
+  private static function getCartCookie () {
     $product = [];
     foreach ($_COOKIE as $name => $value) {
       if (strpos($name, self::PLUGIN_NAME.'-') !== 0) {
@@ -201,15 +217,32 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
    * @return bool
    */
   public static function isSupportedRequest ($filePath) {
-    // TODO: Implement isSupportedRequest() method.
-    return false;
+    return $filePath == self::STATUS_IMG;
   }
 
   /**
    * @return void
    */
   public static function handleRequest () {
-    // TODO: Implement handleRequest() method.
+    $cfg = self::getXML();
+    $src = "";
+    if (empty(self::getCartCookie())) {
+      $src = $cfg->getElementById('status-img-empty')->nodeValue;
+    } else {
+      $src = $cfg->getElementById('status-img-full')->nodeValue;
+    }
+    $src = findFile($src);
+    $im = new Imagick($src);
+    $output = $im->getimageblob();
+    $outputtype = $im->getFormat();
+    header("Content-type: $outputtype");
+    header('Pragma-Directive', 'no-cache');
+    header('Cache-Directive', 'no-cache');
+    header('Cache-Control', 'no-cache, no-store, must-revalidate');
+    header('Pragma', 'no-cache');
+    header('Expires', '0');
+    echo $output;
+    exit();
   }
 }
 
