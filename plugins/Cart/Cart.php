@@ -233,11 +233,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     $src = findFile($src);
     $im = new Imagick($src);
     header("Content-type: {$im->getFormat()}");
-    header('Pragma-Directive', 'no-cache');
-    header('Cache-Directive', 'no-cache');
-    header('Cache-Control', 'no-cache, no-store, must-revalidate');
-    header('Pragma', 'no-cache');
-    header('Expires', '0');
+    header('Cache-Control: no-cache, no-store, must-revalidate');
     echo $im->getimageblob();
     exit();
   }
