@@ -117,7 +117,7 @@ Disallow: /</robots>
 Disallow: /</robots>
   <robots domain="www.*.*" readonly="readonly" meta="all">User-agent: *
 Disallow:</robots>
-  <robots domain="*.*.local" readonly="readonly" meta="noindex, nofollow">User-agent: *
+  <robots domain="*.localhost.cz" readonly="readonly" meta="noindex, nofollow">User-agent: *
 Disallow: /</robots>
 
   <!-- Favicons -->
