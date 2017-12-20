@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
- - Nový plugin Cart
+ - New plugin Cart
 
 ### Removed
  - Plugin Basket
