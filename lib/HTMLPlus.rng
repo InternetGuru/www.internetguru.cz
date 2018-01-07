@@ -348,12 +348,6 @@
     <ref name="htmlplus.var"/>
   </define>
 
-  <define name="Flow.model" combine="interleave">
-    <optional>
-      <ref name="htmlplus.blockcode"/>
-    </optional>
-  </define>
-
   <define name="Inline.model" combine="interleave">
     <optional>
       <ref name="htmlplus.picture"/>
@@ -364,7 +358,7 @@
   </define>
 
   <define name="Block.class" combine="choice">
-    <ref name="htmlplus.list"/>
+    <ref name="contentElements"/>
   </define>
 
   <define name="Block.model" combine="choice">
