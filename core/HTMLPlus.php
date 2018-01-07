@@ -341,7 +341,7 @@ class HTMLPlus extends DOMDocumentPlus {
   public function validatePlus ($repair = false) {
     $i = 0;
     $hash = hash(FILE_HASH_ALGO, $this->saveXML());
-    $version = 6; // increment if validatePlus changes
+    $version = 7; // increment if validatePlus changes
     $cacheKey = apc_get_key("HTMLPlus/validatePlus/$hash/$version");
     if (self::USE_APC && apc_exists($cacheKey)) {
       $i = apc_fetch($cacheKey);
