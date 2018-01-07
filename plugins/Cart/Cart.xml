@@ -1,28 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Cart>
-  <!--
-  User settings:
-  -->
-  <var id="formpage" modifyonly="modifyonly">objednavka</var>
-  <var id="formid" modifyonly="modifyonly">objednavka</var>
-  <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
-  <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
-  <var id="delete" modifyonly="modifyonly">Vyprázdnit košík</var>
-  <var id="deletesuccess" modifyonly="modifyonly">Košík byl úpěšně vyprázdněn</var>
-
-  <var id="currency" modifyonly="modifyonly">Kč</var>
-  <var id="summary-product" modifyonly="modifyonly">– $name ($product-id) … $summary-ammount ks * $price $currency</var>
-  <var id="summary-separator" modifyonly="modifyonly">=====</var>
-  <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var>
-
-  <var id="button" modifyonly="modifyonly=">
-    <div id="wrapper" modifyonly="modifyonly">
-      <a var="gotoorder@title formpage@href"><img var="status-img@src gotoorder@alt" alt="n/a"/></a>
-    </div>
-  </var>
 
   <!--
-  Automatically generated variables:
+  Generated variables:
 
     - cart-order
       order summary, typical usage is <textarea var='cart-order'>Type your order</textarea>
@@ -34,6 +14,29 @@
       typical usage is <a var="cart-delete cart-delete-href@href">n/a</a>
     - cart-status-img
       automatically generated image (full/empty)
+
   -->
+  <var id="formpage" modifyonly="modifyonly">objednavka</var>
+  <var id="formid" modifyonly="modifyonly">objednavka</var>
+  <var id="success" modifyonly="modifyonly">Zboží bylo úspěšně přidáno do košíku</var>
+  <var id="gotoorder" modifyonly="modifyonly">Přejít k objednávce</var>
+  <var id="delete" modifyonly="modifyonly">Vyprázdnit košík</var>
+  <var id="deletesuccess" modifyonly="modifyonly">Košík byl úpěšně vyprázdněn</var>
+
+  <var id="currency" modifyonly="modifyonly">Kč</var>
+
+  <var id="button" modifyonly="modifyonly=">
+    <div id="wrapper" modifyonly="modifyonly">
+      <a var="gotoorder@title formpage@href"><img var="status-img@src gotoorder@alt" alt="n/a"/></a>
+    </div>
+  </var>
+
+  <!--
+  Form summary.
+  Available variables: $product-id, $name, $price, $currency, $summary-ammount
+  -->
+  <var id="summary-product" modifyonly="modifyonly">– $name ($product-id) … $summary-ammount ks * $price $currency</var>
+  <var id="summary-separator" modifyonly="modifyonly">=====</var>
+  <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var>
 
 </Cart>
