@@ -15,9 +15,6 @@
   <var id="summary-separator" modifyonly="modifyonly">=====</var>
   <var id="summary-total" modifyonly="modifyonly">Celková cena: $summary-total $currency</var>
 
-  <var id="status-img-empty" modifyonly="modifyonly=">/lib/cart/empty.png</var>
-  <var id="status-img-full" modifyonly="modifyonly=">/lib/cart/full.png</var>
-
   <var id="button" modifyonly="modifyonly=">
     <div id="wrapper" modifyonly="modifyonly">
       <a var="gotoorder@title formpage@href"><img var="status-img@src gotoorder@alt" alt="n/a"/></a>

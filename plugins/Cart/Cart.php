@@ -21,9 +21,12 @@ use SplSubject;
 class Cart extends Plugin implements SplObserver, ResourceInterface {
 
   const PLUGIN_NAME = 'cart';
-  const OK_PARAM = self::PLUGIN_NAME.'-ok';
+  const OK_PARAM = self::PLUGIN_NAME.'-add';
   const DEL_PARAM = self::PLUGIN_NAME.'-del';
-  const STATUS_IMG = LIB_DIR.'/'.self::PLUGIN_NAME.'/status.png';
+
+  const PLUGIN_DIR = PLUGINS_DIR.'/Cart';
+  const CART_IMG = PLUGINS_DIR.'/cart.png';
+  const CART_FULL_IMG = PLUGINS_DIR.'/cart-full.png';
 
   /**
    * @var array
@@ -93,7 +96,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     $toSet = [
       'delete' => $this->vars['delete'],
       'delete-href' => '?'.self::DEL_PARAM,
-      'status-img' => self::STATUS_IMG,
+      'status-img' => self::CART_IMG,
     ];
     /** @var DOMElementPlus $button */
     $button = $this->vars['button']->processVariables($this->vars, [], true);
@@ -164,8 +167,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     $id = $_POST['id'];
     $this->validateProductId($id);
     $count = (int) ($_POST['count']);
-    // TODO validate min / max
-    if (!is_numeric($count) || $count < 1) {
+    if (!is_numeric($count) || $count < 1 || $count > 99) {
       throw new Exception(sprintf(_('Invalid count %s at product id %s'), $_POST['count'], $id));
     }
     $cookieId = self::PLUGIN_NAME.'-'.$id;
@@ -181,10 +183,9 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
    * @throws Exception
    */
   private function validateProductId ($id) {
-    if (!is_null(HTMLPlusBuilder::getIdToLink($id))) {
-      return;
+    if (is_null(HTMLPlusBuilder::getIdToLink($id))) {
+      throw new Exception(sprintf(_('Product id %s not found'), $id));
     }
-    throw new Exception(sprintf(_('Product id %s not found'), $id));
   }
 
   /**
@@ -217,18 +218,17 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
    * @return bool
    */
   public static function isSupportedRequest ($filePath) {
-    return $filePath == self::STATUS_IMG;
+    return $filePath == self::CART_IMG;
   }
 
   /**
    * @return void
    */
   public static function handleRequest () {
-    $cfg = self::getXML();
     if (empty(self::getCartCookie())) {
-      $src = $cfg->getElementById('status-img-empty')->nodeValue;
+      $src = self::CART_IMG;
     } else {
-      $src = $cfg->getElementById('status-img-full')->nodeValue;
+      $src = self::CART_FULL_IMG;
     }
     $src = findFile($src);
     $im = new Imagick($src);
