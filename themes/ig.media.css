@@ -33,7 +33,7 @@ form div.list.multiple dl {
     margin: 0 auto;
   }
   div.section > div.list.multiple > div {
-    justify-content: space-between;
+    justify-content: space-around;
   }
   div.section > div.list.multiple dl {
     flex: 0 1 50%;
@@ -47,7 +47,7 @@ form div.list.multiple dl {
     max-width: 55em;
   }
   form div.list.multiple > div {
-    justify-content: space-between;
+    justify-content: space-around;
   }
   div.section > div.list.multiple dl {
     flex: 0 1 33.33%;
