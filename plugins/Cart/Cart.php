@@ -95,6 +95,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
   private function createVariables () {
     $toSet = [
       'delete' => $this->vars['delete'],
+      'currency' => $this->vars['currency'],
       'delete-href' => '?'.self::DEL_PARAM,
       'status-img' => self::CART_IMG,
     ];
