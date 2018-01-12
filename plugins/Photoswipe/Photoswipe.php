@@ -42,26 +42,24 @@ class Photoswipe extends Plugin implements SplObserver, ModifyContentStrategyInt
    * @param HTMLPlus $content
    */
   public function modifyContent (HTMLPlus $content) {
-    $xpath = new DOMXPath($content);
-    $r = @$xpath->query("//*[contains(@class, '".strtolower($this->className)."')]");
-    if (!$r->length) {
-      return;
-    }
     $config = $this->getXML();
     $vendorDir = VENDOR_DIR . "/internetguru/photoswipe/dist";
     $os = Cms::getOutputStrategy();
-    $os->addCssFile("$vendorDir/photoswipe.css");
-    $os->addCssFile("$vendorDir/default-skin/default-skin.css");
-    $os->addJsFile("$vendorDir/photoswipe.min.js", 1, "body");
-    $os->addJsFile("$vendorDir/photoswipe-ui-default.min.js", 1, "body");
-    $os->addJsFile($this->pluginDir."/Photoswipe.js", 1, "body");
+    $ifxpath = "//*[contains(@class, '".strtolower($this->className)."')]";
+    $os->addCssFile("$vendorDir/photoswipe.css", false, 1, true, null, $ifxpath);
+    $os->addCssFile("$vendorDir/default-skin/default-skin.css", false, 1, true, null, $ifxpath);
+    $os->addJsFile("$vendorDir/photoswipe.min.js", 1, "body", false, null, $ifxpath);
+    $os->addJsFile("$vendorDir/photoswipe-ui-default.min.js", 1, "body", false, null, $ifxpath);
+    $os->addJsFile($this->pluginDir."/Photoswipe.js", 1, "body", false, null, $ifxpath);
     $socialEl = $config->getElementById("social", "var");
     $social = $socialEl && $socialEl->nodeValue == "enabled" ? "true" : "false";
     $os->addJs("if(typeof IGCMS === \"undefined\") throw \"IGCMS is not defined\";
-IGCMS.Pswp.init({
-  galleryClassSelector: \".".strtolower($this->className)."\",
-  shareEl: ".$social."
-});", 1, "body");
+if (IGCMS.Pswp) {
+  IGCMS.Pswp.init({
+    galleryClassSelector: \".".strtolower($this->className)."\",
+    shareEl: ".$social."
+  });
+}", 1, "body");
   }
 }
 
