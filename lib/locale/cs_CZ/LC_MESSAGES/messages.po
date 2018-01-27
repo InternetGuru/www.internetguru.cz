@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-12-16 00:56-0500\n"
-"PO-Revision-Date: 2017-12-16 00:59-0500\n"
+"POT-Creation-Date: 2017-12-17 08:31-0500\n"
+"PO-Revision-Date: 2017-12-17 08:31-0500\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -77,56 +77,56 @@ msgstr "Není možné vytvořit funkci %s: nejedná se o funkci"
 msgid "Function %s does not exist"
 msgstr "Funkce %s neexistuje"
 
-#: core/DOMDocumentPlus.php:35
+#: core/DOMDocumentPlus.php:42
 #, php-format
 msgid "Invalid attribute %s value '%s'"
 msgstr "Neplatný atribut %s s hodnotou '%s'"
 
-#: core/DOMDocumentPlus.php:69
+#: core/DOMDocumentPlus.php:76
 msgid "File not found or disabled"
 msgstr "Soubor nebyl nalezen nebo je deaktivovaný"
 
-#: core/DOMDocumentPlus.php:72
+#: core/DOMDocumentPlus.php:79
 msgid "Invalid XML file"
 msgstr "Nevalidní syntaxe XML"
 
-#: core/DOMDocumentPlus.php:84
+#: core/DOMDocumentPlus.php:91
 msgid "Invalid XML"
 msgstr "Nevalidní XML"
 
-#: core/DOMDocumentPlus.php:125
+#: core/DOMDocumentPlus.php:132
 #, php-format
 msgid "Duplicit %s found for value '%s'"
 msgstr "Nalezena duplicitní hodnota %2$s atributu '%1$s'"
 
-#: core/DOMDocumentPlus.php:185
+#: core/DOMDocumentPlus.php:192
 msgid "Max variable recursion level exceeded"
 msgstr "Překročeno maximální zanoření proměnné"
 
-#: core/DOMDocumentPlus.php:190
+#: core/DOMDocumentPlus.php:197
 #, php-format
 msgid "Unable to insert variable %s: %s"
 msgstr "Nepodařilo se vložit proměnnou %s: %s"
 
-#: core/DOMDocumentPlus.php:241
+#: core/DOMDocumentPlus.php:248
 #, php-format
 msgid "Unsupported variable type %s"
 msgstr "Nepodporovaný formát proměnné %s"
 
-#: core/DOMDocumentPlus.php:272
+#: core/DOMDocumentPlus.php:279
 msgid "Readonly element hidden"
 msgstr "Skrytý element s atributem 'readonly'"
 
-#: core/DOMDocumentPlus.php:285
+#: core/DOMDocumentPlus.php:292
 #, php-format
 msgid "Unable to find HTML+ RNG schema '%s'"
 msgstr "Nepodařilo se nalézt HTML+ RNG schéma '%s'"
 
-#: core/DOMDocumentPlus.php:292
+#: core/DOMDocumentPlus.php:299
 msgid "relaxNGValidate() internal error occurred"
 msgstr "Došlo k vnitřní chybě funkce relaxNGValidate()"
 
-#: core/DOMDocumentPlus.php:297
+#: core/DOMDocumentPlus.php:304
 msgid "Caution: this message may be misleading"
 msgstr "Upozornění: tato informace může být zavádějící"
 
@@ -1075,77 +1075,82 @@ msgstr "Neaktuální souborová mezipaměť: %s"
 msgid "Unable to create user folder %s"
 msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
 
-#: plugins/GA/GA.php:38
+#: plugins/GA/GA.php:43
 msgid "Using default Google Analytics ID value (without domain match)"
 msgstr "Používá se výchozí hodnota Google Analytics ID (bez odpovídající domény)"
 
-#: plugins/GA/GA.php:41
+#: plugins/GA/GA.php:46
 msgid "Google Analytics ID does not match typical pattern"
 msgstr "Google Analytics ID nemá typický formát"
 
-#: plugins/GA/GA.php:45
+#: plugins/GA/GA.php:50
 #, php-format
 msgid "GA is disabled for logged users (ga_id = %s)"
 msgstr "GA je neaktivní pro přihlášené uživatele (ga_id = %s)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:110
+#: plugins/HtmlOutput/HtmlOutput.php:112
 msgid "Using default robots value (without domain match)"
 msgstr "Používá se výchozí hodnota robots (bez odpovídající domény)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:132
+#: plugins/HtmlOutput/HtmlOutput.php:116
+#, php-format
+msgid "Unable to delete %s file"
+msgstr "Nepodařilo se smazat soubor %s"
+
+#: plugins/HtmlOutput/HtmlOutput.php:138
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:205
+#: plugins/HtmlOutput/HtmlOutput.php:215
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:344
+#: plugins/HtmlOutput/HtmlOutput.php:355
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:371
+#: plugins/HtmlOutput/HtmlOutput.php:382
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:406
+#: plugins/HtmlOutput/HtmlOutput.php:417
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:409
+#: plugins/HtmlOutput/HtmlOutput.php:420
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:562
+#: plugins/HtmlOutput/HtmlOutput.php:575
 #, php-format
 msgid "Invalid xPath query '%s'"
 msgstr "Neplatný xPath '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:595
+#: plugins/HtmlOutput/HtmlOutput.php:609
 msgid "Empty value"
 msgstr "Prázdná hodnota"
 
-#: plugins/HtmlOutput/HtmlOutput.php:621
+#: plugins/HtmlOutput/HtmlOutput.php:635
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:670
+#: plugins/HtmlOutput/HtmlOutput.php:684
 msgid "Target not found"
 msgstr "Cíl nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:781
+#: plugins/HtmlOutput/HtmlOutput.php:796
 #, php-format
 msgid "Attribute src=%s removed: %s"
 msgstr "Odstraněn atribut src=%s: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:902
+#: plugins/HtmlOutput/HtmlOutput.php:917
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1308,6 +1313,9 @@ msgstr "Počkejte %s sekund před dalším odesláním"
 #: plugins/ValidateForm/ValidateForm.php:397
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
+
+#~ msgid "Unable to delete old %s file"
+#~ msgstr "Nepodařilo se smazat původní %s soubor"
 
 #~ msgid "GA disabled (ga_id = %s)"
 #~ msgstr "GA je vypnutý (ga_id = %s)"

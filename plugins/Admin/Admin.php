@@ -369,9 +369,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     try {
       $file = find_file($this->defaultFile, false);
       $this->scheme = $this->getScheme($file);
-    } catch (Exception $exc) {
-      $file = false;
-    }
+    } catch (Exception $exc) {}
     // get user schema if default schema not exists
     if (is_null($this->scheme) && stream_resolve_include_path($this->dataFile)) {
       $this->scheme = $this->getScheme($this->dataFile);
@@ -426,9 +424,6 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return;
     }
     $this->replace = false;
-    if ($file && $doc->removeNodes("//*[@readonly]")) {
-      $this->contentValue = $doc->saveXML();
-    }
     $this->validateXml($doc);
   }
 
@@ -744,7 +739,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       return file_get_contents($defaultFile);
     }
     $doc = XMLBuilder::build($this->defaultFile, $user);
-    $doc->removeNodes("//*[@readonly]");
+    #$doc->removeNodes("//*[@readonly]");
     $doc->formatOutput = true;
     return $doc->saveXML();
   }

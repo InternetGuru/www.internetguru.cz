@@ -46,7 +46,7 @@ class GoogleAnalytics extends Plugin implements SplObserver {
       Logger::user_error(_("Google Analytics ID does not match typical pattern"));
     }
     // disable if logged user
-    if (is_null(Cms::getLoggedUser())) {
+    if (!is_null(Cms::getLoggedUser())) {
       Cms::getOutputStrategy()->addJs("// ".sprintf(_("GA is disabled for logged users (ga_id = %s)"), $ga_id->nodeValue), 1, "body");
       return;
     }

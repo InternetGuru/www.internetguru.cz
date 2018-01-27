@@ -112,6 +112,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       Logger::user_warning(_("Using default robots value (without domain match)"));
     }
     $this->metaRobots = $robots->getAttribute("meta");
+    if (stream_resolve_include_path(ROBOTS_TXT) && !@unlink(ROBOTS_TXT)) {
+      Logger::error(sprintf(_("Unable to delete %s file"), ROBOTS_TXT));
+    }
     if (is_null($this->favIcon)) {
       $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
     }
