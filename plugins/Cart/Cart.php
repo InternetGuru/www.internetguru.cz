@@ -57,13 +57,13 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
         $this->addToCart();
       }
       // after submitting form delete cookies
-      if (getCurLink(true) == "{$this->vars['formpage']}?cfok={$this->vars['formid']}") {
+      if (get_link(true) == "{$this->vars['formpage']}?cfok={$this->vars['formid']}") {
         $this->removeCartCookie();
       }
       // show cart-add success message
       if (array_key_exists(self::OK_PARAM, $_GET)) {
-        $id = $_GET[self::OK_PARAM];
-        $this->validateProductId($id);
+        $okParam = $_GET[self::OK_PARAM];
+        $this->validateProductId($okParam);
         Cms::success("{$this->vars['success']}. <a href='{$this->vars['formpage']}'>{$this->vars['gotoorder']}</a>.");
         return;
       }
@@ -73,25 +73,31 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
         Cms::success($this->vars['deletesuccess']);
         return;
       }
-    } catch (Exception $e) {
-      Logger::error($e->getMessage());
+    } catch (Exception $exc) {
+      Logger::error($exc->getMessage());
     }
   }
 
+  /**
+   * @throws Exception
+   */
   private function loadVariables () {
-    $cfg = $this->getXML();
+    $cfg = self::getXML();
     /** @var DOMElementPlus $var */
     foreach ($cfg->getElementsByTagName("var") as $var) {
-      $id = $var->getRequiredAttribute('id');
+      $varId = $var->getRequiredAttribute('id');
       $childElements = $var->childElementsArray;
       if (!count($childElements)) {
-        $this->vars[$id] = $var->nodeValue;
+        $this->vars[$varId] = $var->nodeValue;
         continue;
       }
-      $this->vars[$id] = $var;
+      $this->vars[$varId] = $var;
     }
   }
 
+  /**
+   * @throws Exception
+   */
   private function createVariables () {
     $toSet = [
       'delete' => $this->vars['delete'],
@@ -109,39 +115,42 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     $this->createOrderVariable();
   }
 
+  /**
+   * @throws Exception
+   */
   private function createOrderVariable () {
     $summary = "";
     $summaryProduct = $this->vars['summary-product'];
     $summarySeparator = $this->vars['summary-separator'];
     $summaryTotal = $this->vars['summary-total'];
     $totalPrice = null;
-    $cookie = $this->getCartCookie();
+    $cookie = self::getCartCookie();
     $notice = false;
-    foreach ($cookie as $id => $value) {
+    foreach ($cookie as $cookieId => $value) {
       try {
-        $this->validateProductId($id);
-      } catch (Exception $e) {
+        $this->validateProductId($cookieId);
+      } catch (Exception $exc) {
         $notice = true;
         continue;
       }
-      $productData = HTMLPlusBuilder::getIdToData($id);
+      $productData = HTMLPlusBuilder::getIdToData($cookieId);
       if (is_null($productData) || !array_key_exists('price', $productData)) {
         Logger::user_warning(sprintf(_('Product %s missing data-price attribute')));
         continue;
       }
       $vars = [
-        'product-id' => $id,
-        'name' => HTMLPlusBuilder::getIdToHeading($id),
+        'product-id' => $cookieId,
+        'name' => HTMLPlusBuilder::getIdToHeading($cookieId),
         'price' => $productData['price'],
         'currency' => $this->vars['currency'],
         'summary-ammount' => $value,
       ];
-      $summary .= replaceVariables($summaryProduct, $vars)."\n";
+      $summary .= replace_vars($summaryProduct, $vars)."\n";
       $totalPrice = (int) $totalPrice + (int) $vars['price'] * (int) $value;
     }
     if (strlen($summary)) {
       $summary .= "$summarySeparator\n";
-      $summary .= replaceVariables(
+      $summary .= replace_vars(
           $summaryTotal,
           ['summary-total' => (string) $totalPrice, 'currency' => $this->vars['currency']]
         )."\n";
@@ -165,18 +174,17 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     if ($_POST['plugin'] != self::PLUGIN_NAME) {
       return;
     }
-    $id = $_POST['id'];
-    $this->validateProductId($id);
+    $this->validateProductId($_POST['id']);
     $count = (int) ($_POST['count']);
     if (!is_numeric($count) || $count < 1 || $count > 99) {
-      throw new Exception(sprintf(_('Invalid count %s at product id %s'), $_POST['count'], $id));
+      throw new Exception(sprintf(_('Invalid count %s at product id %s'), $_POST['count'], $_POST['id']));
     }
-    $cookieId = self::PLUGIN_NAME.'-'.$id;
+    $cookieId = self::PLUGIN_NAME.'-'.$_POST['id'];
     if (isset($_COOKIE[$cookieId])) {
       $count += (int) ($_COOKIE[$cookieId]);
     }
     setcookie($cookieId, $count, time() + (86400 * 30), "/"); // 30 days
-    redirTo(buildLocalUrl(['path' => getCurLink(), 'query' => self::OK_PARAM."=$id"], true));
+    redir_to(build_local_url(['path' => get_link(), 'query' => self::OK_PARAM."=".$_POST['id']], true));
   }
 
   /**
@@ -198,8 +206,8 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
       if (strpos($name, self::PLUGIN_NAME.'-') !== 0) {
         continue;
       }
-      $id = substr($name, strlen(self::PLUGIN_NAME) + 1);
-      $product[$id] = $value;
+      $productId = substr($name, strlen(self::PLUGIN_NAME) + 1);
+      $product[$productId] = $value;
     }
     return $product;
   }
@@ -224,6 +232,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
 
   /**
    * @return void
+   * @throws Exception
    */
   public static function handleRequest () {
     if (empty(self::getCartCookie())) {
@@ -231,13 +240,11 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     } else {
       $src = self::CART_FULL_IMG;
     }
-    $src = findFile($src);
-    $im = new Imagick($src);
-    header("Content-type: {$im->getFormat()}");
+    $src = find_file($src);
+    $imagick = new Imagick($src);
+    header("Content-type: {$imagick->getFormat()}");
     header('Cache-Control: no-cache, no-store, must-revalidate');
-    echo $im->getimageblob();
+    echo $imagick->getImageBlob();
     exit();
   }
 }
-
-?>
