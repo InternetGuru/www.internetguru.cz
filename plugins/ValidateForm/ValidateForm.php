@@ -33,7 +33,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
   /**
    * @var int
    */
-  const WAIT = 120;
+  const WAIT_SEC = 120;
   /**
    * @var int Default input max-length
    */
@@ -58,6 +58,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if (!Cms::isActive()) {
@@ -79,13 +80,14 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
 
   /**
    * @param DOMElementPlus $form
+   * @throws Exception
    */
   private function modifyFormVars (DOMElementPlus $form) {
     if (!$form->hasClass("validable")) {
       return;
     }
     try {
-      $id = $form->getRequiredAttribute("id");
+      $formId = $form->getRequiredAttribute("id");
     } catch (Exception $exc) {
       Logger::user_warning($exc->getMessage());
       return;
@@ -107,7 +109,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     $input = $doc->createElement("input");
     $input->setAttribute("type", "hidden");
     $input->setAttribute("name", self::FORM_ID);
-    $input->setAttribute("value", $id);
+    $input->setAttribute("value", $formId);
     $div->appendChild($input);
 
     $form->appendChild($div);
@@ -116,7 +118,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     if (empty($request)) {
       return;
     }
-    if (!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $id) {
+    if (!isset($request[self::FORM_ID]) || $request[self::FORM_ID] != $formId) {
       return;
     }
     if (!$this->hpCheck($request)) {
@@ -133,7 +135,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       Cms::error($exc->getMessage());
       return;
     }
-    Cms::setVariable($id, $items);
+    Cms::setVariable($formId, $items);
   }
 
   /**
@@ -141,7 +143,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
    * @return int
    */
   private function getWaitTime (DOMElementPlus $form) {
-    $time = self::WAIT;
+    $time = self::WAIT_SEC;
     foreach (explode(" ", $form->getAttribute("class")) as $class) {
       if (strpos($class, "validateform-") !== 0) {
         continue;
@@ -167,7 +169,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     /** @var DOMElementPlus $label */
     foreach ($form->getElementsByTagName("label") as $label) {
       if ($label->hasAttribute("for")) {
-        $id = $label->getAttribute("for");
+        $forId = $label->getAttribute("for");
       } else {
         $fields = [];
         $this->getFormFields($label, $fields);
@@ -178,9 +180,9 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
         if (!$fields[0]->hasAttribute("id")) {
           $fields[0]->setUniqueId();
         }
-        $id = $fields[0]->getAttribute("id");
+        $forId = $fields[0]->getAttribute("id");
       }
-      $this->labels[$id][] = $label->nodeValue;
+      $this->labels[$forId][] = $label->nodeValue;
     }
   }
 
@@ -211,6 +213,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     $fields = [];
     $this->getFormFields($form, $fields);
     foreach ($fields as $field) {
+      $name = null;
       try {
         $name = normalize($field->getAttribute("name"), null, "", false);
         $value = isset($request[$name]) ? $request[$name] : null;
@@ -220,15 +223,15 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
         if (!$field->hasAttribute("id")) {
           $field->setUniqueId();
         }
-        $id = $field->getAttribute("id");
+        $fieldId = $field->getAttribute("id");
         $error = $exc->getMessage();
-        if (isset($this->labels[$id][0])) {
-          $name = $this->labels[$id][0];
+        if (isset($this->labels[$fieldId][0])) {
+          $name = $this->labels[$fieldId][0];
         }
-        if (isset($this->labels[$id][1])) {
-          $error = $this->labels[$id][1];
+        if (isset($this->labels[$fieldId][1])) {
+          $error = $this->labels[$fieldId][1];
         }
-        Cms::error(sprintf("<label for='%s'>%s</label>: %s", $id, $name, $error));
+        Cms::error(sprintf("<label for='%s'>%s</label>: %s", $fieldId, $name, $error));
         $field->parentNode->addClass(self::CSS_WARNING);
         $field->addClass(self::CSS_WARNING);
         $isValid = false;
@@ -314,6 +317,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     if (!strlen($pattern)) {
       return;
     }
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     $res = @preg_match("/^(?:$pattern)$/", $value);
     if ($res === false) {
       Logger::user_warning(_("Invalid item pattern"));
@@ -379,27 +383,28 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     if ($time == 0) {
       return;
     }
-    $IP = get_ip();
-    $IPFile = str_replace(":", "-", $IP);
-    $IPFilePath = USER_FOLDER."/".$this->pluginDir."/$IPFile";
-    $bannedIPFilePath = USER_FOLDER."/".$this->pluginDir."/.$IPFile";
+    $ipAddr = get_ip();
+    $ipFile = str_replace(":", "-", $ipAddr);
+    $ipFilePath = USER_FOLDER."/".$this->pluginDir."/$ipFile";
+    $bannedIPFilePath = USER_FOLDER."/".$this->pluginDir."/.$ipFile";
     if (is_file($bannedIPFilePath)) {
-      throw new Exception(sprintf(_("Your IP address %s is banned"), $IP));
+      throw new Exception(sprintf(_("Your IP address %s is banned"), $ipAddr));
     }
-    if (is_file($IPFilePath)) {
-      if (time() - filemtime($IPFilePath) < $time) { // 2 min timeout
-        $sec = $time - (time() - filemtime($IPFilePath));
+    if (is_file($ipFilePath)) {
+      if (time() - filemtime($ipFilePath) < $time) { // 2 min timeout
+        $sec = $time - (time() - filemtime($ipFilePath));
         throw new Exception(sprintf(_("Please wait %s second before next post"), $sec));
       }
     }
-    mkdir_plus(dirname($IPFilePath));
-    if (!touch($IPFilePath)) {
+    mkdir_plus(dirname($ipFilePath));
+    if (!touch($ipFilePath)) {
       throw new Exception(_("Unable to create security file"));
     }
   }
 
   /**
    * @param HTMLPlus $content
+   * @throws Exception
    */
   public function modifyContent (HTMLPlus $content) {
     foreach ($content->getElementsByTagName("form") as $form) {
@@ -408,5 +413,3 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
   }
 
 }
-
-?>

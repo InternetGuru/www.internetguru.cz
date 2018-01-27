@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
@@ -40,20 +41,21 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
 
   /**
    * @param HTMLPlus $content
+   * @throws Exception
    */
   public function modifyContent (HTMLPlus $content) {
     if (!$content->documentElement->hasClass(strtolower($this->className))) {
       return;
     }
     $filePath = HTMLPlusBuilder::getCurFile();
-    $id = HTMLPlusBuilder::getFileToId($filePath);
+    $fileId = HTMLPlusBuilder::getFileToId($filePath);
     $globalInfo = [];
-    $globalInfo["ctime"] = HTMLPlusBuilder::getIdToCtime($id);
-    $globalInfo["mtime"] = HTMLPlusBuilder::getIdToMtime($id);
-    $globalInfo["author"] = HTMLPlusBuilder::getIdToAuthor($id);
-    $globalInfo["authorid"] = HTMLPlusBuilder::getIdToAuthorId($id);
-    $globalInfo["resp"] = HTMLPlusBuilder::getIdToResp($id);
-    $globalInfo["respid"] = HTMLPlusBuilder::getIdToRespId($id);
+    $globalInfo["ctime"] = HTMLPlusBuilder::getIdToCtime($fileId);
+    $globalInfo["mtime"] = HTMLPlusBuilder::getIdToMtime($fileId);
+    $globalInfo["author"] = HTMLPlusBuilder::getIdToAuthor($fileId);
+    $globalInfo["authorid"] = HTMLPlusBuilder::getIdToAuthorId($fileId);
+    $globalInfo["resp"] = HTMLPlusBuilder::getIdToResp($fileId);
+    $globalInfo["respid"] = HTMLPlusBuilder::getIdToRespId($fileId);
     $this->insertDocInfo($content, $globalInfo, $filePath);
   }
 
@@ -61,23 +63,24 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
    * @param HTMLPlus $doc
    * @param array $globalInfo
    * @param $filePath
+   * @throws Exception
    */
   private function insertDocInfo (HTMLPlus $doc, Array $globalInfo, $filePath) {
     $this->vars = [];
     /** @var DOMElementPlus $var */
-    foreach ($this->getXML()->getElementsByTagName("var") as $var) {
+    foreach (self::getXML()->getElementsByTagName("var") as $var) {
       $this->vars[$var->getAttribute("id")] = $var;
     }
-    foreach ($doc->getElementsByTagName("h") as $h) {
+    foreach ($doc->getElementsByTagName("h") as $hElm) {
       $before = null;
-      if ($h->parentNode->nodeName == "body") {
+      if ($hElm->parentNode->nodeName == "body") {
         if ($filePath == INDEX_HTML) {
           continue;
         }
         $info = $this->createGlobalDocInfo($globalInfo, $filePath);
       } else {
-        $info = $this->createLocalDocInfo($h, $globalInfo);
-        $before = $h->nextElement;
+        $info = $this->createLocalDocInfo($hElm, $globalInfo);
+        $before = $hElm->nextElement;
         while (!is_null($before)) {
           if ($before->nodeName == "h") {
             break;
@@ -91,7 +94,7 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
       /** @var DOMElementPlus $info */
       $info = $doc->importNode($info, true);
       foreach ($info->childElementsArray as $child) {
-        $h->parentNode->insertBefore($child, $before);
+        $hElm->parentNode->insertBefore($child, $before);
       }
     }
   }
@@ -169,5 +172,3 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     return $doc->documentElement;
   }
 }
-
-?>

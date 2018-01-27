@@ -55,6 +55,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if ($subject->getStatus() != STATUS_PREINIT) {
@@ -68,20 +69,20 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     $this->registerFiles(USER_FOLDER);
     $this->setVars();
     $msg = _("Unable to create %s id '%s': %s");
-    foreach ($this->docLists as $id => $docList) {
+    foreach ($this->docLists as $docListId => $docList) {
       try {
-        /** @var DOMElementPlus $docListId $id or id of referenced $docList */
-        $docListId = $this->processFor(self::DOCLIST_CLASS, $id, $docList);
+        /** @var DOMElementPlus $docListId $docListId or id of referenced $docList */
+        $docListId = $this->processFor(self::DOCLIST_CLASS, $docListId, $docList);
         $this->createList(self::DOCLIST_CLASS, $docListId, $docList);
       } catch (Exception $exc) {
-        Logger::user_warning(sprintf($msg, self::DOCLIST_CLASS, $id, $exc->getMessage()));
+        Logger::user_warning(sprintf($msg, self::DOCLIST_CLASS, $docListId, $exc->getMessage()));
       }
     }
-    foreach ($this->imgLists as $id => $imgList) {
+    foreach ($this->imgLists as $imgListId => $imgList) {
       try {
-        $this->createList(self::IMGLIST_CLASS, $id, $imgList);
+        $this->createList(self::IMGLIST_CLASS, $imgListId, $imgList);
       } catch (Exception $exc) {
-        Logger::user_warning(sprintf($msg, self::IMGLIST_CLASS, $id, $exc->getMessage()));
+        Logger::user_warning(sprintf($msg, self::IMGLIST_CLASS, $imgListId, $exc->getMessage()));
       }
     }
   }
@@ -133,24 +134,27 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
   }
 
+  /**
+   * @throws Exception
+   */
   private function setVars () {
     /** @var DOMElementPlus $child */
-    foreach ($this->getXML()->documentElement->childNodes as $child) {
+    foreach (self::getXML()->documentElement->childNodes as $child) {
       if ($child->nodeType != XML_ELEMENT_NODE) {
         continue;
       }
       try {
-        $id = $child->getRequiredAttribute("id");
+        $attrId = $child->getRequiredAttribute("id");
       } catch (Exception $exc) {
         Logger::user_warning($exc->getMessage());
         continue;
       }
       switch ($child->nodeName) {
         case "imglist":
-          $this->imgLists[$id] = $child;
+          $this->imgLists[$attrId] = $child;
           break;
         case "doclist":
-          $this->docLists[$id] = $child;
+          $this->docLists[$attrId] = $child;
           break;
       }
     }
@@ -168,7 +172,7 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     if (!array_key_exists($for, $_GET)) {
       return $doclistId;
     }
-    $this->doclistExists($listClass, $for, "for");
+    $this->doclistExists($listClass, $for);
     if ($doclistId != $_GET[$for]) {
       return $doclistId;
     }
@@ -191,10 +195,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   /**
    * @param string $listClass
    * @param string $doclistId
-   * @param string $for
    * @throws Exception
    */
-  private function doclistExists ($listClass, $doclistId, $for) {
+  private function doclistExists ($listClass, $doclistId) {
     if (!strlen($doclistId)) {
       return;
     }
@@ -220,12 +223,13 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
     if (!strlen($ref)) {
       throw new Exception(sprintf(_("No content"), $templateId));
     }
-    $this->doclistExists($listClass, $ref, $template->nodeName);
+    $this->doclistExists($listClass, $ref);
     new $listClass($template, $this->lists[$listClass][$ref]);
   }
 
   /**
    * @return HTMLPlus|null
+   * @throws Exception
    */
   public function getContent () {
     $file = HTMLPlusBuilder::getCurFile();
@@ -238,5 +242,3 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
 }
-
-?>

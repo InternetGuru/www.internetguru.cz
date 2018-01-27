@@ -39,6 +39,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @var array
    */
   private static $fileToDoc = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
@@ -47,58 +48,72 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @var array
    */
   private static $idToParentId = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToFile = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToShort = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToHeading = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToTitle = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToDesc = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToKw = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToAuthor = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToAuthorId = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToResp = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToRespId = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToCtime = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToMtime = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToLang = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
@@ -291,7 +306,6 @@ class HTMLPlusBuilder extends DOMBuilder {
         Logger::error($exc->getMessage());
         if (apc_exists($cacheKey)) {
           $cache = apc_fetch($cacheKey);
-          $useCache = true;
         } else {
           try {
             return self::doBuild($filePath, false);
@@ -301,13 +315,11 @@ class HTMLPlusBuilder extends DOMBuilder {
         }
       }
     }
-    if ($useCache) {
-      $doc = new HTMLPlus();
-      /** @var array $cache */
-      $doc->loadXML($cache["xml"]);
-      self::$fileToDoc[$filePath] = $doc;
-      return $doc;
-    }
+    $doc = new HTMLPlus();
+    /** @var array $cache */
+    $doc->loadXML($cache["xml"]);
+    self::$fileToDoc[$filePath] = $doc;
+    return $doc;
   }
 
   /**
@@ -538,6 +550,7 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   /**
    * @param string $filePath
+   *
    */
   private static function addToRegister ($filePath) {
     foreach (self::$currentFileTo as $name => $array) {

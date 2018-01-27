@@ -545,8 +545,9 @@ class DOMElementPlus extends DOMElement {
       case "lastElement":
         return $this->getLastElement();
         break;
-      #default:
-      #return parent::__get($name);
+      default:
+      /** @noinspection PhpVariableVariableInspection */
+      return parent::$$name;
     }
   }
 

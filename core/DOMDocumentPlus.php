@@ -95,13 +95,13 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   /**
-   * @param string $id
+   * @param string $elementId
    * @param string|null $eName
    * @param string $aName
    * @return DOMElementPlus|null
    * @throws Exception
    */
-  public function getElementById ($id, $eName = null, $aName = "id") {
+  public function getElementById ($elementId, $eName = null, $aName = "id") {
     try {
       if (!is_null($eName)) {
         $element = null;
@@ -110,7 +110,7 @@ class DOMDocumentPlus extends DOMDocument {
           if (!$candidate->hasAttribute($aName)) {
             continue;
           }
-          if ($candidate->getAttribute($aName) != $id) {
+          if ($candidate->getAttribute($aName) != $elementId) {
             continue;
           }
           if (!is_null($element)) {
@@ -122,7 +122,7 @@ class DOMDocumentPlus extends DOMDocument {
       }
       $xpath = new DOMXPath($this);
       /** @var \DOMNodeList $candidate */
-      $candidate = $xpath->query("//*[@$aName='$id']");
+      $candidate = $xpath->query("//*[@$aName='$elementId']");
       if ($candidate->length == 0) {
         return null;
       }
@@ -133,7 +133,7 @@ class DOMDocumentPlus extends DOMDocument {
       $element = $candidate->item(0);
       return $element;
     } catch (Exception $candidate) {
-      throw new Exception(sprintf(_("Duplicit %s found for value '%s'"), $aName, $id));
+      throw new Exception(sprintf(_("Duplicit %s found for value '%s'"), $aName, $elementId));
     }
   }
 
@@ -157,7 +157,7 @@ class DOMDocumentPlus extends DOMDocument {
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
     $toRemove = [];
-    $result = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
+    $result = $this->doProcessVars($variables, $ignore, $element, $deep, $toRemove);
     if (is_null($result) || !$result->isSameNode($element)) {
       $toRemove[] = $element;
     }
@@ -176,7 +176,7 @@ class DOMDocumentPlus extends DOMDocument {
    * @param array $toRemove
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
-  private function doProcessVariables (Array $variables, $ignore, DOMElementPlus $element, $deep, Array &$toRemove) {
+  private function doProcessVars (Array $variables, $ignore, DOMElementPlus $element, $deep, Array &$toRemove) {
     $result = $element;
     $ignoreAttr = isset($ignore[$this->nodeName]) ? $ignore[$this->nodeName] : [];
     foreach ($element->getVariables("var", $ignoreAttr) as list($vName, $aName, $vValue)) {
@@ -197,7 +197,7 @@ class DOMDocumentPlus extends DOMDocument {
           if (++$element->varRecursionLvl >= DOMElementPlus::MAX_VAR_RECURSION_LEVEL) {
             throw new Exception(_("Max variable recursion level exceeded"));
           }
-          $result = $this->doProcessVariables($variables, $ignore, $element, false, $toRemove);
+          $result = $this->doProcessVars($variables, $ignore, $element, false, $toRemove);
         }
       } catch (Exception $exc) {
         Logger::user_error(sprintf(_("Unable to insert variable %s: %s"), $vName, $exc->getMessage()));
@@ -209,7 +209,7 @@ class DOMDocumentPlus extends DOMDocument {
         if ($element->nodeType != XML_ELEMENT_NODE) {
           continue;
         }
-        $deepResult = $this->doProcessVariables($variables, $ignore, $element, $deep, $toRemove);
+        $deepResult = $this->doProcessVars($variables, $ignore, $element, $deep, $toRemove);
         if (is_null($deepResult) || !$element->isSameNode($deepResult)) {
           $toRemove[] = $element;
         }

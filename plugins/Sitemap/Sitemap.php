@@ -28,7 +28,7 @@ class Sitemap extends Plugin implements SplObserver {
   /**
    * @var array Names of configurable elements
    */
-  private static $configurableElements = ["changefreq", "priority"];
+  private static $cfgElements = ["changefreq", "priority"];
 
   /**
    * @var array Allowed values for changefreq element
@@ -50,7 +50,7 @@ class Sitemap extends Plugin implements SplObserver {
     if (DOMBuilder::isCacheOutdated()) {
       return;
     }
-    $this->createSitemap();
+    self::createSitemap();
   }
 
   /**
@@ -84,11 +84,11 @@ class Sitemap extends Plugin implements SplObserver {
    */
   private static function getLinks () {
     $links = [];
-    foreach (HTMLPlusBuilder::getIdToLink() as $id => $link) {
+    foreach (HTMLPlusBuilder::getIdToLink() as $hId => $link) {
       if (strpos($link, "#") !== false) {
         continue;
       }
-      $file = HTMLPlusBuilder::getIdToFile($id);
+      $file = HTMLPlusBuilder::getIdToFile($hId);
       $mtime = w3c_timestamp(HTMLPlusBuilder::getFileToMtime($file));
       $links[$link] = $mtime;
     }
@@ -103,18 +103,18 @@ class Sitemap extends Plugin implements SplObserver {
    */
   private static function getConfigLinks (DOMDocumentPlus $cfg) {
     $links = [];
-    foreach ($cfg->documentElement->childElementsArray as $e) {
-      if ($e->nodeName != "url") {
+    foreach ($cfg->documentElement->childElementsArray as $childElm) {
+      if ($childElm->nodeName != "url") {
         continue;
       }
-      if (!$e->hasAttribute("link")) {
+      if (!$childElm->hasAttribute("link")) {
         throw new Exception(_("Element url missing attribute link"));
       }
-      foreach ($e->childElementsArray as $f) {
-        if (!in_array($f->nodeName, self::$configurableElements)) {
+      foreach ($childElm->childElementsArray as $linkElm) {
+        if (!in_array($linkElm->nodeName, self::$cfgElements)) {
           continue;
         }
-        $links[$e->getAttribute("link")][$f->nodeName] = $f->nodeValue;
+        $links[$childElm->getAttribute("link")][$linkElm->nodeName] = $linkElm->nodeValue;
       }
     }
     return $links;
@@ -127,11 +127,11 @@ class Sitemap extends Plugin implements SplObserver {
    */
   private static function getConfigDefaults (DOMDocumentPlus $cfg) {
     $defaults = [];
-    foreach ($cfg->documentElement->childElementsArray as $e) {
-      if (!in_array($e->nodeName, self::$configurableElements)) {
+    foreach ($cfg->documentElement->childElementsArray as $childElm) {
+      if (!in_array($childElm->nodeName, self::$cfgElements)) {
         continue;
       }
-      $defaults[$e->nodeName] = $e->nodeValue;
+      $defaults[$childElm->nodeName] = $childElm->nodeValue;
     }
     return $defaults;
   }
@@ -150,7 +150,7 @@ class Sitemap extends Plugin implements SplObserver {
     $urlset = $sitemap->createElement("urlset");
     $sitemap->appendChild($urlset);
     $urlset->setAttribute("xmlns", "http://www.sitemaps.org/schemas/sitemap/0.9");
-    foreach ($links as $link => $h) {
+    foreach ($links as $link => $headingElm) {
       $url = $urlset->appendChild($sitemap->createElement("url"));
       // loc
       $scheme = Cms::getVariable("urlhandler-default_protocol");
@@ -205,5 +205,3 @@ class Sitemap extends Plugin implements SplObserver {
   }
 
 }
-
-?>

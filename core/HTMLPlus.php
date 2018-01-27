@@ -119,12 +119,23 @@ class HTMLPlus extends DOMDocumentPlus {
     }
     switch ($vName) {
       case "defaultCtime":
+        $this->defaultCtime = $vValue;
+        break;
       case "defaultAuthor":
+        $this->defaultAuthor = $vValue;
+        break;
       case "defaultId":
+        $this->defaultId = $vValue;
+        break;
       case "defaultHeading":
+        $this->defaultHeading = $vValue;
+        break;
       case "defaultDesc":
+        $this->defaultDesc = $vValue;
+        break;
       case "defaultKw":
-        $this->$vName = $vValue;
+        $this->defaultKw = $vValue;
+        break;
     }
   }
 
@@ -252,7 +263,8 @@ class HTMLPlus extends DOMDocumentPlus {
         $replace = ['"', '"', '"', "'", "'"];
         $value = str_replace($search, $replace, to_utf8($value, true));
         $newNode = $this->createElement("code", to_utf8($value));
-        if (preg_match("/<code ([a-z]+)>/", $defaultValue, $match)) {
+        /** @noinspection HtmlUnknownAttribute */
+        if (preg_match('/<code ([a-z]+)>/', $defaultValue, $match)) {
           $newNode->setAttribute("class", $match[1]);
         }
         $ele->appendChild($newNode);
@@ -341,7 +353,7 @@ class HTMLPlus extends DOMDocumentPlus {
   public function validatePlus ($repair = false) {
     $iter = 0;
     $hash = hash(FILE_HASH_ALGO, $this->saveXML());
-    $version = 6; // increment if validatePlus changes
+    $version = 7; // increment if validatePlus changes
     $cacheKey = apc_get_key("HTMLPlus/validatePlus/$hash/$version");
     if (self::USE_APC && apc_exists($cacheKey)) {
       $iter = apc_fetch($cacheKey);
@@ -372,9 +384,6 @@ class HTMLPlus extends DOMDocumentPlus {
             $this->validateLang();
           }
           $iter++;
-        case 4:
-          // $this->validateHsrc();
-          $iter++;
         case 5:
           if ($repair) {
             $this->validateHempty();
@@ -387,11 +396,6 @@ class HTMLPlus extends DOMDocumentPlus {
           $iter++;
         case 7:
           $this->validateDates($repair);
-          $iter++;
-        case 8:
-          // if ($repair) {
-          //   $this->validateAuthor();
-          // }
           $iter++;
         case 9:
           $this->validateHeadingAuthor($repair);
@@ -581,28 +585,6 @@ class HTMLPlus extends DOMDocumentPlus {
   /**
    * @throws Exception
    */
-  private function validateHsrc () {
-    $invalid = [];
-    /** @var DOMElementPlus $heading */
-    foreach ($this->headings as $heading) {
-      if (!$heading->hasAttribute("src")) {
-        continue;
-      }
-      if (preg_match("#^[a-z][a-z0-9_/.-]*\.html$#", $heading->getAttribute("src"))) {
-        continue;
-      }
-      $invalid[] = $heading->getAttribute("src");
-    }
-    if (empty($invalid)) {
-      return;
-    }
-    $message = sprintf(_("Invalid src format: %s"), implode(", ", $invalid));
-    $this->errorHandler($message, false);
-  }
-
-  /**
-   * @throws Exception
-   */
   private function validateHempty () {
     foreach ($this->headings as $heading) {
       if (strlen(trim($heading->nodeValue))) {
@@ -701,24 +683,6 @@ class HTMLPlus extends DOMDocumentPlus {
    */
   private function newDOMComment ($comment) {
     return new DOMComment(" $comment ");
-  }
-
-  /**
-   * @throws Exception
-   */
-  private function validateAuthor () {
-    /** @var DOMElementPlus $heading */
-    foreach ($this->headings as $heading) {
-      if (!$heading->hasAttribute("author")) {
-        continue;
-      }
-      if (strlen(trim($heading->getAttribute("author")))) {
-        continue;
-      }
-      $this->errorHandler(_("Attribute 'author' cannot be empty"), true);
-      $heading->parentNode->insertBefore($this->newDOMComment(_("Removed empty attribute 'author'")), $heading);
-      $heading->removeAttribute("author");
-    }
   }
 
   /**

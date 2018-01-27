@@ -1,6 +1,8 @@
 <?php
 
 namespace IGCMS\Core;
+
+/** @noinspection PhpClassNamingConventionInspection */
 /**
  * Interface ResourceInterface
  * @package IGCMS\Core

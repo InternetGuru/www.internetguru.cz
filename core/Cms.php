@@ -153,11 +153,11 @@ class Cms {
    * @throws Exception
    */
   private static function getCaller () {
-    $debug_backtrace = debug_backtrace();
-    if (!isset($debug_backtrace[3]["class"])) {
+    $backtrace = debug_backtrace();
+    if (!isset($backtrace[3]["class"])) {
       throw new Exception(_("Unknown caller class"));
     }
-    return strtolower((new \ReflectionClass($debug_backtrace[3]["class"]))->getShortName());
+    return strtolower((new \ReflectionClass($backtrace[3]["class"]))->getShortName());
   }
 
   /**

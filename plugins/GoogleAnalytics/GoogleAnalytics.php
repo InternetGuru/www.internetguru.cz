@@ -11,10 +11,10 @@ use SplObserver;
 use SplSubject;
 
 /**
- * Class GA
+ * Class GoogleAnalytics
  * @package IGCMS\Plugins
  */
-class GA extends Plugin implements SplObserver {
+class GoogleAnalytics extends Plugin implements SplObserver {
 
   /**
    * @param Plugins|SplSubject $subject
@@ -34,7 +34,7 @@ class GA extends Plugin implements SplObserver {
    * @throws Exception
    */
   private function init () {
-    $cfg = $this->getXML();
+    $cfg = self::getXML();
     $ga_id = $cfg->matchElement("ga_id", "domain", HTTP_HOST);
     if (is_null($ga_id)) {
       throw new Exception("Unable to match ga_id element to domain");

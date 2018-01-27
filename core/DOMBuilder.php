@@ -33,7 +33,7 @@ class DOMBuilder {
     if (!is_null(self::$newestCacheMtime)) {
       return self::$newestCacheMtime;
     }
-    foreach (get_nginx_files() as $cacheFilePath) {
+    foreach (get_nginx_cache() as $cacheFilePath) {
       $cacheMtime = filemtime($cacheFilePath);
       if ($cacheMtime < self::$newestCacheMtime) {
         continue;

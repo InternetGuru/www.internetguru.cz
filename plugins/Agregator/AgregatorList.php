@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins\Agregator;
 
+use Exception;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\Logger;
@@ -22,7 +23,7 @@ class AgregatorList {
   /**
    * @var string
    */
-  protected $id;
+  protected $listId;
   /**
    * @var string
    */
@@ -35,6 +36,10 @@ class AgregatorList {
    * @var string
    */
   private $defaultSortby;
+  /**
+   * @var bool
+   */
+  private $defaultRsort;
   /**
    * @var int
    */
@@ -49,9 +54,10 @@ class AgregatorList {
    * @param DOMElementPlus $doclist
    * @param string $defaultSortby
    * @param bool $defaultRsort
+   * @throws Exception
    */
   public function __construct (DOMElementPlus $doclist, $defaultSortby, $defaultRsort) {
-    $this->id = $doclist->getRequiredAttribute("id");
+    $this->listId = $doclist->getRequiredAttribute("id");
     $this->path = $doclist->getAttribute("path");
     $this->wrapper = $doclist->getAttribute("wrapper");
     $this->defaultSortby = $defaultSortby;
@@ -77,7 +83,7 @@ class AgregatorList {
    * @param array $b
    * @return int
    */
-  private static function cmp ($a, $b) {
+  private static function compare ($a, $b) {
     if ($a[self::$sortby] == $b[self::$sortby]) {
       return 0;
     }
@@ -92,6 +98,7 @@ class AgregatorList {
    * @param DOMElementPlus $pattern
    * @param array $vars
    * @return DOMDocumentPlus
+   * @throws Exception
    */
   protected function createList (DOMElementPlus $pattern, Array $vars) {
     $this->sort($vars);
@@ -110,13 +117,14 @@ class AgregatorList {
       }
       self::$sortby = $this->defaultSortby;
     }
-    uasort($vars, ["IGCMS\\Plugins\\Agregator\\AgregatorList", "cmp"]);
+    uasort($vars, ["IGCMS\\Plugins\\Agregator\\AgregatorList", "compare"]);
   }
 
   /**
    * @param DOMElementPlus $pattern
    * @param array $vars
    * @return DOMDocumentPlus
+   * @throws Exception
    */
   private function getDOM (DOMElementPlus $pattern, Array $vars) {
     $doc = new DOMDocumentPlus();
@@ -124,19 +132,19 @@ class AgregatorList {
     if (strlen($this->wrapper)) {
       /** @var DOMElementPlus $root */
       $root = $root->appendChild($doc->createElement($this->wrapper));
-      $root->setAttribute("class", "agregator ".strtolower(get_caller_class(2))." ".$this->id);
+      $root->setAttribute("class", "agregator ".strtolower(get_caller_class(2))." ".$this->listId);
     }
-    $i = 0;
-    foreach ($vars as $k => $v) {
-      if ($i++ < $this->skip) {
+    $index = 0;
+    foreach ($vars as $key => $varValue) {
+      if ($index++ < $this->skip) {
         continue;
       }
-      if ($this->limit > 0 && $i > $this->skip + $this->limit) {
+      if ($this->limit > 0 && $index > $this->skip + $this->limit) {
         break;
       }
       /** @var DOMElementPlus $list */
       $list = $root->appendChild($doc->importNode($pattern, true));
-      $list->processVariables($v, [], true);
+      $list->processVariables($varValue, [], true);
       $list->stripTag();
     }
     return $doc;

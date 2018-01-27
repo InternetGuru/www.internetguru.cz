@@ -152,6 +152,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
 
   /**
    * @return void
+   * @throws Exception
    */
   public static function handleRequest () {
     $robots = self::getXML()->matchElement("robots", "domain", HTTP_HOST);
@@ -166,6 +167,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @param string $filePath
    * @param int $priority
+   * @throws Exception
    */
   public function addTransformation ($filePath, $priority = self::DEFAULT_PRIORITY) {
     if (isset($this->transformations[$filePath])) {
@@ -222,6 +224,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param string $filePath
    * @param int $priority
@@ -229,6 +232,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param bool $user
    * @param null $ieIfComment
    * @param bool $ifXpath
+   * @throws Exception
    */
   public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->jsFiles[$filePath])) {
@@ -247,6 +251,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->jsFilesPriority[$filePath] = $priority;
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param string $filePath
    * @param bool $media
@@ -254,6 +259,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param bool $user
    * @param string|null $ieIfComment
    * @param bool $ifXpath
+   * @throws Exception
    */
   public function addCssFile ($filePath, $media = false, $priority = self::DEFAULT_PRIORITY, $user = true, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->cssFiles[$filePath])) {
@@ -527,6 +533,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $e->appendChild($meta);
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param DOMElement $parent
    * @param string $filePath
@@ -828,6 +835,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @param string $src
    * @return array
+   * @throws Exception
    */
   private function getImageDimensions ($src) {
     if (stream_resolve_include_path($src)) {

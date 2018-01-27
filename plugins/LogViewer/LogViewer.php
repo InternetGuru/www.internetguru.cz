@@ -5,6 +5,7 @@ namespace IGCMS\Plugins;
 use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
@@ -67,18 +68,18 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
    */
   private function getFiles ($dir, $limit = 0, $ext = null) {
     $files = [];
-    foreach (scandir($dir, SCANDIR_SORT_DESCENDING) as $f) {
-      if (!is_file("$dir/$f")) {
+    foreach (scandir($dir, SCANDIR_SORT_DESCENDING) as $file) {
+      if (!is_file("$dir/$file")) {
         continue;
       }
-      $id = (substr($f, -4) == ".zip") ? substr($f, 0, -4) : $f;
+      $fileId = (substr($file, -4) == ".zip") ? substr($file, 0, -4) : $file;
       if (!is_null($ext)
-        && substr($id, strpos($id, ".") + 1) != $ext
-        && pathinfo($id, PATHINFO_EXTENSION) != $ext
+        && substr($fileId, strpos($fileId, ".") + 1) != $ext
+        && pathinfo($fileId, PATHINFO_EXTENSION) != $ext
       ) {
         continue;
       }
-      $files[$id] = "$dir/$f";
+      $files[$fileId] = "$dir/$file";
       if (count($files) == $limit) {
         break;
       }
@@ -87,17 +88,18 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
   /**
-   * @return \IGCMS\Core\HTMLPlus
+   * @return HTMLPlus
+   * @throws Exception
    */
   public function getContent () {
     $fName = $_GET[$this->className];
     try {
       $fPath = $this->getCurFilePath($fName);
-      $vars["content"] = htmlspecialchars($this->file_get_contents($fPath));
+      $vars["content"] = htmlspecialchars($this->fileGetContents($fPath));
     } catch (Exception $exc) {
       Logger::user_warning($exc->getMessage());
     }
-    $content = $this->getHTMLPlus();
+    $content = self::getHTMLPlus();
     $vars["cur_file"] = $fName;
     $usrFiles = $this->makeLink($this->usrFiles);
     $vars["usr_files"] = empty($usrFiles) ? null : $usrFiles;
@@ -156,6 +158,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
 
   /**
    * @param string $fName
+   * @throws Exception
    */
   private function redirTo ($fName) {
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."=$fName"]));
@@ -164,8 +167,9 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
   /**
    * @param string $file
    * @return bool|string
+   * @throws Exception
    */
-  private function file_get_contents ($file) {
+  private function fileGetContents ($file) {
     if (substr($file, -4) != ".zip") {
       return file_get_contents($file);
     } else {
@@ -186,5 +190,3 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
 }
-
-?>

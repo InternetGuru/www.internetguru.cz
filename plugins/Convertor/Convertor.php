@@ -46,6 +46,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
   /**
    * Convertor constructor.
    * @param Plugins|SplSubject $s
+   * @throws Exception
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -90,17 +91,17 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     if (!strlen($_GET[$this->className]) && substr($_SERVER['QUERY_STRING'], -1) == "=") {
       throw new Exception(_("File URL cannot be empty"));
     }
-    $f = $this->getFile($fileUrl);
-    $this->docName = pathinfo($f, PATHINFO_FILENAME);
-    $mime = get_mime($this->tmpFolder."/$f");
+    $file = $this->getFile($fileUrl);
+    $this->docName = pathinfo($file, PATHINFO_FILENAME);
+    $mime = get_mime($this->tmpFolder."/$file");
     switch ($mime) {
       case "application/zip":
       case "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        $this->parseZippedDoc($f);
+        $this->parseZippedDoc($file);
         break;
       case "application/xml": // just display (may be xml or broken html+)
-        $this->html = file_get_contents($this->tmpFolder."/$f");
-        $this->file = $f;
+        $this->html = file_get_contents($this->tmpFolder."/$file");
+        $this->file = $file;
         break;
       default:
         throw new Exception(sprintf(_("Unsupported file MIME type '%s'"), $mime));
@@ -113,9 +114,9 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
    * @throws Exception
    */
   private function getFile ($dest) {
-    $f = $this->saveFromUrl($dest);
-    if (!is_null($f)) {
-      return $f;
+    $file = $this->saveFromUrl($dest);
+    if (!is_null($file)) {
+      return $file;
     }
     if (!is_file($this->tmpFolder."/$dest")) {
       throw new Exception(sprintf(_("File '%s' not found in temp folder"), $dest));
@@ -148,15 +149,18 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     );
     if ($purl["host"] == "docs.google.com") {
       $url = $purl["scheme"]."://".$purl["host"].$purl["path"]."/export?format=doc";
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
       $headers = @get_headers($url);
       if (strpos($headers[0], '404') !== false) {
         $url = $purl["scheme"]."://".$purl["host"].dirname($purl["path"])."/export?format=doc";
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
         $headers = @get_headers($url);
       }
     } else {
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
       $headers = @get_headers($url);
     }
-    $rh = $http_response_header;
+    $responseHeader = $http_response_header;
     if (strpos($headers[0], '302') !== false) {
       throw new Exception(_("Destination URL is unaccessible; must be shared publicly"));
     } elseif (strpos($headers[0], '200') === false) {
@@ -164,7 +168,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     }
     stream_context_set_default($defaultContext);
     $data = file_get_contents($url);
-    $filename = $this->get_real_filename($rh, $url);
+    $filename = $this->getRealFilename($responseHeader, $url);
     file_put_contents($this->tmpFolder."/$filename", $data);
     return $filename;
   }
@@ -173,8 +177,9 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
    * @param array $headers
    * @param string $url
    * @return string
+   * @throws Exception
    */
-  private function get_real_filename (Array $headers, $url) {
+  private function getRealFilename (Array $headers, $url) {
     foreach ($headers as $header) {
       if (strpos(strtolower($header), 'content-disposition') !== false) {
         $tmp_name = explode('\'\'', $header);
@@ -235,7 +240,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
 
     $this->file = "$f.html";
     $dest = $this->tmpFolder."/".$this->file;
-    $fp = lock_file($dest);
+    $filePointer = lock_file($dest);
     try {
       try {
         fput_contents($dest, $this->html);
@@ -252,7 +257,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     } catch (Exception $exc) {
       Logger::critical($exc->getMessage());
     } finally {
-      unlock_file($fp, $dest);
+      unlock_file($filePointer, $dest);
     }
   }
 
@@ -271,10 +276,10 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
       "relationsFile" => "word/_rels/document.xml.rels",
     ];
     $variables = [];
-    foreach ($varFiles as $varName => $p) {
-      $fileSuffix = pathinfo($p, PATHINFO_BASENAME);
+    foreach ($varFiles as $varName => $path) {
+      $fileSuffix = pathinfo($path, PATHINFO_BASENAME);
       $file = $f."_$fileSuffix";
-      $xml = read_zip($f, $p);
+      $xml = read_zip($f, $path);
       if (is_null($xml)) {
         continue;
       }
@@ -327,14 +332,14 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
    * @param string $aName
    */
   private function parseContent (HTMLPlus $doc, $eName, $aName) {
-    /** @var DOMElementPlus $e */
-    foreach ($doc->getElementsByTagName($eName) as $e) {
+    /** @var DOMElementPlus $element */
+    foreach ($doc->getElementsByTagName($eName) as $element) {
       $lastText = null;
-      foreach ($e->childNodes as $ch) {
-        if ($ch->nodeType != XML_TEXT_NODE) {
+      foreach ($element->childNodes as $childElm) {
+        if ($childElm->nodeType != XML_TEXT_NODE) {
           continue;
         }
-        $lastText = $ch;
+        $lastText = $childElm;
       }
       if (is_null($lastText)) {
         continue;
@@ -348,26 +353,27 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
         continue;
       }
       $lastText->nodeValue = trim(implode("@", $var));
-      $e->setAttribute($aName, $aVal);
+      $element->setAttribute($aName, $aVal);
     }
   }
 
   private function getImportedFiles () {
-    foreach (scandir($this->tmpFolder, SCANDIR_SORT_ASCENDING) as $f) {
-      if (pathinfo($this->tmpFolder."/$f", PATHINFO_EXTENSION) != "html") {
+    foreach (scandir($this->tmpFolder, SCANDIR_SORT_ASCENDING) as $file) {
+      if (pathinfo($this->tmpFolder."/$file", PATHINFO_EXTENSION) != "html") {
         continue;
       }
-      $this->importedFiles[] = "<a href='?Convertor=$f'>$f</a>";
+      $this->importedFiles[] = "<a href='?Convertor=$file'>$file</a>";
     }
   }
 
   /**
    * TODO add addCssFile to interface?
    * @return HTMLPlus
+   * @throws Exception
    */
   public function getContent () {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
-    $content = $this->getHTMLPlus();
+    $content = self::getHTMLPlus();
     $vars["action"] = "?".$this->className;
     $vars["link"] = $_GET[$this->className];
     $vars["path"] = $this->pluginDir;
@@ -384,5 +390,3 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
 }
-
-?>

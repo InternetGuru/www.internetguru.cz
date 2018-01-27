@@ -804,19 +804,6 @@ if (!function_exists("apc_fetch")) {
   }
 }
 
-if (!function_exists("apc_store")) {
-  /**
-   * @param $key
-   * @param $value
-   * @param int $ttl
-   * @return bool
-   * @throws Exception
-   */
-  function apc_store ($key, $value, $ttl = 0) {
-    return file_put_contents(apc_get_path($key), json_encode($value)) !== false;
-  }
-}
-
 /**
  * @param string $key
  * @return string
@@ -874,7 +861,7 @@ function apc_is_valid_cache ($cacheKey, $value) {
  * @throws Exception
  */
 function clear_nginx () {
-  foreach (get_nginx_files() as $fPath) {
+  foreach (get_nginx_cache() as $fPath) {
     if (!unlink($fPath)) {
       throw new Exception(_("Failed to purge cache"));
     }
@@ -886,7 +873,7 @@ function clear_nginx () {
  * @param string $link
  * @return array
  */
-function get_nginx_files ($folder = null, $link = "") {
+function get_nginx_cache ($folder = null, $link = "") {
   if (is_null($folder)) {
     $folder = NGINX_CACHE_FOLDER;
   }
@@ -897,7 +884,7 @@ function get_nginx_files ($folder = null, $link = "") {
     }
     $filepath = "$folder/$filename";
     if (is_dir($filepath)) {
-      $fPaths = array_merge($fPaths, get_nginx_files($filepath, $link));
+      $fPaths = array_merge($fPaths, get_nginx_cache($filepath, $link));
       continue;
     }
     if (empty(preg_grep("/KEY: https?".HTTP_HOST."/$link", file($filepath)))) {
