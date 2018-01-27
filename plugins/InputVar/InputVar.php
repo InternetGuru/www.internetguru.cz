@@ -68,47 +68,47 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if (!in_array($subject->getStatus(), [STATUS_INIT, STATUS_PROCESS])) {
         return;
       }
-      $this->cfg = $this->getXML();
+      $this->cfg = self::getXML();
       if ($subject->getStatus() == STATUS_INIT) {
         if (isset($_GET[$this->getOk])) {
           Logger::user_success(_("Changes successfully saved"));
         }
         $this->loadVars();
       }
-      foreach ($this->cfg->documentElement->childElementsArray as $e) {
-        if ($e->nodeName == "set") {
+      foreach ($this->cfg->documentElement->childElementsArray as $element) {
+        if ($element->nodeName == "set") {
           continue;
         }
-        if ($e->nodeName == "passwd") {
+        if ($element->nodeName == "passwd") {
           continue;
         }
         try {
-          $e->getRequiredAttribute("id"); // only check
-        } catch (Exception $ex) {
-          Logger::user_warning($ex->getMessage());
+          $element->getRequiredAttribute("id"); // only check
+        } catch (Exception $exc) {
+          Logger::user_warning($exc->getMessage());
           continue;
         }
-        switch ($e->nodeName) {
+        switch ($element->nodeName) {
           case "var":
             if ($subject->getStatus() != STATUS_PROCESS) {
               continue;
             }
-            $this->processRule($e);
+            $this->processRule($element);
           case "fn":
             if ($subject->getStatus() != STATUS_INIT) {
               continue;
             }
-            $this->processRule($e);
+            $this->processRule($element);
             break;
           default:
-            Logger::user_warning(sprintf(_("Unknown element name %s"), $e->nodeName));
+            Logger::user_warning(sprintf(_("Unknown element name %s"), $element->nodeName));
         }
       }
-    } catch (Exception $ex) {
-      if ($ex->getCode() === 1) {
-        Logger::user_error($ex->getMessage());
+    } catch (Exception $exc) {
+      if ($exc->getCode() === 1) {
+        Logger::user_error($exc->getMessage());
       } else {
-        Logger::critical($ex->getMessage());
+        Logger::critical($exc->getMessage());
       }
     }
   }
@@ -128,89 +128,94 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(_("Incorrect password"), 1);
     }
     $var = null;
-    foreach ($req as $k => $v) {
-      if (isset($this->vars[$k])) {
-        if ($this->vars[$k]->hasAttribute("var")) {
-          $this->vars[$k]->setAttribute("var", normalize($this->className."-$v"));
+    foreach ($req as $key => $value) {
+      if (isset($this->vars[$key])) {
+        if ($this->vars[$key]->hasAttribute("var")) {
+          $this->vars[$key]->setAttribute("var", normalize($this->className."-$value"));
         } else {
-          $this->vars[$k]->nodeValue = $v;
+          $this->vars[$key]->nodeValue = $value;
         }
-        $var = $this->vars[$k];
+        $var = $this->vars[$key];
       }
     }
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (@$var->ownerDocument->save($this->userCfgPath) === false) {
       throw new Exception(_("Unable to save user config"));
     }
     #if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON)
-    clearNginxCache();
-    redirTo(buildLocalUrl(["path" => getCurLink(), "query" => $this->className."&".$this->getOk], true));
+    clear_nginx();
+    redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
   }
 
+  /**
+   * @throws Exception
+   */
   private function loadVars () {
-    foreach ($this->cfg->documentElement->childElementsArray as $e) {
-      if ($e->nodeName == "var") {
-        $this->vars[$e->getRequiredAttribute("id")] = $e;
+    foreach ($this->cfg->documentElement->childElementsArray as $element) {
+      if ($element->nodeName == "var") {
+        $this->vars[$element->getRequiredAttribute("id")] = $element;
       }
-      if ($e->nodeName == "passwd") {
-        $this->passwd = $e->nodeValue;
+      if ($element->nodeName == "passwd") {
+        $this->passwd = $element->nodeValue;
       }
     }
   }
 
   /**
    * @param DOMElementPlus $element
+   * @throws Exception
    */
   private function processRule (DOMElementPlus $element) {
-    $id = $element->getAttribute("id");
+    $eId = $element->getAttribute("id");
     $name = $element->nodeName;
     $attributes = [];
     foreach ($element->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
-    $el = $element->processVariables(Cms::getAllVariables(), [], true); // pouze posledni node
-    if (is_null($el)
-      || (gettype($el) == "object" && (new \ReflectionClass($el))->getShortName() != "DOMElementPlus"
-        && !$el->isSameNode($element))
+    $lastElm = $element->processVariables(Cms::getAllVariables(), [], true); // pouze posledni node
+    if (is_null($lastElm)
+      || (gettype($lastElm) == "object" && (new \ReflectionClass($lastElm))->getShortName() != "DOMElementPlus"
+        && !$lastElm->isSameNode($element))
     ) {
-      if (is_null($el)) {
-        $el = new DOMText("");
+      if (is_null($lastElm)) {
+        $lastElm = new DOMText("");
       }
       $var = $element->ownerDocument->createElement("var");
       foreach ($attributes as $aName => $aValue) {
         $var->setAttribute($aName, $aValue);
       }
-      $var->appendChild($el);
-      $el = $var;
+      $var->appendChild($lastElm);
+      $lastElm = $var;
     }
-    if (!$el->hasAttribute("fn")) {
-      $this->setVar($name, $id, $el);
+    if (!$lastElm->hasAttribute("fn")) {
+      $this->setVar($name, $eId, $lastElm);
       return;
     }
-    $f = $el->getAttribute("fn");
-    if (strpos($f, "-") === false) {
-      $f = $this->className."-$f";
+    $lastElmFn = $lastElm->getAttribute("fn");
+    if (strpos($lastElmFn, "-") === false) {
+      $lastElmFn = $this->className."-$lastElmFn";
     }
-    $result = Cms::getFunction($f);
-    if ($el->hasAttribute("fn") && !is_null($result)) {
+    $result = Cms::getFunction($lastElmFn);
+    if ($lastElm->hasAttribute("fn") && !is_null($result)) {
       try {
-        $result = Cms::applyUserFn($f, $el);
-      } catch (Exception $e) {
-        Logger::user_warning(sprintf(_("Unable to apply function: %s"), $e->getMessage()));
+        $result = Cms::applyUserFn($lastElmFn, $lastElm);
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("Unable to apply function: %s"), $exc->getMessage()));
         return;
       }
     }
     if (!is_null($result)) {
-      $this->setVar($el->nodeName, $id, $result);
+      $this->setVar($lastElm->nodeName, $eId, $result);
       return;
     }
     try {
-      $fn = $this->register($el);
-    } catch (Exception $e) {
-      Logger::user_warning(sprintf(_("Unable to register function %s: %s"), $el->getAttribute("fn"), $e->getMessage()));
+      $function = $this->register($lastElm);
+    } catch (Exception $exc) {
+      Logger::user_warning(sprintf(_("Unable to register function %s: %s"), $lastElm->getAttribute("fn"), $exc->getMessage()));
       return;
     }
-    if ($el->nodeName == "fn") {
-      Cms::setFunction($id, $fn);
+    if ($lastElm->nodeName == "fn") {
+      Cms::setFunction($eId, $function);
     } else {
-      Cms::setVariable($id, $fn($el));
+      Cms::setVariable($eId, $function($lastElm));
     }
   }
 
@@ -218,6 +223,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @param string $var
    * @param string $name
    * @param mixed $value
+   * @throws Exception
    */
   private function setVar ($var, $name, $value) {
     if ($var == "fn") {
@@ -233,39 +239,39 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @throws Exception
    */
   private function register (DOMElementPlus $el) {
-    $fn = null;
+    $function = null;
     switch ($el->getAttribute("fn")) {
       case "hash":
         $algo = $el->hasAttribute("algo") ? $el->getAttribute("algo") : null;
-        $fn = $this->createFnHash($this->parse($algo));
+        $function = $this->createFnHash($this->parse($algo));
         break;
       case "strftime":
         $format = $el->hasAttribute("format") ? $el->getAttribute("format") : null;
-        $fn = $this->createFnStrftime($format);
+        $function = $this->createFnStrftime($format);
         break;
       case "sprintf":
-        $fn = $this->createFnSprintf($el->nodeValue);
+        $function = $this->createFnSprintf($el->nodeValue);
         break;
       case "pregreplace":
         $pattern = $el->hasAttribute("pattern") ? $el->getAttribute("pattern") : null;
         $replacement = $el->hasAttribute("replacement") ? $el->getAttribute("replacement") : null;
-        $fn = $this->createFnPregReplace($pattern, $replacement);
+        $function = $this->createFnPregReplace($pattern, $replacement);
         break;
       case "replace":
-        $tr = [];
-        foreach ($el->childElementsArray as $d) {
-          if ($d->nodeName != "data") {
+        $toReplace = [];
+        foreach ($el->childElementsArray as $dataElm) {
+          if ($dataElm->nodeName != "data") {
             continue;
           }
           try {
-            $name = $d->getRequiredAttribute("name");
-          } catch (Exception $e) {
-            Logger::user_warning($e->getMessage());
+            $name = $dataElm->getRequiredAttribute("name");
+          } catch (Exception $exc) {
+            Logger::user_warning($exc->getMessage());
             continue;
           }
-          $tr[$name] = $this->parse($d->nodeValue);
+          $toReplace[$name] = $this->parse($dataElm->nodeValue);
         }
-        $fn = $this->createFnReplace($tr);
+        $function = $this->createFnReplace($toReplace);
         break;
       case "sequence":
         $seq = [];
@@ -279,12 +285,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
           }
           $seq[] = $call->nodeValue;
         }
-        $fn = $this->createFnSequence($seq);
+        $function = $this->createFnSequence($seq);
         break;
       default:
         throw new Exception(_("Unknown function name"));
     }
-    return $fn;
+    return $function;
   }
 
   /**
@@ -305,7 +311,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @return string
    */
   private function parse ($value) {
-    return replaceVariables($value, Cms::getAllVariables(), strtolower($this->className."-"));
+    return replace_vars($value, Cms::getAllVariables(), strtolower($this->className."-"));
   }
 
   /**
@@ -316,30 +322,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($format)) {
       $format = "%m/%d/%Y";
     }
-    $format = $this->crossPlatformCompatibleFormat($format);
     return function(DOMNode $node) use ($format) {
       $value = $node->nodeValue;
       $date = trim(strftime($format, strtotime($value)));
       return $date ? $date : $value;
     };
-  }
-
-  /**
-   * http://php.net/manual/en/function.strftime.php
-   * @param string $format
-   * @return mixed
-   */
-  private function crossPlatformCompatibleFormat ($format) {
-    // Jan 1: results in: '%e%1%' (%%, e, %%, %e, %%)
-    #$format = '%%e%%%e%%';
-
-    // Check for Windows to find and replace the %e
-    // modifier correctly
-    if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
-      $format = preg_replace('#(?<!%)((?:%%)*)%e#', '\1%#d', $format);
-    }
-
-    return $format;
   }
 
   /**
@@ -362,6 +349,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if (empty($elements)) {
         $elements[] = $node->nodeValue;
       }
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
       $temp = @vsprintf($format, $elements);
       if ($temp === false) {
         return $format;
@@ -412,14 +400,14 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(_("No data found"));
     }
     return function(DOMNode $node) use ($call) {
-      foreach ($call as $f) {
-        if (strpos($f, "-") === false) {
-          $f = $this->className."-$f";
+      foreach ($call as $function) {
+        if (strpos($function, "-") === false) {
+          $function = $this->className."-$function";
         }
         try {
-          $node = new DOMElement("any", Cms::applyUserFn($f, $node));
-        } catch (Exception $e) {
-          Logger::user_warning(sprintf(_("Sequence call skipped: %s"), $e->getMessage()));
+          $node = new DOMElement("any", Cms::applyUserFn($function, $node));
+        } catch (Exception $exc) {
+          Logger::user_warning(sprintf(_("Sequence call skipped: %s"), $exc->getMessage()));
         }
       }
       return $node->nodeValue;
@@ -428,25 +416,27 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
 
   /**
    * @return HTMLPlus|null
+   * @throws Exception
    */
   public function getContent () {
     if (!isset($_GET[$this->className])) {
       return null;
     }
-    $newContent = $this->getHTMLPlus();
+    $newContent = self::getHTMLPlus();
     /** @var DOMElementPlus $form */
     $form = $newContent->getElementsByTagName("form")->item(0);
     $this->formId = $form->getAttribute("id");
+    /** @var DOMElementPlus $fieldset */
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
-    /** @var DOMElementPlus $e */
-    foreach ($this->cfg->getElementsByTagName("set") as $e) {
+    /** @var DOMElementPlus $setElm */
+    foreach ($this->cfg->getElementsByTagName("set") as $setElm) {
       try {
-        $e->getRequiredAttribute("type"); // only check
-      } catch (Exception $ex) {
-        Logger::user_warning($ex->getMessage());
+        $setElm->getRequiredAttribute("type"); // only check
+      } catch (Exception $exc) {
+        Logger::user_warning($exc->getMessage());
         continue;
       }
-      $this->createFieldset($newContent, $fieldset, $e);
+      $this->createFieldset($newContent, $fieldset, $setElm);
     }
     $fieldset->parentNode->removeChild($fieldset);
     $vars = [];
@@ -462,6 +452,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @param HTMLPlus $content
    * @param DOMElementPlus $fieldset
    * @param DOMElementPlus $set
+   * @throws Exception
    */
   private function createFieldset (HTMLPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set) {
     switch ($set->getAttribute("type")) {
@@ -479,6 +470,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @param DOMElementPlus $fieldset
    * @param DOMElementPlus $set
    * @param string $type
+   * @throws Exception
    */
   private function createFs (DOMDocumentPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set, $type) {
     $for = $set->getAttribute("for");
@@ -517,15 +509,16 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @return array
    */
   private function filterVars ($rule) {
-    $r = [];
-    foreach ($this->vars as $v) {
-      $id = $v->getAttribute("id");
-      if (!@preg_match("/^".$rule."$/", $id)) {
+    $return = [];
+    foreach ($this->vars as $var) {
+      $varId = $var->getAttribute("id");
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
+      if (!@preg_match("/^".$rule."$/", $varId)) {
         continue;
       }
-      $r[] = $v;
+      $return[] = $var;
     }
-    return $r;
+    return $return;
   }
 
   /**
@@ -533,33 +526,34 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @param array $list
    * @param DOMElementPlus $set
    * @return DOMNode
+   * @throws Exception
    */
   private function createTextFs (Array $list, DOMElementPlus $set) {
     $inputDoc = new DOMDocumentPlus();
     $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
-    $dl = $inputVar->appendChild($inputDoc->createElement("dl"));
-    foreach ($list as $v) {
-      $id = normalize($this->className."-".$v->getAttribute("id"));
-      $dt = $inputDoc->createElement("dt");
-      $label = $inputDoc->createElement("label", $v->getAttribute("id"));
-      $dt->appendChild($label);
-      $label->setAttribute("for", $id);
-      $dl->appendChild($dt);
-      $dd = $inputDoc->createElement("dd");
+    $dlElm = $inputVar->appendChild($inputDoc->createElement("dl"));
+    foreach ($list as $varElm) {
+      $varElmId = normalize($this->className."-".$varElm->getAttribute("id"));
+      $dtElm = $inputDoc->createElement("dt");
+      $label = $inputDoc->createElement("label", $varElm->getAttribute("id"));
+      $dtElm->appendChild($label);
+      $label->setAttribute("for", $varElmId);
+      $dlElm->appendChild($dtElm);
+      $ddElm = $inputDoc->createElement("dd");
       $text = $inputDoc->createElement("input");
-      $dd->appendChild($text);
+      $ddElm->appendChild($text);
       $text->setAttribute("type", "text");
-      $text->setAttribute("id", $id);
-      $text->setAttribute("name", $v->getAttribute("id"));
-      $text->setAttribute("value", $v->nodeValue);
+      $text->setAttribute("id", $varElmId);
+      $text->setAttribute("name", $varElm->getAttribute("id"));
+      $text->setAttribute("value", $varElm->nodeValue);
       if ($set->hasAttribute("placeholder")) {
         $text->setAttribute("placeholder", $set->getAttribute("placeholder"));
       }
       if ($set->hasAttribute("pattern")) {
         $text->setAttribute("pattern", $set->getAttribute("pattern"));
       }
-      $dd->appendChild($text);
-      $dl->appendChild($dd);
+      $ddElm->appendChild($text);
+      $dlElm->appendChild($ddElm);
     }
     return $inputVar;
   }
@@ -568,32 +562,33 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @param array $list
    * @param DOMElementPlus $set
    * @return DOMNode
+   * @throws Exception
    */
   private function createSelectFs (Array $list, DOMElementPlus $set) {
     $inputDoc = new DOMDocumentPlus();
     $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
-    $dl = $inputVar->appendChild($inputDoc->createElement("dl"));
+    $dlElm = $inputVar->appendChild($inputDoc->createElement("dl"));
     $dataListArray = [];
-    foreach (explode(" ", $set->getAttribute("datalist")) as $d) {
-      $dataListArray = array_merge($dataListArray, $this->filterVars($d));
+    foreach (explode(" ", $set->getAttribute("datalist")) as $data) {
+      $dataListArray = array_merge($dataListArray, $this->filterVars($data));
     }
-    foreach ($list as $v) {
-      $id = normalize($this->className."-".$v->getAttribute("id"));
+    foreach ($list as $varElm) {
+      $varElmId = normalize($this->className."-".$varElm->getAttribute("id"));
       try {
-        $select = $this->createSelect($inputDoc, $dataListArray, $v->getAttribute("id"));
-      } catch (Exception $e) {
-        Logger::critical($e->getMessage());
+        $select = $this->createSelect($inputDoc, $dataListArray, $varElm->getAttribute("id"));
+      } catch (Exception $exc) {
+        Logger::critical($exc->getMessage());
         continue;
       }
-      $dt = $inputDoc->createElement("dt");
-      $label = $inputDoc->createElement("label", $v->nodeValue);
-      $dt->appendChild($label);
-      $label->setAttribute("for", $id);
-      $dl->appendChild($dt);
-      $dd = $inputDoc->createElement("dd");
-      $dd->appendChild($select);
-      $select->setAttribute("id", $id);
-      $dl->appendChild($dd);
+      $dtElm = $inputDoc->createElement("dt");
+      $label = $inputDoc->createElement("label", $varElm->nodeValue);
+      $dtElm->appendChild($label);
+      $label->setAttribute("for", $varElmId);
+      $dlElm->appendChild($dtElm);
+      $ddElm = $inputDoc->createElement("dd");
+      $ddElm->appendChild($select);
+      $select->setAttribute("id", $varElmId);
+      $dlElm->appendChild($ddElm);
     }
     return $inputVar;
   }
@@ -613,13 +608,13 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(sprintf(_("Variable %s missing inner element with attribute var"), $selectId));
     }*/
     $selected = substr($this->vars[$selectId]->getAttribute("var"), strlen($this->className) + 1);
-    foreach ($vars as $v) {
-      $id = $v->getAttribute("id");
-      $value = strlen($v->nodeValue) ? $v->nodeValue : $id;
+    foreach ($vars as $var) {
+      $varId = $var->getAttribute("id");
+      $value = strlen($var->nodeValue) ? $var->nodeValue : $varId;
       $option = $doc->createElement("option", $value);
       $doc->appendChild($option);
-      $option->setAttribute("value", $id);
-      if ($id == $selected) {
+      $option->setAttribute("value", $varId);
+      if ($varId == $selected) {
         $option->setAttribute("selected", "selected");
       }
       $select->appendChild($option);
@@ -628,5 +623,3 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   }
 
 }
-
-?>

@@ -29,16 +29,17 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if ($subject->getStatus() != STATUS_POSTPROCESS) {
       return;
     }
-    foreach ($this->getXML()->documentElement->childElementsArray as $e) {
-      if ($e->nodeName != "var" || !$e->hasAttribute("id")) {
+    foreach (self::getXML()->documentElement->childElementsArray as $childElm) {
+      if ($childElm->nodeName != "var" || !$childElm->hasAttribute("id")) {
         continue;
       }
-      $this->vars[$e->getAttribute("id")] = $e;
+      $this->vars[$childElm->getAttribute("id")] = $childElm;
     }
     $this->generateBc();
   }
@@ -48,9 +49,9 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
    */
   private function generateBc () {
     #var_dump(HTMLPlusBuilder::getLinkToId());
-    $parentId = HTMLPlusBuilder::getLinkToId(getCurLink());
+    $parentId = HTMLPlusBuilder::getLinkToId(get_link());
     if (is_null($parentId)) {
-      throw new Exception(sprintf(_("Link %s not found"), getCurLink()));
+      throw new Exception(sprintf(_("Link %s not found"), get_link()));
     }
     $bcLang = HTMLPlusBuilder::getIdToLang($parentId);
     $path = [];
@@ -59,52 +60,53 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
       $parentId = HTMLPlusBuilder::getIdToParentId($parentId);
     }
     #var_dump($path); die("die");
-    $bc = new DOMDocumentPlus();
-    $root = $bc->appendChild($bc->createElement("root"));
-    $ol = $bc->createElement("ol");
-    $root->appendChild($ol);
-    $ol->setAttribute("class", "contentlink-bc"); // TODO: rename
-    $ol->setAttribute("lang", $bcLang);
+    $bcDoc = new DOMDocumentPlus();
+    $root = $bcDoc->appendChild($bcDoc->createElement("root"));
+    $olElm = $bcDoc->createElement("ol");
+    $root->appendChild($olElm);
+    $olElm->setAttribute("class", "contentlink-bc"); // TODO: rename
+    $olElm->setAttribute("lang", $bcLang);
     $title = [];
-    $id = $a = null;
-    foreach (array_reverse($path) as $id) {
-      $li = $bc->createElement("li");
-      $ol->appendChild($li);
-      $lang = HTMLPlusBuilder::getIdToLang($id);
+    $pageId = null;
+    foreach (array_reverse($path) as $pageId) {
+      $liElm = $bcDoc->createElement("li");
+      $olElm->appendChild($liElm);
+      $lang = HTMLPlusBuilder::getIdToLang($pageId);
       if ($lang != $bcLang) {
-        $li->setAttribute("lang", $lang);
+        $liElm->setAttribute("lang", $lang);
       }
-      $a = $bc->createElement("a");
-      $li->appendChild($a);
-      $pLink["path"] = HTMLPlusBuilder::getIdToLink($id);
-      addPermParams($pLink);
-      if (implodeLink($pLink) != getCurLink(true)) {
-        $a->setAttribute("href", $id);
-        if ($pLink["path"] == getCurLink()) {
-          $a->setAttribute("title", $this->vars["reset"]->nodeValue);
+      $aElm = $bcDoc->createElement("a");
+      $liElm->appendChild($aElm);
+      $pLink["path"] = HTMLPlusBuilder::getIdToLink($pageId);
+      add_perm_param($pLink);
+      if (implode_link($pLink) != get_link(true)) {
+        $aElm->setAttribute("href", $pageId);
+        if ($pLink["path"] == get_link()) {
+          $aElm->setAttribute("title", $this->vars["reset"]->nodeValue);
         }
       }
-      $aValue = HTMLPlusBuilder::getHeading($id, !strlen(getCurLink()));
+      $aValue = HTMLPlusBuilder::getHeading($pageId, !strlen(get_link()));
       if (empty($title) && array_key_exists("logo", $this->vars)) {
-        $this->insertLogo($this->vars["logo"], $a, $id);
-        if (!strlen(getCurLink())) {
-          $a->parentNode->appendChild($bc->createElement("span", $aValue));
+        $this->insertLogo($this->vars["logo"], $aElm, $pageId);
+        if (!strlen(get_link())) {
+          $aElm->parentNode->appendChild($bcDoc->createElement("span", $aValue));
         }
       } else {
-        $a->nodeValue = $aValue;
+        $aElm->nodeValue = $aValue;
       }
-      $title[] = HTMLPlusBuilder::getHeading($id);
+      $title[] = HTMLPlusBuilder::getHeading($pageId);
     }
     array_pop($title);
-    $title[] = HTMLPlusBuilder::getIdToHeading($id);
+    $title[] = HTMLPlusBuilder::getIdToHeading($pageId);
     $this->title = implode(" - ", array_reverse($title));
-    Cms::setVariable("", $bc->documentElement);
+    Cms::setVariable("", $bcDoc->documentElement);
   }
 
   /**
    * @param DOMElementPlus $logo
    * @param DOMElementPlus $a
    * @param string $id
+   * @throws Exception
    */
   private function insertLogo (DOMElementPlus $logo, DOMElementPlus $a, $id) {
     $doc = $a->ownerDocument;
@@ -123,5 +125,3 @@ class Breadcrumb extends Plugin implements SplObserver, TitleStrategyInterface {
   }
 
 }
-
-?>

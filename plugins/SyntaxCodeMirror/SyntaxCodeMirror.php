@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -43,32 +44,33 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
 
   /**
    * @param HTMLPlus $content
+   * @throws Exception
    */
   public function modifyContent (HTMLPlus $content) {
     // supported syntax only
     $xml = VENDOR_DIR."/".self::CM_DIR."/mode/xml/xml.js";
     $css = VENDOR_DIR."/".self::CM_DIR."/mode/css/css.js";
-    $js = VENDOR_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
+    $jsPath = VENDOR_DIR."/".self::CM_DIR."/mode/javascript/javascript.js";
     $html = VENDOR_DIR."/".self::CM_DIR."/mode/htmlmixed/htmlmixed.js";
     $modes = [
       "xml" => [$xml],
       "css" => [$css],
-      "javascript" => [$js],
-      "htmlmixed" => [$xml, $css, $js, $html],
+      "javascript" => [$jsPath],
+      "htmlmixed" => [$xml, $css, $jsPath, $html],
     ];
     // return if no textarea containing class "codemirror"
     $libs = [];
     $codemirror = false;
-    /** @var DOMElementPlus $t */
-    foreach ($content->getElementsByTagName("textarea") as $t) {
-      $classes = explode(" ", $t->getAttribute("class"));
+    /** @var DOMElementPlus $textAreaElm */
+    foreach ($content->getElementsByTagName("textarea") as $textAreaElm) {
+      $classes = explode(" ", $textAreaElm->getAttribute("class"));
       if (!in_array("codemirror", $classes)) {
         continue;
       }
       $codemirror = true;
-      foreach ($classes as $c) {
-        if (array_key_exists($c, $modes)) {
-          $libs = array_merge($libs, $modes[$c]);
+      foreach ($classes as $class) {
+        if (array_key_exists($class, $modes)) {
+          $libs = array_merge($libs, $modes[$class]);
           break;
         }
       }
@@ -81,42 +83,41 @@ class SyntaxCodeMirror extends Plugin implements SplObserver, ModifyContentStrat
 
   /**
    * @param array $libs
+   * @throws Exception
    */
   private function addSources (Array $libs) {
-    /** @var HtmlOutput $os */
-    $os = Cms::getOutputStrategy();
+    /** @var HtmlOutput $outputStrategy */
+    $outputStrategy = Cms::getOutputStrategy();
 
-    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.css");
-    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/theme/tomorrow-night-eighties.css");
-    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/cminit.css");
+    $outputStrategy->addCssFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.css");
+    $outputStrategy->addCssFile(VENDOR_DIR."/".self::CM_DIR."/theme/tomorrow-night-eighties.css");
+    $outputStrategy->addCssFile(VENDOR_DIR."/".self::CM_DIR."/cminit.css");
 
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.js");
-    foreach ($libs as $l) $os->addJsFile($l);
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/keymap/sublime.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/lib/codemirror.js");
+    foreach ($libs as $lib) $outputStrategy->addJsFile($lib);
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/keymap/sublime.js");
 
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/search.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/jump-to-line.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
-    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/searchcursor.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/search.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/search/jump-to-line.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.js");
+    $outputStrategy->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/dialog/dialog.css");
 
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/selection/active-line.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/selection/mark-selection.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/comment/comment.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/fold/xml-fold.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/edit/matchtags.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/format/formatting.js");
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
-    $os->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/selection/active-line.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/selection/mark-selection.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/comment/comment.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/edit/closetag.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/fold/foldcode.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/fold/xml-fold.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/edit/matchtags.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/wrap/hardwrap.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/format/formatting.js");
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.js");
+    $outputStrategy->addCssFile(VENDOR_DIR."/".self::CM_DIR."/addon/display/fullscreen.css");
 
-    $os->addJsFile(VENDOR_DIR."/".self::CM_DIR."/cminit.js", 10, "body");
-    $os->addJsFile($this->pluginDir.'/'.$this->className.'.js', 10, "body");
-    $os->addCssFile($this->pluginDir.'/'.$this->className.'.css');
+    $outputStrategy->addJsFile(VENDOR_DIR."/".self::CM_DIR."/cminit.js", 10, "body");
+    $outputStrategy->addJsFile($this->pluginDir.'/'.$this->className.'.js', 10, "body");
+    $outputStrategy->addCssFile($this->pluginDir.'/'.$this->className.'.css');
   }
 
 }
-
-?>

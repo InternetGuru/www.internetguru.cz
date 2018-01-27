@@ -86,6 +86,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     $this->deleteCache = isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_FILE;
   }
 
+  /**
+   * @param string $filePath
+   * @return bool
+   */
   public static function isSupportedRequest ($filePath) {
     $ext = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
     foreach (self::$legalMime as $extensions) {
@@ -96,9 +100,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return false;
   }
 
+  /**
+   * @throws Exception
+   */
   public static function handleRequest () {
     try {
-      $dest = getCurLink();
+      $dest = get_link();
       $fInfo = self::getFileInfo($dest);
       #if(self::DEBUG) var_dump($fInfo);
       if (!is_file($dest)) {
@@ -111,10 +118,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         }
         exit;
       }
-      redirTo(ROOT_URL.$dest);
-    } catch (Exception $e) {
-      $errno = $e->getCode() ? $e->getCode() : 500;
-      $msg = strlen($e->getMessage()) ? $e->getMessage() : _("Server error");
+      redir_to(ROOT_URL.$dest);
+    } catch (Exception $exc) {
+      $errno = $exc->getCode() ? $exc->getCode() : 500;
+      $msg = strlen($exc->getMessage()) ? $exc->getMessage() : _("Server error");
       throw new Exception(sprintf(_("Unable to handle file request: %s"), $msg), $errno);
     }
     exit;
@@ -182,8 +189,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   private static function findFile ($filePath) {
     try {
-      return findFile($filePath);
-    } catch (Exception $e) {
+      return find_file($filePath);
+    } catch (Exception $exc) {
       return null;
     }
   }
@@ -213,6 +220,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     return FILES_DIR.substr($src, strlen(FILES_DIR."/".$mode));
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param string $src
    * @param string $dest
@@ -220,9 +228,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @param string $imgmode
    * @param bool $isRoot
    * @param string $resDir
+   * @throws Exception
    */
   private static function createFile ($src, $dest, $ext, $imgmode, $isRoot, $resDir) {
-    $fp = lock_file($dest);
+    $filePointer = lock_file($dest);
     try {
       if (is_file($dest)) {
         return;
@@ -235,12 +244,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       } else {
         copy_plus($src, $dest);
       }
-    } catch (Exception $ex) {
-      Logger::error(sprintf(_("Unable to handle resource '%s': %s"), $dest, $ex->getMessage()));
+    } catch (Exception $exc) {
+      Logger::error(sprintf(_("Unable to handle resource '%s': %s"), $dest, $exc->getMessage()));
       self::outputFile($src, "text/$ext");
       exit;
     } finally {
-      unlock_file($fp, $dest);
+      unlock_file($filePointer, $dest);
     }
   }
 
@@ -250,7 +259,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @throws Exception
    */
   private static function checkMime ($src, $ext) {
-    $mime = getFileMime($src);
+    $mime = get_mime($src);
     if (isset(self::$legalMime[$mime]) && in_array($ext, self::$legalMime[$mime])) {
       return;
     }
@@ -261,10 +270,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @param string $src
    * @param string $dest
    * @param string $ext
+   * @throws Exception
    */
   private static function handleResource ($src, $dest, $ext) {
-    if (strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".getCurLink())) { // using default file
-      copy_plus(CMSRES_FOLDER."/".getCurLink(), $dest);
+    if (strpos($src, CMS_FOLDER."/") === 0 && is_file(CMSRES_FOLDER."/".get_link())) { // using default file
+      copy_plus(CMSRES_FOLDER."/".get_link(), $dest);
       return;
     }
     switch ($ext) {
@@ -279,12 +289,13 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         return;
     }
     touch($dest, filemtime($src));
-    Logger::info(sprintf(_("File %s was successfully built"), getCurLink()));
+    Logger::info(sprintf(_("File %s was successfully built"), get_link()));
   }
 
   /**
    * @param string $src
    * @param string $dest
+   * @throws Exception
    */
   private static function buildCss ($src, $dest) {
     $data = file_get_contents($src);
@@ -302,8 +313,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if (!JS::installed()) {
       throw new Exception(_("UglifyJS not installed"));
     }
-    $js = new JS($src);
-    if ($js->minify($dest)) {
+    $jsInst = new JS($src);
+    if ($jsInst->minify($dest)) {
       return;
     }
     throw new Exception(_("Unable to minify JS"));
@@ -312,6 +323,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   /**
    * @param $src
    * @return array [targetWidth, targetHeight]
+   * @throws Exception
    */
   public static function calculateImageSize ($src) {
     $finfo = self::getFileInfo($src);
@@ -337,12 +349,12 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private static function handleImage ($src, $dest, $mode) {
     $mode = self::$imageModes[$mode];
     $src = realpath($src);
-    $i = self::getImageSize($src);
-    if ($i[0] <= $mode[0] && $i[1] <= $mode[1]) {
+    $imageSize = self::getImageSize($src);
+    if ($imageSize[0] <= $mode[0] && $imageSize[1] <= $mode[1]) {
       $fileSize = filesize($src);
       if ($fileSize > $mode[2]) {
         throw new Exception(
-          sprintf(_("Image size %s is over limit %s"), fileSizeConvert($fileSize), fileSizeConvert($mode[2]))
+          sprintf(_("Image size %s is over limit %s"), size_unit($fileSize), size_unit($mode[2]))
         );
       }
       copy_plus($src, $dest);
@@ -352,15 +364,15 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       copy_plus($src, $dest);
       return;
     }
-    $im = new Imagick($src);
-    $im->setImageCompressionQuality($mode[3]);
-    if ($i[0] > $i[1]) {
-      $result = $im->thumbnailImage($mode[0], 0);
+    $imagick = new Imagick($src);
+    $imagick->setImageCompressionQuality($mode[3]);
+    if ($imageSize[0] > $imageSize[1]) {
+      $result = $imagick->thumbnailImage($mode[0], 0);
     } else {
-      $result = $im->thumbnailImage(0, $mode[1]);
+      $result = $imagick->thumbnailImage(0, $mode[1]);
     }
     #var_dump($im->getImageLength());
-    $imBin = $im->__toString();
+    $imBin = $imagick->__toString();
     if (!$result || !strlen($imBin)) {
       throw new Exception(_("Unable to resize image"));
     }
@@ -368,14 +380,14 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       throw new Exception(
         sprintf(
           _("Generated image size %s is over limit %s"),
-          fileSizeConvert(strlen($imBin)),
-          fileSizeConvert($mode[2])
+          size_unit(strlen($imBin)),
+          size_unit($mode[2])
         )
       );
     }
     mkdir_plus(dirname($dest));
-    $b = file_put_contents($dest, $imBin);
-    if ($b === false || !touch($dest, filemtime($src))) {
+    $bytes = file_put_contents($dest, $imBin);
+    if ($bytes === false || !touch($dest, filemtime($src))) {
       throw new Exception(_("Unable to create file"));
     }
   }
@@ -386,9 +398,10 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    * @throws Exception
    */
   private static function getImageSize ($imagePath) {
-    $i = @getimagesize($imagePath);
-    if (is_array($i)) {
-      return $i;
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    $imageSize = @getimagesize($imagePath);
+    if (is_array($imageSize)) {
+      return $imageSize;
     }
     throw new Exception(_("Failed to get image dimensions"));
   }
@@ -408,6 +421,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if ($subject->getStatus() == STATUS_PROCESS) {
@@ -416,7 +430,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if ($subject->getStatus() != STATUS_PREINIT) {
       return;
     }
-    Cms::setVariable("cache_file", getCurLink()."?".CACHE_PARAM."=".CACHE_FILE);
+    Cms::setVariable("cache_file", get_link()."?".CACHE_PARAM."=".CACHE_FILE);
   }
 
   private function checkResources () {
@@ -427,11 +441,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       return;
     }
     foreach (self::$fileFolders as $sourceFolder => $isResDir) {
-      $folder = getRealResDir($sourceFolder);
+      $folder = get_real_resdir($sourceFolder);
       if ($isResDir && stream_resolve_include_path($folder)) {
         $this->doCheckResources($folder, $sourceFolder, $isResDir);
       }
-      if (stream_resolve_include_path($sourceFolder) && !$isResDir || getRealResDir() == RESOURCES_DIR) {
+      if (stream_resolve_include_path($sourceFolder) && !$isResDir || get_real_resdir() == RESOURCES_DIR) {
         $this->doCheckResources($sourceFolder, $sourceFolder, $isResDir);
       }
     }
@@ -466,7 +480,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       try {
         mkdir_plus(USER_FOLDER."/$sourceFolder");
         touch(USER_FOLDER."/$sourceFolder/".INOTIFY, $refTs);
-      } catch (Exception $e) {
+      } catch (Exception $exc) {
         Logger::error(sprintf(_("Unable to create user folder %s"), $sourceFolder));
       }
     }
@@ -503,7 +517,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     );
     if ($doTouch && $upToDate) {
       if (!touch("$cacheFolder/".INOTIFY, $refTs) && CMS_DEBUG) {
-        Logger::debug("Unable to touch $folder/".INOTIFY);
+        Logger::debug("Unable to touch $cacheFolder/".INOTIFY);
       }
     }
     return $upToDate && $doTouch;
@@ -529,7 +543,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if ($isResDir) {
       $folders[CMS_FOLDER."/$sourceFolder"] = true;
     } else {
-      $rawSourceFolder = $this->getImageSource(
+      $rawSourceFolder = self::getImageSource(
         $cacheFolder, self::getImageMode($cacheFolder)
       );
       $folders[ADMIN_FOLDER."/$rawSourceFolder"] = false;
@@ -552,6 +566,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     // redundant dir if only one
     if (is_null($newestFilemtime)) {
       if ($this->deleteCache) {
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
         @rmdir_plus($cacheFolder);
         if (stream_resolve_include_path($cacheFolder)) {
           $this->error[] = $cacheFolder;
@@ -576,9 +591,9 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   private function folderUpToDate ($cacheFolder, $sourceFolder, $isResDir, Array $files) {
     $folderUptodate = true;
-    foreach ($files as $f) {
-      $cacheFilePath = "$cacheFolder/$f";
-      $sourceFilePath = "$sourceFolder/$f";
+    foreach ($files as $file) {
+      $cacheFilePath = "$cacheFolder/$file";
+      $sourceFilePath = "$sourceFolder/$file";
       $fileUptodate = $this->updateCacheFile(
         $sourceFilePath, $cacheFilePath, $isResDir
       );
@@ -601,13 +616,13 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   private function updateCacheFile ($fileName, $cacheFilePath, $isResDir) {
     $sourceFilePath = self::findFile($fileName);
     if (is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
-      $sourceFilePath = $this->getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
+      $sourceFilePath = self::getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
       $sourceFilePath = self::findFile($sourceFilePath);
     }
     if (!is_file($sourceFilePath)) {
       return $this->deleteCache($cacheFilePath, $fileName);
     }
-    if (isUptodate($sourceFilePath, $cacheFilePath)) {
+    if (is_uptodate($sourceFilePath, $cacheFilePath)) {
       return true;
     }
     if (self::DEBUG) {
@@ -628,6 +643,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       return true;
     }
     if ($this->deleteCache) {
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
       @unlink($cacheFilePath);
       if (is_file($cacheFilePath)) {
         $this->error[] = $cacheFilePath;
@@ -639,4 +655,3 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   }
 
 }
-

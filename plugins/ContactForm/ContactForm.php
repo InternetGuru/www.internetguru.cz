@@ -91,6 +91,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if (!Cms::isActive()) {
@@ -113,8 +114,11 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     }
   }
 
+  /**
+   * @throws Exception
+   */
   private function initForm () {
-    $this->cfg = $this->getXML();
+    $this->cfg = self::getXML();
     $this->createGlobalVars();
     foreach ($this->forms as $formId => $form) {
       $form->addClass("fillable");
@@ -127,24 +131,24 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   }
 
   private function createGlobalVars () {
-    foreach ($this->cfg->documentElement->childElementsArray as $e) {
+    foreach ($this->cfg->documentElement->childElementsArray as $childElm) {
       try {
-        switch ($e->nodeName) {
+        switch ($childElm->nodeName) {
           case "var":
-            $id = $e->getRequiredAttribute("id");
-            $this->vars[$id] = $e->nodeValue;
+            $idAttr = $childElm->getRequiredAttribute("id");
+            $this->vars[$idAttr] = $childElm->nodeValue;
             break;
           case "form":
-            $id = $e->getRequiredAttribute("id");
-            $this->forms[$id] = $e;
+            $idAttr = $childElm->getRequiredAttribute("id");
+            $this->forms[$idAttr] = $childElm;
             break;
           case "message":
-            $id = $e->getRequiredAttribute("for");
-            $this->messages[$id] = $e->nodeValue;
+            $idAttr = $childElm->getRequiredAttribute("for");
+            $this->messages[$idAttr] = $childElm->nodeValue;
             break;
         }
-      } catch (Exception $ex) {
-        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $childElm->nodeName, $exc->getMessage()));
       }
     }
     if (self::DEBUG) {
@@ -155,6 +159,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   /**
    * @param DOMElementPlus $form
    * @return DOMDocumentPlus
+   * @throws Exception
    */
   private function parseForm (DOMElementPlus $form) {
     $prefix = normalize($this->className);
@@ -165,7 +170,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $formId = $htmlForm->getAttribute("id");
     $htmlForm->removeAllAttributes(["id", "class"]);
     $htmlForm->setAttribute("method", "post");
-    $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(getCurLink()));
+    $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(get_link()));
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
     return $doc;
@@ -174,74 +179,78 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   /**
    * @param DOMElementPlus $form
    * @param string $prefix
+   * @throws Exception
    */
   private function registerFormItems (DOMElementPlus $form, $prefix) {
     $idInput = $form->ownerDocument->createElement("input");
     $idInput->setAttribute("name", $this->className);
     $idInput->setAttribute("type", "hidden");
     $idInput->setAttribute("value", $form->getAttribute("id"));
-    $e = null;
+    $matchElm = null;
     $this->formItems = [];
     $this->formValues = [];
     $this->formNames = [$this->className];
     $this->formIds = [];
     $this->formGroupValues = [];
     $xpath = new DOMXPath($form->ownerDocument);
-    /** @var DOMElementPlus $e */
-    foreach ($xpath->query(self::FORM_ITEMS_QUERY) as $e) {
-      if ($e->nodeName == "textarea") {
-        if (!$e->hasAttribute("cols")) {
-          $e->setAttribute("cols", 40);
+    /** @var DOMElementPlus $matchElm */
+    foreach ($xpath->query(self::FORM_ITEMS_QUERY) as $matchElm) {
+      if ($matchElm->nodeName == "textarea") {
+        if (!$matchElm->hasAttribute("cols")) {
+          $matchElm->setAttribute("cols", 40);
         }
-        if (!$e->hasAttribute("rows")) {
-          $e->setAttribute("rows", 7);
+        if (!$matchElm->hasAttribute("rows")) {
+          $matchElm->setAttribute("rows", 7);
         }
       }
       $type = null;
-      if ($e->nodeName == "input") {
+      if ($matchElm->nodeName == "input") {
         try {
-          $type = $e->getRequiredAttribute("type");
-        } catch (Exception $ex) {
-          Logger::user_warning($ex->getMessage());
+          $type = $matchElm->getRequiredAttribute("type");
+        } catch (Exception $exc) {
+          Logger::user_warning($exc->getMessage());
           continue;
         }
       }
-      $this->formItems[] = $e;
-      $defId = strlen($e->getAttribute("name")) ? normalize($e->getAttribute("name")) : "item";
-      $id = $this->processFormItem($this->formIds, $e, "id", $prefix, $defId, false);
-      $this->processFormItem($this->formNames, $e, "name", "", $id, true);
+      $this->formItems[] = $matchElm;
+      $defId = strlen($matchElm->getAttribute("name")) ? normalize($matchElm->getAttribute("name")) : "item";
+      $itemId = $this->processFormItem($this->formIds, $matchElm, "id", $prefix, $defId, false);
+      $this->processFormItem($this->formNames, $matchElm, "name", "", $itemId, true);
       if (is_null(Cms::getLoggedUser()) || $type != "submit") {
         continue;
       }
-      $e->setAttribute("value", _("Show message"));
-      $e->setAttribute("title", _("Not sending form if logged user"));
+      $matchElm->setAttribute("value", _("Show message"));
+      $matchElm->setAttribute("title", _("Not sending form if logged user"));
     }
-    $tmp = $e->parentNode;
+    $tmp = $matchElm->parentNode;
     while (!is_null($tmp) && $tmp->nodeName != "form") {
       if ($tmp->nodeName == "label") {
-        $e = $tmp;
+        $matchElm = $tmp;
         break;
       }
       $tmp = $tmp->parentNode;
     }
-    $e->parentNode->appendChild($idInput);
-    foreach ($xpath->query("//label") as $e) {
-      if ($e->hasAttribute("for")) {
-        $for = $prefix.$e->getAttribute("for");
-        $e->setAttribute("for", $for);
-        $this->formIds[$for][] = $e;
+    if (is_null($matchElm)) {
+      throw new Exception("Form has no input");
+    }
+    $matchElm->parentNode->appendChild($idInput);
+    foreach ($xpath->query("//label") as $matchElm) {
+      if ($matchElm->hasAttribute("for")) {
+        $for = $prefix.$matchElm->getAttribute("for");
+        $matchElm->setAttribute("for", $for);
+        $this->formIds[$for][] = $matchElm;
         continue;
       }
-      /** @var DOMElementPlus $f */
-      foreach ($xpath->query("input | textarea | select", $e) as $f) {
-        $this->formIds[$f->getAttribute("id")][] = $e;
+      /** @var DOMElementPlus $field */
+      foreach ($xpath->query("input | textarea | select", $matchElm) as $field) {
+        $this->formIds[$field->getAttribute("id")][] = $matchElm;
       }
     }
-    foreach ($this->formItems as $e) {
-      $this->completeFormItem($e);
+    foreach ($this->formItems as $matchElm) {
+      $this->completeFormItem($matchElm);
     }
   }
-
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param array $register
    * @param DOMElementPlus $e
@@ -250,6 +259,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
    * @param string $default
    * @param bool $arraySupport
    * @return string
+   * @throws Exception
    */
   private function processFormItem (Array &$register, DOMElementPlus $e, $aName, $prefix, $default, $arraySupport) {
     $value = normalize($e->getAttribute($aName), null, null, false); // remove "[]"" and stuff...
@@ -259,11 +269,11 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $isCheckbox = $e->nodeName == "input" && $e->getAttribute("type") == "checkbox";
     $isRadio = $e->nodeName == "input" && $e->getAttribute("type") == "radio";
     if (array_key_exists($value, $register) && (!$arraySupport || !($isCheckbox || $isRadio))) {
-      $i = 1;
-      while (array_key_exists("$value$i", $register)) {
-        $i++;
+      $index = 1;
+      while (array_key_exists("$value$index", $register)) {
+        $index++;
       }
-      $value = "$value$i";
+      $value = "$value$index";
     }
     if ($arraySupport && $isCheckbox) {
       $e->setAttribute($aName, $prefix.$value."[]");
@@ -275,35 +285,35 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
   }
 
   /**
-   * @param DOMElementPlus $e
+   * @param DOMElementPlus $item
    */
-  private function completeFormItem (DOMElementPlus $e) {
-    switch ($e->nodeName) {
+  private function completeFormItem (DOMElementPlus $item) {
+    switch ($item->nodeName) {
       case "input":
-        if (!in_array($e->getAttribute("type"), ["checkbox", "radio"])) {
+        if (!in_array($item->getAttribute("type"), ["checkbox", "radio"])) {
           break;
         }
         $value = null;
-        if (!empty($this->formIds[$e->getAttribute("id")])) {
-          $value = trim($this->formIds[$e->getAttribute("id")][0]->nodeValue);
+        if (!empty($this->formIds[$item->getAttribute("id")])) {
+          $value = trim($this->formIds[$item->getAttribute("id")][0]->nodeValue);
         }
-        $this->setUniqueGroupValue($e, $value);
+        $this->setUniqueGroupValue($item, $value);
         break;
       case "select":
-        foreach ($e->childElementsArray as $o) {
-          $this->setUniqueGroupValue($o, $o->nodeValue);
+        foreach ($item->childElementsArray as $optionElm) {
+          $this->setUniqueGroupValue($optionElm, $optionElm->nodeValue);
         }
     }
   }
 
   /**
-   * @param DOMElementPlus $e
+   * @param DOMElementPlus $element
    * @param string $default
    */
-  private function setUniqueGroupValue (DOMElementPlus $e, $default) {
-    $name = $e->getAttribute("name");
-    $value = $e->getAttribute("value");
-    $j = "";
+  private function setUniqueGroupValue (DOMElementPlus $element, $default) {
+    $name = $element->getAttribute("name");
+    $value = $element->getAttribute("value");
+    $iter = "";
     if (!strlen($value)) {
       $value = $default;
     }
@@ -311,15 +321,18 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       $this->formGroupValues[$name] = [];
     }
     if (is_null($value) || array_key_exists($value, $this->formGroupValues[$name])) {
-      $j = 1;
-      while (array_key_exists($value.$j, $this->formGroupValues[$name])) {
-        $j++;
+      $iter = 1;
+      while (array_key_exists($value.$iter, $this->formGroupValues[$name])) {
+        $iter++;
       }
     }
-    $e->setAttribute("value", $value.$j);
-    $this->formGroupValues[$name][$value.$j] = null;
+    $element->setAttribute("value", $value.$iter);
+    $this->formGroupValues[$name][$value.$iter] = null;
   }
 
+  /**
+   * @throws Exception
+   */
   private function proceedForm () {
     $formToSend = null;
     $formIdToSend = null;
@@ -327,18 +340,18 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       $prefixedFormId = normalize($this->className)."-$formId";
       $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
       $formValues = Cms::getVariable("validateform-$prefixedFormId");
-      $fv = $this->createFormVars($htmlForm);
+      $formVars = $this->createFormVars($htmlForm);
       if (isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
-        Logger::user_success($fv["success"]);
+        Logger::user_success($formVars["success"]);
       }
       if (is_null($formValues)) {
         continue;
       }
       foreach (["email", "name", "sendcopy"] as $name) {
-        $fv[$name] = isset($formValues[$name]) ? $formValues[$name] : "";
+        $formVars[$name] = isset($formValues[$name]) ? $formValues[$name] : "";
       }
       $this->formValues = $formValues;
-      $this->formVars = $fv;
+      $this->formVars = $formVars;
       $this->formValues["form_id"] = $formId;
       $formToSend = $form;
       $formIdToSend = $formId;
@@ -354,11 +367,11 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
         }
       }
       $variables = array_merge($this->formValues, Cms::getAllVariables());
-      foreach ($this->formVars as $k => $v) {
-        $this->formVars[$k] = replaceVariables($v, $variables);
+      foreach ($this->formVars as $key => $var) {
+        $this->formVars[$key] = replace_vars($var, $variables);
       }
       if (array_key_exists($formIdToSend, $this->messages) && strlen($this->messages[$formIdToSend])) {
-        $msg = replaceVariables($this->messages[$formIdToSend], $variables);
+        $msg = replace_vars($this->messages[$formIdToSend], $variables);
       } else {
         $msg = $this->createMessage();
       }
@@ -367,12 +380,12 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
         var_dump($this->formVars);
         var_dump($this->formValues);
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       $message = sprintf(
         _("Unable to send form %s: %s"),
         "<a href='#".strtolower($this->className)."-".$formIdToSend."'>"
         .$formToSend->getAttribute("id")."</a>",
-        $e->getMessage()
+        $exc->getMessage()
       );
       Logger::user_error($message);
     }
@@ -400,11 +413,11 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
    */
   private function createMessage () {
     $msg = [];
-    foreach ($this->formValues as $k => $v) {
-      if (is_array($v)) {
-        $v = implode(", ", $v);
+    foreach ($this->formValues as $key => $value) {
+      if (is_array($value)) {
+        $value = implode(", ", $value);
       }
-      $msg[] = "$k: $v";
+      $msg[] = "$key: $value";
     }
     return implode("\n", $msg);
   }
@@ -454,9 +467,10 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       $bcc = "";
       $this->sendMail($email, $name, $adminaddr, $adminname, $msg, $bcc);
     }
-    redirTo(buildLocalUrl(["path" => getCurLink(), "query" => "cfok=".$formIdToSend]));
+    redir_to(build_local_url(["path" => get_link(), "query" => "cfok=".$formIdToSend]));
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param string $mailto
    * @param string $mailtoname
@@ -476,7 +490,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $mail->setFrom("no-reply@".DOMAIN, $this->formVars["servername"]);
     $mail->addAddress($mailto, $mailtoname);
     $mail->Body = $msg;
-    $mail->Subject = sprintf(_("New massage from %s"), HOST);
+    $mail->Subject = sprintf(_("New massage from %s"), HTTP_HOST);
     if (strlen($replyto)) {
       $mail->addReplyTo($replyto, $replytoname);
       $mail->Subject .= " [$replyto]";
@@ -504,20 +518,18 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     if (!strlen($this->vars["adminaddr"]) || !preg_match("/".EMAIL_PATTERN."/", $this->vars["adminaddr"])) {
       Logger::user_warning(_("Admin address is not set or invalid"));
     }
-    /** @var DOMElementPlus $f */
-    foreach ($forms as $f) {
-      $id = substr($f->getAttribute("var"), strlen($this->prefix) + 1);
-      if (!array_key_exists($id, $this->forms)) {
-        Logger::user_warning(sprintf(_("Form id '%s' not found"), $id));
+    /** @var DOMElementPlus $form */
+    foreach ($forms as $form) {
+      $varId = substr($form->getAttribute("var"), strlen($this->prefix) + 1);
+      if (!array_key_exists($varId, $this->forms)) {
+        Logger::user_warning(sprintf(_("Form id '%s' not found"), $varId));
         continue;
       }
-      if (!array_key_exists($id, $this->messages)) {
-        Logger::user_warning(sprintf(_("Missing message for form id '%s'"), $id));
+      if (!array_key_exists($varId, $this->messages)) {
+        Logger::user_warning(sprintf(_("Missing message for form id '%s'"), $varId));
         continue;
       }
     }
   }
 
 }
-
-?>

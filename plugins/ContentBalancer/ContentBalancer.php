@@ -70,6 +70,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
 
   /**
    * @param SplSubject|Plugins $subject
+   * @throws Exception
    */
   public function update (SplSubject $subject) {
     if ($subject->getStatus() != STATUS_PREINIT) {
@@ -81,30 +82,33 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
     $this->setTree();
     $this->idToLink = HTMLPlusBuilder::getIdToLink();
-    foreach (HTMLPlusBuilder::getFileToId() as $file => $id) {
+    foreach (HTMLPlusBuilder::getFileToId() as $file => $fileId) {
       $body = HTMLPlusBuilder::getFileToDoc($file)->documentElement;
       if ($body->hasClass($this->noBalanceClass)) {
         continue;
       }
-      $this->balanceLinks($id);
-      $this->modifyFragmentLinks($id);
+      $this->balanceLinks($fileId);
+      $this->modifyFragmentLinks($fileId);
     }
     HTMLPlusBuilder::setIdToLink($this->idToLink);
   }
 
+  /**
+   * @throws Exception
+   */
   private function createVars () {
-    $cfg = $this->getXML();
-    foreach ($cfg->documentElement->childElementsArray as $e) {
+    $cfg = self::getXML();
+    foreach ($cfg->documentElement->childElementsArray as $element) {
       try {
-        $id = $e->getRequiredAttribute("id");
-        if ($e->nodeName == "var") {
-          $this->loadVar($id, $e);
-        } else if ($e->nodeName == "item") {
-          $e->getRequiredAttribute("wrapper"); // only check
-          $this->sets[$id] = $e;
+        $eId = $element->getRequiredAttribute("id");
+        if ($element->nodeName == "var") {
+          $this->loadVar($eId, $element);
+        } else if ($element->nodeName == "item") {
+          $element->getRequiredAttribute("wrapper"); // only check
+          $this->sets[$eId] = $element;
         }
-      } catch (Exception $ex) {
-        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $e->nodeName, $ex->getMessage()));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("Skipped element %s: %s"), $element->nodeName, $exc->getMessage()));
       }
     }
   }
@@ -129,40 +133,40 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   }
 
   private function setTree () {
-    foreach (HTMLPlusBuilder::getIdToLink() as $id => $void) {
-      $parentId = HTMLPlusBuilder::getIdToParentId($id);
-      $this->tree[$id] = [];
+    foreach (HTMLPlusBuilder::getIdToLink() as $hId => $void) {
+      $parentId = HTMLPlusBuilder::getIdToParentId($hId);
+      $this->tree[$hId] = [];
       if (is_null($parentId)) {
         continue;
       }
-      if (HTMLPlusBuilder::getIdToFile($id) != HTMLPlusBuilder::getIdToFile($parentId)) {
+      if (HTMLPlusBuilder::getIdToFile($hId) != HTMLPlusBuilder::getIdToFile($parentId)) {
         continue;
       }
-      $this->tree[$parentId][] = $id;
+      $this->tree[$parentId][] = $hId;
     }
   }
 
   /**
-   * @param string $id
+   * @param string $hId
    * @return int
    */
-  private function balanceLinks ($id) {
-    $deep = 0;
-    foreach ($this->tree[$id] as $childId) {
-      $d = $this->balanceLinks($childId);
-      if ($d > $deep) {
-        $deep = $d;
+  private function balanceLinks ($hId) {
+    $depth = 0;
+    foreach ($this->tree[$hId] as $childId) {
+      $childDepth = $this->balanceLinks($childId);
+      if ($childDepth > $depth) {
+        $depth = $childDepth;
       }
     }
-    $link = $this->idToLink[$id];
-    if ($deep + 1 >= $this->level && count($this->tree[$id]) >= $this->limit) {
+    $link = $this->idToLink[$hId];
+    if ($depth + 1 >= $this->level && count($this->tree[$hId]) >= $this->limit) {
       if (strpos($link, "#") === 0) {
         $link = substr($link, 1);
       }
       $link = str_replace("#", "/", $link);
-      $this->idToLink[$id] = $link;
+      $this->idToLink[$hId] = $link;
     }
-    return ++$deep;
+    return ++$depth;
   }
 
   /**
@@ -182,6 +186,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
 
   /**
    * @param HTMLPlus $content
+   * @throws Exception
    */
   public function modifyContent (HTMLPlus $content) {
     if ($content->documentElement->hasClass($this->noBalanceClass)) {
@@ -213,38 +218,43 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   /**
    * @param HTMLPlus $content
    * @return HTMLPlus
+   * @throws Exception
    */
   private function strip (HTMLPlus $content) {
-    $link = basename(getCurLink());
+    $link = basename(get_link());
     if ($this->isRoot($link)) {
       return $content;
     }
-    $h1 = $content->getElementById($link, "h");
-    if (is_null($h1)) {
+    $h1Elm = $content->getElementById($link, "h");
+    if (is_null($h1Elm)) {
       // Redirect encoded # (%23) in url to decoded url
       if (strpos($link, "#") != -1) {
-        redirTo($link);
+        redir_to($link);
       }
       new ErrorPage(_("Unable to find requested section"), 500);
     }
-    $this->handleAttribute($h1, "ctime");
-    $this->handleAttribute($h1, "mtime");
-    $this->handleAttribute($h1, "author");
-    $this->handleAttribute($h1, "authorid");
-    $this->handleAttribute($h1, "resp");
-    $this->handleAttribute($h1, "respid");
-    $this->handleAttribute($h1->parentNode, "xml:lang", true);
+    $this->handleAttribute($h1Elm, "ctime");
+    $this->handleAttribute($h1Elm, "mtime");
+    $this->handleAttribute($h1Elm, "author");
+    $this->handleAttribute($h1Elm, "authorid");
+    $this->handleAttribute($h1Elm, "resp");
+    $this->handleAttribute($h1Elm, "respid");
+    $this->handleAttribute($h1Elm->parentNode, "xml:lang", true);
     $body = $content->documentElement;
-    foreach ($h1->parentNode->attributes as $attNode) {
+    foreach ($h1Elm->parentNode->attributes as $attNode) {
       $body->setAttribute($attNode->nodeName, $attNode->nodeValue);
     }
-    $elements = $this->getUntilSame($h1);
+    $elements = $this->getUntilSame($h1Elm);
     //    $body->removeChildNodes(); # not working
-    $r = [];
-    foreach ($body->childNodes as $n) $r[] = $n;
-    foreach ($r as $n) $body->removeChild($n);
-    foreach ($elements as $e) {
-      $body->appendChild($e);
+    $toRemove = [];
+    foreach ($body->childNodes as $node) {
+      $toRemove[] = $node;
+    }
+    foreach ($toRemove as $node) {
+      $body->removeChild($node);
+    }
+    foreach ($elements as $element) {
+      $body->appendChild($element);
     }
     return $content;
   }
@@ -278,17 +288,17 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   }
 
   /**
-   * @param DOMElementPlus $e
+   * @param DOMElementPlus $element
    * @return array
    */
-  private function getUntilSame (DOMElementPlus $e) {
-    $elements = [$e];
-    $untilName = $e->nodeName;
-    while (($e = $e->nextElement) !== null) {
-      if ($e->nodeName == $untilName) {
+  private function getUntilSame (DOMElementPlus $element) {
+    $elements = [$element];
+    $untilName = $element->nodeName;
+    while (($element = $element->nextElement) !== null) {
+      if ($element->nodeName == $untilName) {
         break;
       }
-      $elements[] = $e;
+      $elements[] = $element;
     }
     return $elements;
   }
@@ -297,6 +307,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    * @param HTMLPlus $content
    * @param string $hId
    * @param int $level
+   * @throws Exception
    */
   private function balanceContent (HTMLPlus $content, $hId, $level = 1) {
     if (!array_key_exists($hId, $this->tree)) {
@@ -318,11 +329,11 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   private function balanceHeading (DOMElementPlus $section, $h3ids) {
     $setId = null;
-    foreach (explode(" ", $section->getAttribute("class")) as $c) {
-      if (strpos($c, strtolower("$this->className-")) !== 0) {
+    foreach (explode(" ", $section->getAttribute("class")) as $class) {
+      if (strpos($class, strtolower("$this->className-")) !== 0) {
         continue;
       }
-      $setId = substr($c, strlen("$this->className-"));
+      $setId = substr($class, strlen("$this->className-"));
     }
     if ($setId == "none") {
       $section->parentNode->removeChild($section);
@@ -341,8 +352,8 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     foreach ($h3ids as $h3id) {
       $vars = $this->getVariables($h3id);
       $root = $this->createDOMElement($vars, $set);
-      foreach ($root->childElementsArray as $e) {
-        $wrapper->appendChild($section->ownerDocument->importNode($e, true));
+      foreach ($root->childElementsArray as $element) {
+        $wrapper->appendChild($section->ownerDocument->importNode($element, true));
       }
     }
     $section->parentNode->replaceChild($wrapper, $section);
@@ -376,5 +387,3 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
   }
 
 }
-
-?>

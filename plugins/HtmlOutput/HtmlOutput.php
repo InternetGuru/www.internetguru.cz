@@ -63,7 +63,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @var array
    */
-  private $transformationsPriority = [];
+  private $xsltPriority = [];
   /**
    * @var array
    */
@@ -102,9 +102,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     if ($subject->getStatus() != STATUS_PROCESS) {
       return;
     }
-    $this->cfg = $this->getXML();
+    $this->cfg = self::getXML();
     $this->registerThemes($this->cfg);
-    $robots = $this->cfg->matchElement("robots", "domain", HOST);
+    $robots = $this->cfg->matchElement("robots", "domain", HTTP_HOST);
     if (is_null($robots)) {
       throw new Exception("Unable to match robots element to domain");
     }
@@ -116,7 +116,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       Logger::error(sprintf(_("Unable to delete %s file"), ROBOTS_TXT));
     }
     if (is_null($this->favIcon)) {
-      $this->favIcon = findFile($this->pluginDir."/".self::FAVICON);
+      $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
     }
   }
 
@@ -133,11 +133,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $theme = $cfg->getElementById("theme");
     if (!is_null($theme)) {
       $themeId = $theme->nodeValue;
-      $t = $cfg->getElementById($themeId);
-      if (is_null($t)) {
+      $themeElement = $cfg->getElementById($themeId);
+      if (is_null($themeElement)) {
         Logger::user_warning(sprintf(_("Theme '%s' not found"), $themeId));
       } else {
-        $this->addThemeFiles($t);
+        $this->addThemeFiles($themeElement);
       }
     }
 
@@ -145,12 +145,20 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->addThemeFiles($cfg->documentElement);
   }
 
+  /**
+   * @param string $filePath
+   * @return bool
+   */
   public static function isSupportedRequest ($filePath) {
     return $filePath === ROBOTS_TXT;
   }
 
+  /**
+   * @return void
+   * @throws Exception
+   */
   public static function handleRequest () {
-    $robots = self::getXML()->matchElement("robots", "domain", HOST);
+    $robots = self::getXML()->matchElement("robots", "domain", HTTP_HOST);
     if (is_null($robots)) {
       new ErrorPage("No matching robots element", 404);
     }
@@ -162,6 +170,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @param string $filePath
    * @param int $priority
+   * @throws Exception
    */
   public function addTransformation ($filePath, $priority = self::DEFAULT_PRIORITY) {
     if (isset($this->transformations[$filePath])) {
@@ -172,51 +181,53 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       "priority" => $priority,
       "file" => $filePath,
     ];
-    $this->transformationsPriority[$filePath] = $priority;
+    $this->xsltPriority[$filePath] = $priority;
   }
 
   /**
-   * @param DOMElementPlus|null $e
+   * @param DOMElementPlus|null $element
    */
-  private function addThemeFiles (DOMElementPlus $e = null) {
-    foreach ($e->childElementsArray as $n) {
-      if ($n->nodeValue == "" || in_array($n->nodeName, ["var", "themes"])) {
-        continue;
-      }
+  private function addThemeFiles (DOMElementPlus $element = null) {
+    foreach ($element->childElementsArray as $node) {
       try {
-        switch ($n->nodeName) {
+        switch ($node->nodeName) {
+          case "":
+          case "var":
+          case "themes":
+            continue;
           case "xslt":
-            $this->addTransformation($n->nodeValue, 5);
+            $this->addTransformation($node->nodeValue, 5);
             break;
           case "jsFile":
-            $user = !$n->hasAttribute("readonly");
+            $user = !$node->hasAttribute("readonly");
             $append = self::APPEND_HEAD;
             $priority = self::DEFAULT_PRIORITY;
-            if ($n->hasAttribute("append")) {
-              $append = $n->getAttribute("append");
+            if ($node->hasAttribute("append")) {
+              $append = $node->getAttribute("append");
             }
-            if ($n->hasAttribute("priority")) {
-              $priority = $n->getAttribute("priority");
+            if ($node->hasAttribute("priority")) {
+              $priority = $node->getAttribute("priority");
             }
-            $ieIfComment = ($n->hasAttribute("if") ? $n->getAttribute("if") : null);
-            $ifXpath = ($n->hasAttribute("if-xpath") ? $n->getAttribute("if-xpath") : false);
-            $this->addJsFile($n->nodeValue, $priority, $append, $user, $ieIfComment, $ifXpath);
+            $ieIfComment = ($node->hasAttribute("if") ? $node->getAttribute("if") : null);
+            $ifXpath = ($node->hasAttribute("if-xpath") ? $node->getAttribute("if-xpath") : false);
+            $this->addJsFile($node->nodeValue, $priority, $append, $user, $ieIfComment, $ifXpath);
             break;
           case "stylesheet":
-            $media = ($n->hasAttribute("media") ? $n->getAttribute("media") : false);
-            $ieIfComment = ($n->hasAttribute("if") ? $n->getAttribute("if") : null);
-            $ifXpath = ($n->hasAttribute("if-xpath") ? $n->getAttribute("if-xpath") : false);
-            $this->addCssFile($n->nodeValue, $media, self::DEFAULT_PRIORITY, true, $ieIfComment, $ifXpath);
+            $media = ($node->hasAttribute("media") ? $node->getAttribute("media") : false);
+            $ieIfComment = ($node->hasAttribute("if") ? $node->getAttribute("if") : null);
+            $ifXpath = ($node->hasAttribute("if-xpath") ? $node->getAttribute("if-xpath") : false);
+            $this->addCssFile($node->nodeValue, $media, self::DEFAULT_PRIORITY, true, $ieIfComment, $ifXpath);
             break;
           case "favicon":
-            $this->favIcon = findFile($n->nodeValue);
+            $this->favIcon = find_file($node->nodeValue);
         }
-      } catch (Exception $e) {
-        Logger::user_warning(sprintf(_("File %s of type %s not found"), $n->nodeValue, $n->nodeName));
+      } catch (Exception $exc) {
+        Logger::user_warning(sprintf(_("File %s of type %s not found"), $node->nodeValue, $node->nodeName));
       }
     }
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param string $filePath
    * @param int $priority
@@ -224,6 +235,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param bool $user
    * @param null $ieIfComment
    * @param bool $ifXpath
+   * @throws Exception
    */
   public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->jsFiles[$filePath])) {
@@ -242,6 +254,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->jsFilesPriority[$filePath] = $priority;
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param string $filePath
    * @param bool $media
@@ -249,6 +262,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param bool $user
    * @param string|null $ieIfComment
    * @param bool $ifXpath
+   * @throws Exception
    */
   public function addCssFile ($filePath, $media = false, $priority = self::DEFAULT_PRIORITY, $user = true, $ieIfComment = null, $ifXpath = false) {
     if (isset($this->cssFiles[$filePath])) {
@@ -274,9 +288,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @throws Exception
    */
   public function getOutput (HTMLPlus $content) {
-    stableSort($this->cssFilesPriority);
-    stableSort($this->jsFilesPriority);
-    $h1 = $content->documentElement->firstElement;
+    stable_sort($this->cssFilesPriority);
+    stable_sort($this->jsFilesPriority);
+    $heading = $content->documentElement->firstElement;
     $lang = $content->documentElement->getAttribute("xml:lang");
 
     // apply transformations
@@ -297,31 +311,37 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     // final validation
     $contentPlus->processFunctions(Cms::getAllFunctions());
     $xPath = new DOMXPath($contentPlus);
-    $this->addHead($doc, $html, $h1, $xPath);
+    $this->addHead($doc, $html, $heading, $xPath);
 
-    /** @var DOMElementPlus $a */
-    foreach ($xPath->query("//*[@var]") as $a) $a->stripAttr("var");
-    foreach ($xPath->query("//*[@fn]") as $a) $a->stripAttr("fn");
-    foreach ($xPath->query("//select[@pattern]") as $a) $a->stripAttr("pattern");
-    foreach ($contentPlus->getElementsByTagName("a") as $e) {
-      $this->processElement($e, "href");
+    /** @var DOMElementPlus $element */
+    foreach ($xPath->query("//*[@var]") as $element) {
+      $element->stripAttr("var");
     }
-    foreach ($contentPlus->getElementsByTagName("form") as $e) {
-      $this->processElement($e, "action");
+    foreach ($xPath->query("//*[@fn]") as $element) {
+      $element->stripAttr("fn");
+    }
+    foreach ($xPath->query("//select[@pattern]") as $element) {
+      $element->stripAttr("pattern");
+    }
+    foreach ($contentPlus->getElementsByTagName("a") as $element) {
+      $this->processElement($element, "href");
+    }
+    foreach ($contentPlus->getElementsByTagName("form") as $element) {
+      $this->processElement($element, "action");
     }
     $ids = [];
-    foreach ($xPath->query("//*/@id") as $e) {
-      $ids[$e->nodeValue] = null;
+    foreach ($xPath->query("//*/@id") as $element) {
+      $ids[$element->nodeValue] = null;
     }
     /** @var DOMElementPlus $img */
     foreach ($contentPlus->getElementsByTagName("img") as $img) {
       $this->processImage($img, $ids);
     }
-    foreach ($xPath->query("//*[@xml:lang]") as $a) {
-      if (!$a->hasAttribute("lang")) {
-        $a->setAttribute("lang", $a->getAttribute("xml:lang"));
+    foreach ($xPath->query("//*[@xml:lang]") as $element) {
+      if (!$element->hasAttribute("lang")) {
+        $element->setAttribute("lang", $element->getAttribute("xml:lang"));
       }
-      $a->removeAttribute("xml:lang");
+      $element->removeAttribute("xml:lang");
     }
     $this->consolidateLang($contentPlus->documentElement, $lang);
 
@@ -345,19 +365,20 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $proc = new XSLTProcessor();
     /** @noinspection PhpParamsInspection */
     $proc->setParameter('', $this->getProcParams());
-    stableSort($this->transformationsPriority);
-    foreach ($this->transformationsPriority as $xslt => $priority) {
+    stable_sort($this->xsltPriority);
+    foreach ($this->xsltPriority as $xslt => $priority) {
       try {
         $newContent = $this->transform($content, $xslt, $proc);
         $newContent->encoding = "utf-8";
         $xml = $newContent->saveXML();
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
         if (!@$newContent->loadXML($xml)) {
           throw new Exception(sprintf(_("Invalid transformation or parameter in '%s'"), $xslt));
         }
         #todo: validate HTML5 validity
         $content = $newContent;
-      } catch (Exception $e) {
-        Logger::user_error($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::user_error($exc->getMessage());
       }
     }
     return $content;
@@ -367,40 +388,42 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @return array
    */
   private function getProcParams () {
-    $o = [];
-    foreach (Cms::getAllVariables() as $k => $v) {
-      if ($v instanceof \Closure) {
+    $output = [];
+    foreach (Cms::getAllVariables() as $key => $value) {
+      if ($value instanceof \Closure) {
         continue;
-      } elseif ($v instanceof DOMDocumentPlus) {
-        $s = $v->saveXML($v->documentElement);
-      } elseif ($v instanceof DOMElement) {
-        $s = "";
-        foreach ($v->childNodes as $n) $s .= $v->ownerDocument->saveXML($n);
-      } elseif (is_array($v)) {
-        $s = implode(", ", $v);
-      } elseif (is_object($v) && !method_exists($v, '__toString')) {
-        Logger::critical(sprintf(_("Unable to convert variable '%s' to string"), $k));
+      } elseif ($value instanceof DOMDocumentPlus) {
+        $string = $value->saveXML($value->documentElement);
+      } elseif ($value instanceof DOMElement) {
+        $string = "";
+        foreach ($value->childNodes as $node) {
+          $string .= $value->ownerDocument->saveXML($node);
+        }
+      } elseif (is_array($value)) {
+        $string = implode(", ", $value);
+      } elseif (is_object($value) && !method_exists($value, '__toString')) {
+        Logger::critical(sprintf(_("Unable to convert variable '%s' to string"), $key));
         continue;
       } else {
-        $s = (string) $v;
+        $string = (string) $value;
       }
       if (false) {
-        if ($k != "globalmenu") {
+        if ($key != "globalmenu") {
           continue;
         }
         #$v = "&copy;2014 &amp; <a href='http://www.internetguru.cz'>InternetGuru</a>";
-        echo ($v)."\n";
-        echo html_entity_decode($v)."\n";
-        echo htmlentities($v)."\n";
-        echo html_entity_decode($v)."\n";
-        echo utf8_decode(html_entity_decode($v))."\n";
-        echo htmlentities(utf8_decode(html_entity_decode($v)), ENT_XHTML)."\n";
-        echo translateUtf8Entities($v)."\n";
+        echo ($value)."\n";
+        echo html_entity_decode($value)."\n";
+        echo htmlentities($value)."\n";
+        echo html_entity_decode($value)."\n";
+        echo utf8_decode(html_entity_decode($value))."\n";
+        echo htmlentities(utf8_decode(html_entity_decode($value)), ENT_XHTML)."\n";
+        echo to_utf8($value)."\n";
         die();
       }
-      $o[$k] = str_replace("'", '"', translateUtf8Entities($s));
+      $output[$key] = str_replace("'", '"', to_utf8($string));
     }
-    return $o;
+    return $output;
   }
 
   /**
@@ -413,9 +436,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   private function transform (DOMDocument $content, $fileName, XSLTProcessor $proc) {
     #var_dump($fileName);
     $xsl = XMLBuilder::load($fileName);
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (!@$proc->importStylesheet($xsl)) {
       throw new Exception(sprintf(_("XSLT '%s' compilation error"), $fileName));
     }
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (($doc = @$proc->transformToDoc($content)) === false) {
       throw new Exception(sprintf(_("XSLT '%s' transformation fail"), $fileName));
     }
@@ -511,6 +536,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $e->appendChild($meta);
   }
 
+  /** @noinspection PhpTooManyParametersInspection */
   /**
    * @param DOMElement $parent
    * @param string $filePath
@@ -520,24 +546,24 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param string|null $ieIfComment
    */
   private function appendLinkElement (DOMElement $parent, $filePath, $rel, $type = false, $media = false, $ieIfComment = null) {
-    $e = $parent->ownerDocument->createElement("link");
+    $element = $parent->ownerDocument->createElement("link");
     if ($type) {
-      $e->setAttribute("type", $type);
+      $element->setAttribute("type", $type);
     }
     if ($rel) {
-      $e->setAttribute("rel", $rel);
+      $element->setAttribute("rel", $rel);
     }
     if ($media) {
-      $e->setAttribute("media", $media);
+      $element->setAttribute("media", $media);
     }
-    $e->setAttribute("href", $filePath);
+    $element->setAttribute("href", $filePath);
     if (!is_null($ieIfComment)) {
       $parent->appendChild(
-        $parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]")
+        $parent->ownerDocument->createComment("[if $ieIfComment]>".$element->ownerDocument->saveXML($element)."<![endif]")
       );
       return;
     }
-    $parent->appendChild($e);
+    $parent->appendChild($element);
   }
 
   /**
@@ -567,26 +593,27 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @return void
    */
   private function appendCssFiles (DOMElement $parent, DOMXPath $xPath) {
-    foreach ($this->cssFilesPriority as $k => $v) {
-      $ifXpath = isset($this->cssFiles[$k]["ifXpath"]) ? $this->cssFiles[$k]["ifXpath"] : false;
+    foreach ($this->cssFilesPriority as $key => $value) {
+      $ifXpath = isset($this->cssFiles[$key]["ifXpath"]) ? $this->cssFiles[$key]["ifXpath"] : false;
       if ($ifXpath !== false) {
-        $r = @$xPath->query($ifXpath);
-        if ($r === false) {
+        /** @noinspection PhpUsageOfSilenceOperatorInspection */
+        $result = @$xPath->query($ifXpath);
+        if ($result === false) {
           Logger::user_warning(sprintf(_("Invalid xPath query '%s'"), $ifXpath));
           continue;
         }
-        if ($r->length === 0) {
+        if ($result->length === 0) {
           continue;
         }
       }
-      $ieIfComment = isset($this->cssFiles[$k]["if"]) ? $this->cssFiles[$k]["if"] : null;
-      $filePath = ROOT_URL.getResDir($this->cssFiles[$k]["file"]);
+      $ieIfComment = isset($this->cssFiles[$key]["if"]) ? $this->cssFiles[$key]["if"] : null;
+      $filePath = ROOT_URL.get_resdir($this->cssFiles[$key]["file"]);
       $this->appendLinkElement(
         $parent,
         $filePath,
         "stylesheet",
         "text/css",
-        $this->cssFiles[$k]["media"],
+        $this->cssFiles[$key]["media"],
         $ieIfComment
       );
     }
@@ -609,7 +636,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         throw new Exception(_("Empty value"));
       }
       // throws unable to parse exception
-      $pLink = parseLocalLink($target);
+      $pLink = parse_local_link($target);
       // link is external
       if (is_null($pLink)) {
         return;
@@ -631,8 +658,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         return;
       }
       $this->insertTitle($e, $pLink["id"]);
-    } catch (Exception $ex) {
-      $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $ex->getMessage());
+    } catch (Exception $exc) {
+      $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $exc->getMessage());
       $e->stripAttr($aName, $message);
       if (is_null(Cms::getLoggedUser())) {
         return;
@@ -684,7 +711,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       throw new Exception(_("Target not found"));
     }
     $ignoreCyclic = $e->nodeName != "a";
-    $link = buildLocalUrl($pLink, $ignoreCyclic, $isLink);
+    $link = build_local_url($pLink, $ignoreCyclic, $isLink);
     $e->setAttribute($aName, $link);
   }
 
@@ -705,21 +732,21 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $pHref["id"] .= "/".$pHref["fragment"];
     }
     // href is link
-    $id = HTMLPlusBuilder::getLinkToId($pHref["id"]);
-    if (!is_null($id)) {
-      $pHref["id"] = $id;
+    $linkId = HTMLPlusBuilder::getLinkToId($pHref["id"]);
+    if (!is_null($linkId)) {
+      $pHref["id"] = $linkId;
       return $pHref;
     }
     // href is heading id
     $link = HTMLPlusBuilder::getIdToLink($pHref["id"]);
     // href is non-heading id
     if (is_null($link)) {
-      $id = HTMLPlusBuilder::getIdToParentId($pHref["id"]);
+      $linkId = HTMLPlusBuilder::getIdToParentId($pHref["id"]);
       // link not found
-      if (is_null($id)) {
+      if (is_null($linkId)) {
         return [];
       }
-      $link = HTMLPlusBuilder::getIdToLink($id);
+      $link = HTMLPlusBuilder::getIdToLink($linkId);
     }
     $linkArray = explode("#", $link);
     $pHref["path"] = $linkArray[0];
@@ -750,7 +777,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     if (!strlen($title) || $title == $a->nodeValue) {
       $title = HTMLPlusBuilder::getIdToHeading($id);
       if (!strlen($title) || $title == $a->nodeValue) {
-        $title = getShortString(HTMLPlusBuilder::getIdToDesc($id));
+        $title = shorten(HTMLPlusBuilder::getIdToDesc($id));
       }
     }
     $a->setAttribute("title", $title);
@@ -783,17 +810,17 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $src = $img->getAttribute("src");
     // external
-    if (is_null(parseLocalLink($src))) {
+    if (is_null(parse_local_link($src))) {
       return;
     }
     try {
       list($targetWidth, $targetHeight) = $this->getImageDimensions($src);
-    } catch (Exception $ex) {
+    } catch (Exception $exc) {
       if (is_null(Cms::getLoggedUser())) {
         $img->stripElement();
         return;
       }
-      $message = sprintf(_("Attribute src=%s removed: %s"), $src, $ex->getMessage());
+      $message = sprintf(_("Attribute src=%s removed: %s"), $src, $exc->getMessage());
       $img->setAttribute('src', "/".LIB_DIR."/".NOT_FOUND_IMG_FILENAME);
       list($targetWidth, $targetHeight) = getimagesize(LIB_FOLDER."/".NOT_FOUND_IMG_FILENAME);
       $img->setAttribute("title", $message);
@@ -811,6 +838,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @param string $src
    * @return array
+   * @throws Exception
    */
   private function getImageDimensions ($src) {
     if (stream_resolve_include_path($src)) {
@@ -828,8 +856,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     if ($parent->getAttribute("lang") == $lang) {
       $parent->removeAttribute("lang");
     }
-    foreach ($parent->childElementsArray as $e) {
-      $this->consolidateLang($e, $lang);
+    foreach ($parent->childElementsArray as $element) {
+      $this->consolidateLang($element, $lang);
     }
   }
 
@@ -839,33 +867,33 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param DOMXPath $xPath
    */
   private function appendJsFiles (DOMElement $parent, $append = self::APPEND_HEAD, DOMXPath $xPath) {
-    foreach ($this->jsFilesPriority as $k => $v) {
-      if ($append != $this->jsFiles[$k]["append"]) {
+    foreach ($this->jsFilesPriority as $key => $value) {
+      if ($append != $this->jsFiles[$key]["append"]) {
         continue;
       }
-      $ifXpath = isset($this->jsFiles[$k]["ifXpath"]) ? $this->jsFiles[$k]["ifXpath"] : false;
+      $ifXpath = isset($this->jsFiles[$key]["ifXpath"]) ? $this->jsFiles[$key]["ifXpath"] : false;
       if ($ifXpath !== false) {
-        $r = $xPath->query($ifXpath);
-        if ($r === false || $r->length === 0) {
+        $result = $xPath->query($ifXpath);
+        if ($result === false || $result->length === 0) {
           continue;
         }
       }
-      $e = $parent->ownerDocument->createElement("script");
-      $this->appendCdata($e, $this->jsFiles[$k]["content"]);
-      $e->setAttribute("type", "text/javascript");
-      $filePath = ROOT_URL.getResDir($this->jsFiles[$k]["file"]);
-      if (!is_null($this->jsFiles[$k]["file"])) {
-        $e->setAttribute("src", $filePath);
+      $element = $parent->ownerDocument->createElement("script");
+      $this->appendCdata($element, $this->jsFiles[$key]["content"]);
+      $element->setAttribute("type", "text/javascript");
+      $filePath = ROOT_URL.get_resdir($this->jsFiles[$key]["file"]);
+      if (!is_null($this->jsFiles[$key]["file"])) {
+        $element->setAttribute("src", $filePath);
       }
-      $ieIfComment = isset($this->jsFiles[$k]["if"]) ? $this->jsFiles[$k]["if"] : null;
+      $ieIfComment = isset($this->jsFiles[$key]["if"]) ? $this->jsFiles[$key]["if"] : null;
       if (!is_null($ieIfComment)) {
         #$e->nodeValue = "�";
         $parent->appendChild(
-          $parent->ownerDocument->createComment("[if $ieIfComment]>".$e->ownerDocument->saveXML($e)."<![endif]")
+          $parent->ownerDocument->createComment("[if $ieIfComment]>".$element->ownerDocument->saveXML($element)."<![endif]")
         );
         continue;
       }
-      $parent->appendChild($e);
+      $parent->appendChild($element);
     }
   }
 
@@ -877,13 +905,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     if (!strlen($text)) {
       return;
     }
-    $cm = $appendTo->ownerDocument->createTextNode("//");
+    $appendTo->appendChild($appendTo->ownerDocument->createTextNode("//"));
     if (strpos($text, "\n") !== 0) {
       $text = "\n$text";
     }
-    $ct = $appendTo->ownerDocument->createCDATASection("$text\n//");
-    $appendTo->appendChild($cm);
-    $appendTo->appendChild($ct);
+    $appendTo->appendChild($appendTo->ownerDocument->createCDATASection("$text\n//"));
   }
 
   /**
@@ -895,26 +921,30 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $xpath = new DOMXPath($doc);
     $toExpand = [];
     $toDelete = [];
-    foreach ($xpath->query("//*[not(node()) and not(normalize-space())]") as $e) {
-      if (in_array($e->nodeName, $emptyShort)) {
+    foreach ($xpath->query("//*[not(node()) and not(normalize-space())]") as $element) {
+      if (in_array($element->nodeName, $emptyShort)) {
         continue;
       }
-      if (in_array($e->nodeName, $emptyLong)) {
-        $toExpand[] = $e;
+      if (in_array($element->nodeName, $emptyLong)) {
+        $toExpand[] = $element;
         continue;
       }
-      $toDelete[] = $e;
+      $toDelete[] = $element;
     }
-    foreach ($toExpand as $e) $e->appendChild($doc->createTextNode(""));
-    /** @var DOMElement $e */
-    foreach ($toDelete as $e) {
-      if (!property_exists($e, "ownerDocument")) {
+    foreach ($toExpand as $element) {
+      $element->appendChild($doc->createTextNode(""));
+    }
+    /** @var DOMElement $element */
+    foreach ($toDelete as $element) {
+      if (!property_exists($element, "ownerDocument")) {
         continue;
       } // already deleted
-      $eInfo = $e->nodeName;
-      foreach ($e->attributes as $a) $eInfo .= ".".$a->nodeName."=".$a->nodeValue;
-      $this->removePrevDt($e);
-      $this->removeEmptyElement($e, sprintf(_("Removed empty element %s"), $eInfo));
+      $eInfo = $element->nodeName;
+      foreach ($element->attributes as $attribute) {
+        $eInfo .= ".".$attribute->nodeName."=".$attribute->nodeValue;
+      }
+      $this->removePrevDt($element);
+      $this->removeEmptyElement($element, sprintf(_("Removed empty element %s"), $eInfo));
     }
   }
 
@@ -925,7 +955,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     if ($e->nodeName != "dd") {
       return;
     }
-    $prev = $this->previousElementSibling($e);
+    $prev = $this->prevElementSibling($e);
     $next = $this->nextElementSibling($e);
     if ($prev->nodeName != "dt") {
       return;
@@ -937,29 +967,29 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   }
 
   /**
-   * @param DOMElement $e
+   * @param DOMElement $element
    * @return DOMElement
    */
-  private function previousElementSibling (DOMElement $e) {
-    while ($e && ($e = $e->previousSibling)) {
-      if ($e instanceof DOMElement) {
+  private function prevElementSibling (DOMElement $element) {
+    while ($element && ($element = $element->previousSibling)) {
+      if ($element instanceof DOMElement) {
         break;
       }
     }
-    return $e;
+    return $element;
   }
 
   /**
-   * @param DOMElement $e
+   * @param DOMElement $element
    * @return DOMElement
    */
-  private function nextElementSibling (DOMElement $e) {
-    while ($e && ($e = $e->nextSibling)) {
-      if ($e instanceof DOMElement) {
+  private function nextElementSibling (DOMElement $element) {
+    while ($element && ($element = $element->nextSibling)) {
+      if ($element instanceof DOMElement) {
         break;
       }
     }
-    return $e;
+    return $element;
   }
 
   /**

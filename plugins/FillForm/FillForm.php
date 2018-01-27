@@ -63,6 +63,7 @@ class FillForm extends Plugin implements SplObserver, ModifyContentStrategyInter
    */
   private function fixForm (DOMElementPlus $form) {
     $div = $form->ownerDocument->createElement("div");
+    /** @var DOMElementPlus $input */
     foreach ($form->getElementsByTagName("input") as $input) {
       if ($input->getAttribute("type") != "checkbox") {
         continue;
@@ -160,5 +161,3 @@ class FillForm extends Plugin implements SplObserver, ModifyContentStrategyInter
   }
 
 }
-
-?>

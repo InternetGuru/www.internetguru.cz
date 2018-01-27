@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - New plugin Cart
 
+### Changed
+ - code inspection refactor
+
 ### Removed
  - Plugin Basket
  

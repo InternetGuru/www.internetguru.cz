@@ -43,7 +43,7 @@ try {
       $params["secure"],
       $params["httponly"]
     );
-    redirTo($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
+    redir_to($_SERVER["REQUEST_URI"], null, _("Invalid session cookies removed"));
   }
 
   if (!stream_resolve_include_path(DEBUG_FILE) && !stream_resolve_include_path(".".DEBUG_FILE)) {
@@ -60,13 +60,13 @@ try {
   }
 
   if (Cms::isSuperUser()) {
-    initIndexFiles();
+    init_index_files();
     if (isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_NGINX) {
       try {
-        clearNginxCache();
+        clear_nginx();
         Logger::user_success(_("Cache successfully purged"));
-      } catch (Exception $e) {
-        Logger::critical($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::critical($exc->getMessage());
       }
     }
   }
@@ -76,7 +76,7 @@ try {
     parse_str($_SERVER['QUERY_STRING'], $query);
     unset($query["login"]);
     unset($query["q"]);
-    redirTo(buildLocalUrl(["path" => getCurLink(), "query" => buildQuery($query, false)]));
+    redir_to(build_local_url(["path" => get_link(), "query" => build_query($query, false)]));
   }
 
   $plugins = new Plugins();
@@ -98,7 +98,7 @@ try {
   #var_dump(HTMLPlusBuilder::getIntToParentInt());
   #die("die");
 
-  $content = Cms::contentProcessVariables($content);
+  $content = Cms::contentProcessVars($content);
   $plugins->setStatus(STATUS_POSTPROCESS);
   $plugins->notify();
 
@@ -110,29 +110,27 @@ try {
   }
 
   Cms::getMessages();
-  $content = Cms::contentProcessVariables($content);
+  $content = Cms::contentProcessVars($content);
   echo Cms::getOutput($content);
 
-} catch (Exception $e) {
+} catch (Exception $exc) {
 
-  $errno = $e->getCode() ? $e->getCode() : 500;
-  $m = $e->getMessage();
+  $errno = $exc->getCode() ? $exc->getCode() : 500;
+  $msg = $exc->getMessage();
   if (CMS_DEBUG) {
-    $m = sprintf(_("%s in %s on line %s"), $m, $e->getFile(), $e->getLine());
+    $msg = sprintf(_("%s in %s on line %s"), $msg, $exc->getFile(), $exc->getLine());
   }
-  $m = sprintf(_("IGCMS failed to finish: %s"), $m);
+  $msg = sprintf(_("IGCMS failed to finish: %s"), $msg);
   if (class_exists("IGCMS\\Core\\ErrorPage")) {
-    new ErrorPage($m, $errno);
+    new ErrorPage($msg, $errno);
   }
 
-  Logger::alert($m);
+  Logger::alert($msg);
   http_response_code($errno);
-  echo $m;
+  echo $msg;
 
 } finally {
 
   session_write_close();
 
 }
-
-?>
