@@ -1,5 +1,6 @@
-if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
-IGCMS.Hideable.init({
-  expandTitle: "Rozbalit",
-  collapseTitle: "Sbalit"
-});
+require(["IGCMS", "IGCMS.Hideable"], function () {
+  IGCMS.Hideable.init({
+    expandTitle: "Rozbalit",
+    collapseTitle: "Sbalit",
+  })
+})

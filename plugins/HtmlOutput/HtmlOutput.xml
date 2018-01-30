@@ -72,27 +72,26 @@
     </theme>
   </themes>
 
-  <!-- IGCMS global object -->
-  <jsFile append="head">themes/igcms.js</jsFile>
-
   <!-- Browser compatibility -->
   <jsFile>themes/modernizer.js</jsFile>
-  <jsFile if="lte IE 8" priority="100">themes/events.js</jsFile>
-  <jsFile if="lte IE 8" priority="100">themes/indexof.js</jsFile>
-  <jsFile if="lte IE 8" priority="100">themes/textcontent.js</jsFile>
-  <jsFile if="lte IE 9" priority="100">themes/classlist.js</jsFile>
-  <jsFile if="lt IE 9" priority="100">themes/ie9.js</jsFile>
+  <jsFile if="lte IE 8" priority="100" async="false">themes/events.js</jsFile>
+  <jsFile if="lte IE 8" priority="100" async="false">themes/indexof.js</jsFile>
+  <jsFile if="lte IE 8" priority="100" async="false">themes/textcontent.js</jsFile>
+  <jsFile if="lte IE 9" priority="100" async="false">themes/classlist.js</jsFile>
+  <jsFile if="lt IE 9" priority="100" async="false">themes/ie9.js</jsFile>
   <jsFile append="body">themes/iefixes.js</jsFile>
   <jsFile append="body">themes/browserdetect.js</jsFile>
 
   <!-- Default scripts -->
+  <jsFile append="head" async="false">themes/require.js</jsFile>
+  <jsFile append="body">themes/igcms.js</jsFile>
   <jsFile append="body">themes/highlightable.js</jsFile>
   <jsFile append="body">themes/fragmentable.js</jsFile>
   <jsFile append="body">themes/fragmentableinit.js</jsFile>
   <jsFile append="body">themes/scrolltopable.js</jsFile>
   <jsFile append="body">themes/scrolltopableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideable.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideableinit.js</jsFile>
+  <!--<jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideableinit.js</jsFile>-->
   <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="70">themes/tocable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="70">themes/tocableinit.js</jsFile>
   <jsFile append="body" if-xpath="//code[not(contains(@class, 'nohighlight'))]">themes/syntaxhighlightjs.js</jsFile>
@@ -107,6 +106,14 @@
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editableinit.js</jsFile>
   <jsFile append="body" if-xpath="//select[contains(@class, 'completable')]">themes/completable.js</jsFile>
+
+  <!-- Photoswipe -->
+  <stylesheet if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe.css</stylesheet>
+  <stylesheet if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/default-skin/default-skin.css</stylesheet>
+  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe.min.js</jsFile>
+  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe-ui-default.min.js</jsFile>
+  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">themes/photoswipe.js</jsFile>
+  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">themes/photoswipeinit.js</jsFile>
 
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 

@@ -210,7 +210,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
             }
             $ieIfComment = ($node->hasAttribute("if") ? $node->getAttribute("if") : null);
             $ifXpath = ($node->hasAttribute("if-xpath") ? $node->getAttribute("if-xpath") : false);
-            $this->addJsFile($node->nodeValue, $priority, $append, $user, $ieIfComment, $ifXpath);
+            $async = !($node->hasAttribute("async") && $node->getAttribute("async") == "false");
+            $this->addJsFile($node->nodeValue, $priority, $append, $user, $ieIfComment, $ifXpath, $async);
             break;
           case "stylesheet":
             $media = ($node->hasAttribute("media") ? $node->getAttribute("media") : false);
@@ -235,9 +236,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param bool $user
    * @param null $ieIfComment
    * @param bool $ifXpath
+   * @param bool $async
    * @throws Exception
    */
-  public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
+  public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false, $async = true) {
     if (isset($this->jsFiles[$filePath])) {
       return;
     }
@@ -250,6 +252,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       "user" => $user,
       "ifXpath" => $ifXpath,
       "if" => $ieIfComment,
+      "async" => $async,
     ];
     $this->jsFilesPriority[$filePath] = $priority;
   }
@@ -884,6 +887,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $filePath = ROOT_URL.get_resdir($this->jsFiles[$key]["file"]);
       if (!is_null($this->jsFiles[$key]["file"])) {
         $element->setAttribute("src", $filePath);
+      }
+      if (!is_null($this->jsFiles[$key]["async"]) && $this->jsFiles[$key]["async"] ===  true) {
+        $element->setAttribute("async", "async");
       }
       $ieIfComment = isset($this->jsFiles[$key]["if"]) ? $this->jsFiles[$key]["if"] : null;
       if (!is_null($ieIfComment)) {
