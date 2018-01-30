@@ -47,6 +47,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @var array
    */
+  private $linkElements = [];
+  /**
+   * @var array
+   */
+  private $metaElements = [];
+  /**
+   * @var array
+   */
   private $jsFiles = [];
   /**
    * @var array
@@ -255,6 +263,42 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       "async" => $async,
     ];
     $this->jsFilesPriority[$filePath] = $priority;
+  }
+
+  /** @noinspection PhpTooManyParametersInspection */
+  /**
+   * @param string $filePath
+   * @param string $rel
+   * @param bool $type
+   * @param bool $media
+   * @param null $ieIfComment
+   */
+  public function addLinkElement ($filePath, $rel, $type = false, $media = false, $ieIfComment = null) {
+    if (isset($this->linkElements[$filePath])) {
+      return;
+    }
+    $this->linkElements[$filePath] = [
+      "file" => $filePath,
+      "rel" => $rel,
+      "type" => $type,
+      "media" => $media,
+      "if" => $ieIfComment,
+    ];
+  }
+
+  /** @noinspection PhpTooManyParametersInspection */
+  /**
+   * @param string $nameValue
+   * @param string $contentValue
+   * @param bool $httpEquiv
+   * @param bool $short
+   */
+  public function addMetaElement ($nameValue, $contentValue, $httpEquiv = false, $short = false) {
+    $this->metaElements[$nameValue] = [
+      "content" => $contentValue,
+      "httpEquip" => $httpEquiv,
+      "short" => $short,
+    ];
   }
 
   /** @noinspection PhpTooManyParametersInspection */
@@ -497,8 +541,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $this->appendMeta($head, "robots", $this->metaRobots);
+    foreach ($this->metaElements as $name => $metaElement) {
+      $this->appendMeta($head, $name, $metaElement["content"], $metaElement["httpEquip"], $metaElement["short"]);
+    }
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
+    foreach ($this->linkElements as $linkElement) {
+      $this->appendLinkElement($head, $linkElement["file"], $linkElement["rel"], $linkElement["type"], $linkElement["media"], $linkElement["if"]);
+    }
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
