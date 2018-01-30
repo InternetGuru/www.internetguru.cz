@@ -10,9 +10,11 @@
       <!--
         Fonts
       -->
-      <stylesheet>lib/roboto/roboto.css</stylesheet>
+      <!--<stylesheet>lib/roboto/roboto.css</stylesheet>-->
       <!--<stylesheet>lib/opensans/opensans.css</stylesheet>-->
       <!--<stylesheet if-xpath="//*[contains(@class, 'fa')]">lib/font-awesome/css/font-awesome.css</stylesheet>-->
+      <jsFile append="head">themes/webfont.js</jsFile>
+      <jsFile append="head">themes/fontloader.js</jsFile>
       <!--
         Styles
       -->
