@@ -1,3 +1,3 @@
-require(["IGCMS", "IGCMS.Filterable"], function () {
+require("IGCMS.Filterable", function () {
   IGCMS.Filterable.init({});
-}
+})

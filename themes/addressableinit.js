@@ -1,5 +1,4 @@
-require(["IGCMS", "IGCMS.Addressable"], function () {
-  if (typeof IGCMS === "undefined") throw "IGCMS is not defined";
+require("IGCMS.Addressable", function () {
   IGCMS.Addressable.init({
     buttonValue: "Získat adresu formuláře"
   })

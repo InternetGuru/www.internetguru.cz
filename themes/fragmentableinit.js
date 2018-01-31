@@ -1,3 +1,3 @@
-require(["IGCMS", "IGCMS.Fragmentable"], function () {
+require("IGCMS.Fragmentable", function () {
   IGCMS.Fragmentable.init({})
 })

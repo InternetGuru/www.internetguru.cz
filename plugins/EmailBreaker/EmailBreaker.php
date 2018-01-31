@@ -124,7 +124,7 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     }
     Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".$this->className.".js");
     Cms::getOutputStrategy()->addJs(
-      "require(['IGCMS', 'IGCMS.EmailBreaker'], function () {
+      "require('IGCMS.EmailBreaker', function () {
   IGCMS.EmailBreaker.init({
     rep: [".implode(",", $jsRep)."]
   });

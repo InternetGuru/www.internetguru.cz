@@ -1,4 +1,4 @@
-require(["IGCMS", "IGCMS.Selectable"], function () {
+require("IGCMS.Selectable", function () {
   IGCMS.Selectable.init({
     selectTitle: "Vybrat vše"
   })

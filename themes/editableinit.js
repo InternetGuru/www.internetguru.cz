@@ -1,5 +1,4 @@
-require(["IGCMS", "IGCMS.Editable"], function () {
-  if (typeof IGCMS === "undefined") throw "IGCMS is not defined";
+require("IGCMS.Editable", function () {
   IGCMS.Editable.init({
     unload_msg: "Obsah formuláře byl změněn"
   })

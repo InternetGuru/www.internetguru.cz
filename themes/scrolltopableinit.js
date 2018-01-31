@@ -1,4 +1,4 @@
-require(["IGCMS", "IGCMS.Scrolltopable"], function () {
+require("IGCMS.Scrolltopable", function () {
   IGCMS.Scrolltopable.init({
     /* text: "nahoru" */
   })

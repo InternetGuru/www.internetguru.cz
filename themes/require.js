@@ -2,35 +2,26 @@
 
   var MAX_ATTEMPTS = 50
 
-  function index(obj, i) {
-    return obj[i]
+  function getObjectIndex (obj, index) {
+    if (obj === undefined) {
+      return undefined
+    }
+    return obj[index]
   }
 
-  function require (requiredObjectStr, callback, attempt) {
+  function require (objectName, callback, attempt) {
     if (attempt === undefined) {
       attempt = 1
     }
     if (attempt === MAX_ATTEMPTS) {
-      throw "require: max attempts exceeded"
+      throw "require " + objectName + ": max attempts exceeded"
     }
-    var requiredObjects = requiredObjectStr
-    if (!Array.isArray(requiredObjectStr)) {
-      requiredObjects = [requiredObjectStr]
+    if (objectName.split(".").reduce(getObjectIndex, win) === undefined) {
+      setTimeout(require, 100, objectName, callback, ++attempt)
+      return
     }
-    var loaded = true
-    for (var i = 0; i < requiredObjects.length; i++) {
-      if (requiredObjects[i].split(".").reduce(index, win) === undefined) {
-        loaded = false
-        break
-      }
-    }
-    if (!loaded){
-      setTimeout(require, 100, requiredObjectStr, callback, ++attempt)
-    } else {
-      callback()
-    }
+    callback()
   }
 
   win.require = require
-
 })(window)

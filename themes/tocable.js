@@ -1,6 +1,6 @@
 (function(win) {
 
-  require(["IGCMS", "IGCMS.Hideable"], function () {
+  require("IGCMS.Hideable", function () {
 
     var Config = {};
     Config.tocTitle = "Table of contents";
