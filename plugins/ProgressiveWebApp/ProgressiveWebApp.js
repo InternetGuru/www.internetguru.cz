@@ -1,4 +1,4 @@
-'serviceWorker' in navigator && navigator.serviceWorker.register('/sw.js')
+'serviceWorker' in navigator && navigator.serviceWorker.register('/serviceWorker.js')
   .then(function () {
     // console.log('Registered')
   })
