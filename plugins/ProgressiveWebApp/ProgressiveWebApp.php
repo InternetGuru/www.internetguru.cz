@@ -61,7 +61,10 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     // TODO parametrize theme-color
     $outputStrategy->addMetaElement("theme-color", "#ddd");
     $outputStrategy->addLinkElement(self::MANIFEST, "manifest");
-    // append service worker init
+    // add service worker and init
+    file_put_contents(self::SERVICE_WORKER, "importScripts('/".LIB_DIR."/sw-toolbox.js');
+    toolbox.router.get('/:path([^.]+)*', toolbox.networkFirst);
+    // toolbox.router.default = toolbox.networkFirst;");
     $outputStrategy->addJsFile($this->pluginDir."/".$this->className.".js");
   }
 
