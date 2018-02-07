@@ -1,4 +1,4 @@
-require("Webfont", function() {
+require("WebFont", function() {
   WebFont.load({
     google: {
       families: ['Roboto:400,300,400italic,500,700:latin-ext'],
