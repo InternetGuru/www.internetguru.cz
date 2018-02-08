@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.9.0] - 2018-01-30
 ### Added
  - New plugin Cart
 
@@ -302,7 +302,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.9.0]: https://bitbucket.org/igwr/cms/compare/v2.9.0..v2.8.1
 [2.8.1]: https://bitbucket.org/igwr/cms/compare/v2.8.1..v2.8.0
 [2.8.0]: https://bitbucket.org/igwr/cms/compare/v2.8.0..v2.7.2
 [2.7.2]: https://bitbucket.org/igwr/cms/compare/v2.7.2..v2.7.1
