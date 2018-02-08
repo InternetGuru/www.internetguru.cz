@@ -62,10 +62,6 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     $outputStrategy = Cms::getOutputStrategy();
     $outputStrategy->addMetaElement("theme-color", $themeColor);
     $outputStrategy->addLinkElement(self::MANIFEST, "manifest");
-    // add service worker and init
-    file_put_contents(self::SERVICE_WORKER, "importScripts('/".LIB_DIR."/sw-toolbox.js');
-    toolbox.router.get('/:path([^.]+)*', toolbox.networkFirst);
-    // toolbox.router.default = toolbox.networkFirst;");
     $outputStrategy->addJsFile($this->pluginDir."/".$this->className.".js");
   }
 
@@ -80,7 +76,9 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
   public static function handleRequest () {
     header('Content-Type: application/javascript');
     header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (60 * 60 * 24 * 30))); // 1 month
-    echo file_get_contents(self::SERVICE_WORKER);
+    echo "importScripts('/".LIB_DIR."/sw-toolbox.js');
+    toolbox.router.get('/:path([^.]+)*', toolbox.networkFirst);
+    // toolbox.router.default = toolbox.networkFirst;";
     exit;
   }
 }
