@@ -49,17 +49,18 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     // load and process variables
     $xml = self::getXML();
     $manifestTemplate = $xml->getElementsByTagName("manifest")[0]->nodeValue;
+    $themeColor = $xml->getElementsByTagName("themeColor")[0]->nodeValue;
     $h1id = HTMLPlusBuilder::getLinkToId("");
     // save manifest
     file_put_contents(self::MANIFEST, replace_vars($manifestTemplate, [
       "name" => HTMLPlusBuilder::getIdToHeading($h1id),
       "shortName" => HTMLPlusBuilder::getHeading($h1id),
       "rootUrl" => ROOT_URL,
+      "themeColor" => $themeColor,
     ]));
     // add meta
     $outputStrategy = Cms::getOutputStrategy();
-    // TODO parametrize theme-color
-    $outputStrategy->addMetaElement("theme-color", "#ddd");
+    $outputStrategy->addMetaElement("theme-color", $themeColor);
     $outputStrategy->addLinkElement(self::MANIFEST, "manifest");
     // add service worker and init
     file_put_contents(self::SERVICE_WORKER, "importScripts('/".LIB_DIR."/sw-toolbox.js');
@@ -76,9 +77,9 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     return $filePath === self::SERVICE_WORKER;
   }
 
-  // TODO expire headers?
   public static function handleRequest () {
     header('Content-Type: application/javascript');
+    header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (60 * 60 * 24 * 30))); // 1 month
     echo file_get_contents(self::SERVICE_WORKER);
     exit;
   }
