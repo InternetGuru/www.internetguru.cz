@@ -1,6 +1,8 @@
 <?php
 
 namespace IGCMS\Core;
+
+/** @noinspection PhpClassNamingConventionInspection */
 /**
  * Interface ResourceInterface
  * @package IGCMS\Core
@@ -17,5 +19,3 @@ interface ResourceInterface {
    */
   public static function handleRequest ();
 }
-
-?>

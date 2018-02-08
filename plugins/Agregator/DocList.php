@@ -25,29 +25,30 @@ class DocList extends AgregatorList {
   /**
    * @var string
    */
-  private $kw;
+  private $keyword;
 
   /**
    * DocList constructor.
    * @param DOMElementPlus $doclist
    * @param DOMElementPlus|null $pattern
+   * @throws Exception
    */
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
-    $this->kw = $doclist->getAttribute("kw");
+    $this->keyword = $doclist->getAttribute("kw");
     $vars = $this->createVars();
     if (is_null($pattern)) {
       $pattern = $doclist;
     }
     $list = $this->createList($pattern, $vars);
-    $linkParts = explode("/", getCurLink());
+    $linkParts = explode("/", get_link());
     $curFile = HTMLPlusBuilder::getIdToFile(end($linkParts));
     if (array_key_exists($curFile, $vars)) {
       foreach ($vars[$curFile] as $name => $value) {
         Cms::setVariable($name, $value, "");
       }
     }
-    Cms::setVariable($this->id, $list);
+    Cms::setVariable($this->listId, $list);
   }
 
   /**
@@ -57,7 +58,7 @@ class DocList extends AgregatorList {
   private function createVars () {
     $fileIds = [];
     $somethingFound = false;
-    $userKw = preg_split("/ *, */", $this->kw);
+    $userKw = preg_split("/ *, */", $this->keyword);
     $userKw = array_filter(
       $userKw,
       function($value) {
@@ -65,37 +66,37 @@ class DocList extends AgregatorList {
       }
     );
     $dirPrefix = PLUGINS_DIR."/".basename(__DIR__)."/".(strlen($this->path) ? $this->path."/" : "");
-    foreach (HTMLPlusBuilder::getFileToId() as $file => $id) {
+    foreach (HTMLPlusBuilder::getFileToId() as $file => $fileId) {
       if (strpos($file, $dirPrefix) !== 0) {
         continue;
       }
       $somethingFound = true;
       if (count($userKw)) {
-        $docKw = preg_split("/ *, */", HTMLPlusBuilder::getIdToKw($id));
+        $docKw = preg_split("/ *, */", HTMLPlusBuilder::getIdToKw($fileId));
         if (array_diff($userKw, $docKw)) {
           continue;
         }
       }
-      $fileIds[$file] = $id;
+      $fileIds[$file] = $fileId;
     }
     if (empty($fileIds)) {
       if (!$somethingFound) {
         throw new Exception(sprintf(_("No documents registered in '%s'"), $dirPrefix));
       }
-      throw new Exception(sprintf(_("No files matching attribute kw '%s'"), $this->kw));
+      throw new Exception(sprintf(_("No files matching attribute kw '%s'"), $this->keyword));
     }
     $vars = [];
     $date = new DateTime();
-    foreach ($fileIds as $file => $id) {
+    foreach ($fileIds as $file => $fileId) {
       try {
-        $vars[$file] = HTMLPlusBuilder::getIdToAll($id);
+        $vars[$file] = HTMLPlusBuilder::getIdToAll($fileId);
         $vars[$file]["fileToMtime"] = HTMLPlusBuilder::getFileToMtime($file);
         $date->setTimestamp($vars[$file]["fileToMtime"]);
         $vars[$file]["mtime"] = $date->format(DateTime::W3C);
         $vars[$file]["file"] = $file;
-        $vars[$file]["link"] = $id;
+        $vars[$file]["link"] = $fileId;
         $vars[$file]["editlink"] = "";
-        $data = HTMLPlusBuilder::getIdToData($id);
+        $data = HTMLPlusBuilder::getIdToData($fileId);
         if (!is_null($data)) {
           foreach ($data as $varName => $varValue) {
             $vars[$file][$varName] = $varValue;
@@ -104,8 +105,8 @@ class DocList extends AgregatorList {
         if (Cms::isSuperUser()) {
           $vars[$file]["editlink"] = "<a href='?Admin=$file' title='$file' class='fa fa-edit'>"._("Edit")."</a>";
         }
-      } catch (Exception $e) {
-        Logger::critical($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::critical($exc->getMessage());
         continue;
       }
     }

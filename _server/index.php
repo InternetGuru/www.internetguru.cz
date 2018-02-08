@@ -2,13 +2,6 @@
 
 try {
 
-  // localhost
-  $index = "../cms/index.php";
-  if (is_file($index)) {
-    include($index);
-    exit;
-  }
-
   if (is_file("REDIR")) {
     header("Location: ".trim(file_get_contents("REDIR"))."/".$_GET["q"]);
     exit;
@@ -22,13 +15,11 @@ try {
   if (!is_file($index)) {
     throw new Exception("CMS $version index.php not found");
   }
-  include($index);
+  include "$index";
 
-} catch (Exception $e) {
+} catch (Exception $exc) {
 
   http_response_code(500);
-  echo "Core fatal exception: ".$e->getMessage();
+  echo "Core fatal exception: ".$exc->getMessage();
 
 }
-
-?>

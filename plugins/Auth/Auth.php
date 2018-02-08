@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\ErrorPage;
@@ -18,23 +19,24 @@ class Auth extends Plugin implements SplObserver {
   /**
    * Auth constructor.
    * @param Plugins|SplSubject $s
+   * @throws Exception
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
     if (Cms::isSuperUser()) {
       return;
     }
-    $cfg = $this->getXML();
-    $url = ROOT_URL.getCurLink(true);
+    $cfg = self::getXML();
+    $url = ROOT_URL.get_link(true);
     $access = null;
-    /** @var DOMElementPlus $e */
-    foreach ($cfg->getElementsByTagName('url') as $e) {
-      if (strpos($url, $e->nodeValue) === false) {
+    /** @var DOMElementPlus $urlElm */
+    foreach ($cfg->getElementsByTagName('url') as $urlElm) {
+      if (strpos($url, $urlElm->nodeValue) === false) {
         continue;
       }
-      if ($e->getAttribute("access") == "allow") {
+      if ($urlElm->getAttribute("access") == "allow") {
         $access = true;
-      } elseif ($e->getAttribute("access") == "denyall") {
+      } elseif ($urlElm->getAttribute("access") == "denyall") {
         $access = false;
       } else {
         $access = !is_null(Cms::getLoggedUser());
@@ -44,14 +46,14 @@ class Auth extends Plugin implements SplObserver {
       return;
     }
     if (is_null(Cms::getLoggedUser())) {
-      loginRedir();
+      login_redir();
     }
     new ErrorPage(_("Insufficient rights to view this content"), 403);
   }
 
-  public function update (SplSubject $subject) {
-  }
+  /**
+   * @param SplSubject $subject
+   */
+  public function update (SplSubject $subject) {}
 
 }
-
-?>

@@ -30,7 +30,7 @@ class ErrorPage {
     http_response_code($code);
     $status = $this->getStatusMessage($code);
     // set output variables
-    $tt = [
+    $var = [
       "@LANGUAGE@" => "cs",
       "@TITLE@" => "$code $status",
       "@GENERATOR@" => CMS_NAME,
@@ -52,15 +52,15 @@ class ErrorPage {
         _("Contact webmaster."),
       ];
       $images = $this->getImages($dir);
-      $tt["@CLASS@"] = "img".array_rand($images);
-      $tt["@CONTENT@"] = "<ul><li>".implode("</li><li>", $whatnow)."</li></ul>";
-      $tt["@STYLE@"] .= "#content {padding-bottom: 12em; background-repeat: no-repeat;"
+      $var["@CLASS@"] = "img".array_rand($images);
+      $var["@CONTENT@"] = "<ul><li>".implode("</li><li>", $whatnow)."</li></ul>";
+      $var["@STYLE@"] .= "#content {padding-bottom: 12em; background-repeat: no-repeat;"
         ." background-position: right bottom; background-size: 15em} ";
-      foreach ($images as $id => $img) {
-        $tt["@STYLE@"] .= "#content.img$id {background-image: url('$img')} ";
+      foreach ($images as $imgId => $img) {
+        $var["@STYLE@"] .= "#content.img$imgId {background-image: url('$img')} ";
       }
     }
-    echo str_replace(array_keys($tt), $tt, $html);
+    echo str_replace(array_keys($var), $var, $html);
     exit();
   }
 
@@ -69,7 +69,7 @@ class ErrorPage {
    * @return string
    */
   private function getStatusMessage ($code) {
-    $http_status_codes = [
+    $httpStatusCodes = [
       100 => 'Continue',
       102 => 'Processing',
       200 => 'OK',
@@ -128,10 +128,10 @@ class ErrorPage {
       509 => 'unused',
       510 => 'Not Extended',
     ];
-    if (!array_key_exists($code, $http_status_codes)) {
+    if (!array_key_exists($code, $httpStatusCodes)) {
       return "Unknown";
     }
-    return $http_status_codes[$code];
+    return $httpStatusCodes[$code];
   }
 
   /**
@@ -139,7 +139,7 @@ class ErrorPage {
    * @return array
    */
   private function getImages ($dir) {
-    $i = [];
+    $images = [];
     // http://xkcd.com/1350/#p:10e7f9b6-b9b8-11e3-8003-002590d77bdd
     foreach (scandir($dir) as $img) {
       if (strpos($img, ".") === 0) {
@@ -148,11 +148,9 @@ class ErrorPage {
       if (pathinfo("$dir/$img", PATHINFO_EXTENSION) != "png") {
         continue;
       }
-      $i[] = ROOT_URL.LIB_DIR."/".$this->relDir."/$img";
+      $images[] = ROOT_URL.LIB_DIR."/".$this->relDir."/$img";
     }
-    return $i;
+    return $images;
   }
 
 }
-
-?>

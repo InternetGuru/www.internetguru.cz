@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<GA>
-  <jsfile modifyonly="modifyonly">GA.js</jsfile>
+<GoogleAnalytics>
+  <jsfile modifyonly="modifyonly">GoogleAnalytics.js</jsfile>
   <ga_id readonly="readonly">UA-52883188-5</ga_id>
   <ga_id readonly="readonly" domain="*.internetguru.cz">UA-52883188-3</ga_id>
   <ga_id readonly="readonly" domain="*.e-zakladna.cz">UA-52883188-4</ga_id>
-  <ga_id readonly="readonly" domain="*.*.local">UA-52883188-5</ga_id>
-</GA>
+  <ga_id readonly="readonly" domain="*.localhost.cz">UA-52883188-5</ga_id>
+</GoogleAnalytics>

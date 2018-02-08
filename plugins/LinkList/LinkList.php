@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
@@ -41,6 +42,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
 
   /**
    * @param HTMLPlus $content
+   * @throws Exception
    */
   public function modifyContent (HTMLPlus $content) {
     if (!$content->documentElement->hasClass($this->cssClass)) {
@@ -51,6 +53,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
 
   /**
    * @param DOMElementPlus $wrapper
+   * @throws Exception
    */
   private function createLinkList (DOMElementPlus $wrapper) {
     $count = 0;
@@ -69,11 +72,11 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
       if (!isset($linksArray[$href])) {
         $linksArray[$href] = ++$count;
       }
-      $a = $link->ownerDocument->createElement("a");
-      $a->nodeValue = $linksArray[$href];
-      $a->setAttribute("class", "{$this->cssClass}-href print");
-      $a->setAttribute("href", "#{$this->cssClass}-".$a->nodeValue);
-      $link->parentNode->insertBefore($a, $link->nextSibling);
+      $aElm = $link->ownerDocument->createElement("a");
+      $aElm->nodeValue = $linksArray[$href];
+      $aElm->setAttribute("class", "{$this->cssClass}-href print");
+      $aElm->setAttribute("href", "#{$this->cssClass}-".$aElm->nodeValue);
+      $link->parentNode->insertBefore($aElm, $link->nextSibling);
     }
     if ($count == 0) {
       return;
@@ -119,17 +122,15 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
    * @param int $linkId
    */
   private function addLinkItem (DOMElementPlus $list, $href, $linkId) {
-    $li = $list->ownerDocument->createElement("li");
-    $list->appendChild($li);
-    $a = $li->ownerDocument->createElement("a");
-    $li->appendChild($a);
-    $a->setAttribute("id", "{$this->cssClass}-$linkId");
-    $a->setAttribute("href", $href);
-    $a->nodeValue = is_null(HTMLPlusBuilder::getIdToHeading($href))
+    $liElm = $list->ownerDocument->createElement("li");
+    $list->appendChild($liElm);
+    $aElm = $liElm->ownerDocument->createElement("a");
+    $liElm->appendChild($aElm);
+    $aElm->setAttribute("id", "{$this->cssClass}-$linkId");
+    $aElm->setAttribute("href", $href);
+    $aElm->nodeValue = is_null(HTMLPlusBuilder::getIdToHeading($href))
       ? $href
       : HTMLPlusBuilder::getIdToHeading($href);
   }
 
 }
-
-?>

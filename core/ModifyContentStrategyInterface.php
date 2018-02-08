@@ -2,6 +2,7 @@
 
 namespace IGCMS\Core;
 
+/** @noinspection PhpClassNamingConventionInspection */
 /**
  * Interface ModifyContentStrategyInterface
  * @package IGCMS\Core
@@ -12,5 +13,3 @@ interface ModifyContentStrategyInterface {
    */
   public function modifyContent (HTMLPlus $content);
 }
-
-?>

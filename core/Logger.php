@@ -71,18 +71,21 @@ class Logger {
    */
   const EMAIL_FORMAT = "[%datetime%] %extra.ip% %extra.request% %extra.user% %extra.ver%: %message%\n";
 
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * Monolog system logger instance.
    * @var MonologLogger
    */
   private static $monologsys = null;
 
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * Monolog user logger instance.
    * @var MonologLogger
    */
   private static $monologusr = null;
 
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * Monolog mail logger instance.
    * @var MonologLogger
@@ -114,9 +117,10 @@ class Logger {
   /**
    * @param string $methodName
    * @param array $arguments
+   * @throws Exception
    */
   public static function __callStatic ($methodName, $arguments) {
-    validate_callStatic($methodName, $arguments, self::$levels, 1);
+    validate_callstatic($methodName, $arguments, self::$levels, 1);
     $type = self::TYPE_SYS_LOG;
     if (strpos($methodName, "user_") === 0) {
       $methodName = substr($methodName, strlen("user_"));
@@ -139,6 +143,7 @@ class Logger {
    * @param string $level
    * @param string $message
    * @param string $type
+   * @throws Exception
    */
   private static function writeLog ($level, $message, $type = self::TYPE_SYS_LOG) {
     $logger = self::getMonolog($type);
@@ -194,7 +199,7 @@ class Logger {
     foreach (["CRITICAL", "ALERT", "EMERGENCY"] as $type) {
       $mailHandler = new NativeMailerHandler(
         self::EMAIL_ALERT_TO,
-        "IGCMS $type at ".HOST,
+        "IGCMS $type at ".HTTP_HOST,
         self::EMAIL_ALERT_FROM,
         constant("Monolog\\Logger::$type"),
         false
@@ -267,11 +272,11 @@ class Logger {
    * @return array
    */
   public static function appendIP (Array $record) {
-    $ip = "0.0.0.0:0000";
+    $ipAddr = "0.0.0.0:0000";
     if (isset($_SERVER["REMOTE_ADDR"], $_SERVER["REMOTE_PORT"])) {
-      $ip = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
+      $ipAddr = $_SERVER["REMOTE_ADDR"].":".$_SERVER["REMOTE_PORT"];
     }
-    $record["extra"]["ip"] = $ip;
+    $record["extra"]["ip"] = $ipAddr;
     return $record;
   }
 
@@ -285,5 +290,3 @@ class Logger {
     return $record;
   }
 }
-
-?>

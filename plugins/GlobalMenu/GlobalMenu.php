@@ -49,7 +49,7 @@ class GlobalMenu extends Plugin implements SplObserver {
     $menu = new DOMDocumentPlus();
     $root = $menu->createElement("root");
     $menu->appendChild($root);
-    $curLink = getCurLink();
+    $curLink = get_link();
     $idToLi = [];
     $idToLevel = [];
     foreach (HTMLPlusBuilder::getIdToFile() as $id => $file) {

@@ -24,6 +24,7 @@ class ImgList extends AgregatorList {
    * ImgList constructor.
    * @param DOMElementPlus $doclist
    * @param DOMElementPlus|null $pattern
+   * @throws Exception
    */
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
@@ -32,7 +33,7 @@ class ImgList extends AgregatorList {
       $pattern = $doclist;
     }
     $list = $this->createList($pattern, $vars);
-    Cms::setVariable($this->id, $list);
+    Cms::setVariable($this->listId, $list);
   }
 
   /**
@@ -60,22 +61,22 @@ class ImgList extends AgregatorList {
       if (is_dir($fullFilePath)) {
         continue;
       }
-      $mimeType = getFileMime($fullFilePath);
+      $mimeType = get_mime($fullFilePath);
       if ($mimeType != "image/svg+xml" && strpos($mimeType, "image/") !== 0) {
         continue;
       }
-      $v = [];
-      $v["name"] = $file;
-      $v["type"] = $mimeType;
-      $v["mtime"] = filemtime($fullFilePath);
-      $v["url"] = ROOT_URL.$filePath;
-      $v["url-images"] = $v["url"]; // alias for $v["url"]
-      $v["url-thumbs"] = ROOT_URL.FILES_DIR."/thumbs$path/$file";
-      $v["url-preview"] = ROOT_URL.FILES_DIR."/preview$path/$file";
-      $v["url-big"] = ROOT_URL.FILES_DIR."/big$path/$file";
-      $v["url-full"] = ROOT_URL.FILES_DIR."/full$path/$file";
+      $variable = [];
+      $variable["name"] = $file;
+      $variable["type"] = $mimeType;
+      $variable["mtime"] = filemtime($fullFilePath);
+      $variable["url"] = ROOT_URL.$filePath;
+      $variable["url-images"] = $variable["url"]; // alias for $v["url"]
+      $variable["url-thumbs"] = ROOT_URL.FILES_DIR."/thumbs$path/$file";
+      $variable["url-preview"] = ROOT_URL.FILES_DIR."/preview$path/$file";
+      $variable["url-big"] = ROOT_URL.FILES_DIR."/big$path/$file";
+      $variable["url-full"] = ROOT_URL.FILES_DIR."/full$path/$file";
       $altPath = ltrim("$path/".pathinfo($file, PATHINFO_FILENAME), "/");
-      $v["alt"] = preg_replace(
+      $variable["alt"] = preg_replace(
         [
           "~(\d)([a-z])~", // "1.9tdi" to "1.9 tdi"
           "~([a-z])(\d)~", // "file01" to "file 01"
@@ -96,7 +97,7 @@ class ImgList extends AgregatorList {
         ],
         $altPath
       );
-      $vars[$filePath] = $v;
+      $vars[$filePath] = $variable;
     }
     if (empty($vars)) {
       throw new Exception(sprintf(_("No images found in '%s'"), $fileDir));

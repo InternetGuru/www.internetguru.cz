@@ -2,6 +2,7 @@
 
 namespace IGCMS\Core;
 
+/** @noinspection PhpClassNamingConventionInspection */
 /**
  * Interface FinalContentStrategyInterface
  * @package IGCMS\Core
@@ -13,5 +14,3 @@ interface FinalContentStrategyInterface {
    */
   public function getContent (DOMDocumentPlus $content);
 }
-
-?>

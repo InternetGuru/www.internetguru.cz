@@ -39,6 +39,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @var array
    */
   private static $fileToDoc = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
@@ -47,58 +48,72 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @var array
    */
   private static $idToParentId = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToFile = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToShort = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToHeading = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToTitle = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToDesc = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToKw = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToAuthor = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToAuthorId = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToResp = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToRespId = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToCtime = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToMtime = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
   private static $idToLang = [];
+  /** @noinspection PhpUnusedPrivateFieldInspection */
   /**
    * @var array
    */
@@ -131,20 +146,21 @@ class HTMLPlusBuilder extends DOMBuilder {
   public static function getIdToAll ($id) {
     $register = [];
     $properties = (new \ReflectionClass(get_called_class()))->getStaticProperties();
-    foreach (array_keys($properties) as $p) {
-      if (strpos($p, "idTo") !== 0) {
+    foreach (array_keys($properties) as $prop) {
+      if (strpos($prop, "idTo") !== 0) {
         continue;
       }
       #if($p == "idToParentId") continue;
-      $register[strtolower(substr($p, 4))] =
-        array_key_exists($id, self::${$p}) ? self::${$p}[$id] : null;
+      /** @noinspection PhpVariableVariableInspection */
+      $register[strtolower(substr($prop, 4))] =
+        array_key_exists($id, self::${$prop}) ? self::${$prop}[$id] : null;
     }
     return $register;
   }
 
   /**
    * @param string $methodName
-   * @param string $arguments
+   * @param array $arguments
    * @return mixed|null
    * @throws Exception
    */
@@ -158,11 +174,13 @@ class HTMLPlusBuilder extends DOMBuilder {
       throw new Exception("Undefined $className property $propertyName");
     }
     if (count($arguments)) {
+      /** @noinspection PhpVariableVariableInspection */
       if (!array_key_exists($arguments[0], self::$$propertyName)) {
         return null;
       }
       return self::${$propertyName}[$arguments[0]];
     }
+    /** @noinspection PhpVariableVariableInspection */
     return self::$$propertyName;
   }
 
@@ -172,8 +190,8 @@ class HTMLPlusBuilder extends DOMBuilder {
   public static function setIdToLink (Array $idToLink) {
     self::$idToLink = $idToLink;
     self::$linkToId = [];
-    foreach ($idToLink as $id => $link) {
-      self::$linkToId[$link] = $id;
+    foreach ($idToLink as $linkId => $link) {
+      self::$linkToId[$link] = $linkId;
     }
   }
 
@@ -209,10 +227,10 @@ class HTMLPlusBuilder extends DOMBuilder {
       self::$storeCache = false;
     } else {
       $doc = self::build($filePath, true);
-      $id = $doc->documentElement->firstElement->getAttribute("id");
-      self::registerIdToData($doc->documentElement, $id);
-      self::registerStructure($doc->documentElement, $parentId, $id, $prefix, $filePath);
-      self::$currentFileTo["fileToId"] = $id;
+      $hId = $doc->documentElement->firstElement->getAttribute("id");
+      self::registerIdToData($doc->documentElement, $hId);
+      self::registerStructure($doc->documentElement, $parentId, $hId, $prefix, $filePath);
+      self::$currentFileTo["fileToId"] = $hId;
     }
     self::addToRegister($filePath);
     if (self::$storeCache) {
@@ -236,10 +254,10 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     foreach ($fileCache["fileToMtime"] as $file => $mtime) {
       try {
-        if ($mtime == filemtime(findFile($file))) {
+        if ($mtime == filemtime(find_file($file))) {
           continue;
         }
-      } catch (Exception $e) {
+      } catch (Exception $exc) {
       }
       return false;
     }
@@ -249,7 +267,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     if (!array_key_exists("idToParentId", $idCache) || empty($idCache["idToParentId"])) {
       return false;
     }
-    foreach ($idCache["idToParentId"] as $id => $parentId) {
+    foreach ($idCache["idToParentId"] as $parentId) {
       if (!array_key_exists($parentId, self::$idToParentId)) {
         return false;
       }
@@ -284,27 +302,24 @@ class HTMLPlusBuilder extends DOMBuilder {
           apc_store_cache($cacheKey, $value, $filePath);
         }
         return $doc;
-      } catch (Exception $e) {
-        Logger::error($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::error($exc->getMessage());
         if (apc_exists($cacheKey)) {
           $cache = apc_fetch($cacheKey);
-          $useCache = true;
         } else {
           try {
             return self::doBuild($filePath, false);
-          } catch (Exception $e) {
+          } catch (Exception $exc) {
             return self::doBuild($filePath, false, false);
           }
         }
       }
     }
-    if ($useCache) {
-      $doc = new HTMLPlus();
-      /** @var array $cache */
-      $doc->loadXML($cache["xml"]);
-      self::$fileToDoc[$filePath] = $doc;
-      return $doc;
-    }
+    $doc = new HTMLPlus();
+    /** @var array $cache */
+    $doc->loadXML($cache["xml"]);
+    self::$fileToDoc[$filePath] = $doc;
+    return $doc;
   }
 
   /**
@@ -312,6 +327,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @param bool $user
    * @param bool $admin
    * @return HTMLPlus
+   * @throws Exception
    */
   private static function doBuild ($filePath, $user = true, $admin = true) {
     $doc = self::load($filePath, $user, $admin);
@@ -328,21 +344,21 @@ class HTMLPlusBuilder extends DOMBuilder {
    */
   private static function load ($filePath, $user = true, $admin = true) {
     $doc = new HTMLPlus();
-    $fp = findFile($filePath, $user, $admin);
+    $filepath = find_file($filePath, $user, $admin);
     try {
-      $doc->load($fp);
-      self::validateHtml($doc, $fp, $filePath, false);
+      $doc->load($filepath);
+      self::validateHtml($doc, $filepath, $filePath, false);
       self::insertIncludes($doc, dirname($filePath));
       if (array_key_exists("fileToMtime", self::$currentFileTo)
         && count(self::$currentFileTo["fileToMtime"]) > 1
       ) {
-        self::validateHtml($doc, $fp, $filePath, true);
+        self::validateHtml($doc, $filepath, $filePath, true);
       }
-    } catch (Exception $e) {
+    } catch (Exception $exc) {
       self::$storeCache = false;
-      throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $e->getMessage()));
+      throw new Exception(sprintf(_("Unable to load %s: %s"), $filePath, $exc->getMessage()));
     }
-    self::$currentFileTo["fileToMtime"][$filePath] = filemtime($fp);
+    self::$currentFileTo["fileToMtime"][$filePath] = filemtime($filepath);
     self::setNewestFileMtime(self::$currentFileTo["fileToMtime"][$filePath]);
     return $doc;
   }
@@ -352,6 +368,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @param string $fileRealPath
    * @param string $filePath
    * @param bool $included
+   * @throws Exception
    */
   private static function validateHtml (HTMLPlus $doc, $fileRealPath, $filePath, $included) {
     $doc->validatePlus(true);
@@ -365,23 +382,27 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     Logger::user_notice(sprintf($msg, $filePath, count($doc->getErrors())));
     if (AUTOCORRECT) {
-      incrementalRename($fileRealPath);
+      rename_incr($fileRealPath);
       file_put_contents($fileRealPath, $doc->saveXML());
       return;
     }
     self::$storeCache = false;
   }
 
+  /**
+   * @param HTMLPlus $doc
+   * @param $workingDir
+   */
   private static function insertIncludes (HTMLPlus $doc, $workingDir) {
-    /** @var DOMElementPlus $h */
-    foreach ($doc->getElementsByTagName("h") as $h) {
-      if (!$h->hasAttribute("src")) {
+    /** @var DOMElementPlus $heading */
+    foreach ($doc->getElementsByTagName("h") as $heading) {
+      if (!$heading->hasAttribute("src")) {
         continue;
       }
       try {
-        self::insert($h, $workingDir);
-      } catch (Exception $e) {
-        $msg = sprintf(_("Unable to import: %s"), $e->getMessage());
+        self::insert($heading, $workingDir);
+      } catch (Exception $exc) {
+        $msg = sprintf(_("Unable to import: %s"), $exc->getMessage());
         Logger::user_error($msg);
         self::$storeCache = false;
       }
@@ -389,28 +410,29 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   /**
-   * @param DOMElementPlus $h
+   * @param DOMElementPlus $heading
    * @param string $workingDir
    * @return string
+   * @throws Exception
    */
-  private static function insert (DOMElementPlus $h, $workingDir) {
-    $src = $h->getAttribute("src");
+  private static function insert (DOMElementPlus $heading, $workingDir) {
+    $src = $heading->getAttribute("src");
     $includeFile = self::getIncludeSrc($src, $workingDir);
     $doc = self::load($includeFile);
     $lang = $doc->documentElement->getAttribute("xml:lang");
-    foreach ($doc->documentElement->childElementsArray as $n) {
-      /** @var DOMElementPlus $e */
-      $e = $h->parentNode->insertBefore($h->ownerDocument->importNode($n, true), $h);
-      if (strlen($e->getAttribute("xml:lang"))) {
+    foreach ($doc->documentElement->childElementsArray as $node) {
+      /** @var DOMElementPlus $ele */
+      $ele = $heading->parentNode->insertBefore($heading->ownerDocument->importNode($node, true), $heading);
+      if (strlen($ele->getAttribute("xml:lang"))) {
         continue;
       }
-      $e->setAttribute("xml:lang", $lang);
+      $ele->setAttribute("xml:lang", $lang);
     }
-    while (!is_null($h)) {
-      $next = $h->nextElement;
-      $h->parentNode->removeChild($h);
-      $h = $next;
-      if ($h->nodeName == "h") {
+    while (!is_null($heading)) {
+      $next = $heading->nextElement;
+      $heading->parentNode->removeChild($heading);
+      $heading = $next;
+      if ($heading->nodeName == "h") {
         break;
       }
     }
@@ -427,7 +449,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     if (pathinfo($src, PATHINFO_EXTENSION) != "html") {
       throw new Exception(sprintf(_("Included file '%s' extension must be .html"), $src));
     }
-    $file = findFile("$workingDir/$src");
+    $file = find_file("$workingDir/$src");
     if ($workingDir == ".") {
       return $src;
     }
@@ -472,16 +494,16 @@ class HTMLPlusBuilder extends DOMBuilder {
   }
 
   /**
-   * @param DOMElementPlus $e
+   * @param DOMElementPlus $ele
    * @param string $parentId
    * @param string $prefixId
    * @param string $linkPrefix
    * @param string $filePath
    * @return string
    */
-  private static function registerElement (DOMElementPlus $e, $parentId, $prefixId, $linkPrefix, $filePath) {
-    $id = $e->getAttribute("id");
-    $link = (strlen($linkPrefix) ? urlencode($linkPrefix)."/" : "") . urlencode($id);
+  private static function registerElement (DOMElementPlus $ele, $parentId, $prefixId, $linkPrefix, $filePath) {
+    $eId = $ele->getAttribute("id");
+    $link = (strlen($linkPrefix) ? urlencode($linkPrefix)."/" : "") . urlencode($eId);
     if (!strlen($parentId)) {
       $parentId = null;
       if ($filePath == INDEX_HTML) {
@@ -491,21 +513,21 @@ class HTMLPlusBuilder extends DOMBuilder {
         $parentId = current(self::$fileToId);
       }
     }
-    if ($id != $prefixId) {
-      $link = urlencode(self::$currentIdTo["idToLink"][$prefixId]) . "#" . urlencode($id);
-      $id = "$prefixId/$id";
+    if ($eId != $prefixId) {
+      $link = urlencode(self::$currentIdTo["idToLink"][$prefixId]) . "#" . urlencode($eId);
+      $eId = "$prefixId/$eId";
     }
-    if ($e->nodeName == "h") {
-      self::$currentIdTo["idToLink"][$id] = $link;
+    if ($ele->nodeName == "h") {
+      self::$currentIdTo["idToLink"][$eId] = $link;
       #self::$currentIdTo["linkToId"][$link] = $id;
-      self::setHeadingInfo($id, $e);
+      self::setHeadingInfo($eId, $ele);
     }
-    self::$currentIdTo["idToFile"][$id] = $filePath;
-    if ($e->hasAttribute("title")) {
-      self::$currentIdTo["idToTitle"][$id] = $e->getAttribute("title");
+    self::$currentIdTo["idToFile"][$eId] = $filePath;
+    if ($ele->hasAttribute("title")) {
+      self::$currentIdTo["idToTitle"][$eId] = $ele->getAttribute("title");
     }
-    self::$currentIdTo["idToParentId"][$id] = $parentId;
-    return $id;
+    self::$currentIdTo["idToParentId"][$eId] = $parentId;
+    return $eId;
   }
 
   /**
@@ -528,24 +550,27 @@ class HTMLPlusBuilder extends DOMBuilder {
 
   /**
    * @param string $filePath
+   *
    */
   private static function addToRegister ($filePath) {
-    foreach (self::$currentFileTo as $name => $value) {
+    foreach (self::$currentFileTo as $name => $array) {
       switch ($name) {
         case "fileToMtime":
-          foreach ($value as $file => $mtime) {
+          foreach ($array as $file => $mtime) {
             self::${$name}[$file] = $mtime;
           }
           break;
         default:
-          self::${$name}[$filePath] = $value;
+          self::${$name}[$filePath] = $array;
       }
     }
-    foreach (self::$currentIdTo as $name => $value) {
-      foreach ($value as $id => $v) self::${$name}[$id] = $v;
+    foreach (self::$currentIdTo as $name => $array) {
+      foreach ($array as $fId => $value) {
+        self::${$name}[$fId] = $value;
+      }
     }
-    foreach (self::$currentIdTo["idToLink"] as $name => $value) {
-      self::$linkToId[$name] = $value;
+    foreach (self::$currentIdTo["idToLink"] as $name => $array) {
+      self::$linkToId[$name] = $array;
     }
   }
 
@@ -561,7 +586,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @return string|null
    */
   public static function getCurFile () {
-    return self::getIdToFile(self::getLinkToId(getCurLink()));
+    return self::getIdToFile(self::getLinkToId(get_link()));
   }
 
   /**

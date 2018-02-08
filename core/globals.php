@@ -8,7 +8,7 @@ use IGCMS\Core\Logger;
  * @param string $id
  * @return bool
  */
-function isValidId ($id) {
+function is_valid_id ($id) {
   return (bool) preg_match("/^[A-Za-z][A-Za-z0-9_\.-]*$/", $id);
 }
 
@@ -19,7 +19,7 @@ function isValidId ($id) {
  * @return string
  * @throws Exception
  */
-function findFile ($filePath, $user = true, $admin = true) {
+function find_file ($filePath, $user = true, $admin = true) {
   $inactiveFilePath = dirname($filePath)."/.".basename($filePath);
   $dirs = [CMS_FOLDER];
   if ($admin) {
@@ -28,15 +28,15 @@ function findFile ($filePath, $user = true, $admin = true) {
   if ($user) {
     array_unshift($dirs, USER_FOLDER);
   }
-  foreach ($dirs as $d) {
-    if (!stream_resolve_include_path("$d/$filePath")) {
+  foreach ($dirs as $dir) {
+    if (!stream_resolve_include_path("$dir/$filePath")) {
       continue;
     }
-    if (stream_resolve_include_path("$d/$inactiveFilePath")) {
+    if (stream_resolve_include_path("$dir/$inactiveFilePath")) {
       continue;
     }
-    $path = realpath("$d/$filePath");
-    if (strpos($path, realpath($d).DIRECTORY_SEPARATOR) !== 0) {
+    $path = realpath("$dir/$filePath");
+    if (strpos($path, realpath($dir).DIRECTORY_SEPARATOR) !== 0) {
       throw new Exception(sprintf(_("File '%s' is out of working space"), $filePath));
     }
     return $path;
@@ -49,7 +49,7 @@ function findFile ($filePath, $user = true, $admin = true) {
  * @return string
  * @throws Exception
  */
-function getCallerClass ($i = 1) {
+function get_caller_class ($i = 1) {
   $backtrace = debug_backtrace();
   if (!array_key_exists("class", $backtrace[$i + 1])) {
     throw new Exception(_("Unknown caller class"));
@@ -62,7 +62,7 @@ function getCallerClass ($i = 1) {
  * @param string $target
  * @throws Exception
  */
-function createSymlink ($link, $target) {
+function create_symlink ($link, $target) {
   $restart = false;
   if (is_link($link) && readlink($link) == $target) {
     return;
@@ -85,29 +85,29 @@ function createSymlink ($link, $target) {
  * @param string|null $varPrefix
  * @return string
  */
-function replaceVariables ($string, Array $variables, $varPrefix = null) {
+function replace_vars ($string, Array $variables, $varPrefix = null) {
   if (!strlen($string)) {
     return $string;
   }
   $pat = '/(@?\$'.VARIABLE_PATTERN.')/i';
-  $p = preg_split($pat, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
-  if (count($p) < 2) {
+  $arr = preg_split($pat, $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+  if (count($arr) < 2) {
     return $string;
   }
   $newString = "";
-  foreach ($p as $i => $v) {
-    if ($i % 2 == 0) {
-      $newString .= $v;
+  foreach ($arr as $pos => $chunk) {
+    if ($pos % 2 == 0) {
+      $newString .= $chunk;
       continue;
     }
-    $vName = substr($v, strpos($v, '$') + 1);
+    $vName = substr($chunk, strpos($chunk, '$') + 1);
     if (!array_key_exists($vName, $variables)) {
       $vName = $varPrefix.$vName;
       if (!array_key_exists($vName, $variables)) {
-        if (strpos($v, "@") !== 0) {
+        if (strpos($chunk, "@") !== 0) {
           Logger::user_warning(sprintf(_("Variable '%s' does not exist"), $vName));
         }
-        $newString .= $v;
+        $newString .= $chunk;
         continue;
       }
     }
@@ -117,10 +117,10 @@ function replaceVariables ($string, Array $variables, $varPrefix = null) {
     } elseif ($value instanceof DOMElementPlus) {
       $value = $value->nodeValue;
     } elseif (!is_string($value)) {
-      if (strpos($v, "@") !== 0) {
+      if (strpos($chunk, "@") !== 0) {
         Logger::user_warning(sprintf(_("Variable '%s' is not string"), $vName));
       }
-      $newString .= $v;
+      $newString .= $chunk;
       continue;
     }
     $newString .= $value;
@@ -133,7 +133,7 @@ function replaceVariables ($string, Array $variables, $varPrefix = null) {
  * @param int|null $code
  * @param string|null $msg
  */
-function redirTo ($link, $code = null, $msg = null) {
+function redir_to ($link, $code = null, $msg = null) {
   http_response_code(is_null($code) ? 302 : $code);
   if (!strlen($link)) {
     $link = ROOT_URL;
@@ -159,10 +159,10 @@ function redirTo ($link, $code = null, $msg = null) {
  * @param bool $query
  * @return string
  */
-function implodeLink (Array $pLink, $query = true) {
+function implode_link (Array $pLink, $query = true) {
   $url = "";
   if (isset($pLink["scheme"])) {
-    $url .= $pLink["scheme"]."://".HOST."/";
+    $url .= $pLink["scheme"]."://".HTTP_HOST."/";
     if (isset($pLink["path"])) {
       $pLink["path"] = ltrim($pLink["path"], "/");
     }
@@ -185,13 +185,15 @@ function implodeLink (Array $pLink, $query = true) {
  * @return array|null
  * @throws Exception
  */
-function parseLocalLink ($link, $host = null) {
+function parse_local_link ($link, $host = null) {
   $pLink = parse_url($link);
   if ($pLink === false) {
     throw new Exception(sprintf(_("Unable to parse attribute href '%s'"), $link));
   } // fail2parse
-  foreach ($pLink as $k => $v) if (!strlen($v)) {
-    unset($pLink[$k]);
+  foreach ($pLink as $key => $value) {
+    if (!strlen($value)) {
+      unset($pLink[$key]);
+    }
   }
   if (isset($pLink["path"])) {
     $pLink["path"] = trim($pLink["path"], "/");
@@ -203,7 +205,7 @@ function parseLocalLink ($link, $host = null) {
     unset($pLink["scheme"]);
   }
   if (isset($pLink["host"])) {
-    if ($pLink["host"] != (is_null($host) ? HOST : $host)) {
+    if ($pLink["host"] != (is_null($host) ? HTTP_HOST : $host)) {
       return null;
     } // different ns
     unset($pLink["host"]);
@@ -218,16 +220,16 @@ function parseLocalLink ($link, $host = null) {
  * @return string
  * @throws Exception
  */
-function buildLocalUrl (Array $pLink, $ignoreCyclic = false, $addPermParam = true) {
+function build_local_url (Array $pLink, $ignoreCyclic = false, $addPermParam = true) {
   if ($addPermParam) {
-    addPermParams($pLink);
+    add_perm_param($pLink);
   }
-  $cyclic = !$ignoreCyclic && isCyclicLink($pLink);
+  $cyclic = !$ignoreCyclic && is_cyclic_link($pLink);
   if ($cyclic && !isset($pLink["fragment"])) {
     throw new Exception(_("Link is cyclic"));
   }
   if (!isset($pLink["path"])) {
-    return implodeLink($pLink);
+    return implode_link($pLink);
   }
   $path = $pLink["path"];
   #$path = ltrim($pLink["path"], "/");
@@ -238,7 +240,7 @@ function buildLocalUrl (Array $pLink, $ignoreCyclic = false, $addPermParam = tru
   }
   #if(is_null($path) && isset($pLink["fragment"])) return "#".$pLink["fragment"];
   if (SCRIPT_NAME == FINDEX_PHP || SCRIPT_NAME == INDEX_PHP || strpos($path, FILES_DIR) === 0) {
-    return implodeLink($pLink);
+    return implode_link($pLink);
   }
   $pLink["path"] = ROOT_URL.SCRIPT_NAME;
   if ($cyclic) {
@@ -254,25 +256,25 @@ function buildLocalUrl (Array $pLink, $ignoreCyclic = false, $addPermParam = tru
   if (count($query)) {
     $pLink["query"] = implode("&", $query);
   }
-  return implodeLink($pLink);
+  return implode_link($pLink);
 }
 
 /**
  * @param array $pLink
  * @return bool
  */
-function isCyclicLink (Array $pLink) {
+function is_cyclic_link (Array $pLink) {
   if (isset($pLink["fragment"])) {
     return false;
   }
-  if (isset($pLink["path"]) && $pLink["path"] != getCurLink()
+  if (isset($pLink["path"]) && $pLink["path"] != get_link()
     && SCRIPT_NAME != $pLink["path"]) {
     return false;
   }
-  if (!isset($pLink["query"]) && getCurQuery() != "") {
+  if (!isset($pLink["query"]) && get_query() != "") {
     return false;
   }
-  if (isset($pLink["query"]) && $pLink["query"] != getCurQuery()) {
+  if (isset($pLink["query"]) && $pLink["query"] != get_query()) {
     return false;
   }
   return true;
@@ -281,7 +283,7 @@ function isCyclicLink (Array $pLink) {
 /**
  * @param array $pLink
  */
-function addPermParams (Array &$pLink) {
+function add_perm_param (Array &$pLink) {
   foreach ([PAGESPEED_PARAM, DEBUG_PARAM, CACHE_PARAM] as $parName) {
     if (!isset($_GET[$parName]) || !strlen($_GET[$parName])) {
       continue;
@@ -299,23 +301,23 @@ function addPermParams (Array &$pLink) {
 }
 
 /**
- * @param array $a
+ * @param array $array
  * @param int $order
  */
-function stableSort (Array &$a, $order = SORT_ASC) {
-  if (count($a) < 2) {
+function stable_sort (Array &$array, $order = SORT_ASC) {
+  if (count($array) < 2) {
     return;
   }
-  $orderArray = range(1, count($a));
-  array_multisort($a, $order, $orderArray, $order);
+  $orderArray = range(1, count($array));
+  array_multisort($array, $order, $orderArray, $order);
 }
 
 /**
  * @param bool $query
  * @return string
  */
-function getCurLink ($query = false) {
-  return getCurQuery($query, true);
+function get_link ($query = false) {
+  return get_query($query, true);
 }
 
 /**
@@ -323,7 +325,7 @@ function getCurLink ($query = false) {
  * @param bool $link
  * @return string
  */
-function getCurQuery ($questionMark = false, $link = false) {
+function get_query ($questionMark = false, $link = false) {
   if (!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) {
     return "";
   }
@@ -333,7 +335,7 @@ function getCurQuery ($questionMark = false, $link = false) {
     $curLink = $pQuery["q"];
     unset($pQuery["q"]);
   }
-  $query = buildQuery($pQuery, $questionMark);
+  $query = build_query($pQuery, $questionMark);
   if (!$link) {
     return $query; // no link with/without questionmark (true/false, false)
   }
@@ -348,7 +350,7 @@ function getCurQuery ($questionMark = false, $link = false) {
  * @param bool $questionMark
  * @return string
  */
-function buildQuery (Array $pQuery, $questionMark = true) {
+function build_query (Array $pQuery, $questionMark = true) {
   if (empty($pQuery)) {
     return "";
   }
@@ -389,6 +391,7 @@ function normalize ($text, $keep = null, $replace = null, $tolower = true, $conv
   if (is_null($keep)) {
     $keep = "\w\d_-";
   }
+  /** @noinspection PhpUsageOfSilenceOperatorInspection */
   $text = @preg_replace("~[^$keep]~", $replace, $text);
   if (is_null($text)) {
     throw new Exception(_("Invalid parameter 'keep'"));
@@ -401,9 +404,9 @@ function normalize ($text, $keep = null, $replace = null, $tolower = true, $conv
  * @param string $string
  * @throws Exception
  */
-function file_put_contents_plus ($dest, $string) {
-  $b = file_put_contents("$dest.new", $string);
-  if ($b === false) {
+function fput_contents ($dest, $string) {
+  $bytes = file_put_contents("$dest.new", $string);
+  if ($bytes === false) {
     throw new Exception(_("Unable to save content"));
   }
   copy_plus("$dest.new", $dest, false);
@@ -448,10 +451,11 @@ function copy_plus ($src, $dest, $keepSrc = true) {
  * @throws Exception
  */
 function mkdir_plus ($dir, $mode = 0775, $recursive = true) {
-  for ($i = 0; $i < 10; $i++) {
+  for ($iter = 0; $iter < 10; $iter++) {
     if (is_dir($dir)) {
       return;
     }
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (@mkdir($dir, $mode, $recursive)) {
       return;
     }
@@ -466,62 +470,57 @@ function mkdir_plus ($dir, $mode = 0775, $recursive = true) {
  * @return string
  * @throws Exception
  */
-function incrementalRename ($src, $dest = null) {
+function rename_incr ($src, $dest = null) {
   if (!stream_resolve_include_path($src)) {
     throw new Exception(sprintf(_("Source file '%s' not found"), basename($src)));
   }
   if (is_null($dest)) {
     $dest = $src;
   }
-  $i = 0;
-  while (stream_resolve_include_path($dest.$i)) {
-    $i++;
+  $iter = 0;
+  while (stream_resolve_include_path($dest.$iter)) {
+    $iter++;
   }
-  if (!rename($src, $dest.$i)) {
+  if (!rename($src, $dest.$iter)) {
     throw new Exception(sprintf(_("Unable to rename directory '%s'"), basename($src)));
   }
-  return $dest.$i;
+  return $dest.$iter;
 }
 
-function initDirs () {
-  $dirs = [
-    USER_FOLDER, LOG_FOLDER, FILES_FOLDER, THEMES_FOLDER,
-    LIB_DIR, FILES_DIR, THEMES_DIR, PLUGINS_DIR, VENDOR_DIR,
-  ];
-  foreach ($dirs as $d) mkdir_plus($d);
-}
-
-function initIndexFiles () {
+/**
+ * @throws Exception
+ */
+function init_index_files () {
   $links = [];
-  foreach (scandir(CMS_ROOT_FOLDER) as $f) {
-    if (strpos($f, ".") === 0) {
+  foreach (scandir(CMS_ROOT_FOLDER) as $filename) {
+    if (strpos($filename, ".") === 0) {
       continue;
     }
-    if (!is_dir(CMS_ROOT_FOLDER."/$f")) {
+    if (!is_dir(CMS_ROOT_FOLDER."/$filename")) {
       continue;
     }
-    if (stream_resolve_include_path(CMS_ROOT_FOLDER."/.$f")) {
+    if (stream_resolve_include_path(CMS_ROOT_FOLDER."/.$filename")) {
       continue;
     }
-    if (!is_file(CMS_ROOT_FOLDER."/$f/".INDEX_PHP)) {
+    if (!is_file(CMS_ROOT_FOLDER."/$filename/".INDEX_PHP)) {
       continue;
     }
-    $links["$f.php"] = CMS_ROOT_FOLDER."/$f/".INDEX_PHP;
+    $links["$filename.php"] = CMS_ROOT_FOLDER."/$filename/".INDEX_PHP;
   }
-  foreach (scandir(getcwd()) as $f) {
-    if (!is_link($f)) {
+  foreach (scandir(getcwd()) as $filename) {
+    if (!is_link($filename)) {
       continue;
     }
-    if (array_key_exists($f, $links)) {
+    if (array_key_exists($filename, $links)) {
       continue;
     }
-    if ($f == CMS_RELEASE.".php") {
+    if ($filename == CMS_RELEASE.".php") {
       continue;
     }
-    unlink($f);
+    unlink($filename);
   }
-  foreach ($links as $l => $t) {
-    createSymlink($l, $t);
+  foreach ($links as $link => $target) {
+    create_symlink($link, $target);
   }
 }
 
@@ -529,7 +528,7 @@ function initIndexFiles () {
  * @param int $timestamp
  * @return string
  */
-function timestamptToW3C ($timestamp) {
+function w3c_timestamp ($timestamp) {
   $date = new DateTime();
   $date->setTimestamp($timestamp);
   return $date->format(DateTime::W3C);
@@ -550,18 +549,18 @@ function update_file ($src, $dest, $hash = false) {
     throw new Exception("Source file not found");
   }
   if (is_file($dest)) {
-    if ($hash && getFileHash($src) == getFileHash($dest)) {
+    if ($hash && file_hash($src) == file_hash($dest)) {
       return false;
     }
     if (!$hash && filemtime($src) == filemtime($dest)) {
       return false;
     }
   }
-  $fp = lock_file($dest);
+  $filePath = lock_file($dest);
   try {
     copy_plus($src, $dest);
   } finally {
-    unlock_file($fp, $dest);
+    unlock_file($filePath, $dest);
   }
   return true;
 }
@@ -577,6 +576,7 @@ function lock_file ($filePath, $ext = "lock") {
     $filePath = "$filePath.$ext";
   }
   mkdir_plus(dirname($filePath));
+  /** @noinspection PhpUsageOfSilenceOperatorInspection */
   $fpr = @fopen($filePath, "c+");
   if (!$fpr) {
     throw new Exception(sprintf(_("Unable to open file %s"), $filePath));
@@ -605,7 +605,8 @@ function unlock_file ($fpr, $fileName = null, $ext = "lock") {
   if (!strlen($fileName) || !strlen($ext)) {
     return;
   }
-  for ($i = 0; $i < 20; $i++) {
+  for ($iter = 0; $iter < 20; $iter++) {
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if (@unlink("$fileName.$ext")) {
       return;
     }
@@ -618,22 +619,22 @@ function unlock_file ($fpr, $fileName = null, $ext = "lock") {
  * @param bool $reverse
  * @return string
  */
-function translateUtf8Entities ($xmlSource, $reverse = false) {
-  static $literal2NumericEntity;
-  if (empty($literal2NumericEntity)) {
+function to_utf8 ($xmlSource, $reverse = false) {
+  static $literalToNumeric;
+  if (empty($literalToNumeric)) {
     $transTbl = get_html_translation_table(HTML_ENTITIES);
     foreach ($transTbl as $char => $entity) {
       if (strpos('&"<>', $char) !== false) {
         continue;
       }
       #$literal2NumericEntity[$entity] = '&#'.ord($char).';';
-      $literal2NumericEntity[$entity] = $char;
+      $literalToNumeric[$entity] = $char;
     }
   }
   if ($reverse) {
-    return strtr($xmlSource, array_flip($literal2NumericEntity));
+    return strtr($xmlSource, array_flip($literalToNumeric));
   }
-  return strtr($xmlSource, $literal2NumericEntity);
+  return strtr($xmlSource, $literalToNumeric);
 }
 
 /**
@@ -642,7 +643,7 @@ function translateUtf8Entities ($xmlSource, $reverse = false) {
  * @return string|bool
  * @throws Exception
  */
-function readZippedFile ($archiveFile, $dataFile) {
+function read_zip ($archiveFile, $dataFile) {
   // Create new ZIP archive
   $zip = new ZipArchive;
   // Open received archive file
@@ -668,13 +669,14 @@ function readZippedFile ($archiveFile, $dataFile) {
  * @return mixed|string
  * @throws Exception
  */
-function getFileMime ($filePath) {
-  $fh = fopen($filePath, 'rb');
-  if (!$fh) {
+function get_mime ($filePath) {
+  /** @noinspection PhpUsageOfSilenceOperatorInspection */
+  $handle = @fopen($filePath, 'rb');
+  if (!$handle) {
     throw new Exception(_("Unable to open file"));
   }
   try {
-    $bytes6 = fread($fh, 6);
+    $bytes6 = fread($handle, 6);
     if ($bytes6 === false) {
       throw new Exception(_("Unable to read file"));
     }
@@ -695,33 +697,33 @@ function getFileMime ($filePath) {
     finfo_close($finfo);
     return $mime;
   } finally {
-    fclose($fh);
+    fclose($handle);
   }
 }
 
 /**
  * TODO throw if not numeric?
- * @param int $b
+ * @param int $bytes
  * @return float|int|mixed
  */
-function fileSizeConvert ($b) {
-  if (!is_numeric($b)) {
-    return $b;
+function size_unit ($bytes) {
+  if (!is_numeric($bytes)) {
+    return $bytes;
   }
-  $i = 0;
+  $iter = 0;
   $iec = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-  while (($b / 1024) > 1) {
-    $b = $b / 1024;
-    $i++;
+  while (($bytes / 1024) > 1) {
+    $bytes = $bytes / 1024;
+    $iter++;
   }
-  return round($b, 1)." ".$iec[$i];
+  return round($bytes, 1)." ".$iec[$iter];
 }
 
 /**
  * @param string $filePath
  * @return string
  */
-function getFileHash ($filePath) {
+function file_hash ($filePath) {
   if (!is_file($filePath)) {
     return "";
   }
@@ -732,7 +734,7 @@ function getFileHash ($filePath) {
  * @param string $filePath
  * @return string
  */
-function stripDataFolder ($filePath) {
+function strip_data_dir ($filePath) {
   $folders = [USER_FOLDER, ADMIN_FOLDER, CMS_FOLDER];
   foreach ($folders as $folder) {
     if (strpos($filePath, "$folder/") !== 0) {
@@ -750,18 +752,18 @@ function stripDataFolder ($filePath) {
  * @param string $delim
  * @return string
  */
-function getShortString ($str, $lLimit = 60, $hLimit = 80, $delim = " ") {
+function shorten ($str, $lLimit = 60, $hLimit = 80, $delim = " ") {
   if (strlen($str) < $hLimit) {
     return $str;
   }
-  $w = explode($delim, $str);
-  $sStr = $w[0];
-  $i = 1;
+  $words = explode($delim, $str);
+  $sStr = $words[0];
+  $iter = 1;
   while (strlen($sStr) < $lLimit) {
-    if (!isset($w[$i])) {
+    if (!isset($words[$iter])) {
       break;
     }
-    $sStr .= $delim.$w[$i++];
+    $sStr .= $delim.$words[$iter++];
   }
   if (strlen($str) - strlen($sStr) < $hLimit - $lLimit) {
     return $str;
@@ -769,35 +771,43 @@ function getShortString ($str, $lLimit = 60, $hLimit = 80, $delim = " ") {
   return $sStr."…";
 }
 
-function loginRedir () {
+/**
+ * @throws Exception
+ */
+function login_redir () {
   $aQuery = [];
-  parse_str(getCurQuery(), $aQuery);
-  $q = buildQuery(array_merge($aQuery, ["login" => ""]), false);
-  $pLink = ["scheme" => "https", "path" => getCurLink(), "query" => $q];
-  redirTo(buildLocalUrl($pLink, 401, _("Authorization required")));
+  parse_str(get_query(), $aQuery);
+  $query = build_query(array_merge($aQuery, ["login" => ""]), false);
+  $pLink = ["scheme" => "https", "path" => get_link(), "query" => $query];
+  redir_to(build_local_url($pLink, 401, _("Authorization required")));
 }
 
 if (!function_exists("apc_exists")) {
+  /**
+   * @param $key
+   * @return bool|string
+   * @throws Exception
+   */
   function apc_exists ($key) {
     return stream_resolve_include_path(apc_get_path($key));
   }
 }
 
 if (!function_exists("apc_fetch")) {
+  /**
+   * @param $key
+   * @return mixed
+   * @throws Exception
+   */
   function apc_fetch ($key) {
     return json_decode(file_get_contents(apc_get_path($key)), true);
-  }
-}
-
-if (!function_exists("apc_store")) {
-  function apc_store ($key, $value, $ttl = 0) {
-    return file_put_contents(apc_get_path($key), json_encode($value)) !== false;
   }
 }
 
 /**
  * @param string $key
  * @return string
+ * @throws Exception
  */
 function apc_get_path ($key) {
   $apcDir = getcwd()."/../tmp_apc/";
@@ -815,13 +825,14 @@ function apc_get_key ($key) {
   if (isset($callers[1]['class'])) {
     $class = $callers[1]['class'];
   }
-  return APC_PREFIX."/".HOST."/".$class."/".Cms::isSuperUser()."/".$key;
+  return APC_PREFIX."/".HTTP_HOST."/".$class."/".Cms::isSuperUser()."/".$key;
 }
 
 /**
  * @param string $cacheKey
  * @param mixed $value
  * @param string $name
+ * @throws Exception
  */
 function apc_store_cache ($cacheKey, $value, $name) {
   $stored = apc_store($cacheKey, $value, rand(3600 * 24 * 30 * 3, 3600 * 24 * 30 * 6));
@@ -834,6 +845,7 @@ function apc_store_cache ($cacheKey, $value, $name) {
  * @param string $cacheKey
  * @param mixed $value
  * @return bool
+ * @throws Exception
  */
 function apc_is_valid_cache ($cacheKey, $value) {
   if (!apc_exists($cacheKey)) {
@@ -848,8 +860,8 @@ function apc_is_valid_cache ($cacheKey, $value) {
 /**
  * @throws Exception
  */
-function clearNginxCache () {
-  foreach (getNginxCacheFiles() as $fPath) {
+function clear_nginx () {
+  foreach (get_nginx_cache() as $fPath) {
     if (!unlink($fPath)) {
       throw new Exception(_("Failed to purge cache"));
     }
@@ -861,24 +873,24 @@ function clearNginxCache () {
  * @param string $link
  * @return array
  */
-function getNginxCacheFiles ($folder = null, $link = "") {
+function get_nginx_cache ($folder = null, $link = "") {
   if (is_null($folder)) {
     $folder = NGINX_CACHE_FOLDER;
   }
   $fPaths = [];
-  foreach (scandir($folder) as $f) {
-    if (strpos($f, ".") === 0) {
+  foreach (scandir($folder) as $filename) {
+    if (strpos($filename, ".") === 0) {
       continue;
     }
-    $ff = "$folder/$f";
-    if (is_dir($ff)) {
-      $fPaths = array_merge($fPaths, getNginxCacheFiles($ff, $link));
+    $filepath = "$folder/$filename";
+    if (is_dir($filepath)) {
+      $fPaths = array_merge($fPaths, get_nginx_cache($filepath, $link));
       continue;
     }
-    if (empty(preg_grep("/KEY: https?".HOST."/$link", file($ff)))) {
+    if (empty(preg_grep("/KEY: https?".HTTP_HOST."/$link", file($filepath)))) {
       continue;
     }
-    $fPaths[] = $ff;
+    $fPaths[] = $filepath;
   }
   return $fPaths;
 }
@@ -886,7 +898,7 @@ function getNginxCacheFiles ($folder = null, $link = "") {
 /**
  * @return string
  */
-function getIP () {
+function get_ip () {
   if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
     return $_SERVER['HTTP_CLIENT_IP'];
   }
@@ -900,7 +912,7 @@ function getIP () {
  * @param string $file
  * @return string
  */
-function getRealResDir ($file = "") {
+function get_real_resdir ($file = "") {
   $resDir = RESOURCES_DIR;
   if (basename(SCRIPT_NAME) != INDEX_PHP) {
     $resDir = pathinfo(SCRIPT_NAME, PATHINFO_FILENAME);
@@ -912,17 +924,17 @@ function getRealResDir ($file = "") {
  * @param string $file
  * @return string
  */
-function getResDir ($file = "") {
+function get_resdir ($file = "") {
   if (is_null(Cms::getLoggedUser())) {
     return $file;
   }
-  if (getRealResDir() != RESOURCES_DIR) {
-    return getRealResDir($file);
+  if (get_real_resdir() != RESOURCES_DIR) {
+    return get_real_resdir($file);
   }
   if (!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON) {
     return $file;
   } // Debug is off
-  return getRealResDir($file);
+  return get_real_resdir($file);
 }
 
 /**
@@ -930,11 +942,11 @@ function getResDir ($file = "") {
  * @param string $cacheFile
  * @return bool
  */
-function isUptodate ($sourceFile, $cacheFile) {
+function is_uptodate ($sourceFile, $cacheFile) {
   if (filemtime($cacheFile) == filemtime($sourceFile)) {
     return true;
   }
-  if (getFileHash($cacheFile) != getFileHash($sourceFile)) {
+  if (file_hash($cacheFile) != file_hash($sourceFile)) {
     return false;
   }
   touch($cacheFile, filemtime($sourceFile));
@@ -948,18 +960,21 @@ function isUptodate ($sourceFile, $cacheFile) {
  * @param int $nonEmptyArgumentsCount
  * @throws Exception
  */
-function validate_callStatic ($methodName, Array $arguments, Array $functions, $nonEmptyArgumentsCount = 0) {
+function validate_callstatic ($methodName, Array $arguments, Array $functions, $nonEmptyArgumentsCount = 0) {
   if (!array_key_exists($methodName, $functions)) {
     throw new Exception(sprintf(_("Undefined method name %s"), $methodName));
   }
-  for ($i = 0; $i < $nonEmptyArgumentsCount; $i++) {
-    if (array_key_exists($i, $arguments) && strlen($arguments[$i])) {
+  for ($iter = 0; $iter < $nonEmptyArgumentsCount; $iter++) {
+    if (array_key_exists($iter, $arguments) && strlen($arguments[$iter])) {
       continue;
     }
-    throw new Exception(sprintf(_("Argument[%s] empty or missing"), $i));
+    throw new Exception(sprintf(_("Argument[%s] empty or missing"), $iter));
   }
 }
 
+/**
+ * @param $dir
+ */
 function rmdir_plus ($dir) {
   $files = new RecursiveIteratorIterator(
     new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),

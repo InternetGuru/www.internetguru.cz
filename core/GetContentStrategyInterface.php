@@ -2,7 +2,7 @@
 
 namespace IGCMS\Core;
 
-/**
+/** @noinspection PhpClassNamingConventionInspection *//**
  * Interface GetContentStrategyInterface
  * @package IGCMS\Core
  */
@@ -13,5 +13,3 @@ interface GetContentStrategyInterface {
    */
   public function getContent ();
 }
-
-?>

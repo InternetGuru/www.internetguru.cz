@@ -2,13 +2,6 @@
 
 try {
 
-  // localhost
-  $findex = "../cms/findex.php";
-  if (is_file($findex)) {
-    include($findex);
-    exit;
-  }
-
   if (!is_file("VERSION")) {
     throw new Exception("File VERSION not found");
   }
@@ -27,13 +20,11 @@ try {
     header("Location: /index.php?q=$query");
     exit;
   }
-  include($findex);
+  include "$findex";
 
-} catch (Exception $e) {
+} catch (Exception $exc) {
 
   http_response_code(500);
-  echo "File fatal exception: ".$e->getMessage();
+  echo "File fatal exception: ".$exc->getMessage();
 
 }
-
-?>

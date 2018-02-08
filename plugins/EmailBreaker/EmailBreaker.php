@@ -33,17 +33,18 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
   /**
    * @param DOMDocumentPlus $content
    * @return DOMDocumentPlus
+   * @throws Exception
    */
   public function getContent (DOMDocumentPlus $content) {
-    $cfg = $this->getXML();
+    $cfg = self::getXML();
     $pat = [];
     $rep = [];
     /** @var DOMElementPlus $replace */
     foreach ($cfg->getElementsByTagName("replace") as $replace) {
       try {
         $pattern = $replace->getRequiredAttribute("pattern");
-      } catch (Exception $e) {
-        Logger::user_warning($e->getMessage());
+      } catch (Exception $exc) {
+        Logger::user_warning($exc->getMessage());
         continue;
       }
       if (!strlen($replace->nodeValue)) {
@@ -54,26 +55,26 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
       $rep[] = $replace->nodeValue;
     }
     $anchors = [];
-    /** @var DOMElementPlus $a */
-    foreach ($content->getElementsByTagName("a") as $a) {
-      if (strpos($a->getAttribute("href"), "mailto:") === false) {
+    /** @var DOMElementPlus $aElm */
+    foreach ($content->getElementsByTagName("a") as $aElm) {
+      if (strpos($aElm->getAttribute("href"), "mailto:") === false) {
         continue;
       }
-      $anchors[] = $a;
+      $anchors[] = $aElm;
     }
-    foreach ($anchors as $a) {
-      $address = substr($a->getAttribute("href"), 7);
-      $a->addClass("emailbreaker");
-      $a->removeAttribute("href");
+    foreach ($anchors as $aElm) {
+      $address = substr($aElm->getAttribute("href"), 7);
+      $aElm->addClass("emailbreaker");
+      $aElm->removeAttribute("href");
       $spanAddr = $content->createElement("span");
       $spanAddr->setAttribute("class", "addr");
       $spanAddr->nodeValue = str_replace($pat, $rep, $address);
-      $replaced = $this->replace($address, $spanAddr, $a);
+      $replaced = $this->replace($address, $spanAddr, $aElm);
       if (!$replaced) {
         $spanAddr->addClass("del");
-        $a->appendChild($spanAddr);
+        $aElm->appendChild($spanAddr);
       }
-      $a->rename("span");
+      $aElm->rename("span");
     }
     if (count($anchors)) {
       $this->appendJs($pat, $rep);
@@ -91,17 +92,17 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
     $replaced = false;
     foreach ($ele->childNodes as $chld) {
       if ($chld->nodeType == XML_ELEMENT_NODE) {
-        $r = $this->replace($pat, $rep, $chld);
+        $childReplaced = $this->replace($pat, $rep, $chld);
         if (!$replaced) {
-          $replaced = $r;
+          $replaced = $childReplaced;
         }
         continue;
       }
       if (strpos($chld->nodeValue, $pat) === false) {
         continue;
       }
-      foreach (explode($pat, $chld->nodeValue) as $k => $part) {
-        if ($k > 0) {
+      foreach (explode($pat, $chld->nodeValue) as $key => $part) {
+        if ($key > 0) {
           $ele->insertBefore($rep, $chld);
         }
         $ele->insertBefore($ele->ownerDocument->createTextNode($part), $chld);
@@ -113,13 +114,13 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
   }
 
   /**
-   * @param array $pat
+   * @param array $patArray
    * @param array $rep
    */
-  private function appendJs ($pat, $rep) {
+  private function appendJs (array $patArray, array $rep) {
     $jsRep = [];
-    foreach ($pat as $k => $p) {
-      $jsRep[] = "['$p','{$rep[$k]}']";
+    foreach ($patArray as $key => $pattern) {
+      $jsRep[] = "['$pattern','{$rep[$key]}']";
     }
     Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".$this->className.".js");
     Cms::getOutputStrategy()->addJs(
@@ -130,5 +131,3 @@ class EmailBreaker extends Plugin implements SplObserver, FinalContentStrategyIn
   }
 
 }
-
-?>
