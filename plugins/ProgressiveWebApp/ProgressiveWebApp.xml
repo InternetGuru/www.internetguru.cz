@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ProgressiveWebApp>
 
-  <!-- TODO add default icons -->
   <themeColor modifyonly="modifyonly">#ddd</themeColor>
   <manifest modifyonly="modifyonly">
 {
@@ -13,12 +12,12 @@
   "background_color": "#333",
   "icons": [
     {
-      "src": "/lib/icons/256x256.png",
+      "src": "/lib/pwaicons/256x256.png",
       "sizes": "256x256",
       "type": "image/png"
     },
     {
-      "src": "/lib/icons/512x512.png",
+      "src": "/lib/pwaicons/512x512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
