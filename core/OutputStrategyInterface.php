@@ -23,6 +23,23 @@ interface OutputStrategyInterface {
 
   /**
    * @param string $filePath
+   * @param string $rel
+   * @param bool $type
+   * @param bool $media
+   * @param null $ieIfComment
+   */
+  public function addLinkElement ($filePath, $rel, $type = false, $media = false, $ieIfComment = null);
+
+  /**
+   * @param string $nameValue
+   * @param string $contentValue
+   * @param bool $httpEquiv
+   * @param bool $short
+   */
+  public function addMetaElement ($nameValue, $contentValue, $httpEquiv = false, $short = false);
+
+    /**
+   * @param string $filePath
    * @param int $priority
    * @param string $append
    * @param bool $user

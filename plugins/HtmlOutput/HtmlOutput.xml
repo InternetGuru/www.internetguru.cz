@@ -112,10 +112,10 @@
   <!-- Photoswipe -->
   <stylesheet if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe.css</stylesheet>
   <stylesheet if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/default-skin/default-skin.css</stylesheet>
-  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe.min.js</jsFile>
-  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe-ui-default.min.js</jsFile>
-  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">themes/photoswipe.js</jsFile>
-  <jsFile if-xpath="//*[contains(@class, 'photoswipe')]">themes/photoswipeinit.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe.min.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe-ui-default.min.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'photoswipe')]">themes/photoswipe.js</jsFile>
+  <jsFile append="body" if-xpath="//*[contains(@class, 'photoswipe')]">themes/photoswipeinit.js</jsFile>
 
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
