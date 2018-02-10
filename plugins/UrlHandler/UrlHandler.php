@@ -203,15 +203,15 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
 
   /**
    * @param array $links
-   * @param string $link
+   * @param string $curLink
    * @param null $max
    * @return array
    */
-  private static function minPos (Array $links, $link, $max = null) {
+  private static function minPos (Array $links, $curLink, $max = null) {
     $linkpos = [];
     foreach ($links as $key => $link) {
       $link = strtolower($link);
-      $pos = strpos($link, $link);
+      $pos = strpos($link, $curLink);
       if ($pos === false || (!is_null($max) && $pos > $max)) {
         continue;
       }
