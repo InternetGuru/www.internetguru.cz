@@ -93,7 +93,7 @@
   <jsFile append="body">themes/scrolltopable.js</jsFile>
   <jsFile append="body">themes/scrolltopableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideable.js</jsFile>
-  <!--<jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideableinit.js</jsFile>-->
+  <jsFile append="body" if-xpath="//*[contains(@class, 'hideable') or contains(@class, 'tocable')]" priority="20">themes/hideableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="70">themes/tocable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'tocable')]" priority="70">themes/tocableinit.js</jsFile>
   <jsFile append="body" if-xpath="//code[not(contains(@class, 'nohighlight'))]">themes/syntaxhighlightjs.js</jsFile>
