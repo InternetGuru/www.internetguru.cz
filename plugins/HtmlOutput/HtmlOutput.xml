@@ -21,4 +21,6 @@
   <stylesheet>themes/ig.media.css</stylesheet>
   <favicon>themes/ig.ico</favicon>
   <xslt>themes/h1desc.xsl</xslt>
+  <jsFile append="head">themes/webfont.js</jsFile>
+  <jsFile append="head">themes/fontloader.js</jsFile>
 </HtmlOutput>

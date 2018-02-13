@@ -1,6 +1,6 @@
 (function(win) {
 
-  if(typeof IGCMS === "undefined") throw "IGCMS is not defined"
+  require("IGCMS", function() {
 
   if(IGCMS.Hideable) return
 
@@ -163,5 +163,7 @@
   };
 
    IGCMS.Hideable = new Hideable();
+
+  })
 
 })(window);
