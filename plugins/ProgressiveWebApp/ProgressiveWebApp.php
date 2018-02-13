@@ -61,7 +61,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     // add meta
     $outputStrategy = Cms::getOutputStrategy();
     $outputStrategy->addMetaElement("theme-color", $themeColor);
-    $outputStrategy->addLinkElement(self::MANIFEST, "manifest");
+    $outputStrategy->addLinkElement(ROOT_URL.self::MANIFEST, "manifest");
     $outputStrategy->addJsFile($this->pluginDir."/".$this->className.".js");
   }
 
