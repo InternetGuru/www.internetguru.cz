@@ -85,7 +85,7 @@
   <jsFile append="body">themes/browserdetect.js</jsFile>
 
   <!-- Default scripts -->
-  <jsFile append="head" async="false" priority="1000">themes/require.js</jsFile>
+  <jsFile async="false" priority="1">themes/require.js</jsFile>
   <jsFile append="body">themes/igcms.js</jsFile>
   <jsFile append="body">themes/highlightable.js</jsFile>
   <jsFile append="body">themes/fragmentable.js</jsFile>
