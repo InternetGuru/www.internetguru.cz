@@ -46,7 +46,7 @@ $inputvar-service_plain
       </ul></dd>
 -->
       <dt>Pavel Petržela</dt>
-      <dd>IT Support, Development</dd>
+      <dd>IT Support, Chief Developer</dd>
       <dd><ul class="logo">
         <li var="inputvar-phone@class"><a href="tel:+420604412983">+420 604 412 983</a></li>
         <li var="inputvar-email@class"><a href="mailto:pavel.petrzela@internetguru.cz">pavel.petrzela@internetguru.cz</a></li>
@@ -54,7 +54,7 @@ $inputvar-service_plain
         <li var="inputvar-linkedin@class"><a href="https://www.linkedin.com/in/pavelpetrzela">pavelpetrzela (LinkedIn)</a></li>
       </ul></dd>
       <dt class="hideable-nohide hideable-here">Jan Vlnas</dt>
-      <dd class="hideable-nohide">Consulting</dd>
+      <dd class="hideable-nohide">Senior Developer Consultant</dd>
       <dd><ul class="logo">
         <li var="inputvar-email@class"><a href="mailto:jan.vlnas@internetguru.cz">jan.vlnas@internetguru.cz</a></li>
         <li var="inputvar-linkedin@class"><a href="https://www.linkedin.com/in/janvlnas/">janvlnas (LinkedIn)</a></li>
@@ -86,11 +86,11 @@ $inputvar-service_plain
       <dt>Type</dt>
       <dd>Management</dd>
       <dt>Lubomír Brejník</dt>
-      <dd>Accounting</dd>
+      <dd>Executive Director</dd>
       <dd><ul class="logo">
         <li var="inputvar-email@class"><a href="mailto:lubomir.brejnik@internetguru.cz">lubomir.brejnik@internetguru.cz</a></li>
       </ul></dd>
-      <dt>Jiří George Pavelka</dt>
+      <dt>Jiří (George) Pavelka</dt>
       <dd>Business Owner, CEO</dd>
       <dd><ul class="logo">
         <li var="inputvar-phone@class"><a href="tel:+420603307905">+420 603 307 905 (WhatsApp, Viber)</a></li>
