@@ -77,7 +77,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     header('Content-Type: application/javascript');
     header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (60 * 60 * 24 * 30))); // 1 month
     echo "importScripts('/".LIB_DIR."/sw-toolbox.js');
-    toolbox.router.get('/:path([^.?]+)*', toolbox.networkFirst);
+    toolbox.router.get('/:path([^.?]+)', toolbox.networkFirst);
     // toolbox.router.default = toolbox.networkFirst;";
     exit;
   }
