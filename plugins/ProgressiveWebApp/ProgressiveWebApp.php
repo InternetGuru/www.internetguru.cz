@@ -5,6 +5,7 @@ namespace IGCMS\Plugins;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\ResourceInterface;
@@ -53,10 +54,14 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     $name = $xml->getElementsByTagName("name")[0]->nodeValue;
     $shortName = $xml->getElementsByTagName("shortName")[0]->nodeValue;
     $h1id = HTMLPlusBuilder::getLinkToId("");
+    $shortName = strlen($shortName) ? $shortName : HTMLPlusBuilder::getHeading($h1id);
+    if (strlen($shortName) > 12 && !is_null(Cms::getLoggedUser())) {
+      Logger::warning(_("Manifest short_name is longer than 12 characters"));
+    }
     // save manifest
     file_put_contents(self::MANIFEST, replace_vars($manifestTemplate, [
       "name" => strlen($name) ? $name : HTMLPlusBuilder::getIdToHeading($h1id),
-      "shortName" => strlen($shortName) ? $shortName : HTMLPlusBuilder::getHeading($h1id),
+      "shortName" => $shortName,
       "rootUrl" => ROOT_URL,
       "themeColor" => $themeColor,
     ]));
