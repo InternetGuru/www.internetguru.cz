@@ -5,6 +5,7 @@ namespace IGCMS\Plugins;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
 use IGCMS\Core\ResourceInterface;
@@ -51,17 +52,32 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     $manifestTemplate = $xml->getElementsByTagName("manifest")[0]->nodeValue;
     $themeColor = $xml->getElementsByTagName("themeColor")[0]->nodeValue;
     $h1id = HTMLPlusBuilder::getLinkToId("");
+    $name = $xml->getElementsByTagName("name");
+    $shortName = $xml->getElementsByTagName("shortName");
+    if ($name->length) {
+      $name = $name->item(0)->nodeValue;
+    } else {
+      $name = HTMLPlusBuilder::getIdToHeading($h1id);
+    }
+    if ($shortName->length) {
+      $shortName = $shortName->item(0)->nodeValue;
+    } else {
+      $shortName = HTMLPlusBuilder::getHeading($h1id);
+    }
+    if (strlen($shortName) > 12 && !is_null(Cms::getLoggedUser())) {
+      Logger::warning(_("Manifest short_name is longer than 12 characters"));
+    }
     // save manifest
     file_put_contents(self::MANIFEST, replace_vars($manifestTemplate, [
-      "name" => HTMLPlusBuilder::getIdToHeading($h1id),
-      "shortName" => HTMLPlusBuilder::getHeading($h1id),
+      "name" => $name,
+      "shortName" => $shortName,
       "rootUrl" => ROOT_URL,
       "themeColor" => $themeColor,
     ]));
     // add meta
     $outputStrategy = Cms::getOutputStrategy();
     $outputStrategy->addMetaElement("theme-color", $themeColor);
-    $outputStrategy->addLinkElement(self::MANIFEST, "manifest");
+    $outputStrategy->addLinkElement(ROOT_URL.self::MANIFEST, "manifest");
     $outputStrategy->addJsFile($this->pluginDir."/".$this->className.".js");
   }
 
@@ -77,7 +93,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     header('Content-Type: application/javascript');
     header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (60 * 60 * 24 * 30))); // 1 month
     echo "importScripts('/".LIB_DIR."/sw-toolbox.js');
-    toolbox.router.get('/:path([^.]+)*', toolbox.networkFirst);
+    toolbox.router.get('/:path([^.?]+)', toolbox.networkFirst);
     // toolbox.router.default = toolbox.networkFirst;";
     exit;
   }

@@ -1,4 +1,4 @@
-require(["IGCMS"], function () {
+require("IGCMS", function () {
   CodeMirrorInstance.on("change", function (cm, change) {
     if (!IGCMS.Editable) return;
     var form = IGCMS.Editable.getParentForm(CodeMirrorInstance.getTextArea());
