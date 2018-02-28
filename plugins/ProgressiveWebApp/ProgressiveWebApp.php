@@ -50,11 +50,13 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     $xml = self::getXML();
     $manifestTemplate = $xml->getElementsByTagName("manifest")[0]->nodeValue;
     $themeColor = $xml->getElementsByTagName("themeColor")[0]->nodeValue;
+    $name = $xml->getElementsByTagName("name")[0]->nodeValue;
+    $shortName = $xml->getElementsByTagName("shortName")[0]->nodeValue;
     $h1id = HTMLPlusBuilder::getLinkToId("");
     // save manifest
     file_put_contents(self::MANIFEST, replace_vars($manifestTemplate, [
-      "name" => HTMLPlusBuilder::getIdToHeading($h1id),
-      "shortName" => HTMLPlusBuilder::getHeading($h1id),
+      "name" => strlen($name) ? $name : HTMLPlusBuilder::getIdToHeading($h1id),
+      "shortName" => strlen($shortName) ? $shortName : HTMLPlusBuilder::getHeading($h1id),
       "rootUrl" => ROOT_URL,
       "themeColor" => $themeColor,
     ]));
