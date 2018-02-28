@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ProgressiveWebApp>
+
+  <!--<name></name>-->
+  <!--<shortName></shortName>-->
+  <themeColor modifyonly="modifyonly">#ddd</themeColor>
+  <manifest modifyonly="modifyonly">
+{
+  "name": "$name",
+  "short_name": "$shortName",
+  "display": "minimal-ui",
+  "start_url": "$rootUrl",
+  "theme_color": "$themeColor",
+  "background_color": "#333",
+  "icons": [
+    {
+      "src": "/lib/pwaicons/256x256.png",
+      "sizes": "256x256",
+      "type": "image/png"
+    },
+    {
+      "src": "/lib/pwaicons/512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+  </manifest>
+
+</ProgressiveWebApp>

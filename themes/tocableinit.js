@@ -1,5 +1,6 @@
-if(typeof IGCMS === "undefined") throw "IGCMS is not defined";
-IGCMS.TOCable.init({
-  tocTitle: "Obsah",
-  ns: "tocable"
-});
+require("IGCMS.TOCable", function () {
+  IGCMS.TOCable.init({
+    tocTitle: "Obsah",
+    ns: "tocable"
+  })
+})

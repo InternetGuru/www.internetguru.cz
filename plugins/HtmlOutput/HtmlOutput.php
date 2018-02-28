@@ -47,6 +47,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @var array
    */
+  private $linkElements = [];
+  /**
+   * @var array
+   */
+  private $metaElements = [];
+  /**
+   * @var array
+   */
   private $jsFiles = [];
   /**
    * @var array
@@ -210,7 +218,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
             }
             $ieIfComment = ($node->hasAttribute("if") ? $node->getAttribute("if") : null);
             $ifXpath = ($node->hasAttribute("if-xpath") ? $node->getAttribute("if-xpath") : false);
-            $this->addJsFile($node->nodeValue, $priority, $append, $user, $ieIfComment, $ifXpath);
+            $async = !($node->hasAttribute("async") && $node->getAttribute("async") == "false");
+            $this->addJsFile($node->nodeValue, $priority, $append, $user, $ieIfComment, $ifXpath, $async);
             break;
           case "stylesheet":
             $media = ($node->hasAttribute("media") ? $node->getAttribute("media") : false);
@@ -235,9 +244,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param bool $user
    * @param null $ieIfComment
    * @param bool $ifXpath
+   * @param bool $async
    * @throws Exception
    */
-  public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false) {
+  public function addJsFile ($filePath, $priority = self::DEFAULT_PRIORITY, $append = self::APPEND_HEAD, $user = false, $ieIfComment = null, $ifXpath = false, $async = true) {
     if (isset($this->jsFiles[$filePath])) {
       return;
     }
@@ -250,8 +260,45 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       "user" => $user,
       "ifXpath" => $ifXpath,
       "if" => $ieIfComment,
+      "async" => $async,
     ];
     $this->jsFilesPriority[$filePath] = $priority;
+  }
+
+  /** @noinspection PhpTooManyParametersInspection */
+  /**
+   * @param string $filePath
+   * @param string $rel
+   * @param bool $type
+   * @param bool $media
+   * @param null $ieIfComment
+   */
+  public function addLinkElement ($filePath, $rel, $type = false, $media = false, $ieIfComment = null) {
+    if (isset($this->linkElements[$filePath])) {
+      return;
+    }
+    $this->linkElements[$filePath] = [
+      "file" => $filePath,
+      "rel" => $rel,
+      "type" => $type,
+      "media" => $media,
+      "if" => $ieIfComment,
+    ];
+  }
+
+  /** @noinspection PhpTooManyParametersInspection */
+  /**
+   * @param string $nameValue
+   * @param string $contentValue
+   * @param bool $httpEquiv
+   * @param bool $short
+   */
+  public function addMetaElement ($nameValue, $contentValue, $httpEquiv = false, $short = false) {
+    $this->metaElements[$nameValue] = [
+      "content" => $contentValue,
+      "httpEquip" => $httpEquiv,
+      "short" => $short,
+    ];
   }
 
   /** @noinspection PhpTooManyParametersInspection */
@@ -494,8 +541,14 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $this->appendMeta($head, "robots", $this->metaRobots);
+    foreach ($this->metaElements as $name => $metaElement) {
+      $this->appendMeta($head, $name, $metaElement["content"], $metaElement["httpEquip"], $metaElement["short"]);
+    }
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
+    foreach ($this->linkElements as $linkElement) {
+      $this->appendLinkElement($head, $linkElement["file"], $linkElement["rel"], $linkElement["type"], $linkElement["media"], $linkElement["if"]);
+    }
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
@@ -884,6 +937,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $filePath = ROOT_URL.get_resdir($this->jsFiles[$key]["file"]);
       if (!is_null($this->jsFiles[$key]["file"])) {
         $element->setAttribute("src", $filePath);
+      }
+      if (array_key_exists("async", $this->jsFiles[$key]) && $this->jsFiles[$key]["async"] ===  true) {
+        $element->setAttribute("async", "async");
       }
       $ieIfComment = isset($this->jsFiles[$key]["if"]) ? $this->jsFiles[$key]["if"] : null;
       if (!is_null($ieIfComment)) {
