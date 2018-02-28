@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.10.1] - 2018-02-28
 ### Fixed
  - Wrong short_name length warning for UTF-8 string
 
@@ -317,7 +317,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.10.1]: https://bitbucket.org/igwr/cms/compare/v2.10.1..v2.10.0
 [2.10.0]: https://bitbucket.org/igwr/cms/compare/v2.10.0..v2.9.1
 [2.9.1]: https://bitbucket.org/igwr/cms/compare/v2.9.1..v2.9.0
 [2.9.0]: https://bitbucket.org/igwr/cms/compare/v2.9.0..v2.8.1
