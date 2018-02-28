@@ -64,7 +64,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     } else {
       $shortName = HTMLPlusBuilder::getHeading($h1id);
     }
-    if (strlen($shortName) > 12 && !is_null(Cms::getLoggedUser())) {
+    if (mb_strlen($shortName) > 12 && !is_null(Cms::getLoggedUser())) {
       Logger::warning(_("Manifest short_name is longer than 12 characters"));
     }
     // save manifest
