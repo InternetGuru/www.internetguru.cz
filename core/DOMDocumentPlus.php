@@ -185,14 +185,14 @@ class DOMDocumentPlus extends DOMDocument {
       }
       try {
         $element->removeAttrVal("var", $vValue);
-        if (!is_null($variables[$vName]) && !count($variables[$vName])) {
+        if (!is_null($variables[$vName]) && !count($variables[$vName]["value"])) {
           if (!is_null($aName)) {
             $element->removeAttribute($aName);
           } else {
             return null;
           }
         }
-        $result = $this->insertVariable($element, $variables[$vName], $aName);
+        $result = $this->insertVariable($element, $variables[$vName]["value"], $aName);
         if ($aName == "var") {
           if (++$element->varRecursionLvl >= DOMElementPlus::MAX_VAR_RECURSION_LEVEL) {
             throw new Exception(_("Max variable recursion level exceeded"));

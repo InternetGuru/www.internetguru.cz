@@ -115,37 +115,30 @@ class Cms {
   /**
    * @param string $name
    * @param mixed $value
-   * @param string|null $prefix
+   * @param bool $cacheable
    * @return string
    * @throws Exception
    */
-  public static function setVariable ($name, $value, $prefix = null) {
-    $varId = self::getVarId($name, $prefix);
+  public static function setVariable ($name, $value, $cacheable = true) {
+    $varId = self::getVarId($name);
     // if (!array_key_exists($varId, self::$variables)) {
     //   self::addVariableItem("variables", $varId);
     // }
-    self::$variables[$varId] = $value;
+    self::$variables[$varId] = [
+      "value" => $value,
+      "cacheable" => $cacheable,
+    ];
     return $varId;
   }
 
   /**
    * @param $name
-   * @param string|null $prefix
    * @return string
    * @throws Exception
    */
-  private static function getVarId ($name, $prefix = null) {
+  private static function getVarId ($name) {
     $name = normalize($name);
-    if (is_null($prefix)) {
-      $prefix = self::getCaller();
-    }
-    if ($prefix == $name || !strlen($prefix)) {
-      if (!strlen($name)) {
-        throw new Exception("Unable to set variable: name and prefix are empty");
-      }
-      return $name;
-    }
-    return $prefix.(strlen($name) ? "-$name" : "");
+    return self::getCaller().(strlen($name) ? "-$name" : "");
   }
 
   /**
@@ -163,19 +156,23 @@ class Cms {
   /**
    * @param string $name
    * @param mixed $value
+   * @param bool $cachable
    * @throws Exception
    */
-  public static function addVariableItem ($name, $value) {
+  public static function addVariableItem ($name, $value, $cachable = true) {
     $varId = self::getVarId($name);
     $var = self::getVariable($varId);
     if (is_null($var)) {
-      self::$variables[$varId] = [$value];
+      self::$variables[$varId] = [
+        "value" => [$value],
+        "cacheable" => $cachable,
+      ];
       return;
     }
-    if (!is_array($var)) {
-      $var = [$var];
+    if (!is_array($var["value"])) {
+      $var["value"] = [$var["value"]];
     }
-    $var[] = $value;
+    $var["value"][] = $value;
     self::$variables[$varId] = $var;
   }
 
@@ -189,6 +186,18 @@ class Cms {
       return null;
     }
     return self::$variables[$varId];
+  }
+
+  /**
+   * @param string|$name
+   * @return mixed|null
+   */
+  public static function getVariableValue ($name) {
+    $var = self::getVariable($name);
+    if (is_null($var)) {
+      return null;
+    }
+    return $var["value"];
   }
 
   /**
@@ -258,7 +267,7 @@ class Cms {
    */
   public static function init () {
     global $plugins;
-    self::setVariable("messages", self::$flashList);
+    self::setVariable("messages", self::$flashList, false);
     self::setVariable("release", CMS_RELEASE);
     self::setVariable("version", CMS_VERSION);
     self::setVariable("default_release", DEFAULT_RELEASE);
@@ -429,6 +438,14 @@ class Cms {
     try {
       /** @var HTMLPlus $tmpContent */
       $dataVariables = HTMLPlusBuilder::getIdToData(HTMLPlusBuilder::getFileToId(HTMLPlusBuilder::getCurFile()));
+      if (!is_null($dataVariables)) {
+        foreach ($dataVariables as $name => $value) {
+          $dataVariables[$name] = [
+            "value" => $value,
+            "cacheable" => true,
+          ];
+        }
+      }
       $vars = is_null($dataVariables) ? self::$variables : array_merge(self::$variables, $dataVariables);
       $tmpContent = $tmpContent->processVariables($vars);
       $tmpContent->validatePlus(true);

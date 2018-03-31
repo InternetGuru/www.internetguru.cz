@@ -122,6 +122,18 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
       $lists["edit"] = $this->vars["edit"];
     }
     $doc = $this->createDOM($this->vars["docinfo"]);
+    foreach ($lists as $name => $value) {
+      $lists[$name] = [
+        "value" => $value,
+        "cacheable" => true,
+      ];
+    }
+    foreach ($globalInfo as $name => $value) {
+      $globalInfo[$name] = [
+        "value" => $value,
+        "cacheable" => true,
+      ];
+    }
     $doc->processVariables($lists);
     $doc->processVariables($globalInfo);
     return $doc->documentElement;
@@ -166,6 +178,18 @@ class DocInfo extends Plugin implements SplObserver, ModifyContentStrategyInterf
     }
     if (empty($vars)) {
       return null;
+    }
+    foreach ($lists as $name => $value) {
+      $lists[$name] = [
+        "value" => $value,
+        "cacheable" => true,
+      ];
+    }
+    foreach ($vars as $name => $value) {
+      $vars[$name] = [
+        "value" => $value,
+        "cacheable" => true,
+      ];
     }
     $doc->processVariables($lists);
     $doc->processVariables($vars);

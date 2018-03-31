@@ -339,7 +339,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     foreach ($this->forms as $formId => $form) {
       $prefixedFormId = normalize($this->className)."-$formId";
       $htmlForm = $this->formsElements[$prefixedFormId]->documentElement->firstElement;
-      $formValues = Cms::getVariable("validateform-$prefixedFormId");
+      $formValues = Cms::getVariableValue("validateform-$prefixedFormId");
       $formVars = $this->createFormVars($htmlForm);
       if (isset($_GET["cfok"]) && $_GET["cfok"] == $formId) {
         Logger::user_success($formVars["success"]);
@@ -362,8 +362,12 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     }
     try {
       foreach ($this->formValues as $name => $value) {
+        $this->formValues[$name] = [
+          "value" => $value,
+          "cacheable" => false,
+        ];
         if (is_null($value) || !strlen($value)) {
-          $this->formValues[$name] = $this->formVars["nothing"];
+          $this->formValues[$name]["value"] = $this->formVars["nothing"];
         }
       }
       $variables = array_merge($this->formValues, Cms::getAllVariables());
@@ -413,7 +417,8 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
    */
   private function createMessage () {
     $msg = [];
-    foreach ($this->formValues as $key => $value) {
+    foreach ($this->formValues as $key => $variable) {
+      $value = $variable["value"];
       if (is_array($value)) {
         $value = implode(", ", $value);
       }

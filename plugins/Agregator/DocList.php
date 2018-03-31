@@ -44,8 +44,8 @@ class DocList extends AgregatorList {
     $linkParts = explode("/", get_link());
     $curFile = HTMLPlusBuilder::getIdToFile(end($linkParts));
     if (array_key_exists($curFile, $vars)) {
-      foreach ($vars[$curFile] as $name => $value) {
-        Cms::setVariable($name, $value, "");
+      foreach ($vars[$curFile] as $name => $var) {
+        Cms::setVariable($name, $var["value"], $var["cacheable"]);
       }
     }
     Cms::setVariable($this->listId, $list);
@@ -108,6 +108,13 @@ class DocList extends AgregatorList {
       } catch (Exception $exc) {
         Logger::critical($exc->getMessage());
         continue;
+      } finally {
+        foreach ($vars[$file] as $name => $value) {
+          $vars[$file][$name] = [
+            "value" => $value,
+            "cacheable" => true,
+          ];
+        }
       }
     }
     return $vars;

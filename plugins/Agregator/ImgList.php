@@ -97,6 +97,12 @@ class ImgList extends AgregatorList {
         ],
         $altPath
       );
+      foreach ($variable as $name => $value) {
+        $variable[$name] = [
+          "value" => $value,
+          "cacheable" => true,
+        ];
+      }
       $vars[$filePath] = $variable;
     }
     if (empty($vars)) {

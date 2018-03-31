@@ -120,7 +120,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (!is_file($this->userCfgPath)) {
       return;
     }
-    $req = Cms::getVariable("validateform-".$this->formId);
+    $req = Cms::getVariableValue("validateform-".$this->formId);
     if (is_null($req)) {
       return;
     }
@@ -441,9 +441,15 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $fieldset->parentNode->removeChild($fieldset);
     $vars = [];
     if (is_null($this->passwd)) {
-      $vars["nopasswd"] = "";
+      $vars["nopasswd"] = [
+        "value" => "",
+        "cacheable" => true,
+      ];
     }
-    $vars["action"] = "?".$this->className;
+    $vars["action"] = [
+      "value" => "?".$this->className,
+      "cacheable" => true,
+    ];
     $newContent->processVariables($vars);
     return $newContent;
   }
@@ -497,8 +503,14 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         Logger::user_warning(sprintf(_("Cannot create fieldset for %s"), $rule)); // never happend?
         continue;
       }
-      $vars["group"] = strlen($set->nodeValue) ? $set->nodeValue : $rule;
-      $vars["inputs"] = $inputVar;
+      $vars["group"] = [
+        "value" => strlen($set->nodeValue) ? $set->nodeValue : $rule,
+        "cacheable" => true,
+      ];
+      $vars["inputs"] = [
+        "value" => $inputVar,
+        "cacheable" => true,
+      ];
       $doc->processVariables($vars);
       $fieldset->parentNode->insertBefore($content->importNode($doc->documentElement, true), $fieldset);
     }

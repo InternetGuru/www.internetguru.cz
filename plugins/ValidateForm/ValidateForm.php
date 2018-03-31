@@ -69,7 +69,8 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       return;
     }
     $this->detachIfNotAttached("HtmlOutput");
-    foreach (Cms::getAllVariables() as $varId => $formDoc) {
+    foreach (Cms::getAllVariables() as $varId => $formDocVar) {
+      $formDoc = $formDocVar["value"];
       if (strpos($varId, "contactform-") !== 0) {
         continue;
       }

@@ -110,6 +110,12 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
     $histFiles = $this->makeLink($this->histFiles);
     $vars["history_file"] = empty($histFiles) ? null : $histFiles;
     $vars["type"] = strpos($fName, "CHANGELOG") === 0 ? "markdown" : "accesslog";
+    foreach ($vars as $name => $value) {
+      $vars[$name] = [
+        "value" => $value,
+        "cacheable" => false,
+      ];
+    }
     $content->processVariables($vars);
     return $content;
   }
