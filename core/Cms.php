@@ -116,11 +116,12 @@ class Cms {
    * @param string $name
    * @param mixed $value
    * @param bool $cacheable
+   * @param string|null $prefix
    * @return string
    * @throws Exception
    */
-  public static function setVariable ($name, $value, $cacheable = true) {
-    $varId = self::getVarId($name);
+  public static function setVariable ($name, $value, $cacheable = true, $prefix = null) {
+    $varId = self::getVarId($name, $prefix);
     // if (!array_key_exists($varId, self::$variables)) {
     //   self::addVariableItem("variables", $varId);
     // }
@@ -133,12 +134,22 @@ class Cms {
 
   /**
    * @param $name
+   * @param string|null $prefix
    * @return string
    * @throws Exception
    */
-  private static function getVarId ($name) {
+  private static function getVarId ($name, $prefix = null) {
     $name = normalize($name);
-    return self::getCaller().(strlen($name) ? "-$name" : "");
+    if (is_null($prefix)) {
+      $prefix = self::getCaller();
+    }
+    if ($prefix == $name || !strlen($prefix)) {
+      if (!strlen($name)) {
+        throw new Exception("Unable to set variable: name and prefix are empty");
+      }
+      return $name;
+    }
+    return $prefix.(strlen($name) ? "-$name" : "");
   }
 
   /**
