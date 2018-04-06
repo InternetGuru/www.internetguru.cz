@@ -185,7 +185,7 @@ class DOMDocumentPlus extends DOMDocument {
       }
       try {
         $element->removeAttrVal("var", $vValue);
-        if (!is_null($variables[$vName]) && !count($variables[$vName]["value"])) {
+        if (!is_null($variables[$vName]["value"]) && !count($variables[$vName]["value"])) {
           if (!is_null($aName)) {
             $element->removeAttribute($aName);
           } else {
