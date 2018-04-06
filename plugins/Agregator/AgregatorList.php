@@ -135,7 +135,7 @@ class AgregatorList {
       $root->setAttribute("class", "agregator ".strtolower(get_caller_class(2))." ".$this->listId);
     }
     $index = 0;
-    foreach ($vars as $key => $vars) {
+    foreach ($vars as $key => $variables) {
       if ($index++ < $this->skip) {
         continue;
       }
@@ -144,7 +144,7 @@ class AgregatorList {
       }
       /** @var DOMElementPlus $list */
       $list = $root->appendChild($doc->importNode($pattern, true));
-      $list->processVariables($vars, [], true);
+      $list->processVariables($variables, [], true);
       $list->stripTag();
     }
     return $doc;
