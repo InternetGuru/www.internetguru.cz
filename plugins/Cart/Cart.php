@@ -128,7 +128,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     $button = $button->processVariables($toSet, [], true);
     Cms::setVariable('button', $button);
     foreach ($toSet as $name => $var) {
-      Cms::setVariable($name, $var);
+      Cms::setVariable($name, $var['value'], $var['cacheable']);
     }
     $this->createOrderVariable();
   }
