@@ -72,7 +72,11 @@ class DOMDocumentPlus extends DOMDocument {
    * @throws NoFileException
    */
   public function load ($filePath, $options = 0) {
-    if (!stream_resolve_include_path($filePath) || stream_resolve_include_path(dirname($filePath)."/.".basename($filePath))) {
+    if (!stream_resolve_include_path($filePath)
+      || stream_resolve_include_path(
+        dirname($filePath)."/.".basename($filePath)
+      )
+    ) {
       throw new NoFileException(_("File not found or disabled"));
     }
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
@@ -147,6 +151,71 @@ class DOMDocumentPlus extends DOMDocument {
     return $this->elementProcessVars($variables, $ignore, $this->documentElement, true);
   }
 
+  private function generateCallTrace() {
+    $e = new Exception();
+    $trace = explode("\n", $e->getTraceAsString());
+    // reverse array to make steps line up chronologically
+    $trace = array_reverse($trace);
+    array_shift($trace); // remove {main}
+    array_pop($trace); // remove call to this method
+    $length = count($trace);
+    $result = array();
+
+    for ($i = 0; $i < $length; $i++) {
+      $result[] = ($i + 1)  . ')' . substr($trace[$i], strpos($trace[$i], ' ')); // replace '#someNum' with '$i)', set the right ordering
+    }
+    return "\t" . implode("\n\t", $result);
+  }
+
+  /**
+   * @param array $variables
+   * @param array $ignore
+   * @param DOMElementPlus $element
+   * @param bool $deep
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   */
+  public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
+    $cacheKey = apc_get_key(__FUNCTION__."/".
+      $element->getNodePath()."/".
+      hash("crc32b", serialize($variables))."/".
+      hash("crc32b", $element->ownerDocument->saveXML($element))
+    );
+    $cacheExists = apc_exists($cacheKey);
+    if ($cacheExists) {
+      $cache = apc_fetch($cacheKey);
+      $fragment = $element->ownerDocument->createDocumentFragment();
+      $fragment->appendXML($cache);
+      $element->parentNode->replaceChild($fragment, $element);
+    }
+
+    $cacheable = "true";
+    $cacheableVariables = array_filter(
+      $variables,
+      function($value) use ($cacheable) {
+        return $value['cacheable'] == $cacheable;
+      }
+    );
+
+    $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
+
+    // TODO save
+    
+
+    $cacheable = "false";
+    $notCacheableVariables = array_filter(
+      $variables,
+      function($value) use ($cacheable) {
+        return $value['cacheable'] == $cacheable;
+      }
+    );
+
+    if (!count($notCacheableVariables)) {
+      return $result;
+    }
+
+    return $this->elementDoProcessVars($notCacheableVariables, $ignore, $element, $deep);
+  }
+
   /**
    * TODO return?
    * @param array $variables
@@ -155,7 +224,7 @@ class DOMDocumentPlus extends DOMDocument {
    * @param bool $deep
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
-  public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
+  public function elementDoProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
     $toRemove = [];
     $result = $this->doProcessVars($variables, $ignore, $element, $deep, $toRemove);
     if (is_null($result) || !$result->isSameNode($element)) {
@@ -234,7 +303,7 @@ class DOMDocumentPlus extends DOMDocument {
       case "NULL":
         return $element;
       case "integer":
-      /** @noinspection PhpMissingBreakStatementInspection */
+        /** @noinspection PhpMissingBreakStatementInspection */
       case "boolean":
         $value = (string) $value;
       case "string":
