@@ -175,31 +175,40 @@ class DOMDocumentPlus extends DOMDocument {
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
-    $cacheKey = apc_get_key(__FUNCTION__."/".
-      $element->getNodePath()."/".
-      hash("crc32b", serialize($variables))."/".
-      hash("crc32b", $element->ownerDocument->saveXML($element))
+    $cacheKey = apc_get_key(__FUNCTION__ . "/"
+      . $element->getNodePath() . "/"
+      . hash("crc32b", serialize($variables))
     );
     $cacheExists = apc_exists($cacheKey);
+    $cache = null;
     if ($cacheExists) {
       $cache = apc_fetch($cacheKey);
-      $fragment = $element->ownerDocument->createDocumentFragment();
-      $fragment->appendXML($cache);
-      $element->parentNode->replaceChild($fragment, $element);
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML($cache["data"]);
+      $element->removeChildNodes();
+      foreach ($doc->documentElement->childNodes as $childNode) {
+        $element->appendChild($element->ownerDocument->importNode($childNode, true));
+      }
+      $result = $element;
+    } else {
+      $cacheable = "true";
+      $cacheableVariables = array_filter(
+        $variables,
+        function($value) use ($cacheable) {
+          return $value['cacheable'] == $cacheable;
+        }
+      );
+      $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
     }
 
-    $cacheable = "true";
-    $cacheableVariables = array_filter(
-      $variables,
-      function($value) use ($cacheable) {
-        return $value['cacheable'] == $cacheable;
-      }
-    );
-
-    $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
-
-    // TODO save
-    
+    $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
+    if (!$cacheExists || $cache["newestFileMtime"] != $newestFileMtime) {
+      $cache = [
+        "data" => $result->ownerDocument->saveXML($result),
+        "newestFileMtime" => $newestFileMtime,
+      ];
+      apc_store_cache($cacheKey, $cache, __FUNCTION__);
+    }
 
     $cacheable = "false";
     $notCacheableVariables = array_filter(
@@ -213,7 +222,7 @@ class DOMDocumentPlus extends DOMDocument {
       return $result;
     }
 
-    return $this->elementDoProcessVars($notCacheableVariables, $ignore, $element, $deep);
+    return $this->elementDoProcessVars($notCacheableVariables, $ignore, $result, $deep);
   }
 
   /**
