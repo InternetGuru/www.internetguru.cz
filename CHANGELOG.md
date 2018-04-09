@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
- - Cache ImageList and processVariables results to improve performance
+ - Cache ImageList, DocList and processVariables results to improve performance
 
 ## [2.10.1] - 2018-02-28
 ### Fixed
