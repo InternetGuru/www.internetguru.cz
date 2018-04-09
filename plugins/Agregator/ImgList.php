@@ -20,13 +20,10 @@ class ImgList extends AgregatorList {
    * @var bool
    */
   const DEFAULT_RSORT = false;
-
-  const APC_ID = 2;
-
   /**
-   * @var bool
+   * @var int
    */
-  private $isFilesUpToDateCache = null;
+  const APC_ID = 2;
 
   /**
    * ImgList constructor.
@@ -43,7 +40,7 @@ class ImgList extends AgregatorList {
     $listDoc = null;
     if ($cacheExists) {
       $cache = apc_fetch($cacheKey);
-      $cacheUpTodate = $this->isFilesUpToDate((int)$cache["filesInotify"]);
+      $cacheUpTodate = $cache["filesInotify"] === filemtime(FILES_FOLDER."/".INOTIFY);
       $doc = new DOMDocumentPlus();
       $doc->loadXML($cache["data"]);
       $listDoc = $doc;
@@ -63,17 +60,6 @@ class ImgList extends AgregatorList {
       apc_store_cache($cacheKey, $cache, __FUNCTION__);
     }
     Cms::setVariable($this->listId, $listDoc);
-  }
-
-  /**
-   * @param int $cacheInotify
-   * @return bool
-   */
-  private function isFilesUpToDate ($cacheInotify) {
-    if (is_null($this->isFilesUpToDateCache)) {
-      $this->isFilesUpToDateCache = $cacheInotify === filemtime(FILES_FOLDER."/".INOTIFY);
-    }
-    return $this->isFilesUpToDateCache;
   }
 
   /**
