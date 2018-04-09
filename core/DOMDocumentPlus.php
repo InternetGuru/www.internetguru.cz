@@ -179,18 +179,23 @@ class DOMDocumentPlus extends DOMDocument {
       .$element->getNodePath()."/"
       .hash("crc32b", serialize($variables))
     );
+    $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
     $cacheExists = apc_exists($cacheKey);
+    $cacheUpToDate = false;
     $cache = null;
+    $result = null;
     if ($cacheExists) {
       $cache = apc_fetch($cacheKey);
       $doc = new DOMDocumentPlus();
       $doc->loadXML($cache["data"]);
+      $cacheUpToDate = $cache["newestFileMtime"] == $newestFileMtime;
       $element->removeChildNodes();
       foreach ($doc->documentElement->childNodes as $childNode) {
         $element->appendChild($element->ownerDocument->importNode($childNode, true));
       }
       $result = $element;
-    } else {
+    }
+    if (!$cacheUpToDate) {
       $cacheable = "true";
       $cacheableVariables = array_filter(
         $variables,
@@ -201,8 +206,7 @@ class DOMDocumentPlus extends DOMDocument {
       $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
     }
 
-    $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
-    if (!$cacheExists || $cache["newestFileMtime"] != $newestFileMtime) {
+    if (!$cacheExists || !$cacheUpToDate) {
       $cache = [
         "data" => $result->ownerDocument->saveXML($result),
         "newestFileMtime" => $newestFileMtime,

@@ -21,6 +21,13 @@ class ImgList extends AgregatorList {
    */
   const DEFAULT_RSORT = false;
 
+  const APC_ID = 2;
+
+  /**
+   * @var bool
+   */
+  private $isFilesUpToDateCache = null;
+
   /**
    * ImgList constructor.
    * @param DOMElementPlus $doclist
@@ -29,35 +36,44 @@ class ImgList extends AgregatorList {
    */
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
-    $cacheKey = apc_get_key(__FUNCTION__."/".$this->listId);
+    $cacheKey = apc_get_key(__FUNCTION__."/".self::APC_ID."/".$this->listId);
     $cacheExists = apc_exists($cacheKey);
+    $cacheUpTodate = false;
     $cache = null;
+    $listDoc = null;
     if ($cacheExists) {
       $cache = apc_fetch($cacheKey);
+      $cacheUpTodate = $this->isFilesUpToDate((int)$cache["filesInotify"]);
       $doc = new DOMDocumentPlus();
-      $doc->loadXML($cache);
+      $doc->loadXML($cache["data"]);
       $listDoc = $doc;
-    } else {
+    }
+    if (!$cacheUpTodate) {
       $vars = $this->createVars();
       if (is_null($pattern)) {
         $pattern = $doclist;
       }
       $listDoc = $this->createList($pattern, $vars);
     }
-    if (!$cacheExists || !$this->isFilesUpToDate()) {
-      $cache = $listDoc->saveXML($listDoc);
+    if (!$cacheExists || !$cacheUpTodate) {
+      $cache = [
+        "data" => $listDoc->saveXML($listDoc),
+        "filesInotify" => filemtime(FILES_FOLDER."/".INOTIFY),
+      ];
       apc_store_cache($cacheKey, $cache, __FUNCTION__);
     }
     Cms::setVariable($this->listId, $listDoc);
   }
 
   /**
+   * @param int $cacheInotify
    * @return bool
    */
-  private function isFilesUpToDate () {
-    $userFilesInotifyPath = FILES_FOLDER."/".INOTIFY;
-    $domainFilesInotifyPath = FILES_DIR."/".INOTIFY;
-    return filemtime($userFilesInotifyPath) === filemtime($domainFilesInotifyPath);
+  private function isFilesUpToDate ($cacheInotify) {
+    if (is_null($this->isFilesUpToDateCache)) {
+      $this->isFilesUpToDateCache = $cacheInotify === filemtime(FILES_FOLDER."/".INOTIFY);
+    }
+    return $this->isFilesUpToDateCache;
   }
 
   /**
