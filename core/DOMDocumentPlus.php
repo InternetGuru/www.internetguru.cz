@@ -175,9 +175,9 @@ class DOMDocumentPlus extends DOMDocument {
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
-    $cacheKey = apc_get_key(__FUNCTION__ . "/"
-      . $element->getNodePath() . "/"
-      . hash("crc32b", serialize($variables))
+    $cacheKey = apc_get_key(__FUNCTION__."/"
+      .$element->getNodePath()."/"
+      .hash("crc32b", serialize($variables))
     );
     $cacheExists = apc_exists($cacheKey);
     $cache = null;

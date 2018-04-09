@@ -4,6 +4,7 @@ namespace IGCMS\Plugins\Agregator;
 
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 
 /**
@@ -28,12 +29,35 @@ class ImgList extends AgregatorList {
    */
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
-    $vars = $this->createVars();
-    if (is_null($pattern)) {
-      $pattern = $doclist;
+    $cacheKey = apc_get_key(__FUNCTION__."/".$this->listId);
+    $cacheExists = apc_exists($cacheKey);
+    $cache = null;
+    if ($cacheExists) {
+      $cache = apc_fetch($cacheKey);
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML($cache);
+      $listDoc = $doc;
+    } else {
+      $vars = $this->createVars();
+      if (is_null($pattern)) {
+        $pattern = $doclist;
+      }
+      $listDoc = $this->createList($pattern, $vars);
     }
-    $list = $this->createList($pattern, $vars);
-    Cms::setVariable($this->listId, $list);
+    if (!$cacheExists || !$this->isFilesUpToDate()) {
+      $cache = $listDoc->saveXML($listDoc);
+      apc_store_cache($cacheKey, $cache, __FUNCTION__);
+    }
+    Cms::setVariable($this->listId, $listDoc);
+  }
+
+  /**
+   * @return bool
+   */
+  private function isFilesUpToDate () {
+    $userFilesInotifyPath = FILES_FOLDER."/".INOTIFY;
+    $domainFilesInotifyPath = FILES_DIR."/".INOTIFY;
+    return filemtime($userFilesInotifyPath) === filemtime($domainFilesInotifyPath);
   }
 
   /**
