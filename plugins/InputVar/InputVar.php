@@ -171,6 +171,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $attributes = [];
     foreach ($element->attributes as $attr) $attributes[$attr->nodeName] = $attr->nodeValue;
     $lastElm = $element->processVariables(Cms::getAllVariables(), [], true); // pouze posledni node
+    $cacheable = $element->getAttribute("cacheable") !== "false"; // empty or true => true
     if (is_null($lastElm)
       || (gettype($lastElm) == "object" && (new \ReflectionClass($lastElm))->getShortName() != "DOMElementPlus"
         && !$lastElm->isSameNode($element))
@@ -186,7 +187,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $lastElm = $var;
     }
     if (!$lastElm->hasAttribute("fn")) {
-      $this->setVar($name, $eId, $lastElm);
+      $this->setVar($name, $eId, $lastElm, $cacheable);
       return;
     }
     $lastElmFn = $lastElm->getAttribute("fn");
@@ -203,7 +204,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
     }
     if (!is_null($result)) {
-      $this->setVar($lastElm->nodeName, $eId, $result);
+      $this->setVar($lastElm->nodeName, $eId, $result, $cacheable);
       return;
     }
     try {
@@ -215,7 +216,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if ($lastElm->nodeName == "fn") {
       Cms::setFunction($eId, $function);
     } else {
-      Cms::setVariable($eId, $function($lastElm));
+      Cms::setVariable($eId, $function($lastElm), $cacheable);
     }
   }
 
@@ -223,13 +224,14 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @param string $var
    * @param string $name
    * @param mixed $value
+   * @param bool $cacheable
    * @throws Exception
    */
-  private function setVar ($var, $name, $value) {
+  private function setVar ($var, $name, $value, $cacheable=true) {
     if ($var == "fn") {
       Cms::setFunction($name, $value);
     } else {
-      Cms::setVariable($name, $value);
+      Cms::setVariable($name, $value, $cacheable);
     }
   }
 

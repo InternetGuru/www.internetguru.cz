@@ -4,9 +4,15 @@
   <!--
 
     Element var:
-      - identifikátor (atribut id="neco")
-      - funkce (nepovinný atribut fn="název funkce")
-      - proměnná (nepovinný atribut var="název proměnné")
+      - identifikátor
+        atribut id="neco"
+      - funkce
+        nepovinný atribut fn="název funkce"
+      - proměnná
+        nepovinný atribut var="název proměnné"
+      - je proměnná cachovatelná?
+        nepovinný atribut cacheable="[true|false]"
+        výchozí hodnota je true
 
     Element fn:
       - identifikátor (atribut id="neco")
@@ -61,11 +67,11 @@
   <!-- <var id="service_plain">Nestárnoucí weby, www.nestarnouciweby.cz</var> -->
   <!-- <var id="service">Na službě: <a href="http://www.nestarnouciweby.cz">Nestárnoucí weby</a></var> -->
   <var id="resp">Webmaster: <span var="cms-resp">n/a</span></var>
-  <var id="mtime">Úpravy webu: <span var="cms-mtime" fn="inputvar-dateformat">n/a</span></var>
+  <var id="mtime" cacheable="false">Úpravy webu: <span var="cms-mtime" fn="inputvar-dateformat">n/a</span></var>
   <var id="admin">Admin: <span var="cms-admin_id">n/a</span></var>
-  <var id="cyear" fn="yearformat" var="cms-ctime"/>
-  <var id="year" fn="yearformat" var="cms-server">now</var><!-- cms-server to disable value for webdiff -->
-  <var id="today" fn="dateformat" var="cms-server">now</var><!-- cms-server to disable value for webdiff -->
+  <var id="cyear" fn="yearformat" var="cms-ctime" cacheable="false"/>
+  <var id="year" fn="yearformat" var="cms-server" cacheable="false">now</var><!-- cms-server to disable value for webdiff -->
+  <var id="today" fn="dateformat" var="cms-server" cacheable="false">now</var><!-- cms-server to disable value for webdiff -->
   <var id="adminmenu">
     <ul class="adminmenu noprint">
       <li><a href="?admin">Administrace</a></li>
