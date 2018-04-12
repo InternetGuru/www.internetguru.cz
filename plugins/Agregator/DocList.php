@@ -27,7 +27,7 @@ class DocList extends AgregatorList {
   /**
    * @var int
    */
-  const APC_ID = 1;
+  const APC_ID = 2;
   /**
    * @var string
    */

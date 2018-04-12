@@ -17,6 +17,11 @@ use Exception;
 class DOMDocumentPlus extends DOMDocument {
 
   /**
+   * @var int
+   */
+  const APC_ID = 1;
+
+  /**
    * DOMDocumentPlus constructor.
    * @param string $version
    * @param string $encoding
@@ -160,6 +165,7 @@ class DOMDocumentPlus extends DOMDocument {
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
     $cacheKey = apc_get_key(__FUNCTION__."/"
+      .self::APC_ID."/"
       .$element->getNodePath()."/"
       .hash("crc32b", serialize($variables))
     );
