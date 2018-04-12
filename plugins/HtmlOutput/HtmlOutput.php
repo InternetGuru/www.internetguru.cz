@@ -436,7 +436,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    */
   private function getProcParams () {
     $output = [];
-    foreach (Cms::getAllVariables() as $key => $value) {
+    foreach (Cms::getAllVariables() as $key => $var) {
+      $value = $var["value"];
       if ($value instanceof \Closure) {
         continue;
       } elseif ($value instanceof DOMDocumentPlus) {
@@ -536,7 +537,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
     $this->appendMeta($head, "charset", "utf-8", false, true);
     $this->appendMeta($head, "viewport", "initial-scale=1");
-    $this->appendMeta($head, "generator", Cms::getVariable("cms-name"));
+    $this->appendMeta($head, "generator", Cms::getVariableValue("cms-name"));
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
     $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));

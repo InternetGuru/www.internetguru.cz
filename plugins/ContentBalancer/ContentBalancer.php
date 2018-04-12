@@ -365,12 +365,30 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   private function getVariables ($id) {
     $vars = [];
-    $vars['heading'] = HTMLPlusBuilder::getIdToHeading($id);
-    $vars['link'] = $id;
-    $vars['headingplus'] = HTMLPlusBuilder::getHeading($id);
-    $vars['short'] = HTMLPlusBuilder::getIdToShort($id);
-    $vars['desc'] = HTMLPlusBuilder::getIdToDesc($id);
-    $vars['kw'] = HTMLPlusBuilder::getIdToKw($id);
+    $vars['heading'] = [
+      "value" => HTMLPlusBuilder::getIdToHeading($id),
+      "cacheable" => true,
+    ];
+    $vars['link'] = [
+      "value" => $id,
+      "cacheable" => true,
+    ];
+    $vars['headingplus'] = [
+      "value" => HTMLPlusBuilder::getHeading($id),
+      "cacheable" => true,
+    ];
+    $vars['short'] = [
+      "value" => HTMLPlusBuilder::getIdToShort($id),
+      "cacheable" => true,
+    ];
+    $vars['desc'] = [
+      "value" => HTMLPlusBuilder::getIdToDesc($id),
+      "cacheable" => true,
+    ];
+    $vars['kw'] = [
+      "value" => HTMLPlusBuilder::getIdToKw($id),
+      "cacheable" => true,
+    ];
     return $vars;
   }
 

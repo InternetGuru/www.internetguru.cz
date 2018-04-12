@@ -72,7 +72,11 @@ class DOMDocumentPlus extends DOMDocument {
    * @throws NoFileException
    */
   public function load ($filePath, $options = 0) {
-    if (!stream_resolve_include_path($filePath) || stream_resolve_include_path(dirname($filePath)."/.".basename($filePath))) {
+    if (!stream_resolve_include_path($filePath)
+      || stream_resolve_include_path(
+        dirname($filePath)."/.".basename($filePath)
+      )
+    ) {
       throw new NoFileException(_("File not found or disabled"));
     }
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
@@ -148,7 +152,6 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   /**
-   * TODO return?
    * @param array $variables
    * @param array $ignore
    * @param DOMElementPlus $element
@@ -156,6 +159,69 @@ class DOMDocumentPlus extends DOMDocument {
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
+    $cacheKey = apc_get_key(__FUNCTION__."/"
+      .$element->getNodePath()."/"
+      .hash("crc32b", serialize($variables))
+    );
+    $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
+    $cacheExists = apc_exists($cacheKey);
+    $cacheUpToDate = false;
+    $cache = null;
+    $result = null;
+    if ($cacheExists) {
+      $cache = apc_fetch($cacheKey);
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML($cache["data"]);
+      $cacheUpToDate = $cache["newestFileMtime"] == $newestFileMtime;
+      $element->removeChildNodes();
+      foreach ($doc->documentElement->childNodes as $childNode) {
+        $element->appendChild($element->ownerDocument->importNode($childNode, true));
+      }
+      $result = $element;
+    }
+    if (!$cacheUpToDate) {
+      $cacheable = "true";
+      $cacheableVariables = array_filter(
+        $variables,
+        function($value) use ($cacheable) {
+          return $value['cacheable'] == $cacheable;
+        }
+      );
+      $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
+    }
+
+    if (!$cacheExists || !$cacheUpToDate) {
+      $cache = [
+        "data" => $result->ownerDocument->saveXML($result),
+        "newestFileMtime" => $newestFileMtime,
+      ];
+      apc_store_cache($cacheKey, $cache, __FUNCTION__);
+    }
+
+    $cacheable = "false";
+    $notCacheableVariables = array_filter(
+      $variables,
+      function($value) use ($cacheable) {
+        return $value['cacheable'] == $cacheable;
+      }
+    );
+
+    if (!count($notCacheableVariables)) {
+      return $result;
+    }
+
+    return $this->elementDoProcessVars($notCacheableVariables, $ignore, $result, $deep);
+  }
+
+  /**
+   * TODO return?
+   * @param array $variables
+   * @param array $ignore
+   * @param DOMElementPlus $element
+   * @param bool $deep
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   */
+  public function elementDoProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
     $toRemove = [];
     $result = $this->doProcessVars($variables, $ignore, $element, $deep, $toRemove);
     if (is_null($result) || !$result->isSameNode($element)) {
@@ -185,14 +251,14 @@ class DOMDocumentPlus extends DOMDocument {
       }
       try {
         $element->removeAttrVal("var", $vValue);
-        if (!is_null($variables[$vName]) && !count($variables[$vName])) {
+        if (!is_null($variables[$vName]["value"]) && !count($variables[$vName]["value"])) {
           if (!is_null($aName)) {
             $element->removeAttribute($aName);
           } else {
             return null;
           }
         }
-        $result = $this->insertVariable($element, $variables[$vName], $aName);
+        $result = $this->insertVariable($element, $variables[$vName]["value"], $aName);
         if ($aName == "var") {
           if (++$element->varRecursionLvl >= DOMElementPlus::MAX_VAR_RECURSION_LEVEL) {
             throw new Exception(_("Max variable recursion level exceeded"));
@@ -234,7 +300,7 @@ class DOMDocumentPlus extends DOMDocument {
       case "NULL":
         return $element;
       case "integer":
-      /** @noinspection PhpMissingBreakStatementInspection */
+        /** @noinspection PhpMissingBreakStatementInspection */
       case "boolean":
         $value = (string) $value;
       case "string":

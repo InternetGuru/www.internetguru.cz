@@ -4,6 +4,7 @@ namespace IGCMS\Plugins\Agregator;
 
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 
 /**
@@ -19,6 +20,10 @@ class ImgList extends AgregatorList {
    * @var bool
    */
   const DEFAULT_RSORT = false;
+  /**
+   * @var int
+   */
+  const APC_ID = 2;
 
   /**
    * ImgList constructor.
@@ -28,12 +33,33 @@ class ImgList extends AgregatorList {
    */
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
-    $vars = $this->createVars();
-    if (is_null($pattern)) {
-      $pattern = $doclist;
+    $cacheKey = apc_get_key(__FUNCTION__."/".self::APC_ID."/".$this->listId);
+    $cacheExists = apc_exists($cacheKey);
+    $cacheUpTodate = false;
+    $cache = null;
+    $listDoc = null;
+    if ($cacheExists) {
+      $cache = apc_fetch($cacheKey);
+      $cacheUpTodate = $cache["filesInotify"] === filemtime(FILES_FOLDER."/".INOTIFY);
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML($cache["data"]);
+      $listDoc = $doc;
     }
-    $list = $this->createList($pattern, $vars);
-    Cms::setVariable($this->listId, $list);
+    if (!$cacheUpTodate) {
+      $vars = $this->createVars();
+      if (is_null($pattern)) {
+        $pattern = $doclist;
+      }
+      $listDoc = $this->createList($pattern, $vars);
+    }
+    if (!$cacheExists || !$cacheUpTodate) {
+      $cache = [
+        "data" => $listDoc->saveXML($listDoc),
+        "filesInotify" => filemtime(FILES_FOLDER."/".INOTIFY),
+      ];
+      apc_store_cache($cacheKey, $cache, __FUNCTION__);
+    }
+    Cms::setVariable($this->listId, $listDoc);
   }
 
   /**
@@ -97,6 +123,12 @@ class ImgList extends AgregatorList {
         ],
         $altPath
       );
+      foreach ($variable as $name => $value) {
+        $variable[$name] = [
+          "value" => $value,
+          "cacheable" => true,
+        ];
+      }
       $vars[$filePath] = $variable;
     }
     if (empty($vars)) {

@@ -5,6 +5,8 @@ namespace IGCMS\Plugins\Agregator;
 use DateTime;
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
+use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
@@ -23,6 +25,10 @@ class DocList extends AgregatorList {
    */
   const DEFAULT_RSORT = true;
   /**
+   * @var int
+   */
+  const APC_ID = 1;
+  /**
    * @var string
    */
   private $keyword;
@@ -35,20 +41,45 @@ class DocList extends AgregatorList {
    */
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
-    $this->keyword = $doclist->getAttribute("kw");
-    $vars = $this->createVars();
-    if (is_null($pattern)) {
-      $pattern = $doclist;
+    $newestCacheMtime = DOMBuilder::getNewestCacheMtime();
+    $cacheKey = apc_get_key(__FUNCTION__."/".self::APC_ID."/".$this->listId);
+    $cacheExists = apc_exists($cacheKey);
+    $cacheUpTodate = false;
+    $cache = null;
+    $listDoc = null;
+    $vars = [];
+    if ($cacheExists) {
+      $cache = apc_fetch($cacheKey);
+      $cacheUpTodate = $cache["newestCacheMtime"] == $newestCacheMtime;
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML($cache["data"]);
+      $listDoc = $doc;
+      $vars = unserialize($cache["vars"]);
     }
-    $list = $this->createList($pattern, $vars);
+    if (!$cacheUpTodate) {
+      $this->keyword = $doclist->getAttribute("kw");
+      $vars = $this->createVars();
+      if (is_null($pattern)) {
+        $pattern = $doclist;
+      }
+      $listDoc = $this->createList($pattern, $vars);
+    }
+    if (!$cacheExists || !$cacheUpTodate) {
+      $cache = [
+        "data" => $listDoc->saveXML($listDoc),
+        "vars" => serialize($vars),
+        "newestCacheMtime" => $newestCacheMtime,
+      ];
+      apc_store_cache($cacheKey, $cache, __FUNCTION__);
+    }
     $linkParts = explode("/", get_link());
     $curFile = HTMLPlusBuilder::getIdToFile(end($linkParts));
     if (array_key_exists($curFile, $vars)) {
-      foreach ($vars[$curFile] as $name => $value) {
-        Cms::setVariable($name, $value, "");
+      foreach ($vars[$curFile] as $name => $var) {
+        Cms::setVariable($name, $var["value"], $var["cacheable"], "");
       }
     }
-    Cms::setVariable($this->listId, $list);
+    Cms::setVariable($this->listId, $listDoc);
   }
 
   /**
@@ -108,6 +139,13 @@ class DocList extends AgregatorList {
       } catch (Exception $exc) {
         Logger::critical($exc->getMessage());
         continue;
+      } finally {
+        foreach ($vars[$file] as $name => $value) {
+          $vars[$file][$name] = [
+            "value" => $value,
+            "cacheable" => true,
+          ];
+        }
       }
     }
     return $vars;

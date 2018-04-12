@@ -398,7 +398,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     } else {
       if ($this->type == "html") {
         $doc = new HTMLPlus();
-        $doc->defaultAuthor = Cms::getVariable("cms-author");
+        $doc->defaultAuthor = Cms::getVariableValue("cms-author");
         $doc->defaultId = $htmlId;
       } else {
         $doc = new DOMDocumentPlus();
@@ -578,7 +578,8 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $varListVar = $doc->createElement("var");
     $varlist = $doc->createElement("dl");
     $varListVar->appendChild($varlist);
-    foreach (Cms::getAllVariables() as $name => $value) {
+    foreach (Cms::getAllVariables() as $name => $var) {
+      $value = $var["value"];
       $varlist->appendChild($doc->createTextNode("\n  "));
       $varlist->appendChild($doc->createElement("dt", "$name"));
       $varlist->appendChild($doc->createTextNode("\n  "));
@@ -654,7 +655,10 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
 
     $adminLink = "?".$this->className."=".$_GET[$this->className];
     if ($this->dataFileStatus == self::STATUS_DISABLED) {
-      $vars["warning"] = "warning";
+      $vars["warning"] = [
+        "value" => "warning",
+        "cacheable" => true,
+      ];
     }
     $usrDestHash = $this->getDataFileHash();
     $mode = $this->replace ? _("replace") : _("modify");
@@ -672,52 +676,126 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         $type = $this->type;
     }
 
-    #$d = new DOMDocumentPlus();
-    #$v = $d->appendChild($d->createElement("var"));
-    #$v->appendChild($d->importNode($content->getElementsByTagName("h")->item(0), true));
-    #$vars["heading"] = $d->documentElement;
-    $vars["rooturl"] = HTMLPlusBuilder::getFileToId(INDEX_HTML);
-    $vars["heading"] = _("Administration");
+    $vars["rooturl"] = [
+      "value" => HTMLPlusBuilder::getFileToId(INDEX_HTML),
+      "cacheable" => true,
+    ];
+    $vars["heading"] = [
+      "value" => _("Administration"),
+      "cacheable" => true,
+    ];
     if (strlen($this->defaultFile)) {
-      $vars["heading"] = sprintf(_("File %s Administration"), basename($this->defaultFile));
+      $vars["heading"] = [
+        "value" => sprintf(_("File %s Administration"), basename($this->defaultFile)),
+        "cacheable" => true,
+      ];
       $this->title = sprintf(_("%s (%s) - Administration"), basename($this->defaultFile), ROOT_URL.$this->defaultFile);
     } else {
       $this->title = $vars["heading"];
     }
-    $vars["link"] = get_link();
-    $vars["linkadmin"] = $adminLink;
+    $vars["link"] = [
+      "value" => get_link(),
+      "cacheable" => true,
+    ];
+    $vars["linkadmin"] = [
+      "value" => $adminLink,
+      "cacheable" => true,
+    ];
     if ($this->contentValue !== "") {
-      $vars["content"] = htmlspecialchars($this->contentValue);
+      $vars["content"] = [
+        "value" => htmlspecialchars($this->contentValue),
+        "cacheable" => true,
+      ];
     }
-    $vars["filename"] = $_GET[$this->className];
-    $vars["filepathpattern"] = FILEPATH_PATTERN;
-    $vars["schema"] = $format;
-    $vars["mode"] = $mode;
-    $vars["classtype"] = $type;
+    $vars["filename"] = [
+      "value" => $_GET[$this->className],
+      "cacheable" => true,
+    ];
+    $vars["filepathpattern"] = [
+      "value" => FILEPATH_PATTERN,
+      "cacheable" => true,
+    ];
+    $vars["schema"] = [
+      "value" => $format,
+      "cacheable" => true,
+    ];
+    $vars["mode"] = [
+      "value" => $mode,
+      "cacheable" => true,
+    ];
+    $vars["classtype"] = [
+      "value" => $type,
+      "cacheable" => true,
+    ];
     if ($this->dataFileStatus == self::STATUS_DISABLED) {
-      $vars["disabled"] = "disabled";
+      $vars["disabled"] = [
+        "value" => "disabled",
+        "cacheable" => true,
+      ];
     }
-    $vars["defaultcontent"] = htmlspecialchars($this->showContent(false));
-    $vars["resultcontent"] = htmlspecialchars($this->showContent(true));
-    $vars["status"] = $this->dataFileStatuses[$this->dataFileStatus];
-    $vars["changestatus"] = $this->dataFileStatus == self::STATUS_DISABLED ? _("enable") : _("disable");
-    $vars["changestatusurl"] = $this->dataFileStatus == self::STATUS_DISABLED ? "$adminLink&enable" : "$adminLink&disable";
-    $vars["userfilehash"] = $usrDestHash;
+    $vars["defaultcontent"] = [
+      "value" => htmlspecialchars($this->showContent(false)),
+      "cacheable" => true,
+    ];
+    $vars["resultcontent"] = [
+      "value" => htmlspecialchars($this->showContent(true)),
+      "cacheable" => true,
+    ];
+    $vars["status"] = [
+      "value" => $this->dataFileStatuses[$this->dataFileStatus],
+      "cacheable" => true,
+    ];
+    $vars["changestatus"] = [
+      "value" => $this->dataFileStatus == self::STATUS_DISABLED ? _("enable") : _("disable"),
+      "cacheable" => true,
+    ];
+    $vars["changestatusurl"] = [
+      "value" => $this->dataFileStatus == self::STATUS_DISABLED ? "$adminLink&enable" : "$adminLink&disable",
+      "cacheable" => true,
+    ];
+    $vars["userfilehash"] = [
+      "value" => $usrDestHash,
+      "cacheable" => true,
+    ];
     if ((!$this->isPost() && $this->dataFileStatus == self::STATUS_DISABLED)) {
-      $vars["checked"] = "checked";
+      $vars["checked"] = [
+        "value" => "checked",
+        "cacheable" => true,
+      ];
     }
     if ($this->dataFileStatus == self::STATUS_NEW) {
-      $vars["warning"] = "warning";
-      $vars["nohide"] = "nohide";
+      $vars["warning"] = [
+        "value" => "warning",
+        "cacheable" => true,
+      ];
+      $vars["nohide"] = [
+        "value" => "nohide",
+        "cacheable" => true,
+      ];
     }
     $pagespeed = isset($_GET[PAGESPEED_PARAM]) && $_GET[PAGESPEED_PARAM] == PAGESPEED_OFF;
-    $vars["pagespeed"] = $pagespeed ? null : "";
+    $vars["pagespeed"] = [
+      "value" => $pagespeed ? null : "",
+      "cacheable" => true,
+    ];
     $debug = isset($_GET[DEBUG_PARAM]) && $_GET[DEBUG_PARAM] == DEBUG_ON;
-    $vars["debug"] = $debug ? null : "";
+    $vars["debug"] = [
+      "value" => $debug ? null : "",
+      "cacheable" => true,
+    ];
     $cache = isset($_GET[CACHE_PARAM]);
-    $vars["cache"] = $cache ? null : "";
-    $vars["cache_value"] = $cache ? $_GET[CACHE_PARAM] : "";
-    $vars["filepicker_options"] = $this->createFilepicker();
+    $vars["cache"] = [
+      "value" => $cache ? null : "",
+      "cacheable" => true,
+    ];
+    $vars["cache_value"] = [
+      "value" => $cache ? $_GET[CACHE_PARAM] : "",
+      "cacheable" => true,
+    ];
+    $vars["filepicker_options"] = [
+      "value" => $this->createFilepicker(),
+      "cacheable" => true,
+    ];
     $content->processVariables($vars);
     return $content;
   }

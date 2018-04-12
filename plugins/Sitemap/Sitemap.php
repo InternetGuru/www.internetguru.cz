@@ -153,7 +153,7 @@ class Sitemap extends Plugin implements SplObserver {
     foreach ($links as $link => $headingElm) {
       $url = $urlset->appendChild($sitemap->createElement("url"));
       // loc
-      $scheme = Cms::getVariable("urlhandler-default_protocol");
+      $scheme = Cms::getVariableValue("urlhandler-default_protocol");
       if (is_null($scheme)) {
         $scheme = "http";
       }
