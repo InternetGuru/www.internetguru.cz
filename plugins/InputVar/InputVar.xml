@@ -13,6 +13,8 @@
       - je proměnná cachovatelná?
         nepovinný atribut cacheable="[true|false]"
         výchozí hodnota je true
+      - nepovinný atribut required="required"
+        aplikuje se v případě použití uživatelské editace (níže)
 
     Element fn:
       - identifikátor (atribut id="neco")

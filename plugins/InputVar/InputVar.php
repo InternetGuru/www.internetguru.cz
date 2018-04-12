@@ -566,6 +566,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if ($set->hasAttribute("pattern")) {
         $text->setAttribute("pattern", $set->getAttribute("pattern"));
       }
+      if ($varElm->hasAttribute("required")) {
+        $text->setAttribute("required", $varElm->getAttribute("required"));
+      }
       $ddElm->appendChild($text);
       $dlElm->appendChild($ddElm);
     }
