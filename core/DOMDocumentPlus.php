@@ -167,7 +167,9 @@ class DOMDocumentPlus extends DOMDocument {
     $cacheKey = apc_get_key(__FUNCTION__."/"
       .self::APC_ID."/"
       .$element->getNodePath()."/"
-      .hash("crc32b", serialize($variables))
+      .hash("crc32b", print_r($variables, true))."/"
+      .hash("crc32b", $element->ownerDocument->saveXML($element))."/"
+      .$deep
     );
     $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
     $cacheExists = apc_exists($cacheKey);
