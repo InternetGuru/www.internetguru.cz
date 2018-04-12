@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
 
+## [2.10.3] - 2018-04-12
+### Fixed
+ - Wrong Cart class name
+
 ## [2.10.2] - 2018-04-11
 ### Fixed
  - Repair cart status img path
@@ -326,6 +330,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.2
+[2.10.3]: https://bitbucket.org/igwr/cms/compare/v2.10.3..v2.10.2
 [2.10.2]: https://bitbucket.org/igwr/cms/compare/v2.10.2..v2.10.1
 [2.10.1]: https://bitbucket.org/igwr/cms/compare/v2.10.1..v2.10.0
 [2.10.0]: https://bitbucket.org/igwr/cms/compare/v2.10.0..v2.9.1
