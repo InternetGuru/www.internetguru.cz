@@ -18,7 +18,7 @@ use SplSubject;
  * Class Cart
  * @package IGCMS\Plugins
  */
-class glaCart extends Plugin implements SplObserver, ResourceInterface {
+class Cart extends Plugin implements SplObserver, ResourceInterface {
 
   const PLUGIN_NAME = 'cart';
   const OK_PARAM = self::PLUGIN_NAME.'-add';
