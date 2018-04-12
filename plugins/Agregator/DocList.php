@@ -47,16 +47,16 @@ class DocList extends AgregatorList {
     $cacheUpTodate = false;
     $cache = null;
     $listDoc = null;
-    $vars = [];
     if ($cacheExists) {
       $cache = apc_fetch($cacheKey);
       $cacheUpTodate = $cache["newestCacheMtime"] == $newestCacheMtime;
+    }
+    if ($cacheUpTodate) {
       $doc = new DOMDocumentPlus();
       $doc->loadXML($cache["data"]);
       $listDoc = $doc;
       $vars = unserialize($cache["vars"]);
-    }
-    if (!$cacheUpTodate) {
+    } else {
       $this->keyword = $doclist->getAttribute("kw");
       $vars = $this->createVars();
       if (is_null($pattern)) {

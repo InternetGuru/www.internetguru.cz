@@ -39,6 +39,13 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     if ($subject->getStatus() != STATUS_POSTPROCESS) {
       return;
     }
+    $xml = self::getXML();
+    $themeColor = $xml->getElementsByTagName("themeColor")[0]->nodeValue;
+    // add meta
+    $outputStrategy = Cms::getOutputStrategy();
+    $outputStrategy->addMetaElement("theme-color", $themeColor);
+    $outputStrategy->addLinkElement(ROOT_URL.self::MANIFEST, "manifest");
+    $outputStrategy->addJsFile($this->pluginDir."/".$this->className.".js");
     // do not update if uptodate
     if (is_file(self::MANIFEST) && filemtime(self::MANIFEST) == HTMLPlusBuilder::getNewestFileMtime()) {
       return;
@@ -48,9 +55,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
       return;
     }
     // load and process variables
-    $xml = self::getXML();
     $manifestTemplate = $xml->getElementsByTagName("manifest")[0]->nodeValue;
-    $themeColor = $xml->getElementsByTagName("themeColor")[0]->nodeValue;
     $h1id = HTMLPlusBuilder::getLinkToId("");
     $name = $xml->getElementsByTagName("name");
     $shortName = $xml->getElementsByTagName("shortName");
@@ -74,11 +79,6 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
       "rootUrl" => ROOT_URL,
       "themeColor" => $themeColor,
     ]));
-    // add meta
-    $outputStrategy = Cms::getOutputStrategy();
-    $outputStrategy->addMetaElement("theme-color", $themeColor);
-    $outputStrategy->addLinkElement(ROOT_URL.self::MANIFEST, "manifest");
-    $outputStrategy->addJsFile($this->pluginDir."/".$this->className.".js");
   }
 
   /**

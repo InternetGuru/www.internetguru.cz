@@ -41,11 +41,12 @@ class ImgList extends AgregatorList {
     if ($cacheExists) {
       $cache = apc_fetch($cacheKey);
       $cacheUpTodate = $cache["filesInotify"] === filemtime(FILES_FOLDER."/".INOTIFY);
+    }
+    if ($cacheUpTodate) {
       $doc = new DOMDocumentPlus();
       $doc->loadXML($cache["data"]);
       $listDoc = $doc;
-    }
-    if (!$cacheUpTodate) {
+    } else {
       $vars = $this->createVars();
       if (is_null($pattern)) {
         $pattern = $doclist;

@@ -170,16 +170,17 @@ class DOMDocumentPlus extends DOMDocument {
     $result = null;
     if ($cacheExists) {
       $cache = apc_fetch($cacheKey);
+      $cacheUpToDate = $cache["newestFileMtime"] == $newestFileMtime;
+    }
+    if ($cacheUpToDate) {
       $doc = new DOMDocumentPlus();
       $doc->loadXML($cache["data"]);
-      $cacheUpToDate = $cache["newestFileMtime"] == $newestFileMtime;
       $element->removeChildNodes();
       foreach ($doc->documentElement->childNodes as $childNode) {
         $element->appendChild($element->ownerDocument->importNode($childNode, true));
       }
       $result = $element;
-    }
-    if (!$cacheUpToDate) {
+    } else {
       $cacheable = "true";
       $cacheableVariables = array_filter(
         $variables,
