@@ -18,15 +18,15 @@ use SplSubject;
  * Class Cart
  * @package IGCMS\Plugins
  */
-class Cart extends Plugin implements SplObserver, ResourceInterface {
+class glaCart extends Plugin implements SplObserver, ResourceInterface {
 
   const PLUGIN_NAME = 'cart';
   const OK_PARAM = self::PLUGIN_NAME.'-add';
   const DEL_PARAM = self::PLUGIN_NAME.'-del';
 
   const PLUGIN_DIR = PLUGINS_DIR.'/Cart';
-  const CART_IMG = PLUGINS_DIR.'/cart.png';
-  const CART_FULL_IMG = PLUGINS_DIR.'/cart-full.png';
+  const CART_IMG = self::PLUGIN_DIR.'/cart.png';
+  const CART_FULL_IMG = self::PLUGIN_DIR.'/cart-full.png';
 
   /**
    * @var array
