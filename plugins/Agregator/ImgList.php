@@ -23,7 +23,7 @@ class ImgList extends AgregatorList {
   /**
    * @var int
    */
-  const APC_ID = 2;
+  const APC_ID = 3;
 
   /**
    * ImgList constructor.
