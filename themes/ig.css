@@ -100,9 +100,10 @@ ol.contentlink-bc li a:first-child {
 #content div.hdesc {
     max-width: 100%;
     background: red;
-    background-color: rgb(223, 86, 16);
-    background: linear-gradient(135deg,#E27814,#DB310B);
-    color: white;
+    background-color: rgb(246, 191, 78);
+    background: linear-gradient(180deg,rgb(246, 191, 78),#ffecc4);
+    /* color: white; */
+    padding-bottom: 4em;
 }
 
 p.description {
@@ -113,7 +114,7 @@ p.description {
 #header {
   background-position: 0 0%;
   background-color: #C84F12;
-  background: linear-gradient(135deg,#B96319,#DB380B);
+  background: #f6bf4e;
   padding: 1em 0;
 }
 
@@ -145,8 +146,13 @@ form#contactform-collaboration:after {
 
 ol.contentlink-bc,
 ol.contentlink-bc a {
-    color: #E8E8E8;
+    color: #ffffff;
     border-color: #d5ad94;
+}
+
+ol.contentlink-bc {
+  border-bottom: medium solid #eeaa31;
+  padding-bottom: 1em;
 }
 
 #pref {
@@ -268,5 +274,9 @@ a#scrolltop {
 }
 
 h1 {
-    color: #FFFFFF;
+    color: #7c0e3e;
+    padding-top: 1.5em;
+    padding-bottom: 1em;
+    text-align: center;
+    font-size: 2.5em;
 }
