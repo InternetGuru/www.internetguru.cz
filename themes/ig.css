@@ -35,7 +35,7 @@ dt {
   /* font-weight: 100; */
 }
 
-div.list.multiple dtQ {
+div.list.multiple dt {
   padding: 0 0 0.25em 0;
   font-size: 1.15em;
 }
@@ -47,14 +47,15 @@ h1 {
 
 h2 {
   font-size: 2em;
-  padding: 0;
-  margin: 3rem 0 2rem 0;
+  margin: 1em 0;
   text-align: center;
 }
 
 h1, h2, h3, h4 {
   color: #1e1e1e;
   font-weight: 400;
+  padding-left:  1rem;
+  padding-right:  1rem;
 }
 
 ol.contentlink-bc {
@@ -83,6 +84,8 @@ ol.contentlink-bc > li+li:before {
 ol.contentlink-bc li a {
   display: inline-block;
   font-weight: 600;
+  color: white;
+  border-color: #fff5ea;
 }
 
 ol.contentlink-bc li a:first-child {
@@ -91,9 +94,8 @@ ol.contentlink-bc li a:first-child {
 
 #content div.hdesc {
     max-width: 100%;
-    background-color: rgb(246, 191, 78);
-    background: linear-gradient(rgb(246, 191, 78),#ffecc4);
     padding-bottom: 4em;
+    position: relative;
 }
 
 p.description {
@@ -217,13 +219,6 @@ form#contactform-collaboration:after {
   padding: 1em;
 }
 
-#pref {
-  min-height: 0.1em;
-  margin-top: 2em;
-  background-position: 0% 100%;
-  background: #252525;
-}
-
 input[type="submit"] {
   padding: 0.5rem 1rem;
   background: #DB630B;
@@ -302,12 +297,14 @@ ul.logo li a object {
 
 #footer {
   padding: 1em;
+  padding-top: 5em;
+  background: whitesmoke;
+  position: relative;
+  z-index: -2;
 }
 
 #footer,
 #footer a {
-    color: #D5D5D5;
-    border-color: #A5A5A5;
 }
 
 #footer > ul.globalmenu > li a.current {
@@ -326,11 +323,6 @@ form dd > input[type="text"], form dd > input[type="email"], form dd > textarea,
     box-sizing: border-box;
 }
 
-h1 {
-    /* margin: 0.8em 0; */
-    /* font-size: 2em; */
-}
-
 a#scrolltop {
     border: none;
 }
@@ -341,4 +333,61 @@ h1 {
     padding-bottom: 1em;
     text-align: center;
     font-size: 2.5em;
+}
+
+.part {
+  padding: 7em 0;
+}
+
+.part:nth-child(2n) {
+  position: relative;
+  background-color: #32315e;
+  background: linear-gradient(#32315e,#515e80);
+}
+
+.part:nth-child(2n) > *,
+.part:nth-child(2n) a {
+  color: white;
+}
+
+.part:nth-child(2n) a {
+  border-color: #939ebf;
+}
+
+#content > div.hdesc:before,
+.part:nth-child(2n):before,
+#content > div.hdesc:after,
+.part:nth-child(2n):after {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  top: 1em;
+  left: 0;
+  background: whitesmoke;
+  transform: skewY(-2deg);
+  z-index: -2;
+}
+
+#content > div.hdesc:before,
+.part:nth-child(2n):before {
+  top: 0;
+  left: 0;
+  background: #feae59;
+  transform: skewY(1deg);
+  z-index: -1;
+}
+
+#content > div.hdesc {
+  background-color: rgb(246, 191, 78);
+  background: linear-gradient(rgb(246, 191, 78),#ffecc4);
+}
+
+.part:last-child {
+  padding-bottom: 4em;
+}
+
+.list {
+  margin-top: 3em;
+  margin-bottom: 3em;
 }

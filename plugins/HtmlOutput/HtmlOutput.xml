@@ -10,6 +10,8 @@
       <xslt>themes/lists.xsl</xslt>
 <!--       <xslt>themes/basicLayout.xsl</xslt> -->
       <xslt>themes/default/layout.xsl</xslt>
+      <xslt>themes/h1desc.xsl</xslt>
+      <xslt>themes/default/part.xsl</xslt>
       <xslt>themes/footer.xsl</xslt>
       <xslt>themes/ielte7.xsl</xslt>
       <xslt>themes/adminmenu.xsl</xslt>
@@ -21,7 +23,6 @@
   <stylesheet append="head">themes/ig.css</stylesheet>
   <stylesheet>themes/ig.media.css</stylesheet>
   <favicon>themes/ig.ico</favicon>
-  <xslt>themes/h1desc.xsl</xslt>
   <jsFile append="head">themes/webfont.js</jsFile>
   <jsFile append="head">themes/fontloader.js</jsFile>
 </HtmlOutput>

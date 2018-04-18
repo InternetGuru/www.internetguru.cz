@@ -108,7 +108,7 @@ div.section > pre {
   margin: 0;
 }
 
-#content > *, #header > *, #footer > *,
+#content > .section > .part > *, #header > *, #footer > *,
 #content > .hdesc > * {
   max-width: 62rem;
   margin-left: auto;
