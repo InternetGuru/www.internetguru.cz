@@ -61,10 +61,7 @@ ol.contentlink-bc {
   list-style: none;
   padding: 0;
   margin: 0 auto;
-  padding-left: 1em;
-  padding-left: 1rem;
   max-width: 61em;
-  max-width: 61rem;
 }
 
 ol.contentlink-bc li {
@@ -94,10 +91,8 @@ ol.contentlink-bc li a:first-child {
 
 #content div.hdesc {
     max-width: 100%;
-    background: red;
     background-color: rgb(246, 191, 78);
-    background: linear-gradient(180deg,rgb(246, 191, 78),#ffecc4);
-    /* color: white; */
+    background: linear-gradient(rgb(246, 191, 78),#ffecc4);
     padding-bottom: 4em;
 }
 
@@ -109,18 +104,9 @@ p.description {
 }
 
 #header {
-  background-position: 0 0%;
-  background-color: #C84F12;
+  background-color: #f8ca6b;
   background: linear-gradient(#ffad5a, #f6bf4e);
-  padding: 0;
-}
-
-#header > div {
-  max-width: 100% !important;
-  background-color: rgba(0, 0, 0, 0.1);
-  padding-top: 1em;
-  background: linear-gradient(135deg,#B96319,#DB380B);
-  /* color: white; */
+  padding: 0 1em;
 }
 
 #header > * {
@@ -130,22 +116,105 @@ p.description {
   color:  white;
 }
 
+#header > div {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1.5em 0;
+  position: relative;
+  border-bottom:  medium solid #ecb143;
+}
+#header > div .globalmenu {
+  margin: 1em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#header > div .globalmenu li {
+  margin: 0;
+}
+#header > div .globalmenu li:first-child {
+  margin-left: 0;
+}
+#header div.hideable-button {
+  position: absolute;
+  top: 0.7em;
+  right: 0;
+}
+#header div.hideable-button a {
+  display: inline-block;
+  padding: 0.9em 1.2em;
+  color: white;
+}
+#header > div .globalmenu a {
+  border: none;
+  display: block;
+  padding: 1em 0 1em 2em;
+  text-align: center;
+  letter-spacing: 0.02em;
+  color: #fff;
+  font-weight: 600;
+  background: none;
+ }
+#header div.hideable-button span:last-child {
+  display: none;
+}
+#header .globalmenu-top {
+  position: absolute;
+  right: 0;
+  display: none;
+}
+@media (max-width: 28em) {
+  #header .hideable-nohide .globalmenu-top {
+    display: block;
+  }
+  #header .hideable-nohide .globalmenu-top ul {
+    background: #fff;
+    background: #ffffffe8;
+  }
+  #header .hideable-nohide .globalmenu-top a {
+    color: #333333;
+    padding: 1em 1.5em;
+  }
+  #header .hideable-nohide div.hideable-button {
+    background: #f8c866;
+  }
+  #header .hideable-nohide .globalmenu-top li + li {
+    border-top: thin solid #dddddd;
+  }
+}
+@media (min-width: 28em) {
+  #header > div .globalmenu li {
+    display: inline-block;
+  }
+}
+@media (min-width: 42em) {
+  #header > div {
+    display: flex;
+  }
+  #header > div ol.contentlink-bc {
+    flex-grow: 1;
+  }
+  #header > div .globalmenu {
+    margin-top: 0;
+  }
+  #header a.hideable-switch {
+    display: none !important;
+  }
+  #header div.globalmenu-top {
+    display: block !important;
+    position: static;
+    padding: 0;
+  }
+  #header > div .globalmenu a {
+    padding: 0;
+    padding-left: 1em;
+  }
+}
+
 form#contactform-collaboration:after {
   content: "";
   display: block;
   clear: both;
   padding: 1em;
-}
-
-ol.contentlink-bc,
-ol.contentlink-bc a {
-    color: #ffffff;
-    border-color: #d5ad94;
-}
-
-ol.contentlink-bc {
-  border-bottom: medium solid #ecb143;
-  padding: 1.5em 1em;
 }
 
 #pref {
