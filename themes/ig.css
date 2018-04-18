@@ -46,21 +46,15 @@ h1 {
 }
 
 h2 {
-  /* margin: 1em 0; */
   font-size: 2em;
-  /* margin-top: 3rem; */
-  /* margin-bottom: 2rem; */
-  /* background: #ffdfc2; */
-  border-bottom: medium solid #e6e6e6;
-  border-bottom: thin solid #999999;
   padding: 0;
-  padding-bottom: 0.1em;
-  margin: 3rem 1rem 2rem;
+  margin: 3rem 0 2rem 0;
+  text-align: center;
 }
 
 h1, h2, h3, h4 {
-  color: #424242;
-  font-weight: normal;
+  color: #1e1e1e;
+  font-weight: 400;
 }
 
 ol.contentlink-bc {
@@ -91,6 +85,7 @@ ol.contentlink-bc > li+li:before {
 
 ol.contentlink-bc li a {
   display: inline-block;
+  font-weight: 600;
 }
 
 ol.contentlink-bc li a:first-child {
@@ -108,14 +103,16 @@ ol.contentlink-bc li a:first-child {
 
 p.description {
     padding: 0 1em 2rem 1em;
-    margin: 0;
+    text-align: center;
+    font-size: 1.2em;
+    color: #525252;
 }
 
 #header {
   background-position: 0 0%;
   background-color: #C84F12;
-  background: #f6bf4e;
-  padding: 1em 0;
+  background: linear-gradient(#ffad5a, #f6bf4e);
+  padding: 0;
 }
 
 #header > div {
@@ -133,10 +130,6 @@ p.description {
   color:  white;
 }
 
-p.description {
-  /* margin-bottom: 1em; */
-}
-
 form#contactform-collaboration:after {
   content: "";
   display: block;
@@ -151,8 +144,8 @@ ol.contentlink-bc a {
 }
 
 ol.contentlink-bc {
-  border-bottom: medium solid #eeaa31;
-  padding-bottom: 1em;
+  border-bottom: medium solid #ecb143;
+  padding: 1.5em 1em;
 }
 
 #pref {
