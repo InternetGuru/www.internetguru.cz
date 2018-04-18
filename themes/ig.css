@@ -40,11 +40,6 @@ div.list.multiple dt {
   font-size: 1.15em;
 }
 
-h1 {
-  padding: 2rem 1rem 0.5em 1rem;
-  margin: 0;
-}
-
 h2 {
   font-size: 2em;
   margin: 1em 0;
@@ -65,7 +60,7 @@ body {
 ol.contentlink-bc {
   list-style: none;
   padding: 0;
-  padding-right: 1.5em;
+  padding-right: 2.5em;
   margin: 0 auto;
   max-width: 61em;
 }
@@ -88,6 +83,7 @@ ol.contentlink-bc > li+li:before {
 
 ol.contentlink-bc li a {
   display: inline-block;
+  padding: 1rem 0;
   font-weight: 600;
   color: white;
   border-color: #fff5ea;
@@ -102,7 +98,6 @@ ol.contentlink-bc li a:first-child {
 
 #content div.hdesc {
     max-width: 100%;
-    padding-bottom: 4em;
     position: relative;
 }
 
@@ -128,7 +123,7 @@ p.description {
 #header > div {
   max-width: 60rem;
   margin: 0 auto;
-  padding: 1.5em 0;
+  padding: 0.5em 0;
   position: relative;
   border-bottom:  medium solid #ecb143;
 }
@@ -215,8 +210,6 @@ p.description {
     padding: 0;
   }
   #header > div .globalmenu a {
-    padding-top: 0;
-    padding-bottom: 0;
   }
   #header > div .globalmenu li:last-child a {
     padding-right: 0;
@@ -338,13 +331,6 @@ a#scrolltop {
     border: none;
 }
 
-h1 {
-    color: #7c0e3e;
-    padding-top: 1.5em;
-    padding-bottom: 1em;
-    text-align: center;
-    font-size: 2.5em;
-}
 
 .part {
   padding: 7em 0;
@@ -365,9 +351,8 @@ h1 {
   border-color: #939ebf;
 }
 
-#content > div.hdesc:before,
+
 .part:nth-child(2n):before,
-#content > div.hdesc:after,
 .part:nth-child(2n):after {
   position: absolute;
   content: "";
@@ -380,7 +365,6 @@ h1 {
   z-index: -2;
 }
 
-#content > div.hdesc:before,
 .part:nth-child(2n):before {
   top: 0;
   left: 0;
@@ -389,9 +373,67 @@ h1 {
   z-index: -1;
 }
 
-#content > div.hdesc {
+h1 {
+  color: #7c0e3e;
+  margin: 0;
+  padding-top: 1.5em;
+  padding-bottom: 1em;
+  text-align: center;
+  font-size: 2.5em;
+}
+
+#content > .hdesc > div {
   background-color: rgb(246, 191, 78);
   background: linear-gradient(rgb(246, 191, 78),#ffecc4);
+  padding-bottom: 5em;
+}
+
+#content > .hdesc > div > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#content > .hdesc > div > ul li {
+  margin: 0;
+  padding: 0;
+}
+
+#content > .hdesc > div > ul {
+  text-align: center;
+}
+
+#content a.button {
+  white-space: nowrap;
+  display: inline-block;
+  line-height: 3em;
+  padding: 0 1em;
+  box-shadow: 0 4px 6px rgba(50,50,93,.11),0 1px 3px rgba(0,0,0,.08);
+  background-color: #6772e5;
+  border-radius: 0.2em;
+  text-transform: uppercase;
+  letter-spacing: .025em;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all .15s ease;
+}
+
+#content a.button:focus, #content a.button:hover {
+  color: #fff;
+  background-color: #7795f8;
+  transform: translateY(-0.1em);
+  box-shadow: 0 7px 14px rgba(50,50,93,.1),0 3px 6px rgba(0,0,0,.08)
+}
+
+#content a.button:active {
+  color: #e6ebf1;
+  background-color: #555abf;
+  transform: translateY(0.1em);
+  box-shadow: 0 4px 6px rgba(50,50,93,.11),0 1px 3px rgba(0,0,0,.08)
+}
+
+#content > .hdesc .description {
+  margin-top: 3em;
 }
 
 .part:last-child {

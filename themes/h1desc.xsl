@@ -3,8 +3,12 @@
 
   <xsl:template match="//h1">
     <xsl:text disable-output-escaping="yes">&lt;div class="hdesc"&gt;</xsl:text>
-    <xsl:copy-of select="."/>
+    <div>
+      <xsl:copy-of select="."/>
+      <ul><li><a class="button" href="#contact">Already interested?</a></li></ul>
+    </div>
   </xsl:template>
+
 
   <xsl:template match="//p[contains(@class, 'description')][preceding-sibling::*[1][name() = 'h1']]">
     <xsl:copy-of select="."/>
