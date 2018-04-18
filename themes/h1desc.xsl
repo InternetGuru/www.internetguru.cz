@@ -4,8 +4,15 @@
   <xsl:template match="//h1">
     <xsl:text disable-output-escaping="yes">&lt;div class="hdesc"&gt;</xsl:text>
     <div>
-      <xsl:copy-of select="."/>
-      <ul><li><a class="button" href="#contact">Already interested?</a></li></ul>
+      <div>
+        <xsl:copy-of select="."/>
+        <ul><li><a class="button" href="#contact">Already interested?</a></li></ul>
+      </div>
+      <div class="stripes">
+        <div class="stripe s1"> </div>
+        <div class="stripe s2"> </div>
+        <div class="stripe s3"> </div>
+      </div>
     </div>
   </xsl:template>
 

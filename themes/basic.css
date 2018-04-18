@@ -109,7 +109,7 @@ div.section > pre {
 }
 
 #content > .section > .part > *, #header > *, #footer > *,
-#content > .hdesc > * {
+#content > .hdesc > div > div:first-child > * {
   max-width: 62rem;
   margin-left: auto;
   margin-right: auto;

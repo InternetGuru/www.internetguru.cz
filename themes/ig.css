@@ -108,9 +108,9 @@ p.description {
 }
 
 #header {
-  background-color: #f8ca6b;
-  background: linear-gradient(#ffad5a, #f6bf4e);
   padding: 0 1em;
+  position: relative;
+  z-index: 10;
 }
 
 #header > * {
@@ -131,11 +131,10 @@ p.description {
   margin: 1em 0 0;
   padding: 0;
   list-style: none;
-  position: relative;
-  z-index: 10;
 }
 #header > div .globalmenu li {
   margin: 0;
+  display: inline-block;
 }
 #header > div .globalmenu li:first-child {
   margin-left: 0;
@@ -168,7 +167,7 @@ p.description {
   right: 0;
   display: none;
 }
-@media (max-width: 28em) {
+@media (max-width: 42em) {
   #header .hideable-nohide .globalmenu-top {
     display: block;
   }
@@ -182,13 +181,13 @@ p.description {
   #header .hideable-nohide div.hideable-button {
     background: #f8c866;
   }
+}
+@media (max-width: 28em) {
+  #header > div .globalmenu li {
+    display: block;
+  }
   #header .hideable-nohide .globalmenu-top li + li {
     border-top: thin solid #dddddd;
-  }
-}
-@media (min-width: 28em) {
-  #header > div .globalmenu li {
-    display: inline-block;
   }
 }
 @media (min-width: 42em) {
@@ -385,20 +384,69 @@ h1 {
 #content > .hdesc > div {
   background-color: rgb(246, 191, 78);
   background: linear-gradient(rgb(246, 191, 78),#ffecc4);
-  padding-bottom: 5em;
+  margin-top: -5em;
 }
 
-#content > .hdesc > div > ul {
+#content > .hdesc > div:after {
+  content: url("/files/header/web.svg");
+}
+
+#content > .hdesc > div > div:first-child {
+  position: relative;
+  padding-top: 5em;
+  z-index: 1;
+}
+
+.stripes {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: -130px;
+  -webkit-transform: skewY(-12deg);
+  transform: skewY(-12deg);
+}
+
+.stripes .stripe {
+  position: absolute;
+  height: 190px
+}
+
+.stripes .s1 {
+  top: 0;
+  left: 0;
+  width: 30%;
+  background: -webkit-gradient(linear,left top,right top,from(#ffad5a),to(rgba(250,175,82,.25)));
+  background: linear-gradient(90deg,#ffad5a,rgba(250,175,82,.25))
+}
+
+.stripes .s2 {
+  top: 190px;
+  left: 0;
+  width: 38%;
+  background: -webkit-gradient(linear,left top,right top,from(#ffcd68),to(rgba(255,199,107,0)));
+  background: linear-gradient(90deg,#ffcd68,rgba(255,199,107,0))
+}
+
+.stripes .s3 {
+  top: 380px;
+  right: 0;
+  width: 36%;
+  background: -webkit-gradient(linear,left top,right top,from(hsla(46,98%,78%,0)),to(#ffda84));
+  background: linear-gradient(90deg,hsla(46,98%,78%,0),#ffda84)
+}
+
+
+#content > .hdesc > div > div > ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
-#content > .hdesc > div > ul li {
+#content > .hdesc > div > div > ul li {
   margin: 0;
   padding: 0;
 }
 
-#content > .hdesc > div > ul {
+#content > .hdesc > div > div > ul {
   text-align: center;
 }
 
