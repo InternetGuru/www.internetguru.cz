@@ -58,9 +58,14 @@ h1, h2, h3, h4 {
   padding-right:  1rem;
 }
 
+body {
+  color: #525f7f;
+}
+
 ol.contentlink-bc {
   list-style: none;
   padding: 0;
+  padding-right: 1.5em;
   margin: 0 auto;
   max-width: 61em;
 }
@@ -102,7 +107,6 @@ p.description {
     padding: 0 1em 2rem 1em;
     text-align: center;
     font-size: 1.2em;
-    color: #525252;
 }
 
 #header {
@@ -129,6 +133,8 @@ p.description {
   margin: 1em 0 0;
   padding: 0;
   list-style: none;
+  position: relative;
+  z-index: 10;
 }
 #header > div .globalmenu li {
   margin: 0;
