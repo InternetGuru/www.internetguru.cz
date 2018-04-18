@@ -95,6 +95,9 @@ ol.contentlink-bc li a {
 
 ol.contentlink-bc li a:first-child {
   padding-left: 0;
+  font-weight: 600;
+  font-size: 1.3em;
+  line-height: 1;
 }
 
 #content div.hdesc {
@@ -155,7 +158,7 @@ p.description {
 #header > div .globalmenu a {
   border: none;
   display: block;
-  padding: 1em 0 1em 2em;
+  padding: 1em 1.5em;
   text-align: center;
   letter-spacing: 0.02em;
   color: #fff;
@@ -180,7 +183,6 @@ p.description {
   }
   #header .hideable-nohide .globalmenu-top a {
     color: #333333;
-    padding: 1em 1.5em;
   }
   #header .hideable-nohide div.hideable-button {
     background: #f8c866;
@@ -213,8 +215,11 @@ p.description {
     padding: 0;
   }
   #header > div .globalmenu a {
-    padding: 0;
-    padding-left: 1em;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  #header > div .globalmenu li:last-child a {
+    padding-right: 0;
   }
 }
 
