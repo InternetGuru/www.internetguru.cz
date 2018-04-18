@@ -84,7 +84,7 @@ ol.contentlink-bc > li+li:before {
 ol.contentlink-bc li a {
   display: inline-block;
   padding: 1rem 0;
-  font-weight: 600;
+  /* font-weight: 600; */
   color: white;
   border-color: #fff5ea;
 }
@@ -92,8 +92,8 @@ ol.contentlink-bc li a {
 ol.contentlink-bc li a:first-child {
   padding-left: 0;
   font-weight: 600;
-  font-size: 1.3em;
-  line-height: 1;
+  /* font-size: 1.3em; */
+  /* line-height: 1; */
 }
 
 #content div.hdesc {
@@ -125,7 +125,7 @@ p.description {
   margin: 0 auto;
   padding: 0.5em 0;
   position: relative;
-  border-bottom:  medium solid #ecb143;
+  border-bottom: thin solid #fbe4b3;
 }
 #header > div .globalmenu {
   margin: 1em 0 0;
@@ -146,8 +146,9 @@ p.description {
 }
 #header div.hideable-button a {
   display: inline-block;
-  padding: 0.9em 1.2em;
+  padding-top: 1rem;
   color: white;
+  font-size: 1.3em;
 }
 #header > div .globalmenu a {
   border: none;
@@ -190,7 +191,7 @@ p.description {
     border-top: thin solid #dddddd;
   }
 }
-@media (min-width: 42em) {
+@media (min-width: 50em) {
   #header > div {
     display: flex;
   }
@@ -382,19 +383,22 @@ h1 {
 
 #content > .hdesc > div {
   background-color: rgb(246, 191, 78);
-  background: linear-gradient(rgb(246, 191, 78) 0%,#ffffff 80%);
+  background: linear-gradient(rgb(246, 191, 78) 0%, #ffffff 60%);
   margin-top: -5em;
 }
 
 #content > .hdesc > div:after {
-  content: url("/files/header/web5.svg");
+  content: url("/files/header/web2.svg");
   display: block;
   text-align: center;
   position: relative;
-  top: 5em;
-  left: -21em;
-  margin-top: -21em;
+  top: 0em;
+  left: -15em;
+  margin-top: -11em;
   max-width: 100%;
+  /* width: 70em; */
+  /* height: 50em; */
+  opacity: 0.3;
 }
 
 #content > .hdesc > div > div:first-child {
@@ -406,40 +410,41 @@ h1 {
 .stripes {
   position: absolute;
   width: 100%;
-  height: 100%;
-  top: -130px;
+  /* height: 34em; */
+  top: 0em;
   -webkit-transform: skewY(-12deg);
   transform: skewY(-12deg);
   z-index: 1;
+  /* background: #fffdf3; */
 }
 
 .stripes .stripe {
   position: absolute;
-  height: 190px
+  height: 12em;
 }
 
 .stripes .s1 {
-  top: 0;
+  top: -7em;
   left: 0;
   width: 33%;
-  background: -webkit-gradient(linear,left top,right top,from(#ffad5a),to(rgba(250,175,82,.25)));
-  background: linear-gradient(90deg,#ffad5a,rgba(250,175,82,.25));
+  background: -webkit-gradient(linear,left top,right top,from(#ffad5a),to(rgba(250,175,82,.05)));
+  background: linear-gradient(90deg,#ffad5a,rgba(250,175,82,.05));
 }
 
 .stripes .s2 {
-  top: 190px;
+  top: 5em;
   left: 0;
-  width: 38%;
+  width: 46%;
   background: -webkit-gradient(linear,left top,right top,from(#ffcd68),to(rgba(255,199,107,0)));
-  background: linear-gradient(90deg,#ffcd68,rgba(255,199,107,0))
+  background: linear-gradient(90deg,#ffcd68,rgba(255,199,107,0));
 }
 
 .stripes .s3 {
-  top: 380px;
+  top: 17em;
   right: 0;
-  width: 36%;
+  width: 46%;
   background: -webkit-gradient(linear,left top,right top,from(hsla(46,98%,78%,0)),to(#ffda84));
-  background: linear-gradient(90deg,hsla(46,98%,78%,0),#ffda84)
+  background: linear-gradient(90deg,hsla(46,98%,78%,0),#ffda84);
 }
 
 
@@ -462,7 +467,7 @@ h1 {
   display: inline-block;
   line-height: 3em;
   padding: 0 1em;
-  box-shadow: 0 4px 6px rgba(50,50,93,.11),0 1px 3px rgba(0,0,0,.08);
+  box-shadow: 0 0.2em 0.3em rgba(50,50,93,.11),0 0.05em 0.15em rgba(0,0,0,.08);
   background-color: #6772e5;
   border-radius: 0.2em;
   text-transform: uppercase;
@@ -477,14 +482,14 @@ h1 {
   color: #fff;
   background-color: #7795f8;
   transform: translateY(-0.1em);
-  box-shadow: 0 7px 14px rgba(50,50,93,.1),0 3px 6px rgba(0,0,0,.08)
+  box-shadow: 0 0.35em 10.2em rgba(50,50,93,.1),0 0.15em 0.3em rgba(0,0,0,.08)
 }
 
 #content a.button:active {
   color: #e6ebf1;
   background-color: #555abf;
   transform: translateY(0.1em);
-  box-shadow: 0 4px 6px rgba(50,50,93,.11),0 1px 3px rgba(0,0,0,.08)
+  box-shadow: 0 0.2em 0.3em rgba(50,50,93,.11),0 0.05em 0.15em rgba(0,0,0,.08)
 }
 
 #content > .hdesc .description {
