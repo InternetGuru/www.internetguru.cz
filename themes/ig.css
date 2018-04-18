@@ -375,26 +375,32 @@ a#scrolltop {
 h1 {
   color: #7c0e3e;
   margin: 0;
-  padding-top: 1.5em;
-  padding-bottom: 1em;
+  padding: 2em 1rem;
   text-align: center;
   font-size: 2.5em;
 }
 
 #content > .hdesc > div {
   background-color: rgb(246, 191, 78);
-  background: linear-gradient(rgb(246, 191, 78),#ffecc4);
+  background: linear-gradient(rgb(246, 191, 78) 0%,#ffffff 80%);
   margin-top: -5em;
 }
 
 #content > .hdesc > div:after {
-  content: url("/files/header/web.svg");
+  content: url("/files/header/web5.svg");
+  display: block;
+  text-align: center;
+  position: relative;
+  top: 5em;
+  left: -21em;
+  margin-top: -21em;
+  max-width: 100%;
 }
 
 #content > .hdesc > div > div:first-child {
   position: relative;
   padding-top: 5em;
-  z-index: 1;
+  z-index: 2;
 }
 
 .stripes {
@@ -404,6 +410,7 @@ h1 {
   top: -130px;
   -webkit-transform: skewY(-12deg);
   transform: skewY(-12deg);
+  z-index: 1;
 }
 
 .stripes .stripe {
@@ -414,9 +421,9 @@ h1 {
 .stripes .s1 {
   top: 0;
   left: 0;
-  width: 30%;
+  width: 33%;
   background: -webkit-gradient(linear,left top,right top,from(#ffad5a),to(rgba(250,175,82,.25)));
-  background: linear-gradient(90deg,#ffad5a,rgba(250,175,82,.25))
+  background: linear-gradient(90deg,#ffad5a,rgba(250,175,82,.25));
 }
 
 .stripes .s2 {
@@ -481,7 +488,7 @@ h1 {
 }
 
 #content > .hdesc .description {
-  margin-top: 3em;
+  margin-top: 0;
 }
 
 .part:last-child {
