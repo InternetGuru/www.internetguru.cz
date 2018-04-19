@@ -40,18 +40,23 @@ div.list.multiple dt {
   font-size: 1.15em;
 }
 
-h2 {
-  font-size: 2em;
-  margin: 0;
-  margin-bottom: 2em;
-}
-
 h1, h2, h3, h4 {
   color: #1e1e1e;
   font-weight: 400;
   padding-left:  1rem;
   padding-right:  1rem;
 }
+
+h2 {
+  font-size: 2em;
+  margin: 0;
+}
+
+h3 {
+  font-size: 1.3em;
+  font-weight: 600;
+}
+
 
 body {
   color: #525f7f;
@@ -101,9 +106,15 @@ ol.contentlink-bc li a:first-child {
     /* position: relative; */
 }
 
+#content > .hdesc .description {
+  margin-top: 0;
+  text-align: center;
+  max-width: 35em;
+  font-size: 1.3em;
+}
+
 h2 + p.description {
-    padding: 0 1em 2rem 1em;
-    font-size: 1.2em;
+    font-size: 1.3em;
 }
 
 #messages, #header {
@@ -300,7 +311,7 @@ ul.logo li a object {
 
 #footer {
   padding: 1em;
-  padding-top: 2em;
+  padding-top: 0;
   background: whitesmoke;
   position: relative;
   /* z-index: -2; */
@@ -313,6 +324,18 @@ ul.logo li a object {
 
 #footer > ul.globalmenu > li a.current {
   color: #E02000;
+}
+
+#footer:before {
+  position: absolute;
+  content: "";
+  width: 100%;
+  height: 100%;
+  top: -4em;
+  left: 0;
+  background: whitesmoke;
+  transform: skewY(-2deg);
+  z-index: -2;
 }
 
 @media all and (min-width: 150em) {
@@ -336,6 +359,22 @@ a#scrolltop {
   padding: 7em 0;
 }
 
+.section {
+  background: transparent url("") no-repeat fixed center;
+}
+
+.part:first-child {
+  max-width: 62em;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#content div.part:first-child > * {
+  max-width: 35em;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 .part:nth-child(2) {
   position: relative;
   background-color: #32315e;
@@ -344,7 +383,7 @@ a#scrolltop {
 
 .part:nth-child(2) > *,
 .part:nth-child(2) a {
-  color: white;
+  color: #cfd7df;
   border-color: #ffffffa1;
 }
 
@@ -369,6 +408,15 @@ a#scrolltop {
   z-index: -1;
 }
 
+.part:nth-child(2) h2 {
+  text-align: center;
+  color: white;
+}
+
+.part:nth-child(2) h3 {
+  color: white;
+}
+
 h1 {
   color: #7c0e3e;
   margin: 0;
@@ -386,7 +434,7 @@ h1 {
 
 #content > .hdesc > div > div:first-child {
   position: relative;
-  padding: 12em 0;
+  padding: 13em 0;
   z-index: 2;
 }
 
@@ -475,10 +523,6 @@ h1 {
   background-color: #555abf;
   transform: translateY(0.1em);
   box-shadow: 0 0.2em 0.3em rgba(50,50,93,.11),0 0.05em 0.15em rgba(0,0,0,.08)
-}
-
-#content > .hdesc .description {
-  margin-top: 0;
 }
 
 .part:last-child {

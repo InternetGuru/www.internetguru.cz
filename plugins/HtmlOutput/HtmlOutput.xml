@@ -7,7 +7,7 @@
       <stylesheet>lib/opensans/opensans.css</stylesheet>
       <stylesheet>lib/flaticon/flaticon.css</stylesheet>
       <stylesheet>lib/font-awesome/css/font-awesome.css</stylesheet>
-      <xslt>themes/lists.xsl</xslt>
+<!--       <xslt>themes/lists.xsl</xslt> -->
 <!--       <xslt>themes/basicLayout.xsl</xslt> -->
       <xslt>themes/default/layout.xsl</xslt>
       <xslt>themes/h1desc.xsl</xslt>
