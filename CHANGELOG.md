@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
 
+## [2.10.5] - 2018-04-19
+### Fixed
+ - Load meta description from internal register
+
 ## [2.10.4] - 2018-04-19
 ### Fixed
  - Script tag
@@ -339,6 +343,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
 [2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.2
+[2.10.5]: https://bitbucket.org/igwr/cms/compare/v2.10.5..v2.10.4
 [2.10.4]: https://bitbucket.org/igwr/cms/compare/v2.10.4..v2.10.3
 [2.10.3]: https://bitbucket.org/igwr/cms/compare/v2.10.3..v2.10.2
 [2.10.2]: https://bitbucket.org/igwr/cms/compare/v2.10.2..v2.10.1
