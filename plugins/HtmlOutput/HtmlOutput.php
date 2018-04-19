@@ -933,7 +933,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       }
       $element = $parent->ownerDocument->createElement("script");
       $this->appendCdata($element, $this->jsFiles[$key]["content"]);
-      $element->setAttribute("type", "text/javascript");
       $filePath = ROOT_URL.get_resdir($this->jsFiles[$key]["file"]);
       if (!is_null($this->jsFiles[$key]["file"])) {
         $element->setAttribute("src", $filePath);
