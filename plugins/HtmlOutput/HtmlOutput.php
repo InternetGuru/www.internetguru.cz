@@ -933,13 +933,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       }
       $element = $parent->ownerDocument->createElement("script");
       $this->appendCdata($element, $this->jsFiles[$key]["content"]);
-      $element->setAttribute("type", "text/javascript");
       $filePath = ROOT_URL.get_resdir($this->jsFiles[$key]["file"]);
       if (!is_null($this->jsFiles[$key]["file"])) {
         $element->setAttribute("src", $filePath);
-      }
-      if (array_key_exists("async", $this->jsFiles[$key]) && $this->jsFiles[$key]["async"] ===  true) {
-        $element->setAttribute("async", "async");
+        if (array_key_exists("async", $this->jsFiles[$key]) && $this->jsFiles[$key]["async"] ===  true) {
+          $element->setAttribute("async", "async");
+        }
       }
       $ieIfComment = isset($this->jsFiles[$key]["if"]) ? $this->jsFiles[$key]["if"] : null;
       if (!is_null($ieIfComment)) {
