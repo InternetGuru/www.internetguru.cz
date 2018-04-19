@@ -8,6 +8,7 @@ use DOMImplementation;
 use DOMXPath;
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\ErrorPage;
@@ -538,7 +539,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendMeta($head, "viewport", "initial-scale=1");
     $this->appendMeta($head, "generator", Cms::getVariable("cms-name"));
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
-    $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
+    $this->appendMeta($head, "description", HTMLPlusBuilder::getIdToDesc($h1->getAttribute("id")));
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $this->appendMeta($head, "robots", $this->metaRobots);
     foreach ($this->metaElements as $name => $metaElement) {
