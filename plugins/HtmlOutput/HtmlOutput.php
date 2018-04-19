@@ -8,6 +8,7 @@ use DOMImplementation;
 use DOMXPath;
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\ErrorPage;
@@ -539,7 +540,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendMeta($head, "viewport", "initial-scale=1");
     $this->appendMeta($head, "generator", Cms::getVariableValue("cms-name"));
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
-    $this->appendMeta($head, "description", $h1->nextElement->nodeValue);
+    $this->appendMeta($head, "description", HTMLPlusBuilder::getIdToDesc($h1->getAttribute("id")));
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $this->appendMeta($head, "robots", $this->metaRobots);
     foreach ($this->metaElements as $name => $metaElement) {
@@ -934,13 +935,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       }
       $element = $parent->ownerDocument->createElement("script");
       $this->appendCdata($element, $this->jsFiles[$key]["content"]);
-      $element->setAttribute("type", "text/javascript");
       $filePath = ROOT_URL.get_resdir($this->jsFiles[$key]["file"]);
       if (!is_null($this->jsFiles[$key]["file"])) {
         $element->setAttribute("src", $filePath);
-      }
-      if (array_key_exists("async", $this->jsFiles[$key]) && $this->jsFiles[$key]["async"] ===  true) {
-        $element->setAttribute("async", "async");
+        if (array_key_exists("async", $this->jsFiles[$key]) && $this->jsFiles[$key]["async"] ===  true) {
+          $element->setAttribute("async", "async");
+        }
       }
       $ieIfComment = isset($this->jsFiles[$key]["if"]) ? $this->jsFiles[$key]["if"] : null;
       if (!is_null($ieIfComment)) {
