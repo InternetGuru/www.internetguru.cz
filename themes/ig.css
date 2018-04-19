@@ -5,13 +5,13 @@ a[href] {
 }
 a[href] {
   text-decoration: none;
-  color: #BF342F;
-  border-color: #D37B78;
+  color: #7c0e3e;
+  border-color: #7c0e3e8f;
 }
 
 a:visited {
   color: #5b0358;
-  border-color: #a277a0;
+  border-color: #5b035887;
 }
 
 .hdesc a[href],
@@ -44,7 +44,6 @@ h2 {
   font-size: 2em;
   margin: 0;
   margin-bottom: 2em;
-  text-align: center;
 }
 
 h1, h2, h3, h4 {
@@ -102,13 +101,12 @@ ol.contentlink-bc li a:first-child {
     /* position: relative; */
 }
 
-p.description {
+h2 + p.description {
     padding: 0 1em 2rem 1em;
-    text-align: center;
     font-size: 1.2em;
 }
 
-#header {
+#messages, #header {
   padding: 0 1em;
   position: relative;
   z-index: 2;
@@ -302,14 +300,15 @@ ul.logo li a object {
 
 #footer {
   padding: 1em;
-  padding-top: 5em;
+  padding-top: 2em;
   background: whitesmoke;
   position: relative;
   /* z-index: -2; */
 }
 
-#footer,
-#footer a {
+#footer > ul:first-child {
+    border-top: thin solid #d8d8d8;
+    padding-top: 2em;
 }
 
 #footer > ul.globalmenu > li a.current {
@@ -337,24 +336,20 @@ a#scrolltop {
   padding: 7em 0;
 }
 
-.part:nth-child(2n) {
+.part:nth-child(2) {
   position: relative;
   background-color: #32315e;
   background: linear-gradient(#32315e,#515e80);
 }
 
-.part:nth-child(2n) > *,
-.part:nth-child(2n) a {
+.part:nth-child(2) > *,
+.part:nth-child(2) a {
   color: white;
+  border-color: #ffffffa1;
 }
 
-.part:nth-child(2n) a {
-  border-color: #939ebf;
-}
-
-
-.part:nth-child(2n):before,
-.part:nth-child(2n):after {
+.part:nth-child(2):before,
+.part:nth-child(2):after {
   position: absolute;
   content: "";
   width: 100%;
@@ -366,7 +361,7 @@ a#scrolltop {
   z-index: -2;
 }
 
-.part:nth-child(2n):before {
+.part:nth-child(2):before {
   top: 0;
   left: 0;
   background: #feae59;
@@ -387,20 +382,6 @@ h1 {
   background: linear-gradient(rgb(246, 191, 78) 30%, #ffffff 60%);
   margin-top: -12em;
   position: relative;
-}
-
-x#content > .hdesc > div:after {
-  content: url("/files/header/web2.svg");
-  display: block;
-  text-align: center;
-  position: relative;
-  top: 0em;
-  left: -15em;
-  margin-top: -11em;
-  max-width: 100%;
-  /* width: 70em; */
-  /* height: 50em; */
-  opacity: 0.3;
 }
 
 #content > .hdesc > div > div:first-child {

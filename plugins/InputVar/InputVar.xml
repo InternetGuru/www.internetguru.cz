@@ -22,8 +22,9 @@
     <call>monthen</call>
   </fn>
 
-  <var id="service_plain">E-Základna, www.e-zakladna.cz</var>
-  <var id="service">Powered by: <a href="https://www.e-zakladna.cz">E-Základna</a></var>
+  <var id="service_plain">Internet Guru, www.internetguru.cz</var>
+<!--   <var id="service">Powered by: Internet Guru</var> -->
+  <var id="service"></var>
   <var id="mtime">Edited: <span var="cms-mtime" fn="inputvar-dateformat">n/a</span></var>
   <var id="ielt7">
     <div class="ielte7" style="background: yellow; margin: 0; border: 0.3em solid red;">
