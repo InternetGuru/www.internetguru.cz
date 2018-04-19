@@ -540,7 +540,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendMeta($head, "viewport", "initial-scale=1");
     $this->appendMeta($head, "generator", Cms::getVariableValue("cms-name"));
     $this->appendMeta($head, "author", $h1->getAttribute("author"));
-    $this->appendMeta($head, "description", HTMLPlusBuilder::getIdToDesc($h1->getAttribute("id")));
+    $desc = HTMLPlusBuilder::getIdToDesc($h1->getAttribute("id"));
+    if (!strlen($desc)) {
+      $desc = $h1->nextElement->nodeValue;
+    }
+    $this->appendMeta($head, "description", $desc);
     $this->appendMeta($head, "keywords", $h1->nextElement->getAttribute("kw"));
     $this->appendMeta($head, "robots", $this->metaRobots);
     foreach ($this->metaElements as $name => $metaElement) {
