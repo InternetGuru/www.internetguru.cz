@@ -42,7 +42,8 @@ div.list.multiple dt {
 
 h2 {
   font-size: 2em;
-  margin: 1em 0;
+  margin: 0;
+  margin-bottom: 2em;
   text-align: center;
 }
 
@@ -91,14 +92,14 @@ ol.contentlink-bc li a {
 
 ol.contentlink-bc li a:first-child {
   padding-left: 0;
-  font-weight: 600;
+  font-weight: 700;
   /* font-size: 1.3em; */
   /* line-height: 1; */
 }
 
 #content div.hdesc {
     max-width: 100%;
-    position: relative;
+    /* position: relative; */
 }
 
 p.description {
@@ -110,7 +111,7 @@ p.description {
 #header {
   padding: 0 1em;
   position: relative;
-  z-index: 10;
+  z-index: 2;
 }
 
 #header > * {
@@ -123,7 +124,7 @@ p.description {
 #header > div {
   max-width: 60rem;
   margin: 0 auto;
-  padding: 0.5em 0;
+  padding: 0.5em;
   position: relative;
   border-bottom: thin solid #fbe4b3;
 }
@@ -153,11 +154,11 @@ p.description {
 #header > div .globalmenu a {
   border: none;
   display: block;
-  padding: 1em 1.5em;
+  padding: 1em 1.1em;
   text-align: center;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.03em;
   color: #fff;
-  font-weight: 600;
+  /* font-weight: 600; */
   background: none;
  }
 #header div.hideable-button span:last-child {
@@ -304,7 +305,7 @@ ul.logo li a object {
   padding-top: 5em;
   background: whitesmoke;
   position: relative;
-  z-index: -2;
+  /* z-index: -2; */
 }
 
 #footer,
@@ -382,12 +383,13 @@ h1 {
 }
 
 #content > .hdesc > div {
-  background-color: rgb(246, 191, 78);
-  background: linear-gradient(rgb(246, 191, 78) 0%, #ffffff 60%);
-  margin-top: -5em;
+  /* bg covering left corner */
+  background: linear-gradient(rgb(246, 191, 78) 30%, #ffffff 60%);
+  margin-top: -12em;
+  position: relative;
 }
 
-#content > .hdesc > div:after {
+x#content > .hdesc > div:after {
   content: url("/files/header/web2.svg");
   display: block;
   text-align: center;
@@ -403,19 +405,21 @@ h1 {
 
 #content > .hdesc > div > div:first-child {
   position: relative;
-  padding-top: 5em;
+  padding: 12em 0;
   z-index: 2;
 }
 
 .stripes {
   position: absolute;
   width: 100%;
-  /* height: 34em; */
-  top: 0em;
+  height: 36em;
+  top: 0;
   -webkit-transform: skewY(-12deg);
   transform: skewY(-12deg);
   z-index: 1;
-  /* background: #fffdf3; */
+  background-color: rgb(246, 191, 78);
+  background: linear-gradient(rgb(246, 191, 78) 40%, #fef9ee 85%);
+  /* background: #ffce6c; */
 }
 
 .stripes .stripe {
@@ -424,15 +428,15 @@ h1 {
 }
 
 .stripes .s1 {
-  top: -7em;
+  top: 0;
   left: 0;
   width: 33%;
   background: -webkit-gradient(linear,left top,right top,from(#ffad5a),to(rgba(250,175,82,.05)));
-  background: linear-gradient(90deg,#ffad5a,rgba(250,175,82,.05));
+  background: linear-gradient(90deg,#ffa143,rgba(250,175,82,.05));
 }
 
 .stripes .s2 {
-  top: 5em;
+  top: 12em;
   left: 0;
   width: 46%;
   background: -webkit-gradient(linear,left top,right top,from(#ffcd68),to(rgba(255,199,107,0)));
@@ -440,7 +444,7 @@ h1 {
 }
 
 .stripes .s3 {
-  top: 17em;
+  top: 24em;
   right: 0;
   width: 46%;
   background: -webkit-gradient(linear,left top,right top,from(hsla(46,98%,78%,0)),to(#ffda84));
@@ -468,7 +472,7 @@ h1 {
   line-height: 3em;
   padding: 0 1em;
   box-shadow: 0 0.2em 0.3em rgba(50,50,93,.11),0 0.05em 0.15em rgba(0,0,0,.08);
-  background-color: #6772e5;
+  background-color: #5E6AE3;
   border-radius: 0.2em;
   text-transform: uppercase;
   letter-spacing: .025em;
