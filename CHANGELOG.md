@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.10.6] - 2018-04-19
 ### Fixed
  - Meta description fallback to HTML content
 
@@ -337,7 +337,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.10.6]: https://bitbucket.org/igwr/cms/compare/v2.10.6..v2.10.5
 [2.10.5]: https://bitbucket.org/igwr/cms/compare/v2.10.5..v2.10.4
 [2.10.4]: https://bitbucket.org/igwr/cms/compare/v2.10.4..v2.10.3
 [2.10.3]: https://bitbucket.org/igwr/cms/compare/v2.10.3..v2.10.2
