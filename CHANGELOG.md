@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - Service worker cache
  - Inputvar supports required attribute
 
 ## [2.11.0] - 2018-04-12
