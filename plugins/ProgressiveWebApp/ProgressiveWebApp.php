@@ -91,9 +91,9 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
 
   public static function handleRequest () {
     header('Content-Type: application/javascript');
-    header('Expires: '.gmdate('D, d M Y H:i:s \G\M\T', time() + (60 * 60 * 24 * 30))); // 1 month
+    header('Cache-Control: max-age=0'); // https://stackoverflow.com/questions/41000874/service-worker-expiration
     echo "importScripts('/".LIB_DIR."/sw-toolbox.js');
-    toolbox.router.get('/:path([^.?]+)', toolbox.networkFirst);
+    toolbox.router.get('/:path([^.?]*)', toolbox.networkFirst);
     // toolbox.router.default = toolbox.networkFirst;";
     exit;
   }
