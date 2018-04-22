@@ -21,7 +21,7 @@
   </themes>
   <var id="theme">ig</var>
   <stylesheet append="head">themes/ig.css</stylesheet>
-  <stylesheet>themes/ig.media.css</stylesheet>
+<!--   <stylesheet>themes/ig.media.css</stylesheet> -->
   <favicon>themes/ig.ico</favicon>
   <jsFile append="head">themes/webfont.js</jsFile>
   <jsFile append="head">themes/fontloader.js</jsFile>
