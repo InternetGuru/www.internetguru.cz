@@ -6,6 +6,29 @@
   <var id="subject" modifyonly="modifyonly">New Message from internetguru.cz</var>
   <var id="success" modifyonly="modifyonly">Thank you, message has been sent!</var>
 
+  <message for="help">
+    Help form message:
+
+    $message
+    
+    Contact:
+    
+    $contact
+
+    --
+    Odesláno z IP adresy $cms-ip
+    $inputvar-service_plain
+  </message>
+  <form id="help">
+    <dl>
+      <dt><label for="message">How can we help with your web presence?</label></dt>
+      <dd><textarea id="message" required="required">1) Current </textarea></dd>
+      <dt><label for="contact">How can we contact you?</label></dt>
+      <dd><input type="text" id="contact" required="required" placeholder="+1 (305) 123-1234, john.smith@gmail.com"/></dd>
+      <dd><input type="submit" id="submit" value="Send"/></dd>
+    </dl>
+  </form>
+
   <message for="tel">
 Someone just entered following telephone number into contact form
 
