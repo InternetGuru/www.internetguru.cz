@@ -9,4 +9,4 @@ li.print {display: list-item;}
 ::placeholder {color: transparent;}
 ol.contentlink-bc {list-style: none; padding-left: 0;}
 ol.contentlink-bc li {display: inline-block;}
-ol.contentlink-bc li + li:before {content: ">"; margin: 0 0.5em;}
+ol.contentlink-bc li + li:before {margin: 0 0.5em;}
