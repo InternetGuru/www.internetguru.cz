@@ -121,7 +121,7 @@ h2 + p.description {
 #messages, #header {
   padding: 0 1em;
   position: relative;
-  z-index: 2;
+  z-index: 3;
 }
 
 #header > * {
