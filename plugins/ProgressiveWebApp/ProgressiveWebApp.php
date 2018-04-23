@@ -92,17 +92,26 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
   public static function handleRequest () {
     header('Content-Type: application/javascript');
     header('Cache-Control: max-age=0'); // https://stackoverflow.com/questions/41000874/service-worker-expiration
-    echo "importScripts('/".LIB_DIR."/sw-toolbox.js');
+    echo "
+    importScripts('/".LIB_DIR."/sw-toolbox.js')
+    
+    var cacheHandler = function (request, values, options) {
+      //if (document.cookie.match(/PHPSESSID=[^;]+/)) {
+        return self.toolbox.networkOnly(request, values, options)
+      //} else {
+      //  return self.toolbox.fastest(request, values, options)
+      //}
+    }
     
     self.toolbox.router.get(
       /^https:\\/\\/[^.]+\\.[^.]+\\.[^./]+(\\/?|\\/[^.?]+)$/,
-      self.toolbox.fastest,
+      cacheHandler,
       {
         cache: {
-          name: 'content-cache-v1'
+          name: 'content-cache-v2'
         }
       }
-    ); 
+    )
     ";
     exit;
   }
