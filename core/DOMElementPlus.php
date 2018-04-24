@@ -29,6 +29,12 @@ class DOMElementPlus extends DOMElement {
    */
   public $varRecursionLvl = 0;
 
+  public function __sleep () {
+    return [
+      "content" => $this->ownerDocument->saveXML($this)
+    ];
+  }
+
   /**
    * @param string $aName
    * @return string

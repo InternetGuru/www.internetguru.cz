@@ -31,6 +31,12 @@ class DOMDocumentPlus extends DOMDocument {
     parent::registerNodeClass("DOMElement", "IGCMS\\Core\\DOMElementPlus");
   }
 
+  public function __sleep () {
+    return [
+      "content" => $this->saveXML()
+    ];
+  }
+
   /**
    * @param string $eName
    * @param string $aMatch
@@ -167,8 +173,8 @@ class DOMDocumentPlus extends DOMDocument {
     $cacheKey = apc_get_key(__FUNCTION__."/"
       .self::APC_ID."/"
       .$element->getNodePath()."/"
-      .hash("crc32b", print_r($variables, true))."/"
-      .hash("crc32b", $element->ownerDocument->saveXML($element))."/"
+      .hash("sha1", serialize($variables))."/"
+      .hash("sha1", serialize($element))."/"
       .$deep
     );
     $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
