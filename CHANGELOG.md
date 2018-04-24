@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - Service worker uses cache-first (fastest) method
  - Service worker cache
  - Inputvar supports required attribute
 
