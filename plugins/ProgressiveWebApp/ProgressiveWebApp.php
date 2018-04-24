@@ -95,17 +95,9 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     echo "
     importScripts('/".LIB_DIR."/sw-toolbox.js')
     
-    var cacheHandler = function (request, values, options) {
-      //if (document.cookie.match(/PHPSESSID=[^;]+/)) {
-        return self.toolbox.networkOnly(request, values, options)
-      //} else {
-      //  return self.toolbox.fastest(request, values, options)
-      //}
-    }
-    
     self.toolbox.router.get(
       /^https:\\/\\/[^.]+\\.[^.]+\\.[^./]+(\\/?|\\/[^.?]+)$/,
-      cacheHandler,
+      self.toolbox.fastest,
       {
         cache: {
           name: 'content-cache-v2'
