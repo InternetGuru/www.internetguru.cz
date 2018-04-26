@@ -13,6 +13,7 @@
     Config.collapseTitle = "Collapse"
     Config.hideableHiddenClass = Config.ns + "-hidden"
     Config.hideableNohideClass = Config.ns + "-nohide"
+    Config.hideableNohideFallbackClass = "nohide"
     Config.hideClass = Config.ns + "-hide"
     Config.switchClass = Config.ns + "-switch"
     Config.noprintClass = "noprint"
@@ -30,7 +31,7 @@
           if (link === null) {
             continue
           }
-          if (hideables[i].classList.contains(Config.hideableNohideClass)) {
+          if (hideables[i].classList.contains(Config.hideableNohideClass) || hideables[i].classList.contains(Config.hideableNohideFallbackClass)) {
             continue
           }
           hideables[i].classList.add(Config.hideableNohideClass)
@@ -59,19 +60,19 @@
           var before = item.getAttribute(Config.dataBefore)
           var button = null
           var value = ""
-          if (here !== null) {
-            value = (here === Config.dataHere || here === '') ? item.innerHTML : here
-            button = createToggleButton(value)
-            item.innerHTML = ""
-            item.appendChild(button)
-            return button
-          }
           if (before !== null) {
             value = (before === Config.dataBefore || before === '') ? item.innerHTML : before
             button = createToggleButton(value)
             var el = document.createElement(item.nodeName)
             el.appendChild(button)
             item.parentNode.insertBefore(el, item)
+            return button
+          }
+          if (here !== null || i === 0) {
+            value = (here === Config.dataHere || !here) ? item.innerHTML : here
+            button = createToggleButton(value)
+            item.innerHTML = ""
+            item.appendChild(button)
             return button
           }
         }
@@ -126,8 +127,8 @@
             + ' .' + Config.hideClass + ' { display: none !important; }'
             + ' a.' + Config.switchClass + ' { text-decoration: none;'
             + ' border: none !important;'
-            + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
-            + ' font-weight: bold }';
+            // + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
+            + ' font-weight: 600; }';
           IGCMS.appendStyle(css);
           initHideables();
           inited = true;

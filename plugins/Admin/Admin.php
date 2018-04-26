@@ -769,7 +769,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         "cacheable" => true,
       ];
       $vars["nohide"] = [
-        "value" => "nohide",
+        "value" => "hideable-nohide",
         "cacheable" => true,
       ];
     }
