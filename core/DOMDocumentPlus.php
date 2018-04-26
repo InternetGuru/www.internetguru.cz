@@ -195,11 +195,10 @@ class DOMDocumentPlus extends DOMDocument {
       }
       $result = $element;
     } else {
-      $cacheable = "true";
       $cacheableVariables = array_filter(
         $variables,
-        function($value) use ($cacheable) {
-          return $value['cacheable'] == $cacheable;
+        function($value) {
+          return $value['cacheable'] === true;
         }
       );
       $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
@@ -213,11 +212,10 @@ class DOMDocumentPlus extends DOMDocument {
       apc_store_cache($cacheKey, $cache, __FUNCTION__);
     }
 
-    $cacheable = "false";
     $notCacheableVariables = array_filter(
       $variables,
-      function($value) use ($cacheable) {
-        return $value['cacheable'] == $cacheable;
+      function($value) {
+        return $value['cacheable'] === false;
       }
     );
 
