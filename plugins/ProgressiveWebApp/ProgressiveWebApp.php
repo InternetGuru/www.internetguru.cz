@@ -74,10 +74,22 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     }
     // save manifest
     file_put_contents(self::MANIFEST, replace_vars($manifestTemplate, [
-      "name" => $name,
-      "shortName" => $shortName,
-      "rootUrl" => ROOT_URL,
-      "themeColor" => $themeColor,
+      "name" => [
+        "value" => $name,
+        "cacheable" => false,
+      ],
+      "shortName" => [
+        "value" => $shortName,
+        "cacheable" => false,
+      ],
+      "rootUrl" => [
+        "value" => ROOT_URL,
+        "cacheable" => false,
+      ],
+      "themeColor" => [
+        "value" => $themeColor,
+        "cacheable" => false,
+      ],
     ]));
   }
 
