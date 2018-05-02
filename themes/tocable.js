@@ -27,7 +27,7 @@
           var div = document.createElement("p");
           div.className = "list";
           tocWrapper = document.createElement("dl");
-          tocWrapper.className = "hideable nohide toc";
+          tocWrapper.className = "hideable hideable-nohide toc";
           div.appendChild(tocWrapper);
           tocRoot.parentNode.insertBefore(div, tocRoot);
           return true;

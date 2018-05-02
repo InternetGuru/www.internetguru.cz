@@ -3,7 +3,8 @@
   <h id="convertor" author="InternetGuru" ctime="2015-05">Convertor</h>
   <desc kw="import, google document, word, plugin">Import do HTML+ ze souboru nebo z URL</desc>
   <form action="/" method="get" var="action@action">
-    <fieldset class="hideable nohide"><legend>Import souboru</legend>
+    <fieldset class="hideable hideable-nohide">
+      <legend>Import souboru</legend>
       <dl>
         <dt><label for="i1">Umístění nebo URL souboru, který chcete zobrazit nebo importovat</label></dt>
         <dd><input id="i1" name="Convertor" type="text" var="link@value"/></dd>
@@ -13,7 +14,8 @@
         <dd class="links"><samp var="importedhtml">žádné</samp></dd>
       </dl>
     </fieldset>
-    <fieldset class="hideable" var="nohide@class"><legend>Importovaný soubor <samp var="filename">n/a</samp></legend>
+    <fieldset class="hideable" var="nohide@class">
+      <legend>Importovaný soubor <samp var="filename">n/a</samp></legend>
       <blockcode class="selectable html" var="content">n/a</blockcode>
     </fieldset>
   </form>
