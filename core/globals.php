@@ -111,7 +111,7 @@ function replace_vars ($string, Array $variables, $varPrefix = null) {
         continue;
       }
     }
-    $value = $variables[$vName];
+    $value = $variables[$vName]["value"];
     if (is_array($value)) {
       $value = implode(", ", $value);
     } elseif ($value instanceof DOMElementPlus) {

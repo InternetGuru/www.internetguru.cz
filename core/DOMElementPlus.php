@@ -19,7 +19,7 @@ use Exception;
  * @property DOMElementPlus[] $childElementsArray
  * @property DOMElementPlus $lastElement
  */
-class DOMElementPlus extends DOMElement {
+class DOMElementPlus extends DOMElement implements \Serializable {
   /**
    * @var int
    */
@@ -28,6 +28,29 @@ class DOMElementPlus extends DOMElement {
    * @var int
    */
   public $varRecursionLvl = 0;
+
+  /**
+   * String representation of object
+   * @link http://php.net/manual/en/serializable.serialize.php
+   * @return string the string representation of the object or null
+   * @since 5.1.0
+   */
+  public function serialize () {
+    return $this->ownerDocument->saveXML($this);
+  }
+
+  /**
+   * Constructs the object
+   * @link http://php.net/manual/en/serializable.unserialize.php
+   * @param string $serialized <p>
+   * The string representation of the object.
+   * </p>
+   * @return void
+   * @since 5.1.0
+   */
+  public function unserialize ($serialized) {
+    // TODO: Implement unserialize() method.
+  }
 
   /**
    * @param string $aName

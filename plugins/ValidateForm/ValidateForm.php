@@ -101,11 +101,15 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     $doc = $form->ownerDocument;
     $div = $doc->createElement("div");
 
+    $hpLabel = $doc->createElement("label");
+    $hpLabel->setAttribute("class", self::FORM_HP);
+
     $input = $doc->createElement("input");
     $input->setAttribute("type", "email");
     $input->setAttribute("name", self::FORM_HP);
     $input->setAttribute("class", self::FORM_HP);
-    $div->appendChild($input);
+    $hpLabel->appendChild($input);
+    $div->appendChild($hpLabel);
 
     $input = $doc->createElement("input");
     $input->setAttribute("type", "hidden");

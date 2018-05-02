@@ -14,7 +14,7 @@ use Exception;
  * @property DOMElementPlus documentElement
  * @property DOMDocumentPlus $ownerDocument
  */
-class DOMDocumentPlus extends DOMDocument {
+class DOMDocumentPlus extends DOMDocument implements \Serializable {
 
   /**
    * @var int
@@ -29,6 +29,29 @@ class DOMDocumentPlus extends DOMDocument {
   function __construct ($version = "1.0", $encoding = "utf-8") {
     parent::__construct($version, $encoding);
     parent::registerNodeClass("DOMElement", "IGCMS\\Core\\DOMElementPlus");
+  }
+
+  /**
+   * String representation of object
+   * @link http://php.net/manual/en/serializable.serialize.php
+   * @return string the string representation of the object or null
+   * @since 5.1.0
+   */
+  public function serialize () {
+    return $this->saveXML();
+  }
+
+  /**
+   * Constructs the object
+   * @link http://php.net/manual/en/serializable.unserialize.php
+   * @param string $serialized <p>
+   * The string representation of the object.
+   * </p>
+   * @return void
+   * @since 5.1.0
+   */
+  public function unserialize ($serialized) {
+    // TODO: Implement unserialize() method.
   }
 
   /**
@@ -167,8 +190,8 @@ class DOMDocumentPlus extends DOMDocument {
     $cacheKey = apc_get_key(__FUNCTION__."/"
       .self::APC_ID."/"
       .$element->getNodePath()."/"
-      .hash("crc32b", print_r($variables, true))."/"
-      .hash("crc32b", $element->ownerDocument->saveXML($element))."/"
+      .hash("sha1", serialize($variables))."/"
+      .hash("sha1", serialize($element))."/"
       .$deep
     );
     $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
@@ -189,11 +212,10 @@ class DOMDocumentPlus extends DOMDocument {
       }
       $result = $element;
     } else {
-      $cacheable = "true";
       $cacheableVariables = array_filter(
         $variables,
-        function($value) use ($cacheable) {
-          return $value['cacheable'] == $cacheable;
+        function($value) {
+          return $value['cacheable'] === true;
         }
       );
       $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
@@ -207,11 +229,10 @@ class DOMDocumentPlus extends DOMDocument {
       apc_store_cache($cacheKey, $cache, __FUNCTION__);
     }
 
-    $cacheable = "false";
     $notCacheableVariables = array_filter(
       $variables,
-      function($value) use ($cacheable) {
-        return $value['cacheable'] == $cacheable;
+      function($value) {
+        return $value['cacheable'] === false;
       }
     );
 
@@ -397,5 +418,4 @@ class DOMDocumentPlus extends DOMDocument {
     }
     return true;
   }
-
 }
