@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Inputvar supports required attribute
 
 ### Changed
+ - Refactor hideable to use data attributes
  - Improve scrolltopable UX
- - Improve scrolltop UX
 
 ## [2.11.0] - 2018-04-12
 ### Added
