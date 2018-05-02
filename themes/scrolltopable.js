@@ -11,6 +11,8 @@
     Config.hidePosition = 200; // display / hide button int px from top
     Config.scrollhideClass = "scrollhide";
     Config.noprintClass = "noprint";
+    Config.visibleClass = Config.ns + "-visible";
+    Config.hiddenClass = Config.ns + "-hidden";
     Config.inactiveTimeout = 10; // s
     Config.deltaY = 200;
     Config.actionTimeout = 200; // ms
@@ -41,11 +43,11 @@
         },
         hideButton = function () {
           displayed = false;
-          button.style.opacity = 0;
+          button.className = Config.noprintClass + " " + Config.hiddenClass;
         },
         showButton = function () {
           displayed = true;
-          button.style.opacity = 1;
+          button.className = Config.noprintClass + " " + Config.visibleClass;
         },
         processScroll = function () {
           window.clearTimeout(windowScrollTimeOut);
@@ -70,7 +72,7 @@
           button = document.createElement("a");
           button.id = Config.wrapperId;
           button.title = Config.title;
-          button.className = Config.noprintClass;
+          button.className = Config.noprintClass + " " + Config.hiddenClass;
           var span = document.createElement("span");
           span.innerHTML = Config.text;
           button.appendChild(span);
@@ -98,19 +100,24 @@
             + '  bottom: 0;'
             + '  text-decoration: none;'
             + '  background: rgba(0, 0, 0, 0.45);'
-            + '  padding: 0.4em;'
             + '  font-size: 1.75rem;'
             + '  margin: 0.75rem;'
             + '  display: block;'
             + '  color: white;'
             + '  width: 1em;'
             + '  text-align: center;'
-            + '  height: 1em;'
+            + '  height: 0;'
+            + '  overflow: hidden;'
             + '  z-index: 100;'
             + '  cursor: pointer;'
             + '  line-height: 1;'
             + '  opacity: 0;'
-            + '  transition: all ' + Config.animationSpeed + 'ms ease;'
+            + '  transition: opacity ' + Config.animationSpeed + 'ms ease;'
+            + '}'
+            + 'a#' + Config.wrapperId + '.' + Config.visibleClass + ' { '
+            + '  padding: 0.4em;'
+            + '  height: 1em;'
+            + '  opacity: 1;'
             + '}'
             + 'a#' + Config.wrapperId + ':hover { background: rgba(0, 0, 0, 0.65) }'
             + 'a#' + Config.wrapperId + ' span { font-size: 2.3rem; }';
