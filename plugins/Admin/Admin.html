@@ -19,17 +19,13 @@
     <fieldset class="hideable hideable-nohide">
       <legend>Uživatelský soubor, mód <samp var="mode">n/a</samp>, stav <samp var="status warning@class">n/a</samp></legend>
       <textarea cols="40" name="content" rows="20" class="codemirror" var="content classtype@class"/>
-    </fieldset>
-    <fieldset>
-      <legend>Ovládací panel</legend>
-      <input name="userfilehash" type="hidden" value="" var="userfilehash@value"/>
       <ul>
         <li><a class="toggle" var="changestatusurl@href changestatus">n/a</a></li>
         <li><label>Uložit do souboru <input name="filename" type="text" var="filename@value filepathpattern@pattern"/></label></li>
         <li><label><input name="repair" value="repair" type="checkbox" checked="checked" /> Automaticky opravovat chyby</label></li>
         <li><label><input name="overwrite" value="overwrite" type="checkbox"/> Přepsat soubor, pokud existuje</label></li>
         <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
-        <li><input name="saveandgo" type="submit" value="Uložit a přejít" title="Ctrl+Shift+S"/></li>
+        <li><input name="saveandgo" type="submit" value="Uložit a přejít" title="Ctrl+Shift+S"/><input name="userfilehash" type="hidden" value="" var="userfilehash@value"/></li>
       </ul>
     </fieldset>
     <fieldset class="hideable" var="nohide@class">
