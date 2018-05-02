@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Honeypot label
  - Inputvar supports required attribute
 
+### Changed
+ - Refactor hideable to use data attributes
+ - Improve scrolltopable UX
+
 ## [2.11.0] - 2018-04-12
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
