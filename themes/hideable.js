@@ -125,9 +125,9 @@
           IGCMS.initCfg(Config, cfg);
           var css = '/* hideables.js */'
             + ' .' + Config.hideClass + ' { display: none !important; }'
+            + ' a.' + Config.switchClass + ' span { font-family: "Emilbus Mono", "Lucida Console", monospace; }'
             + ' a.' + Config.switchClass + ' { text-decoration: none;'
             + ' border: none !important;'
-            // + ' font-family: "Emilbus Mono", "Lucida Console", monospace;'
             + ' font-weight: 600; }';
           IGCMS.appendStyle(css);
           initHideables();
