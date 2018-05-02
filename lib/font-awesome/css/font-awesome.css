@@ -16,7 +16,7 @@
   text-rendering: auto;
   display: inline-block;
   text-align: center;
-  width: 1em;
+  margin-right: 0.3em;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
