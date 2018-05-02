@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
  - Refactor hideable to use data attributes
+ - Improve scrolltopable UX
 
 ## [2.11.0] - 2018-04-12
 ### Added
