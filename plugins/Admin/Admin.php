@@ -691,7 +691,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       ];
       $this->title = sprintf(_("%s (%s) - Administration"), basename($this->defaultFile), ROOT_URL.$this->defaultFile);
     } else {
-      $this->title = $vars["heading"];
+      $this->title = $vars["heading"]["value"];
     }
     $vars["link"] = [
       "value" => get_link(),
