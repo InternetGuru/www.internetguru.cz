@@ -15,6 +15,10 @@ class AgregatorList {
   /**
    * @var string
    */
+  const AGREGATOR_NAME="Agregator";
+  /**
+   * @var string
+   */
   private static $sortby;
   /**
    * @var bool
