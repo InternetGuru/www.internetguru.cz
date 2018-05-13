@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
 
+## [2.10.9] - 2018-05-14
+### Fixed
+ - Fix inserting specialchars into InputVar
+
 ## [2.10.8] - 2018-05-14
 ### Fixed
  - InputVar specialchars causing error
@@ -360,7 +364,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
-[2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.8
+[2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.9
+[2.10.9]: https://bitbucket.org/igwr/cms/compare/v2.10.9..v2.10.8
 [2.10.8]: https://bitbucket.org/igwr/cms/compare/v2.10.8..v2.10.7
 [2.10.7]: https://bitbucket.org/igwr/cms/compare/v2.10.7..v2.10.6
 [2.10.6]: https://bitbucket.org/igwr/cms/compare/v2.10.6..v2.10.5
