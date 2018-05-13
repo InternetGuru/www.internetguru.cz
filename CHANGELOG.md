@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.10.8] - 2018-05-14
+### Fixed
+ - InputVar specialchars causing error
+
 ## [2.10.7] - 2018-04-20
 ### Fixed
  - Service-worker cache
@@ -341,6 +345,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[2.10.8]: https://bitbucket.org/igwr/cms/compare/v2.10.8..v2.10.7
 [2.10.7]: https://bitbucket.org/igwr/cms/compare/v2.10.7..v2.10.6
 [2.10.6]: https://bitbucket.org/igwr/cms/compare/v2.10.6..v2.10.5
 [2.10.5]: https://bitbucket.org/igwr/cms/compare/v2.10.5..v2.10.4
