@@ -374,7 +374,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(_("No replacement found"));
     }
     return function(DOMNode $node) use ($pattern, $replacement) {
-      return preg_replace("/^(?:".$pattern.")$/", $replacement, $node->nodeValue);
+      return preg_replace("/^(?:".$pattern.")$/", $replacement, htmlspecialchars($node->nodeValue));
     };
   }
 
@@ -388,7 +388,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(_("No data found"));
     }
     return function(DOMNode $node) use ($replace) {
-      return str_replace(array_keys($replace), $replace, $node->nodeValue);
+      return str_replace(array_keys($replace), $replace, htmlspecialchars($node->nodeValue));
     };
   }
 
