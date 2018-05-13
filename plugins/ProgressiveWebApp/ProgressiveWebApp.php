@@ -109,7 +109,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
     
     self.toolbox.router.get(
       /^https:\\/\\/[^.]+\\.[^.]+\\.[^./]+(\\/?|\\/[^.?]+)$/,
-      self.toolbox.fastest,
+      self.toolbox.networkFirst,
       {
         cache: {
           name: 'content-cache-v2'
