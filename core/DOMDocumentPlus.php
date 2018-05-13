@@ -199,7 +199,7 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
     $cacheUpToDate = false;
     $cache = null;
     $result = null;
-    if ($cacheExists) {
+    if (Cms::getLoggedUser() != SERVER_USER && $cacheExists) {
       $cache = apc_fetch($cacheKey);
       $cacheUpToDate = $cache["newestFileMtime"] == $newestFileMtime;
     }
