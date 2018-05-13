@@ -133,7 +133,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         if ($this->vars[$key]->hasAttribute("var")) {
           $this->vars[$key]->setAttribute("var", normalize($this->className."-$value"));
         } else {
-          $this->vars[$key]->nodeValue = $value;
+          $this->vars[$key]->nodeValue = htmlspecialchars($value);
         }
         $var = $this->vars[$key];
       }
