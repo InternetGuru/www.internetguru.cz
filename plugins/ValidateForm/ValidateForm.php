@@ -37,7 +37,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
   /**
    * @var int Default input max-length
    */
-  const INPUT_MAX_LEN = 128;
+  const INPUT_MAX_LEN = 256;
   /**
    * @var int Default textarea max-length
    */
