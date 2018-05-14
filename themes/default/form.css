@@ -10,6 +10,7 @@ form dt {
   max-width: 15em;
   width: 100%;
   display: inline-block;
+  font-weight: 500;
 }
 
 form input[type="text"],
@@ -37,6 +38,8 @@ form dt, form dt+dd {
 
 form dt, form dt+dd+dd {
   clear:left;
+  font-weight: normal;
+  font-style: italic;
 }
 
 form input[type="text"],
@@ -56,9 +59,12 @@ form dd > textarea {
   box-sizing: border-box;
 }
 
-@media screen and (min-width: 32em) {
+@media screen and (min-width: 43em) {
   form dt, form dt+dd {
     float: left;
+  }
+  form dt+dd+dd {
+    margin-left: 15em;
   }
 }
 
