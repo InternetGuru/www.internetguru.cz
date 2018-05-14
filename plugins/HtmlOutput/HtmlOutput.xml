@@ -3,6 +3,7 @@
   <themes>
     <theme id="ig">
       <stylesheet>themes/cms-default.css</stylesheet>
+      <stylesheet>themes/default/columns.css</stylesheet>
       <stylesheet media="print">themes/cms-print.css</stylesheet>
       <stylesheet>lib/opensans/opensans.css</stylesheet>
       <stylesheet>lib/flaticon/flaticon.css</stylesheet>

@@ -32,7 +32,7 @@ div.list.multiple div {
 }
 
 div.list.multiple dl {
-  margin: 1em;
+  /*! margin: 1em; */
   padding: 0.5em 1em;
 }
 
@@ -109,7 +109,8 @@ div.section > pre {
 }
 
 #content > .section > .part > *, #header > *, #footer > *,
-#content > .hdesc > div > div:first-child > * {
+#content > .hdesc > div > div:first-child > *,
+div.list.multiple {
   max-width: 62rem;
   margin-left: auto;
   margin-right: auto;
