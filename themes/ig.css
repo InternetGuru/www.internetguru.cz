@@ -236,8 +236,8 @@ form#contactform-collaboration:after {
 
 input[type="submit"] {
   padding: 0.5rem 1rem;
-  background: #DB630B;
-  color: white;
+  background: #fff;
+  color: #6772e5;
   font-weight: 600;
   border: none;
 }
@@ -535,3 +535,66 @@ h1 {
   margin-top: 3em;
   margin-bottom: 3em;
 }
+
+/****************************/
+form#contactform-help {
+  background: #f6f9fc;
+  padding: 5em 0;
+  text-align: center;
+}
+form#contactform-help dl {
+  margin: 0;
+}
+form#contactform-help textarea {
+  margin: 1em 0 0;
+  border: thin solid #ddd;
+  border-radius: 0.3em 0.3em 0 0;
+  background: #fff;
+  padding: 0.5em 1em;
+  max-width: 35em;
+  height: 6em;
+}
+form#contactform-help:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+form#contactform-help dt,
+form#contactform-help dd {
+  max-width: 100%;
+  width: 100%
+}
+form#contactform-help dt {
+  font-size: 1em;
+  color: #424770;
+  text-transform: uppercase;
+}
+form#contactform-help dt:first-child {
+  margin-bottom: 0;
+}
+form#contactform-help dd:nth-child(3),
+form#contactform-help dd:nth-child(5) {
+  margin: 0;
+}
+form#contactform-help dt:nth-child(4) {
+  display: none;
+}
+form#contactform-help .send {
+  display: inline-flex;
+  width: 35em;
+  max-width: 100%;
+}
+form#contactform-help .send input[type="text"] {
+  flex-grow: 1;
+  border-radius: 0 0 0 0.3em;
+  border: thin solid #ddd;
+  border-top: none;
+}
+form#contactform-help .send input[type="submit"] {
+  border-radius: 0 0 0.3em 0;
+  border: thin solid #ddd;
+  border-top: none;
+  border-left: none;
+  text-transform: uppercase;
+}
+/****************************/
