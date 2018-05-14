@@ -41,7 +41,7 @@
   text-transform: uppercase;
   border: none;
   display: block;
-  padding: 1em 0 1em 2em;
+  padding: 1em;
   text-align: center;
   letter-spacing: 0.02em;
   background: none;
@@ -55,7 +55,7 @@
 #header .globalmenu-top {
   position: absolute;
   right: 0;
-  padding-right: 1.5em;
+  padding-right: 0;
 }
 @media (min-width: 28em) {
   #header > div .globalmenu li {
