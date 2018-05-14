@@ -43,6 +43,9 @@ class GlobalMenu extends Plugin implements SplObserver {
       $this->vars[$e->getAttribute("id")] = $e;
     }
     $this->generateMenu();
+    $os = Cms::getOutputStrategy();
+    $os->addCssFile($this->pluginDir."/".$this->className.".css");
+    $os->addTransformation($this->pluginDir."/".$this->className.".xsl");
   }
 
   private function generateMenu () {
