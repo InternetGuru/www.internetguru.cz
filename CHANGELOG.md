@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - GlobalMenu has own transformation and styles
  - Honeypot label
  - Inputvar supports required attribute
 
