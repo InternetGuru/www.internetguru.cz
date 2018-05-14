@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Inputvar supports required attribute
 
 ### Changed
+ - InputVar form inputs has no max-length
  - Eventable supports any element
  - Refactor hideable to use data attributes
  - Improve scrolltopable UX
