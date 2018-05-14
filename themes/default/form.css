@@ -20,6 +20,13 @@ form dd {
   width: 100%;
 }
 
+form#inputvarform input[type="text"],
+form#inputvarform input[type="email"],
+form#inputvarform dd > textarea,
+form#inputvarform dd {
+  max-width: none;
+}
+
 form dt, form dd {
   margin: 0.5rem 0;
 }
