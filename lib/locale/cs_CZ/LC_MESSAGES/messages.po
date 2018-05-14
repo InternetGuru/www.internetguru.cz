@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-02 18:43+0200\n"
-"PO-Revision-Date: 2018-05-02 18:44+0200\n"
+"POT-Creation-Date: 2018-05-14 15:28+0200\n"
+"PO-Revision-Date: 2018-05-14 15:28+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -542,7 +542,7 @@ msgstr "Neznámý název metody %s"
 msgid "Argument[%s] empty or missing"
 msgstr "Argument[%s] chybí nebo je prázdný"
 
-#: findex.php:18 plugins/FileHandler/FileHandler.php:181
+#: findex.php:18 plugins/FileHandler/FileHandler.php:182
 msgid "File not found"
 msgstr "Soubor nenalezen"
 
@@ -779,7 +779,7 @@ msgstr "Nenalezen referenční id '%s'"
 msgid "No content"
 msgstr "Žádný obsah"
 
-#: plugins/Agregator/AgregatorList.php:114
+#: plugins/Agregator/AgregatorList.php:118
 #, php-format
 msgid "Sort variable %s not found; using default"
 msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
@@ -994,85 +994,85 @@ msgstr "Nepodařilo se aplikovat transformaci '%s'"
 msgid "Element replace missing value"
 msgstr "Element replace postrádá hodnotu"
 
-#: plugins/FileHandler/FileHandler.php:124
+#: plugins/FileHandler/FileHandler.php:125
 msgid "Server error"
 msgstr "Chyba serveru"
 
-#: plugins/FileHandler/FileHandler.php:125
+#: plugins/FileHandler/FileHandler.php:126
 #, php-format
 msgid "Unable to handle file request: %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor: %s"
 
-#: plugins/FileHandler/FileHandler.php:169
+#: plugins/FileHandler/FileHandler.php:170
 msgid "File illegal path"
 msgstr "Neplatná cesta souboru"
 
-#: plugins/FileHandler/FileHandler.php:248
+#: plugins/FileHandler/FileHandler.php:249
 #, php-format
 msgid "Unable to handle resource '%s': %s"
 msgstr "Nepodařilo se zpracovat požadavek na soubor %s: %s"
 
-#: plugins/FileHandler/FileHandler.php:266
+#: plugins/FileHandler/FileHandler.php:267
 #, php-format
 msgid "Unsupported mime type %s"
 msgstr "Nepodporovaný mime typ %s"
 
-#: plugins/FileHandler/FileHandler.php:292
+#: plugins/FileHandler/FileHandler.php:293
 #, php-format
 msgid "File %s was successfully built"
 msgstr "Soubor %s byl úspěšně postaven"
 
-#: plugins/FileHandler/FileHandler.php:314
+#: plugins/FileHandler/FileHandler.php:315
 msgid "UglifyJS not installed"
 msgstr "UglifyJS není nainstalovaný"
 
-#: plugins/FileHandler/FileHandler.php:320
+#: plugins/FileHandler/FileHandler.php:321
 msgid "Unable to minify JS"
 msgstr "Nepodařilo se minifikovat JS"
 
-#: plugins/FileHandler/FileHandler.php:357
+#: plugins/FileHandler/FileHandler.php:358
 #, php-format
 msgid "Image size %s is over limit %s"
 msgstr "Velikost obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:377
+#: plugins/FileHandler/FileHandler.php:378
 msgid "Unable to resize image"
 msgstr "Nepodařilo se zmenšit obrázek"
 
-#: plugins/FileHandler/FileHandler.php:382
+#: plugins/FileHandler/FileHandler.php:383
 #, php-format
 msgid "Generated image size %s is over limit %s"
 msgstr "Velikost vygenerovaného obrázku %s přesahuje limit %s"
 
-#: plugins/FileHandler/FileHandler.php:391
+#: plugins/FileHandler/FileHandler.php:392
 msgid "Unable to create file"
 msgstr "Nepodařilo se vytvořit soubor"
 
-#: plugins/FileHandler/FileHandler.php:406
+#: plugins/FileHandler/FileHandler.php:407
 msgid "Failed to get image dimensions"
 msgstr "Nepodařilo se načíst rozměry obrázku"
 
-#: plugins/FileHandler/FileHandler.php:416
+#: plugins/FileHandler/FileHandler.php:417
 #, php-format
 msgid "File %s does not exists"
 msgstr "Soubor %s neexistuje"
 
-#: plugins/FileHandler/FileHandler.php:453
+#: plugins/FileHandler/FileHandler.php:454
 #, php-format
 msgid "Unable to update file cache: %s"
 msgstr "Nepodařilo se aktualizovat souborovou mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:457
+#: plugins/FileHandler/FileHandler.php:458
 #, php-format
 msgid "File cache successfully updated: %s"
 msgstr "Souborová mezipaměť byla úspěšně aktualizovaná: %s"
 
-#: plugins/FileHandler/FileHandler.php:460
+#: plugins/FileHandler/FileHandler.php:461
 #, php-format
 msgid "Outdated file cache: %s"
 msgstr "Neaktuální souborová mezipaměť: %s"
 
-#: plugins/FileHandler/FileHandler.php:484
+#: plugins/FileHandler/FileHandler.php:485
 #, php-format
 msgid "Unable to create user folder %s"
 msgstr "Nepodařilo se vytvořit uživatelskou složku %s"
@@ -1143,16 +1143,20 @@ msgstr "Prázdná hodnota"
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:770
+#: plugins/HtmlOutput/HtmlOutput.php:775
 msgid "Target not found"
 msgstr "Cíl nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:882
+#: plugins/HtmlOutput/HtmlOutput.php:777
+msgid "Target file not supported"
+msgstr "Cílový soubor není podporován"
+
+#: plugins/HtmlOutput/HtmlOutput.php:889
 #, php-format
 msgid "Attribute src=%s removed: %s"
 msgstr "Odstraněn atribut src=%s: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:1008
+#: plugins/HtmlOutput/HtmlOutput.php:1015
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
