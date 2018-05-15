@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <HtmlOutput>
   <stylesheet>lib/flaticon/flaticon.css</stylesheet>
-  <stylesheet>lib/font-awesome/css/font-awesome.css</stylesheet>
+<!--   <stylesheet>lib/font-awesome/css/font-awesome.css</stylesheet> -->
   <xslt>themes/h1desc.xsl</xslt>
   <xslt>themes/default/part.xsl</xslt>
   <favicon>themes/ig.ico</favicon>
+  <jsFile append="head">lib/fontawesome5/js/fontawesome-all.min.js</jsFile>
+<!--   <stylesheet>lib/fontawesome5/css/fa-svg-with-js.css</stylesheet> -->
 </HtmlOutput>

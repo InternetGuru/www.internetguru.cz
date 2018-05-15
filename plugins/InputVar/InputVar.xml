@@ -37,17 +37,17 @@
     </div>
   </var>
   
-  <var id="linkedin">fa fa-linkedin-square</var>
-  <var id="skype">fa fa-skype</var>
-  <var id="email">fa fa-envelope</var>
-  <var id="facebook">fa fa-facebook-official</var>
-  <var id="github">fa fa-github</var>
-  <var id="google">fa fa-google-plus-square</var>
-  <var id="phone">fa fa-phone-square</var>
-  <var id="twitter">fa fa-twitter-square</var>
-  <var id="map">fa fa-map</var>
-  <var id="usd">fa fa-usd</var>
-  <var id="cc">fa fa-credit-card</var>
-  <var id="money">fa fa-money</var>
+  <var id="linkedin">fab fa-linkedin</var>
+  <var id="skype">fab fa-skype</var>
+  <var id="email">fab fa-envelope</var>
+  <var id="facebook">fab fa-facebook-official</var>
+  <var id="github">fab fa-github</var>
+  <var id="google">fab fa-google-plus-square</var>
+  <var id="phone">fab fa-phone-square</var>
+  <var id="twitter">fab fa-twitter-square</var>
+  <var id="map">fab fa-map</var>
+  <var id="usd">fab fa-usd</var>
+  <var id="cc">fab fa-credit-card</var>
+  <var id="money">fab fa-money</var>
   
 </InputVar>
