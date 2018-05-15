@@ -3,6 +3,7 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
   color: #525f7f;
+  line-height: 1.5;
 }
 .wf-active body {
   font-family: Roboto, sans-serif;
@@ -33,18 +34,29 @@ h3 {
 /************************************/
 a[href] {
   text-decoration: none;
-  color: #7c0e3e;
-  border-color: #7c0e3e8f;
+  color: #6772e5;
+  border: none;
+  font-weight: 500;
+  transition: color .1s ease;
+  cursor: pointer;
 }
-a:visited {
-  color: #5b0358;
-  border-color: #5b035887;
+a[href]:focus {
+    outline: none;
+    text-decoration: underline;
+    text-underline-position: under
+}
+a[href]:focus, a[href]:hover {
+    color: #32325d
+}
+a[href]:active {
+    color: #000
 }
 /************************************/
 #content > .hdesc .description {
   margin-top: 0;
   text-align: center;
-  max-width: 35em
+  max-width: 35em;
+  margin-bottom: 3em;
 }
 p.description {
     font-size: 1.3em;
@@ -142,6 +154,7 @@ form#contactform-help {
   background: #f6f9fc;
   padding: 5em 0;
   text-align: center;
+  margin-top: 4em;
 }
 form#contactform-help textarea {
   margin: 1em 0 0;
@@ -194,6 +207,9 @@ form#contactform-help .send input[type="text"] {
   border-top: none;
   padding: 0.5em 1em;
 }
+::placeholder {
+  color: #aab7c4;
+}
 form#contactform-help .send input[type="submit"] {
   border-radius: 0 0 0.3em 0;
   border: thin solid #ddd;
@@ -219,9 +235,6 @@ form#contactform-help .send input[type="submit"] {
   text-align: center;
   font-size: 1.5em;
 }
-#contactform-tel input[type="text"]::placeholder {
-  color: #6a6a6a;
-}
 #contactform-tel input {
   margin-top: 1rem;
   width: 100%;
@@ -239,12 +252,13 @@ ul.logo li {
   display: flex;
   width: 100%;
   align-items: center;
-  word-break: break-all;
+  /* word-break: break-all; */
+  margin-bottom: 0.2em;
 }
 ul.logo li svg {
   font-size: 1.5em;
   width: 1.5em;
-  color: #de540f;
+  color: #ffaa4f;
   flex: 0 0 1.5em;
 }
 ul.logo li a {
@@ -370,7 +384,8 @@ a.logo {
   margin: 0;
   padding: 0;
 }
-#content a.button {
+#content a.button,
+form#contactform-tel input[type="submit"] {
   white-space: nowrap;
   display: inline-block;
   line-height: 3em;
@@ -385,17 +400,24 @@ a.logo {
   text-decoration: none;
   transition: all .15s ease;
 }
-#content a.button:focus, #content a.button:hover {
+#content a.button:focus,
+#content a.button:hover,
+form#contactform-tel input[type="submit"]:focus,
+form#contactform-tel input[type="submit"]:hover {
   color: #fff;
   background-color: #7795f8;
   transform: translateY(-0.1em);
   box-shadow: 0 0.35em 10.2em rgba(50,50,93,.1),0 0.15em 0.3em rgba(0,0,0,.08)
 }
-#content a.button:active {
+#content a.button:active,
+form#contactform-tel input[type="submit"]:active {
   color: #e6ebf1;
   background-color: #555abf;
   transform: translateY(0.1em);
   box-shadow: 0 0.2em 0.3em rgba(50,50,93,.11),0 0.05em 0.15em rgba(0,0,0,.08)
+}
+form#contactform-tel dd {
+  font-style: normal;
 }
 /************************************/
 #footer {
@@ -428,3 +450,78 @@ a.logo {
   margin-bottom: 3em;
 }
 /************************************/
+.top3 svg {
+  display: block;
+  width: 100%;
+  font-size: 3em;
+  color: rgb(251, 200, 92);
+  margin-bottom: 0.5em;
+}
+.top3 dt {
+  color: #32325d;
+  margin-bottom: 1em;
+  font-size: 1.1em;
+}
+.top3 dd {
+  margin: 0;
+}
+/************************************/
+form#contactform-tel div.list.multiple dl {
+    max-width: 27em
+}
+@media screen and (min-width: 22em) {
+  form#contactform-tel div.list.multiple dl {
+    box-shadow:.1em .1em .7em #c4c4c4;
+    background-color: #fff;
+    margin-bottom: 1em
+  }
+}
+@media (min-width: 52em) {
+  form#contactform-tel > div.list.multiple dl {
+    flex: 0 1 50%
+  }
+  form#contactform-tel div.list.multiple {
+    max-width: 55em
+  }
+  form#contactform-tel div.list.multiple>div {
+    justify-content: space-around
+  }
+}
+form#contactform-tel dt:first-child {
+  display: none
+}
+form#contactform-tel div.list.multiple dt:first-child+dd {
+  display: block;
+  font-size: 1.8em;
+  border-bottom: thin solid #d8d8d8;
+  padding-bottom: .1em;
+  color: #32325d;
+}
+form#contactform-tel dd {
+    float: none
+}
+form#contactform-tel dt,div.list.multiple dl.adv dt {
+    margin-top: 1.5em;
+    margin-bottom: 0;
+    font-weight: 400;
+    float: none
+}
+form#contactform-tel dt:not(:first-child) {
+    font-weight: 500;
+    color: #32325d;
+}
+form#contactform-tel dt:fist-child,div.list.multiple dl.adv dt:fist-child {
+    margin-top: 0
+}
+div.list.multiple dl.adv dd {
+    margin-left: 0;
+    margin-bottom: 0;
+    margin-top: 0
+}
+div.list.multiple dl.adv dd~dd {
+    font-weight: 600
+}
+form#contactform-tel dd {
+    margin-top: .15em;
+    margin-bottom: 0
+}

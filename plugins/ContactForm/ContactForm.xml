@@ -23,7 +23,7 @@
     <dl>
       <dt><label for="message">How can we help with your web presence?</label></dt>
       <dd>Describe your current status, expectations and known limitations.</dd>
-      <dd><textarea id="message" required="required">Own a website, new one under development.
+      <dd><textarea id="message" required="required" placeholder="Limitations&#10;TODO">Own a website, new one under development.
 Want to have a working and accessible website.
 Must stick to current vendor and their CMS.</textarea></dd>
       <dt><label for="contact">How can we contact you?</label></dt>
