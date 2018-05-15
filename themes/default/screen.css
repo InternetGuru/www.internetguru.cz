@@ -241,7 +241,7 @@ ul.logo li {
   align-items: center;
   word-break: break-all;
 }
-ul.logo li:before {
+ul.logo li svg {
   font-size: 1.5em;
   width: 1.5em;
   color: #de540f;

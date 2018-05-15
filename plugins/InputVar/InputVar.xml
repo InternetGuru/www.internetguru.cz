@@ -39,15 +39,14 @@
   
   <var id="linkedin">fab fa-linkedin</var>
   <var id="skype">fab fa-skype</var>
-  <var id="email">fab fa-envelope</var>
-  <var id="facebook">fab fa-facebook-official</var>
+  <var id="email">fas fa-envelope</var>
+  <var id="facebook">fab fa-facebook</var>
   <var id="github">fab fa-github</var>
   <var id="google">fab fa-google-plus-square</var>
-  <var id="phone">fab fa-phone-square</var>
+  <var id="phone">fas fa-phone-square</var>
   <var id="twitter">fab fa-twitter-square</var>
-  <var id="map">fab fa-map</var>
-  <var id="usd">fab fa-usd</var>
-  <var id="cc">fab fa-credit-card</var>
-  <var id="money">fab fa-money</var>
+  <var id="map">fas fa-map</var>
+  <var id="usd">fas fa-dollar-sign</var>
+  <var id="cc">far fa-credit-card</var>
   
 </InputVar>

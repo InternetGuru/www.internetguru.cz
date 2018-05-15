@@ -5,6 +5,7 @@
   <xslt>themes/h1desc.xsl</xslt>
   <xslt>themes/default/part.xsl</xslt>
   <favicon>themes/ig.ico</favicon>
-  <jsFile append="head">lib/fontawesome5/js/fontawesome-all.min.js</jsFile>
+  <jsFile append="body">themes/fa.js</jsFile>
+  <jsFile append="body">lib/fontawesome5/js/fontawesome-all.js</jsFile>
 <!--   <stylesheet>lib/fontawesome5/css/fa-svg-with-js.css</stylesheet> -->
 </HtmlOutput>
