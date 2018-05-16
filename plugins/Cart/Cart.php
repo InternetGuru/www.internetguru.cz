@@ -57,20 +57,20 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
         $this->addToCart();
       }
       // after submitting form delete cookies
-      if (get_link(true) == "{$this->vars['formpage']}?cfok={$this->vars['formid']}") {
+      if (get_link(true) == "{$this->vars['formpage']['value']}?cfok={$this->vars['formid']['value']}") {
         $this->removeCartCookie();
       }
       // show cart-add success message
       if (array_key_exists(self::OK_PARAM, $_GET)) {
         $okParam = $_GET[self::OK_PARAM];
         $this->validateProductId($okParam);
-        Cms::success("{$this->vars['success']}. <a href='{$this->vars['formpage']}'>{$this->vars['gotoorder']}</a>.");
+        Cms::success("{$this->vars['success']['value']}. <a href='{$this->vars['formpage']['value']}'>{$this->vars['gotoorder']['value']}</a>.");
         return;
       }
       // show cart-delete success message
       if (array_key_exists(self::DEL_PARAM, $_GET)) {
         $this->removeCartCookie();
-        Cms::success($this->vars['deletesuccess']);
+        Cms::success($this->vars['deletesuccess']['value']);
         return;
       }
     } catch (Exception $exc) {
@@ -88,10 +88,16 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
       $varId = $var->getRequiredAttribute('id');
       $childElements = $var->childElementsArray;
       if (!count($childElements)) {
-        $this->vars[$varId] = $var->nodeValue;
+        $this->vars[$varId] = [
+          "value" => $var->nodeValue,
+          "cacheable" => true,
+        ];
         continue;
       }
-      $this->vars[$varId] = $var;
+      $this->vars[$varId] = [
+        "value" => $var,
+        "cacheable" => true,
+      ];
     }
   }
 
@@ -100,17 +106,29 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
    */
   private function createVariables () {
     $toSet = [
-      'delete' => $this->vars['delete'],
-      'currency' => $this->vars['currency'],
-      'delete-href' => '?'.self::DEL_PARAM,
-      'status-img' => self::CART_IMG,
+      'delete' => [
+        "value" => $this->vars['delete']['value'],
+        "cacheable" => true,
+      ],
+      'currency' => [
+        "value" => $this->vars['currency']['value'],
+        "cacheable" => true,
+      ],
+      'delete-href' => [
+        "value" => '?'.self::DEL_PARAM,
+        "cacheable" => true,
+      ],
+      'status-img' => [
+        "value" => self::CART_IMG,
+        "cacheable" => true,
+      ],
     ];
     /** @var DOMElementPlus $button */
-    $button = $this->vars['button']->processVariables($this->vars, [], true);
+    $button = $this->vars['button']['value']->processVariables($this->vars, [], true);
     $button = $button->processVariables($toSet, [], true);
     Cms::setVariable('button', $button);
-    foreach ($toSet as $name => $value) {
-      Cms::setVariable($name, $value);
+    foreach ($toSet as $name => $var) {
+      Cms::setVariable($name, $var['value'], $var['cacheable']);
     }
     $this->createOrderVariable();
   }
@@ -120,9 +138,9 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
    */
   private function createOrderVariable () {
     $summary = "";
-    $summaryProduct = $this->vars['summary-product'];
-    $summarySeparator = $this->vars['summary-separator'];
-    $summaryTotal = $this->vars['summary-total'];
+    $summaryProduct = $this->vars['summary-product']['value'];
+    $summarySeparator = $this->vars['summary-separator']['value'];
+    $summaryTotal = $this->vars['summary-total']['value'];
     $totalPrice = null;
     $cookie = self::getCartCookie();
     $notice = false;
@@ -139,20 +157,44 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
         continue;
       }
       $vars = [
-        'product-id' => $cookieId,
-        'name' => HTMLPlusBuilder::getIdToHeading($cookieId),
-        'price' => $productData['price'],
-        'currency' => $this->vars['currency'],
-        'summary-ammount' => $value,
+        'product-id' => [
+          "value" => $cookieId,
+          "cacheable" => true,
+        ],
+        'name' => [
+          "value" => HTMLPlusBuilder::getIdToHeading($cookieId),
+          "cacheable" => true,
+        ],
+        'price' => [
+          "value" => $productData['price'],
+          "cacheable" => true,
+        ],
+        'currency' => [
+          "value" => $this->vars['currency']['value'],
+          "cacheable" => true,
+        ],
+        'summary-ammount' => [
+          "value" => $value,
+          "cacheable" => true,
+        ],
       ];
       $summary .= replace_vars($summaryProduct, $vars)."\n";
-      $totalPrice = (int) $totalPrice + (int) $vars['price'] * (int) $value;
+      $totalPrice = (int) $totalPrice + (int) $vars['price']['value'] * (int) $value;
     }
     if (strlen($summary)) {
       $summary .= "$summarySeparator\n";
       $summary .= replace_vars(
           $summaryTotal,
-          ['summary-total' => (string) $totalPrice, 'currency' => $this->vars['currency']]
+          [
+            'summary-total' => [
+              "value" => (string) $totalPrice,
+              "cacheable" => false,
+            ],
+            'currency' => [
+              "value" => $this->vars['currency']['value'],
+              "cacheable" => true,
+            ]
+          ]
         )."\n";
       Cms::setVariable('order', $summary);
     }

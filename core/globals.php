@@ -111,7 +111,7 @@ function replace_vars ($string, Array $variables, $varPrefix = null) {
         continue;
       }
     }
-    $value = $variables[$vName];
+    $value = $variables[$vName]["value"];
     if (is_array($value)) {
       $value = implode(", ", $value);
     } elseif ($value instanceof DOMElementPlus) {
@@ -878,12 +878,13 @@ function get_nginx_cache ($folder = null, $link = "") {
     $folder = NGINX_CACHE_FOLDER;
   }
   $fPaths = [];
-  foreach (scandir($folder) as $filename) {
-    if (strpos($filename, ".") === 0) {
+  $iterator = new DirectoryIterator($folder);
+  foreach ($iterator as $fileinfo) {
+    if ($fileinfo->isDot()) {
       continue;
     }
-    $filepath = "$folder/$filename";
-    if (is_dir($filepath)) {
+    $filepath = "$folder/".$fileinfo->getFilename();
+    if ($fileinfo->isDir()) {
       $fPaths = array_merge($fPaths, get_nginx_cache($filepath, $link));
       continue;
     }

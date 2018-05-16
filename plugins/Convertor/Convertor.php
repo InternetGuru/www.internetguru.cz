@@ -208,7 +208,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     foreach ($mergable as $tag) $xml = preg_replace('/(\s)*(<\/'.$tag.'>)/', "$2$1", $xml);
 
     $doc = new HTMLPlus();
-    $doc->defaultAuthor = Cms::getVariable("cms-author");
+    $doc->defaultAuthor = Cms::getVariableValue("cms-author");
     $doc->loadXML($xml);
     if (is_null($doc->documentElement->firstElement)
       || $doc->documentElement->firstElement->nodeName != "h"
@@ -374,16 +374,37 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
   public function getContent () {
     Cms::getOutputStrategy()->addCssFile($this->pluginDir.'/Convertor.css');
     $content = self::getHTMLPlus();
-    $vars["action"] = "?".$this->className;
-    $vars["link"] = $_GET[$this->className];
-    $vars["path"] = $this->pluginDir;
+    $vars["action"] = [
+      "value"=> "?".$this->className,
+      "cacheable" => true,
+    ];
+    $vars["link"] = [
+      "value"=> $_GET[$this->className],
+      "cacheable" => true,
+    ];
+    $vars["path"] = [
+      "value"=> $this->pluginDir,
+      "cacheable" => true,
+    ];
     if (!empty($this->importedFiles)) {
-      $vars["importedhtml"] = $this->importedFiles;
+      $vars["importedhtml"] = [
+        "value"=> $this->importedFiles,
+        "cacheable" => false,
+      ];
     }
-    $vars["filename"] = $this->file;
+    $vars["filename"] = [
+      "value"=> $this->file,
+      "cacheable" => true,
+    ];
     if (!is_null($this->html)) {
-      $vars["nohide"] = "nohide";
-      $vars["content"] = $this->html;
+      $vars["nohide"] = [
+        "value"=> "nohide",
+        "cacheable" => true,
+      ];
+      $vars["content"] = [
+        "value"=> $this->html,
+        "cacheable" => true,
+      ];
     }
     $content->processVariables($vars);
     return $content;

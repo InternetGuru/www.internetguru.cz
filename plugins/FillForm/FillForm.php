@@ -39,7 +39,8 @@ class FillForm extends Plugin implements SplObserver, ModifyContentStrategyInter
     if ($subject->getStatus() != STATUS_INIT) {
       return;
     }
-    foreach (Cms::getAllVariables() as $varId => $formDoc) {
+    foreach (Cms::getAllVariables() as $varId => $formDocVar) {
+      $formDoc = $formDocVar["value"];
       if (strpos($varId, "contactform-") !== 0) {
         continue;
       }

@@ -14,7 +14,12 @@ use Exception;
  * @property DOMElementPlus documentElement
  * @property DOMDocumentPlus $ownerDocument
  */
-class DOMDocumentPlus extends DOMDocument {
+class DOMDocumentPlus extends DOMDocument implements \Serializable {
+
+  /**
+   * @var int
+   */
+  const APC_ID = 1;
 
   /**
    * DOMDocumentPlus constructor.
@@ -24,6 +29,29 @@ class DOMDocumentPlus extends DOMDocument {
   function __construct ($version = "1.0", $encoding = "utf-8") {
     parent::__construct($version, $encoding);
     parent::registerNodeClass("DOMElement", "IGCMS\\Core\\DOMElementPlus");
+  }
+
+  /**
+   * String representation of object
+   * @link http://php.net/manual/en/serializable.serialize.php
+   * @return string the string representation of the object or null
+   * @since 5.1.0
+   */
+  public function serialize () {
+    return $this->saveXML();
+  }
+
+  /**
+   * Constructs the object
+   * @link http://php.net/manual/en/serializable.unserialize.php
+   * @param string $serialized <p>
+   * The string representation of the object.
+   * </p>
+   * @return void
+   * @since 5.1.0
+   */
+  public function unserialize ($serialized) {
+    // TODO: Implement unserialize() method.
   }
 
   /**
@@ -72,7 +100,11 @@ class DOMDocumentPlus extends DOMDocument {
    * @throws NoFileException
    */
   public function load ($filePath, $options = 0) {
-    if (!stream_resolve_include_path($filePath) || stream_resolve_include_path(dirname($filePath)."/.".basename($filePath))) {
+    if (!stream_resolve_include_path($filePath)
+      || stream_resolve_include_path(
+        dirname($filePath)."/.".basename($filePath)
+      )
+    ) {
       throw new NoFileException(_("File not found or disabled"));
     }
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
@@ -148,7 +180,6 @@ class DOMDocumentPlus extends DOMDocument {
   }
 
   /**
-   * TODO return?
    * @param array $variables
    * @param array $ignore
    * @param DOMElementPlus $element
@@ -156,6 +187,71 @@ class DOMDocumentPlus extends DOMDocument {
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
+    $cacheKey = apc_get_key(__FUNCTION__."/"
+      .self::APC_ID."/"
+      .$element->getNodePath()."/"
+      .hash("sha1", serialize($variables))."/"
+      .hash("sha1", serialize($element))."/"
+      .$deep
+    );
+    $newestFileMtime = HTMLPlusBuilder::getNewestFileMtime();
+    $cacheExists = apc_exists($cacheKey);
+    $cacheUpToDate = false;
+    $cache = null;
+    $result = null;
+    if ($cacheExists) {
+      $cache = apc_fetch($cacheKey);
+      $cacheUpToDate = $cache["newestFileMtime"] == $newestFileMtime;
+    }
+    if ($cacheUpToDate) {
+      $doc = new DOMDocumentPlus();
+      $doc->loadXML($cache["data"]);
+      $element->removeChildNodes();
+      foreach ($doc->documentElement->childNodes as $childNode) {
+        $element->appendChild($element->ownerDocument->importNode($childNode, true));
+      }
+      $result = $element;
+    } else {
+      $cacheableVariables = array_filter(
+        $variables,
+        function($value) {
+          return $value['cacheable'] === true;
+        }
+      );
+      $result = $this->elementDoProcessVars($cacheableVariables, $ignore, $element, $deep);
+    }
+
+    if (!$cacheExists || !$cacheUpToDate) {
+      $cache = [
+        "data" => $result->ownerDocument->saveXML($result),
+        "newestFileMtime" => $newestFileMtime,
+      ];
+      apc_store_cache($cacheKey, $cache, __FUNCTION__);
+    }
+
+    $notCacheableVariables = array_filter(
+      $variables,
+      function($value) {
+        return $value['cacheable'] === false;
+      }
+    );
+
+    if (!count($notCacheableVariables)) {
+      return $result;
+    }
+
+    return $this->elementDoProcessVars($notCacheableVariables, $ignore, $result, $deep);
+  }
+
+  /**
+   * TODO return?
+   * @param array $variables
+   * @param array $ignore
+   * @param DOMElementPlus $element
+   * @param bool $deep
+   * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   */
+  public function elementDoProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
     $toRemove = [];
     $result = $this->doProcessVars($variables, $ignore, $element, $deep, $toRemove);
     if (is_null($result) || !$result->isSameNode($element)) {
@@ -185,14 +281,14 @@ class DOMDocumentPlus extends DOMDocument {
       }
       try {
         $element->removeAttrVal("var", $vValue);
-        if (!is_null($variables[$vName]) && !count($variables[$vName])) {
+        if (!is_null($variables[$vName]["value"]) && !count($variables[$vName]["value"])) {
           if (!is_null($aName)) {
             $element->removeAttribute($aName);
           } else {
             return null;
           }
         }
-        $result = $this->insertVariable($element, $variables[$vName], $aName);
+        $result = $this->insertVariable($element, $variables[$vName]["value"], $aName);
         if ($aName == "var") {
           if (++$element->varRecursionLvl >= DOMElementPlus::MAX_VAR_RECURSION_LEVEL) {
             throw new Exception(_("Max variable recursion level exceeded"));
@@ -234,7 +330,7 @@ class DOMDocumentPlus extends DOMDocument {
       case "NULL":
         return $element;
       case "integer":
-      /** @noinspection PhpMissingBreakStatementInspection */
+        /** @noinspection PhpMissingBreakStatementInspection */
       case "boolean":
         $value = (string) $value;
       case "string":
@@ -322,5 +418,4 @@ class DOMDocumentPlus extends DOMDocument {
     }
     return true;
   }
-
 }

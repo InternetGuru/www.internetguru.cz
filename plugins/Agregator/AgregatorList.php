@@ -15,6 +15,10 @@ class AgregatorList {
   /**
    * @var string
    */
+  const AGREGATOR_NAME="Agregator";
+  /**
+   * @var string
+   */
   private static $sortby;
   /**
    * @var bool
@@ -135,7 +139,7 @@ class AgregatorList {
       $root->setAttribute("class", "agregator ".strtolower(get_caller_class(2))." ".$this->listId);
     }
     $index = 0;
-    foreach ($vars as $key => $varValue) {
+    foreach ($vars as $key => $variables) {
       if ($index++ < $this->skip) {
         continue;
       }
@@ -144,7 +148,7 @@ class AgregatorList {
       }
       /** @var DOMElementPlus $list */
       $list = $root->appendChild($doc->importNode($pattern, true));
-      $list->processVariables($varValue, [], true);
+      $list->processVariables($variables, [], true);
       $list->stripTag();
     }
     return $doc;
