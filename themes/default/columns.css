@@ -22,6 +22,11 @@ div.list.multiple div > * {
     flex: 0 1 50%;
     max-width: 50%;
   }
+  .adv.img img {
+    max-width: none;
+    width: 135%;
+    box-shadow: 0.5em 0.5em 2em #ddd;
+  }
 }
 
 @media (min-width: 52em) {
