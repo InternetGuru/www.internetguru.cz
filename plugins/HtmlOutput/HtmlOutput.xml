@@ -8,4 +8,6 @@
   <jsFile append="body">themes/fa.js</jsFile>
   <jsFile append="body">lib/fontawesome5/js/fontawesome-all.js</jsFile>
 <!--   <stylesheet>lib/fontawesome5/css/fa-svg-with-js.css</stylesheet> -->
+  <robots domain="beta.internetguru.cz" readonly="readonly" meta="all">User-agent: *
+Disallow:</robots>
 </HtmlOutput>
