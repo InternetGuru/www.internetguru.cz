@@ -6,11 +6,32 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - GlobalMenu has own transformation and styles
+ - Honeypot label
  - Inputvar supports required attribute
+
+### Changed
+ - Align input description to input
+ - InputVar form inputs has no max-length
+ - Eventable supports any element
+ - Refactor hideable to use data attributes
+ - Improve scrolltopable UX
 
 ## [2.11.0] - 2018-04-12
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
+
+## [2.10.10] - 2018-05-16
+### Changed
+ - Default powerded by is Nestárnoucí weby
+
+## [2.10.9] - 2018-05-14
+### Fixed
+ - Fix inserting specialchars into InputVar
+
+## [2.10.8] - 2018-05-14
+### Fixed
+ - InputVar specialchars causing error
 
 ## [2.10.7] - 2018-04-20
 ### Fixed
@@ -350,7 +371,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
-[2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.7
+[2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.10
+[2.10.10]: https://bitbucket.org/igwr/cms/compare/v2.10.10..v2.10.9
+[2.10.9]: https://bitbucket.org/igwr/cms/compare/v2.10.9..v2.10.8
+[2.10.8]: https://bitbucket.org/igwr/cms/compare/v2.10.8..v2.10.7
 [2.10.7]: https://bitbucket.org/igwr/cms/compare/v2.10.7..v2.10.6
 [2.10.6]: https://bitbucket.org/igwr/cms/compare/v2.10.6..v2.10.5
 [2.10.5]: https://bitbucket.org/igwr/cms/compare/v2.10.5..v2.10.4

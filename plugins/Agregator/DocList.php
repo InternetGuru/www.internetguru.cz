@@ -27,7 +27,7 @@ class DocList extends AgregatorList {
   /**
    * @var int
    */
-  const APC_ID = 2;
+  const APC_ID = 3;
   /**
    * @var string
    */
@@ -41,15 +41,15 @@ class DocList extends AgregatorList {
    */
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
-    $newestCacheMtime = DOMBuilder::getNewestCacheMtime();
+    $newestFileMtime = DOMBuilder::getNewestFileMtime();
     $cacheKey = apc_get_key(__FUNCTION__."/".self::APC_ID."/".$this->listId);
     $cacheExists = apc_exists($cacheKey);
     $cacheUpTodate = false;
     $cache = null;
     $listDoc = null;
-    if ($cacheExists) {
+    if (Cms::getLoggedUser() != SERVER_USER && $cacheExists) {
       $cache = apc_fetch($cacheKey);
-      $cacheUpTodate = $cache["newestCacheMtime"] == $newestCacheMtime;
+      $cacheUpTodate = $cache["newestFileMtime"] == $newestFileMtime;
     }
     if ($cacheUpTodate) {
       $doc = new DOMDocumentPlus();
@@ -68,7 +68,7 @@ class DocList extends AgregatorList {
       $cache = [
         "data" => $listDoc->saveXML($listDoc),
         "vars" => serialize($vars),
-        "newestCacheMtime" => $newestCacheMtime,
+        "newestFileMtime" => $newestFileMtime,
       ];
       apc_store_cache($cacheKey, $cache, __FUNCTION__);
     }

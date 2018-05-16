@@ -398,7 +398,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     ];
     if (!is_null($this->html)) {
       $vars["nohide"] = [
-        "value"=> "nohide",
+        "value"=> "hideable-nohide",
         "cacheable" => true,
       ];
       $vars["content"] = [

@@ -46,7 +46,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "text/x-c" => ["js"],
     "application/x-elc" => ["js"],
     "application/x-empty" => ["css", "js"],
-    "application/octet-stream" => ["woff", "woff2", "eot", "js"],
+    "application/octet-stream" => ["woff", "woff2", "eot", "js", "zip"],
     "image/svg+xml" => ["svg"],
     "image/png" => ["png"],
     "image/jpeg" => ["jpg", "jpeg"],
@@ -55,6 +55,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "application/vnd.ms-fontobject" => ["eot"],
     "application/x-font-ttf" => ["ttf"],
     "application/vnd.ms-opentype" => ["otf"],
+    "application/zip" => ["zip"],
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document" => ["docx"],
   ];
   /**

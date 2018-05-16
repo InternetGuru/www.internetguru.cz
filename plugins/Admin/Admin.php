@@ -691,7 +691,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       ];
       $this->title = sprintf(_("%s (%s) - Administration"), basename($this->defaultFile), ROOT_URL.$this->defaultFile);
     } else {
-      $this->title = $vars["heading"];
+      $this->title = $vars["heading"]["value"];
     }
     $vars["link"] = [
       "value" => get_link(),
@@ -746,7 +746,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
       "cacheable" => true,
     ];
     $vars["changestatus"] = [
-      "value" => $this->dataFileStatus == self::STATUS_DISABLED ? _("enable") : _("disable"),
+      "value" => $this->dataFileStatus == self::STATUS_DISABLED ? _("Enable file") : _("Disable file"),
       "cacheable" => true,
     ];
     $vars["changestatusurl"] = [
@@ -769,7 +769,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         "cacheable" => true,
       ];
       $vars["nohide"] = [
-        "value" => "nohide",
+        "value" => "hideable-nohide",
         "cacheable" => true,
       ];
     }

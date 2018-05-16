@@ -38,7 +38,7 @@ class ImgList extends AgregatorList {
     $cacheUpTodate = false;
     $cache = null;
     $listDoc = null;
-    if ($cacheExists) {
+    if (Cms::getLoggedUser() != SERVER_USER && $cacheExists) {
       $cache = apc_fetch($cacheKey);
       $cacheUpTodate = $cache["filesInotify"] === filemtime(FILES_FOLDER."/".INOTIFY);
     }
