@@ -59,7 +59,10 @@ a[href]:active {
   margin-bottom: 3em;
 }
 p.description {
-    font-size: 1.3em;
+  font-size: 1.3em;
+}
+h3 + p.description {
+  font-size: 1.2em;
 }
 /************************************/
 ol.contentlink-bc li a {
@@ -328,7 +331,8 @@ a.logo {
   margin-left: auto;
   margin-right: auto;
 }
-#content div.part:first-child > * {
+#content div.part:first-child > *:not(.section),
+#content div.part:first-child > .section > *:not(.list){
   max-width: 30em;
   margin-left: 0;
   margin-right: 0;
@@ -450,19 +454,27 @@ form#contactform-tel dd {
   margin-bottom: 3em;
 }
 /************************************/
-.top3 svg {
+.svg-inline--fa {
   display: block;
   width: 100%;
   font-size: 3em;
   color: rgb(251, 200, 92);
   margin-bottom: 0.5em;
 }
-.top3 dt {
+.adv .svg-inline--fa {
+  margin: 0 0.3em 0.2em 0;
+  float: left;
+  width: 1em;
+}
+#content .adv dt {
+  margin-bottom: 0.5em;
+}
+dl dt {
   color: #32325d;
   margin-bottom: 1em;
   font-size: 1.1em;
 }
-.top3 dd {
+dl dd {
   margin: 0;
 }
 /************************************/
@@ -514,9 +526,9 @@ form#contactform-tel dt:fist-child,div.list.multiple dl.adv dt:fist-child {
     margin-top: 0
 }
 div.list.multiple dl.adv dd {
-    margin-left: 0;
     margin-bottom: 0;
-    margin-top: 0
+    margin-top: 0;
+    margin-left: 4.3em;
 }
 div.list.multiple dl.adv dd~dd {
     font-weight: 600
