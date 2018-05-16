@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
 
+## [2.10.10] - 2018-05-16
+### Changed
+ - Default powerded by is Nestárnoucí weby
+
 ## [2.10.9] - 2018-05-14
 ### Fixed
  - Fix inserting specialchars into InputVar
@@ -353,7 +357,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.9
+[2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.10
+[2.10.10]: https://bitbucket.org/igwr/cms/compare/v2.10.10..v2.10.9
 [2.10.9]: https://bitbucket.org/igwr/cms/compare/v2.10.9..v2.10.8
 [2.10.8]: https://bitbucket.org/igwr/cms/compare/v2.10.8..v2.10.7
 [2.10.7]: https://bitbucket.org/igwr/cms/compare/v2.10.7..v2.10.6
