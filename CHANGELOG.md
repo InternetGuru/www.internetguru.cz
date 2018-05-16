@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.12.0] - 2018-05-16
 ### Added
  - GlobalMenu has own transformation and styles
  - Honeypot label
@@ -370,7 +370,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.0
 [2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.10
 [2.10.10]: https://bitbucket.org/igwr/cms/compare/v2.10.10..v2.10.9
 [2.10.9]: https://bitbucket.org/igwr/cms/compare/v2.10.9..v2.10.8
