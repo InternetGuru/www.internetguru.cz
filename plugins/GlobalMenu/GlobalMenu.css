@@ -50,7 +50,12 @@
   display: none;
 }
 #header > div .globalmenu a.current {
-  font-weight: 600;
+  font-weight: 500;
+}
+#header > div .globalmenu a.current:before {
+  content: "●";
+  padding-right: 0.4em;
+  vertical-align: 0.1em;
 }
 #header .globalmenu-top {
   position: absolute;
