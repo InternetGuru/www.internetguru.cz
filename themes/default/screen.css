@@ -178,6 +178,9 @@ form#contactform-help:after {
   display: table;
   clear: both;
 }
+form#contactform-help dl {
+  margin: 0;
+}
 form#contactform-help dt,
 form#contactform-help dd {
   max-width: 100%;
@@ -228,7 +231,7 @@ form#contactform-help .send input[type="submit"] {
 }
 /************************************/
 #contactform-tel {
-  margin: 1.5em 0;
+  margin: 5em 0;
 }
 #contactform-tel p {
   margin: 0;
@@ -386,6 +389,9 @@ a.logo {
 }
 .part:last-child {
   padding-bottom: 4em;
+}
+#technology {
+  margin-top: 6em;
 }
 /************************************/
 #content > .hdesc > div > div > ul {
@@ -550,3 +556,33 @@ form#contactform-tel dd {
     margin-top: .15em;
     margin-bottom: 0
 }
+/************************************/
+#consulting + p.description {
+  max-width: 35em;
+  text-align: center;
+}
+#consulting + p + .section > * {
+  margin-left: 8rem;
+}
+#consulting + p + .section > #training,
+#consulting + p + .section > #training + p,
+#consulting + p + .section > #training + p + .list {
+  margin-left: 0;
+  margin-right: 8rem;
+}
+#consulting + p + .section > .description {
+  position: relative;
+}
+.description svg {
+  position: absolute;
+  left: -13rem;
+  top: -3rem;
+  color: #8898AA;
+  display: block;
+  font-size: 10rem;
+}
+#consulting + p + .section > #training + p.description svg {
+  right: -13rem;
+  left: unset;
+}
+/************************************/

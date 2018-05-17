@@ -21,12 +21,12 @@
   </message>
   <form id="help">
     <dl>
-      <dt><label for="message">How can we help with your web presence?</label></dt>
-      <dd>Describe your current status, expectations, known limitations and enter your <label for="contact">e-mail or phone</label>.</dd>
+      <dt>How can we help with your web presence?</dt>
+      <dd>Describe your current <label for="message">status, expectations, known limitations</label> and enter your <label for="contact">e-mail or phone</label>.</dd>
       <dd><textarea id="message" required="required" placeholder="Status&#10;Expectations&#10;Limitations">Own a website, new one under development.
 Want to have a working and accessible website.
 Must stick to current vendor and their CMS.</textarea></dd>
-      <dt><label for="contact">How can we contact you?</label></dt>
+      <dt>How can we contact you?</dt>
       <dd>
         <span class="send">
           <input type="text" id="contact" required="required" placeholder="+1 (305) 123-1234, john.smith@gmail.com"/>

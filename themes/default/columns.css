@@ -5,9 +5,12 @@ div.list.multiple > div {
   flex-wrap: wrap;
 }
 
-#care + p + div.list.multiple > div,
-#technology + p + div.list.multiple > div {
+#care + p + div.list.multiple > div {
   display: block;
+}
+
+#care + p + div.list.multiple .img {
+  display: none;
 }
 
 div.list.multiple div > * {
@@ -34,12 +37,14 @@ div.list.multiple div > * {
     flex: 0 1 50%;
     max-width: 50%;
   }
-  .adv.img {
+  #care + p + div.list.multiple .adv.img {
+    display: block;
     float: right;
+    padding-left: 2em;
   }
   .adv.img img {
     max-width: none;
-    width: 180%;
+    width: 190%;
   }
   .adv.img:not(.devices) img {
     box-shadow: 0.5em 0.5em 2em #ddd;
