@@ -60,11 +60,10 @@ a[href]:active, label:active {
   margin-bottom: 3em;
 }
 p.description {
-  font-size: 1.5em;
-  font-weight: 300;
+  font-size: 1.3em;
 }
 h3 + p.description {
-  font-size: 1.3em;
+  font-size: 1.2em;
 }
 /************************************/
 ol.contentlink-bc li a {
@@ -75,6 +74,8 @@ ol.contentlink-bc li a {
 ol.contentlink-bc li a:first-child {
   padding-left: 0;
   font-weight: 600;
+  font-size: 1.2em;
+  line-height: 1;
 }
 #messages, #header {
   padding: 0 1em;
@@ -83,8 +84,9 @@ ol.contentlink-bc li a:first-child {
 }
 #header > div {
   padding: 0.5em;
+  padding-bottom: 0;
   position: relative;
-  border-bottom: thin solid #fbe4b3;
+  border-bottom: thin solid #f9d281;
 }
 #header div.hideable-button {
   top: 0.7em;
@@ -190,7 +192,7 @@ form#contactform-help dt {
   text-transform: uppercase;
 }
 form#contactform-help dt:first-child {
-  margin-bottom: 0.3em;
+  margin-bottom: 0.2em;
 }
 form#contactform-help dd:nth-child(3),
 form#contactform-help dd:nth-child(5) {
@@ -257,8 +259,8 @@ ul.logo li {
   border: none;
   display: flex;
   width: 100%;
-  align-items: center;
-  /* word-break: break-all; */
+  /* align-items: center; */
+  word-break: break-all;
   margin-bottom: 0.2em;
 }
 ul.logo li svg {
@@ -349,6 +351,10 @@ a.logo {
 .part:nth-child(2) a {
   color: #cfd7df;
   border-color: #ffffffa1;
+}
+.part:nth-child(2) a {
+  color: white;
+  font-weight: normal;
 }
 .part:nth-child(2):before,
 .part:nth-child(2):after {
