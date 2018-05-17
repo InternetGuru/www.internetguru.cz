@@ -5,6 +5,11 @@ div.list.multiple > div {
   flex-wrap: wrap;
 }
 
+#care + p + div.list.multiple > div,
+#technology + p + div.list.multiple > div {
+  display: block;
+}
+
 div.list.multiple div > * {
   flex: 0 1 100%;
   max-width: 100%;
@@ -18,13 +23,25 @@ div.list.multiple div > * {
 }
 
 @media (min-width: 33em) {
-  div.list.multiple div > * {
+  div.list.multiple div > *:not(.adv) {
     flex: 0 1 50%;
     max-width: 50%;
   }
+}
+
+@media (min-width: 58em) {
+  div.list.multiple div > *.adv {
+    flex: 0 1 50%;
+    max-width: 50%;
+  }
+  .adv.img {
+    float: right;
+  }
   .adv.img img {
     max-width: none;
-    width: 135%;
+    width: 180%;
+  }
+  .adv.img:not(.devices) img {
     box-shadow: 0.5em 0.5em 2em #ddd;
   }
 }

@@ -60,10 +60,11 @@ a[href]:active, label:active {
   margin-bottom: 3em;
 }
 p.description {
-  font-size: 1.3em;
+  font-size: 1.5em;
+  font-weight: 300;
 }
 h3 + p.description {
-  font-size: 1.2em;
+  font-size: 1.3em;
 }
 /************************************/
 ol.contentlink-bc li a {
@@ -161,7 +162,7 @@ form#contactform-help {
   margin-top: 4em;
 }
 form#contactform-help textarea {
-  margin: 1em 0 0;
+  margin: 1.5em 0 0;
   border: thin solid #ddd;
   border-radius: 0.3em 0.3em 0 0;
   background: #fff;
@@ -189,7 +190,7 @@ form#contactform-help dt {
   text-transform: uppercase;
 }
 form#contactform-help dt:first-child {
-  margin-bottom: 0;
+  margin-bottom: 0.3em;
 }
 form#contactform-help dd:nth-child(3),
 form#contactform-help dd:nth-child(5) {
