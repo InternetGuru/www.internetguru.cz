@@ -171,6 +171,7 @@ form#contactform-help textarea {
   padding: 0.5em 1em;
   max-width: 35em;
   height: 6em;
+  width: 100% !important;
 }
 form#contactform-help:after {
   content: "";
