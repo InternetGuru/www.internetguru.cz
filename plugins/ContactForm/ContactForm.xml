@@ -52,8 +52,30 @@ $inputvar-service_plain
       <dd>Quick Contact</dd>
       <dt><label for="tel">Should we call you?</label></dt>
       <dd>Enter your telephone number below</dd>
-      <dd><input type="text" id="tel" required="required" placeholder="+420 123456789" pattern="\D*(\d\D*){9,}" value="+420 "/></dd>
+      <dd><input type="text" id="tel" required="required" placeholder="+1 (305) 123-1234" pattern="\D*(\d\D*){9,}" value=""/></dd>
       <dd><input type="submit" id="submit" value="Call Me"/></dd>
+    </dl>
+    <dl>
+      <dt>Type</dt>
+      <dd>Company Info</dd>
+      <dt>Internet Guru</dt>
+      <dd><ul class="logo">
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:info@internetguru.cz">info@internetguru.cz</a></li>
+<!--         <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/company/internetguru">internetguru (LinkedIn)</a></li> -->
+        <li><span var="inputvar-facebook@class">icon</span><a href="https://www.facebook.com/internetguru.cz">facebook.com/internetguru.cz</a></li>
+<!--         <li><a href="https://plus.google.com/b/105762234819973683704/105762234819973683704"><span var="inputvar-google@class">icon</span><span>plus.google.com/internetguru</span></a></li> -->
+        <li><span var="inputvar-github@class">icon</span><a href="https://github.com/InternetGuru">github.com/InternetGuru</a></li>
+      </ul></dd>
+<!--       <dt>Address</dt>
+      <dd><ul class="logo">
+        <li><span var="inputvar-map@class">icon</span><a href="https://www.google.cz/maps/place/Bro%C5%BE%C3%ADkova+15%2F1,+150+00+Praha+5-Ko%C5%A1%C3%AD%C5%99e/@50.0711549,14.3862536,17z/data=!3m1!4b1!4m5!3m4!1s0x470b95aba6630ab5:0xd73a1479f9dfb046!8m2!3d50.0711515!4d14.3884476?hl=en">Brožíkova 1, 150 00 Prague 5, Czech Republic</a></li>
+        <li><span var="inputvar-map@class">icon</span><a href="https://www.google.cz/maps/place/Th%C3%A1kurova+9,+160+00+Praha+6/@50.1047496,14.3875576,17z/data=!3m1!4b1!4m5!3m4!1s0x470b953a13eadb29:0xc5f7771c23fd33ff!8m2!3d50.1047462!4d14.3897516?hl=en">Thákurova 9, 160 00 Prague 6, Czech Republic</a></li>
+      </ul></dd> -->
+      <dt>Bank Accounts</dt>
+      <dd><ul class="logo">
+        <li><span var="inputvar-cc@class">icon</span><a>670100-2201433979/6210 (mBank)</a></li>
+        <li><span var="inputvar-cc@class">icon</span><a>2800426615/2010 (FIO)</a></li>
+      </ul></dd>
     </dl>
     <dl>
       <dt>Type</dt>
@@ -75,41 +97,24 @@ $inputvar-service_plain
         <li><a href="https://www.linkedin.com/in/lucie-zdenkova"><span var="inputvar-linkedin@class">icon</span><span>linkedin.com/in/lucie-zdenkova</span></a></li>
       </ul></dd>
 -->
+      <dt>Jan Pospíšil</dt>
+      <dd>Marketing Support, Accounting</dd>
+      <dd><ul class="logo">
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:jan.pospisil@internetguru.cz">jan.pospisil@internetguru.cz</a></li>
+      </ul></dd>
       <dt>Pavel Petržela</dt>
       <dd>IT Support, Chief Developer</dd>
       <dd><ul class="logo">
-        <li><span var="inputvar-phone@class">icon</span><a href="tel:+420604412983">+420 604 412 983</a></li>
+<!--         <li><span var="inputvar-phone@class">icon</span><a href="tel:+420604412983">+420 604 412 983</a></li> -->
         <li><span var="inputvar-email@class">icon</span><a href="mailto:pavel.petrzela@internetguru.cz">pavel.petrzela@internetguru.cz</a></li>
-        <!--         <li><a href="skype:poulikpetrzela"><span var="inputvar-skype@class">icon</span><span>poulikpetrzela</span></a></li> -->
-        <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/pavelpetrzela">pavelpetrzela (LinkedIn)</a></li>
+<!--         <li><a href="skype:poulikpetrzela"><span var="inputvar-skype@class">icon</span><span>poulikpetrzela</span></a></li> -->
+<!--         <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/pavelpetrzela">pavelpetrzela (LinkedIn)</a></li> -->
       </ul></dd>
       <dt class="hideable-nohide hideable-here">Jan Vlnas</dt>
       <dd class="hideable-nohide">Senior Developer Consultant</dd>
       <dd><ul class="logo">
         <li><span var="inputvar-email@class">icon</span><a href="mailto:jan.vlnas@internetguru.cz">jan.vlnas@internetguru.cz</a></li>
-        <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/janvlnas/">janvlnas (LinkedIn)</a></li>
-      </ul></dd>
-    </dl>
-    <dl>
-      <dt>Type</dt>
-      <dd>Company Info</dd>
-      <dt>Internet Guru</dt>
-      <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:info@internetguru.cz">info@internetguru.cz</a></li>
-        <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/company/internetguru">internetguru (LinkedIn)</a></li>
-        <li><span var="inputvar-facebook@class">icon</span><a href="https://www.facebook.com/internetguru.cz">facebook.com/internetguru.cz</a></li>
-<!--         <li><a href="https://plus.google.com/b/105762234819973683704/105762234819973683704"><span var="inputvar-google@class">icon</span><span>plus.google.com/internetguru</span></a></li> -->
-        <li><span var="inputvar-github@class">icon</span><a href="https://github.com/InternetGuru">github.com/InternetGuru</a></li>
-      </ul></dd>
-<!--       <dt>Address</dt>
-      <dd><ul class="logo">
-        <li><span var="inputvar-map@class">icon</span><a href="https://www.google.cz/maps/place/Bro%C5%BE%C3%ADkova+15%2F1,+150+00+Praha+5-Ko%C5%A1%C3%AD%C5%99e/@50.0711549,14.3862536,17z/data=!3m1!4b1!4m5!3m4!1s0x470b95aba6630ab5:0xd73a1479f9dfb046!8m2!3d50.0711515!4d14.3884476?hl=en">Brožíkova 1, 150 00 Prague 5, Czech Republic</a></li>
-        <li><span var="inputvar-map@class">icon</span><a href="https://www.google.cz/maps/place/Th%C3%A1kurova+9,+160+00+Praha+6/@50.1047496,14.3875576,17z/data=!3m1!4b1!4m5!3m4!1s0x470b953a13eadb29:0xc5f7771c23fd33ff!8m2!3d50.1047462!4d14.3897516?hl=en">Thákurova 9, 160 00 Prague 6, Czech Republic</a></li>
-      </ul></dd> -->
-      <dt>Bank Accounts</dt>
-      <dd><ul class="logo">
-        <li><span var="inputvar-cc@class">icon</span><a>670100-2201433979/6210 (mBank)</a></li>
-        <li><span var="inputvar-cc@class">icon</span><a>2800426615/2010 (FIO)</a></li>
+<!--         <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/janvlnas/">janvlnas (LinkedIn)</a></li> -->
       </ul></dd>
     </dl>
     <dl>
@@ -125,9 +130,9 @@ $inputvar-service_plain
       <dd><ul class="logo">
         <li><span var="inputvar-phone@class">icon</span><a href="tel:+420603307905">+420 603 307 905 (WhatsApp, Viber)</a></li>
         <li><span var="inputvar-phone@class">icon</span><a href="tel:+13054870703">+1 (305) 487-0703 (iMessage, FaceTime)</a></li>
-        <li><span var="inputvar-skype@class">icon</span><a href="skype:pavelkajiri?call">pavelkajiri (Skype)</a></li>
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:jiri.pavelka@internetguru.cz">jiri.pavelka@internetguru.cz (Google Talk)</a></li>
-        <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/jiripavelka">jiripavelka (LinkedIn)</a></li>
+<!--         <li><span var="inputvar-skype@class">icon</span><a href="skype:pavelkajiri?call">pavelkajiri (Skype)</a></li> -->
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:jiri.pavelka@internetguru.cz">george@internetguru.cz</a></li>
+        <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/jiripavelka">LinkedIn Profile</a></li>
       </ul></dd>
     </dl>
       </div></div>
