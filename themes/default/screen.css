@@ -490,8 +490,6 @@ form#contactform-tel dd {
   margin-bottom: 0.5em;
 }
 .adv .svg-inline--fa {
-  margin: 0 0.3em 0.2em 0;
-  float: left;
   width: 1em;
 }
 #content .adv dt {
@@ -507,6 +505,22 @@ dl dt {
 }
 dl dd {
   margin: 0;
+}
+@media (min-width: 58em) {
+  .adv .svg-inline--fa {
+    margin: 0 0.3em 0.2em 0;
+    float: left;
+  }
+  div.list.multiple dl.adv dd {
+    margin-bottom: 0;
+    margin-top: 0;
+    margin-left: 4.3em;
+  }
+  div.list.multiple dl.adv dt {
+    margin-top: 1.5em;
+    font-weight: 400;
+    margin-bottom: 0;
+  }
 }
 /************************************/
 form#contactform-tel div.list.multiple dl {
@@ -543,7 +557,7 @@ form#contactform-tel div.list.multiple dt:first-child+dd {
 form#contactform-tel dd {
     float: none
 }
-form#contactform-tel dt,div.list.multiple dl.adv dt {
+form#contactform-tel dt {
     margin-top: 1.5em;
     margin-bottom: 0;
     font-weight: 400;
@@ -555,11 +569,6 @@ form#contactform-tel dt:not(:first-child) {
 }
 form#contactform-tel dt:fist-child,div.list.multiple dl.adv dt:fist-child {
     margin-top: 0
-}
-div.list.multiple dl.adv dd {
-    margin-bottom: 0;
-    margin-top: 0;
-    margin-left: 4.3em;
 }
 div.list.multiple dl.adv dd~dd {
     font-weight: 600

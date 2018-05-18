@@ -5,10 +5,6 @@ div.list.multiple > div {
   flex-wrap: wrap;
 }
 
-#care + p + div.list.multiple > div {
-  display: block;
-}
-
 #care + p + div.list.multiple .img {
   display: none;
 }
@@ -26,7 +22,7 @@ div.list.multiple div > * {
 }
 
 @media (min-width: 33em) {
-  div.list.multiple div > *:not(.adv) {
+  div.list.multiple div > * {
     flex: 0 1 50%;
     max-width: 50%;
   }
@@ -36,6 +32,9 @@ div.list.multiple div > * {
   div.list.multiple div > *.adv {
     flex: 0 1 50%;
     max-width: 50%;
+  }
+  #care + p + div.list.multiple > div {
+    display: block;
   }
   #care + p + div.list.multiple .adv.img {
     display: block;
@@ -52,7 +51,7 @@ div.list.multiple div > * {
 }
 
 @media (min-width: 52em) {
-  div.list.multiple div > *:not(.adv) {
+  div.list.multiple div > * {
     flex: 0 1 33.33%;
     max-width: 33.3%;
   }
