@@ -8,8 +8,8 @@
   <favicon>themes/ig.ico</favicon>
   <jsFile append="body">themes/fa.js</jsFile>
   <jsFile append="body">lib/fontawesome5/js/fontawesome-all.js</jsFile>
-  <jsFile append="body">lib/scrollreveal.min.js</jsFile>
-  <jsFile append="body">themes/revealinit.js</jsFile>
+<!--   <jsFile append="body">lib/scrollreveal.min.js</jsFile> -->
+<!--   <jsFile append="body">themes/revealinit.js</jsFile> -->
 <!--   <stylesheet>lib/fontawesome5/css/fa-svg-with-js.css</stylesheet> -->
   <robots domain="beta.internetguru.cz" readonly="readonly" meta="all">User-agent: *
 Disallow:</robots>

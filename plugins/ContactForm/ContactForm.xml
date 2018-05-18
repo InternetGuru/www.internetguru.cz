@@ -50,8 +50,8 @@ $inputvar-service_plain
     <dl>
       <dt>Type</dt>
       <dd>Quick Contact</dd>
-      <dt><label for="tel">Should we call you?</label></dt>
-      <dd>Enter your telephone number below</dd>
+      <dt>Should we call you?</dt>
+      <dd>Enter your <label for="tel">telephone number</label> below</dd>
       <dd><input type="text" id="tel" required="required" placeholder="+1 (305) 123-1234" pattern="\D*(\d\D*){9,}" value=""/></dd>
       <dd><input type="submit" id="submit" value="Call Me"/></dd>
     </dl>
