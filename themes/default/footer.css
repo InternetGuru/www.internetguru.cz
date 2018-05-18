@@ -28,6 +28,10 @@
   margin: 0;
 }
 
+#footer > ul.globalmenu {
+  text-transform: uppercase;
+}
+
 #footer > ul.globalmenu > li li {
   margin: 0.2em 0;
 }
