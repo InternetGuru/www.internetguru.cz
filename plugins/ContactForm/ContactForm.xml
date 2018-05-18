@@ -97,23 +97,23 @@ $inputvar-service_plain
         <li><a href="https://www.linkedin.com/in/lucie-zdenkova"><span var="inputvar-linkedin@class">icon</span><span>linkedin.com/in/lucie-zdenkova</span></a></li>
       </ul></dd>
 -->
-      <dt>Jan Pospíšil</dt>
+      <dt>Honza Pospíšil</dt>
       <dd>Marketing Support, Accounting</dd>
       <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:jan.pospisil@internetguru.cz">jan.pospisil@internetguru.cz</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:honza@internetguru.cz">honza@internetguru.cz</a></li>
       </ul></dd>
-      <dt>Pavel Petržela</dt>
+      <dt>Pavel Petrzela</dt>
       <dd>IT Support, Chief Developer</dd>
       <dd><ul class="logo">
 <!--         <li><span var="inputvar-phone@class">icon</span><a href="tel:+420604412983">+420 604 412 983</a></li> -->
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:pavel.petrzela@internetguru.cz">pavel.petrzela@internetguru.cz</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:pavel@internetguru.cz">pavel@internetguru.cz</a></li>
 <!--         <li><a href="skype:poulikpetrzela"><span var="inputvar-skype@class">icon</span><span>poulikpetrzela</span></a></li> -->
 <!--         <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/pavelpetrzela">pavelpetrzela (LinkedIn)</a></li> -->
       </ul></dd>
       <dt class="hideable-nohide hideable-here">Jan Vlnas</dt>
-      <dd class="hideable-nohide">Senior Developer Consultant</dd>
+      <dd class="hideable-nohide">Senior Developer, Consultant</dd>
       <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:jan.vlnas@internetguru.cz">jan.vlnas@internetguru.cz</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:jan@internetguru.cz">jan@internetguru.cz</a></li>
 <!--         <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/janvlnas/">janvlnas (LinkedIn)</a></li> -->
       </ul></dd>
     </dl>
@@ -123,15 +123,15 @@ $inputvar-service_plain
       <dt>Lubomír Brejník</dt>
       <dd>Executive Director</dd>
       <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:lubomir.brejnik@internetguru.cz">lubomir.brejnik@internetguru.cz</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:lubos@internetguru.cz">lubos@internetguru.cz</a></li>
       </ul></dd>
-      <dt>Jiří (George) Pavelka</dt>
+      <dt>George Pavelka</dt>
       <dd>Business Owner, CEO</dd>
       <dd><ul class="logo">
-        <li><span var="inputvar-phone@class">icon</span><a href="tel:+420603307905">+420 603 307 905 (WhatsApp, Viber)</a></li>
-        <li><span var="inputvar-phone@class">icon</span><a href="tel:+13054870703">+1 (305) 487-0703 (iMessage, FaceTime)</a></li>
+        <li><span var="inputvar-phone@class">icon</span><a href="tel:+420603307905">+420 603 307 905</a> <em>(WhatsApp, Viber)</em></li>
+        <li><span var="inputvar-phone@class">icon</span><a href="tel:+13054870703">+1 (305) 487-0703</a></li>
 <!--         <li><span var="inputvar-skype@class">icon</span><a href="skype:pavelkajiri?call">pavelkajiri (Skype)</a></li> -->
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:jiri.pavelka@internetguru.cz">george@internetguru.cz</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:george@internetguru.cz">george@internetguru.cz</a></li>
         <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/jiripavelka">LinkedIn Profile</a></li>
       </ul></dd>
     </dl>

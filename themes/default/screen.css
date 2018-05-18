@@ -37,7 +37,7 @@ a[href], label {
   text-decoration: none;
   color: #4954bd;
   border: none;
-  font-weight: 500;
+  /*! font-weight: 500; */
   transition: color .1s ease;
   cursor: pointer;
 }
@@ -266,11 +266,11 @@ form#contactform-help .send input[type="submit"] {
   height: 100%;
 }
 #contactform-tel input[type="text"] {
-  /*! border-bottom: thin solid #c8c8c8; */
+  border-bottom: thin solid #e3e3e3;
   width: 100%;
   text-align: left;
   font-size: 1.5em;
-  border-top: thin solid #ddd;
+  border-top: thin solid #e3e3e3;
   height: auto;
   margin: 0;
 }
@@ -303,6 +303,9 @@ ul.logo li svg {
 ul.logo li a {
   border-bottom: none;
   display: inline-block;
+}
+ul.logo a + em {
+  padding-left: 0.5em;
 }
 a.logo {
   border-bottom: none;
@@ -362,36 +365,41 @@ a.logo {
 .part {
   padding: 7em 0;
 }
-.part:first-child {
+.part:first-child,
+.part:nth-child(2) {
   max-width: 62em;
   margin-left: auto;
   margin-right: auto;
+  padding-bottom: 0;
 }
-#content div.part:first-child > *:not(.section),
-#content div.part:first-child > .section > *:not(.list){
+#content div.part:first-child > *:not(.list),
+#content div.part:nth-child(2) > *:not(.list) {
   max-width: 30em;
   margin-left: 0;
   margin-right: 0;
 }
 .part:nth-child(2) {
+  margin-bottom: 6em;
+}
+.part:nth-child(3) {
   position: relative;
   background-color: #32315e;
   background: linear-gradient(#32315e,#515e80);
 }
-.part:nth-child(2) li {
+.part:nth-child(3) li {
   margin-left: 0;
 }
-.part:nth-child(2) > *,
-.part:nth-child(2) a {
+.part:nth-child(3) > *,
+.part:nth-child(3) a {
   color: #cfd7df;
   border-color: #ffffffa1;
 }
-.part:nth-child(2) a {
+.part:nth-child(3) a {
   color: white;
   font-weight: normal;
 }
-.part:nth-child(2):before,
-.part:nth-child(2):after {
+.part:nth-child(3):before,
+.part:nth-child(3):after {
   position: absolute;
   content: "";
   width: 100%;
@@ -402,26 +410,26 @@ a.logo {
   transform: skewY(-2deg);
   z-index: -2;
 }
-.part:nth-child(2):before {
+.part:nth-child(3):before {
   top: 0;
   left: 0;
   background: #feae59;
   transform: skewY(1deg);
   z-index: -1;
 }
-.part:nth-child(2) h2 {
+.part:nth-child(3) h2 {
   /*! text-align: center; */
   color: white;
   margin-bottom: 2em;
 }
-.part:nth-child(2) h3 {
+.part:nth-child(3) h3 {
   color: white;
 }
 .part:last-child {
   padding-bottom: 4em;
 }
 #technology {
-  margin-top: 6em;
+  /*! margin-top: 6em; */
 }
 /************************************/
 #content > .hdesc > div > div > ul {
@@ -456,20 +464,24 @@ form#contactform-tel input[type="submit"] {
   border: none;
   text-transform: uppercase;
   background: none;
-  /*! width: auto; */
-  /*! margin-left: auto; */
   display: block;
-  /*! border-bottom: thin solid #c8c8c8; */
   margin-top: 0;
   height: auto;
   background: #fff;
   border-top: none;
   text-align: center;
-  /*! width: auto; */
-  background: #f1f1f1;
-  /*! margin: 0.5em; */
-  /*! margin-left: auto; */
-  /*! margin-right: auto; */
+}
+#contactform-tel input[type="text"] {
+  margin-top: 1em;
+}
+@media (min-width: 33em) {
+  form#contactform-tel input[type="submit"] {
+    background: #f6f9fc;
+  }
+  #contactform-tel input[type="text"] {
+    margin-top: 0;
+    border-bottom: 0;
+  }
 }
 form#contactform-tel dd {
   font-style: normal;
@@ -538,6 +550,7 @@ dl dt {
   color: #32325d;
   margin-bottom: 1em;
   font-size: 1.1em;
+  font-weight: normal;
 }
 dl dd {
   margin: 0;
@@ -614,10 +627,10 @@ form#contactform-tel dt {
     margin-top: 1.5em;
     margin-bottom: 0;
     font-weight: 400;
-    float: none
+    float: none;
 }
 form#contactform-tel dt:not(:first-child) {
-    font-weight: 500;
+    font-weight: normal;
     color: #32325d;
 }
 form#contactform-tel dt:fist-child,div.list.multiple dl.adv dt:fist-child {
@@ -648,10 +661,6 @@ form#contactform-tel dl:first-child dd:nth-child(5) input {
   max-width: none;
 }
 /************************************/
-#consulting + p.description {
-  /*! max-width: 35em; */
-  /*! text-align: center; */
-}
 #consulting + p + .section h3 {
   position: relative;
   margin-top: 3em;
