@@ -270,6 +270,9 @@ form#contactform-help .send input[type="submit"] {
   width: 100%;
   text-align: left;
   font-size: 1.5em;
+  border-top: thin solid #c8c8c8;
+  height: auto;
+  margin: 0;
 }
 #contactform-tel input {
   margin-top: 1rem;
@@ -450,9 +453,14 @@ form#contactform-tel input[type="submit"] {
   border: none;
   text-transform: uppercase;
   background: none;
-  width: auto;
-  margin-left: auto;
+  /*! width: auto; */
+  /*! margin-left: auto; */
   display: block;
+  border-bottom: thin solid #c8c8c8;
+  margin-top: 0;
+  height: auto;
+  background: #fff;
+  border-top: none;
 }
 form#contactform-tel dd {
   font-style: normal;
@@ -563,15 +571,31 @@ form#contactform-tel div.list.multiple dl {
     justify-content: space-around
   }
 }
+form#contactform-tel dl {
+  padding: 0;
+}
+#content form#contactform-tel dl:first-child {
+  display: flex;
+  flex-direction: column;
+  background: #f6f9fc;
+}
+form#contactform-tel dl > * {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+form#contactform-tel dd:last-child {
+  padding-bottom: 1rem;
+}
 form#contactform-tel dt:first-child {
-  display: none
+  display: none;
 }
 form#contactform-tel div.list.multiple dt:first-child+dd {
   display: block;
   font-size: 1.8em;
-  border-bottom: thin solid #d8d8d8;
-  padding-bottom: .1em;
+  /*! border-bottom: thin solid #d8d8d8; */
+  /*! padding-bottom: .1em; */
   color: #32325d;
+  padding-top: 1rem;
 }
 form#contactform-tel dd {
     float: none
@@ -595,6 +619,23 @@ div.list.multiple dl.adv dd~dd {
 form#contactform-tel dd {
     margin-top: .15em;
     margin-bottom: 0
+}
+form#contactform-tel dl:first-child dd:nth-child(4),
+form#contactform-tel dl:first-child dd:nth-child(6){
+  flex-grow: 1;
+}
+form#contactform-tel dl:first-child dd:nth-child(5),
+form#contactform-tel dl:first-child dd:nth-child(6){
+  padding: 0;
+  width: 100%;
+  display: block;
+  max-width: none;
+}
+form#contactform-tel dl:first-child dd:nth-child(6) {
+  margin: 0;
+}
+form#contactform-tel dl:first-child dd:nth-child(5) input {
+  max-width: none;
 }
 /************************************/
 #consulting + p.description {
