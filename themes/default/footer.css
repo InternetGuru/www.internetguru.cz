@@ -28,18 +28,6 @@
   margin: 0;
 }
 
-#footer > ul.globalmenu {
-  text-transform: uppercase;
-}
-
-#footer > ul.globalmenu > li li {
-  margin: 0.2em 0;
-}
-
-#footer > ul.globalmenu > li a.current {
-  font-weight: 600;
-}
-
 /* Browser compatibility */
 
 .no-flexbox #footer > ul {
