@@ -166,11 +166,10 @@ form#contactform-help {
 form#contactform-help textarea {
   margin: 1.5em 0 0;
   border: thin solid #ddd;
-  border-radius: 0.3em 0.3em 0 0;
   background: #fff;
   padding: 0.5em 1em;
   max-width: 35em;
-  height: 6em;
+  height: 10em;
   width: 100% !important;
 }
 form#contactform-help:after {
@@ -205,29 +204,42 @@ form#contactform-help dd:nth-child(5) {
 form#contactform-help dt:nth-child(4) {
   display: none;
 }
-form#contactform-help .send {
-  display: inline-flex;
-  width: 35em;
-  max-width: 100%;
-}
+
 form#contactform-help .send input[type="text"] {
   max-width: none;
-  border-radius: 0 0 0 0.3em;
   border: thin solid #ddd;
   border-top: none;
   padding: 0.5em 1em;
-  flex-grow: 1;
 }
 form#contactform-help .send label {display: none;}
 ::placeholder {
   color: #aab7c4;
 }
 form#contactform-help .send input[type="submit"] {
-  border-radius: 0 0 0.3em 0;
   border: thin solid #ddd;
   border-top: none;
-  border-left: none;
   text-transform: uppercase;
+  display: block;
+  margin-left: auto;
+}
+@media (min-width: 33em) {
+  form#contactform-help textarea {
+    border-radius: 0.3em 0.3em 0 0;
+    height: 6em;
+  }
+  form#contactform-help .send {
+    display: inline-flex;
+    width: 35em;
+    max-width: 100%;
+  }
+  form#contactform-help .send input[type="text"] {
+    border-radius: 0 0 0 0.3em;
+    flex-grow: 1;
+  }
+  form#contactform-help .send input[type="submit"] {
+    border-radius: 0 0 0.3em 0;
+    border-left: none;
+  }
 }
 /************************************/
 #contactform-tel {
@@ -561,28 +573,37 @@ form#contactform-tel dd {
   max-width: 35em;
   text-align: center;
 }
-#consulting + p + .section > * {
-  margin-left: 8rem;
-}
-#consulting + p + .section > #training,
-#consulting + p + .section > #training + p,
-#consulting + p + .section > #training + p + .list {
-  margin-left: 0;
-  margin-right: 8rem;
-}
 #consulting + p + .section > .description {
   position: relative;
 }
+#consulting + p + .section h3 {
+  margin-top: 6em;
+}
 .description svg {
   position: absolute;
-  left: -13rem;
-  top: -3rem;
+  top: -2.1em;
   color: #8898AA;
-  display: block;
-  font-size: 10rem;
 }
-#consulting + p + .section > #training + p.description svg {
-  right: -13rem;
-  left: unset;
+@media (min-width: 33em) {
+  #consulting + p + .section > * {
+    margin-left: 8rem;
+  }
+  #consulting + p + .section > #training,
+  #consulting + p + .section > #training + p,
+  #consulting + p + .section > #training + p + .list {
+    margin-left: 0;
+    margin-right: 8rem;
+  }
+  #consulting + p + .section > #training + p.description svg {
+    right: -13rem;
+    left: unset;
+  }
+  .description svg {
+    left: -13rem;
+    top: -3rem;
+    color: #8898AA;
+    display: block;
+    font-size: 10rem;
+  }
 }
 /************************************/
