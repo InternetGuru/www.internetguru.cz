@@ -167,10 +167,16 @@ form#contactform-help textarea {
   margin: 1.5em 0 0;
   border: thin solid #ddd;
   background: #fff;
-  padding: 0.5em 1em;
+  padding: 0.5em;
   max-width: 35em;
   height: 10em;
   width: 100% !important;
+}
+input,
+textarea {
+  -webkit-appearance: none;
+  -moz-appearance: value;
+  appearance: value;
 }
 form#contactform-help:after {
   content: "";
@@ -204,14 +210,15 @@ form#contactform-help dd:nth-child(5) {
 form#contactform-help dt:nth-child(4) {
   display: none;
 }
-
 form#contactform-help .send input[type="text"] {
   max-width: none;
   border: thin solid #ddd;
   border-top: none;
   padding: 0.5em 1em;
 }
-form#contactform-help .send label {display: none;}
+form#contactform-help .send label {
+  display: none;
+}
 ::placeholder {
   color: #aab7c4;
 }
@@ -221,8 +228,12 @@ form#contactform-help .send input[type="submit"] {
   text-transform: uppercase;
   display: block;
   margin-left: auto;
+  width: 100%;
 }
 @media (min-width: 33em) {
+  form#contactform-help textarea {
+    padding: 0.5em 1em;
+  }
   form#contactform-help textarea {
     border-radius: 0.3em 0.3em 0 0;
     height: 6em;
@@ -239,6 +250,7 @@ form#contactform-help .send input[type="submit"] {
   form#contactform-help .send input[type="submit"] {
     border-radius: 0 0 0.3em 0;
     border-left: none;
+    width: auto;
   }
 }
 /************************************/
@@ -254,9 +266,9 @@ form#contactform-help .send input[type="submit"] {
   height: 100%;
 }
 #contactform-tel input[type="text"] {
-  border: thin solid #c8c8c8;
+  border-bottom: thin solid #c8c8c8;
   width: 100%;
-  text-align: center;
+  text-align: left;
   font-size: 1.5em;
 }
 #contactform-tel input {
@@ -416,8 +428,7 @@ a.logo {
   margin: 0;
   padding: 0;
 }
-#content a.button,
-form#contactform-tel input[type="submit"] {
+#content a.button {
   white-space: nowrap;
   display: inline-block;
   line-height: 3em;
@@ -432,24 +443,32 @@ form#contactform-tel input[type="submit"] {
   text-decoration: none;
   transition: all .15s ease;
 }
+form#contactform-tel input[type="submit"] {
+  padding: 1rem 1rem;
+  color: #4954bd;
+  font-weight: 600;
+  border: none;
+  text-transform: uppercase;
+  background: none;
+  width: auto;
+  margin-left: auto;
+  display: block;
+}
+form#contactform-tel dd {
+  font-style: normal;
+}
 #content a.button:focus,
-#content a.button:hover,
-form#contactform-tel input[type="submit"]:focus,
-form#contactform-tel input[type="submit"]:hover {
+#content a.button:hover {
   color: #fff;
   background-color: #7795f8;
   transform: translateY(-0.1em);
   box-shadow: 0 0.35em 10.2em rgba(50,50,93,.1),0 0.15em 0.3em rgba(0,0,0,.08)
 }
-#content a.button:active,
-form#contactform-tel input[type="submit"]:active {
+#content a.button:active {
   color: #e6ebf1;
   background-color: #555abf;
   transform: translateY(0.1em);
   box-shadow: 0 0.2em 0.3em rgba(50,50,93,.11),0 0.05em 0.15em rgba(0,0,0,.08)
-}
-form#contactform-tel dd {
-  font-style: normal;
 }
 /************************************/
 #footer {
@@ -582,15 +601,11 @@ form#contactform-tel dd {
   max-width: 35em;
   text-align: center;
 }
-#consulting + p + .section > .description {
-  position: relative;
-}
 #consulting + p + .section h3 {
-  margin-top: 6em;
+  position: relative;
+  margin-top: 3em;
 }
-.description svg {
-  position: absolute;
-  top: -2.1em;
+#content h3 svg {
   color: #8898AA;
 }
 @media (min-width: 33em) {
@@ -603,14 +618,14 @@ form#contactform-tel dd {
     margin-left: 0;
     margin-right: 8rem;
   }
-  #consulting + p + .section > #training + p.description svg {
-    right: -13rem;
+  #consulting + p + .section > #training svg {
+    right: -1.3em;
     left: unset;
   }
-  .description svg {
+  #content h3 svg {
+    position: absolute;
     left: -13rem;
-    top: -3rem;
-    color: #8898AA;
+    top: 0;
     display: block;
     font-size: 10rem;
   }

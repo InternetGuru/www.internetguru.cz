@@ -4,6 +4,7 @@
 <!--   <stylesheet>lib/font-awesome/css/font-awesome.css</stylesheet> -->
   <xslt>themes/h1desc.xsl</xslt>
   <xslt>themes/default/part.xsl</xslt>
+  <xslt>themes/icons.xsl</xslt>
   <favicon>themes/ig.ico</favicon>
   <jsFile append="body">themes/fa.js</jsFile>
   <jsFile append="body">lib/fontawesome5/js/fontawesome-all.js</jsFile>
