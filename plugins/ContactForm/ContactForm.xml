@@ -73,8 +73,8 @@ $inputvar-service_plain
       </ul></dd> -->
       <dt>Bank Accounts</dt>
       <dd><ul class="logo">
-        <li><span var="inputvar-cc@class">icon</span><a>670100-2201433979/6210 (mBank)</a></li>
-        <li><span var="inputvar-cc@class">icon</span><a>2800426615/2010 (FIO)</a></li>
+        <li><span var="inputvar-cc@class">icon</span><span><a>CZ14 6210 6701 0022 0143 3979</a> <em>(mBank)</em></span></li>
+        <li><span var="inputvar-cc@class">icon</span><span><a>2800426615 / 2010</a> <em>(FIO)</em></span></li>
       </ul></dd>
     </dl>
     <dl>
@@ -97,7 +97,7 @@ $inputvar-service_plain
         <li><a href="https://www.linkedin.com/in/lucie-zdenkova"><span var="inputvar-linkedin@class">icon</span><span>linkedin.com/in/lucie-zdenkova</span></a></li>
       </ul></dd>
 -->
-      <dt>Honza Pospíšil</dt>
+      <dt>Honza Pospisil</dt>
       <dd>Marketing Support, Accounting</dd>
       <dd><ul class="logo">
         <li><span var="inputvar-email@class">icon</span><a href="mailto:honza@internetguru.cz">honza@internetguru.cz</a></li>
@@ -120,7 +120,7 @@ $inputvar-service_plain
     <dl>
       <dt>Type</dt>
       <dd>Management</dd>
-      <dt>Lubomír Brejník</dt>
+      <dt>Lubomir Brejník</dt>
       <dd>Executive Director</dd>
       <dd><ul class="logo">
         <li><span var="inputvar-email@class">icon</span><a href="mailto:lubos@internetguru.cz">lubos@internetguru.cz</a></li>
@@ -128,7 +128,7 @@ $inputvar-service_plain
       <dt>George Pavelka</dt>
       <dd>Business Owner, CEO</dd>
       <dd><ul class="logo">
-        <li><span var="inputvar-phone@class">icon</span><a href="tel:+420603307905">+420 603 307 905</a> <em>(WhatsApp, Viber)</em></li>
+        <li><span var="inputvar-phone@class">icon</span><span><a href="tel:+420603307905">+420 603 307 905</a> <em>(WhatsApp, Viber)</em></span></li>
         <li><span var="inputvar-phone@class">icon</span><a href="tel:+13054870703">+1 (305) 487-0703</a></li>
 <!--         <li><span var="inputvar-skype@class">icon</span><a href="skype:pavelkajiri?call">pavelkajiri (Skype)</a></li> -->
         <li><span var="inputvar-email@class">icon</span><a href="mailto:george@internetguru.cz">george@internetguru.cz</a></li>

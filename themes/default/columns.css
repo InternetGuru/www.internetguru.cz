@@ -26,6 +26,10 @@ div.list.multiple div > * {
     flex: 0 1 50%;
     max-width: 50%;
   }
+  #contactform-tel div.list.multiple div > * {
+    flex: 0 1 100%;
+    max-width: none;
+  }
 }
 
 @media (min-width: 58em) {
@@ -39,7 +43,10 @@ div.list.multiple div > * {
   #care + p + div.list.multiple .adv.img {
     display: block;
     float: right;
-    padding-left: 2em;
+    box-sizing: content-box;
+  }
+  #care + p + div.list.multiple .adv.img img {
+    margin-left: 2em;
   }
   .adv.img img {
     max-width: none;
@@ -47,6 +54,12 @@ div.list.multiple div > * {
   }
   .adv.img:not(.devices) img {
     box-shadow: 0.5em 0.5em 2em #ddd;
+  }
+}
+
+@media (min-width: 70em) {
+  #care + p + div.list.multiple .adv.img img {
+    margin-left: 5em;
   }
 }
 

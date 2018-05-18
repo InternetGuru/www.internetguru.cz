@@ -281,6 +281,9 @@ form#contactform-help .send input[type="submit"] {
 #contactform-tel dd {
   margin-left: 0;
 }
+#contactform-tel div > div {
+  justify-content: center;
+}
 /************************************/
 ul.logo {
   list-style: none;
@@ -291,7 +294,6 @@ ul.logo li {
   display: flex;
   width: 100%;
   /* align-items: center; */
-  word-break: break-all;
   margin-bottom: 0.2em;
 }
 ul.logo li svg {
@@ -303,9 +305,7 @@ ul.logo li svg {
 ul.logo li a {
   border-bottom: none;
   display: inline-block;
-}
-ul.logo a + em {
-  padding-left: 0.5em;
+  word-break: break-all;
 }
 a.logo {
   border-bottom: none;
@@ -575,14 +575,14 @@ dl dd {
 form#contactform-tel div.list.multiple dl {
     max-width: 27em
 }
-@media screen and (min-width: 22em) {
+@media screen and (min-width: 23.5em) {
   form#contactform-tel div.list.multiple dl {
     box-shadow:.1em .1em .7em #c4c4c4;
     background-color: #fff;
     margin-bottom: 1em;
   }
 }
-@media (min-width: 52em) {
+@media (min-width: 48em) {
   form#contactform-tel > div.list.multiple dl {
     flex: 0 1 50%
   }
