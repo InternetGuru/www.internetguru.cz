@@ -36,21 +36,13 @@ h3 {
 a[href], label {
   text-decoration: none;
   color: #4954bd;
-  border: none;
-  /*! font-weight: 500; */
   transition: color .1s ease;
-  cursor: pointer;
+  border-color: #4954bd9e;
 }
-a[href]:focus, label:focus {
-    outline: none;
-    text-decoration: underline;
-    text-underline-position: under
-}
-a[href]:focus, label:focus, a[href]:hover, label:hover {
-    color: #32325d
-}
-a[href]:active, label:active {
-    color: #000
+a[href]:focus, a[href]:hover, a[href]:active, a[href]:visited,
+label:focus, label:hover, label:active {
+    color: #000244;
+    border-color: #0002449e;
 }
 /************************************/
 #content > .hdesc .description {
@@ -66,14 +58,14 @@ h3 + p.description {
   font-size: 1.2em;
 }
 /************************************/
-ol.contentlink-bc li a {
-  padding: 1rem 0;
+ol.contentlink-bc li a, ol.contentlink-bc li a[href] {
+  margin: 1rem 0;
   color: white;
   border-color: #fff5ea;
 }
 ol.contentlink-bc li a:first-child {
   padding-left: 0;
-  font-weight: 600;
+  /* font-weight: 600; */
   font-size: 1.2em;
   line-height: 1;
 }
@@ -125,28 +117,6 @@ ol.contentlink-bc li a:first-child {
   }
   #header .hideable-nohide .globalmenu-top li + li {
     border-top: thin solid #dddddd;
-  }
-}
-@media (min-width: 50em) {
-  #header > div {
-    display: flex;
-  }
-  #header > div ol.contentlink-bc {
-    flex-grow: 1;
-  }
-  #header > div .globalmenu {
-    margin-top: 0;
-  }
-  #header a.hideable-switch {
-    display: none !important;
-  }
-  #header div.globalmenu-top {
-    display: block !important;
-    position: static;
-    padding: 0;
-  }
-  #header > div .globalmenu li:last-child a {
-    padding-right: 0;
   }
 }
 /************************************/
@@ -382,6 +352,7 @@ a.logo {
   margin-bottom: 6em;
 }
 .part:nth-child(3) {
+  color: #cfd7df;
   position: relative;
   background-color: #32315e;
   background: linear-gradient(#32315e,#515e80);
@@ -389,14 +360,16 @@ a.logo {
 .part:nth-child(3) li {
   margin-left: 0;
 }
-.part:nth-child(3) > *,
-.part:nth-child(3) a {
-  color: #cfd7df;
+.part:nth-child(3) a[href] {
+  color: #e5eaef;
   border-color: #ffffffa1;
 }
-.part:nth-child(3) a {
+.part:nth-child(3) a[href]:focus,
+.part:nth-child(3) a[href]:hover,
+.part:nth-child(3) a[href]:active,
+.part:nth-child(3) a[href]:visited {
   color: white;
-  font-weight: normal;
+  border-color: white;
 }
 .part:nth-child(3):before,
 .part:nth-child(3):after {
@@ -451,7 +424,7 @@ a.logo {
   background-color: #5E6AE3;
   border-radius: 0.2em;
   text-transform: uppercase;
-  letter-spacing: .025em;
+  letter-spacing: .05em;
   color: #fff;
   font-weight: 600;
   text-decoration: none;
