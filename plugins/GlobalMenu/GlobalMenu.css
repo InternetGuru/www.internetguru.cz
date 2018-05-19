@@ -62,6 +62,18 @@
   right: 0;
   padding-right: 0;
 }
+#footer > ul.globalmenu {
+  text-transform: uppercase;
+}
+#footer > ul.globalmenu > li li {
+  margin: 0.2em 0;
+}
+#footer > ul.globalmenu > li a {
+  border: none;
+}
+#footer > ul.globalmenu > li a.current {
+  font-weight: 600;
+}
 @media (min-width: 28em) {
   #header > div .globalmenu li {
     display: inline-block;
