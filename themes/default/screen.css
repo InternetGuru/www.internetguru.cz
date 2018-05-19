@@ -236,7 +236,6 @@ form#contactform-help .send input[type="submit"] {
   height: 100%;
 }
 #contactform-tel input[type="text"] {
-  border-bottom: thin solid #e3e3e3;
   width: 100%;
   text-align: left;
   font-size: 1.5em;
@@ -443,13 +442,14 @@ form#contactform-tel input[type="submit"] {
   background: #fff;
   border-top: none;
   text-align: center;
+  background: #f6f9fc;
 }
 #contactform-tel input[type="text"] {
   margin-top: 1em;
 }
 @media (min-width: 33em) {
   form#contactform-tel input[type="submit"] {
-    background: #f6f9fc;
+    
   }
   #contactform-tel input[type="text"] {
     margin-top: 0;
