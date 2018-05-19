@@ -14,7 +14,8 @@
     Config.visibleClass = Config.ns + "-visible";
     Config.hiddenClass = Config.ns + "-hidden";
     Config.inactiveTimeout = 10; // s
-    Config.deltaY = 200;
+    Config.deltaYshow = 400;
+    Config.deltaYhide = 200;
     Config.actionTimeout = 200; // ms
     Config.animationSpeed = 250; // ms
 
@@ -53,13 +54,14 @@
           window.clearTimeout(windowScrollTimeOut);
           windowScrollTimeOut = window.setTimeout(function () {
             var scrollTop = getScrollTop();
-            if (Math.abs(scrollTop - lastScrollTop) < Config.deltaY) {
-              lastScrollTop = scrollTop;
-              return;
-            }
-            if (scrollTop <= Config.hidePosition || scrollTop - lastScrollTop > 0) {
+            var delta = scrollTop - lastScrollTop;
+            var deltaAbs = Math.abs(delta);
+            if (
+              scrollTop < Config.hidePosition
+              || (delta > 0 && deltaAbs > Config.deltaYhide)
+            ) {
               hideButton();
-            } else if (displayed === false) {
+            } else if (displayed === false && deltaAbs > Config.deltaYshow) {
               showButton();
             }
             lastScrollTop = scrollTop;
