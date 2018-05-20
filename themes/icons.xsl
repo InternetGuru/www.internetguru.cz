@@ -12,7 +12,8 @@
   </xsl:template>
   
   <xsl:template match="h3[@id='business']/node()">
-    <span class="fas fa-fw fa-handshake">icon</span>
+    <span class="fas fa-fw fa-briefcase">icon</span>
+<!--     <span class="fas fa-fw fa-handshake">icon</span> -->
     <xsl:value-of select="normalize-space(.)"/>
   </xsl:template>
 
