@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Refactor hideable to use data attributes
  - Improve scrolltopable UX
 
+## [2.11.1] - 2018-05-27
+### Fixed
+ - Exception of addClass has wrong sprintf params
+
 ## [2.11.0] - 2018-04-12
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
@@ -371,6 +375,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.11.1]: https://bitbucket.org/igwr/cms/compare/v2.11.1..v2.11.0
 [2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.10
 [2.10.10]: https://bitbucket.org/igwr/cms/compare/v2.10.10..v2.10.9
 [2.10.9]: https://bitbucket.org/igwr/cms/compare/v2.10.9..v2.10.8
