@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.11.1] - 2018-05-27
+### Fixed
+ - Exception of addClass has wrong sprintf params
+
 ## [2.11.0] - 2018-04-12
 ### Added
  - Cache ImageList, DocList and processVariables results to improve performance
@@ -357,6 +361,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[2.11.1]: https://bitbucket.org/igwr/cms/compare/v2.11.1..v2.11.0
 [2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.10
 [2.10.10]: https://bitbucket.org/igwr/cms/compare/v2.10.10..v2.10.9
 [2.10.9]: https://bitbucket.org/igwr/cms/compare/v2.10.9..v2.10.8
