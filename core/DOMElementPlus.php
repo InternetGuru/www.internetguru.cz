@@ -390,7 +390,7 @@ class DOMElementPlus extends DOMElement implements \Serializable {
    */
   public function addClass ($class) {
     if (!preg_match("/^[A-Za-z][A-Za-z0-9_-]*$/", $class)) {
-      throw new Exception(sprintf(_("Invalid class name '%s'")), $class);
+      throw new Exception(sprintf(_("Invalid class name '%s'"), $class));
     }
     if ($this->hasClass($class)) {
       return;
