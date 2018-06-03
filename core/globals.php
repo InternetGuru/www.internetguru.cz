@@ -225,8 +225,13 @@ function build_local_url (Array $pLink, $ignoreCyclic = false, $addPermParam = t
     add_perm_param($pLink);
   }
   $cyclic = !$ignoreCyclic && is_cyclic_link($pLink);
-  if ($cyclic && !isset($pLink["fragment"])) {
-    throw new Exception(_("Link is cyclic"));
+  if ($cyclic) {
+    if (isset($pLink["fragment"])) {
+      $fragment = $pLink["fragment"];
+      $pLink = ["fragment" => $fragment];
+    } else {
+      throw new Exception(_("Link is cyclic"));
+    }
   }
   if (!isset($pLink["path"])) {
     return implode_link($pLink);
@@ -264,7 +269,7 @@ function build_local_url (Array $pLink, $ignoreCyclic = false, $addPermParam = t
  * @return bool
  */
 function is_cyclic_link (Array $pLink) {
-  if (isset($pLink["fragment"])) {
+  if (isset($pLink["fragment"]) && !isset($pLink["id"])) {
     return false;
   }
   if (isset($pLink["path"]) && $pLink["path"] != get_link()
