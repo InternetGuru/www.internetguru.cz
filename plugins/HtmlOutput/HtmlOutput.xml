@@ -108,6 +108,7 @@
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editableinit.js</jsFile>
   <jsFile append="body" if-xpath="//select[contains(@class, 'completable')]">themes/completable.js</jsFile>
+  <jsFile append="body" if-xpath="//textarea[@data-pattern]">themes/validate-textarea.js</jsFile>
 
   <!-- Photoswipe -->
   <stylesheet if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe.css</stylesheet>
