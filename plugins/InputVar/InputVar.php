@@ -374,7 +374,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(_("No replacement found"));
     }
     return function(DOMNode $node) use ($pattern, $replacement) {
-      return preg_replace("/^(?:".$pattern.")$/", $replacement, htmlspecialchars($node->nodeValue));
+      return preg_replace("/$pattern/", $replacement, htmlspecialchars($node->nodeValue));
     };
   }
 
@@ -465,6 +465,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   private function createFieldset (HTMLPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set) {
     switch ($set->getAttribute("type")) {
       case "text":
+      case "textarea":
       case "select":
         $this->createFs($content, $fieldset, $set, $set->getAttribute("type"));
         break;
@@ -492,7 +493,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $doc->appendChild($doc->importNode($fieldset, true));
       switch ($type) {
         case "text":
-          $inputVar = $this->createTextFs($list, $set);
+        case "textarea":
+          $inputVar = $this->createTextFs($list, $set, $type);
           break;
         case "select":
           $inputVar = $this->createSelectFs($list, $set);
@@ -539,10 +541,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * TODO refactor: neopakovat kod ...
    * @param array $list
    * @param DOMElementPlus $set
+   * @param string $type
    * @return DOMNode
    * @throws Exception
    */
-  private function createTextFs (Array $list, DOMElementPlus $set) {
+  private function createTextFs (Array $list, DOMElementPlus $set, $type) {
     $inputDoc = new DOMDocumentPlus();
     $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
     $dlElm = $inputVar->appendChild($inputDoc->createElement("dl"));
@@ -554,17 +557,29 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $label->setAttribute("for", $varElmId);
       $dlElm->appendChild($dtElm);
       $ddElm = $inputDoc->createElement("dd");
-      $text = $inputDoc->createElement("input");
+
+      if ($set->getAttribute("type") == "textarea") {
+        $text = $inputDoc->createElement("textarea");
+        $text->setAttribute("cols", 10);
+        $text->setAttribute("rows", 3);
+        if ($set->hasAttribute("pattern")) {
+          $text->setAttribute("data-pattern", $set->getAttribute("pattern"));
+        }
+        $text->nodeValue = $varElm->nodeValue;
+      } else {
+        $text = $inputDoc->createElement("input");
+        $text->setAttribute("type", "text");
+        if ($set->hasAttribute("pattern")) {
+          $text->setAttribute("pattern", $set->getAttribute("pattern"));
+        }
+        $text->setAttribute("value", $varElm->nodeValue);
+      }
+
       $ddElm->appendChild($text);
-      $text->setAttribute("type", "text");
       $text->setAttribute("id", $varElmId);
-      $text->setAttribute("name", $varElm->getAttribute("id"));
-      $text->setAttribute("value", $varElm->nodeValue);
+      $text->setAttribute("name", $varElm->getAttribute("id"));      
       if ($set->hasAttribute("placeholder")) {
         $text->setAttribute("placeholder", $set->getAttribute("placeholder"));
-      }
-      if ($set->hasAttribute("pattern")) {
-        $text->setAttribute("pattern", $set->getAttribute("pattern"));
       }
       if ($varElm->hasAttribute("required")) {
         $text->setAttribute("required", $varElm->getAttribute("required"));

@@ -258,6 +258,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     $req = $e->hasAttribute("required");
     switch ($e->nodeName) {
       case "textarea":
+        $pattern = $e->getAttribute("data-pattern");
         $this->verifyText($value, $pattern, $req, self::TEXTAREA_MAX_LEN);
         break;
       case "input":
@@ -323,7 +324,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       return;
     }
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    $res = @preg_match("/^(?:$pattern)$/", $value);
+    $res = @preg_match_all("/^$pattern$/m", $value, $matches);
     if ($res === false) {
       Logger::user_warning(_("Invalid item pattern"));
       return;
