@@ -4,9 +4,3 @@ a.linklist-href {
   font-size: 0.85em;
   text-decoration: none;
 }
-a.linklist-href:before {
-  content: "[";
-}
-a.linklist-href:after {
-  content: "]";
-}

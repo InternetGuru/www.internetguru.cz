@@ -72,11 +72,9 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
       if (!isset($linksArray[$href])) {
         $linksArray[$href] = ++$count;
       }
-      $aElm = $link->ownerDocument->createElement("a");
-      $aElm->nodeValue = $linksArray[$href];
-      $aElm->setAttribute("class", "{$this->cssClass}-href print");
-      $aElm->setAttribute("href", "#{$this->cssClass}-".$aElm->nodeValue);
-      $link->parentNode->insertBefore($aElm, $link->nextSibling);
+      $link->setAttribute("data-linklist-href", "#{$this->cssClass}-{$linksArray[$href]}");
+      $link->setAttribute("data-linklist-value", $linksArray[$href]);
+      $link->setAttribute("data-linklist-class", "{$this->cssClass}-href print");
     }
     if ($count == 0) {
       return;
@@ -89,6 +87,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
     $var->appendChild($list);
     Cms::setVariable($this->cssClass, $var);
     Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".$this->className.".css");
+    Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".$this->className.".js", 10, "body");
   }
 
   /**
