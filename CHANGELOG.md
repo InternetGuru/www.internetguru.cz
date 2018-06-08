@@ -17,6 +17,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Refactor hideable to use data attributes
  - Improve scrolltopable UX
 
+## [2.11.2] - 2018-06-08
+### Fixed
+ - Meta description with attribute var is empty
+
 ## [2.11.1] - 2018-05-27
 ### Fixed
  - Exception of addClass has wrong sprintf params
@@ -374,7 +378,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.1
+[2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.2
+[2.11.2]: https://bitbucket.org/igwr/cms/compare/v2.11.2..v2.11.1
 [2.11.1]: https://bitbucket.org/igwr/cms/compare/v2.11.1..v2.11.0
 [2.11.0]: https://bitbucket.org/igwr/cms/compare/v2.11.0..v2.10.10
 [2.10.10]: https://bitbucket.org/igwr/cms/compare/v2.10.10..v2.10.9
