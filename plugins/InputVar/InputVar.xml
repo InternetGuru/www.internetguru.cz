@@ -65,9 +65,9 @@
   <var id="codemirror"><a href="https://dokumenty.internetguru.cz/zkratky">Klávesové zkratky CodeMirror</a></var>
   <var id="version_link"><a href="/%s.php" var="cms-default_release@href" title="Pro nezávislé ladění zdrojových souborů (CSS/JS)">Samostatná větev</a></var>
   <!--<var id="service_plain">E-Základna, www.e-zakladna.cz</var>-->
-  <!--<var id="service">Na službě: <a href="https://www.e-zakladna.cz">E-Základna</a></var>-->
+  <!--<var id="service">Na službě: <a href="https://www.e-zakladna.cz/">E-Základna</a></var>-->
    <var id="service_plain">Nestárnoucí weby, www.nestarnouciweby.cz</var>
-   <var id="service">Na službě: <a href="http://www.nestarnouciweby.cz">Nestárnoucí weby</a></var>
+   <var id="service">Na službě: <a href="http://www.nestarnouciweby.cz/">Nestárnoucí weby</a></var>
   <var id="resp">Webmaster: <span var="cms-resp">n/a</span></var>
   <var id="mtime" cacheable="false">Úpravy webu: <span var="cms-mtime" fn="inputvar-dateformat">n/a</span></var>
   <var id="admin">Admin: <span var="cms-admin_id">n/a</span></var>
