@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased]
+### Fixed
+ - Change InputVar service protocol
+
 ## [2.11.3] - 2018-06-08
 ### Changed
  - Change InputVar service url to end with /
@@ -369,6 +373,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
 [2.11.3]: https://bitbucket.org/igwr/cms/compare/v2.11.3..v2.11.2
 [2.11.2]: https://bitbucket.org/igwr/cms/compare/v2.11.2..v2.11.1
 [2.11.1]: https://bitbucket.org/igwr/cms/compare/v2.11.1..v2.11.0
