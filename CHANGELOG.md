@@ -4,6 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+<<<<<<< HEAD
 ## [Unreleased]
 ### Added
  - Open Graph protocol support
@@ -27,6 +28,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Eventable supports any element
  - Refactor hideable to use data attributes
  - Improve scrolltopable UX
+
+## [2.11.5] - 2018-06-10
+### Removed
+ - Default agregator.xsl
+
+### Fixed
+ - Admin variable list does not handle integer value
 
 ## [2.11.4] - 2018-06-08
 ### Fixed
@@ -398,7 +406,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
-[2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.4
+[2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.5
+[2.11.5]: https://bitbucket.org/igwr/cms/compare/v2.11.5..v2.11.4
 [2.11.4]: https://bitbucket.org/igwr/cms/compare/v2.11.4..v2.11.3
 [2.11.3]: https://bitbucket.org/igwr/cms/compare/v2.11.3..v2.11.2
 [2.11.2]: https://bitbucket.org/igwr/cms/compare/v2.11.2..v2.11.1

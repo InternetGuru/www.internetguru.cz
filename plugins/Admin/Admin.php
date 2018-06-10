@@ -596,6 +596,9 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
             continue 2;
           }
           break;
+        case "integer":
+        case "double":
+        break;
         case "object":
           if ($value instanceof \DOMDocument) {
             $value = $value->documentElement;
