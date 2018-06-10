@@ -17,6 +17,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Refactor hideable to use data attributes
  - Improve scrolltopable UX
 
+## [2.11.5] - 2018-06-10
+### Removed
+ - Default agregator.xsl
+
+### Fixed
+ - Admin variable list does not handle integer value
+
 ## [2.11.4] - 2018-06-08
 ### Fixed
  - Change InputVar service protocol
@@ -386,7 +393,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.4
+[2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.5
+[2.11.5]: https://bitbucket.org/igwr/cms/compare/v2.11.5..v2.11.4
 [2.11.4]: https://bitbucket.org/igwr/cms/compare/v2.11.4..v2.11.3
 [2.11.3]: https://bitbucket.org/igwr/cms/compare/v2.11.3..v2.11.2
 [2.11.2]: https://bitbucket.org/igwr/cms/compare/v2.11.2..v2.11.1
