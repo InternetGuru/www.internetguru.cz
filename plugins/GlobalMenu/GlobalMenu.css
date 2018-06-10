@@ -1,0 +1,104 @@
+@charset "UTF-8";
+/************************************/
+#header > div {
+  max-width: 60rem;
+  margin: 0 auto;
+  padding: 1rem;
+  position: relative;
+}
+#header > div ol.contentlink-bc {
+  padding: 0 1.5em 0 0;
+}
+#header > div .globalmenu {
+  margin: 1.5em 0 0;
+  padding: 0;
+  list-style: none;
+}
+#header > div .globalmenu li {
+  margin: 0;
+}
+#header > div .globalmenu li:first-child {
+  margin-left: 0;
+}
+#header div.hideable-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+#header div.hideable-button a {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 1em;
+  visibility: hidden;
+  width: 1em;
+}
+#header div.hideable-button a:before {
+  content:'\2630';
+  visibility: visible;
+}
+#header > div .globalmenu a {
+  text-transform: uppercase;
+  border: none;
+  display: block;
+  padding: 1em;
+  text-align: center;
+  letter-spacing: 0.02em;
+  background: none;
+}
+#header div.hideable-button span:last-child {
+  display: none;
+}
+#header > div .globalmenu a.current {
+  font-weight: 500;
+}
+#header > div .globalmenu a.current:before {
+  content: "●";
+  padding-right: 0.4em;
+  vertical-align: 0.1em;
+}
+#header .globalmenu-top {
+  position: absolute;
+  right: 0;
+  padding-right: 0;
+}
+#footer > ul.globalmenu {
+  text-transform: uppercase;
+}
+#footer > ul.globalmenu > li li {
+  margin: 0.2em 0;
+}
+#footer > ul.globalmenu > li a {
+  border: none;
+}
+#footer > ul.globalmenu > li a.current {
+  font-weight: 600;
+}
+@media (min-width: 28em) {
+  #header > div .globalmenu li {
+    display: inline-block;
+  }
+}
+@media (min-width: 42em) {
+  #header > div {
+    display: flex;
+  }
+  #header > div ol.contentlink-bc {
+    flex-grow: 1;
+  }
+  #header > div .globalmenu {
+    margin-top: 0;
+  }
+  #header a.hideable-switch {
+    display: none !important;
+  }
+  #header div.globalmenu-top {
+    display: block !important;
+    position: static;
+    padding: 0;
+  }
+  #header > div .globalmenu a {
+    padding: 0 0 0 1em;
+  }
+}
+/************************************/

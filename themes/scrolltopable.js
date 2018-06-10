@@ -1,4 +1,4 @@
-(function(win) {
+(function() {
 
   require("IGCMS", function () {
 
@@ -11,6 +11,13 @@
     Config.hidePosition = 200; // display / hide button int px from top
     Config.scrollhideClass = "scrollhide";
     Config.noprintClass = "noprint";
+    Config.visibleClass = Config.ns + "-visible";
+    Config.hiddenClass = Config.ns + "-hidden";
+    Config.inactiveTimeout = 10; // s
+    Config.deltaYshow = 400;
+    Config.deltaYhide = 200;
+    Config.actionTimeout = 200; // ms
+    Config.animationSpeed = 250; // ms
 
     var Scrolltopable = function () {
 
@@ -20,11 +27,12 @@
         displayed = false,
         step = null,
         wait = 10,
+        lastScrollTop = 0,
         getScrollTop = function () {
           return document.body.scrollTop || document.documentElement.scrollTop;
         },
         doScroll = function () {
-          if (getScrollTop() != 0) {
+          if (getScrollTop() !== 0) {
             window.scrollBy(0, -1 * step);
             scrollTimeOut = setTimeout(function () {
               doScroll();
@@ -34,34 +42,46 @@
             window.history.replaceState("", "", window.location.pathname + window.location.search);
           }
         },
+        hideButton = function () {
+          displayed = false;
+          button.className = Config.noprintClass + " " + Config.hiddenClass;
+        },
+        showButton = function () {
+          displayed = true;
+          button.className = Config.noprintClass + " " + Config.visibleClass;
+        },
+        processScroll = function () {
+          window.clearTimeout(windowScrollTimeOut);
+          windowScrollTimeOut = window.setTimeout(function () {
+            var scrollTop = getScrollTop();
+            var delta = scrollTop - lastScrollTop;
+            var deltaAbs = Math.abs(delta);
+            if (
+              scrollTop < Config.hidePosition
+              || (delta > 0 && deltaAbs > Config.deltaYhide)
+            ) {
+              hideButton();
+            } else if (displayed === false && deltaAbs > Config.deltaYshow) {
+              showButton();
+            }
+            lastScrollTop = scrollTop;
+          }, Config.actionTimeout);
+        },
         setScrollEvent = function () {
-          win.onscroll = function () {
-            win.clearTimeout(windowScrollTimeOut);
-            windowScrollTimeOut = window.setTimeout(function () {
-              if (getScrollTop() <= Config.hidePosition) {
-                if (button === null) return;
-                displayed = false;
-                button.className = Config.scrollhideClass + ' ' + Config.noprintClass;
-              } else if (displayed == false) {
-                displayed = true;
-                if (button === null) createButton();
-                button.className = Config.noprintClass;
-              }
-            }, 50);
-          };
-          win.onload = win.onscroll;
+          window.addEventListener('scroll', processScroll, false);
         },
         createButton = function () {
           button = document.createElement("a");
           button.id = Config.wrapperId;
           button.title = Config.title;
+          button.className = Config.noprintClass + " " + Config.hiddenClass;
           var span = document.createElement("span");
           span.innerHTML = Config.text;
           button.appendChild(span);
           document.body.appendChild(button);
           button.onclick = function () {
             step = Math.round(getScrollTop() / Config.time * wait);
-            if (Config.time == 0) window.scrollTo(0, 0);
+            if (Config.time === 0) window.scrollTo(0, 0);
             else doScroll();
             return false;
           }
@@ -82,27 +102,34 @@
             + '  bottom: 0;'
             + '  text-decoration: none;'
             + '  background: rgba(0, 0, 0, 0.45);'
-            + '  padding: 0.4em;'
             + '  font-size: 1.75rem;'
             + '  margin: 0.75rem;'
             + '  display: block;'
             + '  color: white;'
             + '  width: 1em;'
             + '  text-align: center;'
-            + '  height: 1em;'
+            + '  height: 0;'
+            + '  overflow: hidden;'
             + '  z-index: 100;'
             + '  cursor: pointer;'
             + '  line-height: 1;'
+            + '  opacity: 0;'
+            + '  transition: opacity ' + Config.animationSpeed + 'ms ease;'
+            + '}'
+            + 'a#' + Config.wrapperId + '.' + Config.visibleClass + ' { '
+            + '  padding: 0.4em;'
+            + '  height: 1em;'
+            + '  opacity: 1;'
             + '}'
             + 'a#' + Config.wrapperId + ':hover { background: rgba(0, 0, 0, 0.65) }'
-            + 'a#' + Config.wrapperId + ' span { font-size: 2.3rem; }'
-            + 'a#' + Config.wrapperId + '.' + Config.scrollhideClass + ' { display: none; }';
+            + 'a#' + Config.wrapperId + ' span { font-size: 2.3rem; }';
           IGCMS.appendStyle(css);
+          createButton();
           setScrollEvent();
         }
       }
     };
 
-    win.IGCMS.Scrolltopable = new Scrolltopable();
+    window.IGCMS.Scrolltopable = new Scrolltopable();
   })
-})(window)
+})()

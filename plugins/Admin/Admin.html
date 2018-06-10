@@ -16,26 +16,28 @@
     </fieldset>
   </form>
   <form class="editable fillable" action="/" method="post" var="linkadmin@action disabled@class">
-    <fieldset class="hideable nohide"><legend>Uživatelský soubor, mód <samp var="mode">n/a</samp>, stav <samp var="status warning@class">n/a</samp> <a class="toggle" var="changestatusurl@href changestatus">n/a</a></legend>
+    <fieldset class="hideable hideable-nohide">
+      <legend>Uživatelský soubor, mód <samp var="mode">n/a</samp>, stav <samp var="status warning@class">n/a</samp></legend>
       <textarea cols="40" name="content" rows="20" class="codemirror" var="content classtype@class"/>
-    </fieldset>
-    <fieldset><legend>Ovládací panel</legend>
-      <input name="userfilehash" type="hidden" value="" var="userfilehash@value"/>
       <ul>
         <li><label>Uložit do souboru <input name="filename" type="text" var="filename@value filepathpattern@pattern"/></label></li>
         <li><label><input name="repair" value="repair" type="checkbox" checked="checked" /> Automaticky opravovat chyby</label></li>
         <li><label><input name="overwrite" value="overwrite" type="checkbox"/> Přepsat soubor, pokud existuje</label></li>
         <li><input name="saveandstay" type="submit" value="Uložit" title="Ctrl+S"/></li>
-        <li><input name="saveandgo" type="submit" value="Uložit a přejít" title="Ctrl+Shift+S"/></li>
+        <li><input name="saveandgo" type="submit" value="Uložit a přejít" title="Ctrl+Shift+S"/><input name="userfilehash" type="hidden" value="" var="userfilehash@value"/></li>
+        <li><a class="toggle" var="changestatusurl@href changestatus">n/a</a></li>
       </ul>
     </fieldset>
-    <fieldset class="hideable" var="nohide@class"><legend>Výchozí soubor</legend>
+    <fieldset class="hideable" var="nohide@class">
+      <legend>Výchozí soubor</legend>
       <blockcode class="selectable" var="defaultcontent">n/a</blockcode>
     </fieldset>
-    <fieldset class="hideable"><legend>Výsledek, mód <samp var="mode">n/a</samp></legend>
+    <fieldset class="hideable">
+      <legend>Výsledek, mód <samp var="mode">n/a</samp></legend>
       <blockcode class="selectable" var="resultcontent">n/a</blockcode>
     </fieldset>
-    <fieldset class="hideable"><legend>Globální proměnné</legend>
+    <fieldset class="hideable">
+      <legend>Globální proměnné</legend>
       <p var="admin-varlist">n/a</p>
     </fieldset>
   </form>

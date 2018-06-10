@@ -733,7 +733,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    */
   private function processLink (DOMElementPlus $e, $aName, Array &$pLink) {
     $isLink = true;
+    $path = null;
     if (array_key_exists("path", $pLink)) {
+      $path = $pLink["path"];
       // link to supported file
       if (FileHandler::isSupportedRequest($pLink["path"])) {
         $isLink = false;
@@ -763,7 +765,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       if ($localFragment) {
         return;
       }
-      throw new Exception(_("Target not found"));
+      try {
+        find_file($path);
+      } catch(Exception $ex) {
+        throw new Exception(_("Target not found"));
+      }
+      throw new Exception(_("Target file not supported"));
     }
     $ignoreCyclic = $e->nodeName != "a";
     $link = build_local_url($pLink, $ignoreCyclic, $isLink);

@@ -1,6 +1,6 @@
-*, *:before, *:after {color: black !important; background: transparent !important; text-shadow: none !important; box-shadow: none !important;}
+*, *:before, *:after {color: black !important;background: transparent !important;text-shadow: none !important;border-color: #5e5e5e !important;box-shadow: none !important;}
 h1, h2, h3 {font-weight: normal; page-break-after: avoid; page-break-inside: avoid;}
-body {font-size:10pt; font-family: Charter, Georgia, sans;}
+body {font-size:10pt;font-family: Charter, Georgia, sans;}
 @page {size: auto; margin: 21mm 20mm;}
 .print {display: initial;}
 li.print {display: list-item;}
@@ -9,4 +9,3 @@ li.print {display: list-item;}
 ::placeholder {color: transparent;}
 ol.contentlink-bc {list-style: none; padding-left: 0;}
 ol.contentlink-bc li {display: inline-block;}
-ol.contentlink-bc li + li:before {content: ">"; margin: 0 0.5em;}

@@ -2,63 +2,80 @@
 
   require("IGCMS", function () {
 
-    var Config = {};
-    Config.ns = "eventable";
+    var Config = {}
+    Config.ns = "eventable"
+    Config.dataCategory = "data-" + Config.ns + "-category"
+    Config.dataAction = "data-" + Config.ns + "-action"
+    Config.debug = false
 
     var Eventable = function () {
 
       // private
       var
-        debug = false,
-        elements = null,
-        idRegExp = null,
-        fireEvents = function () {
-          formElemets = [];
+        fireEvents = function (elements) {
+          if (elements.length === 0) {
+            return
+          }
           for (var i = 0; i < elements.length; i++) {
-            var form = elements[i].form;
-            if (!form || elements[i].nodeName.toLowerCase() != "input") continue; // working only on form inputs
-            var m = form.className.match(idRegExp);
-            if (!m) {
-              m = Config.ns + "-" + i;
-              form.classList.add(m);
-              form.onsubmit = sendGAEvents;
+            var handler = sendGAEvents
+            var eventName = "click"
+            if (elements[i].nodeName.toLowerCase() === "form") {
+              handler = sendGAFormEvents
+              eventName = "submit"
             }
-            if (typeof formElemets[m] === "undefined") formElemets[m] = [];
-            formElemets[m].push(elements[i]);
+            elements[i].addEventListener(eventName, handler, false)
           }
         },
-        sendGAEvents = function (e) {
-          var id = this.className.match(idRegExp)[0];
-          var inputs = formElemets[id];
+        sendGAEvents = function (event) {
+          var element = event.target
+          var category = element.getAttribute(Config.dataCategory) || element.id || element.className || element.nodeName
+          var action = element.getAttribute(Config.dataAction) || element.href || element.nodeName
+          sendGAEvent(category, action, element.innerText)
+          if (Config.debug) {
+            event.preventDefault();
+          }
+        },
+        sendGAFormEvents = function (event) {
+          var form = event.target
+          var inputs = form.getElementsByTagName("input")
+          var category = form.getAttribute(Config.dataCategory) || form.id || form.className || 'form-' + form.action + '-' + form.method
           for (var i = 0; i < inputs.length; i++) {
-            sendGAEvent(this, inputs[i]);
+            sendGAEvent(category, inputs[i].name, inputs[i].value)
           }
-          if (debug) e.preventDefault();
+          if (Config.debug) {
+            event.preventDefault();
+          }
         },
-        sendGAEvent = function (form, input) {
-          if (debug) {
-            alert("category: '" + form.id + (form.id.length ? "_" : "") + form.action + "',"
-              + "action: '" + input.name + "',"
-              + "label: '" + input.value + "'");
+        sendGAEvent = function (category, action, label) {
+          if (Config.debug) {
+            alert("category: '" + category + "',"
+              + "action: '" + action + "',"
+              + "label: '" + label + "'")
           } else {
             ga('send', {
               'hitType': 'event',
-              'eventCategory': form.id + (form.id.length ? "_" : "") + form.action,
-              'eventAction': input.name,
-              'eventLabel': input.value
+              'eventCategory': category,
+              'eventAction': action,
+              'eventLabel': label
             });
           }
         };
 
       // public
       return {
-        debug: debug,
+        debug: Config.debug,
         init: function (cfg) {
-          IGCMS.initCfg(Config, cfg);
-          idRegExp = new RegExp(Config.ns + "-\\d+");
-          elements = document.getElementsByClassName(Config.ns);
-          if (elements.length == 0) return;
-          fireEvents();
+          IGCMS.initCfg(Config, cfg)
+          var allLinks = document.getElementsByTagName("a")
+          var externalLinks = []
+          for (var i = 0; i < allLinks.length; i++) {
+            if (allLinks[i].host && allLinks[i].host !== window.location.host) {
+              externalLinks.push(allLinks[i])
+            }
+          }
+          fireEvents(externalLinks)
+          fireEvents(document.getElementsByTagName("form"))
+          fireEvents(document.getElementsByClassName(Config.ns))
         }
       }
     };

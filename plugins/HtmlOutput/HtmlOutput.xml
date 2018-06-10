@@ -101,8 +101,8 @@
   <jsFile append="body" if-xpath="//*[contains(@class, 'filterable')]" priority="70">themes/filterableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'selectable')]" priority="70">themes/selectable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'selectable')]" priority="70">themes/selectableinit.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'eventable')]">themes/eventable.js</jsFile>
-  <jsFile append="body" if-xpath="//*[contains(@class, 'eventable')]">themes/eventableinit.js</jsFile>
+  <jsFile append="body">themes/eventable.js</jsFile>
+  <jsFile append="body">themes/eventableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'addressable')]">themes/addressable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'addressable')]">themes/addressableinit.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editable.js</jsFile>

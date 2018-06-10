@@ -31,6 +31,7 @@ class GlobalMenu extends Plugin implements SplObserver {
 
   /**
    * @param Plugins|SplSubject $subject
+   * @throws \Exception
    */
   public function update (SplSubject $subject) {
     if ($subject->getStatus() != STATUS_PROCESS) {
@@ -43,6 +44,13 @@ class GlobalMenu extends Plugin implements SplObserver {
       $this->vars[$e->getAttribute("id")] = $e;
     }
     $this->generateMenu();
+    $os = Cms::getOutputStrategy();
+    $os->addCssFile($this->pluginDir."/".$this->className.".css");
+    $xsl = $this->vars["xsl"]->nodeValue;
+    if (!strlen($xsl)) {
+      return;
+    }
+    $os->addTransformation($xsl);
   }
 
   private function generateMenu () {
@@ -107,5 +115,3 @@ class GlobalMenu extends Plugin implements SplObserver {
   }
 
 }
-
-?>
