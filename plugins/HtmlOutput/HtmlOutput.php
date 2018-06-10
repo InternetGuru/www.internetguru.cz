@@ -8,7 +8,6 @@ use DOMImplementation;
 use DOMXPath;
 use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\ErrorPage;
@@ -359,7 +358,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     // final validation
     $contentPlus->processFunctions(Cms::getAllFunctions());
     $xPath = new DOMXPath($contentPlus);
-    $this->addHead($doc, $html, $heading, $xPath);
 
     /** @var DOMElementPlus $element */
     foreach ($xPath->query("//*[@var]") as $element) {
@@ -393,6 +391,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->consolidateLang($contentPlus->documentElement, $lang);
 
+    $this->addHead($doc, $html, $heading, $xPath, $contentPlus);
     // import into html and save
     /** @var DOMElement $content */
     $content = $doc->importNode($contentPlus->documentElement, true);
@@ -521,6 +520,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     #$html->setAttribute("xml:lang", $lang);
     $html->setAttribute("lang", $lang);
+    $html->setAttribute("prefix", "og: http://ogp.me/ns#");
     $doc->appendChild($html);
     return $html;
   }
@@ -531,9 +531,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param DOMElementPlus $h1
    * @param DOMXPath $xPath
    * @return DOMElement
+   * @param DOMDocumentPlus $content
    * @throws Exception
    */
-  private function addHead (DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath) {
+  private function addHead (DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath, DOMDocumentPlus $content) {
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
     $this->appendMeta($head, "charset", "utf-8", false, true);
@@ -546,6 +547,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     foreach ($this->metaElements as $name => $metaElement) {
       $this->appendMeta($head, $name, $metaElement["content"], $metaElement["httpEquip"], $metaElement["short"]);
     }
+    if ($this->cfg->getElementById('og')->nodeValue == "enabled") {
+      $this->setMetaOg($head, $content);
+    }
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
     foreach ($this->linkElements as $linkElement) {
@@ -554,6 +558,84 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
+  }
+
+  /**
+   * @param DOMElement $head
+   * @param DOMDocumentPlus $content
+   * @throws Exception
+   */
+  private function setMetaOg (DOMElement $head, DOMDocumentPlus $content) {
+    $id = HTMLPlusBuilder::getLinkToId(get_link());
+    $type = 'website';
+    $images = [];
+    $dataAttrs = HTMLPlusBuilder::getIdToData($id);
+    if (is_null($dataAttrs)) {
+      $dataAttrs = [];
+    }
+    foreach ($dataAttrs as $name => $value) {
+      if (substr($name, 0, 3) !== 'og-') {
+        continue;
+      }
+      switch ($name) {
+        case 'og-image':
+          $urls = explode(' ', $value);
+          foreach ($urls as $url) {
+            $images[] = trim($url);
+          }
+        break;
+        case 'og-type':
+          $type = $value;
+          if ($type == 'article') {
+            $this->appendOgElement($head, 'og:article:published_time', HTMLPlusBuilder::getIdToCtime($id));
+            $mtime = HTMLPlusBuilder::getIdToMtime($id);
+            if ($mtime) {
+              $this->appendOgElement($head, 'og:article:modified_time', $mtime);
+            }
+            $this->appendOgElement($head, 'og:article:author', HTMLPlusBuilder::getIdToAuthor($id));
+          }
+        break;
+        case 'og-article-published_time':
+        case 'og-article-modified_time':
+        case 'og-article-author':
+        case 'og-title':
+        case 'og-description':
+        case 'og-site_name':
+        case 'og-url':
+        break;
+        default:
+          $this->appendOgElement($head, 'og:' . str_replace('-', ':', substr($name, 3)), $value);
+      }
+    }
+    if (empty($images)) {
+      /** @var DOMElement $img */
+      foreach ($content->getElementsByTagName('img') as $img) {
+        $images[] = $img->getAttribute('src');
+      }
+    }
+    if (empty($images)) {
+      $images[] = $this->cfg->getElementById('og-default-image')->nodeValue;
+    }
+    foreach ($images as $url) {
+      $this->appendOgElement($head, 'og:image', $url);
+    }
+    $this->appendOgElement($head, 'og:type', $type);
+    $this->appendOgElement($head, 'og:title', HTMLPlusBuilder::getIdToHeading($id));
+    $this->appendOgElement($head, 'og:description', HTMLPlusBuilder::getIdToDesc($id));
+    $this->appendOgElement($head, 'og:site_name ', current(HTMLPlusBuilder::getIdToHeading()));
+    $this->appendOgElement($head, 'og:url', HTTP_URL . '/' . get_link());
+  }
+
+  /**
+   * @param DOMElement $head
+   * @param $name
+   * @param $value
+   */
+  private function appendOgElement (DOMElement $head, $name, $value) {
+    $meta = $head->ownerDocument->createElement("meta");
+    $meta->setAttribute('property', $name);
+    $meta->setAttribute('content', $value);
+    $head->appendChild($meta);
   }
 
   /**
