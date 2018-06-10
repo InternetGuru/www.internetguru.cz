@@ -617,6 +617,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $images[] = $this->cfg->getElementById('og-default-image')->nodeValue;
     }
     foreach ($images as $url) {
+      if (strpos($url, 'http:') !== 0 || strpos($url, 'https:') !== 0) {
+        $url = HTTP_URL.'/'.ltrim($url, '/');
+      }
       $this->appendOgElement($head, 'og:image', $url);
     }
     $this->appendOgElement($head, 'og:type', $type);
