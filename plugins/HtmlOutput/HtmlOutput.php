@@ -614,7 +614,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       }
     }
     if (empty($images)) {
-      $images[] = $this->cfg->getElementById('og-default-image')->nodeValue;
+      $defaultImage = $this->cfg->getElementById('og-default-image')->nodeValue;
+      if ($defaultImage) {
+        $images[] = $defaultImage;
+      } else {
+        $images = $this->getRandomImages();
+      }
     }
     foreach ($images as $url) {
       if (strpos($url, 'http:') !== 0 && strpos($url, 'https:') !== 0) {
@@ -627,6 +632,28 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendOgElement($head, 'og:description', HTMLPlusBuilder::getIdToDesc($id));
     $this->appendOgElement($head, 'og:site_name ', current(HTMLPlusBuilder::getIdToHeading()));
     $this->appendOgElement($head, 'og:url', HTTP_URL . '/' . get_link());
+  }
+
+  /**
+   * @throws Exception
+   */
+  private function getRandomImages () {
+    $urls = [];
+    $gravity = ["north", "east", "south", "west", "center"];
+    for ($i = 0; $i < 20; $i++) {
+      $url = "https://picsum.photos/";
+      if (random_int(0, 4) == 0) {
+        $url .= "g/";
+      }
+      $url .= "600/315/?image=".random_int(0, 1084);
+      if (random_int(0, 4) == 0) {
+        $url .= "&blur";
+      }
+      if (random_int(0, 4) == 0) {
+        $url .= "&gravity=".$gravity[random_int(0, count($gravity)-1)];
+      }
+      $urls[] = $url;
+    }
   }
 
   /**

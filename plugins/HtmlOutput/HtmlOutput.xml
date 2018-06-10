@@ -138,6 +138,6 @@ Disallow: /</robots>
 
   <!-- Opengraph Protocol -->
   <var id="og">enabled</var>
-  <var id="og-default-image">https://picsum.photos/600/315/?image=868&amp;blur=true</var>
+  <var id="og-default-image" />
 
 </HtmlOutput>
