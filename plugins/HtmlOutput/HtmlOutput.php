@@ -654,6 +654,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       }
       $urls[] = $url;
     }
+    return $urls;
   }
 
   /**
