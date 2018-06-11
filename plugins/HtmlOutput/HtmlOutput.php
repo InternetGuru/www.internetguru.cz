@@ -618,7 +618,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       if ($defaultImage) {
         $images[] = $defaultImage;
       } else {
-        $images = $this->getRandomImages();
+        $images = $this->getRandomImages(get_link());
       }
     }
     foreach ($images as $url) {
@@ -635,21 +635,24 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   }
 
   /**
-   * @throws Exception
+   * @param $pageUrl
+   * @return array
    */
-  private function getRandomImages () {
+  private function getRandomImages ($pageUrl) {
     $urls = [];
+    srand(crc32($pageUrl));
+    $onein = 5;
     $gravity = ["north", "east", "south", "west", "center"];
     for ($i = 0; $i < 20; $i++) {
       $url = "https://picsum.photos/";
-      if (rand(0, 4) == 0) {
+      if (rand() % $onein == 0) {
         $url .= "g/";
       }
       $url .= "600/315/?image=".rand(0, 1084);
-      if (rand(0, 4) == 0) {
+      if (rand() % $onein == 0) {
         $url .= "&blur";
       }
-      if (rand(0, 4) == 0) {
+      if (rand() % $onein == 0) {
         $url .= "&gravity=".$gravity[rand(0, count($gravity)-1)];
       }
       $urls[] = $url;
