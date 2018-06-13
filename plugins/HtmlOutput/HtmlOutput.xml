@@ -151,7 +151,7 @@ Disallow: /</robots>
     - count ... number of images to generate, default 10 (max 20)
     - grayscale, blur ... occurence of image type (from 0 to 1), default 0.2
   -->
-  <image-gen id="default"/>
+  <image-gen id="default-gen"/>
 
   <!-- Default OG image
 
@@ -162,6 +162,6 @@ Disallow: /</robots>
     - if-xpath ... apply to pages matching if-xpath (default all pages)
     - apply ... [always] or [auto] only when no other images (default)
   -->
-  <og-image gen="default"/>
+  <og-image gen="default-gen"/>
 
 </HtmlOutput>
