@@ -88,6 +88,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @var string|null
    */
   private $metaRobots = null;
+  /**
+   * @var bool
+   */
+  private $useOg = false;
 
   /**
    * HtmlOutput constructor.
@@ -351,6 +355,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $contentPlus = $fcs->getContent($contentPlus);
     }
 
+    $this->useOg = $this->cfg->getElementById('og')->nodeValue == "enabled";
+
     // create output DOM with doctype
     $doc = $this->createDoc();
     $html = $this->addRoot($doc, $lang);
@@ -520,7 +526,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     #$html->setAttribute("xml:lang", $lang);
     $html->setAttribute("lang", $lang);
-    $html->setAttribute("prefix", "og: http://ogp.me/ns#");
+    if ($this->useOg) {
+      $html->setAttribute("prefix", "og: http://ogp.me/ns#");
+    }
     $doc->appendChild($html);
     return $html;
   }
@@ -547,7 +555,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     foreach ($this->metaElements as $name => $metaElement) {
       $this->appendMeta($head, $name, $metaElement["content"], $metaElement["httpEquip"], $metaElement["short"]);
     }
-    if ($this->cfg->getElementById('og')->nodeValue == "enabled") {
+    if ($this->useOg) {
       $this->setMetaOg($head, $content, $xPath);
     }
     update_file($this->favIcon, self::FAVICON); // hash?
