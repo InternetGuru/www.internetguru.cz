@@ -548,7 +548,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $this->appendMeta($head, $name, $metaElement["content"], $metaElement["httpEquip"], $metaElement["short"]);
     }
     if ($this->cfg->getElementById('og')->nodeValue == "enabled") {
-      $this->setMetaOg($head, $content);
+      $this->setMetaOg($head, $content, $xPath);
     }
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
@@ -563,9 +563,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   /**
    * @param DOMElement $head
    * @param DOMDocumentPlus $content
+   * @param DOMXPath $xpath
    * @throws Exception
    */
-  private function setMetaOg (DOMElement $head, DOMDocumentPlus $content) {
+  private function setMetaOg (DOMElement $head, DOMDocumentPlus $content, DOMXPath $xpath) {
     $id = HTMLPlusBuilder::getLinkToId(get_link());
     $type = 'website';
     $images = [];
@@ -613,14 +614,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         $images[] = $img->getAttribute('src');
       }
     }
-    if (empty($images)) {
-      $defaultImage = $this->cfg->getElementById('og-default-image')->nodeValue;
-      if ($defaultImage) {
-        $images[] = $defaultImage;
-      } else {
-        $images = $this->getRandomImages(get_link());
-      }
-    }
+    $this->getConfigImages($xpath, $images);
     foreach ($images as $url) {
       if (strpos($url, 'http:') !== 0 && strpos($url, 'https:') !== 0) {
         $url = HTTP_URL.'/'.ltrim($url, '/');
@@ -635,26 +629,90 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
   }
 
   /**
+   * @param DOMXPath $xPath
+   * @param array $images
+   */
+  private function getConfigImages(DOMXPath $xPath, Array &$images) {
+    $configImages = $this->cfg->getElementsByTagName('og-image');
+    /** @var DOMElementPlus $img */
+    foreach ($configImages as $img) {
+      $ifXpath = $img->getAttribute('if-xpath');
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
+      if (strlen($ifXpath)) {
+        $result = @$xPath->query($ifXpath);
+        if ($result === false) {
+          Logger::user_warning(sprintf(_("Invalid xPath query '%s'"), $ifXpath));
+          continue;
+        }
+        if ($result->length === 0) {
+          continue;
+        }
+      }
+      $apply = $img->getAttribute('apply');
+      if ($apply != 'always') {
+        $apply = 'auto';
+      }
+      if ($apply == 'auto' && count($images)) {
+        continue;
+      }
+      $src = $img->getAttribute('src');
+      if (strlen($src)) {
+        $images[] = $src;
+      }
+      $genid = $img->getAttribute('gen');
+      if (!strlen($genid)) {
+        continue;
+      }
+      try {
+        $gen = $this->cfg->getElementById($genid, 'image-gen');
+        if (is_null($gen)) {
+          throw new Exception(sprintf(_('Generator %s does not exist'), $gen));
+        }
+      } catch (Exception $e) {
+        Logger::warning(sprintf(_('Unable to generate images: %s'), $e->getMessage()));
+        continue;
+      }
+      $count = $gen->getAttribute('count');
+      $grayscale = $gen->getAttribute('grayscale');
+      $blur = $gen->getAttribute('blur');
+      $count = min($count, 20);
+      if (!is_int($count) || $count < 0) {
+        $count = 10;
+      }
+      if (!is_numeric($grayscale) || $grayscale < 0 || $grayscale > 1) {
+        $grayscale = 0.2;
+      }
+      if (!is_numeric($blur) || $blur < 0 || $blur > 1) {
+        $blur = 0.2;
+      }
+      $randomImages = $this->getRandomImages(get_link(), $count, $grayscale, $blur);
+      foreach ($randomImages as $randomImage) {
+        $images[] = $randomImage;
+      }
+    }
+  }
+
+  /**
    * @param $pageUrl
+   * @param $count
+   * @param $grayscale
+   * @param $blur
    * @return array
    */
-  private function getRandomImages ($pageUrl) {
+  private function getRandomImages ($pageUrl, $count, $grayscale, $blur) {
     $urls = [];
     srand(crc32($pageUrl));
-    $onein = 5;
     $gravity = ["north", "east", "south", "west", "center"];
-    for ($i = 0; $i < 20; $i++) {
+    for ($i = 0; $i < $count; $i++) {
       $url = "https://picsum.photos/";
-      if (rand() % $onein == 0) {
+      if ($grayscale != 0 && rand() % round(1 / $grayscale) == 0) {
         $url .= "g/";
       }
       $url .= "600/315/?image=".rand(0, 1084);
-      if (rand() % $onein == 0) {
+      if ($blur != 0 && rand() % round(1 / $blur) == 0) {
         $url .= "&blur";
       }
-      if (rand() % $onein == 0) {
-        $url .= "&gravity=".$gravity[rand(0, count($gravity)-1)];
-      }
+      $url .= "&gravity=".$gravity[rand(0, count($gravity)-1)];
       $urls[] = $url;
     }
     return $urls;
