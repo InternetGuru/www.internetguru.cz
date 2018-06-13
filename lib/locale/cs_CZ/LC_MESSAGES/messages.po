@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-14 15:28+0200\n"
-"PO-Revision-Date: 2018-05-14 15:28+0200\n"
+"POT-Creation-Date: 2018-06-13 22:02+0200\n"
+"PO-Revision-Date: 2018-06-13 22:03+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -320,37 +320,37 @@ msgstr "V elementu body chybí atribut 'ns'"
 msgid "Heading description missing or empty: %s"
 msgstr "Chybějící nebo prázdný popis nadpisu: %s"
 
-#: core/HTMLPlusBuilder.php:209
+#: core/HTMLPlusBuilder.php:214
 #, php-format
 msgid "Undefined link '%s'"
 msgstr "Neznámý odkaz '%s'"
 
-#: core/HTMLPlusBuilder.php:359
+#: core/HTMLPlusBuilder.php:364
 #, php-format
 msgid "Unable to load %s: %s"
 msgstr "Nepodařilo se načíst %s: %s"
 
-#: core/HTMLPlusBuilder.php:379
+#: core/HTMLPlusBuilder.php:384
 #, php-format
 msgid "File %s invalid syntax caused by includes fixed %s times"
 msgstr "Nevalidní syntaxe souboru %s způsobená importem opravena %s krát"
 
-#: core/HTMLPlusBuilder.php:381
+#: core/HTMLPlusBuilder.php:386
 #, php-format
 msgid "File %s invalid syntax fixed %s times"
 msgstr "Nevalidní syntaxe souboru %s opravena %s krát"
 
-#: core/HTMLPlusBuilder.php:405
+#: core/HTMLPlusBuilder.php:410
 #, php-format
 msgid "Unable to import: %s"
 msgstr "Nepodařilo se importovat: %s"
 
-#: core/HTMLPlusBuilder.php:450
+#: core/HTMLPlusBuilder.php:455
 #, php-format
 msgid "Included file '%s' extension must be .html"
 msgstr "Přípona importovaného souboru '%s' musí být .html"
 
-#: core/HTMLPlusBuilder.php:457
+#: core/HTMLPlusBuilder.php:462
 #, php-format
 msgid "Included file '%s' is out of working directory"
 msgstr "Vkládaný soubor '%s' leží mimo pracovní adresář"
@@ -448,96 +448,96 @@ msgstr "Přesměrování na '%s'"
 msgid "Unable to parse attribute href '%s'"
 msgstr "Nepodařilo se zpracovat atribut href '%s'"
 
-#: core/globals.php:229
+#: core/globals.php:233
 msgid "Link is cyclic"
 msgstr "Odkaz je cyklický"
 
-#: core/globals.php:397
+#: core/globals.php:402
 msgid "Invalid parameter 'keep'"
 msgstr "Chybný parametr 'keep'"
 
-#: core/globals.php:410
+#: core/globals.php:415
 msgid "Unable to save content"
 msgstr "Nepodařilo se uložit obsah"
 
-#: core/globals.php:423
+#: core/globals.php:428
 msgid "Source file is a link"
 msgstr "Zdrojový soubor je symbolický odkaz (link)"
 
-#: core/globals.php:426
+#: core/globals.php:431
 msgid "Source file not found"
 msgstr "Zdrojový soubor nebyl nalezen"
 
-#: core/globals.php:430
+#: core/globals.php:435
 msgid "Unable to backup destination file"
 msgstr "Nepodařilo se zálohovat cílový soubor"
 
-#: core/globals.php:435
+#: core/globals.php:440
 msgid "Unable to copy source file"
 msgstr "Nepodařilo se zkopírovat zdrojový soubor"
 
-#: core/globals.php:440
+#: core/globals.php:445
 msgid "Unable to rename new file to destination"
 msgstr "Nový soubor se nepodařilo přejmenovat"
 
-#: core/globals.php:443
+#: core/globals.php:448
 msgid "Unable to set new file modification time"
 msgstr "Nepodařilo se nastavit čas modifikace"
 
-#: core/globals.php:464
+#: core/globals.php:469
 msgid "Unable to create directory"
 msgstr "Nepodařilo se vytvořit složku"
 
-#: core/globals.php:475
+#: core/globals.php:480
 #, php-format
 msgid "Source file '%s' not found"
 msgstr "Zdrojový soubor '%s' nebyl nalezen"
 
-#: core/globals.php:485
+#: core/globals.php:490
 #, php-format
 msgid "Unable to rename directory '%s'"
 msgstr "Nepodařilo se přejmenovat složku '%s'"
 
-#: core/globals.php:582
+#: core/globals.php:587
 #, php-format
 msgid "Unable to open file %s"
 msgstr "Nepodařilo se otevřít soubor %s"
 
-#: core/globals.php:591
+#: core/globals.php:596
 msgid "Unable to acquire file lock"
 msgstr "Nepodařilo se získat zámek"
 
-#: core/globals.php:651 core/globals.php:676
+#: core/globals.php:656 core/globals.php:681
 msgid "Unable to open file"
 msgstr "Nepodařilo se otevřít soubor"
 
-#: core/globals.php:681
+#: core/globals.php:686
 msgid "Unable to read file"
 msgstr "Nepodařilo se přečíst soubor"
 
-#: core/globals.php:693
+#: core/globals.php:698
 msgid "Function finfo_file() not supported"
 msgstr "Funkce finfo_file() není podporovaná"
 
-#: core/globals.php:782
+#: core/globals.php:787
 msgid "Authorization required"
 msgstr "Vyžadována autorizace"
 
-#: core/globals.php:840
+#: core/globals.php:845
 #, php-format
 msgid "Unable to cache variable %s"
 msgstr "Proměnnou %s se nepodařilo uložit do mezipaměti (cache)"
 
-#: core/globals.php:866
+#: core/globals.php:871
 msgid "Failed to purge cache"
 msgstr "Nepodařilo se vymazat mezipaměť (cache)"
 
-#: core/globals.php:966
+#: core/globals.php:971
 #, php-format
 msgid "Undefined method name %s"
 msgstr "Neznámý název metody %s"
 
-#: core/globals.php:972
+#: core/globals.php:977
 #, php-format
 msgid "Argument[%s] empty or missing"
 msgstr "Argument[%s] chybí nebo je prázdný"
@@ -720,37 +720,37 @@ msgstr "hodnota null"
 msgid "empty value"
 msgstr "prázná hodnota"
 
-#: plugins/Admin/Admin.php:639
+#: plugins/Admin/Admin.php:642
 msgid "Data file is inactive. Save anyways?"
 msgstr "Soubor je neaktivní. Chcete ho přesto uložit?"
 
-#: plugins/Admin/Admin.php:664
+#: plugins/Admin/Admin.php:667
 msgid "replace"
 msgstr "nahrazení"
 
-#: plugins/Admin/Admin.php:664
+#: plugins/Admin/Admin.php:667
 msgid "modify"
 msgstr "modifikace"
 
-#: plugins/Admin/Admin.php:684
+#: plugins/Admin/Admin.php:687
 msgid "Administration"
 msgstr "Administrace"
 
-#: plugins/Admin/Admin.php:689
+#: plugins/Admin/Admin.php:692
 #, php-format
 msgid "File %s Administration"
 msgstr "Administrace souboru %s"
 
-#: plugins/Admin/Admin.php:692
+#: plugins/Admin/Admin.php:695
 #, php-format
 msgid "%s (%s) - Administration"
 msgstr "%s (%s) - Administrace"
 
-#: plugins/Admin/Admin.php:749
+#: plugins/Admin/Admin.php:752
 msgid "Enable file"
 msgstr "Aktivovat soubor"
 
-#: plugins/Admin/Admin.php:749
+#: plugins/Admin/Admin.php:752
 msgid "Disable file"
 msgstr "Deaktivovat soubor"
 
@@ -764,17 +764,12 @@ msgstr "Nepodařilo se vytvořit %s id '%s': %s"
 msgid "Unable to register '%s': %s"
 msgstr "Nepodařilo se zaregistrovat '%s': %s"
 
-#: plugins/Agregator/Agregator.php:180
-#, php-format
-msgid "Undefined %s id '%s'"
-msgstr "Nedefinovaný %s id '%s'"
-
 #: plugins/Agregator/Agregator.php:207
 #, php-format
 msgid "Reference id '%s' not found"
 msgstr "Nenalezen referenční id '%s'"
 
-#: plugins/Agregator/Agregator.php:224
+#: plugins/Agregator/Agregator.php:227
 #, php-format
 msgid "No content"
 msgstr "Žádný obsah"
@@ -784,17 +779,17 @@ msgstr "Žádný obsah"
 msgid "Sort variable %s not found; using default"
 msgstr "Nebyla nalezena proměnná %s pro řazení; používá se výchozí řazení"
 
-#: plugins/Agregator/DocList.php:115
+#: plugins/Agregator/DocList.php:119
 #, php-format
 msgid "No documents registered in '%s'"
 msgstr "V '%s' nejsou žádné dokumenty"
 
-#: plugins/Agregator/DocList.php:117
+#: plugins/Agregator/DocList.php:121
 #, php-format
 msgid "No files matching attribute kw '%s'"
 msgstr "Žádný soubor neobsahuje v atributu kw hodnotu '%s'"
 
-#: plugins/Agregator/DocList.php:137
+#: plugins/Agregator/DocList.php:141
 msgid "Edit"
 msgstr "Editovat"
 
@@ -816,6 +811,11 @@ msgstr "Nedostatečná práva pro zobrazení obsahu"
 #, php-format
 msgid "Link %s not found"
 msgstr "Odkaz %s nebyl nalezen"
+
+#: plugins/Canonical/Canonical.php:41
+#, php-format
+msgid "Unregistered namespace for %s"
+msgstr "Nezaregistrovaný namespace pro %s"
 
 #: plugins/Cart/Cart.php:156
 #, php-format
@@ -1090,73 +1090,83 @@ msgstr "Google Analytics ID nemá typický formát"
 msgid "GA is disabled for logged users (ga_id = %s)"
 msgstr "GA je neaktivní pro přihlášené uživatele (ga_id = %s)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:121
+#: plugins/HtmlOutput/HtmlOutput.php:120
 msgid "Using default robots value (without domain match)"
 msgstr "Používá se výchozí hodnota robots (bez odpovídající domény)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:125
+#: plugins/HtmlOutput/HtmlOutput.php:124
 #, php-format
 msgid "Unable to delete %s file"
 msgstr "Nepodařilo se smazat soubor %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:147
+#: plugins/HtmlOutput/HtmlOutput.php:146
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:235
+#: plugins/HtmlOutput/HtmlOutput.php:234
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:424
+#: plugins/HtmlOutput/HtmlOutput.php:423
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:454
+#: plugins/HtmlOutput/HtmlOutput.php:453
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:490
+#: plugins/HtmlOutput/HtmlOutput.php:489
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:494
+#: plugins/HtmlOutput/HtmlOutput.php:493
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:661
+#: plugins/HtmlOutput/HtmlOutput.php:644 plugins/HtmlOutput/HtmlOutput.php:831
 #, php-format
 msgid "Invalid xPath query '%s'"
 msgstr "Neplatný xPath '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:695
+#: plugins/HtmlOutput/HtmlOutput.php:669
+#, php-format
+msgid "Generator %s does not exist"
+msgstr "Generátor %s neexistuje"
+
+#: plugins/HtmlOutput/HtmlOutput.php:672
+#, php-format
+msgid "Unable to generate images: %s"
+msgstr "Nepodařilo se vygenerovat obrázky: %s"
+
+#: plugins/HtmlOutput/HtmlOutput.php:865
 msgid "Empty value"
 msgstr "Prázdná hodnota"
 
-#: plugins/HtmlOutput/HtmlOutput.php:721
+#: plugins/HtmlOutput/HtmlOutput.php:891
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:775
+#: plugins/HtmlOutput/HtmlOutput.php:945
 msgid "Target not found"
 msgstr "Cíl nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:777
+#: plugins/HtmlOutput/HtmlOutput.php:947
 msgid "Target file not supported"
 msgstr "Cílový soubor není podporován"
 
-#: plugins/HtmlOutput/HtmlOutput.php:889
+#: plugins/HtmlOutput/HtmlOutput.php:1059
 #, php-format
 msgid "Attribute src=%s removed: %s"
 msgstr "Odstraněn atribut src=%s: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:1015
+#: plugins/HtmlOutput/HtmlOutput.php:1185
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1213,12 +1223,12 @@ msgstr "Nebyla nalezena data"
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"
 
-#: plugins/InputVar/InputVar.php:472
+#: plugins/InputVar/InputVar.php:473
 #, php-format
 msgid "Unsupported attribute type value '%s'"
 msgstr "Nepodporovaná hodnota atributu type '%s'"
 
-#: plugins/InputVar/InputVar.php:505
+#: plugins/InputVar/InputVar.php:507
 #, php-format
 msgid "Cannot create fieldset for %s"
 msgstr "Nepodařilo se vytvořit fieldset pro %s"
@@ -1273,56 +1283,59 @@ msgstr "Neprošla kontrola medovníku"
 msgid "Invalid label '%s' with %s input fields"
 msgstr "Element label '%s' obsahuje více elementů input (%s)"
 
-#: plugins/ValidateForm/ValidateForm.php:310
+#: plugins/ValidateForm/ValidateForm.php:311
 msgid "Value missing"
 msgstr "Chybí hodnota"
 
-#: plugins/ValidateForm/ValidateForm.php:317
+#: plugins/ValidateForm/ValidateForm.php:318
 msgid "Item is required"
 msgstr "Položka je povinná"
 
-#: plugins/ValidateForm/ValidateForm.php:320
+#: plugins/ValidateForm/ValidateForm.php:321
 #, php-format
 msgid "Maximal number of characters exceeded (%s of %s)"
 msgstr "Překročen maximální počet znaků (%s z %s)"
 
-#: plugins/ValidateForm/ValidateForm.php:328
+#: plugins/ValidateForm/ValidateForm.php:329
 msgid "Invalid item pattern"
 msgstr "Neplatný formát předpisu (pattern)"
 
-#: plugins/ValidateForm/ValidateForm.php:334
+#: plugins/ValidateForm/ValidateForm.php:335
 msgid "Item value does not match required pattern"
 msgstr "Hodnota položky neodpovídá požadovanému formátu"
 
-#: plugins/ValidateForm/ValidateForm.php:345
+#: plugins/ValidateForm/ValidateForm.php:346
 msgid "Item value is lower then allowed minimum"
 msgstr "Hodnota je menší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:348
+#: plugins/ValidateForm/ValidateForm.php:349
 msgid "Item value is greater then allowed maximum"
 msgstr "Hodnota je větší než povolené minimum"
 
-#: plugins/ValidateForm/ValidateForm.php:361
+#: plugins/ValidateForm/ValidateForm.php:362
 msgid "Item must be checked"
 msgstr "Položka musí být zaškrtnutá"
 
-#: plugins/ValidateForm/ValidateForm.php:379
+#: plugins/ValidateForm/ValidateForm.php:380
 msgid "Select value does not match any option"
 msgstr "Hodnota výběru neodpovídá žádné z možností"
 
-#: plugins/ValidateForm/ValidateForm.php:396
+#: plugins/ValidateForm/ValidateForm.php:397
 #, php-format
 msgid "Your IP address %s is banned"
 msgstr "Odesílání z vaší IP adresy %s je zakázáno"
 
-#: plugins/ValidateForm/ValidateForm.php:401
+#: plugins/ValidateForm/ValidateForm.php:402
 #, php-format
 msgid "Please wait %s second before next post"
 msgstr "Počkejte %s sekund před dalším odesláním"
 
-#: plugins/ValidateForm/ValidateForm.php:406
+#: plugins/ValidateForm/ValidateForm.php:407
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
+
+#~ msgid "Undefined %s id '%s'"
+#~ msgstr "Nedefinovaný %s id '%s'"
 
 #~ msgid "enable"
 #~ msgstr "aktivovat"

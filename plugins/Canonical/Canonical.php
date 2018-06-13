@@ -5,6 +5,7 @@ namespace IGCMS\Plugins;
 use Exception;
 use IGCMS\Core\Cms;
 use IGCMS\Core\HTMLPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
@@ -37,7 +38,7 @@ class Canonical extends Plugin implements SplObserver, ModifyContentStrategyInte
     $nsDomain = parse_url($ns);
     $matches = $cfg->matchElement("ns", "domain", $nsDomain['host']);
     if (is_null($matches)) {
-      Logger::warning(_("Using outer..."));
+      Logger::warning(sprintf(_("Unregistered namespace for %s"), $ns));
       return;
     }
     Cms::getOutputStrategy()->addLinkElement($ns, 'canonical');
