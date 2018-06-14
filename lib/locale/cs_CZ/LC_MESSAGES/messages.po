@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-13 22:02+0200\n"
-"PO-Revision-Date: 2018-06-13 22:03+0200\n"
+"POT-Creation-Date: 2018-06-14 13:24+0200\n"
+"PO-Revision-Date: 2018-06-14 13:24+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -812,7 +812,7 @@ msgstr "Nedostatečná práva pro zobrazení obsahu"
 msgid "Link %s not found"
 msgstr "Odkaz %s nebyl nalezen"
 
-#: plugins/Canonical/Canonical.php:41
+#: plugins/Canonical/Canonical.php:44
 #, php-format
 msgid "Unregistered namespace for %s"
 msgstr "Nezaregistrovaný namespace pro %s"
@@ -1090,83 +1090,93 @@ msgstr "Google Analytics ID nemá typický formát"
 msgid "GA is disabled for logged users (ga_id = %s)"
 msgstr "GA je neaktivní pro přihlášené uživatele (ga_id = %s)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:120
+#: plugins/HtmlOutput/HtmlOutput.php:124
 msgid "Using default robots value (without domain match)"
 msgstr "Používá se výchozí hodnota robots (bez odpovídající domény)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:124
+#: plugins/HtmlOutput/HtmlOutput.php:128
 #, php-format
 msgid "Unable to delete %s file"
 msgstr "Nepodařilo se smazat soubor %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:146
+#: plugins/HtmlOutput/HtmlOutput.php:150
 #, php-format
 msgid "Theme '%s' not found"
 msgstr "Téma '%s' nebylo nalezeno"
 
-#: plugins/HtmlOutput/HtmlOutput.php:234
+#: plugins/HtmlOutput/HtmlOutput.php:238
 #, php-format
 msgid "File %s of type %s not found"
 msgstr "Soubor %s typu %s nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:423
+#: plugins/HtmlOutput/HtmlOutput.php:429
 #, php-format
 msgid "Invalid transformation or parameter in '%s'"
 msgstr "Chybná transformace nebo parametr v '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:453
+#: plugins/HtmlOutput/HtmlOutput.php:459
 #, php-format
 msgid "Unable to convert variable '%s' to string"
 msgstr "Proměnnou '%s'  se nepodařilo převést na text (na řetězec)"
 
-#: plugins/HtmlOutput/HtmlOutput.php:489
+#: plugins/HtmlOutput/HtmlOutput.php:495
 #, php-format
 msgid "XSLT '%s' compilation error"
 msgstr "Neúspěšná kompilace transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:493
+#: plugins/HtmlOutput/HtmlOutput.php:499
 #, php-format
 msgid "XSLT '%s' transformation fail"
 msgstr "Selhání transformace '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:644 plugins/HtmlOutput/HtmlOutput.php:831
+#: plugins/HtmlOutput/HtmlOutput.php:626
+#, php-format
+msgid "Unable to get image size: %s"
+msgstr "Nepodařilo se načíst rozměry obrázku: %s"
+
+#: plugins/HtmlOutput/HtmlOutput.php:630
+#, php-format
+msgid "Image %s dimensions are smaler than 200px"
+msgstr "Rozměry obrázku %s jsou menší než 200 px"
+
+#: plugins/HtmlOutput/HtmlOutput.php:663 plugins/HtmlOutput/HtmlOutput.php:850
 #, php-format
 msgid "Invalid xPath query '%s'"
 msgstr "Neplatný xPath '%s'"
 
-#: plugins/HtmlOutput/HtmlOutput.php:669
+#: plugins/HtmlOutput/HtmlOutput.php:688
 #, php-format
 msgid "Generator %s does not exist"
 msgstr "Generátor %s neexistuje"
 
-#: plugins/HtmlOutput/HtmlOutput.php:672
+#: plugins/HtmlOutput/HtmlOutput.php:691
 #, php-format
 msgid "Unable to generate images: %s"
 msgstr "Nepodařilo se vygenerovat obrázky: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:865
+#: plugins/HtmlOutput/HtmlOutput.php:884
 msgid "Empty value"
 msgstr "Prázdná hodnota"
 
-#: plugins/HtmlOutput/HtmlOutput.php:891
+#: plugins/HtmlOutput/HtmlOutput.php:910
 #, php-format
 msgid "Attribute %s='%s' removed: %s"
 msgstr "Atribut %s='%s' byl odstraněn: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:945
+#: plugins/HtmlOutput/HtmlOutput.php:964
 msgid "Target not found"
 msgstr "Cíl nebyl nalezen"
 
-#: plugins/HtmlOutput/HtmlOutput.php:947
+#: plugins/HtmlOutput/HtmlOutput.php:966
 msgid "Target file not supported"
 msgstr "Cílový soubor není podporován"
 
-#: plugins/HtmlOutput/HtmlOutput.php:1059
+#: plugins/HtmlOutput/HtmlOutput.php:1078
 #, php-format
 msgid "Attribute src=%s removed: %s"
 msgstr "Odstraněn atribut src=%s: %s"
 
-#: plugins/HtmlOutput/HtmlOutput.php:1185
+#: plugins/HtmlOutput/HtmlOutput.php:1204
 #, php-format
 msgid "Removed empty element %s"
 msgstr "Odstraněn prázdný element %s"
@@ -1333,6 +1343,9 @@ msgstr "Počkejte %s sekund před dalším odesláním"
 #: plugins/ValidateForm/ValidateForm.php:407
 msgid "Unable to create security file"
 msgstr "Nepodařilo se vytvořit bezpečnostní soubor"
+
+#~ msgid "Image %s dimensions are smaler than 300px"
+#~ msgstr "Rozměry obrázku %s jsou menší než 300 px"
 
 #~ msgid "Undefined %s id '%s'"
 #~ msgstr "Nedefinovaný %s id '%s'"

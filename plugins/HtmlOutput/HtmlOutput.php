@@ -619,7 +619,18 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     if (empty($images)) {
       /** @var DOMElement $img */
       foreach ($content->getElementsByTagName('img') as $img) {
-        $images[] = $img->getAttribute('src');
+        $src = $img->getAttribute('src');
+        try {
+          $dimensions = $this->getImageDimensions($src);
+        } catch (Exception $e) {
+          Logger::warning(sprintf(_('Unable to get image size: %s'), $e->getMessage()));
+          continue;
+        }
+        if ($dimensions[0] < 200 || $dimensions[1] < 200) {
+          Logger::warning(sprintf(_('Image %s dimensions are smaler than 200px'), $src));
+          continue;
+        }
+        $images[] = $src;
       }
     }
     $this->getConfigImages($xpath, $images);
