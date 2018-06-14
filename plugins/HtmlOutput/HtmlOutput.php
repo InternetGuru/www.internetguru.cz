@@ -627,7 +627,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
           continue;
         }
         if ($dimensions[0] < 200 || $dimensions[1] < 200) {
-          Logger::warning(sprintf(_('Image %s dimensions are smaler than 200px'), $src));
+          // Logger::warning(sprintf(_('Image %s dimensions are smaler than 200px'), $src));
           continue;
         }
         $images[] = $src;
