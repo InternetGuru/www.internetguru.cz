@@ -36,7 +36,10 @@ class Canonical extends Plugin implements SplObserver, ModifyContentStrategyInte
       return;
     }
     $nsDomain = parse_url($ns);
-    $matches = $cfg->matchElement("ns", "domain", $nsDomain['host']);
+    $matches = null;
+    if (isset($nsDomain['host'])) {
+      $matches = $cfg->matchElement("ns", "domain", $nsDomain['host']);
+    }
     if (is_null($matches)) {
       Logger::warning(sprintf(_("Unregistered namespace for %s"), $ns));
       return;
