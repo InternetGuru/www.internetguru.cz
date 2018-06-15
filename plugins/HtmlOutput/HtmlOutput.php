@@ -720,18 +720,31 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    */
   private function getRandomImages ($pageUrl, $count, $grayscale, $blur) {
     $urls = [];
+    $notfoundid = [97, 968, 963, 956, 934, 920, 917, 899, 897, 895, 86, 854, 850,
+      843, 812, 801, 792, 771, 763, 762, 761, 759, 754, 753, 752, 751, 750, 749,
+      748, 747, 746, 745, 734, 725, 720, 714, 713, 712, 711, 710, 709, 708, 707,
+      706, 697, 673, 647, 644, 636, 632, 624, 601, 597, 595, 592, 589, 587, 578,
+      561, 540, 489, 470, 463, 462, 438, 422, 414, 394, 359, 346, 333, 332, 303,
+      298, 286, 285, 262, 246, 245, 226, 224, 207, 205, 150, 148, 138, 105, 1046,
+      1034, 1030, 1017, 1007];
+
     srand(crc32($pageUrl));
+    $imageid = range(0, 1084);
+    shuffle($imageid);
     $gravity = ["north", "east", "south", "west", "center"];
     for ($i = 0; $i < $count; $i++) {
       $url = "https://picsum.photos/";
       if ($grayscale != 0 && rand() % round(1 / $grayscale) == 0) {
         $url .= "g/";
       }
-      $url .= "600/315/?image=".rand(0, 1084);
+      do {
+        $id = array_pop($imageid);
+      } while (in_array($id, $notfoundid));
+      $url .= "600/315/?image=".$id;
       if ($blur != 0 && rand() % round(1 / $blur) == 0) {
         $url .= "&blur";
       }
-      $url .= "&gravity=".$gravity[rand(0, count($gravity)-1)];
+        $url .= "&gravity=".$gravity[rand(0, count($gravity)-1)];
       $urls[] = $url;
     }
     return $urls;

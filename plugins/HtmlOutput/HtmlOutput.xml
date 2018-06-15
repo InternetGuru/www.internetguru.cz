@@ -143,7 +143,6 @@ Disallow: /</robots>
 
   <!-- Image generator
   Atomatically generates random images from picsum.photos
-  Warning: 10% images are not available (404)
 
   Element(s) image-gen
   Attributes:
