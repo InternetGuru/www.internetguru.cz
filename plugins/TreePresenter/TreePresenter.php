@@ -12,12 +12,20 @@ use SplSubject;
 
 /**
  * Class TreePresenter
+ *
+ * Example of real usage in footer.xsl
+ * <xsl:element name="a">
+ *   <xsl:attribute name="href">
+ *     <xsl:value-of select="concat('?tree_presenter#', $contentbalancer-h1id)" />
+ *   </xsl:attribute>
+ *   <xsl:text>Presentation</xsl:text>
+ * </xsl:element>
+ *
  * @package IGCMS\Plugins
  */
 class TreePresenter extends Plugin implements SplObserver, ModifyContentStrategyInterface {
 
-  private $getParam = 'presentation';
-  private $allValue = 'all';
+  private $getParam = 'tree_presenter';
 
   /**
    * @param SplSubject|Plugins $subject <p>
@@ -30,9 +38,7 @@ class TreePresenter extends Plugin implements SplObserver, ModifyContentStrategy
     if ($subject->getStatus() !== STATUS_INIT) {
       return;
     }
-    if ($_GET[$this->getParam] == $this->allValue) {
-      $subject->detach($subject->getObserver('ContentBalancer'));
-    }
+    $subject->detach($subject->getObserver('ContentBalancer'));
   }
 
   /**
