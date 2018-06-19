@@ -323,7 +323,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
       return;
     }
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    $res = @preg_match("/^(?:$pattern)$/", $value);
+    $res = @preg_match_all("/^".$pattern."/m", str_replace("\r", "", $value), $matches);
     if ($res === false) {
       Logger::user_warning(_("Invalid item pattern"));
       return;
