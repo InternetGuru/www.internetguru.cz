@@ -868,7 +868,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         }
       }
       $ieIfComment = isset($this->cssFiles[$key]["if"]) ? $this->cssFiles[$key]["if"] : null;
-      $filePath = ROOT_URL.get_resdir($this->cssFiles[$key]["file"]);
+      if (strpos($this->cssFiles[$key]["file"], 'http://') !== 0 && strpos($this->cssFiles[$key]["file"], 'https://') !== 0) {
+        $filePath = ROOT_URL.get_resdir($this->cssFiles[$key]["file"]);
+      } else {
+        $filePath = $this->cssFiles[$key]["file"];
+      }
       $this->appendLinkElement(
         $parent,
         $filePath,
@@ -1157,7 +1161,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       }
       $ieIfComment = isset($this->jsFiles[$key]["if"]) ? $this->jsFiles[$key]["if"] : null;
       if (!is_null($ieIfComment)) {
-        #$e->nodeValue = "�";
         $parent->appendChild(
           $parent->ownerDocument->createComment("[if $ieIfComment]>".$element->ownerDocument->saveXML($element)."<![endif]")
         );

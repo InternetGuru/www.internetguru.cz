@@ -102,6 +102,14 @@ class Plugins implements SplSubject {
   }
 
   /**
+   * @param $pluginName
+   * @return null|SplObserver
+   */
+  public function getObserver ($pluginName) {
+    return isset($this->observers[$pluginName]) ? $this->observers[$pluginName] : null;
+  }
+
+  /**
    * @param string $pluginName
    * @return bool
    */
