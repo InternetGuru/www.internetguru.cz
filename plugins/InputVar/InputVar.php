@@ -125,24 +125,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       return;
     }
     if (!empty($this->logins)) {
-      if (!isset($req["username"])) {
-        throw new Exception(_("Missing POST username"), 1);
+      if (!isset($req["username"]) || !isset($req["passwd"])) {
+        throw new Exception(_("Invalid credentials"), 1);
       }
-      if (isset($req["passwd"])) {
-        $passwdMatch = false;
-        foreach ($this->logins as $username => $password) {
-          if ($req["username"] !== $username) {
-            continue;
-          }
-          if (hash_equals($password, crypt($req["passwd"], $password))) {
-            $passwdMatch = true;
-            break;
-          }
-          throw new Exception(sprintf(_("Incorrect password for user %s"), $username), 1);
-        }
-        if (!$passwdMatch) {
-          throw new Exception(_("Incorrect login"), 1);
-        }
+      if (!isset($this-logins[$req["username"]))
+        || !hash_equals($this-logins[$req["username"]), crypt($req["passwd"], $this-logins[$req["username"])))) {
+        throw new Exception(_("Invalid username or password"), 1);
       }
     }
     $var = null;
@@ -156,13 +144,14 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         $var = $this->vars[$key];
       }
     }
-    if (!is_null($var)) {
-      /** @noinspection PhpUsageOfSilenceOperatorInspection */
-      if ($var->ownerDocument->save($this->userCfgPath) === false) {
-        throw new Exception(_("Unable to save user config"));
-      }
-      clear_nginx();
+    if (is_null($var)) {
+     throw new Exception(_("Nothing to save"));
     }
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    if ($var->ownerDocument->save($this->userCfgPath) === false) {
+     throw new Exception(_("Unable to save user config"));
+    }
+    clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
   }
 
