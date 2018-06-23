@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - InputVar element password has mandatory attribute username
  - New plugin TreePresenter
  - Plugin Canonical
  - Open Graph protocol support
