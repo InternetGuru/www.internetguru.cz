@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.10.10] - 2018-05-16
 ### Changed
- - Default powerded by is Nestárnoucí weby
+ - Powerded by Nestarnouci weby by default
 
 ## [2.10.9] - 2018-05-14
 ### Fixed
