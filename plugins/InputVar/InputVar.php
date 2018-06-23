@@ -128,8 +128,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if (!isset($req["username"]) || !isset($req["passwd"])) {
         throw new Exception(_("Invalid credentials"), 1);
       }
-      if (!isset($this-logins[$req["username"]))
-        || !hash_equals($this-logins[$req["username"]), crypt($req["passwd"], $this-logins[$req["username"])))) {
+      if (!isset($this->logins[$req["username"]])
+        || !hash_equals($this->logins[$req["username"]], crypt($req["passwd"], $this->logins[$req["username"]]))) {
         throw new Exception(_("Invalid username or password"), 1);
       }
     }
