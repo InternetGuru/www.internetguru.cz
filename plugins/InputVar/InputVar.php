@@ -37,7 +37,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   /**
    * @var array|null
    */
-  private $passwds = null;
+  private $logins = null;
   /**
    * @var string
    */
@@ -79,7 +79,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         if ($element->nodeName == "set") {
           continue;
         }
-        if ($element->nodeName == "passwd") {
+        if ($element->nodeName == "login") {
           continue;
         }
         try {
@@ -124,25 +124,26 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($req)) {
       return;
     }
-    if (!isset($req["username"])) {
-      throw new Exception(_("Missing POST username"), 1);
-    }
-    if (isset($req["passwd"])) {
-      $passwdMatch = false;
-      // Allow mutiple passwords for one username
-      /** @var DOMElementPlus $passwdElm */
-      foreach ($this->passwds as $passwdElm) {
-        $username = $passwdElm->getRequiredAttribute("username");
-        if (
-          hash_equals($passwdElm->nodeValue, crypt($req["passwd"], $passwdElm->nodeValue))
-          && $req["username"] === $username
-        ) {
-          $passwdMatch = true;
-          break;
-        }
+    if (!empty($this->logins)) {
+      if (!isset($req["username"])) {
+        throw new Exception(_("Missing POST username"), 1);
       }
-      if (!$passwdMatch) {
-        throw new Exception(_("Incorrect password"), 1);
+      if (isset($req["passwd"])) {
+        $passwdMatch = false;
+        /** @var DOMElementPlus $passwdElm */
+        foreach ($this->logins as $username => $password) {
+          if ($req["username"] !== $username) {
+            continue;
+          }
+          if (hash_equals($password, crypt($req["passwd"], $password))) {
+            $passwdMatch = true;
+            break;
+          }
+          throw new Exception(sprintf(_("Incorrect password for user %s"), $username), 1);
+        }
+        if (!$passwdMatch) {
+          throw new Exception(_("Incorrect login"), 1);
+        }
       }
     }
     $var = null;
@@ -174,8 +175,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if ($element->nodeName == "var") {
         $this->vars[$element->getRequiredAttribute("id")] = $element;
       }
-      if ($element->nodeName == "passwd") {
-        $this->passwds[] = $element;
+      if ($element->nodeName == "login") {
+        $this->logins[$element->getRequiredAttribute('id')] = $element->getRequiredAttribute('password');
       }
     }
   }
@@ -461,7 +462,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     }
     $fieldset->parentNode->removeChild($fieldset);
     $vars = [];
-    if (is_null($this->passwds)) {
+    if (is_null($this->logins)) {
       $vars["nopasswd"] = [
         "value" => "",
         "cacheable" => true,
