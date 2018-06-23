@@ -35,9 +35,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    */
   private $formId = null;
   /**
-   * @var string|null
+   * @var array|null
    */
-  private $passwd = null;
+  private $logins = null;
   /**
    * @var string
    */
@@ -79,7 +79,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         if ($element->nodeName == "set") {
           continue;
         }
-        if ($element->nodeName == "passwd") {
+        if ($element->nodeName == "login") {
           continue;
         }
         try {
@@ -124,8 +124,17 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($req)) {
       return;
     }
-    if (isset($req["passwd"]) && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {
-      throw new Exception(_("Incorrect password"), 1);
+    if (!empty($this->logins)) {
+      if (!isset($req["username"]) || !isset($req["passwd"])) {
+        throw new Exception(_("Invalid credentials"), 1);
+      }
+      Logger::info(sprintf(_('Form id %s request from username %s'), $this->formId, $req["username"]));
+      if (!isset($this->logins[$req["username"]])
+        || !hash_equals($this->logins[$req["username"]], crypt($req["passwd"], $this->logins[$req["username"]]))) {
+        throw new Exception(_("Invalid username or password"), 1);
+      }
+    } else {
+      Logger::info(sprintf(_('Form id %s anonymous request'), $this->formId));
     }
     $var = null;
     foreach ($req as $key => $value) {
@@ -138,11 +147,13 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         $var = $this->vars[$key];
       }
     }
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if (@$var->ownerDocument->save($this->userCfgPath) === false) {
-      throw new Exception(_("Unable to save user config"));
+    if (is_null($var)) {
+     throw new Exception(_("No data to save"));
     }
-    #if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON)
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    if ($var->ownerDocument->save($this->userCfgPath) === false) {
+     throw new Exception(_("Unable to save user config"));
+    }
     clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
   }
@@ -155,8 +166,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if ($element->nodeName == "var") {
         $this->vars[$element->getRequiredAttribute("id")] = $element;
       }
-      if ($element->nodeName == "passwd") {
-        $this->passwd = $element->nodeValue;
+      if ($element->nodeName == "login") {
+        $this->logins[$element->getRequiredAttribute('id')] = $element->getRequiredAttribute('password');
       }
     }
   }
@@ -442,7 +453,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     }
     $fieldset->parentNode->removeChild($fieldset);
     $vars = [];
-    if (is_null($this->passwd)) {
+    if (is_null($this->logins)) {
       $vars["nopasswd"] = [
         "value" => "",
         "cacheable" => true,
@@ -577,7 +588,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
 
       $ddElm->appendChild($text);
       $text->setAttribute("id", $varElmId);
-      $text->setAttribute("name", $varElm->getAttribute("id"));      
+      $text->setAttribute("name", $varElm->getAttribute("id"));
       if ($set->hasAttribute("placeholder")) {
         $text->setAttribute("placeholder", $set->getAttribute("placeholder"));
       }

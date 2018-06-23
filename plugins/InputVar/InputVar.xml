@@ -131,9 +131,13 @@
         pattern=".[5,20], \d\d Kč \(sleva \d\d %\)"
         placeholder="Čokoláda Orion, 22 Kč (sleva 20 %)">Akce</set>
 
-    2) Element passwd (volitelný)
-      - zabezpečení formuláře pomocí vlastního hesla
-        - otisk hesla vytvořený funkcí crypt (například příkazem "openssl passwd -1")
+    2) Element login (volitelný)
+      - attribut id:  jméno uživatele
+      - attribut password: otisk hesla vytvořený funkcí crypt
+      ^^ například příkazem "openssl passwd -1"
+
+    Například:
+      <login id="admin" password="$1$uvMgWfZe$MZGyiPRqL.YUDT3Jmurya0"/>
 
    -->
 
