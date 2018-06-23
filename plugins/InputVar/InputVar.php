@@ -130,7 +130,6 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
       if (isset($req["passwd"])) {
         $passwdMatch = false;
-        /** @var DOMElementPlus $passwdElm */
         foreach ($this->logins as $username => $password) {
           if ($req["username"] !== $username) {
             continue;
