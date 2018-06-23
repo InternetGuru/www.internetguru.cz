@@ -128,10 +128,13 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if (!isset($req["username"]) || !isset($req["passwd"])) {
         throw new Exception(_("Invalid credentials"), 1);
       }
+      Logger::info(sprintf(_('Form id %s request from username %s'), $this->formId, $req["username"]));
       if (!isset($this->logins[$req["username"]])
         || !hash_equals($this->logins[$req["username"]], crypt($req["passwd"], $this->logins[$req["username"]]))) {
         throw new Exception(_("Invalid username or password"), 1);
       }
+    } else {
+      Logger::info(sprintf(_('Form id %s anonymous request'), $this->formId));
     }
     $var = null;
     foreach ($req as $key => $value) {
@@ -145,7 +148,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
     }
     if (is_null($var)) {
-     throw new Exception(_("Nothing to save"));
+     throw new Exception(_("No data to save"));
     }
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
     if ($var->ownerDocument->save($this->userCfgPath) === false) {
