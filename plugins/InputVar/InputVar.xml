@@ -132,8 +132,13 @@
         placeholder="Čokoláda Orion, 22 Kč (sleva 20 %)">Akce</set>
 
     2) Element passwd (volitelný)
+      - attribut username
       - zabezpečení formuláře pomocí vlastního hesla
         - otisk hesla vytvořený funkcí crypt (například příkazem "openssl passwd -1")
+
+    Například:
+
+      <passwd username="admin">$1$uvMgWfZe$MZGyiPRqL.YUDT3Jmurya0</passwd>
 
    -->
 

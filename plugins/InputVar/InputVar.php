@@ -35,9 +35,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    */
   private $formId = null;
   /**
-   * @var string|null
+   * @var array|null
    */
-  private $passwd = null;
+  private $passwds = null;
   /**
    * @var string
    */
@@ -124,8 +124,26 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($req)) {
       return;
     }
-    if (isset($req["passwd"]) && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {
-      throw new Exception(_("Incorrect password"), 1);
+    if (!isset($req["username"])) {
+      throw new Exception(_("Missing POST username"), 1);
+    }
+    if (isset($req["passwd"])) {
+      $passwdMatch = false;
+      // Allow mutiple passwords for one username
+      /** @var DOMElementPlus $passwdElm */
+      foreach ($this->passwds as $passwdElm) {
+        $username = $passwdElm->getRequiredAttribute("username");
+        if (
+          hash_equals($passwdElm->nodeValue, crypt($req["passwd"], $passwdElm->nodeValue))
+          && $req["username"] === $username
+        ) {
+          $passwdMatch = true;
+          break;
+        }
+      }
+      if (!$passwdMatch) {
+        throw new Exception(_("Incorrect password"), 1);
+      }
     }
     $var = null;
     foreach ($req as $key => $value) {
@@ -138,12 +156,13 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         $var = $this->vars[$key];
       }
     }
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if (@$var->ownerDocument->save($this->userCfgPath) === false) {
-      throw new Exception(_("Unable to save user config"));
+    if (!is_null($var)) {
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
+      if ($var->ownerDocument->save($this->userCfgPath) === false) {
+        throw new Exception(_("Unable to save user config"));
+      }
+      clear_nginx();
     }
-    #if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON)
-    clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
   }
 
@@ -156,7 +175,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         $this->vars[$element->getRequiredAttribute("id")] = $element;
       }
       if ($element->nodeName == "passwd") {
-        $this->passwd = $element->nodeValue;
+        $this->passwds[] = $element;
       }
     }
   }
@@ -442,7 +461,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     }
     $fieldset->parentNode->removeChild($fieldset);
     $vars = [];
-    if (is_null($this->passwd)) {
+    if (is_null($this->passwds)) {
       $vars["nopasswd"] = [
         "value" => "",
         "cacheable" => true,
@@ -577,7 +596,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
 
       $ddElm->appendChild($text);
       $text->setAttribute("id", $varElmId);
-      $text->setAttribute("name", $varElm->getAttribute("id"));      
+      $text->setAttribute("name", $varElm->getAttribute("id"));
       if ($set->hasAttribute("placeholder")) {
         $text->setAttribute("placeholder", $set->getAttribute("placeholder"));
       }
