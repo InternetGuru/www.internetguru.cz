@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
- - InputVar element password has mandatory attribute username
+ - InputVar user administration supports multiple logins
  - New plugin TreePresenter
  - Plugin Canonical
  - Open Graph protocol support
@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.10.10] - 2018-05-16
 ### Changed
- - Default powerded by is Nest√°rnouc√≠ weby
+ - Default powerded by is Nest·rnoucÌ weby
 
 ## [2.10.9] - 2018-05-14
 ### Fixed
