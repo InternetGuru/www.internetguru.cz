@@ -33,6 +33,7 @@ class Plugin {
   /**
    * Plugin constructor.
    * @param SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     $this->subject = $s;

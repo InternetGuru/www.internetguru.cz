@@ -37,6 +37,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
   /**
    * LogViewer constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -47,7 +48,7 @@ class LogViewer extends Plugin implements SplObserver, GetContentStrategyInterfa
    * @param Plugins|SplSubject $subject
    */
   public function update (SplSubject $subject) {
-    if (!Cms::isSuperUser() || !isset($_GET[$this->className])) {
+    if (!isset($_GET[$this->className])) {
       $subject->detach($this);
     }
     if ($subject->getStatus() != STATUS_INIT) {
