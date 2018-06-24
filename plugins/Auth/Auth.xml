@@ -14,4 +14,5 @@
   <url>?LogViewer</url>
   <url>?Convertor</url>
   <url access="allow">?LogViewer=usr</url>
+  <url access="allow">?LogViewer=CHANGELOG</url>
 </Auth>
