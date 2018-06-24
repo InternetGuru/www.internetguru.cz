@@ -435,6 +435,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (!isset($_GET[$this->className])) {
       return null;
     }
+    $sets = $this->cfg->getElementsByTagName("set");
+    if (!$sets->length) {
+      Logger::warning(_('No set elements found'));
+      return null;
+    }
     $newContent = self::getHTMLPlus();
     /** @var DOMElementPlus $form */
     $form = $newContent->getElementsByTagName("form")->item(0);
@@ -442,7 +447,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     /** @var DOMElementPlus $fieldset */
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
     /** @var DOMElementPlus $setElm */
-    foreach ($this->cfg->getElementsByTagName("set") as $setElm) {
+    foreach ($sets as $setElm) {
       try {
         $setElm->getRequiredAttribute("type"); // only check
       } catch (Exception $exc) {
