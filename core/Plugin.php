@@ -53,7 +53,9 @@ class Plugin {
     if (is_null($fileName)) {
       $fileName = "$pluginName.html";
     }
-    self::$html[$fileName] = HTMLPlusBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    $html = HTMLPlusBuilder::build(PLUGINS_DIR."/$pluginName/$fileName");
+    $html->getElementsByTagName('body')->item(0)->setAttribute('ns', HTTP_URL);
+    self::$html[$fileName] = $html;
     return self::$html[$fileName];
   }
 
