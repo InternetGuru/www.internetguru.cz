@@ -116,17 +116,31 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->cfg = self::getXML();
     $this->registerThemes($this->cfg);
-    $robots = $this->cfg->matchElement("robots", "domain", HTTP_HOST);
-    if (is_null($robots)) {
-      throw new Exception("Unable to match robots element to domain");
-    }
-    if (!$robots->hasAttribute("domain")) {
+    $metaRobots = "all";
+    $robotsFile = "User-agent: *";
+    $disallow = [];
+    $allowDomain = $this->cfg->matchElement("allow_domain", null, HTTP_HOST);
+    if (is_null($allowDomain)) {
+      $metaRobots = "noindex, nofollow";
+      $robotsFile = "User-agent: *\nDisallow: /";
       Logger::user_warning(_("Using default robots value (without domain match)"));
+      //throw new Exception("Unable to match robots element to domain");
+    } else {
+      /** @var DOMElementPlus $disallow */
+      foreach ($this->cfg->getElementsByTagName('disallow') as $disallowElm) {
+        $disallow[] = $disallowElm->nodeValue;
+      }
     }
-    $this->metaRobots = $robots->getAttribute("meta");
+    if (count($disallow)) {
+      $robotsFile .= "\nDisallow: ".implode("\nDisallow: ", $disallow);
+    } else {
+      $robotsFile .= "\nDisallow:";
+    }
+    $this->metaRobots = $metaRobots;
     if (stream_resolve_include_path(ROBOTS_TXT) && !@unlink(ROBOTS_TXT)) {
       Logger::error(sprintf(_("Unable to delete %s file"), ROBOTS_TXT));
     }
+    // TODO file_put_contents $robotsFile?
     if (is_null($this->favIcon)) {
       $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
     }

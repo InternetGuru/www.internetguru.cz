@@ -56,7 +56,7 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
 
   /**
    * @param string $eName
-   * @param string $aMatch
+   * @param string|null $aMatch
    * @param string $to
    * @return DOMElementPlus|null
    */
@@ -64,10 +64,12 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
     $lastMatch = null;
     /** @var DOMElementPlus $element */
     foreach ($this->getElementsByTagName($eName) as $element) {
-      if ($element->hasAttribute($aMatch)) {
-        $aValue = $element->getAttribute($aMatch);
+      if ($element->hasAttribute($aMatch) || is_null($aMatch)) {
+        $aValue = is_null($aMatch)
+          ? $element->nodeValue
+          : $element->getAttribute($aMatch);
         if (!preg_match("/^[a-z0-9.*-]+$/", $aValue)) {
-          Logger::user_error(sprintf(_("Invalid attribute %s value '%s'"), $aMatch, $aValue));
+          Logger::user_error(sprintf(_("Invalid element value '%s'"), $aValue));
           continue;
         }
         $pattern = str_replace([".", "*"], ["\.", "[a-z0-9-]+"], $aValue);
