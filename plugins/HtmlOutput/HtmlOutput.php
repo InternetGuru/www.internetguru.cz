@@ -27,7 +27,7 @@ use XSLTProcessor;
  * Class HtmlOutput
  * @package IGCMS\Plugins
  */
-class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface, ResourceInterface {
+class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
   /**
    * @var string
    */
@@ -116,6 +116,18 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->cfg = self::getXML();
     $this->registerThemes($this->cfg);
+    if (is_null($this->favIcon)) {
+      $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
+    }
+    $cacheKey = apc_get_key(__FUNCTION__);
+    $useCache = false;
+    $cfgMtime = filemtime(find_file($this->pluginDir."/".$this->className.".xml"));
+    if (apc_exists($cacheKey)) {
+      $useCache = apc_is_valid_cache($cacheKey, $cfgMtime);
+    }
+    if ($useCache) {
+      return;
+    }
     $metaRobots = "all";
     $robotsFile = "User-agent: *";
     $disallow = [];
@@ -130,20 +142,17 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       foreach ($this->cfg->getElementsByTagName('disallow') as $disallowElm) {
         $disallow[] = $disallowElm->nodeValue;
       }
-    }
-    if (count($disallow)) {
-      $robotsFile .= "\nDisallow: ".implode("\nDisallow: ", $disallow);
-    } else {
-      $robotsFile .= "\nDisallow:";
+      if (count($disallow)) {
+        $robotsFile .= "\nDisallow: ".implode("\nDisallow: ", $disallow);
+      } else {
+        $robotsFile .= "\nDisallow:";
+      }
     }
     $this->metaRobots = $metaRobots;
-    if (stream_resolve_include_path(ROBOTS_TXT) && !@unlink(ROBOTS_TXT)) {
-      Logger::error(sprintf(_("Unable to delete %s file"), ROBOTS_TXT));
+    if (!file_put_contents(ROBOTS_TXT, $robotsFile)) {
+      Logger::error(sprintf(_("Unable to save %s file"), ROBOTS_TXT));
     }
-    // TODO file_put_contents $robotsFile?
-    if (is_null($this->favIcon)) {
-      $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
-    }
+    apc_store_cache($cacheKey, $cfgMtime, __FUNCTION__);
   }
 
   /**
@@ -169,28 +178,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
-  }
-
-  /**
-   * @param string $filePath
-   * @return bool
-   */
-  public static function isSupportedRequest ($filePath) {
-    return $filePath === ROBOTS_TXT;
-  }
-
-  /**
-   * @return void
-   * @throws Exception
-   */
-  public static function handleRequest () {
-    $robots = self::getXML()->matchElement("robots", "domain", HTTP_HOST);
-    if (is_null($robots)) {
-      new ErrorPage("No matching robots element", 404);
-    }
-    header('Content-Type: text/plain');
-    echo $robots->nodeValue;
-    exit;
   }
 
   /**

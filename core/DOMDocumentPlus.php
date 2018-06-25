@@ -176,6 +176,7 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
    * @param array $variables
    * @param array $ignore
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   * @throws Exception
    */
   public function processVariables (Array $variables, $ignore = []) {
     return $this->elementProcessVars($variables, $ignore, $this->documentElement, true);
@@ -187,6 +188,7 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
    * @param DOMElementPlus $element
    * @param bool $deep
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   * @throws Exception
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
     $cacheKey = apc_get_key(__FUNCTION__."/"
