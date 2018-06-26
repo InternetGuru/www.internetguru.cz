@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ProgressiveWebApp>
-  <shortName>InternetGuru</shortName>
+  <var id="shortName">InternetGuru</var>
 </ProgressiveWebApp>
