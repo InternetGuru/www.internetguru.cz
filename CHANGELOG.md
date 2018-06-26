@@ -7,7 +7,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
  - InputVar user administration supports multiple logins
- - New plugin TreePresenter
  - Plugin Canonical
  - Open Graph protocol support
  - Inputvar supports textarea set
