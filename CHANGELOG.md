@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Open Graph protocol support
  - Inputvar supports textarea set
 
+### Changed
+ - Improve robots syntax
+
 ## Changed
  - Hideable icon is defined by css
  - Configurable Hideable css
