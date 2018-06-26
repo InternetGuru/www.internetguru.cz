@@ -10,8 +10,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - New plugin TreePresenter
  - Plugin Canonical
  - Open Graph protocol support
-
-## Added
  - Inputvar supports textarea set
 
 ## Changed

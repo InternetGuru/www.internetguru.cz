@@ -122,12 +122,15 @@
 
   <!-- robots.txt and meta robots -->
   <robots>
-    <!-- deny all by default -->
-    <allow_domain>*.internetguru.cz</allow_domain>
+    <!--
+    disallow all by default with a warning
+    use disallow_domain tag to suppress warning
+    -->
     <allow_domain>*.localhost.cz</allow_domain>
     <allow_domain>www.*.*</allow_domain>
     <disallow>/?LogViewer</disallow>
     <disallow>/?Admin</disallow>
+    <disallow>/?Convertor</disallow>
   </robots>
 
   <!-- Favicons -->

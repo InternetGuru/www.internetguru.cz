@@ -135,8 +135,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if (is_null($allowDomain)) {
       $metaRobots = "noindex, nofollow";
       $robotsFile = "User-agent: *\nDisallow: /";
-      Logger::user_warning(_("Using default robots value (without domain match)"));
-      //throw new Exception("Unable to match robots element to domain");
+      $disallowDomain = $this->cfg->matchElement("disallow_domain", null, HTTP_HOST);
+      if (!is_null($disallowDomain)) {
+        Logger::user_warning(_("Robots disallowed due to no domain match"));
+      }
     } else {
       /** @var DOMElementPlus $disallow */
       foreach ($this->cfg->getElementsByTagName('disallow') as $disallowElm) {
