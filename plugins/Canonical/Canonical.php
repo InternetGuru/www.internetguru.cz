@@ -23,7 +23,11 @@ class Canonical extends Plugin implements SplObserver, ModifyContentStrategyInte
    * @param Plugins|SplSubject $subject
    * @throws Exception
    */
-  public function update (SplSubject $subject) {}
+  public function update (SplSubject $subject) {
+    if ($this->detachIfNotAttached("HtmlOutput")) {
+      return;
+    }
+  }
 
   /**
    * @param HTMLPlus $content
@@ -32,7 +36,7 @@ class Canonical extends Plugin implements SplObserver, ModifyContentStrategyInte
   public function modifyContent (HTMLPlus $content) {
     $cfg = self::getXML();
     $ns = $content->documentElement->getAttribute('ns');
-    if ($ns === DOMAIN || $ns == "https://www.dev.null") {
+    if ($ns === DOMAIN) {
       return;
     }
     $nsDomain = parse_url($ns);
