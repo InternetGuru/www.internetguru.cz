@@ -121,14 +121,17 @@
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
   <!-- robots.txt and meta robots -->
-  <robots readonly="readonly" meta="noindex, nofollow">User-agent: *
-Disallow: /</robots>
-  <robots domain="*.internetguru.cz" readonly="readonly" meta="noindex, nofollow">User-agent: *
-Disallow: /</robots>
-  <robots domain="www.*.*" readonly="readonly" meta="all">User-agent: *
-Disallow:</robots>
-  <robots domain="*.localhost.cz" readonly="readonly" meta="noindex, nofollow">User-agent: *
-Disallow: /</robots>
+  <robots>
+    <!--
+    disallow all by default with a warning
+    use disallow_domain tag to suppress warning
+    -->
+    <allow_domain>*.localhost.cz</allow_domain>
+    <allow_domain>www.*.*</allow_domain>
+    <disallow>/?LogViewer</disallow>
+    <disallow>/?Admin</disallow>
+    <disallow>/?Convertor</disallow>
+  </robots>
 
   <!-- Favicons -->
   <var id="error" modifyonly="modifyonly">data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%02%00%00%00%90%91h6%00%00%00%19IDAT(%91c%BCd%AB%C2%40%0A%60%22I%F5%A8%86Q%0DCJ%03%00%DE%B5%01S%07%88%8FG%00%00%00%00IEND%AEB%60%82</var>
