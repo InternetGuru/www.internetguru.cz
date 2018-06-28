@@ -32,6 +32,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
   /**
    * UrlHandler constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -96,6 +97,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     self::$newReg = HTMLPlusBuilder::getIdToLink();
     foreach ($cfg->documentElement->childNodes as $childElm) {
       switch ($childElm->nodeName) {
+        case 'notfound':
         case 'redir':
         case 'rewrite':
           $nodeName = $childElm->nodeName;
@@ -323,6 +325,20 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
       }
       self::$newReg[$linkId] = str_replace($match, $rewrite->nodeValue, $link);
     }
+  }
+
+  /** @noinspection PhpUnusedPrivateMethodInspection */
+  /**
+   * @param DOMElementPlus $notfound
+   * @throws Exception
+   */
+  private static function notfound (DOMElementPlus $notfound) {
+    $link = $notfound->getRequiredAttribute("link");
+    if (strpos(get_link(), $link) === false) {
+      return;
+    }
+    new ErrorPage('', 404);
+    exit;
   }
 
   /** @noinspection PhpUnusedPrivateMethodInspection */

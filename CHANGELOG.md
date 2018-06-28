@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
  - Plugin Canonical
  - Open Graph protocol support
  - Inputvar supports textarea set
+ - UrlHandler supports notfound
 
 ### Changed
  - Improve robots syntax

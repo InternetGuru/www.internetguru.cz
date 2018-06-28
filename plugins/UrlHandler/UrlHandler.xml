@@ -1,6 +1,14 @@
 <UrlHandler>
 
   <!--
+    404; element notfound
+    - atribut link     ... cesta
+
+    např.:
+    <notfound link="dymky/"/>
+  -->
+
+  <!--
     PŘEPIS URL adresy; element rewrite
     - atribut match    ... přepisovaná část
     - obsah elementu   ... náhrada
@@ -11,7 +19,7 @@
 
   <!--
     ATRIBUTY elementu redir
-    - link     ... cesta
+    - link     ... celá cesta
     - parName  ... název parametru
     - parValue ... hodnota parametru
 

@@ -61,6 +61,7 @@ class Plugins implements SplSubject {
   /**
    * @param Plugin|SplObserver $observer
    * @param int $priority
+   * @throws \ReflectionException
    */
   public function attach (SplObserver $observer, $priority = 50) {
     $oId = (new \ReflectionClass($observer))->getShortName();
@@ -75,6 +76,7 @@ class Plugins implements SplSubject {
 
   /**
    * @param Plugin|SplObserver $observer
+   * @throws \ReflectionException
    */
   public function detach (SplObserver $observer) {
     $oId = (new \ReflectionClass($observer))->getShortName();
@@ -141,6 +143,7 @@ class Plugins implements SplSubject {
   /**
    * @param Plugin|SplObserver $observer
    * @param int $priority
+   * @throws \ReflectionException
    */
   public function setPriority (SplObserver $observer, $priority) {
     $this->observerPriority[(new \ReflectionClass($observer))->getShortName()] = $priority;
