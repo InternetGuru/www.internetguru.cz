@@ -337,7 +337,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     if (strpos(get_link(), $link) === false) {
       return;
     }
-    new ErrorPage('', 404);
+    new ErrorPage('', 404, true);
     exit;
   }
 
