@@ -179,8 +179,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if (!is_null($this->message)) {
         $this->sendMessage($req["username"]);
       }
+      clear_nginx();
     }
-    clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
   }
 
