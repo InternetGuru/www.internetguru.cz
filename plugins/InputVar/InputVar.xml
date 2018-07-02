@@ -143,22 +143,22 @@
       - atribut email: email na který se má zpráva poslat
       - atribut subject: předmět emailu
       - hodnota elementu: šablona zprávy
-      ^^ dostupné proměnné pro hodnotu elementu a atribut subject: TODO
+      ^^ dostupné proměnné pro hodnotu elementu a atribut subject: $user, $diff, $date
 
     Například:
-      <message email="majitel@firma.cz" subject="Změna obsahu na webu $domain">Dobrý den,
-    na webu $domain došlo k uživatelské změně obsahu.
-     - uživatel: $user
-     - čas změny: $date
-     - odkaz na užvatelskou administraci: $administration
-     - výsledek: $http_domain/listek
+    <message email="pavel@petrzela.eu" subject="Změna obsahu na webu $cms-url">Dobrý den,
+  na webu cms-url došlo k uživatelské změně obsahu.
+  - uživatel: $user
+  - čas změny: $date
+  - uživatelská administrace: $cms-url/?InputVar
+  - výsledek: $cms-url/listek
 
-    Následuje výspis rozdílů:
-    $diff
+  Následuje výspis rozdílů:
+  $diff
 
-    \-\-
-    $inputvar-service_plain
-      </message>
+  \-\-
+  $inputvar-service_plain
+    </message>
 
    -->
 </InputVar>

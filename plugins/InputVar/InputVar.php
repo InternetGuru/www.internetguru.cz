@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use Cz\Git\GitException;
 use Cz\Git\GitRepository;
 use DOMElement;
 use DOMNode;
@@ -167,15 +168,17 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($var)) {
      throw new Exception(_("No data to save"));
     }
-    /** @var DOMDocumentPlus $document */
-    $document = new DOMDocumentPlus();
-    $document->loadXML($var->ownerDocument->saveXML());
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if ($document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]) === false) {
-     throw new Exception(_("Unable to save user config"));
-    }
-    if (!is_null($this->message)) {
-      $this->sendMessage($req["username"]);
+    $toSave = $var->ownerDocument->saveXML();
+    if ($toSave !== file_get_contents($this->userCfgPath)) {
+      /** @var DOMDocumentPlus $document */
+      $document = new DOMDocumentPlus();
+      $document->loadXML($toSave);
+      if (@$document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]) === false) {
+        throw new Exception(_("Unable to save user config"));
+      }
+      if (!is_null($this->message)) {
+        $this->sendMessage($req["username"]);
+      }
     }
     clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
@@ -190,7 +193,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $diff = array_filter($diff, function ($value) {
         return strpos($value, '-') === 0 || strpos($value, '+') === 0;
       });
-      $diff = htmlspecialchars(implode("\n", array_slice($diff, 2)));
+      $diff = strip_tags(implode("\n", array_slice($diff, 2)));
     } catch (Exception $exc) {}
     $vars = array_merge(Cms::getAllVariables(), [
       'user' => [
@@ -200,7 +203,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       'diff' => [
         'value' => $diff,
         'cacheable' => 'false',
-      ]
+      ],
+      'date' => [
+        'value' => date("j. n. Y H:i:s"),
+        'cacheable' => 'false',
+      ],
     ]);
     $message = replace_vars($this->message, $vars);
     $subject = replace_vars($this->messageSubject, $vars);
