@@ -419,7 +419,7 @@ function fput_contents ($dest, $string) {
   copy_plus("$dest.new", $dest, false);
   // commit only iff repo exists
   try {
-    $gitRepo = new Git();
+    $gitRepo = Git::Instance();
     $gitRepo->commitFile($dest);
   } catch (GitException $exc) {}
 }
@@ -998,4 +998,47 @@ function rmdir_plus ($dir) {
     $todo($fileinfo->getRealPath());
   }
   rmdir($dir);
+}
+
+/**
+ * @param string $mailto
+ * @param string $mailtoname
+ * @param string $replyto
+ * @param string $replytoname
+ * @param string $fromName
+ * @param string $msg
+ * @param string $subject
+ * @param string $bcc
+ * @throws Exception
+ */
+function send_mail ($mailto, $mailtoname, $replyto, $replytoname, $fromName, $msg, $subject, $bcc) {
+  Logger::mail(
+    sprintf(
+      _("Sending e-mail: %s"),
+      "to=$mailtoname<$mailto>; replyto=$replytoname<$replyto>; bcc=$bcc; subject=$subject; msg=$msg"
+    )
+  );
+  if (!is_null(Cms::getLoggedUser())) {
+    Cms::notice("<pre><code class='nohighlight'>$msg</code></pre>");
+    return;
+  }
+  $mail = new PHPMailer;
+  $mail->CharSet = 'UTF-8';
+  $mail->setFrom("no-reply@".DOMAIN, $fromName);
+  $mail->addAddress($mailto, $mailtoname);
+  $mail->Body = $msg;
+  $mail->Subject = sprintf(_("New massage from %s"), HTTP_HOST);
+  if (strlen($replyto)) {
+    $mail->addReplyTo($replyto, $replytoname);
+    $mail->Subject .= " [$replyto]";
+  }
+  if (strlen($subject)) {
+    $mail->Subject = $subject;
+  }
+  if (strlen($bcc)) {
+    $mail->addBCC($bcc, '');
+  }
+  if (!$mail->send()) {
+    throw new Exception($mail->ErrorInfo);
+  }
 }

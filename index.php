@@ -80,9 +80,6 @@ try {
     redir_to(build_local_url(["path" => get_link(), "query" => build_query($query, false)]));
   }
 
-  $repo = new Git();
-  // TODO init git repository
-
   $plugins = new Plugins();
   HTMLPlusBuilder::register(INDEX_HTML);
   $plugins->setStatus(STATUS_PREINIT);

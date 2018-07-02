@@ -2,6 +2,7 @@
 
 namespace IGCMS\Plugins;
 
+use Cz\Git\GitRepository;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -10,6 +11,7 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\Git;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -46,6 +48,18 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @var array
    */
   private $vars = [];
+  /**
+   * @var string|null
+   */
+  private $message = null;
+  /**
+   * @var string|null
+   */
+  private $messageSubject = null;
+  /**
+   * @var string|null
+   */
+  private $messageEmail = null;
 
   /**
    * InputVar constructor.
@@ -80,6 +94,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
           continue;
         }
         if ($element->nodeName == "login") {
+          continue;
+        }
+        if ($element->nodeName == "message") {
           continue;
         }
         try {
@@ -157,8 +174,42 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if ($document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]) === false) {
      throw new Exception(_("Unable to save user config"));
     }
+    if (!is_null($this->message)) {
+      $this->sendMessage($req["username"]);
+    }
     clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
+  }
+
+  private function sendMessage ($user) {
+    $diff = "";
+    try {
+      /** @var GitRepository $repo */
+      $repo = Git::Instance();
+      $diff = $repo->execute(['diff', 'HEAD~1', '--minimal']);
+      $diff = array_filter($diff, function ($value) {
+        return strpos($value, '-') === 0 || strpos($value, '+') === 0;
+      });
+      $diff = htmlspecialchars(implode("\n", array_slice($diff, 2)));
+    } catch (Exception $exc) {}
+    $vars = array_merge(Cms::getAllVariables(), [
+      'user' => [
+        'value' => $user,
+        'cacheable' => 'false',
+      ],
+      'diff' => [
+        'value' => $diff,
+        'cacheable' => 'false',
+      ]
+    ]);
+    $message = replace_vars($this->message, $vars);
+    $subject = replace_vars($this->messageSubject, $vars);
+    try {
+      // TODO bcc?
+      send_mail($this->messageEmail, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
+    } catch (Exception $exc) {
+      Logger::error($exc->getMessage());
+    }
   }
 
   /**
@@ -171,6 +222,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
       if ($element->nodeName == "login") {
         $this->logins[$element->getRequiredAttribute('id')] = $element->getRequiredAttribute('password');
+      }
+      if ($element->nodeName == "message") {
+        $this->messageSubject = $element->getRequiredAttribute('subject');
+        $this->messageEmail = $element->getRequiredAttribute('email');
+        $this->message = $element->nodeValue;
       }
     }
   }

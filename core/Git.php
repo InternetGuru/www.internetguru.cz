@@ -9,23 +9,22 @@ use Exception;
  * Class Git
  * @package IGCMS\Core
  */
-class Git {
+class Git extends GitRepository {
   /**
    * @var GitRepository|null
    */
-  private $gitRepository = null;
+  private static $gitRepository = null;
 
   /**
-   * Git constructor.
+   * @return Git|GitRepository|null
    * @throws GitException
-   * @return GitRepository
    */
-  public function __construct () {
-    if (!is_null($this->gitRepository)) {
-      return $this->gitRepository;
+  public static function Instance () {
+    if (!is_null(self::$gitRepository)) {
+      return self::$gitRepository;
     }
-    $this->gitRepository = new GitRepository(USER_FOLDER);
-    return $this->gitRepository;
+    self::$gitRepository = new self(USER_FOLDER);
+    return self::$gitRepository;
   }
 
   /**
@@ -54,8 +53,8 @@ class Git {
     }
     $author .= " $email";
     try {
-      $this->gitRepository->addFile($filename);
-      $this->gitRepository->commit($message, ['--author' => $author]);
+      self::$gitRepository->addFile($filename);
+      self::$gitRepository->commit($message, ['--author' => $author]);
       return true;
     } catch (Exception $e) {
       Logger::error(sprintf(_('Unable to commit file %s: %s'), $filename, $e->getMessage()));
