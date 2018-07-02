@@ -1,7 +1,9 @@
 <?php
 
+use Cz\Git\GitException;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Git;
 use IGCMS\Core\Logger;
 
 /**
@@ -415,6 +417,11 @@ function fput_contents ($dest, $string) {
     throw new Exception(_("Unable to save content"));
   }
   copy_plus("$dest.new", $dest, false);
+  // commit only iff repo exists
+  try {
+    $gitRepo = new Git();
+    $gitRepo->commitFile($dest);
+  } catch (GitException $exc) {}
 }
 
 /**

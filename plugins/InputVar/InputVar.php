@@ -150,8 +150,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($var)) {
      throw new Exception(_("No data to save"));
     }
+    /** @var DOMDocumentPlus $document */
+    $document = new DOMDocumentPlus();
+    $document->loadXML($var->ownerDocument->saveXML());
     /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if ($var->ownerDocument->save($this->userCfgPath) === false) {
+    if ($document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]) === false) {
      throw new Exception(_("Unable to save user config"));
     }
     clear_nginx();

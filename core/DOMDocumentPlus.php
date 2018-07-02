@@ -2,8 +2,11 @@
 
 namespace IGCMS\Core;
 
+use Cz\Git\GitException;
+use Cz\Git\GitRepository;
 use DOMDocument;
 use DOMElement;
+use DOMNode;
 use DOMXPath;
 use Exception;
 
@@ -126,6 +129,23 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
     if (!@parent::loadXML($xml, $options)) {
       throw new Exception(_("Invalid XML"));
     }
+  }
+
+  /**
+   * @param string $filename
+   * @param null $options
+   * @param null $message
+   * @param null $author
+   * @param null $email
+   * @return int|void
+   */
+  public function save ($filename, $options = null, $message=null, $author=null, $email=null) {
+    parent::save($filename, $options);
+    // commit only iff repo exists
+    try {
+      $gitRepo = new Git();
+      $gitRepo->commitFile($filename, $message, $author, $email);
+    } catch (GitException $exc) { }
   }
 
   /**

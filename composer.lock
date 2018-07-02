@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7a2a3981558e9c4d4549ac2ee80eae0",
+    "content-hash": "9e1264e783df33e82aad26c30e48996a",
     "packages": [
         {
             "name": "components/highlightjs",
@@ -49,6 +49,48 @@
             "time": "2016-03-05T17:39:56+00:00"
         },
         {
+            "name": "czproject/git-php",
+            "version": "v3.14.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/czproject/git-php.git",
+                "reference": "6faf55527a17fb569456709c2769a6d8749ceb6d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/czproject/git-php/zipball/6faf55527a17fb569456709c2769a6d8749ceb6d",
+                "reference": "6faf55527a17fb569456709c2769a6d8749ceb6d",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "nette/tester": "~1.1.0"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Jan Pecha",
+                    "email": "janpecha@email.cz"
+                }
+            ],
+            "description": "Library for work with Git repository in PHP.",
+            "keywords": [
+                "git"
+            ],
+            "time": "2018-04-17T08:52:47+00:00"
+        },
+        {
             "name": "internetguru/codemirror",
             "version": "dev-master",
             "source": {
@@ -72,7 +114,7 @@
             "support": {
                 "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.1.4"
             },
-            "time": "2016-06-06 18:56:07"
+            "time": "2016-06-06T18:56:07+00:00"
         },
         {
             "name": "internetguru/photoswipe",
@@ -98,7 +140,7 @@
             "support": {
                 "source": "https://github.com/InternetGuru/PhotoSwipe/tree/dev"
             },
-            "time": "2017-11-09 19:48:52"
+            "time": "2017-11-09T19:48:52+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -367,7 +409,7 @@
                 "css",
                 "prefixes"
             ],
-            "time": "2015-06-14 13:40:00"
+            "time": "2015-06-14T13:40:00+00:00"
         }
     ],
     "packages-dev": [],

@@ -3,6 +3,7 @@
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\ErrorPage;
+use IGCMS\Core\Git;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugins;
@@ -78,6 +79,9 @@ try {
     unset($query["q"]);
     redir_to(build_local_url(["path" => get_link(), "query" => build_query($query, false)]));
   }
+
+  $repo = new Git();
+  // TODO init git repository
 
   $plugins = new Plugins();
   HTMLPlusBuilder::register(INDEX_HTML);
