@@ -218,7 +218,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $message = replace_vars($this->message, $vars);
     $subject = replace_vars($this->messageSubject, $vars);
     try {
-      // TODO support multiple email address
+      // TODO support multiple email address (explode messageTo)
       send_mail($this->messageTo, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
     } catch (Exception $exc) {
       Logger::error($exc->getMessage());
