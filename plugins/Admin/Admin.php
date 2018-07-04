@@ -662,12 +662,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         "cacheable" => true,
       ];
     }
-    // invalid post
-    if ($this->isPost()) {
-      $usrDestHash = $_POST["userfilehash"];
-    } else {
-      $usrDestHash = $this->getDataFileHash();
-    }
+    $usrDestHash = $this->isPost() ? $_POST["userfilehash"] : $this->getDataFileHash();
     $mode = $this->replace ? _("replace") : _("modify");
     switch ($this->type) {
       case "html":
