@@ -629,7 +629,6 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
   }
 
   /**
-   * TODO addJsFile & addJs to interface?
    * @return HTMLPlus
    * @throws Exception
    */
@@ -663,7 +662,12 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
         "cacheable" => true,
       ];
     }
-    $usrDestHash = $this->getDataFileHash();
+    // invalid post
+    if ($this->isPost()) {
+      $usrDestHash = $_POST["userfilehash"];
+    } else {
+      $usrDestHash = $this->getDataFileHash();
+    }
     $mode = $this->replace ? _("replace") : _("modify");
     switch ($this->type) {
       case "html":
