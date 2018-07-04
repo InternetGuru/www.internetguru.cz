@@ -60,7 +60,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   /**
    * @var string|null
    */
-  private $messageEmail = null;
+  private $messageTo = null;
 
   /**
    * InputVar constructor.
@@ -173,12 +173,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       /** @var DOMDocumentPlus $document */
       $document = new DOMDocumentPlus();
       $document->loadXML($toSave);
-      // TODO return commit id
-      if (@$document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]) === false) {
+      $commit = $document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]);
+      if (!$commit) {
         throw new Exception(_("Unable to save user config"));
       }
       if (!is_null($this->message)) {
-        $this->sendDiffEmail($req["username"]);
+        $this->sendDiffEmail($req["username"], $commit);
       }
       clear_nginx();
     }
@@ -186,22 +186,21 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   }
 
   /**
-   * @param $user
+   * @param string $user
+   * @param string $commit
    * @throws GitException
    */
-  private function sendDiffEmail ($user) {
+  private function sendDiffEmail ($user, $commit) {
     try {
       $repo = Git::Instance();
     } catch (Exception $exc) {
       return;
     }
-    // TODO use commit id
-    $diff = $repo->execute(['diff', 'HEAD~1', '--minimal']);
+    $diff = $repo->execute(['diff', "$commit~", "$commit"]);
     $diff = array_filter($diff, function ($value) {
       return strpos($value, '-') === 0 || strpos($value, '+') === 0;
     });
     $diff = strip_tags(implode("\n", array_slice($diff, 2)));
-    // TODO nahradit 2x misto merge
     $vars = array_merge(Cms::getAllVariables(), [
       'user' => [
         'value' => $user,
@@ -220,7 +219,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $subject = replace_vars($this->messageSubject, $vars);
     try {
       // TODO support multiple email address
-      send_mail($this->messageEmail, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
+      send_mail($this->messageTo, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
     } catch (Exception $exc) {
       Logger::error($exc->getMessage());
     }
@@ -239,7 +238,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
       if ($element->nodeName == "message") {
         $this->messageSubject = $element->getRequiredAttribute('subject');
-        $this->messageEmail = $element->getRequiredAttribute('email');
+        $this->messageTo = $element->getRequiredAttribute('to');
         $this->message = $element->nodeValue;
       }
     }

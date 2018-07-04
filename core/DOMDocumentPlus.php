@@ -137,7 +137,8 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
    * @param null $message
    * @param null $author
    * @param null $email
-   * @return int|void
+   * @return int
+   * @throws GitException
    */
   public function save ($filename, $options = null, $message=null, $author=null, $email=null) {
     parent::save($filename, $options);
@@ -145,9 +146,10 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
     try {
       $gitRepo = Git::Instance();
     } catch (GitException $exc) {
-      return;
+      return 0;
     }
     $gitRepo->commitFile($filename, $message, $author, $email);
+    return $gitRepo->getLastCommitId();
   }
 
   /**
