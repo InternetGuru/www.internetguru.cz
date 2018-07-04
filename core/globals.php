@@ -417,11 +417,13 @@ function fput_contents ($dest, $string) {
     throw new Exception(_("Unable to save content"));
   }
   copy_plus("$dest.new", $dest, false);
-  // commit only iff repo exists
+  // commit only if repo exists
   try {
     $gitRepo = Git::Instance();
-    $gitRepo->commitFile($dest);
-  } catch (GitException $exc) {}
+  } catch (GitException $exc) {
+    return;
+  }
+  $gitRepo->commitFile($dest);
 }
 
 /**

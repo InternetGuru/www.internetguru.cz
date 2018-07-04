@@ -145,9 +145,10 @@
       - hodnota elementu: šablona zprávy
       ^^ dostupné proměnné pro hodnotu elementu a atribut subject: $user, $diff, $date
 
+    TODO email 2 to
     Například:
     <message email="pavel@petrzela.eu" subject="Změna obsahu na webu $cms-url">Dobrý den,
-  na webu cms-url došlo k uživatelské změně obsahu.
+  na webu $cms-url došlo k uživatelské změně obsahu.
   - uživatel: $user
   - čas změny: $date
   - uživatelská administrace: $cms-url/?InputVar

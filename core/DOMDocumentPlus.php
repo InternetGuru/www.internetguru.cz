@@ -141,11 +141,13 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
    */
   public function save ($filename, $options = null, $message=null, $author=null, $email=null) {
     parent::save($filename, $options);
-    // commit only iff repo exists
+    // commit only if repo exists
     try {
       $gitRepo = Git::Instance();
-      $gitRepo->commitFile($filename, $message, $author, $email);
-    } catch (GitException $exc) { }
+    } catch (GitException $exc) {
+      return;
+    }
+    $gitRepo->commitFile($filename, $message, $author, $email);
   }
 
   /**

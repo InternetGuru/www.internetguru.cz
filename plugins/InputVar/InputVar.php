@@ -173,28 +173,35 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       /** @var DOMDocumentPlus $document */
       $document = new DOMDocumentPlus();
       $document->loadXML($toSave);
+      // TODO return commit id
       if (@$document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]) === false) {
         throw new Exception(_("Unable to save user config"));
       }
       if (!is_null($this->message)) {
-        $this->sendMessage($req["username"]);
+        $this->sendDiffEmail($req["username"]);
       }
       clear_nginx();
     }
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
   }
 
-  private function sendMessage ($user) {
-    $diff = "";
+  /**
+   * @param $user
+   * @throws GitException
+   */
+  private function sendDiffEmail ($user) {
     try {
-      /** @var GitRepository $repo */
       $repo = Git::Instance();
-      $diff = $repo->execute(['diff', 'HEAD~1', '--minimal']);
-      $diff = array_filter($diff, function ($value) {
-        return strpos($value, '-') === 0 || strpos($value, '+') === 0;
-      });
-      $diff = strip_tags(implode("\n", array_slice($diff, 2)));
-    } catch (Exception $exc) {}
+    } catch (Exception $exc) {
+      return;
+    }
+    // TODO use commit id
+    $diff = $repo->execute(['diff', 'HEAD~1', '--minimal']);
+    $diff = array_filter($diff, function ($value) {
+      return strpos($value, '-') === 0 || strpos($value, '+') === 0;
+    });
+    $diff = strip_tags(implode("\n", array_slice($diff, 2)));
+    // TODO nahradit 2x misto merge
     $vars = array_merge(Cms::getAllVariables(), [
       'user' => [
         'value' => $user,
@@ -212,7 +219,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $message = replace_vars($this->message, $vars);
     $subject = replace_vars($this->messageSubject, $vars);
     try {
-      // TODO bcc?
+      // TODO support multiple email address
       send_mail($this->messageEmail, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
     } catch (Exception $exc) {
       Logger::error($exc->getMessage());

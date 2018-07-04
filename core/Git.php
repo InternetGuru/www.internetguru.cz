@@ -46,18 +46,18 @@ class Git extends GitRepository {
       }
     }
     if (is_null($email)) {
-      $email = '<igcms@commit.com>';
+      $email = 'igcms@commit.com';
     }
     if (is_null($author)) {
       $author = Cms::getLoggedUser();
     }
-    $author .= " $email";
+    $author .= " <$email>";
     try {
       self::$gitRepository->addFile($filename);
       self::$gitRepository->commit($message, ['--author' => $author]);
       return true;
-    } catch (Exception $e) {
-      Logger::error(sprintf(_('Unable to commit file %s: %s'), $filename, $e->getMessage()));
+    } catch (Exception $exc) {
+      Logger::error(sprintf(_('Unable to commit file %s: %s'), $filename, $exc->getMessage()));
       return false;
     }
   }
