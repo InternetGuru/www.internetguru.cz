@@ -1027,7 +1027,9 @@ function send_mail ($mailto, $mailtoname, $replyto, $replytoname, $fromName, $ms
   $mail = new PHPMailer;
   $mail->CharSet = 'UTF-8';
   $mail->setFrom("no-reply@".DOMAIN, $fromName);
-  $mail->addAddress($mailto, $mailtoname);
+  foreach (explode(" ", $mailto) as $email) {
+    $mail->addAddress($email, $mailtoname);
+  }
   $mail->Body = $msg;
   $mail->Subject = sprintf(_("New massage from %s"), HTTP_HOST);
   if (strlen($replyto)) {
