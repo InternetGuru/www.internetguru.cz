@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContactForm>
-<!--   <var id="adminaddr" modifyonly="modifyonly">info@internetguru.cz</var> -->
-  <var id="adminaddr" modifyonly="modifyonly">pavel@petrzela.eu</var>
+  <var id="adminaddr" modifyonly="modifyonly">info@internetguru.cz</var>
+<!--   <var id="adminaddr" modifyonly="modifyonly">pavel@petrzela.eu</var> -->
   <var id="servername" modifyonly="modifyonly">InternetGuru.cz</var>
   <var id="subject" modifyonly="modifyonly">New Message from internetguru.cz</var>
   <var id="success" modifyonly="modifyonly">Thank you, message has been sent!</var>
