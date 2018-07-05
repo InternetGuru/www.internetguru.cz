@@ -2,6 +2,8 @@
 
 namespace IGCMS\Plugins;
 
+use Cz\Git\GitException;
+use Cz\Git\GitRepository;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -10,6 +12,7 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\Git;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -46,6 +49,18 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @var array
    */
   private $vars = [];
+  /**
+   * @var string|null
+   */
+  private $message = null;
+  /**
+   * @var string|null
+   */
+  private $messageSubject = null;
+  /**
+   * @var string|null
+   */
+  private $messageTo = null;
 
   /**
    * InputVar constructor.
@@ -80,6 +95,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
           continue;
         }
         if ($element->nodeName == "login") {
+          continue;
+        }
+        if ($element->nodeName == "message") {
           continue;
         }
         try {
@@ -150,12 +168,61 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($var)) {
      throw new Exception(_("No data to save"));
     }
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if ($var->ownerDocument->save($this->userCfgPath) === false) {
-     throw new Exception(_("Unable to save user config"));
+    $toSave = $var->ownerDocument->saveXML();
+    if ($toSave !== file_get_contents($this->userCfgPath)) {
+      /** @var DOMDocumentPlus $document */
+      $document = new DOMDocumentPlus();
+      $document->loadXML($toSave);
+      $commit = $document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]);
+      if (!$commit) {
+        throw new Exception(_("Unable to save user config"));
+      }
+      if (!is_null($this->message)) {
+        $this->sendDiffEmail($req["username"], $commit);
+      }
+      clear_nginx();
     }
-    clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
+  }
+
+  /**
+   * @param string $user
+   * @param string $commit
+   * @throws GitException
+   */
+  private function sendDiffEmail ($user, $commit) {
+    try {
+      $repo = Git::Instance();
+    } catch (Exception $exc) {
+      return;
+    }
+    $diff = $repo->execute(['diff', "$commit~", "$commit"]);
+    $diff = array_filter($diff, function ($value) {
+      return strpos($value, '-') === 0 || strpos($value, '+') === 0;
+    });
+    $diff = strip_tags(implode("\n", array_slice($diff, 2)));
+    $vars = array_merge(Cms::getAllVariables(), [
+      'user' => [
+        'value' => $user,
+        'cacheable' => 'false',
+      ],
+      'diff' => [
+        'value' => $diff,
+        'cacheable' => 'false',
+      ],
+      'date' => [
+        'value' => date("j. n. Y H:i:s"),
+        'cacheable' => 'false',
+      ],
+    ]);
+    $message = replace_vars($this->message, $vars);
+    $subject = replace_vars($this->messageSubject, $vars);
+    try {
+      // TODO support multiple email address (explode messageTo)
+      send_mail($this->messageTo, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
+    } catch (Exception $exc) {
+      Logger::error($exc->getMessage());
+    }
   }
 
   /**
@@ -168,6 +235,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
       if ($element->nodeName == "login") {
         $this->logins[$element->getRequiredAttribute('id')] = $element->getRequiredAttribute('password');
+      }
+      if ($element->nodeName == "message") {
+        $this->messageSubject = $element->getRequiredAttribute('subject');
+        $this->messageTo = $element->getRequiredAttribute('to');
+        $this->message = $element->nodeValue;
       }
     }
   }

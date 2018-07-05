@@ -132,13 +132,33 @@
         placeholder="Čokoláda Orion, 22 Kč (sleva 20 %)">Akce</set>
 
     2) Element login (volitelný)
-      - attribut id:  jméno uživatele
-      - attribut password: otisk hesla vytvořený funkcí crypt
+      - atribut id:  jméno uživatele
+      - atribut password: otisk hesla vytvořený funkcí crypt
       ^^ například příkazem "openssl passwd -1"
 
     Například:
       <login id="admin" password="$1$uvMgWfZe$MZGyiPRqL.YUDT3Jmurya0"/>
 
-   -->
+    3) Element message
+      - atribut email: email na který se má zpráva poslat
+      - atribut subject: předmět emailu
+      - hodnota elementu: šablona zprávy
+      ^^ dostupné proměnné pro hodnotu elementu a atribut subject: $user, $diff, $date
 
+    Například:
+    <message to="pavel@petrzela.eu" subject="Změna obsahu na webu $cms-url">Dobrý den,
+  na webu $cms-url došlo k uživatelské změně obsahu.
+  - uživatel: $user
+  - čas změny: $date
+  - uživatelská administrace: $cms-url/?InputVar
+  - výsledek: $cms-url/listek
+
+  Následuje výspis rozdílů:
+  $diff
+
+  \-\-
+  $inputvar-service_plain
+    </message>
+
+   -->
 </InputVar>
