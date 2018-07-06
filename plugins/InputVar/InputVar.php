@@ -205,10 +205,15 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $diffLines = $repo->execute(['diff', "$commit~", "$commit"]);
     $diff = "";
     foreach ($diffLines as $key => $line) {
-      if (strpos($line, '- ') !== 0 && strpos($line, '+ ') !== 0) {
+      if ($key < 4) {
         continue;
       }
-      $diff .= trim(html_entity_decode(strip_tags(trim($line))), "\n")."\n";
+      if (strpos($line, '-') !== 0 && strpos($line, '+') !== 0) {
+        continue;
+      }
+      $line = str_replace("</var>", "", $line);
+      $line = preg_replace("/ *<var [^>]+>/", "", $line);
+      $diff .= trim(html_entity_decode($line), "\n")."\n";
     }
     $vars = array_merge(Cms::getAllVariables(), [
       'user' => [
