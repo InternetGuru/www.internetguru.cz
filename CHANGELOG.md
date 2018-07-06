@@ -13,10 +13,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
  - Improve robots syntax
-
-## Changed
  - Hideable icon is defined by css
  - Configurable Hideable css
+
+## [2.12.2] - 2018-07-06
+### Fixed
+ - Admin save does not keep changed file warning
 
 ## [2.12.1] - 2018-06-19
 ### Fixed
@@ -412,6 +414,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - System messages from previous request are now marked via class.
 
 [Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.12.2]: https://bitbucket.org/igwr/cms/compare/v2.12.2..v2.12.1
 [2.12.1]: https://bitbucket.org/igwr/cms/compare/v2.12.1..v2.12.0
 [2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.5
 [2.11.5]: https://bitbucket.org/igwr/cms/compare/v2.11.5..v2.11.4
