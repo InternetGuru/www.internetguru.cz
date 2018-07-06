@@ -170,7 +170,9 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     $formId = $htmlForm->getAttribute("id");
     $htmlForm->removeAllAttributes(["id", "class"]);
     $htmlForm->setAttribute("method", "post");
-    $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(get_link()));
+    if (!$htmlForm->hasAttribute("action")) {
+      $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(get_link()));
+    }
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
     return $doc;
