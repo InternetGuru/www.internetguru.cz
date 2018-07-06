@@ -200,7 +200,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $diff = array_filter($diff, function ($value) {
       return strpos($value, '-') === 0 || strpos($value, '+') === 0;
     });
-    $diff = strip_tags(implode("\n", array_slice($diff, 2)));
+    $diff = html_entity_decode(strip_tags(trim(implode("\n", array_slice($diff, 2)))));
     $vars = array_merge(Cms::getAllVariables(), [
       'user' => [
         'value' => $user,
