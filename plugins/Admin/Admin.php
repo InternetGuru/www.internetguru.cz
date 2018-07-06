@@ -171,7 +171,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
     $this->initDataFiles();
     if ($this->isPost()) {
       if ($_POST["userfilehash"] != $this->getDataFileHash()) {
-        throw new Exception(sprintf(_("User file '%s' changed during administration"), $this->defaultFile));
+        throw new Exception(sprintf(_("User file '%s' has changed during administration"), $this->defaultFile));
       }
       $this->contentValue = str_replace("\r\n", "\n", $_POST["content"]);;
     } else {

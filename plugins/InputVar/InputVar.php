@@ -154,6 +154,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     } else {
       Logger::info(sprintf(_('Form id %s anonymous request'), $this->formId));
     }
+    if (!isset($req["userfilehash"])) {
+      throw new Exception(_("Missing userfilehash value"));
+    }
+    if ($req["userfilehash"] != file_hash($this->userCfgPath)) {
+      throw new Exception(_("Data file has changed during administration"));
+    }
     $var = null;
     foreach ($req as $key => $value) {
       if (isset($this->vars[$key])) {
@@ -196,11 +202,14 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     } catch (Exception $exc) {
       return;
     }
-    $diff = $repo->execute(['diff', "$commit~", "$commit"]);
-    $diff = array_filter($diff, function ($value) {
-      return strpos($value, '-') === 0 || strpos($value, '+') === 0;
-    });
-    $diff = html_entity_decode(strip_tags(trim(implode("\n", array_slice($diff, 2)))));
+    $diffLines = $repo->execute(['diff', "$commit~", "$commit"]);
+    $diff = "";
+    foreach ($diffLines as $key => $line) {
+      if (strpos($line, '- ') !== 0 && strpos($line, '+ ') !== 0) {
+        continue;
+      }
+      $diff .= trim(html_entity_decode(strip_tags(trim($line))), "\n")."\n";
+    }
     $vars = array_merge(Cms::getAllVariables(), [
       'user' => [
         'value' => $user,
@@ -538,6 +547,10 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $vars["action"] = [
       "value" => "?".$this->className,
       "cacheable" => true,
+    ];
+    $vars["userfilehash"] = [
+      "value" => file_hash($this->userCfgPath),
+      "cacheable" => false,
     ];
     $newContent->processVariables($vars);
     return $newContent;
