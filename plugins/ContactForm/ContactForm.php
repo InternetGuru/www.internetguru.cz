@@ -168,7 +168,7 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     /** @var DOMElementPlus $htmlForm */
     $htmlForm = $var->appendChild($doc->importNode($form, true));
     $formId = $htmlForm->getAttribute("id");
-    $htmlForm->removeAllAttributes(["id", "class", "action"]);
+    $htmlForm->removeAllAttributes(["id", "class", "action", "var", "fn"]);
     $htmlForm->setAttribute("method", "post");
     if (!$htmlForm->hasAttribute("action")) {
       $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(get_link()));
