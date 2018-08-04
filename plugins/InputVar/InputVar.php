@@ -155,10 +155,10 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       Logger::info(sprintf(_('Form id %s anonymous request'), $this->formId));
     }
     if (!isset($req["userfilehash"])) {
-      throw new Exception(_("Missing userfilehash value"));
+      throw new Exception(_("Missing userfilehash value"), 1);
     }
     if ($req["userfilehash"] != file_hash($this->userCfgPath)) {
-      throw new Exception(_("Data file has changed during administration"));
+      throw new Exception(_("Data file has changed during administration"), 1);
     }
     $var = null;
     foreach ($req as $key => $value) {
@@ -172,7 +172,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
     }
     if (is_null($var)) {
-     throw new Exception(_("No data to save"));
+     throw new Exception(_("No data to save"), 1);
     }
     $toSave = $var->ownerDocument->saveXML();
     if ($toSave !== file_get_contents($this->userCfgPath)) {
@@ -181,7 +181,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $document->loadXML($toSave);
       $commit = $document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]);
       if (!$commit) {
-        throw new Exception(_("Unable to save user config"));
+        throw new Exception(_("Unable to save user config"), 1);
       }
       if (!is_null($this->message)) {
         $this->sendDiffEmail($req["username"], $commit);
