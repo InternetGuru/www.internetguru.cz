@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: IGCMS sysmsg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-07-06 17:00+0200\n"
-"PO-Revision-Date: 2018-07-06 17:11+0200\n"
+"POT-Creation-Date: 2018-08-06 11:31+0200\n"
+"PO-Revision-Date: 2018-08-06 11:32+0200\n"
 "Last-Translator: Jiří Pavelka <j.pavelka@seznam.cz>\n"
 "Language-Team: InternetGuru\n"
 "Language: cs_CZ\n"
@@ -1186,89 +1186,93 @@ msgstr "Odstraněn prázdný element %s"
 msgid "Unknown element name %s"
 msgstr "Neznámý název elementu %s"
 
-#: plugins/InputVar/InputVar.php:147
+#: plugins/InputVar/InputVar.php:129
+msgid "Unexpected error occurred. Please contact website administrator."
+msgstr "Nastala neočekávaná chyba. Kontaktujte prosím správce webu."
+
+#: plugins/InputVar/InputVar.php:148
 msgid "Invalid credentials"
 msgstr "Neplatné přihlašovací údaje"
 
-#: plugins/InputVar/InputVar.php:149
+#: plugins/InputVar/InputVar.php:150
 #, php-format
 msgid "Form id %s request from username %s"
 msgstr "Požadavek formuláře id %s od uživatele %s"
 
-#: plugins/InputVar/InputVar.php:152
+#: plugins/InputVar/InputVar.php:153
 msgid "Invalid username or password"
 msgstr "Neplatné uživatelské jméno nebo heslo"
 
-#: plugins/InputVar/InputVar.php:155
+#: plugins/InputVar/InputVar.php:156
 #, php-format
 msgid "Form id %s anonymous request"
 msgstr "Anonymní požadavek formuláře id %s"
 
-#: plugins/InputVar/InputVar.php:158
+#: plugins/InputVar/InputVar.php:159
 msgid "Missing userfilehash value"
 msgstr "Chybí hodnota userfilehash"
 
-#: plugins/InputVar/InputVar.php:161
+#: plugins/InputVar/InputVar.php:162
 msgid "Data file has changed during administration"
 msgstr "Datový soubor se během úprav změnil"
 
-#: plugins/InputVar/InputVar.php:175
+#: plugins/InputVar/InputVar.php:176
 msgid "No data to save"
 msgstr "Žádný obsah k uložení"
 
-#: plugins/InputVar/InputVar.php:184
+#: plugins/InputVar/InputVar.php:185
 msgid "Unable to save user config"
 msgstr "Nepodařilo se uložit uživatelské nastavení"
 
-#: plugins/InputVar/InputVar.php:296
+#: plugins/InputVar/InputVar.php:299
 #, php-format
 msgid "Unable to apply function: %s"
 msgstr "Nepodařilo se aplikovat funkci: %s"
 
-#: plugins/InputVar/InputVar.php:307
+#: plugins/InputVar/InputVar.php:310
 #, php-format
 msgid "Unable to register function %s: %s"
 msgstr "Nepodařilo se zaregistrovat funkci %s: %s"
 
-#: plugins/InputVar/InputVar.php:379
+#: plugins/InputVar/InputVar.php:382
 msgid "Element call missing content"
 msgstr "Element call postrádá obsah"
 
-#: plugins/InputVar/InputVar.php:387
+#: plugins/InputVar/InputVar.php:390
 msgid "Unknown function name"
 msgstr "Neznámá funkce"
 
-#: plugins/InputVar/InputVar.php:435
+#: plugins/InputVar/InputVar.php:438
 msgid "No content found"
 msgstr "Nebyl nalezen obsah"
 
-#: plugins/InputVar/InputVar.php:465
+#: plugins/InputVar/InputVar.php:468
 msgid "No pattern found"
 msgstr "Nebyl nalezen atribut pattern"
 
-#: plugins/InputVar/InputVar.php:468
+#: plugins/InputVar/InputVar.php:471
 msgid "No replacement found"
 msgstr "Nebyl nalezen atribut replacement"
 
-#: plugins/InputVar/InputVar.php:482 plugins/InputVar/InputVar.php:496
+#: plugins/InputVar/InputVar.php:485 plugins/InputVar/InputVar.php:499
 msgid "No data found"
 msgstr "Nebyla nalezena data"
 
-#: plugins/InputVar/InputVar.php:506
+#: plugins/InputVar/InputVar.php:509
 #, php-format
 msgid "Sequence call skipped: %s"
 msgstr "Funkce sequence přeskočila volání funkce: %s"
 
-#: plugins/InputVar/InputVar.php:523
+#: plugins/InputVar/InputVar.php:526
 msgid "No set elements found"
 msgstr "Nebyly nalezeny žádné elementy set"
 
-#: plugins/InputVar/InputVar.php:576
+#: plugins/InputVar/InputVar.php:579
 #, php-format
 msgid "Unsupported attribute type value '%s'"
 msgstr "Nepodporovaná hodnota atributu type '%s'"
 
-#: plugins/InputVar/InputVar.php:610
+#: plugins/InputVar/InputVar.php:613
 #, php-format
 msgid "Cannot create fieldset for %s"
 msgstr "Nepodařilo se vytvořit fieldset pro %s"

@@ -126,6 +126,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if ($exc->getCode() === 1) {
         Logger::user_error($exc->getMessage());
       } else {
+        Logger::user_error(_("Unexpected error occurred. Please contact website administrator."));
         Logger::critical($exc->getMessage());
       }
     }
