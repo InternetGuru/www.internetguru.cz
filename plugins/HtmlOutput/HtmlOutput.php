@@ -120,10 +120,16 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
     }
     $cacheKey = apc_get_key(__FUNCTION__);
+    $metaRobotsCacheKey = apc_get_key(__FUNCTION__."/robots");
     $useCache = false;
     $cfgMtime = filemtime(find_file($this->pluginDir."/".$this->className.".xml"));
     if (apc_exists($cacheKey)) {
       $useCache = apc_is_valid_cache($cacheKey, $cfgMtime);
+    }
+    if (apc_exists($metaRobotsCacheKey)) {
+      $this->metaRobots = apc_fetch($metaRobotsCacheKey);
+    } else {
+      $useCache = false;
     }
     if ($useCache) {
       return;
@@ -155,6 +161,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       Logger::error(sprintf(_("Unable to save %s file"), ROBOTS_TXT));
     }
     apc_store_cache($cacheKey, $cfgMtime, __FUNCTION__);
+    apc_store_cache($metaRobotsCacheKey, $metaRobots, __FUNCTION__."/robots");
   }
 
   /**

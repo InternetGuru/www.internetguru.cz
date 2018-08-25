@@ -36,7 +36,7 @@ class Canonical extends Plugin implements SplObserver, ModifyContentStrategyInte
   public function modifyContent (HTMLPlus $content) {
     $cfg = self::getXML();
     $ns = $content->documentElement->getAttribute('ns');
-    if ($ns === DOMAIN) {
+    if ($ns === HTTP_URL) {
       return;
     }
     $nsDomain = parse_url($ns);

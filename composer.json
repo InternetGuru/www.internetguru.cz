@@ -16,7 +16,8 @@
         "smallhadroncollider/uglify-php": "^1.0",
         "phpmailer/phpmailer": "^5.2",
         "InternetGuru/CodeMirror": "dev-master",
-        "InternetGuru/PhotoSwipe": "dev-dev"
+        "InternetGuru/PhotoSwipe": "dev-dev",
+        "czproject/git-php": "^3.14"
     },
     "autoload": {
         "psr-4": {

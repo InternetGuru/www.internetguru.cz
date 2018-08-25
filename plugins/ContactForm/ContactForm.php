@@ -168,9 +168,11 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
     /** @var DOMElementPlus $htmlForm */
     $htmlForm = $var->appendChild($doc->importNode($form, true));
     $formId = $htmlForm->getAttribute("id");
-    $htmlForm->removeAllAttributes(["id", "class"]);
+    $htmlForm->removeAllAttributes(["id", "class", "action", "var", "fn"]);
     $htmlForm->setAttribute("method", "post");
-    $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(get_link()));
+    if (!$htmlForm->hasAttribute("action")) {
+      $htmlForm->setAttribute("action", HTMLPlusBuilder::getLinkToId(get_link()));
+    }
     $htmlForm->setAttribute("id", "$prefix-$formId");
     $this->registerFormItems($htmlForm, "$prefix-$formId-");
     return $doc;
@@ -453,62 +455,19 @@ class ContactForm extends Plugin implements SplObserver, ModifyContentStrategyIn
       $adminname = "Jiří Pavelka";
       $bcc = "pavel@petrzela.eu";
     }
+    send_mail($adminaddr, $adminname, $email, $name, '', $msg, '', $bcc);
     if (!is_null(Cms::getLoggedUser())) {
-      Cms::notice("<pre><code class='nohighlight'>$msg</code></pre>");
       return;
     }
-    $this->sendMail($adminaddr, $adminname, $email, $name, $msg, $bcc);
-    Logger::mail(
-      sprintf(
-        _("Sending e-mail: %s"),
-        "to=$adminname<$adminaddr>; replyto=$name<$email>; bcc=$bcc; msg=$msg"
-      )
-    );
     if (strlen($this->formVars["sendcopy"])) {
       if (!strlen($this->formVars["email"])) {
         throw new Exception(_("Unable to send copy to empty client address"));
       }
       $msg = $this->formVars["copymsg"]."\n\n$msg";
       $bcc = "";
-      $this->sendMail($email, $name, $adminaddr, $adminname, $msg, $bcc);
+      send_mail($email, $name, $adminaddr, $adminname, $this->formVars["servername"], $msg, $this->formVars["subject"], $bcc);
     }
     redir_to(build_local_url(["path" => get_link(), "query" => "cfok=".$formIdToSend]));
-  }
-
-  /** @noinspection PhpTooManyParametersInspection */
-  /**
-   * @param string $mailto
-   * @param string $mailtoname
-   * @param string $replyto
-   * @param string $replytoname
-   * @param string $msg
-   * @param string $bcc
-   * @throws Exception
-   */
-  private function sendMail ($mailto, $mailtoname, $replyto, $replytoname, $msg, $bcc) {
-    if (self::DEBUG) {
-      echo $msg;
-      throw new Exception (sprintf("Sending e-mail to %s skipped", $mailto));
-    }
-    $mail = new PHPMailer;
-    $mail->CharSet = 'UTF-8';
-    $mail->setFrom("no-reply@".DOMAIN, $this->formVars["servername"]);
-    $mail->addAddress($mailto, $mailtoname);
-    $mail->Body = $msg;
-    $mail->Subject = sprintf(_("New massage from %s"), HTTP_HOST);
-    if (strlen($replyto)) {
-      $mail->addReplyTo($replyto, $replytoname);
-      $mail->Subject .= " [$replyto]";
-    }
-    if (strlen($this->formVars["subject"])) {
-      $mail->Subject = $this->formVars["subject"];
-    }
-    if (strlen($bcc)) {
-      $mail->addBCC($bcc, '');
-    }
-    if (!$mail->send()) {
-      throw new Exception($mail->ErrorInfo);
-    }
   }
 
   /**

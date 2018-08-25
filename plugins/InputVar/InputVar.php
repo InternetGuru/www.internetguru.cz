@@ -2,6 +2,8 @@
 
 namespace IGCMS\Plugins;
 
+use Cz\Git\GitException;
+use Cz\Git\GitRepository;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -10,6 +12,7 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\Git;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -46,6 +49,18 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @var array
    */
   private $vars = [];
+  /**
+   * @var string|null
+   */
+  private $message = null;
+  /**
+   * @var string|null
+   */
+  private $messageSubject = null;
+  /**
+   * @var string|null
+   */
+  private $messageTo = null;
 
   /**
    * InputVar constructor.
@@ -82,6 +97,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         if ($element->nodeName == "login") {
           continue;
         }
+        if ($element->nodeName == "message") {
+          continue;
+        }
         try {
           $element->getRequiredAttribute("id"); // only check
         } catch (Exception $exc) {
@@ -108,6 +126,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if ($exc->getCode() === 1) {
         Logger::user_error($exc->getMessage());
       } else {
+        Logger::user_error(_("Unexpected error occurred. Please contact website administrator."));
         Logger::critical($exc->getMessage());
       }
     }
@@ -136,6 +155,12 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     } else {
       Logger::info(sprintf(_('Form id %s anonymous request'), $this->formId));
     }
+    if (!isset($req["userfilehash"])) {
+      throw new Exception(_("Missing userfilehash value"), 1);
+    }
+    if ($req["userfilehash"] != file_hash($this->userCfgPath)) {
+      throw new Exception(_("Data file has changed during administration"), 1);
+    }
     $var = null;
     foreach ($req as $key => $value) {
       if (isset($this->vars[$key])) {
@@ -148,14 +173,70 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
     }
     if (is_null($var)) {
-     throw new Exception(_("No data to save"));
+     throw new Exception(_("No data to save"), 1);
     }
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if ($var->ownerDocument->save($this->userCfgPath) === false) {
-     throw new Exception(_("Unable to save user config"));
+    $toSave = $var->ownerDocument->saveXML();
+    if ($toSave !== file_get_contents($this->userCfgPath)) {
+      /** @var DOMDocumentPlus $document */
+      $document = new DOMDocumentPlus();
+      $document->loadXML($toSave);
+      $commit = $document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]);
+      if (!$commit) {
+        throw new Exception(_("Unable to save user config"), 1);
+      }
+      if (!is_null($this->message)) {
+        $this->sendDiffEmail($req["username"], $commit);
+      }
+      clear_nginx();
     }
-    clear_nginx();
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
+  }
+
+  /**
+   * @param string $user
+   * @param string $commit
+   * @throws GitException
+   */
+  private function sendDiffEmail ($user, $commit) {
+    try {
+      $repo = Git::Instance();
+    } catch (Exception $exc) {
+      return;
+    }
+    $diffLines = $repo->execute(['diff', "$commit~", "$commit"]);
+    $diff = "";
+    foreach ($diffLines as $key => $line) {
+      if ($key < 4) {
+        continue;
+      }
+      if (strpos($line, '-') !== 0 && strpos($line, '+') !== 0) {
+        continue;
+      }
+      $line = str_replace("</var>", "", $line);
+      $line = preg_replace("/ *<var [^>]+>/", "", $line);
+      $diff .= trim(html_entity_decode($line), "\n")."\n";
+    }
+    $vars = array_merge(Cms::getAllVariables(), [
+      'user' => [
+        'value' => $user,
+        'cacheable' => 'false',
+      ],
+      'diff' => [
+        'value' => $diff,
+        'cacheable' => 'false',
+      ],
+      'date' => [
+        'value' => date("j. n. Y H:i:s"),
+        'cacheable' => 'false',
+      ],
+    ]);
+    $message = replace_vars($this->message, $vars);
+    $subject = replace_vars($this->messageSubject, $vars);
+    try {
+      send_mail($this->messageTo, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
+    } catch (Exception $exc) {
+      Logger::error($exc->getMessage());
+    }
   }
 
   /**
@@ -168,6 +249,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       }
       if ($element->nodeName == "login") {
         $this->logins[$element->getRequiredAttribute('id')] = $element->getRequiredAttribute('password');
+      }
+      if ($element->nodeName == "message") {
+        $this->messageSubject = $element->getRequiredAttribute('subject');
+        $this->messageTo = $element->getRequiredAttribute('to');
+        $this->message = $element->nodeValue;
       }
     }
   }
@@ -467,6 +553,10 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $vars["action"] = [
       "value" => "?".$this->className,
       "cacheable" => true,
+    ];
+    $vars["userfilehash"] = [
+      "value" => file_hash($this->userCfgPath),
+      "cacheable" => false,
     ];
     $newContent->processVariables($vars);
     return $newContent;
