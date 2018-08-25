@@ -8,7 +8,6 @@ use DOMImplementation;
 use DOMXPath;
 use Exception;
 use IGCMS\Core\Cms;
-use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\ErrorPage;
@@ -28,7 +27,7 @@ use XSLTProcessor;
  * Class HtmlOutput
  * @package IGCMS\Plugins
  */
-class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface, ResourceInterface {
+class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface {
   /**
    * @var string
    */
@@ -89,6 +88,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @var string|null
    */
   private $metaRobots = null;
+  /**
+   * @var bool
+   */
+  private $useOg = false;
 
   /**
    * HtmlOutput constructor.
@@ -113,20 +116,52 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->cfg = self::getXML();
     $this->registerThemes($this->cfg);
-    $robots = $this->cfg->matchElement("robots", "domain", HTTP_HOST);
-    if (is_null($robots)) {
-      throw new Exception("Unable to match robots element to domain");
-    }
-    if (!$robots->hasAttribute("domain")) {
-      Logger::user_warning(_("Using default robots value (without domain match)"));
-    }
-    $this->metaRobots = $robots->getAttribute("meta");
-    if (stream_resolve_include_path(ROBOTS_TXT) && !@unlink(ROBOTS_TXT)) {
-      Logger::error(sprintf(_("Unable to delete %s file"), ROBOTS_TXT));
-    }
     if (is_null($this->favIcon)) {
       $this->favIcon = find_file($this->pluginDir."/".self::FAVICON);
     }
+    $cacheKey = apc_get_key(__FUNCTION__);
+    $metaRobotsCacheKey = apc_get_key(__FUNCTION__."/robots");
+    $useCache = false;
+    $cfgMtime = filemtime(find_file($this->pluginDir."/".$this->className.".xml"));
+    if (apc_exists($cacheKey)) {
+      $useCache = apc_is_valid_cache($cacheKey, $cfgMtime);
+    }
+    if (apc_exists($metaRobotsCacheKey)) {
+      $this->metaRobots = apc_fetch($metaRobotsCacheKey);
+    } else {
+      $useCache = false;
+    }
+    if ($useCache) {
+      return;
+    }
+    $metaRobots = "all";
+    $robotsFile = "User-agent: *";
+    $disallow = [];
+    $allowDomain = $this->cfg->matchElement("allow_domain", null, HTTP_HOST);
+    if (is_null($allowDomain)) {
+      $metaRobots = "noindex, nofollow";
+      $robotsFile = "User-agent: *\nDisallow: /";
+      $disallowDomain = $this->cfg->matchElement("disallow_domain", null, HTTP_HOST);
+      if (!is_null($disallowDomain)) {
+        Logger::user_warning(_("Robots disallowed due to no domain match"));
+      }
+    } else {
+      /** @var DOMElementPlus $disallow */
+      foreach ($this->cfg->getElementsByTagName('disallow') as $disallowElm) {
+        $disallow[] = $disallowElm->nodeValue;
+      }
+      if (count($disallow)) {
+        $robotsFile .= "\nDisallow: ".implode("\nDisallow: ", $disallow);
+      } else {
+        $robotsFile .= "\nDisallow:";
+      }
+    }
+    $this->metaRobots = $metaRobots;
+    if (!file_put_contents(ROBOTS_TXT, $robotsFile)) {
+      Logger::error(sprintf(_("Unable to save %s file"), ROBOTS_TXT));
+    }
+    apc_store_cache($cacheKey, $cfgMtime, __FUNCTION__);
+    apc_store_cache($metaRobotsCacheKey, $metaRobots, __FUNCTION__."/robots");
   }
 
   /**
@@ -152,28 +187,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
 
     // add root template files
     $this->addThemeFiles($cfg->documentElement);
-  }
-
-  /**
-   * @param string $filePath
-   * @return bool
-   */
-  public static function isSupportedRequest ($filePath) {
-    return $filePath === ROBOTS_TXT;
-  }
-
-  /**
-   * @return void
-   * @throws Exception
-   */
-  public static function handleRequest () {
-    $robots = self::getXML()->matchElement("robots", "domain", HTTP_HOST);
-    if (is_null($robots)) {
-      new ErrorPage("No matching robots element", 404);
-    }
-    header('Content-Type: text/plain');
-    echo $robots->nodeValue;
-    exit;
   }
 
   /**
@@ -352,6 +365,8 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       $contentPlus = $fcs->getContent($contentPlus);
     }
 
+    $this->useOg = $this->cfg->getElementById('og')->nodeValue == "enabled";
+
     // create output DOM with doctype
     $doc = $this->createDoc();
     $html = $this->addRoot($doc, $lang);
@@ -359,7 +374,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     // final validation
     $contentPlus->processFunctions(Cms::getAllFunctions());
     $xPath = new DOMXPath($contentPlus);
-    $this->addHead($doc, $html, $heading, $xPath);
 
     /** @var DOMElementPlus $element */
     foreach ($xPath->query("//*[@var]") as $element) {
@@ -393,6 +407,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     }
     $this->consolidateLang($contentPlus->documentElement, $lang);
 
+    $this->addHead($doc, $html, $heading, $xPath, $contentPlus);
     // import into html and save
     /** @var DOMElement $content */
     $content = $doc->importNode($contentPlus->documentElement, true);
@@ -521,6 +536,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $html->setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
     #$html->setAttribute("xml:lang", $lang);
     $html->setAttribute("lang", $lang);
+    if ($this->useOg) {
+      $html->setAttribute("prefix", "og: http://ogp.me/ns#");
+    }
     $doc->appendChild($html);
     return $html;
   }
@@ -531,9 +549,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
    * @param DOMElementPlus $h1
    * @param DOMXPath $xPath
    * @return DOMElement
+   * @param DOMDocumentPlus $content
    * @throws Exception
    */
-  private function addHead (DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath) {
+  private function addHead (DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath, DOMDocumentPlus $content) {
     $head = $doc->createElement("head");
     $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
     $this->appendMeta($head, "charset", "utf-8", false, true);
@@ -546,6 +565,9 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     foreach ($this->metaElements as $name => $metaElement) {
       $this->appendMeta($head, $name, $metaElement["content"], $metaElement["httpEquip"], $metaElement["short"]);
     }
+    if ($this->useOg) {
+      $this->setMetaOg($head, $content, $xPath);
+    }
     update_file($this->favIcon, self::FAVICON); // hash?
     $this->appendLinkElement($head, $this->getFavIcon(), "shortcut icon", false, false);
     foreach ($this->linkElements as $linkElement) {
@@ -554,6 +576,200 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
     $this->appendCssFiles($head, $xPath);
     $html->appendChild($head);
     return $head;
+  }
+
+  /**
+   * @param DOMElement $head
+   * @param DOMDocumentPlus $content
+   * @param DOMXPath $xpath
+   * @throws Exception
+   */
+  private function setMetaOg (DOMElement $head, DOMDocumentPlus $content, DOMXPath $xpath) {
+    $id = HTMLPlusBuilder::getLinkToId(get_link());
+    $type = 'website';
+    $images = [];
+    $dataAttrs = HTMLPlusBuilder::getIdToData($id);
+    if (is_null($dataAttrs)) {
+      $dataAttrs = [];
+    }
+    foreach ($dataAttrs as $name => $value) {
+      if (substr($name, 0, 3) !== 'og-') {
+        continue;
+      }
+      switch ($name) {
+        case 'og-image':
+          $urls = explode(' ', $value);
+          foreach ($urls as $url) {
+            $images[] = trim($url);
+          }
+        break;
+        case 'og-type':
+          $type = $value;
+          if ($type == 'article') {
+            $this->appendOgElement($head, 'og:article:published_time', HTMLPlusBuilder::getIdToCtime($id));
+            $mtime = HTMLPlusBuilder::getIdToMtime($id);
+            if ($mtime) {
+              $this->appendOgElement($head, 'og:article:modified_time', $mtime);
+            }
+            $this->appendOgElement($head, 'og:article:author', HTMLPlusBuilder::getIdToAuthor($id));
+          }
+        break;
+        case 'og-article-published_time':
+        case 'og-article-modified_time':
+        case 'og-article-author':
+        case 'og-title':
+        case 'og-description':
+        case 'og-site_name':
+        case 'og-url':
+        break;
+        default:
+          $this->appendOgElement($head, 'og:' . str_replace('-', ':', substr($name, 3)), $value);
+      }
+    }
+    if (empty($images)) {
+      /** @var DOMElement $img */
+      foreach ($content->getElementsByTagName('img') as $img) {
+        $src = $img->getAttribute('src');
+        try {
+          $dimensions = $this->getImageDimensions($src);
+        } catch (Exception $e) {
+          Logger::warning(sprintf(_('Unable to get image size: %s'), $e->getMessage()));
+          continue;
+        }
+        if ($dimensions[0] < 200 || $dimensions[1] < 200) {
+          // Logger::warning(sprintf(_('Image %s dimensions are smaler than 200px'), $src));
+          continue;
+        }
+        $images[] = $src;
+      }
+    }
+    $this->getConfigImages($xpath, $images);
+    foreach ($images as $url) {
+      if (strpos($url, 'http:') !== 0 && strpos($url, 'https:') !== 0) {
+        $url = HTTP_URL.'/'.ltrim($url, '/');
+      }
+      $this->appendOgElement($head, 'og:image', $url);
+    }
+    $this->appendOgElement($head, 'og:type', $type);
+    $this->appendOgElement($head, 'og:title', HTMLPlusBuilder::getIdToHeading($id));
+    $this->appendOgElement($head, 'og:description', HTMLPlusBuilder::getIdToDesc($id));
+    $this->appendOgElement($head, 'og:site_name ', current(HTMLPlusBuilder::getIdToHeading()));
+    $this->appendOgElement($head, 'og:url', HTTP_URL . '/' . get_link());
+  }
+
+  /**
+   * @param DOMXPath $xPath
+   * @param array $images
+   */
+  private function getConfigImages(DOMXPath $xPath, Array &$images) {
+    $configImages = $this->cfg->getElementsByTagName('og-image');
+    /** @var DOMElementPlus $img */
+    foreach ($configImages as $img) {
+      $ifXpath = $img->getAttribute('if-xpath');
+      /** @noinspection PhpUsageOfSilenceOperatorInspection */
+      if (strlen($ifXpath)) {
+        $result = @$xPath->query($ifXpath);
+        if ($result === false) {
+          Logger::user_warning(sprintf(_("Invalid xPath query '%s'"), $ifXpath));
+          continue;
+        }
+        if ($result->length === 0) {
+          continue;
+        }
+      }
+      $apply = $img->getAttribute('apply');
+      if ($apply != 'always') {
+        $apply = 'auto';
+      }
+      if ($apply == 'auto' && count($images)) {
+        continue;
+      }
+      $src = $img->getAttribute('src');
+      if (strlen($src)) {
+        $images[] = $src;
+      }
+      $genid = $img->getAttribute('gen');
+      if (!strlen($genid)) {
+        continue;
+      }
+      try {
+        $gen = $this->cfg->getElementById($genid, 'image-gen');
+        if (is_null($gen)) {
+          throw new Exception(sprintf(_('Generator %s does not exist'), $gen));
+        }
+      } catch (Exception $e) {
+        Logger::warning(sprintf(_('Unable to generate images: %s'), $e->getMessage()));
+        continue;
+      }
+      $count = $gen->getAttribute('count');
+      $grayscale = $gen->getAttribute('grayscale');
+      $blur = $gen->getAttribute('blur');
+      $count = min($count, 20);
+      if (!is_int($count) || $count < 0) {
+        $count = 10;
+      }
+      if (!is_numeric($grayscale) || $grayscale < 0 || $grayscale > 1) {
+        $grayscale = 0.2;
+      }
+      if (!is_numeric($blur) || $blur < 0 || $blur > 1) {
+        $blur = 0.2;
+      }
+      $randomImages = $this->getRandomImages(get_link(), $count, $grayscale, $blur);
+      foreach ($randomImages as $randomImage) {
+        $images[] = $randomImage;
+      }
+    }
+  }
+
+  /**
+   * @param $pageUrl
+   * @param $count
+   * @param $grayscale
+   * @param $blur
+   * @return array
+   */
+  private function getRandomImages ($pageUrl, $count, $grayscale, $blur) {
+    $urls = [];
+    $notfoundid = [97, 968, 963, 956, 934, 920, 917, 899, 897, 895, 86, 854, 850,
+      843, 812, 801, 792, 771, 763, 762, 761, 759, 754, 753, 752, 751, 750, 749,
+      748, 747, 746, 745, 734, 725, 720, 714, 713, 712, 711, 710, 709, 708, 707,
+      706, 697, 673, 647, 644, 636, 632, 624, 601, 597, 595, 592, 589, 587, 578,
+      561, 540, 489, 470, 463, 462, 438, 422, 414, 394, 359, 346, 333, 332, 303,
+      298, 286, 285, 262, 246, 245, 226, 224, 207, 205, 150, 148, 138, 105, 1046,
+      1034, 1030, 1017, 1007];
+
+    srand(crc32($pageUrl));
+    $imageid = range(0, 1084);
+    shuffle($imageid);
+    $gravity = ["north", "east", "south", "west", "center"];
+    for ($i = 0; $i < $count; $i++) {
+      $url = "https://picsum.photos/";
+      if ($grayscale != 0 && rand() % round(1 / $grayscale) == 0) {
+        $url .= "g/";
+      }
+      do {
+        $id = array_pop($imageid);
+      } while (in_array($id, $notfoundid));
+      $url .= "600/315/?image=".$id;
+      if ($blur != 0 && rand() % round(1 / $blur) == 0) {
+        $url .= "&blur";
+      }
+        $url .= "&gravity=".$gravity[rand(0, count($gravity)-1)];
+      $urls[] = $url;
+    }
+    return $urls;
+  }
+
+  /**
+   * @param DOMElement $head
+   * @param $name
+   * @param $value
+   */
+  private function appendOgElement (DOMElement $head, $name, $value) {
+    $meta = $head->ownerDocument->createElement("meta");
+    $meta->setAttribute('property', $name);
+    $meta->setAttribute('content', $value);
+    $head->appendChild($meta);
   }
 
   /**
@@ -662,7 +878,11 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
         }
       }
       $ieIfComment = isset($this->cssFiles[$key]["if"]) ? $this->cssFiles[$key]["if"] : null;
-      $filePath = ROOT_URL.get_resdir($this->cssFiles[$key]["file"]);
+      if (strpos($this->cssFiles[$key]["file"], 'http://') !== 0 && strpos($this->cssFiles[$key]["file"], 'https://') !== 0) {
+        $filePath = ROOT_URL.get_resdir($this->cssFiles[$key]["file"]);
+      } else {
+        $filePath = $this->cssFiles[$key]["file"];
+      }
       $this->appendLinkElement(
         $parent,
         $filePath,
@@ -951,7 +1171,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface,
       }
       $ieIfComment = isset($this->jsFiles[$key]["if"]) ? $this->jsFiles[$key]["if"] : null;
       if (!is_null($ieIfComment)) {
-        #$e->nodeValue = "�";
         $parent->appendChild(
           $parent->ownerDocument->createComment("[if $ieIfComment]>".$element->ownerDocument->saveXML($element)."<![endif]")
         );

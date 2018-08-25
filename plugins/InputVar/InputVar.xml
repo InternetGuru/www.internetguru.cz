@@ -99,7 +99,7 @@
     Uživatelská editace
 
     1) Element set
-      - atribut type: typ pole "select" nebo "text" (níže)
+      - atribut type: select | text | textarea
       - atribut for: jaké proměnné se mají editovat
         - jeden nebo více regulárních výrazů oddělených mezerou
       - hodnota elementu: název skupiny
@@ -119,7 +119,7 @@
       <var id="akce2" var="empty">Akce 2</var>
       <set type="select" for="akce\d " datalist="a\d+ empty">Akce</set>
 
-    b) Typ text
+    b) Typ text | textarea
       - atribut placeholder (nepovinný)
       - atribut pattern (nepovinný)
 
@@ -131,10 +131,35 @@
         pattern=".[5,20], \d\d Kč \(sleva \d\d %\)"
         placeholder="Čokoláda Orion, 22 Kč (sleva 20 %)">Akce</set>
 
-    2) Element passwd (volitelný)
-      - zabezpečení formuláře pomocí vlastního hesla
-        - otisk hesla vytvořený funkcí crypt (například příkazem "openssl passwd -1")
+    2) Element login (volitelný)
+      - atribut id:  jméno uživatele
+      - atribut password: otisk hesla vytvořený funkcí crypt
+      ^^ například příkazem "openssl passwd -1"
+
+    Například:
+      <login id="admin" password="$1$uvMgWfZe$MZGyiPRqL.YUDT3Jmurya0"/>
+
+    3) Element message
+      - atribut email: email na který se má zpráva poslat
+      - atribut subject: předmět emailu
+      - hodnota elementu: šablona zprávy
+      ^^ dostupné proměnné pro hodnotu elementu a atribut subject: $user, $diff, $date
+
+    Například:
+    <message to="pavel@petrzela.eu" subject="Změna obsahu na webu $cms-url">Dobrý den,
+  na webu $cms-url došlo k uživatelské změně obsahu.
+  - uživatel: $user
+  - čas změny: $date
+  - uživatelská administrace: $cms-url/?InputVar
+  - výsledek: $cms-url/listek
+
+  Následuje výspis rozdílů:
+
+  $diff
+
+  \-\-
+  $inputvar-service_plain
+    </message>
 
    -->
-
 </InputVar>

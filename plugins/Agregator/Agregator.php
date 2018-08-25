@@ -169,15 +169,15 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
    */
   private function processFor ($listClass, $doclistId, DOMElementPlus $docList) {
     $for = $docList->getAttribute("for");
+    if (!strlen($for)) {
+      return $doclistId;
+    }
     if (!array_key_exists($for, $_GET)) {
       return $doclistId;
     }
     $this->doclistExists($listClass, $for);
     if ($doclistId != $_GET[$for]) {
       return $doclistId;
-    }
-    if (!array_key_exists($for, $this->lists[$listClass])) {
-      throw new Exception(sprintf(_("Undefined %s id '%s'"), $docList->nodeName, $for));
     }
     if (!$docList->hasAttribute($docList->nodeName)) {
       $docList->setAttribute($docList->nodeName, $for);
@@ -221,6 +221,9 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
       return;
     }
     if (!strlen($ref)) {
+      if ($template->hasAttribute("for")) {
+        return;
+      }
       throw new Exception(sprintf(_("No content"), $templateId));
     }
     $this->doclistExists($listClass, $ref);
@@ -242,3 +245,4 @@ class Agregator extends Plugin implements SplObserver, GetContentStrategyInterfa
   }
 
 }
+

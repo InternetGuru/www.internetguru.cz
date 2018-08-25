@@ -19,6 +19,12 @@
     Config.noprintClass = "noprint"
     Config.dataHere = "data-" + Config.ns + "-here"
     Config.dataBefore = "data-" + Config.ns + "-before"
+    Config.css = '/* hideables.js */'
+      + ' .' + Config.hideClass + ' { display: none !important; }'
+      + ' a.' + Config.switchClass + ' { text-decoration: none; border: none !important; }'
+      + ' a.' + Config.switchClass + ':before { font-family: "Emilbus Mono", "Lucida Console", monospace; margin-right: 0.3em; }'
+      + '.' + Config.hideableHiddenClass + ' a.' + Config.switchClass + ':before { content: "' + Config.expand + '" }'
+      + '.' + Config.hideableNohideClass + ' a.' + Config.switchClass + ':before { content: "' + Config.collapse + '" }'
 
     var Hideable = function() {
 
@@ -42,14 +48,11 @@
       var createToggleButton = function (value) {
         var link = document.createElement('a')
         link.href = 'Javascript:void(0)'
-        var linkButton = document.createElement('span')
-        linkButton.innerHTML = Config.collapse
-        link.appendChild(linkButton)
         link.title = Config.collapseTitle
         link.classList.add(Config.switchClass)
         link.classList.add(Config.noprintClass)
         link.addEventListener('click', toggle, false)
-        link.innerHTML += ' ' + value
+        link.innerHTML = value
         return link
       }
 
@@ -87,16 +90,13 @@
 
       var toggleElement = function (link) {
         var e = link.parentNode.parentNode
-        var linkButton = link.children[0]
         if (e.classList.contains(Config.hideableNohideClass)) {
           e.classList.remove(Config.hideableNohideClass)
           e.classList.add(Config.hideableHiddenClass)
-          linkButton.innerHTML = Config.expand
           link.title = Config.expandTitle
         } else {
           e.classList.remove(Config.hideableHiddenClass)
           e.classList.add(Config.hideableNohideClass)
-          linkButton.innerHTML = Config.collapse
           link.title = Config.collapseTitle
         }
         for (var i = e.childNodes.length - 1; i > 0; i--) {
@@ -123,13 +123,7 @@
         init : function(cfg) {
           if(inited) return;
           IGCMS.initCfg(Config, cfg);
-          var css = '/* hideables.js */'
-            + ' .' + Config.hideClass + ' { display: none !important; }'
-            + ' a.' + Config.switchClass + ' span { font-family: "Emilbus Mono", "Lucida Console", monospace; }'
-            + ' a.' + Config.switchClass + ' { text-decoration: none;'
-            + ' border: none !important;'
-            + ' font-weight: 600; }';
-          IGCMS.appendStyle(css);
+          IGCMS.appendStyle(Config.css);
           initHideables();
           inited = true;
         },

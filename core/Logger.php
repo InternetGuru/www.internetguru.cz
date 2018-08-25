@@ -149,7 +149,7 @@ class Logger {
     $logger = self::getMonolog($type);
     $monologLevel = self::parseLevel($level);
     $logger->{'add'.$level}($message);
-    if (!Cms::isSuperUser()) {
+    if (!Cms::isSuperUser() && $type !== self::TYPE_USER_LOG) {
       return;
     }
     switch ($monologLevel) {

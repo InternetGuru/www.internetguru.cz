@@ -40,7 +40,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
       return;
     }
     $xml = self::getXML();
-    $themeColor = $xml->getElementsByTagName("themeColor")[0]->nodeValue;
+    $themeColor = $xml->getElementById("themeColor")->nodeValue;
     // add meta
     $outputStrategy = Cms::getOutputStrategy();
     $outputStrategy->addMetaElement("theme-color", $themeColor);
@@ -55,23 +55,24 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
       return;
     }
     // load and process variables
-    $manifestTemplate = $xml->getElementsByTagName("manifest")[0]->nodeValue;
+    $manifestTemplate = $xml->getElementById("manifest")->nodeValue;
     $h1id = HTMLPlusBuilder::getLinkToId("");
-    $name = $xml->getElementsByTagName("name");
-    $shortName = $xml->getElementsByTagName("shortName");
-    if ($name->length) {
-      $name = $name->item(0)->nodeValue;
+    $name = $xml->getElementById("name");
+    $shortName = $xml->getElementById("shortName");
+    if (!is_null($name)) {
+      $name = $name->nodeValue;
     } else {
       $name = HTMLPlusBuilder::getIdToHeading($h1id);
     }
-    if ($shortName->length) {
-      $shortName = $shortName->item(0)->nodeValue;
+    if (!is_null($shortName)) {
+      $shortName = $shortName->nodeValue;
     } else {
       $shortName = HTMLPlusBuilder::getHeading($h1id);
     }
     if (mb_strlen($shortName) > 12 && !is_null(Cms::getLoggedUser())) {
       Logger::warning(_("Manifest short_name is longer than 12 characters"));
     }
+
     // save manifest
     file_put_contents(self::MANIFEST, replace_vars($manifestTemplate, [
       "name" => [

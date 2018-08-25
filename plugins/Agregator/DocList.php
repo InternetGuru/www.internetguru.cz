@@ -42,7 +42,11 @@ class DocList extends AgregatorList {
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
     $newestFileMtime = DOMBuilder::getNewestFileMtime();
-    $cacheKey = apc_get_key(__FUNCTION__."/".self::APC_ID."/".$this->listId);
+    $cacheKey = apc_get_key(
+      __FUNCTION__."/"
+      .self::APC_ID."/"
+      .$this->listId."/"
+      .hash("sha1", serialize($doclist)));
     $cacheExists = apc_exists($cacheKey);
     $cacheUpTodate = false;
     $cache = null;

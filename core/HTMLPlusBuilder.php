@@ -30,7 +30,11 @@ class HTMLPlusBuilder extends DOMBuilder {
   /**
    * @var int
    */
-  const APC_ID = 0;
+  const APC_ID = 1;
+  /**
+   * @var bool
+   */
+  const USE_APC = true;
   /**
    * @var array
    */
@@ -142,6 +146,7 @@ class HTMLPlusBuilder extends DOMBuilder {
   /**
    * @param string $id
    * @return array
+   * @throws \ReflectionException
    */
   public static function getIdToAll ($id) {
     $register = [];
@@ -215,7 +220,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     $cacheKey = apc_get_key(self::APC_ID."/".__FUNCTION__."/".$filePath);
     $useCache = false;
     $cache = null;
-    if (apc_exists($cacheKey)) {
+    if (apc_exists($cacheKey) && self::USE_APC) {
       $cache = apc_fetch($cacheKey);
       $useCache = self::isValidApc($cache["currentFileTo"], $cache["currentIdTo"]);
     }
@@ -535,6 +540,7 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @param DOMElementPlus $h
    */
   private static function setHeadingInfo ($id, DOMElementPlus $h) {
+    self::registerIdToData($h->parentNode, $id);
     self::$currentIdTo["idToShort"][$id] = $h->getAttribute("short");
     self::$currentIdTo["idToHeading"][$id] = $h->nodeValue;
     self::$currentIdTo["idToDesc"][$id] = $h->nextElement->nodeValue;

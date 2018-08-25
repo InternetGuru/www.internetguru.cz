@@ -258,6 +258,7 @@ class ValidateForm extends Plugin implements SplObserver, ModifyContentStrategyI
     $req = $e->hasAttribute("required");
     switch ($e->nodeName) {
       case "textarea":
+        $pattern = $e->getAttribute("data-pattern");
         $this->verifyText($value, $pattern, $req, self::TEXTAREA_MAX_LEN);
         break;
       case "input":

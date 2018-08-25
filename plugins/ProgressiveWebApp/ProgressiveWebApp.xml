@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ProgressiveWebApp>
 
-  <!--<name></name>-->
-  <!--<shortName></shortName>-->
-  <themeColor modifyonly="modifyonly">#ddd</themeColor>
-  <manifest modifyonly="modifyonly">
+  <!--<var id="name"></var>-->
+  <!--<var id="shortName"></var>-->
+  <var id="themeColor" modifyonly="modifyonly">#ddd</var>
+  <var id="manifest" modifyonly="modifyonly">
 {
   "name": "$name",
   "short_name": "$shortName",
@@ -25,6 +25,6 @@
     }
   ]
 }
-  </manifest>
+  </var>
 
 </ProgressiveWebApp>

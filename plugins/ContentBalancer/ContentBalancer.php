@@ -3,6 +3,7 @@
 namespace IGCMS\Plugins;
 
 use Exception;
+use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\ErrorPage;
@@ -209,6 +210,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     $prefixId = $content->documentElement->firstElement->getAttribute("id");
     $content = $this->strip($content);
     $h1id = $content->documentElement->firstElement->getAttribute("id");
+    Cms::setVariable('h1id', $h1id);
     if ($h1id != $prefixId) {
       $h1id = "$prefixId/$h1id";
     }

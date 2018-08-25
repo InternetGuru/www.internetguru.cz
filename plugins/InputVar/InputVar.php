@@ -2,6 +2,8 @@
 
 namespace IGCMS\Plugins;
 
+use Cz\Git\GitException;
+use Cz\Git\GitRepository;
 use DOMElement;
 use DOMNode;
 use DOMText;
@@ -10,6 +12,7 @@ use IGCMS\Core\Cms;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\GetContentStrategyInterface;
+use IGCMS\Core\Git;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
@@ -35,9 +38,9 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    */
   private $formId = null;
   /**
-   * @var string|null
+   * @var array|null
    */
-  private $passwd = null;
+  private $logins = null;
   /**
    * @var string
    */
@@ -46,6 +49,18 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * @var array
    */
   private $vars = [];
+  /**
+   * @var string|null
+   */
+  private $message = null;
+  /**
+   * @var string|null
+   */
+  private $messageSubject = null;
+  /**
+   * @var string|null
+   */
+  private $messageTo = null;
 
   /**
    * InputVar constructor.
@@ -79,7 +94,10 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         if ($element->nodeName == "set") {
           continue;
         }
-        if ($element->nodeName == "passwd") {
+        if ($element->nodeName == "login") {
+          continue;
+        }
+        if ($element->nodeName == "message") {
           continue;
         }
         try {
@@ -108,6 +126,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if ($exc->getCode() === 1) {
         Logger::user_error($exc->getMessage());
       } else {
+        Logger::user_error(_("Unexpected error occurred. Please contact website administrator."));
         Logger::critical($exc->getMessage());
       }
     }
@@ -124,8 +143,23 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (is_null($req)) {
       return;
     }
-    if (isset($req["passwd"]) && !hash_equals($this->passwd, crypt($req["passwd"], $this->passwd))) {
-      throw new Exception(_("Incorrect password"), 1);
+    if (!empty($this->logins)) {
+      if (!isset($req["username"]) || !isset($req["passwd"])) {
+        throw new Exception(_("Invalid credentials"), 1);
+      }
+      Logger::info(sprintf(_('Form id %s request from username %s'), $this->formId, $req["username"]));
+      if (!isset($this->logins[$req["username"]])
+        || !hash_equals($this->logins[$req["username"]], crypt($req["passwd"], $this->logins[$req["username"]]))) {
+        throw new Exception(_("Invalid username or password"), 1);
+      }
+    } else {
+      Logger::info(sprintf(_('Form id %s anonymous request'), $this->formId));
+    }
+    if (!isset($req["userfilehash"])) {
+      throw new Exception(_("Missing userfilehash value"), 1);
+    }
+    if ($req["userfilehash"] != file_hash($this->userCfgPath)) {
+      throw new Exception(_("Data file has changed during administration"), 1);
     }
     $var = null;
     foreach ($req as $key => $value) {
@@ -138,13 +172,71 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
         $var = $this->vars[$key];
       }
     }
-    /** @noinspection PhpUsageOfSilenceOperatorInspection */
-    if (@$var->ownerDocument->save($this->userCfgPath) === false) {
-      throw new Exception(_("Unable to save user config"));
+    if (is_null($var)) {
+     throw new Exception(_("No data to save"), 1);
     }
-    #if(!isset($_GET[DEBUG_PARAM]) || $_GET[DEBUG_PARAM] != DEBUG_ON)
-    clear_nginx();
+    $toSave = $var->ownerDocument->saveXML();
+    if ($toSave !== file_get_contents($this->userCfgPath)) {
+      /** @var DOMDocumentPlus $document */
+      $document = new DOMDocumentPlus();
+      $document->loadXML($toSave);
+      $commit = $document->save($this->userCfgPath, null, 'InputVar user save', $req["username"]);
+      if (!$commit) {
+        throw new Exception(_("Unable to save user config"), 1);
+      }
+      if (!is_null($this->message)) {
+        $this->sendDiffEmail($req["username"], $commit);
+      }
+      clear_nginx();
+    }
     redir_to(build_local_url(["path" => get_link(), "query" => $this->className."&".$this->getOk], true));
+  }
+
+  /**
+   * @param string $user
+   * @param string $commit
+   * @throws GitException
+   */
+  private function sendDiffEmail ($user, $commit) {
+    try {
+      $repo = Git::Instance();
+    } catch (Exception $exc) {
+      return;
+    }
+    $diffLines = $repo->execute(['diff', "$commit~", "$commit"]);
+    $diff = "";
+    foreach ($diffLines as $key => $line) {
+      if ($key < 4) {
+        continue;
+      }
+      if (strpos($line, '-') !== 0 && strpos($line, '+') !== 0) {
+        continue;
+      }
+      $line = str_replace("</var>", "", $line);
+      $line = preg_replace("/ *<var [^>]+>/", "", $line);
+      $diff .= trim(html_entity_decode($line), "\n")."\n";
+    }
+    $vars = array_merge(Cms::getAllVariables(), [
+      'user' => [
+        'value' => $user,
+        'cacheable' => 'false',
+      ],
+      'diff' => [
+        'value' => $diff,
+        'cacheable' => 'false',
+      ],
+      'date' => [
+        'value' => date("j. n. Y H:i:s"),
+        'cacheable' => 'false',
+      ],
+    ]);
+    $message = replace_vars($this->message, $vars);
+    $subject = replace_vars($this->messageSubject, $vars);
+    try {
+      send_mail($this->messageTo, '', 'info@internetguru.cz', 'Internet Guru', '', $message, $subject, '');
+    } catch (Exception $exc) {
+      Logger::error($exc->getMessage());
+    }
   }
 
   /**
@@ -155,8 +247,13 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       if ($element->nodeName == "var") {
         $this->vars[$element->getRequiredAttribute("id")] = $element;
       }
-      if ($element->nodeName == "passwd") {
-        $this->passwd = $element->nodeValue;
+      if ($element->nodeName == "login") {
+        $this->logins[$element->getRequiredAttribute('id')] = $element->getRequiredAttribute('password');
+      }
+      if ($element->nodeName == "message") {
+        $this->messageSubject = $element->getRequiredAttribute('subject');
+        $this->messageTo = $element->getRequiredAttribute('to');
+        $this->message = $element->nodeValue;
       }
     }
   }
@@ -374,7 +471,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       throw new Exception(_("No replacement found"));
     }
     return function(DOMNode $node) use ($pattern, $replacement) {
-      return preg_replace("/^(?:".$pattern.")$/", $replacement, htmlspecialchars($node->nodeValue));
+      return preg_replace("/$pattern/", $replacement, htmlspecialchars($node->nodeValue));
     };
   }
 
@@ -424,6 +521,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     if (!isset($_GET[$this->className])) {
       return null;
     }
+    $sets = $this->cfg->getElementsByTagName("set");
+    if (!$sets->length) {
+      Logger::warning(_('No set elements found'));
+      return null;
+    }
     $newContent = self::getHTMLPlus();
     /** @var DOMElementPlus $form */
     $form = $newContent->getElementsByTagName("form")->item(0);
@@ -431,7 +533,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     /** @var DOMElementPlus $fieldset */
     $fieldset = $newContent->getElementsByTagName("fieldset")->item(0);
     /** @var DOMElementPlus $setElm */
-    foreach ($this->cfg->getElementsByTagName("set") as $setElm) {
+    foreach ($sets as $setElm) {
       try {
         $setElm->getRequiredAttribute("type"); // only check
       } catch (Exception $exc) {
@@ -442,7 +544,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     }
     $fieldset->parentNode->removeChild($fieldset);
     $vars = [];
-    if (is_null($this->passwd)) {
+    if (is_null($this->logins)) {
       $vars["nopasswd"] = [
         "value" => "",
         "cacheable" => true,
@@ -451,6 +553,10 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $vars["action"] = [
       "value" => "?".$this->className,
       "cacheable" => true,
+    ];
+    $vars["userfilehash"] = [
+      "value" => file_hash($this->userCfgPath),
+      "cacheable" => false,
     ];
     $newContent->processVariables($vars);
     return $newContent;
@@ -465,6 +571,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   private function createFieldset (HTMLPlus $content, DOMElementPlus $fieldset, DOMElementPlus $set) {
     switch ($set->getAttribute("type")) {
       case "text":
+      case "textarea":
       case "select":
         $this->createFs($content, $fieldset, $set, $set->getAttribute("type"));
         break;
@@ -492,7 +599,8 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $doc->appendChild($doc->importNode($fieldset, true));
       switch ($type) {
         case "text":
-          $inputVar = $this->createTextFs($list, $set);
+        case "textarea":
+          $inputVar = $this->createTextFs($list, $set, $type);
           break;
         case "select":
           $inputVar = $this->createSelectFs($list, $set);
@@ -539,10 +647,11 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
    * TODO refactor: neopakovat kod ...
    * @param array $list
    * @param DOMElementPlus $set
+   * @param string $type
    * @return DOMNode
    * @throws Exception
    */
-  private function createTextFs (Array $list, DOMElementPlus $set) {
+  private function createTextFs (Array $list, DOMElementPlus $set, $type) {
     $inputDoc = new DOMDocumentPlus();
     $inputVar = $inputDoc->appendChild($inputDoc->createElement("var"));
     $dlElm = $inputVar->appendChild($inputDoc->createElement("dl"));
@@ -554,17 +663,29 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
       $label->setAttribute("for", $varElmId);
       $dlElm->appendChild($dtElm);
       $ddElm = $inputDoc->createElement("dd");
-      $text = $inputDoc->createElement("input");
+
+      if ($set->getAttribute("type") == "textarea") {
+        $text = $inputDoc->createElement("textarea");
+        $text->setAttribute("cols", 10);
+        $text->setAttribute("rows", 3);
+        if ($set->hasAttribute("pattern")) {
+          $text->setAttribute("data-pattern", $set->getAttribute("pattern"));
+        }
+        $text->nodeValue = $varElm->nodeValue;
+      } else {
+        $text = $inputDoc->createElement("input");
+        $text->setAttribute("type", "text");
+        if ($set->hasAttribute("pattern")) {
+          $text->setAttribute("pattern", $set->getAttribute("pattern"));
+        }
+        $text->setAttribute("value", $varElm->nodeValue);
+      }
+
       $ddElm->appendChild($text);
-      $text->setAttribute("type", "text");
       $text->setAttribute("id", $varElmId);
       $text->setAttribute("name", $varElm->getAttribute("id"));
-      $text->setAttribute("value", $varElm->nodeValue);
       if ($set->hasAttribute("placeholder")) {
         $text->setAttribute("placeholder", $set->getAttribute("placeholder"));
-      }
-      if ($set->hasAttribute("pattern")) {
-        $text->setAttribute("pattern", $set->getAttribute("pattern"));
       }
       if ($varElm->hasAttribute("required")) {
         $text->setAttribute("required", $varElm->getAttribute("required"));

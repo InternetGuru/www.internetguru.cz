@@ -1,7 +1,9 @@
 <?php
 
+use Cz\Git\GitException;
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\Git;
 use IGCMS\Core\Logger;
 
 /**
@@ -225,8 +227,13 @@ function build_local_url (Array $pLink, $ignoreCyclic = false, $addPermParam = t
     add_perm_param($pLink);
   }
   $cyclic = !$ignoreCyclic && is_cyclic_link($pLink);
-  if ($cyclic && !isset($pLink["fragment"])) {
-    throw new Exception(_("Link is cyclic"));
+  if ($cyclic) {
+    if (isset($pLink["fragment"])) {
+      $fragment = $pLink["fragment"];
+      $pLink = ["fragment" => $fragment];
+    } else {
+      throw new Exception(_("Link is cyclic"));
+    }
   }
   if (!isset($pLink["path"])) {
     return implode_link($pLink);
@@ -264,7 +271,7 @@ function build_local_url (Array $pLink, $ignoreCyclic = false, $addPermParam = t
  * @return bool
  */
 function is_cyclic_link (Array $pLink) {
-  if (isset($pLink["fragment"])) {
+  if (isset($pLink["fragment"]) && !isset($pLink["id"])) {
     return false;
   }
   if (isset($pLink["path"]) && $pLink["path"] != get_link()
@@ -410,6 +417,13 @@ function fput_contents ($dest, $string) {
     throw new Exception(_("Unable to save content"));
   }
   copy_plus("$dest.new", $dest, false);
+  // commit only if repo exists
+  try {
+    $gitRepo = Git::Instance();
+  } catch (GitException $exc) {
+    return;
+  }
+  $gitRepo->commitFile($dest);
 }
 
 /**
@@ -986,4 +1000,49 @@ function rmdir_plus ($dir) {
     $todo($fileinfo->getRealPath());
   }
   rmdir($dir);
+}
+
+/**
+ * @param string $mailto
+ * @param string $mailtoname
+ * @param string $replyto
+ * @param string $replytoname
+ * @param string $fromName
+ * @param string $msg
+ * @param string $subject
+ * @param string $bcc
+ * @throws Exception
+ */
+function send_mail ($mailto, $mailtoname, $replyto, $replytoname, $fromName, $msg, $subject, $bcc) {
+  Logger::mail(
+    sprintf(
+      _("Sending e-mail: %s"),
+      "to=$mailtoname<$mailto>; replyto=$replytoname<$replyto>; bcc=$bcc; subject=$subject; msg=$msg"
+    )
+  );
+  if (!is_null(Cms::getLoggedUser())) {
+    Cms::notice("<pre><code class='nohighlight'>$msg</code></pre>");
+    return;
+  }
+  $mail = new PHPMailer;
+  $mail->CharSet = 'UTF-8';
+  $mail->setFrom("no-reply@".DOMAIN, $fromName);
+  foreach (explode(" ", $mailto) as $email) {
+    $mail->addAddress($email, $mailtoname);
+  }
+  $mail->Body = $msg;
+  $mail->Subject = sprintf(_("New massage from %s"), HTTP_HOST);
+  if (strlen($replyto)) {
+    $mail->addReplyTo($replyto, $replytoname);
+    $mail->Subject .= " [$replyto]";
+  }
+  if (strlen($subject)) {
+    $mail->Subject = $subject;
+  }
+  if (strlen($bcc)) {
+    $mail->addBCC($bcc, '');
+  }
+  if (!$mail->send()) {
+    throw new Exception($mail->ErrorInfo);
+  }
 }

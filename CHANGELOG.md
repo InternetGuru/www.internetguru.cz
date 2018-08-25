@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.13.0] - 2018-06-26
+### Added
+ - InputVar user administration supports multiple logins
+ - Plugin Canonical
+ - Open Graph protocol support
+ - Inputvar supports textarea set
+ - UrlHandler supports notfound
+
+### Changed
+ - Improve robots syntax
+ - Hideable icon is defined by css
+ - Configurable Hideable css
+
 ## [2.12.2] - 2018-07-06
 ### Fixed
  - Admin save does not keep changed file warning
@@ -54,7 +67,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.10.10] - 2018-05-16
 ### Changed
- - Default powerded by is Nestárnoucí weby
+ - Powerded by Nestarnouci weby by default
 
 ## [2.10.9] - 2018-05-14
 ### Fixed
@@ -401,6 +414,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[2.13.0]: https://bitbucket.org/igwr/cms/compare/v2.13.0..v2.12.2
 [2.12.2]: https://bitbucket.org/igwr/cms/compare/v2.12.2..v2.12.1
 [2.12.1]: https://bitbucket.org/igwr/cms/compare/v2.12.1..v2.12.0
 [2.12.0]: https://bitbucket.org/igwr/cms/compare/v2.12.0..v2.11.5

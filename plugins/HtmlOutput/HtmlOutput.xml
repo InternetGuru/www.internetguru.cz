@@ -108,6 +108,7 @@
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editable.js</jsFile>
   <jsFile append="body" if-xpath="//*[contains(@class, 'editable')]">themes/editableinit.js</jsFile>
   <jsFile append="body" if-xpath="//select[contains(@class, 'completable')]">themes/completable.js</jsFile>
+  <jsFile append="body" if-xpath="//textarea[@data-pattern]">themes/validate-textarea.js</jsFile>
 
   <!-- Photoswipe -->
   <stylesheet if-xpath="//*[contains(@class, 'photoswipe')]">vendor/internetguru/photoswipe/dist/photoswipe.css</stylesheet>
@@ -120,19 +121,49 @@
   <!-- <favicon>themes/myFavicon.ico</favicon> -->
 
   <!-- robots.txt and meta robots -->
-  <robots readonly="readonly" meta="noindex, nofollow">User-agent: *
-Disallow: /</robots>
-  <robots domain="*.internetguru.cz" readonly="readonly" meta="noindex, nofollow">User-agent: *
-Disallow: /</robots>
-  <robots domain="www.*.*" readonly="readonly" meta="all">User-agent: *
-Disallow:</robots>
-  <robots domain="*.localhost.cz" readonly="readonly" meta="noindex, nofollow">User-agent: *
-Disallow: /</robots>
+  <robots>
+    <!--
+    disallow all by default with a warning
+    use disallow_domain tag to suppress warning
+    -->
+    <allow_domain>*.localhost.cz</allow_domain>
+    <allow_domain>www.*.*</allow_domain>
+    <disallow>/?LogViewer</disallow>
+    <disallow>/?Admin</disallow>
+    <disallow>/?Convertor</disallow>
+  </robots>
 
   <!-- Favicons -->
   <var id="error" modifyonly="modifyonly">data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%02%00%00%00%90%91h6%00%00%00%19IDAT(%91c%BCd%AB%C2%40%0A%60%22I%F5%A8%86Q%0DCJ%03%00%DE%B5%01S%07%88%8FG%00%00%00%00IEND%AEB%60%82</var>
   <var id="warning" modifyonly="modifyonly">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QUZFQUZBMTkwQTEyMTFFNTkzNDZEQzNFMkEzODgxRUUiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QUZFQUZBMUEwQTEyMTFFNTkzNDZEQzNFMkEzODgxRUUiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpBRkVBRkExNzBBMTIxMUU1OTM0NkRDM0UyQTM4ODFFRSIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpBRkVBRkExODBBMTIxMUU1OTM0NkRDM0UyQTM4ODFFRSIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Pi0y9jUAAAAaSURBVHjaYlxWwUASYGJgGNUwqmG4agAIMACehwE+QRw0MgAAAABJRU5ErkJggg==</var>
   <var id="success" modifyonly="modifyonly">data:image/png,%89PNG%0D%0A%1A%0A%00%00%00%0DIHDR%00%00%00%10%00%00%00%10%08%02%00%00%00%90%91h6%00%00%00%19IDAT(%91c%0C%DD%10%C5%40%0A%60%22I%F5%A8%86Q%0DCJ%03%00dy%01%7F%0C%9F0%7D%00%00%00%00IEND%AEB%60%82</var>
   <var id="notice" modifyonly="modifyonly">data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6OEJENDBDN0YwQTEyMTFFNTgwNzVEMUVDMTZEOEE0ODciIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6OEJENDBDODAwQTEyMTFFNTgwNzVEMUVDMTZEOEE0ODciPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDo4QkQ0MEM3RDBBMTIxMUU1ODA3NUQxRUMxNkQ4QTQ4NyIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDo4QkQ0MEM3RTBBMTIxMUU1ODA3NUQxRUMxNkQ4QTQ4NyIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/PjGqmSUAAAAcSURBVHjaYmSQ+M9ACmBiIBGMahjVMHQ0AAQYAIeAATeNcdSsAAAAAElFTkSuQmCC</var>
+
+  <!-- Opengraph Protocol (OG) -->
+
+  <!--Enable / disable OG -->
+  <var id="og">enabled</var>
+
+  <!-- Image generator
+  Atomatically generates random images from picsum.photos
+
+  Element(s) image-gen
+  Attributes:
+    - id ... id of image generator
+    - count ... number of images to generate, default 10 (max 20)
+    - grayscale, blur ... occurence of image type (from 0 to 1), default 0.2
+  -->
+  <image-gen id="default-gen"/>
+
+  <!-- Default OG image
+
+  Element(s) og-image
+  Attributes:
+    - gen ... image generator id
+    - src ... default image source path
+    - if-xpath ... apply to pages matching if-xpath (default all pages)
+    - apply ... [always] or [auto] only when no other images (default)
+  -->
+  <og-image gen="default-gen"/>
 
 </HtmlOutput>

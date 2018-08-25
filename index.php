@@ -3,6 +3,7 @@
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\ErrorPage;
+use IGCMS\Core\Git;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugins;
