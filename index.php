@@ -115,8 +115,7 @@ try {
   }
 
   if (stream_resolve_include_path(WATCH_USER_FILEPATH_TMP)) {
-    //unlink(WATCH_USER_FILEPATH_TMP);
-    Logger::info("TODO unlink WATCH_USER_FILEPATH_TMP");
+    unlink(WATCH_USER_FILEPATH_TMP);
   }
 
   Cms::getMessages();
