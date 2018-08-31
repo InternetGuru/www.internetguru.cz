@@ -440,9 +440,6 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if (!Cms::isSuperUser()) {
       return;
     }
-    // if (isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) {
-    //   return;
-    // }
     foreach (get_modified_files() as $filePath) {
       $rootDir = substr($filePath, 0, strpos($filePath, "/"));
       if (!array_key_exists($rootDir, self::$fileFolders)) {
