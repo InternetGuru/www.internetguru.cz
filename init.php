@@ -71,6 +71,8 @@ define('ADMIN_ROOT_FOLDER', WWW_FOLDER."/".ADMIN_ROOT_DIR);
 define('USER_ROOT_FOLDER', WWW_FOLDER."/".USER_ROOT_DIR);
 define('ADMIN_FOLDER', ADMIN_ROOT_FOLDER."/".HTTP_HOST);
 define('USER_FOLDER', USER_ROOT_FOLDER."/".ADMIN_ID."/".HTTP_HOST);
+define("WATCH_USER_FILEPATH", USER_FOLDER."/.watch_user");
+define("WATCH_USER_FILEPATH_TMP", WATCH_USER_FILEPATH.".tmp");
 define('LOG_FOLDER', WWW_FOLDER."/".LOG_DIR."/".HTTP_HOST);
 define('CMS_DEBUG', is_file(DEBUG_FILE));
 define("SCHEME", (@$_SERVER["HTTPS"] == "on" ? "https" : "http"));

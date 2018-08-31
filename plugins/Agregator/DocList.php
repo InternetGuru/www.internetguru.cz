@@ -32,6 +32,10 @@ class DocList extends AgregatorList {
    * @var string
    */
   private $keyword;
+  /**
+   * @var string
+   */
+  private $dirPrefix;
 
   /**
    * DocList constructor.
@@ -42,20 +46,21 @@ class DocList extends AgregatorList {
   public function __construct (DOMElementPlus $doclist, DOMElementPlus $pattern = null) {
     parent::__construct($doclist, self::DEFAULT_SORTBY, self::DEFAULT_RSORT);
     $newestFileMtime = DOMBuilder::getNewestFileMtime();
+    $this->dirPrefix =  PLUGINS_DIR."/".basename(__DIR__)."/".(strlen($this->path) ? $this->path."/" : "");
     $cacheKey = apc_get_key(
       __FUNCTION__."/"
       .self::APC_ID."/"
       .$this->listId."/"
       .hash("sha1", serialize($doclist)));
     $cacheExists = apc_exists($cacheKey);
-    $cacheUpTodate = false;
+    $useCache = empty(get_modified_files(PLUGINS_DIR."/Agregator/Agregator.xml"))
+      && empty(get_modified_files($this->dirPrefix))
+      && Cms::getLoggedUser() != SERVER_USER
+      && $cacheExists;
     $cache = null;
     $listDoc = null;
-    if (Cms::getLoggedUser() != SERVER_USER && $cacheExists) {
+    if ($useCache) {
       $cache = apc_fetch($cacheKey);
-      $cacheUpTodate = $cache["newestFileMtime"] == $newestFileMtime;
-    }
-    if ($cacheUpTodate) {
       $doc = new DOMDocumentPlus();
       $doc->loadXML($cache["data"]);
       $listDoc = $doc;
@@ -68,7 +73,7 @@ class DocList extends AgregatorList {
       }
       $listDoc = $this->createList($pattern, $vars);
     }
-    if (!$cacheExists || !$cacheUpTodate) {
+    if (!$cacheExists || !$useCache) {
       $cache = [
         "data" => $listDoc->saveXML($listDoc),
         "vars" => serialize($vars),
@@ -100,9 +105,8 @@ class DocList extends AgregatorList {
         return $value !== '';
       }
     );
-    $dirPrefix = PLUGINS_DIR."/".basename(__DIR__)."/".(strlen($this->path) ? $this->path."/" : "");
     foreach (HTMLPlusBuilder::getFileToId() as $file => $fileId) {
-      if (strpos($file, $dirPrefix) !== 0) {
+      if (strpos($file, $this->dirPrefix) !== 0) {
         continue;
       }
       $somethingFound = true;
@@ -116,7 +120,7 @@ class DocList extends AgregatorList {
     }
     if (empty($fileIds)) {
       if (!$somethingFound) {
-        throw new Exception(sprintf(_("No documents registered in '%s'"), $dirPrefix));
+        throw new Exception(sprintf(_("No documents registered in '%s'"), $this->dirPrefix));
       }
       throw new Exception(sprintf(_("No files matching attribute kw '%s'"), $this->keyword));
     }

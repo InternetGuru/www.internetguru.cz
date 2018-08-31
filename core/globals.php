@@ -1046,3 +1046,29 @@ function send_mail ($mailto, $mailtoname, $replyto, $replytoname, $fromName, $ms
     throw new Exception($mail->ErrorInfo);
   }
 }
+
+/**
+ * @param string $path
+ * @param bool $events
+ * @return array
+ */
+function get_modified_files ($path = "", $events = false) {
+  if (!stream_resolve_include_path(WATCH_USER_FILEPATH_TMP)) {
+    return [];
+  }
+  $files = file(WATCH_USER_FILEPATH_TMP);
+  $filteredFiles = [];
+  foreach ($files as $line) {
+    if ($path != "" && strpos($line, $path) !== 0) {
+      continue;
+    }
+    if ($events) {
+      $filteredFiles[] = $line;
+      continue;
+    }
+    $chunks = explode(" ", $line);
+    array_pop($chunks);
+    $filteredFiles[] = implode(" ", $chunks);
+  }
+  return $filteredFiles;
+}
