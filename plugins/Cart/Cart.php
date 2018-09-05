@@ -52,14 +52,17 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     }
     try {
       $this->loadVariables();
+      // get link from id (without fragment)
+      $link = HTMLPlusBuilder::getIdToLink($this->vars['formpage']['value']);
+      $link = substr($link, 0, strpos($link, "#"));
+      // after submitting form delete cookies
+      if (get_link(true) == "$link?cfok={$this->vars['formid']['value']}") {
+        $this->removeCartCookie();
+      }
       $this->createVariables();
       // add to cart
       if (!empty($_POST)) {
         $this->addToCart();
-      }
-      // after submitting form delete cookies
-      if (get_link(true) == "{$this->vars['formpage']['value']}?cfok={$this->vars['formid']['value']}") {
-        $this->removeCartCookie();
       }
       // show cart-add success message
       if (array_key_exists(self::OK_PARAM, $_GET)) {
