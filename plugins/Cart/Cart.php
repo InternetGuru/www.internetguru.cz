@@ -36,6 +36,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
   /**
    * Cart constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -226,7 +227,9 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
       $count += (int) ($_COOKIE[$cookieId]);
     }
     setcookie($cookieId, $count, time() + (86400 * 30), "/"); // 30 days
-    redir_to(build_local_url(['path' => get_link(), 'query' => self::OK_PARAM."=".$_POST['id']], true));
+    $curQuery = get_query(false, false, ["q", self::OK_PARAM]);
+    $query = ($curQuery == "" ? "" : $curQuery."&").self::OK_PARAM."=".$_POST['id'];
+    redir_to(build_local_url(['path' => get_link(), 'query' => $query], true));
   }
 
   /**
