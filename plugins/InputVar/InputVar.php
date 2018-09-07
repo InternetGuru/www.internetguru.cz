@@ -65,6 +65,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   /**
    * InputVar constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);

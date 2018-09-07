@@ -1026,7 +1026,7 @@ function send_mail ($mailto, $mailtoname, $replyto, $replytoname, $fromName, $ms
     )
   );
   if (!is_null(Cms::getLoggedUser())) {
-    Cms::notice("<pre><code class='nohighlight'>$msg</code></pre>");
+    Cms::notice("<pre><code class='nohighlight'>".htmlspecialchars($msg)."</code></pre>");
     return;
   }
   $mail = new PHPMailer;
