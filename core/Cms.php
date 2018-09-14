@@ -299,6 +299,7 @@ class Cms {
     self::setVariable("cache_nginx", get_link()."?".CACHE_PARAM."=".CACHE_NGINX);
     self::setVariable("cache_ignore", get_link()."?".CACHE_PARAM."=".CACHE_IGNORE);
     self::setVariable("link", "/".get_link());
+    self::setVariable("linkquery", "/".get_link(true));
     self::setVariable(
       "url_debug_on",
       get_link()."/?".PAGESPEED_PARAM."=".PAGESPEED_OFF."&".DEBUG_PARAM."=".DEBUG_ON."&".CACHE_PARAM

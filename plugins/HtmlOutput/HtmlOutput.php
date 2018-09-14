@@ -554,7 +554,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   private function addHead (DOMDocument $doc, DOMElement $html, DOMElementPlus $h1, DOMXPath $xPath, DOMDocumentPlus $content) {
     $head = $doc->createElement("head");
-    $head->appendChild($doc->createElement("title", $this->getTitle($h1)));
+    $head->appendChild($doc->createElement("title", htmlspecialchars($this->getTitle($h1))));
     $this->appendMeta($head, "charset", "utf-8", false, true);
     $this->appendMeta($head, "viewport", "initial-scale=1");
     $this->appendMeta($head, "generator", Cms::getVariableValue("cms-name"));

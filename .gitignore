@@ -8,3 +8,4 @@ vendor/*
 !.gitignore
 !.idea/codeStyleSettings.xml
 .inotify
+.watch_user
