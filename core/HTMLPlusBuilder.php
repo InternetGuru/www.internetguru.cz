@@ -437,7 +437,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       $next = $heading->nextElement;
       $heading->parentNode->removeChild($heading);
       $heading = $next;
-      if ($heading->nodeName == "h") {
+      if (!is_null($heading) && $heading->nodeName == "h") {
         break;
       }
     }

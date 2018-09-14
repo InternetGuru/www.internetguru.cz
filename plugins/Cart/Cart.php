@@ -36,6 +36,7 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
   /**
    * Cart constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -51,14 +52,17 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
     }
     try {
       $this->loadVariables();
+      // get link from id (without fragment)
+      $link = HTMLPlusBuilder::getIdToLink($this->vars['formpage']['value']);
+      $link = substr($link, 0, strpos($link, "#"));
+      // after submitting form delete cookies
+      if (get_link(true) == "$link?cfok={$this->vars['formid']['value']}") {
+        $this->removeCartCookie();
+      }
       $this->createVariables();
       // add to cart
       if (!empty($_POST)) {
         $this->addToCart();
-      }
-      // after submitting form delete cookies
-      if (get_link(true) == "{$this->vars['formpage']['value']}?cfok={$this->vars['formid']['value']}") {
-        $this->removeCartCookie();
       }
       // show cart-add success message
       if (array_key_exists(self::OK_PARAM, $_GET)) {
@@ -226,7 +230,9 @@ class Cart extends Plugin implements SplObserver, ResourceInterface {
       $count += (int) ($_COOKIE[$cookieId]);
     }
     setcookie($cookieId, $count, time() + (86400 * 30), "/"); // 30 days
-    redir_to(build_local_url(['path' => get_link(), 'query' => self::OK_PARAM."=".$_POST['id']], true));
+    $curQuery = get_query(false, false, ["q", self::OK_PARAM]);
+    $query = ($curQuery == "" ? "" : $curQuery."&").self::OK_PARAM."=".$_POST['id'];
+    redir_to(build_local_url(['path' => get_link(), 'query' => $query], true));
   }
 
   /**

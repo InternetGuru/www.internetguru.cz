@@ -65,6 +65,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
   /**
    * InputVar constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -164,11 +165,7 @@ class InputVar extends Plugin implements SplObserver, GetContentStrategyInterfac
     $var = null;
     foreach ($req as $key => $value) {
       if (isset($this->vars[$key])) {
-        if ($this->vars[$key]->hasAttribute("var")) {
-          $this->vars[$key]->setAttribute("var", normalize($this->className."-$value"));
-        } else {
-          $this->vars[$key]->nodeValue = htmlspecialchars($value);
-        }
+        $this->vars[$key]->nodeValue = htmlspecialchars($value);
         $var = $this->vars[$key];
       }
     }

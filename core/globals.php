@@ -330,9 +330,10 @@ function get_link ($query = false) {
 /**
  * @param bool $questionMark
  * @param bool $link
+ * @param array $unset
  * @return string
  */
-function get_query ($questionMark = false, $link = false) {
+function get_query ($questionMark = false, $link = false, $unset = ["q"]) {
   if (!isset($_SERVER['QUERY_STRING']) || !strlen($_SERVER['QUERY_STRING'])) {
     return "";
   }
@@ -340,7 +341,11 @@ function get_query ($questionMark = false, $link = false) {
   $curLink = "";
   if (isset($pQuery["q"])) {
     $curLink = $pQuery["q"];
-    unset($pQuery["q"]);
+  }
+  foreach ($unset as $name) {
+    if (isset($pQuery[$name])) {
+      unset($pQuery[$name]);
+    }
   }
   $query = build_query($pQuery, $questionMark);
   if (!$link) {
@@ -1021,7 +1026,7 @@ function send_mail ($mailto, $mailtoname, $replyto, $replytoname, $fromName, $ms
     )
   );
   if (!is_null(Cms::getLoggedUser())) {
-    Cms::notice("<pre><code class='nohighlight'>$msg</code></pre>");
+    Cms::notice("<pre><code class='nohighlight'>".htmlspecialchars($msg)."</code></pre>");
     return;
   }
   $mail = new PHPMailer;
