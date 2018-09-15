@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.14.0] - 2018-08-25
 
 ### Changed
  - Refactor inotify to watch_use to improve performance
@@ -419,7 +419,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[2.14.0]: https://bitbucket.org/igwr/cms/compare/v2.14.0..v2.13.0
 [2.13.0]: https://bitbucket.org/igwr/cms/compare/v2.13.0..v2.12.2
 [2.12.2]: https://bitbucket.org/igwr/cms/compare/v2.12.2..v2.12.1
 [2.12.1]: https://bitbucket.org/igwr/cms/compare/v2.12.1..v2.12.0
