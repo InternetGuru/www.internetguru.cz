@@ -80,6 +80,10 @@ try {
     redir_to(build_local_url(["path" => get_link(), "query" => build_query($query, false)]));
   }
 
+  if (stream_resolve_include_path(WATCH_USER_FILEPATH) && !stream_resolve_include_path(WATCH_USER_FILEPATH_TMP)) {
+    rename(WATCH_USER_FILEPATH, WATCH_USER_FILEPATH_TMP);
+  }
+
   $plugins = new Plugins();
   HTMLPlusBuilder::register(INDEX_HTML);
   $plugins->setStatus(STATUS_PREINIT);
@@ -108,6 +112,10 @@ try {
     && DOMBuilder::isCacheOutdated()
   ) {
     Logger::user_notice(_("Server cache (nginx) is outdated"));
+  }
+
+  if (stream_resolve_include_path(WATCH_USER_FILEPATH_TMP)) {
+    unlink(WATCH_USER_FILEPATH_TMP);
   }
 
   Cms::getMessages();

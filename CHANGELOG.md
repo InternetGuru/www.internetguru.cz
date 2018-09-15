@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.14.0] - 2018-08-25
 
+### Changed
+ - Refactor inotify to watch_use to improve performance
+
 ## [2.13.0] - 2018-06-26
 ### Added
  - InputVar user administration supports multiple logins
