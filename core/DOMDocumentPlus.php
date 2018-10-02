@@ -22,7 +22,7 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
   /**
    * @var int
    */
-  const APC_ID = 1;
+  const APC_ID = 2;
 
   /**
    * DOMDocumentPlus constructor.
@@ -140,7 +140,7 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
    * @return int
    * @throws GitException
    */
-  public function save ($filename, $options = null, $message=null, $author=null, $email=null) {
+  public function save ($filename, $options = null, $message = null, $author = null, $email = null) {
     parent::save($filename, $options);
     // commit only if repo exists
     try {
@@ -215,7 +215,8 @@ class DOMDocumentPlus extends DOMDocument implements \Serializable {
    * @throws Exception
    */
   public function elementProcessVars (Array $variables, $ignore = [], DOMElementPlus $element, $deep = false) {
-    $cacheKey = apc_get_key(__FUNCTION__."/"
+    $cacheKey = apc_get_key(
+      __FUNCTION__."/"
       .self::APC_ID."/"
       .$element->getNodePath()."/"
       .hash("sha1", serialize($variables))."/"
