@@ -25,6 +25,10 @@ class DOMElementPlus extends DOMElement implements \Serializable {
    */
   const MAX_VAR_RECURSION_LEVEL = 3;
   /**
+   * @var array
+   */
+  const VAR_ATTRIBUTES = ["id", "fn", "var", "cacheable", "required"];
+  /**
    * @var int
    */
   public $varRecursionLvl = 0;
@@ -320,6 +324,24 @@ class DOMElementPlus extends DOMElement implements \Serializable {
     $nodes = [];
     foreach ($var->childNodes as $node) {
       $nodes[] = $node;
+    }
+    $insertAttributes = [];
+    /** @var \DOMAttr $attr */
+    foreach ($element->attributes as $attr) {
+      if (in_array($attr->nodeName, self::VAR_ATTRIBUTES)) {
+        continue;
+      }
+      $insertAttributes[$attr->nodeName] = $attr->nodeValue;
+    }
+    if (count($insertAttributes)) {
+      foreach ($insertAttributes as $attrName => $attrValue) {
+        if ($attrName == "class" && $this->hasAttribute("class")) {
+          $this->addClass($attrValue);
+          continue;
+        }
+        $this->setAttribute($attrName, $attrValue);
+      }
+      return $this;
     }
     if ($this->toInsert($element)) {
       $this->removeChildNodes();
