@@ -20,7 +20,7 @@ s/\b(č|max|min|r|s|st)\. /$1.·/g
 Víceslovné zkratky a značky
 Víceslovné zkratky a značky mají obsahovat pevné mezery mezi jednotlivými částmi.
 { a. s., č. p., j. č., k. s., mn. č., n. l., n. m., př. n. l., s. r. o., spol. s r. o., t. č., t. r., v. r., v. o. s., v. v. i. }
-s/\ba\. s\./a.·s./
+s/\ba\. s\./a.·s.
 s/\bč\. p\./č.·p./g
 s/\bj\. č\./j.·č./g
 s/\bk\. s\./k.·s./g
