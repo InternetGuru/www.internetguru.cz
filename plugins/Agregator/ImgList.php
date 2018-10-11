@@ -40,14 +40,15 @@ class ImgList extends AgregatorList {
       .hash("sha1", serialize($doclist))
     );
     $cacheExists = apc_exists($cacheKey);
-    $cacheUpTodate = false;
+    // TODO pass plugin name in constructor?
+    $useCache = empty(get_modified_files(PLUGINS_DIR."/Agregator/Agregator.xml"))
+      && empty(get_modified_files(FILES_DIR.(strlen($this->path) ? "/".$this->path : "")))
+      && Cms::getLoggedUser() != SERVER_USER
+      && $cacheExists;
     $cache = null;
     $listDoc = null;
-    if (Cms::getLoggedUser() != SERVER_USER && $cacheExists) {
+    if ($useCache) {
       $cache = apc_fetch($cacheKey);
-      $cacheUpTodate = $cache["filesInotify"] === filemtime(FILES_FOLDER."/".INOTIFY);
-    }
-    if ($cacheUpTodate) {
       $doc = new DOMDocumentPlus();
       $doc->loadXML($cache["data"]);
       $listDoc = $doc;
@@ -58,7 +59,7 @@ class ImgList extends AgregatorList {
       }
       $listDoc = $this->createList($pattern, $vars);
     }
-    if (!$cacheExists || !$cacheUpTodate) {
+    if (!$cacheExists || !$useCache) {
       $cache = [
         "data" => $listDoc->saveXML($listDoc),
         "filesInotify" => filemtime(FILES_FOLDER."/".INOTIFY),

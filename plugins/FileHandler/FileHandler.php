@@ -80,6 +80,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
   /**
    * FileHandler constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -361,6 +362,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       copy_plus($src, $dest);
       return;
     }
+    // TODO limit full size to ? MB
     if ($mode[0] == 0 && $mode[1] == 0) {
       copy_plus($src, $dest);
       return;
@@ -438,221 +440,65 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     if (!Cms::isSuperUser()) {
       return;
     }
-    if (isset($_GET[CACHE_PARAM]) && $_GET[CACHE_PARAM] == CACHE_IGNORE) {
-      return;
-    }
-    foreach (self::$fileFolders as $sourceFolder => $isResDir) {
-      $folder = get_real_resdir($sourceFolder);
-      if ($isResDir && stream_resolve_include_path($folder)) {
-        $this->doCheckResources($folder, $sourceFolder, $isResDir);
+    foreach (get_modified_files() as $filePath) {
+      $rootDir = substr($filePath, 0, strpos($filePath, "/"));
+      if (!array_key_exists($rootDir, self::$fileFolders)) {
+        continue;
       }
-      if (stream_resolve_include_path($sourceFolder) && !$isResDir || get_real_resdir() == RESOURCES_DIR) {
-        $this->doCheckResources($sourceFolder, $sourceFolder, $isResDir);
+      $this->updateCacheFile($filePath, self::$fileFolders[$rootDir]);
+      if (self::$fileFolders[$rootDir]) {
+        $this->updateCacheFile(get_real_resdir($filePath), self::$fileFolders[$rootDir]);
       }
     }
     if (count($this->error)) {
       Logger::critical(sprintf(_("Unable to update file cache: %s"), implode(", ", $this->error)));
-    } elseif (count($this->update)) {
-      if ($this->deleteCache) {
-        Logger::user_success(
-          sprintf(_("File cache successfully updated: %s"), implode(", ", array_keys($this->update)))
-        );
-      } else {
-        Logger::user_notice(sprintf(_("Outdated file cache: %s"), implode(", ", array_keys($this->update))));
-      }
     }
   }
 
   /**
-   * @param $cacheFolder
-   * @param $sourceFolder
-   * @param $isResDir
+   * @param string $fileName
+   * @param bool $isResDir
    * @return bool
    */
-  private function doCheckResources ($cacheFolder, $sourceFolder, $isResDir) {
-    $inotifyUpToDate = $this->getSrcFolders(
-      $cacheFolder,
-      $sourceFolder,
-      $isResDir,
-      $refTs
-    );
-   // create user files folder if not exists
-    if (!$isResDir && !stream_resolve_include_path(USER_FOLDER."/$sourceFolder")) {
-      try {
-        mkdir_plus(USER_FOLDER."/$sourceFolder");
-        touch(USER_FOLDER."/$sourceFolder/".INOTIFY, $refTs);
-      } catch (Exception $exc) {
-        Logger::error(sprintf(_("Unable to create user folder %s"), $sourceFolder));
-      }
-    }
-    // all folder .inotify files uptodate
-    if ($inotifyUpToDate) {
+  private function updateCacheFile ($fileName, $isResDir) {
+    if (!stream_resolve_include_path($fileName)) {
       return true;
     }
-    $iter = new DirectoryIterator($cacheFolder);
-    $files = [];
-    $doTouch = true;
-    foreach ($iter as $splfi) {
-      if ($splfi->isDot() || $splfi->getFilename() == INOTIFY) {
-        continue;
-      }
-      if ($splfi->isDir()) {
-        $childUpToDate = $this->doCheckResources(
-          ($cacheFolder ? "$cacheFolder/" : "").$splfi->getFilename(),
-          ($sourceFolder ? "$sourceFolder/" : "").$splfi->getFilename(),
-          $isResDir
-        );
-        if (!$childUpToDate) {
-          $doTouch = false;
-        }
-        continue;
-      }
-      $files[] = $splfi->getFilename();
+    if (!$isResDir && self::isImage(pathinfo($fileName, PATHINFO_EXTENSION)) && self::getImageMode($fileName) === "") {
+      return $this->updateImageCache($fileName);
     }
-    // touch .inotify files if folder gets to be uptodate
-    $upToDate = $this->folderUpToDate(
-      $cacheFolder,
-      $sourceFolder,
-      $isResDir,
-      $files
-    );
-    if ($doTouch && $upToDate) {
-      if (!touch("$cacheFolder/".INOTIFY, $refTs) && CMS_DEBUG) {
-        Logger::debug("Unable to touch $cacheFolder/".INOTIFY);
-      }
-    }
-    return $upToDate && $doTouch;
+    return $this->deleteCache($fileName);
   }
 
   /**
-   * @param string $cacheFolder
-   * @param string $sourceFolder
-   * @param bool $isResDir
-   * @param int $newestFilemtime
+   * @param $fileName
    * @return bool
    */
-  private function getSrcFolders ($cacheFolder, $sourceFolder, $isResDir, &$newestFilemtime) {
-    // check for .inotify in cms/admin/user/domain
-    $newestFilemtime = null;
-    $cacheMtime = null;
-    if (!stream_resolve_include_path("$cacheFolder/".INOTIFY)) {
-      return false;
-    }
-    $cacheMtime = filemtime("$cacheFolder/".INOTIFY);
-    $folders = [];
-    // files folder has no defaults
-    if ($isResDir) {
-      $folders[CMS_FOLDER."/$sourceFolder"] = true;
-    } else {
-      $rawSourceFolder = self::getImageSource(
-        $cacheFolder, self::getImageMode($cacheFolder)
-      );
-      $folders[ADMIN_FOLDER."/$rawSourceFolder"] = false;
-      $folders[USER_FOLDER."/$rawSourceFolder"] = false;
-    }
-    $folders[ADMIN_FOLDER."/$sourceFolder"] = false;
-    $folders[USER_FOLDER."/$sourceFolder"] = false;
-    foreach ($folders as $folder => $isCmsFolder) {
-      if (!stream_resolve_include_path($folder)) {
-        continue;
-      }
-      if (!stream_resolve_include_path("$folder/".INOTIFY)) {
-        touch("$folder/".INOTIFY);
-      }
-      $filemtime = filemtime("$folder/".INOTIFY);
-      if ($filemtime > $newestFilemtime) {
-        $newestFilemtime = $filemtime;
-      }
-    }
-    // redundant dir if only one
-    if (is_null($newestFilemtime)) {
-      if ($this->deleteCache) {
-        /** @noinspection PhpUsageOfSilenceOperatorInspection */
-        @rmdir_plus($cacheFolder);
-        if (stream_resolve_include_path($cacheFolder)) {
-          $this->error[] = $cacheFolder;
+  private function updateImageCache ($fileName) {
+    foreach (self::$imageModes as $mode => $value) {
+      $cacheFile = str_replace(FILES_DIR."/", FILES_DIR."/$mode/", $fileName);
+      if (stream_resolve_include_path($cacheFile)) {
+        if (!$this->deleteCache($cacheFile)) {
           return false;
         }
-        if (CMS_DEBUG) {
-          Logger::debug("Removed cache folder $cacheFolder");
-        }
       }
-      $this->update[$cacheFolder] = $cacheFolder;
+    }
+    return true;
+  }
+
+  /**
+   * @param string $cacheFilePath
+   * @return bool
+   */
+  private function deleteCache ($cacheFilePath) {
+    /** @noinspection PhpUsageOfSilenceOperatorInspection */
+    @unlink($cacheFilePath);
+    if (is_file($cacheFilePath)) {
+      $this->error[] = $cacheFilePath;
       return false;
     }
-    return $cacheMtime >= $newestFilemtime;
+    return true;
   }
 
-  /**
-   * @param string $cacheFolder
-   * @param string $sourceFolder
-   * @param bool $isResDir
-   * @param array $files
-   * @return bool
-   */
-  private function folderUpToDate ($cacheFolder, $sourceFolder, $isResDir, Array $files) {
-    $folderUptodate = true;
-    foreach ($files as $file) {
-      $cacheFilePath = "$cacheFolder/$file";
-      $sourceFilePath = "$sourceFolder/$file";
-      $fileUptodate = $this->updateCacheFile(
-        $sourceFilePath, $cacheFilePath, $isResDir
-      );
-      if (!$fileUptodate) {
-        $folderUptodate = false;
-      }
-    }
-    if (CMS_DEBUG) {
-      Logger::debug("Cache folder $cacheFolder uptodate: ".($folderUptodate ? "YES" : "NO"));
-    }
-    return $folderUptodate;
-  }
-
-  /**
-   * @param string $fileName
-   * @param string $cacheFilePath
-   * @param bool $isResDir
-   * @return bool
-   */
-  private function updateCacheFile ($fileName, $cacheFilePath, $isResDir) {
-    $sourceFilePath = self::findFile($fileName);
-    if (is_null($sourceFilePath) && !$isResDir && self::isImage(pathinfo($cacheFilePath, PATHINFO_EXTENSION))) {
-      $sourceFilePath = self::getImageSource($cacheFilePath, self::getImageMode($cacheFilePath));
-      $sourceFilePath = self::findFile($sourceFilePath);
-    }
-    if (!is_file($sourceFilePath)) {
-      return $this->deleteCache($cacheFilePath, $fileName);
-    }
-    if (is_uptodate($sourceFilePath, $cacheFilePath)) {
-      return true;
-    }
-    if (self::DEBUG) {
-      Cms::notice(
-        sprintf("%s@%s | %s@%s", $cacheFilePath, filemtime($cacheFilePath), $sourceFilePath, filemtime($sourceFilePath))
-      );
-    }
-    return $this->deleteCache($cacheFilePath, $fileName);
-  }
-
-  /**
-   * @param string $cacheFilePath
-   * @param string $fileName
-   * @return bool
-   */
-  private function deleteCache ($cacheFilePath, $fileName) {
-    if (!is_file($cacheFilePath)) {
-      return true;
-    }
-    if ($this->deleteCache) {
-      /** @noinspection PhpUsageOfSilenceOperatorInspection */
-      @unlink($cacheFilePath);
-      if (is_file($cacheFilePath)) {
-        $this->error[] = $cacheFilePath;
-        return false;
-      }
-    }
-    $this->update[$fileName] = $cacheFilePath;
-    return $this->deleteCache;
-  }
 
 }

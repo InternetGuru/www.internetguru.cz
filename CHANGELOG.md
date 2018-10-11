@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.0] - 2018-10-02
+### Added
+ - InputVar variables can define custom attributes
+
 ## [2.14.0] - 2018-08-25
+
+### Changed
+ - Refactor inotify to watch_use to improve performance
 
 ## [2.13.0] - 2018-06-26
 ### Added
@@ -416,6 +423,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
+[3.1.0]: https://bitbucket.org/igwr/cms/compare/v3.1.0..v3.0.0
 [2.14.0]: https://bitbucket.org/igwr/cms/compare/v2.14.0..v2.13.0
 [2.13.0]: https://bitbucket.org/igwr/cms/compare/v2.13.0..v2.12.2
 [2.12.2]: https://bitbucket.org/igwr/cms/compare/v2.12.2..v2.12.1
