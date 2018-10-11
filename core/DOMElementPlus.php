@@ -325,6 +325,11 @@ class DOMElementPlus extends DOMElement implements \Serializable {
     foreach ($var->childNodes as $node) {
       $nodes[] = $node;
     }
+    if ($this->toInsert($element)) {
+      $this->removeChildNodes();
+      foreach ($nodes as $node) $this->appendChild($node);
+      return $this;
+    }
     $insertAttributes = [];
     /** @var \DOMAttr $attr */
     foreach ($element->attributes as $attr) {
@@ -341,11 +346,6 @@ class DOMElementPlus extends DOMElement implements \Serializable {
         }
         $this->setAttribute($attrName, $attrValue);
       }
-      return $this;
-    }
-    if ($this->toInsert($element)) {
-      $this->removeChildNodes();
-      foreach ($nodes as $node) $this->appendChild($node);
       return $this;
     }
     $res = null;
