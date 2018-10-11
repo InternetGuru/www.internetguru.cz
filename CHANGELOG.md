@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.1.3] - 2018-10-11
 ### Fixed
  - Change Terminable.js defaults
 
@@ -435,7 +435,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[3.1.3]: https://bitbucket.org/igwr/cms/compare/v3.1.3..v3.1.2
 [3.1.2]: https://bitbucket.org/igwr/cms/compare/v3.1.2..v3.1.1
 [3.1.1]: https://bitbucket.org/igwr/cms/compare/v3.1.1..v3.1.0
 [3.1.0]: https://bitbucket.org/igwr/cms/compare/v3.1.0..v3.0.0
