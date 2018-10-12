@@ -5,8 +5,8 @@ Tento dokument formalizuje pravidla pevných mezer pro český jazyk a definuje 
 Předpisy jsou koncipované, aby prováděly i nejednoznačné náhrady. Proto místo pevných mezer vkládají speciální znak „·“, tzv. interpunct nebo také middle-dot (&#183;). Před jeho náhradou za pevnou mezeru je nutné výstup projít a tzv. false-positive náhrady smazat (nahradit zpět za normální mezeru).
 Zvýraznění existujících pevných mezer
 Před samotnou náhradou je doporučeno převést existující pevné mezery na jiný znak pro účely rozlišení původních pevných mezer od vygenerovaných kandidátů – např. znakem vlnovka (~). Tento krok je možné vynechat.
-//s/\x{00A0}/~/g
-s/ /~/g
+/s/\x{00A0}/~/g
+/s/ /~/g
 Jednopísmenné předložky a spojky
 Za jednopísmenné předložky patří pevná mezera vždy včetně velkých písmen (na začátku věty).
 { k, s, v, z, o, u, a, i }
