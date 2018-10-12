@@ -9,7 +9,7 @@ s/\x{00A0}/~/g
 Jednopísmenné předložky a spojky
 Za jednopísmenné předložky patří pevná mezera vždy včetně velkých písmen (na začátku věty).
 { k, s, v, z, o, u, a, i }
-s/\b(k|s|v|z|o|u|a|i) /$1·/g
+s/\b[](k|s|v|z|o|u|a|i) /$1·/g
 Jednoslovné zkratky a značky
 Za jednoslovné zkratky a značky psané bez tečky patří pevná mezera vždy včetně zkratek a značek začínajících na velké písmeno.
 { ca, cca, fa, fce, viz }
