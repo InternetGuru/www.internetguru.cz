@@ -1,7 +1,7 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
     "content-hash": "9e1264e783df33e82aad26c30e48996a",
@@ -96,12 +96,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/InternetGuru/CodeMirror.git",
-                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f"
+                "reference": "b7818275be8c7cab6dda615f9121ded1cc710268"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/f86367959bc16be6c9acc57af4eedac6d4925a9f",
-                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f",
+                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/b7818275be8c7cab6dda615f9121ded1cc710268",
+                "reference": "b7818275be8c7cab6dda615f9121ded1cc710268",
                 "shasum": ""
             },
             "type": "library",
@@ -112,9 +112,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.1.4"
+                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.2.0"
             },
-            "time": "2016-06-06T18:56:07+00:00"
+            "time": "2018-10-22 09:39:04"
         },
         {
             "name": "internetguru/photoswipe",
@@ -140,7 +140,7 @@
             "support": {
                 "source": "https://github.com/InternetGuru/PhotoSwipe/tree/dev"
             },
-            "time": "2017-11-09T19:48:52+00:00"
+            "time": "2017-11-09 19:48:52"
         },
         {
             "name": "monolog/monolog",
@@ -409,7 +409,7 @@
                 "css",
                 "prefixes"
             ],
-            "time": "2015-06-14T13:40:00+00:00"
+            "time": "2015-06-14 13:40:00"
         }
     ],
     "packages-dev": [],
