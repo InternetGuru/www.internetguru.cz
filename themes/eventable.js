@@ -4,6 +4,7 @@
 
     var Config = {}
     Config.ns = "eventable"
+    Config.classNoEvent = Config.ns + "-noevent"
     Config.dataCategory = "data-" + Config.ns + "-category"
     Config.dataAction = "data-" + Config.ns + "-action"
     Config.debug = false
@@ -17,6 +18,9 @@
             return
           }
           for (var i = 0; i < elements.length; i++) {
+            if (elements[i].classList.contains(Config.classNoEvent)) {
+              continue;
+            }
             var handler = sendGAEvents
             var eventName = "click"
             if (elements[i].nodeName.toLowerCase() === "form") {
