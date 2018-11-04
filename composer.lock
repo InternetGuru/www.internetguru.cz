@@ -141,12 +141,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/InternetGuru/CodeMirror.git",
-                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f"
+                "reference": "b7818275be8c7cab6dda615f9121ded1cc710268"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/f86367959bc16be6c9acc57af4eedac6d4925a9f",
-                "reference": "f86367959bc16be6c9acc57af4eedac6d4925a9f",
+                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/b7818275be8c7cab6dda615f9121ded1cc710268",
+                "reference": "b7818275be8c7cab6dda615f9121ded1cc710268",
                 "shasum": ""
             },
             "type": "library",
@@ -157,9 +157,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.1.4"
+                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.2.0"
             },
-            "time": "2016-06-06 18:56:07"
+            "time": "2018-10-22 09:39:04"
         },
         {
             "name": "internetguru/photoswipe",
