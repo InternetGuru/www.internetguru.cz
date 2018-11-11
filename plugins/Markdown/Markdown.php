@@ -199,7 +199,7 @@ class Markdown extends Plugin implements SplObserver {
       }
       $attributes[] = $attNode->nodeName.'="'.$attNode->nodeValue.'"';
     }
-    return count($attributes) ? "{".implode(" ", $attributes)."}" : "";
+    return count($attributes) ? " {".implode(" ", $attributes)."}" : "";
   }
 
   /**
