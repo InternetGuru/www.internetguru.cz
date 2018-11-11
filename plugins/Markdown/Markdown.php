@@ -95,7 +95,7 @@ class Markdown extends Plugin implements SplObserver {
     $attributeString = trim($matches[0], "{} ");
     $attributePartsPattern = '/([^= ]+)="([^"]+)"|([^= ]+)=([^ ]+)/u';
     preg_match_all($attributePartsPattern, $attributeString, $attributeParts);
-    if (count($attributeParts) !== 4) {
+    if (count($attributeParts) < 3) {
       Logger::warning(sprintf(_("Unable to parse element attribute %s"), $attributeString));
       return;
     }
@@ -226,7 +226,11 @@ class Markdown extends Plugin implements SplObserver {
         $element->parentNode->insertBefore($attrParagraph, $element);
         $element->removeAllAttributes();
       } else {
-        $attrNode = $rootElement->ownerDocument->createTextNode($this->getAttrString($element, ["href", "src", "alt"]));
+        $attrText = $this->getAttrString($element, ["href", "src", "alt"]);
+        if (!strlen($attrText)) {
+          continue;
+        }
+        $attrNode = $rootElement->ownerDocument->createTextNode($attrText);
         $element->removeAllAttributes(["href", "src", "alt"]);
         $element->appendChild($attrNode);
       }
