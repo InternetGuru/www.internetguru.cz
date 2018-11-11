@@ -26,52 +26,36 @@ class Markdown extends Plugin implements SplObserver {
     if ($subject->getStatus() != STATUS_PREINIT) {
       return;
     }
-    foreach (get_modified_files() as $file) {
-      try {
-        $pathinfo = pathinfo($file);
-        switch ($pathinfo["extension"]) {
-          case "md":
-            $mdFile = USER_FOLDER."/$file";
-            $htmlPlusFile = USER_FOLDER."/".$pathinfo["dirname"]."/".$pathinfo["filename"].".html";
-            $mdFileMtime = filemtime($mdFile);
-            if (stream_resolve_include_path($htmlPlusFile)) {
-              $htmlPlusFileMtime = filemtime($htmlPlusFile);
-              if ($mdFileMtime < $htmlPlusFileMtime) {
-                throw new Exception("Unexpected exception");
-              }
-              if ($htmlPlusFileMtime === $mdFileMtime) {
-                return;
-              }
-              rename_incr($htmlPlusFile, "$htmlPlusFile.");
-            }
-            $htmlPlus = $this->md2htmlplus(file_get_contents($mdFile));
-            fput_contents($htmlPlusFile, $htmlPlus);
-            touch($htmlPlusFile, $mdFileMtime);
-            break;
-          case "html":
-            $mdFile = USER_FOLDER."/".$pathinfo["dirname"]."/".$pathinfo["filename"].".md";
-            $htmlPlusFile = USER_FOLDER."/$file";
-            $htmlPlusFileMtime = filemtime($htmlPlusFile);
-            if (stream_resolve_include_path($mdFile)) {
-              $mdFileMtime = filemtime($mdFile);
-              if ($htmlPlusFileMtime < $mdFileMtime) {
-                throw new Exception("Unexpected exception");
-              }
-              if ($htmlPlusFileMtime === $mdFileMtime) {
-                return;
-              }
-              rename_incr($mdFile, "$mdFile.");
-            }
-            $markdown = $this->htmlplus2md(file_get_contents($htmlPlusFile));
-            fput_contents($mdFile, $markdown);
-            touch($mdFile, $htmlPlusFileMtime);
-            break;
+    try {
+      foreach (get_modified_files() as $file) {
+        $modifiedFileInfo = pathinfo($file);
+        $srcFileExt = $modifiedFileInfo["extension"];
+        if (!in_array($srcFileExt, ["md", "html"])) {
+          continue;
         }
-      } catch (Exception $exc) {
-        global $removeWatchUserFile;
-        $removeWatchUserFile = false;
-        Logger::warning($exc->getMessage());
+        $destFileExt = $srcFileExt == "md" ? "html" : "md";
+        $srcFile = USER_FOLDER."/$file";
+        $destFile = USER_FOLDER."/".$modifiedFileInfo["dirname"]."/".$modifiedFileInfo["filename"].".$destFileExt";
+        $srcFileMtime = filemtime($srcFile);
+        if (stream_resolve_include_path($destFile)) {
+          $destFileMtime = filemtime($destFile);
+          if ($srcFileMtime < $destFileMtime) {
+            throw new Exception(sprintf(_("Destination file is newer than source file %s"), $file));
+          }
+          if ($destFileMtime === $srcFileMtime) {
+            continue;
+          }
+          rename_incr($destFile, "$destFile.");
+        }
+        $convertMethod = $srcFileExt."2".$destFileExt;
+        $destContent = $this->$convertMethod(file_get_contents($srcFile));
+        fput_contents($destFile, $destContent);
+        touch($destFile, $srcFileMtime);
       }
+    } catch (Exception $exc) {
+      global $removeWatchUserFile;
+      $removeWatchUserFile = false;
+      Logger::warning(sprintf(_("Conversion failed: %s"), $exc->getMessage()));
     }
   }
 
@@ -105,14 +89,14 @@ class Markdown extends Plugin implements SplObserver {
     }
     $value = $lastNode->nodeValue;
     preg_match($attributePattern, $value, $matches);
-    $lastNode->nodeValue = preg_replace($attributePattern, "", $value);
     $attributeString = trim($matches[0], "{} ");
     $attributePartsPattern = '/([^= ]+)="([^"]+)"|([^= ]+)=([^ ]+)/u';
     preg_match_all($attributePartsPattern, $attributeString, $attributeParts);
-    if (!isset($attributeParts[1]) || !isset($attributeParts[2]) || !isset($attributeParts[3])
-      || !isset($attributeParts[3])) {
+    if (count($attributeParts) !== 4) {
+      Logger::warning(sprintf(_("Unable to parse element attribute %s"), $attributeString));
       return;
     }
+    $lastNode->nodeValue = substr($value, 0, strlen($value) - strlen($matches[0]));
     for ($i = 0; $i < count($attributeParts[0]); $i++) {
       $attName = strlen($attributeParts[1][$i]) ? $attributeParts[1][$i] : $attributeParts[3][$i];
       $attValue = strlen($attributeParts[2][$i]) ? $attributeParts[2][$i] : $attributeParts[4][$i];
@@ -172,7 +156,7 @@ class Markdown extends Plugin implements SplObserver {
    * @return string
    * @throws Exception
    */
-  private function md2htmlplus ($mdText) {
+  private function md2html ($mdText) {
     $html = MarkdownExtra::defaultTransform($mdText);
     $content = new DOMDocumentPlus();
     $content->loadXML("<body>$html</body>");
@@ -192,19 +176,11 @@ class Markdown extends Plugin implements SplObserver {
     }
     $xml = $doc->saveXML();
     // https://github.com/gajus/dindent
-    $indeter = new Indenter(["indentation_character" => "  "]);
+    $sep = "  ";
+    $indeter = new Indenter(["indentation_character" => $sep]);
     $xml = $indeter->indent($xml);
     // unindent each line for 2 chars
-    $xml = implode(
-      "\n",
-      array_map(
-        function($line) {
-          return (strpos($line, " ") === 0) ? substr($line, 2) : $line;
-        },
-        explode("\n", $xml)
-      )
-    );
-    return $xml;
+    return preg_replace("/^$sep/m", "", $xml);
   }
 
   /**
@@ -227,7 +203,7 @@ class Markdown extends Plugin implements SplObserver {
    * @param DOMElementPlus $rootElement
    * @param array $ignore
    */
-  private function convertHTMLAttrs (DOMElementPlus $rootElement, $ignore = ["form", "q"]) {
+  private function convertHTMLAttrs (DOMElementPlus $rootElement, $ignore = ["form", "q", "span"]) {
     /** @var DOMElementPlus $element */
     foreach ($rootElement->childElementsArray as $element) {
       if (in_array($element->nodeName, $ignore)) {
@@ -247,14 +223,9 @@ class Markdown extends Plugin implements SplObserver {
         $element->parentNode->insertBefore($attrParagraph, $element);
         $element->removeAllAttributes();
       } else {
-        $lastNode = $this->getLastTextNode($element);
-        if (is_null($lastNode)) {
-          // TODO throw?
-          return;
-        }
-        $attrString = $this->getAttrString($element, ["href"]);
+        $attrNode = $rootElement->ownerDocument->createTextNode($this->getAttrString($element, ["href"]));
         $element->removeAllAttributes(["href"]);
-        $lastNode->nodeValue = $lastNode->nodeValue." $attrString";
+        $element->appendChild($attrNode);
       }
     }
   }
@@ -264,7 +235,7 @@ class Markdown extends Plugin implements SplObserver {
    * @return string
    * @throws Exception
    */
-  private function htmlplus2md ($htmlplus) {
+  private function html2md ($htmlplus) {
     $content = new DOMDocumentPlus();
     $content->loadXML($htmlplus);
 
