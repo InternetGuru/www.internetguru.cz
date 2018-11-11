@@ -29,6 +29,9 @@ class Markdown extends Plugin implements SplObserver {
     try {
       foreach (get_modified_files() as $file) {
         $modifiedFileInfo = pathinfo($file);
+        if (!isset($modifiedFileInfo["extension"])) {
+          continue;
+        }
         $srcFileExt = $modifiedFileInfo["extension"];
         if (!in_array($srcFileExt, ["md", "html"])) {
           continue;
