@@ -85,6 +85,9 @@ try {
   }
 
   $plugins = new Plugins();
+  $plugins->setStatus(STATUS_PREINDEX);
+  $plugins->notify();
+  
   HTMLPlusBuilder::register(INDEX_HTML);
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();

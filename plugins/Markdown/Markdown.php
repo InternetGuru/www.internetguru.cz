@@ -23,7 +23,7 @@ class Markdown extends Plugin implements SplObserver {
    * @throws Exception
    */
   public function update (SplSubject $subject) {
-    if ($subject->getStatus() != STATUS_PREINIT) {
+    if ($subject->getStatus() != STATUS_PREINDEX) {
       return;
     }
     try {
