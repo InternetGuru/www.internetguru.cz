@@ -226,8 +226,8 @@ class Markdown extends Plugin implements SplObserver {
         $element->parentNode->insertBefore($attrParagraph, $element);
         $element->removeAllAttributes();
       } else {
-        $attrNode = $rootElement->ownerDocument->createTextNode($this->getAttrString($element, ["href"]));
-        $element->removeAllAttributes(["href"]);
+        $attrNode = $rootElement->ownerDocument->createTextNode($this->getAttrString($element, ["href", "src", "alt"]));
+        $element->removeAllAttributes(["href", "src", "alt"]);
         $element->appendChild($attrNode);
       }
     }
