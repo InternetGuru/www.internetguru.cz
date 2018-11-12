@@ -206,7 +206,7 @@ class Markdown extends Plugin implements SplObserver {
    * @param DOMElementPlus $rootElement
    * @param array $ignore
    */
-  private function convertHTMLAttrs (DOMElementPlus $rootElement, $ignore = ["form", "q", "span"]) {
+  private function convertHTMLAttrs (DOMElementPlus $rootElement, $ignore = ["form", "q", "span", "img"]) {
     /** @var DOMElementPlus $element */
     foreach ($rootElement->childElementsArray as $element) {
       if (in_array($element->nodeName, $ignore)) {
@@ -226,12 +226,12 @@ class Markdown extends Plugin implements SplObserver {
         $element->parentNode->insertBefore($attrParagraph, $element);
         $element->removeAllAttributes();
       } else {
-        $attrText = $this->getAttrString($element, ["href", "src", "alt"]);
+        $attrText = $this->getAttrString($element, ["href"]);
         if (!strlen($attrText)) {
           continue;
         }
         $attrNode = $rootElement->ownerDocument->createTextNode($attrText);
-        $element->removeAllAttributes(["href", "src", "alt"]);
+        $element->removeAllAttributes(["href"]);
         $element->appendChild($attrNode);
       }
     }
