@@ -30,6 +30,10 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   const DEFAULT_LEVEL = 2;
   /**
+   * @var string
+   */
+  const NOBALANCE_HEADING_CLASS = "nobalance";
+  /**
    * @var array
    */
   private $tree = [];
@@ -351,7 +355,24 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     }
     $wrapper = $section->ownerDocument->createElement($set->getAttribute("wrapper"));
     $wrapper->setAttribute("class", strtolower($this->className)."-".$set->getAttribute("id"));
+    $newSection = null;
     foreach ($h3ids as $h3id) {
+      $id = substr($h3id, strpos($h3id, "/") + 1);
+      $h3 = $section->ownerDocument->getElementById($id);
+      if (is_null($h3)) {
+        continue;
+      }
+      if ($h3->hasClass(self::NOBALANCE_HEADING_CLASS)) {
+        if (is_null($newSection)) {
+          $newSection = $section->ownerDocument->createElement("section");
+          $section->parentNode->insertBefore($newSection, $section);
+        }
+        $elements = $this->getUntilSame($h3);
+        foreach ($elements as $element) {
+          $newSection->appendChild($element);
+        }
+        continue;
+      }
       $vars = $this->getVariables($h3id);
       $root = $this->createDOMElement($vars, $set);
       foreach ($root->childElementsArray as $element) {
