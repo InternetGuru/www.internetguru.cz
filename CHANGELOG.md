@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Added
+ - ContentBalancer supports nobalance heading class to suppress balancing
  - New plugin Markdown
 
 ## [3.2.2] - 2018-11-09
