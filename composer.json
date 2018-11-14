@@ -24,7 +24,7 @@
         "czproject/git-php": "^3.14",
         "michelf/php-markdown": "^1.8",
         "gajus/dindent": "^2.0",
-        "InternetGuru/markdownify": "^2.3"
+        "InternetGuru/markdownify": "^3.1"
     },
     "autoload": {
         "psr-4": {

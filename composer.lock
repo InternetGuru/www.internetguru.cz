@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0e0dd300df543f46d6af479d2f26c6ca",
+    "content-hash": "90ef580e9b85b03f8e67f89978d46949",
     "packages": [
         {
             "name": "components/highlightjs",
@@ -163,16 +163,16 @@
         },
         {
             "name": "internetguru/markdownify",
-            "version": "v2.3.0",
+            "version": "v3.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/InternetGuru/Markdownify.git",
-                "reference": "ddacf31a4f3445ed7944e20f4b85163d2e8a9b19"
+                "reference": "ca7648588948dc2cc5ab8bf88fe5f50ed91f884e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InternetGuru/Markdownify/zipball/ddacf31a4f3445ed7944e20f4b85163d2e8a9b19",
-                "reference": "ddacf31a4f3445ed7944e20f4b85163d2e8a9b19",
+                "url": "https://api.github.com/repos/InternetGuru/Markdownify/zipball/ca7648588948dc2cc5ab8bf88fe5f50ed91f884e",
+                "reference": "ca7648588948dc2cc5ab8bf88fe5f50ed91f884e",
                 "shasum": ""
             },
             "require": {
@@ -204,7 +204,6 @@
                 }
             ],
             "description": "The HTML to Markdown converter for PHP ",
-            "homepage": "https://github.com/elephant418/Markdownify",
             "keywords": [
                 "converter",
                 "html",
@@ -212,9 +211,9 @@
                 "markdownify"
             ],
             "support": {
-                "source": "https://github.com/InternetGuru/Markdownify/tree/v2.3.0"
+                "source": "https://github.com/InternetGuru/Markdownify/tree/master"
             },
-            "time": "2018-03-27T14:58:56+00:00"
+            "time": "2018-11-14T15:45:03+00:00"
         },
         {
             "name": "internetguru/photoswipe",
