@@ -35,8 +35,13 @@ class Git extends GitRepository {
    * @return bool
    */
   public function commitFile ($filename, $message=null, $author=null, $email=null) {
-    if (strpos($filename, USER_FOLDER) !== 0) {
-      return false;
+    if (!is_array($filename)) {
+      $filename = [$filename];
+    }
+    foreach ($filename as $file) {
+      if (strpos($file, USER_FOLDER) !== 0) {
+        return false;
+      }
     }
     if (is_null($message)) {
       try {
@@ -57,8 +62,23 @@ class Git extends GitRepository {
       self::$gitRepository->commit($message, ['--author' => $author]);
       return true;
     } catch (Exception $exc) {
-      Logger::error(sprintf(_('Unable to commit file %s: %s'), $filename, $exc->getMessage()));
+      Logger::error(sprintf(_('Unable to commit file(s) %s: %s'), implode(",", $filename), $exc->getMessage()));
       return false;
     }
   }
+
+  public function pushChanges () {
+    try {
+      $remotes = self::$gitRepository->execute(['remote', '-v']);
+      if (!$remotes) {
+        return;
+      }
+      self::$gitRepository->push('origin');
+      return true;
+    } catch (Exception $exc) {
+      Logger::error(sprintf(_('Unable to push changes %s'), $exc->getMessage()));
+      return false;
+    }
+  }
+
 }

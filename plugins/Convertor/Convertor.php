@@ -244,6 +244,7 @@ class Convertor extends Plugin implements SplObserver, GetContentStrategyInterfa
     try {
       try {
         fput_contents($dest, $this->html);
+        commit_and_push($dest);
       } catch (Exception $exc) {
         throw new Exception(sprintf(_("Unable to save file %s: %s"), $this->file, $exc->getMessage()));
       }

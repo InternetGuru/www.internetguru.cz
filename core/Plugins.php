@@ -88,8 +88,11 @@ class Plugins implements SplSubject {
     }
   }
 
-  public function notify () {
+  public function sortObservers () {
     stable_sort($this->observerPriority, SORT_DESC);
+  }
+
+  public function notify () {
     foreach ($this->observerPriority as $key => $value) {
       $this->observers[$key]->update($this);
     }
@@ -120,7 +123,6 @@ class Plugins implements SplSubject {
   }
 
   public function printObservers () {
-    stable_sort($this->observerPriority, SORT_DESC);
     print_r($this->observerPriority);
   }
 
@@ -155,7 +157,6 @@ class Plugins implements SplSubject {
    */
   public function getIsInterface ($itf) {
     $contentStrats = [];
-    stable_sort($this->observerPriority, SORT_DESC);
     foreach ($this->observerPriority as $key => $priority) {
       if (!$this->observers[$key] instanceOf $itf) {
         continue;
