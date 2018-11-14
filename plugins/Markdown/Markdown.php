@@ -274,6 +274,6 @@ class Markdown extends Plugin implements SplObserver {
     $html = $content->saveXML();
     $html2mdConvertor = new ConverterExtra();
     $mdString = $html2mdConvertor->parseString("$html");
-    return html_entity_decode(substr($mdString, strpos($mdString, "\n") + 1));
+    return html_entity_decode(substr($mdString, strpos($mdString, "\n") + 1))."\n\n";
   }
 }
