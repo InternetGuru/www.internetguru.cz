@@ -229,7 +229,7 @@ class Markdown extends Plugin implements SplObserver {
       if (!$attributes->length) {
         continue;
       }
-      $beforeElements = ["body", "ul", "ol", "dl"];
+      $beforeElements = ["body", "ul", "ol", "dl", "h1", "h2", "h3", "h4", "h5", "h6", "p"];
       if (in_array($element->nodeName, $beforeElements)) {
         $attrParagraph = $rootElement->ownerDocument->createElement("p");
         $attrParagraph->nodeValue = $this->getAttrString($element);
