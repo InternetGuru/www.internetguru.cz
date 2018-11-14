@@ -7,6 +7,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/InternetGuru/PhotoSwipe"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/InternetGuru/markdownify"
         }
     ],
     "require": {
@@ -20,7 +24,7 @@
         "czproject/git-php": "^3.14",
         "michelf/php-markdown": "^1.8",
         "gajus/dindent": "^2.0",
-        "pixel418/markdownify": "^2.3"
+        "InternetGuru/markdownify": "^2.3"
     },
     "autoload": {
         "psr-4": {
