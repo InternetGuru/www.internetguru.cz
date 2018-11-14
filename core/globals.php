@@ -315,12 +315,29 @@ function stable_sort (Array &$array, $order = SORT_ASC) {
   if (count($array) < 2) {
     return;
   }
-  array_walk($array, function (&$v, $k) { $v = array($v, $k); });
-  asort($array);
-  array_walk($array, function (&$v, $k) { $v = $v[0]; });
   if ($order == SORT_DESC) {
     $array = array_reverse($array, true);
   }
+   $index = 0;
+  foreach ($array as &$item) {
+    $item = array($index++, $item);
+  }
+  $result = uasort($array, function($a, $b) {
+    if ($a[1] == $b[1]) {
+      return $a[0] - $b[0];
+    }
+    $set = array(-1 => $a[1], 1 => $b[1]);
+    asort($set);
+    reset($set);
+    return key($set);
+  });
+  foreach ($array as &$item) {
+    $item = $item[1];
+  }
+  if ($order == SORT_DESC) {
+    $array = array_reverse($array, true);
+  }
+  return $result;
 }
 
 /**
