@@ -315,8 +315,12 @@ function stable_sort (Array &$array, $order = SORT_ASC) {
   if (count($array) < 2) {
     return;
   }
-  $orderArray = range(1, count($array));
-  array_multisort($array, $order, $orderArray, $order);
+  array_walk($array, function (&$v, $k) { $v = array($v, $k); });
+  asort($array);
+  array_walk($array, function (&$v, $k) { $v = $v[0]; });
+  if ($order == SORT_DESC) {
+    $array = array_reverse($array, true);
+  }
 }
 
 /**
@@ -422,13 +426,17 @@ function fput_contents ($dest, $string) {
     throw new Exception(_("Unable to save content"));
   }
   copy_plus("$dest.new", $dest, false);
+}
+
+function commit_and_push ($file) {
   // commit only if repo exists
   try {
     $gitRepo = Git::Instance();
   } catch (GitException $exc) {
     return;
   }
-  $gitRepo->commitFile($dest);
+  $gitRepo->commitFile($file);
+  $gitRepo->pushChanges();
 }
 
 /**

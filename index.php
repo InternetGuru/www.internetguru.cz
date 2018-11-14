@@ -83,8 +83,8 @@ try {
   if (stream_resolve_include_path(WATCH_USER_FILEPATH) && !stream_resolve_include_path(WATCH_USER_FILEPATH_TMP)) {
     rename(WATCH_USER_FILEPATH, WATCH_USER_FILEPATH_TMP);
   }
-
   $plugins = new Plugins();
+  $plugins->sortObservers();
   $plugins->setStatus(STATUS_PREINDEX);
   $plugins->notify();
   

@@ -315,6 +315,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
     if (!array_key_exists($hId, $this->tree)) {
       return;
     }
+
     if ($level < $this->level || count($this->tree[$hId]) < $this->limit) {
       foreach ($this->tree[$hId] as $childId) {
         $this->balanceContent($content, $childId, $level + 1);

@@ -26,8 +26,9 @@ class Markdown extends Plugin implements SplObserver {
     if ($subject->getStatus() != STATUS_PREINDEX) {
       return;
     }
+    $destFiles = [];
     try {
-      foreach (get_modified_files() as $file) {
+      foreach (get_modified_files() as $file) {        
         $modifiedFileInfo = pathinfo($file);
         if (!isset($modifiedFileInfo["extension"])) {
           continue;
@@ -48,18 +49,27 @@ class Markdown extends Plugin implements SplObserver {
           if ($destFileMtime === $srcFileMtime) {
             continue;
           }
-          rename_incr($destFile, "$destFile.");
         }
         $convertMethod = $srcFileExt."2".$destFileExt;
         $destContent = $this->$convertMethod(file_get_contents($srcFile));
+        if (stream_resolve_include_path($destFile)) {
+          rename_incr($destFile, "$destFile.");
+        }
         fput_contents($destFile, $destContent);
-        touch($destFile, $srcFileMtime);
+        if (!touch($destFile, $srcFileMtime)) {
+          throw new Exception(sprintf("Unable to touch file %s", $destFile));
+        }
+        $destFiles[] = $destFile;
       }
     } catch (Exception $exc) {
       global $removeWatchUserFile;
       $removeWatchUserFile = false;
       Logger::warning(sprintf(_("Conversion failed: %s"), $exc->getMessage()));
     }
+    if (!count($destFiles)) {
+      return;
+    }
+    commit_and_push($destFiles);
   }
 
   /**
