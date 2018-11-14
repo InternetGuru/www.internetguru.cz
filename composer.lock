@@ -1,10 +1,10 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e1264e783df33e82aad26c30e48996a",
+    "content-hash": "90ef580e9b85b03f8e67f89978d46949",
     "packages": [
         {
             "name": "components/highlightjs",
@@ -91,6 +91,51 @@
             "time": "2018-04-17T08:52:47+00:00"
         },
         {
+            "name": "gajus/dindent",
+            "version": "2.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/gajus/dindent.git",
+                "reference": "d81c3a6f78fbe1ab26f5e753098bbbef6b6a9f3c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/gajus/dindent/zipball/d81c3a6f78fbe1ab26f5e753098bbbef6b6a9f3c",
+                "reference": "d81c3a6f78fbe1ab26f5e753098bbbef6b6a9f3c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "require-dev": {
+                "satooshi/php-coveralls": "dev-master"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Gajus\\Dindent\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Gajus Kuizinas",
+                    "email": "gk@anuary.com"
+                }
+            ],
+            "description": "HTML indentation library for development and testing.",
+            "homepage": "https://github.com/gajus/dindent",
+            "keywords": [
+                "format",
+                "html",
+                "indent"
+            ],
+            "time": "2014-10-08T10:03:04+00:00"
+        },
+        {
             "name": "internetguru/codemirror",
             "version": "dev-master",
             "source": {
@@ -114,7 +159,61 @@
             "support": {
                 "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.2.0"
             },
-            "time": "2018-10-22 09:39:04"
+            "time": "2018-10-22T09:39:04+00:00"
+        },
+        {
+            "name": "internetguru/markdownify",
+            "version": "v3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/InternetGuru/Markdownify.git",
+                "reference": "ca7648588948dc2cc5ab8bf88fe5f50ed91f884e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/InternetGuru/Markdownify/zipball/ca7648588948dc2cc5ab8bf88fe5f50ed91f884e",
+                "reference": "ca7648588948dc2cc5ab8bf88fe5f50ed91f884e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "lib",
+            "autoload": {
+                "psr-4": {
+                    "Markdownify\\": "src",
+                    "Test\\Markdownify\\": "test"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Milian Wolff",
+                    "email": "mail@milianw.de",
+                    "homepage": "http://milianw.de"
+                },
+                {
+                    "name": "Thomas Zilliox",
+                    "email": "hello@tzi.fr",
+                    "homepage": "https://tzi.fr"
+                }
+            ],
+            "description": "The HTML to Markdown converter for PHP ",
+            "keywords": [
+                "converter",
+                "html",
+                "markdown",
+                "markdownify"
+            ],
+            "support": {
+                "source": "https://github.com/InternetGuru/Markdownify/tree/master"
+            },
+            "time": "2018-11-14T15:45:03+00:00"
         },
         {
             "name": "internetguru/photoswipe",
@@ -140,7 +239,53 @@
             "support": {
                 "source": "https://github.com/InternetGuru/PhotoSwipe/tree/dev"
             },
-            "time": "2017-11-09 19:48:52"
+            "time": "2017-11-09T19:48:52+00:00"
+        },
+        {
+            "name": "michelf/php-markdown",
+            "version": "1.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/michelf/php-markdown.git",
+                "reference": "01ab082b355bf188d907b9929cd99b2923053495"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/michelf/php-markdown/zipball/01ab082b355bf188d907b9929cd99b2923053495",
+                "reference": "01ab082b355bf188d907b9929cd99b2923053495",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Michelf\\": "Michelf/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Michel Fortin",
+                    "email": "michel.fortin@michelf.ca",
+                    "homepage": "https://michelf.ca/",
+                    "role": "Developer"
+                },
+                {
+                    "name": "John Gruber",
+                    "homepage": "https://daringfireball.net/"
+                }
+            ],
+            "description": "PHP Markdown",
+            "homepage": "https://michelf.ca/projects/php-markdown/",
+            "keywords": [
+                "markdown"
+            ],
+            "time": "2018-01-15T00:49:33+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -409,7 +554,7 @@
                 "css",
                 "prefixes"
             ],
-            "time": "2015-06-14 13:40:00"
+            "time": "2015-06-14T13:40:00+00:00"
         }
     ],
     "packages-dev": [],

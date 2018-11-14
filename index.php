@@ -3,7 +3,6 @@
 use IGCMS\Core\Cms;
 use IGCMS\Core\DOMBuilder;
 use IGCMS\Core\ErrorPage;
-use IGCMS\Core\Git;
 use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugins;
@@ -80,11 +79,15 @@ try {
     redir_to(build_local_url(["path" => get_link(), "query" => build_query($query, false)]));
   }
 
+  $removeWatchUserFile = true;
   if (stream_resolve_include_path(WATCH_USER_FILEPATH) && !stream_resolve_include_path(WATCH_USER_FILEPATH_TMP)) {
     rename(WATCH_USER_FILEPATH, WATCH_USER_FILEPATH_TMP);
   }
-
   $plugins = new Plugins();
+  $plugins->sortObservers();
+  $plugins->setStatus(STATUS_PREINDEX);
+  $plugins->notify();
+  
   HTMLPlusBuilder::register(INDEX_HTML);
   $plugins->setStatus(STATUS_PREINIT);
   $plugins->notify();
@@ -114,7 +117,7 @@ try {
     Logger::user_notice(_("Server cache (nginx) is outdated"));
   }
 
-  if (stream_resolve_include_path(WATCH_USER_FILEPATH_TMP)) {
+  if (stream_resolve_include_path(WATCH_USER_FILEPATH_TMP) && $removeWatchUserFile) {
     unlink(WATCH_USER_FILEPATH_TMP);
   }
 

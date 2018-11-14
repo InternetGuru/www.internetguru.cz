@@ -502,6 +502,7 @@ class Admin extends Plugin implements SplObserver, GetContentStrategyInterface, 
           }
         }
         fput_contents($this->destFile, $this->contentValue);
+        commit_and_push($this->destFile);
       } catch (Exception $exc) {
         throw new Exception(sprintf(_("Unable to save changes to %s: %s"), $_POST["filename"], $exc->getMessage()));
       }

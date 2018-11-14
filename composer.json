@@ -7,6 +7,10 @@
         {
             "type": "vcs",
             "url": "https://github.com/InternetGuru/PhotoSwipe"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/InternetGuru/markdownify"
         }
     ],
     "require": {
@@ -17,7 +21,10 @@
         "phpmailer/phpmailer": "^5.2",
         "InternetGuru/CodeMirror": "dev-master",
         "InternetGuru/PhotoSwipe": "dev-dev",
-        "czproject/git-php": "^3.14"
+        "czproject/git-php": "^3.14",
+        "michelf/php-markdown": "^1.8",
+        "gajus/dindent": "^2.0",
+        "InternetGuru/markdownify": "^3.1"
     },
     "autoload": {
         "psr-4": {
