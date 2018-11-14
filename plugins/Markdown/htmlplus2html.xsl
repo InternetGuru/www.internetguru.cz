@@ -17,7 +17,7 @@
   </xsl:template>
 
   <xsl:template match="//desc">
-    <p class="description">
+    <p>
       <xsl:copy-of select="@*"/>
       <xsl:apply-templates/>
     </p>
