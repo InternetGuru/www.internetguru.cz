@@ -141,12 +141,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/InternetGuru/CodeMirror.git",
-                "reference": "b7818275be8c7cab6dda615f9121ded1cc710268"
+                "reference": "fd01c8e5f8aa5a29a267d6f0fd188711e362805b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/b7818275be8c7cab6dda615f9121ded1cc710268",
-                "reference": "b7818275be8c7cab6dda615f9121ded1cc710268",
+                "url": "https://api.github.com/repos/InternetGuru/CodeMirror/zipball/fd01c8e5f8aa5a29a267d6f0fd188711e362805b",
+                "reference": "fd01c8e5f8aa5a29a267d6f0fd188711e362805b",
                 "shasum": ""
             },
             "type": "library",
@@ -157,9 +157,9 @@
                 }
             ],
             "support": {
-                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.2.0"
+                "source": "https://github.com/InternetGuru/CodeMirror/tree/v0.4.0"
             },
-            "time": "2018-10-22T09:39:04+00:00"
+            "time": "2018-11-15T21:24:30+00:00"
         },
         {
             "name": "internetguru/markdownify",
