@@ -70,7 +70,7 @@ class ContentBalancer extends Plugin implements SplObserver, ModifyContentStrate
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
-    $s->setPriority($this, 100);
+    $s->setPriority($this, 110);
   }
 
   /**
