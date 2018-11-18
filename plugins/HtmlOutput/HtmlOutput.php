@@ -904,10 +904,6 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if (!$e->hasAttribute($aName)) {
       return;
     }
-    // skip nowarning class
-    if ($e->hasClass("nowarning")) {
-      return;
-    }
     $target = trim($e->getAttribute($aName));
     try {
       // link is empty
@@ -938,7 +934,12 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
       }
       $this->insertTitle($e, $pLink["id"]);
     } catch (Exception $exc) {
-      $message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $exc->getMessage());
+      // skip nowarning class
+      if ($e->hasClass("nowarning")) {
+        $e->stripAttr($aName);
+        return;
+      }
+$message = sprintf(_("Attribute %s='%s' removed: %s"), $aName, $target, $exc->getMessage());
       $e->stripAttr($aName, $message);
       if (is_null(Cms::getLoggedUser())) {
         return;
