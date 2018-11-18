@@ -904,6 +904,10 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
     if (!$e->hasAttribute($aName)) {
       return;
     }
+    // skip nowarning class
+    if ($e->hasClass("nowarning")) {
+      return;
+    }
     $target = trim($e->getAttribute($aName));
     try {
       // link is empty
