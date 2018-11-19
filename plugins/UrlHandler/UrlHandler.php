@@ -355,18 +355,24 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
       return;
     }
     try {
-      if ($redir->nodeValue == "/") {
+      $value = replace_vars($redir->nodeValue, [
+        "parvalue" => [
+          "cacheable" => false,
+          "value" => (!is_null($pNam) && isset($_GET[$pNam])) ? $_GET[$pNam] : "",
+         ],
+      ]); 
+      if ($value == "/") {
         redir_to(ROOT_URL);
       }
-      $pLink = parse_local_link($redir->nodeValue);
+      $pLink = parse_local_link($value);
       if (is_null($pLink)) {
-        redir_to($redir->nodeValue);
+        redir_to($value);
       } // external redir
       $silent = !isset($pLink["path"]);
       if ($silent) {
         $pLink["path"] = get_link();
       } // no path = keep current path
-      if (strpos($redir->nodeValue, "?") === false) {
+      if (strpos($value, "?") === false) {
         $pLink["query"] = get_query();
       } // no query = keep current query
       #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
