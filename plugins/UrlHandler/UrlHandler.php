@@ -121,7 +121,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   private static function proceed () {
     if (self::$notFound) {
-      Logger::info(_("This page is visible only for logged user (otherwise 404)"));
+      Logger::notice(_("This page is visible only for logged user (otherwise 404)"));
     }
     $links = array_keys(HTMLPlusBuilder::getLinkToId());
     $path = get_link();
