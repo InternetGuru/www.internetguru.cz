@@ -1,13 +1,20 @@
 <UrlHandler>
 
   <!--
+    404; element notfound
+    - atribut link     ... cesta
+
+    např.:
+    <notfound link="dymky/"/>
+  -->
+
+  <!--
     PŘEPIS URL adresy; element rewrite
-    - atribut match    ... přepisovaná část, může obsahovat *
+    - atribut match    ... přepisovaná část
     - obsah elementu   ... náhrada
 
     např.:
     <rewrite match="coop/"></rewrite>
-    <rewrite match="coop/*"></rewrite>  ... smaže linky obsahující coop/*
   -->
 
   <!--
