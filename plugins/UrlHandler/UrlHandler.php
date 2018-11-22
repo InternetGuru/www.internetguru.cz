@@ -28,6 +28,10 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    * @var array
    */
   private static $newReg = [];
+  /**
+   * @var bool
+   */
+  private static $notFound = false;
 
   /**
    * UrlHandler constructor.
@@ -116,6 +120,9 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    * @throws Exception
    */
   private static function proceed () {
+    if (self::$notFound) {
+      Logger::info(_("This page is visible only for logged user (otherwise 404)"));
+    }
     $links = array_keys(HTMLPlusBuilder::getLinkToId());
     $path = get_link();
     if (!HTMLPlusBuilder::isLink($path)) {
@@ -337,6 +344,10 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     if (strpos(get_link(), $link) === false) {
       return;
     }
+    if (Cms::isSuperUser()) {
+      self::$notFound = true;
+      return;
+    }
     new ErrorPage('', 404, true);
     exit;
   }
@@ -360,7 +371,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
           "cacheable" => false,
           "value" => (!is_null($pNam) && isset($_GET[$pNam])) ? $_GET[$pNam] : "",
          ],
-      ]); 
+      ]);
       if ($value == "/") {
         redir_to(ROOT_URL);
       }
