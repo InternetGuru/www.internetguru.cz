@@ -97,7 +97,6 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     self::$newReg = HTMLPlusBuilder::getIdToLink();
     foreach ($cfg->documentElement->childNodes as $childElm) {
       switch ($childElm->nodeName) {
-        case 'notfound':
         case 'redir':
         case 'rewrite':
           $nodeName = $childElm->nodeName;
@@ -276,7 +275,7 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
       $short[$linkId] = $len;
     }
     $keys = array_keys($short, $minLen); // filter result to minlength
-    return $keys[0];
+    return isset($keys[0]) ? $keys[0] : "";
   }
 
   /**
@@ -319,26 +318,18 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    */
   private static function rewrite (DOMElementPlus $rewrite) {
     $match = $rewrite->getRequiredAttribute("match");
+    $matchPattern = str_replace("\*", ".*", preg_quote($match, "/"));
     foreach (self::$newReg as $linkId => $link) {
-      if (strpos($link, $match) === false) {
+      $newLink = preg_replace("/$matchPattern/", $rewrite->nodeValue, $link, -1, $cnt);
+      // null or "" continue
+      if ($newLink == "") {
         continue;
       }
-      self::$newReg[$linkId] = str_replace($match, $rewrite->nodeValue, $link);
+      if ($cnt == 0) {
+        $newLink = $link;
+      }
+      self::$newReg[$linkId] = $newLink;
     }
-  }
-
-  /** @noinspection PhpUnusedPrivateMethodInspection */
-  /**
-   * @param DOMElementPlus $notfound
-   * @throws Exception
-   */
-  private static function notfound (DOMElementPlus $notfound) {
-    $link = $notfound->getRequiredAttribute("link");
-    if (strpos(get_link(), $link) === false) {
-      return;
-    }
-    new ErrorPage('', 404, true);
-    exit;
   }
 
   /** @noinspection PhpUnusedPrivateMethodInspection */
