@@ -5,10 +5,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+## [3.4.0] - 2018-11-14
 ### Added
  - Link nowarning class supress link validation
 
-## [3.4.0] - 2018-11-14
+### Changed
+ - UrlHandler notfound changed to rewrite with *
 
 ## [3.3.0] - 2018-11-12
 ### Added
