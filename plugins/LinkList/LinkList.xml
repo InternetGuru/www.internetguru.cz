@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<LinkList>
+
+  <!--
+
+    Element se šablonou pro seznam odkazů na stránce
+
+    - název elementu: item
+
+    - atributy
+      id (povinné) ... unikátní název šablony
+      wrapper ... název obalovacího elementu šablony
+
+  -->
+  <var id="template">simple</var>
+  <item id="simple" wrapper="ol" modifyonly="modifyonly">
+    <li><a var="link@href headingplus linkid@id">n/a</a></li>
+  </item>
+
+</LinkList>

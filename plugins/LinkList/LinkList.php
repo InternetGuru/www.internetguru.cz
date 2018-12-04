@@ -4,9 +4,11 @@ namespace IGCMS\Plugins;
 
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
 use IGCMS\Core\HTMLPlus;
 use IGCMS\Core\HTMLPlusBuilder;
+use IGCMS\Core\Logger;
 use IGCMS\Core\ModifyContentStrategyInterface;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
@@ -48,18 +50,22 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
     if (!$content->documentElement->hasClass($this->cssClass)) {
       return;
     }
-    $this->createLinkList($content->documentElement);
+    try {
+      $this->createLinkList($content->documentElement);
+    } catch (Exception $exc) {
+      Logger::warning(sprintf(_("Unable to create LinkList: %s"), $exc->getMessage()));
+    }
   }
 
   /**
-   * @param DOMElementPlus $wrapper
+   * @param DOMElementPlus $parent
    * @throws Exception
    */
-  private function createLinkList (DOMElementPlus $wrapper) {
+  private function createLinkList (DOMElementPlus $parent) {
     $count = 0;
     $links = [];
     $linksArray = [];
-    foreach ($wrapper->getElementsByTagName("a") as $link) {
+    foreach ($parent->getElementsByTagName("a") as $link) {
       $links[] = $link;
     }
     /** @var DOMElementPlus $link */
@@ -79,12 +85,41 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
     if ($count == 0) {
       return;
     }
-    $var = $wrapper->ownerDocument->createElement("var");
-    $list = $wrapper->ownerDocument->createElement("ol");
-    foreach ($linksArray as $href => $linkId) {
-      $this->addLinkItem($list, $href, $linkId);
+    $cfg = $this::getXML();
+    $templateId = $cfg->getElementById("template", "var")->nodeValue;
+    $template = $cfg->getElementById($templateId, "item");
+    if (is_null($template)) {
+      throw new Exception(sprintf(_("Unable to find template id %s"), $templateId));
     }
-    $var->appendChild($list);
+    $var = $parent->ownerDocument->createElement("var");
+    $wrapper = $template->getAttribute("wrapper");
+    $root = $var;
+    if (strlen($wrapper)) {
+      $root = $parent->ownerDocument->createElement($wrapper);
+      $var->appendChild($root);
+    }
+    $vars = Cms::getAllVariables();
+    foreach ($linksArray as $href => $linkId) {
+      $localVars = HTMLPlusBuilder::getIdToAll($href);
+      foreach ($localVars as $varId => $varValue) {
+        if (!isset($vars[$varId])) {
+          continue;
+        }
+        $vars[$varId]["value"] = $varValue;
+      }
+      $vars["linkid"] = [
+        "value" => "{$this->cssClass}-$linkId",
+        "cacheable" => false,
+      ];
+      $vars["headingplus"] = [
+        "value" => is_null($vars["heading"]["value"]) ? $href : $vars["heading"]["value"],
+        "cacheable" => false,
+      ];
+      $item = $this->getItem(clone $template, $vars);
+      foreach ($item->childElementsArray as $child) {
+        $root->appendChild($root->ownerDocument->importNode($child, true));
+      }
+    }
     Cms::setVariable($this->cssClass, $var);
     Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".$this->className.".css");
     Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".$this->className.".js", 10, "body");
@@ -116,20 +151,15 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
   }
 
   /**
-   * @param DOMElementPlus $list
-   * @param String $href
-   * @param int $linkId
+   * @param DOMElementPlus $template
+   * @param array $vars
+   * @return DOMElementPlus
    */
-  private function addLinkItem (DOMElementPlus $list, $href, $linkId) {
-    $liElm = $list->ownerDocument->createElement("li");
-    $list->appendChild($liElm);
-    $aElm = $liElm->ownerDocument->createElement("a");
-    $liElm->appendChild($aElm);
-    $aElm->setAttribute("id", "{$this->cssClass}-$linkId");
-    $aElm->setAttribute("href", $href);
-    $aElm->nodeValue = is_null(HTMLPlusBuilder::getIdToHeading($href))
-      ? $href
-      : HTMLPlusBuilder::getIdToHeading($href);
+  private function getItem (DOMElementPlus $template, Array $vars) {
+    $doc = new DOMDocumentPlus();
+    $doc->appendChild($doc->importNode($template, true));
+    $doc->processVariables($vars);
+    return $doc->documentElement;
   }
 
 }
