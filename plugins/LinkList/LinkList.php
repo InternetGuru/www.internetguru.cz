@@ -107,9 +107,12 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
         }
         if ($varId == "data") {
           foreach ($varValue as $dataAttr => $dataAttrValue) {
-            $vars[$varId][$dataAttr]["value"] = $dataAttrValue;
-            continue 2;
+            if (!isset($vars[$dataAttr])) {
+              continue;
+            }
+            $vars[$dataAttr]["value"] = $dataAttrValue;
           }
+          continue;
         }
         $vars[$varId]["value"] = $varValue;
       }
@@ -121,11 +124,13 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
         "value" => is_null($vars["heading"]["value"]) ? $href : $vars["heading"]["value"],
         "cacheable" => false,
       ];
+      var_dump($vars);
       $item = $this->getItem(clone $template, $vars);
       foreach ($item->childElementsArray as $child) {
         $root->appendChild($root->ownerDocument->importNode($child, true));
       }
     }
+    die();
     Cms::setVariable($this->cssClass, $var);
     Cms::getOutputStrategy()->addCssFile($this->pluginDir."/".$this->className.".css");
     Cms::getOutputStrategy()->addJsFile($this->pluginDir."/".$this->className.".js", 10, "body");
