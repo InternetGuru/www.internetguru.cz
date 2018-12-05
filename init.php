@@ -115,8 +115,8 @@ require_once CORE_FOLDER.'/globals.php';
 if (isset($_GET["login"]) && SCHEME == "http") {
   login_redir();
 }
-if (update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME)
-  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP)
+if (update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".SCRIPT_NAME, SCRIPT_NAME, true)
+  || update_file(CMS_FOLDER."/".SERVER_FILES_DIR."/".FINDEX_PHP, FINDEX_PHP, true)
 ) {
   redir_to($_SERVER["REQUEST_URI"], null, _("Root file(s) updated"));
 }

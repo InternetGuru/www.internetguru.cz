@@ -30,7 +30,7 @@ class HTMLPlusBuilder extends DOMBuilder {
   /**
    * @var int
    */
-  const APC_ID = 1;
+  const APC_ID = 2;
   /**
    * @var bool
    */
@@ -519,7 +519,7 @@ class HTMLPlusBuilder extends DOMBuilder {
       }
     }
     if ($eId != $prefixId) {
-      $link = urlencode(self::$currentIdTo["idToLink"][$prefixId]) . "#" . urlencode($eId);
+      $link = self::$currentIdTo["idToLink"][$prefixId] . "#" . urlencode($eId);
       $eId = "$prefixId/$eId";
     }
     if ($ele->nodeName == "h") {

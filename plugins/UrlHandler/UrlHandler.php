@@ -28,6 +28,10 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    * @var array
    */
   private static $newReg = [];
+  /**
+   * @var bool
+   */
+  private static $notFound = false;
 
   /**
    * UrlHandler constructor.
@@ -116,200 +120,81 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
    * @throws Exception
    */
   private static function proceed () {
-    $links = array_keys(HTMLPlusBuilder::getLinkToId());
+    if (self::$notFound) {
+      Logger::notice(_("This page is visible only for logged user (otherwise 404)"));
+    }
+    // exact match
     $path = get_link();
-    if (!HTMLPlusBuilder::isLink($path)) {
-      $path = normalize($path, "a-zA-Z0-9/_-");
-      if (self::DEBUG) {
-        var_dump($path);
-        var_dump($links);
-      }
-      $linkId = self::findSimilarLinkId($links, $path);
-      if (!is_null($linkId) && !$linkId == $links[0]) {
-        $path = $links[$linkId];
-      }
-    }
-    if (!HTMLPlusBuilder::isLink($path)) {
-      new ErrorPage(_("Requested page not found"), 404, true);
-    } elseif ($path == $links[0]) {
-      $path = "";
-    }
-    if ($path == get_link()) {
+    if (HTMLPlusBuilder::isLink($path)) {
       return;
     }
+    // normalize
+    // all-you CAN.eat -> all_you_can_eat
+    $path = preg_replace("/[#\/.,_ -]+/", "_", normalize($path, "a-z0-9/.,_ -"));
+    $links = [];
+    foreach (HTMLPlusBuilder::getIdToLink() as $link) {
+      $links[$link] = preg_replace("/[#\/.,_-]+/", "_", strtolower($link));
+    }
+    // exact match (normalized)
+    foreach ($links as $key => $link) {
+      if ($link == $path) {
+        self::redirTo($key);
+      }
+    }
+    // exact match (no separator)
+    // all_you_can_eat -> allyoucaneat
+    $path = str_replace("_", "", $path);
+    foreach ($links as $key => $link) {
+      $links[$key] = str_replace("_", "", $link);
+      if ($links[$key] == $path) {
+        self::redirTo($key);
+      }
+    }
+    // starts with (no sep)
+    foreach ($links as $key => $link) {
+      if (strpos($link, $path) === 0) {
+        self::redirTo($key);
+      }
+    }
+    // levenshtein
+    // allyoucouldeat matches allyoucaneat
+    $newPath = self::getLowestLevenshtein($links, $path, min(4, floor(strlen($path) / 2)));
+    if (strlen($newPath) > 0) {
+      self::redirTo($newPath);
+    }
+    // exact word match
+    // you matches allyoucaneat
+    foreach ($links as $key => $link) {
+      foreach (explode("_", preg_replace("/[#\/.,_-]+/", "_", strtolower($key))) as $word) {
+        if ($word == $path) {
+          self::redirTo($key);
+        }
+      }
+    }
+    new ErrorPage(_("Requested page not found"), 404, true);
+  }
+
+  private static function redirTo ($path) {
     if (self::DEBUG) {
       die("Redirecting to '$path'");
     }
     redir_to(build_local_url(["path" => $path, "query" => get_query()]), 303);
   }
 
-  /**
-   * [suppose]
-   * - hotelpatriot (1)
-   * - hotelpatriot/archiv (2)
-   * - rsbstavebniny (3)
-   * - rsbstavebniny/archiv (4)
-   *
-   * [url (redir)]
-   * - hotel (1)
-   * - patriot (1)
-   * - patriot/a (2)
-   * - patriot/archvi (2)
-   * - rbstavebniny (3)
-   * - rbstavebniny/a (4)
-   * - rbstavebniny/archvi (4)
-   * - rbstavebniny/chiv (4)
-   *
-   * @param array $links
-   * @param string $link
-   * @return null|string
-   */
-  private static function findSimilarLinkId (Array $links, $link) {
-    if (!strlen($link)) {
-      return null;
-    }
-    // zero pos substring
-    $found = self::minPos($links, $link);
-    if (self::DEBUG) {
-      var_dump($found);
-    }
-    if (count($found)) {
-      return self::getBestId($links, $found);
-    }
-    // low levenstein first
-    $found = self::minLev($links, $link, 2);
-    if (self::DEBUG) {
-      var_dump($found);
-    }
-    if (count($found)) {
-      return self::getBestId($links, $found);
-    }
-    // first "directory" search
-    $parts = explode("/", $link);
-    if (count($parts) == 1) {
-      return null;
-    }
-    $first = array_shift($parts);
-    $foundId = self::findSimilarLinkId($links, $first);
-    if (is_null($foundId)) {
-      return null;
-    }
-    array_unshift($parts, $links[$foundId]);
-    $newLink = implode("/", $parts);
-    if ($newLink == $link) {
-      return $foundId;
-    }
-    $foundId = self::findSimilarLinkId($links, $newLink);
-    return $foundId;
-  }
-
-  /**
-   * @param array $links
-   * @param string $curLink
-   * @param null $max
-   * @return array
-   */
-  private static function minPos (Array $links, $curLink, $max = null) {
-    $linkpos = [];
-    foreach ($links as $key => $link) {
-      $link = strtolower($link);
-      $pos = strpos($link, $curLink);
-      if ($pos === false || (!is_null($max) && $pos > $max)) {
-        continue;
+  private static function getLowestLevenshtein (Array $haystack, $needle, $maxLev) {
+    $minKey = null;
+    $minLev = 255;
+    foreach ($haystack as $key => $value) {
+      if ($value == $needle) {
+        return $key;
       }
-      $linkpos[$key] = strpos($link, "#") === 0 ? $pos - 1 : $pos;
-    }
-    asort($linkpos);
-    if (count($linkpos)) {
-      return $linkpos;
-    }
-    $sublinks = [];
-    foreach ($links as $key => $link) {
-      $link = strtolower($link);
-      $link = str_replace(["_", "-"], "/", $link);
-      if (strpos($link, "/") === false) {
-        continue;
+      $curLev = levenshtein($value, $needle);
+      if ($curLev < $minLev && $curLev <= $maxLev) {
+        $minLev = $curLev;
+        $minKey = $key;
       }
-      $sublinks[$key] = substr($link, strpos($link, "/") + 1);
     }
-    if (empty($sublinks)) {
-      return [];
-    }
-    return self::minPos($sublinks, $link, $max);
-  }
-
-  /**
-   * @param array $links
-   * @param array $found
-   * @return string
-   */
-  private static function getBestId (Array $links, Array $found) {
-    if (count($found) == 1) {
-      return key($found);
-    }
-    $minVal = PHP_INT_MAX;
-    $minLvl = PHP_INT_MAX;
-    $foundLvl = [];
-    foreach ($found as $linkId => $val) {
-      $lvl = substr_count($links[$linkId], "/");
-      if ($val < $minVal) {
-        $minVal = $val;
-      }
-      if ($lvl < $minLvl) {
-        $minLvl = $lvl;
-      }
-      $foundLvl[$linkId] = $lvl;
-    }
-    $minLen = PHP_INT_MAX;
-    $short = [];
-    foreach ($found as $linkId => $val) {
-      if ($foundLvl[$linkId] != $minLvl) {
-        continue;
-      }
-      if ($val != $minVal) {
-        continue;
-      }
-      $len = strlen($links[$linkId]);
-      if ($len < $minLen) {
-        $minLen = $len;
-      }
-      $short[$linkId] = $len;
-    }
-    $keys = array_keys($short, $minLen); // filter result to minlength
-    return $keys[0];
-  }
-
-  /**
-   * @param array $links
-   * @param string $link
-   * @param int $limit
-   * @return array
-   */
-  private static function minLev (Array $links, $link, $limit) {
-    $leven = [];
-    foreach ($links as $key => $link) {
-      $lVal = levenshtein($link, $link);
-      if ($lVal > $limit) {
-        continue;
-      }
-      $leven[$key] = $lVal;
-    }
-    asort($leven);
-    if (count($leven)) {
-      return $leven;
-    }
-    $sublinks = [];
-    foreach ($links as $key => $link) {
-      $link = str_replace(["_", "-"], "/", $link);
-      if (strpos($link, "/") === false) {
-        continue;
-      }
-      $sublinks[$key] = substr($link, strpos($link, "/") + 1);
-    }
-    if (empty($sublinks)) {
-      return [];
-    }
-    return self::minLev($sublinks, $link, $limit);
+    return $minKey;
   }
 
   /** @noinspection PhpUnusedPrivateMethodInspection */
@@ -337,6 +222,10 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     if (strpos(get_link(), $link) === false) {
       return;
     }
+    if (Cms::isSuperUser()) {
+      self::$notFound = true;
+      return;
+    }
     new ErrorPage('', 404, true);
     exit;
   }
@@ -355,18 +244,24 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
       return;
     }
     try {
-      if ($redir->nodeValue == "/") {
+      $value = replace_vars($redir->nodeValue, [
+        "parvalue" => [
+          "cacheable" => false,
+          "value" => (!is_null($pNam) && isset($_GET[$pNam])) ? $_GET[$pNam] : "",
+         ],
+      ]);
+      if ($value == "/") {
         redir_to(ROOT_URL);
       }
-      $pLink = parse_local_link($redir->nodeValue);
+      $pLink = parse_local_link($value);
       if (is_null($pLink)) {
-        redir_to($redir->nodeValue);
+        redir_to($value);
       } // external redir
       $silent = !isset($pLink["path"]);
       if ($silent) {
         $pLink["path"] = get_link();
       } // no path = keep current path
-      if (strpos($redir->nodeValue, "?") === false) {
+      if (strpos($value, "?") === false) {
         $pLink["query"] = get_query();
       } // no query = keep current query
       #todo: no value ... keep current parameter value, eg. "?Admin" vs. "?Admin="
