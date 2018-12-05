@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
  - Link nowarning class supress link validation
 
+### Changed
+ - Improve and fix automatic URL repair
+
 ## [3.4.0] - 2018-11-14
 
 ## [3.3.0] - 2018-11-12
