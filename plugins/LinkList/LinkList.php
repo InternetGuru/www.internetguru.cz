@@ -105,7 +105,7 @@ class LinkList extends Plugin implements SplObserver, ModifyContentStrategyInter
         if (!isset($vars[$varId])) {
           continue;
         }
-        if ($varId == "data") {
+        if ($varId == "data" && is_array($varValue)) {
           foreach ($varValue as $dataAttr => $dataAttrValue) {
             if (!isset($vars[$dataAttr])) {
               continue;
