@@ -129,18 +129,20 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
       return;
     }
     // normalize
-    $path = preg_replace("/[#\/.,_-]+/", "_", normalize($path, "a-z0-9/.,_-"));
+    // all-you CAN.eat -> all_you_can_eat
+    $path = preg_replace("/[#\/.,_ -]+/", "_", normalize($path, "a-z0-9/.,_ -"));
     $links = [];
     foreach (HTMLPlusBuilder::getIdToLink() as $link) {
       $links[$link] = preg_replace("/[#\/.,_-]+/", "_", strtolower($link));
     }
-    // exact match
+    // exact match (normalized)
     foreach ($links as $key => $link) {
       if ($link == $path) {
         self::redirTo($key);
       }
     }
-    // exact match (no sep)
+    // exact match (no separator)
+    // all_you_can_eat -> allyoucaneat
     $path = str_replace("_", "", $path);
     foreach ($links as $key => $link) {
       $links[$key] = str_replace("_", "", $link);
@@ -155,14 +157,16 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
       }
     }
     // levenshtein
+    // allyoucouldeat matches allyoucaneat
     $newPath = self::getLowestLevenshtein($links, $path, min(4, floor(strlen($path) / 2)));
     if (strlen($newPath) > 0) {
       self::redirTo($newPath);
     }
-    // exact word match (no sep)
+    // exact word match
+    // you matches allyoucaneat
     foreach ($links as $key => $link) {
-      foreach (explode("_", $link) as $linkPart) {
-        if ($linkPart == $path) {
+      foreach (explode("_", preg_replace("/[#\/.,_-]+/", "_", strtolower($key))) as $word) {
+        if ($word == $path) {
           self::redirTo($key);
         }
       }
