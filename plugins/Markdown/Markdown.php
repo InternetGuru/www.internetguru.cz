@@ -6,6 +6,7 @@ use Exception;
 use Gajus\Dindent\Indenter;
 use IGCMS\Core\DOMDocumentPlus;
 use IGCMS\Core\DOMElementPlus;
+use IGCMS\Core\HTMLPlusBuilder;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
@@ -28,7 +29,7 @@ class Markdown extends Plugin implements SplObserver {
     }
     $destFiles = [];
     try {
-      foreach (get_modified_files() as $file) {        
+      foreach (get_modified_files() as $file) {
         $modifiedFileInfo = pathinfo($file);
         if (!isset($modifiedFileInfo["extension"])) {
           continue;
@@ -51,7 +52,11 @@ class Markdown extends Plugin implements SplObserver {
           }
         }
         $convertMethod = $srcFileExt."2".$destFileExt;
-        $destContent = $this->$convertMethod(file_get_contents($srcFile));
+        if ($srcFileExt == "html") {
+          $destContent = $this->$convertMethod(HTMLPlusBuilder::build($file)->saveXML());
+        } else {
+          $destContent = $this->$convertMethod(file_get_contents($srcFile));
+        }
         if (stream_resolve_include_path($destFile)) {
           rename_incr($destFile, "$destFile.");
         }
