@@ -452,6 +452,9 @@ function commit_and_push ($file) {
   } catch (GitException $exc) {
     return;
   }
+  if (!$gitRepo->isModified($file)) {
+    return;
+  }
   $gitRepo->commitFile($file);
   $gitRepo->pushChanges();
 }

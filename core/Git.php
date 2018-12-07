@@ -67,11 +67,22 @@ class Git extends GitRepository {
     }
   }
 
+  /**
+   * @param array $filenames
+   * @return bool
+   */
+  public function isModified (Array $filenames) {
+    return !empty(self::$gitRepository->execute(['status', '--porcelain', $filenames]));
+  }
+
+  /**
+   * @return bool
+   */
   public function pushChanges () {
     try {
       $remotes = self::$gitRepository->execute(['remote', '-v']);
       if (!$remotes) {
-        return;
+        return true;
       }
       self::$gitRepository->push('origin');
       return true;

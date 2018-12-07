@@ -30,7 +30,7 @@ class HTMLPlusBuilder extends DOMBuilder {
   /**
    * @var int
    */
-  const APC_ID = 2;
+  const APC_ID = 3;
   /**
    * @var bool
    */
@@ -137,11 +137,11 @@ class HTMLPlusBuilder extends DOMBuilder {
   /**
    * @var array
    */
-  private static $currentFileTo;
+  private static $currentFileTo = [];
   /**
    * @var array
    */
-  private static $currentIdTo;
+  private static $currentIdTo = [];
 
   /**
    * @param string $id
@@ -233,6 +233,9 @@ class HTMLPlusBuilder extends DOMBuilder {
     } else {
       $doc = self::build($filePath, true);
       $hId = $doc->documentElement->firstElement->getAttribute("id");
+      if (array_key_exists($hId, self::$idToFile)) {
+        throw new Exception(sprintf(_("%s already registered!"), $hId));
+      }
       self::registerIdToData($doc->documentElement, $hId);
       self::registerStructure($doc->documentElement, $parentId, $hId, $prefix, $filePath);
       self::$currentFileTo["fileToId"] = $hId;
