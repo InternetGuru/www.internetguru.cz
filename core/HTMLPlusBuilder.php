@@ -288,7 +288,8 @@ class HTMLPlusBuilder extends DOMBuilder {
    */
   public static function build ($filePath, $force = false) {
     if (array_key_exists($filePath, self::$fileToDoc)) {
-      throw new Exception("File $filePath already built");
+      //  throw new Exception("File $filePath already built");
+      return self::$fileToDoc[$filePath];
     }
     $cacheKey = apc_get_key(self::APC_ID."/".__FUNCTION__."/".$filePath);
     $useCache = false;
@@ -387,7 +388,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     Logger::user_notice(sprintf($msg, $filePath, count($doc->getErrors())));
     if (AUTOCORRECT) {
-      rename_incr($fileRealPath);
+      rename_incr($fileRealPath, "$fileRealPath.auto.");
       file_put_contents($fileRealPath, $doc->saveXML());
       return;
     }
