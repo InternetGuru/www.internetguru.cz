@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
  - Improve and fix automatic URL repair
 
+### Fixed
+ - Markdown failed with autocorrect
+
 ## [3.4.0] - 2018-11-14
 
 ## [3.3.0] - 2018-11-12
