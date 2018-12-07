@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.4.2] - 2018-12-07
 ### Fixed
  - Git commit fails iff nothing to commit
 
@@ -472,7 +472,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[3.4.2]: https://bitbucket.org/igwr/cms/compare/v3.4.2..v3.4.1
 [3.4.1]: https://bitbucket.org/igwr/cms/compare/v3.4.1..v3.4.0
 [3.4.0]: https://bitbucket.org/igwr/cms/compare/v3.4.0..v3.3.0
 [3.3.0]: https://bitbucket.org/igwr/cms/compare/v3.3.0..v3.2.2
