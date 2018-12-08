@@ -68,10 +68,10 @@ class Git extends GitRepository {
   }
 
   /**
-   * @param array $filenames
+   * @param $filenames
    * @return bool
    */
-  public function isModified (Array $filenames) {
+  public function isModified ($filenames) {
     return !empty(self::$gitRepository->execute(['status', '--porcelain', $filenames]));
   }
 
