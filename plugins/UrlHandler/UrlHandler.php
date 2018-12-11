@@ -156,12 +156,6 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
         self::redirTo($key);
       }
     }
-    // levenshtein
-    // allyoucouldeat matches allyoucaneat
-    $newPath = self::getLowestLevenshtein($links, $path, min(4, floor(strlen($path) / 2)));
-    if (strlen($newPath) > 0) {
-      self::redirTo($newPath);
-    }
     // exact word match
     // you matches allyoucaneat
     foreach ($links as $key => $link) {
@@ -171,9 +165,18 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
         }
       }
     }
+    // levenshtein
+    // allyoucouldeat matches allyoucaneat
+    $newPath = self::getLowestLevenshtein($links, $path, min(3, floor(strlen($path) / 3)));
+    if (strlen($newPath) > 0) {
+      self::redirTo($newPath);
+    }
     new ErrorPage(_("Requested page not found"), 404, true);
   }
 
+  /**
+   * @param $path
+   */
   private static function redirTo ($path) {
     if (self::DEBUG) {
       die("Redirecting to '$path'");
@@ -181,6 +184,12 @@ class UrlHandler extends Plugin implements SplObserver, ResourceInterface {
     redir_to(build_local_url(["path" => $path, "query" => get_query()]), 303);
   }
 
+  /**
+   * @param array $haystack
+   * @param $needle
+   * @param $maxLev
+   * @return int|null|string
+   */
   private static function getLowestLevenshtein (Array $haystack, $needle, $maxLev) {
     $minKey = null;
     $minLev = 255;
