@@ -111,6 +111,7 @@ class DOMElementPlus extends DOMElement implements \Serializable {
    * @param array $ignore
    * @param bool $deep
    * @return DOMDocumentPlus|DOMElementPlus|mixed|null
+   * @throws Exception
    */
   public function processVariables (Array $variables, $ignore = [], $deep = false) {
     return $this->ownerDocument->elementProcessVars($variables, $ignore, $this, $deep);
@@ -130,7 +131,7 @@ class DOMElementPlus extends DOMElement implements \Serializable {
         $this->removeAttrVal("fn", $fName);
         $value = call_user_func($func, is_null($aName) ? $this : $this->getAttributeNode($aName));
         $res = $this->ownerDocument->insertVariable($this, $value, $aName);
-        if (!$res->isSameNode($this)) {
+        if (is_null($res) || !$res->isSameNode($this)) {
           $this->emptyRecursive();
         }
       } catch (Exception $exc) {
