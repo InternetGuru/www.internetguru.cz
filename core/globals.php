@@ -924,23 +924,21 @@ function get_nginx_cache ($folder = null, $link = "") {
   if (is_null($folder)) {
     $folder = NGINX_CACHE_FOLDER;
   }
-  $fPaths = [];
-  $iterator = new DirectoryIterator($folder);
-  foreach ($iterator as $fileinfo) {
-    if ($fileinfo->isDot()) {
-      continue;
-    }
-    $filepath = "$folder/".$fileinfo->getFilename();
-    if ($fileinfo->isDir()) {
-      $fPaths = array_merge($fPaths, get_nginx_cache($filepath, $link));
-      continue;
-    }
-    if (empty(preg_grep("/KEY: https?".HTTP_HOST."/$link", file($filepath)))) {
-      continue;
-    }
-    $fPaths[] = $filepath;
+  $descriptorspec = [
+    1 => ['pipe', 'w'],
+  ];
+  $arg1 = escapeshellarg(HTTP_HOST."/$link");
+  $process = proc_open("/var/local/scripts/get_nginx_cache.sh $arg1", $descriptorspec, $pipes);
+  if(!is_resource($process)) exit;
+
+  # get stdout, stderr
+  $out = [];
+  while (($buf = fgets($pipes[1], 4096))) {
+    $out []= trim($buf);
   }
-  return $fPaths;
+  fclose($pipes[1]);
+  proc_close($process);
+  return $out;
 }
 
 /**

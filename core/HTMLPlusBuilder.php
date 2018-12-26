@@ -142,6 +142,11 @@ class HTMLPlusBuilder extends DOMBuilder {
    * @var array
    */
   private static $currentIdTo = [];
+  /**
+   * @var array
+   */
+  private static $modifiedFiles = null;
+
 
   /**
    * @param string $id
@@ -200,6 +205,19 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
   }
 
+  private function loadModifiedFiles () {
+    if (!is_null(self::$modifiedFiles)) {
+      return;
+    }
+    self::$modifiedFiles = [];
+    foreach (get_modified_files() as $file) {
+      if (pathinfo($file, PATHINFO_EXTENSION) != "html") {
+        continue;
+      }
+      self::$modifiedFiles[$file] = null;
+    }
+  }
+
   /**
    * @param string $filePath
    * @param string $prefix
@@ -217,6 +235,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     self::$currentFileTo = [];
     self::$currentIdTo = [];
     self::$storeCache = true;
+    self::loadModifiedFiles();
     $cacheKey = apc_get_key(self::APC_ID."/".__FUNCTION__."/".$filePath);
     $useCache = false;
     $cache = null;
@@ -261,13 +280,9 @@ class HTMLPlusBuilder extends DOMBuilder {
       return false;
     }
     foreach ($fileCache["fileToMtime"] as $file => $mtime) {
-      try {
-        if ($mtime == filemtime(find_file($file))) {
-          continue;
-        }
-      } catch (Exception $exc) {
-      }
-      return false;
+      if (array_key_exists($file, self::$modifiedFiles)) {
+        return false;
+      } 
     }
     if (empty($idCache)) {
       return true;
@@ -275,10 +290,10 @@ class HTMLPlusBuilder extends DOMBuilder {
     if (!array_key_exists("idToParentId", $idCache) || empty($idCache["idToParentId"])) {
       return false;
     }
-    foreach ($idCache["idToParentId"] as $parentId) {
-      if (!array_key_exists($parentId, self::$idToParentId)) {
-        return false;
-      }
+    // usless ?
+    if (!array_key_exists(current($idCache["idToParentId"]), self::$idToParentId)) {
+      Logger::info("No parent exception");
+      return false;
     }
     return true;
   }
@@ -296,6 +311,7 @@ class HTMLPlusBuilder extends DOMBuilder {
     }
     $cacheKey = apc_get_key(self::APC_ID."/".__FUNCTION__."/".$filePath);
     $useCache = false;
+    self::loadModifiedFiles();
     if (!$force && apc_exists($cacheKey)) {
       $cache = apc_fetch($cacheKey);
       $useCache = self::isValidApc($cache);

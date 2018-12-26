@@ -32,7 +32,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     "images" => [1000, 1000, 307200, 85], // 300 kB
     "preview" => [500, 500, 204800, 85], // 200 kB
     "thumbs" => [200, 200, 71680, 85], // 70 kB
-    "big" => [1500, 1500, 460800, 75], // 450 kB
+    "big" => [1500, 1500, 460800, 85], // 450 kB
     "full" => [0, 0, 0, 0],
   ];
   /**
@@ -247,7 +247,7 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         copy_plus($src, $dest);
       }
     } catch (Exception $exc) {
-      Logger::error(sprintf(_("Unable to handle resource '%s': %s"), $dest, $exc->getMessage()));
+      Logger::alert(sprintf(_("Unable to handle resource '%s': %s"), $dest, $exc->getMessage()));
       self::outputFile($src, "text/$ext");
       exit;
     } finally {
@@ -353,14 +353,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
     $src = realpath($src);
     $imageSize = self::getImageSize($src);
     if ($imageSize[0] <= $mode[0] && $imageSize[1] <= $mode[1]) {
-      $fileSize = filesize($src);
-      if ($fileSize > $mode[2]) {
-        throw new Exception(
-          sprintf(_("Image size %s is over limit %s"), size_unit($fileSize), size_unit($mode[2]))
-        );
-      }
-      copy_plus($src, $dest);
-      return;
+      $mode[0] = $imageSize[0];
+      $mode[1] = $imageSize[1];
     }
     // TODO limit full size to ? MB
     if ($mode[0] == 0 && $mode[1] == 0) {
@@ -380,13 +374,18 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       throw new Exception(_("Unable to resize image"));
     }
     if (strlen($imBin) > $mode[2]) {
-      throw new Exception(
-        sprintf(
-          _("Generated image size %s is over limit %s"),
-          size_unit(strlen($imBin)),
-          size_unit($mode[2])
-        )
-      );
+      $imagick->setOption('jpeg:extent', $mode[2].'b');
+      $imBin = $imagick->__toString();
+      if (strlen($imBin) > $mode[2]) {
+        throw new Exception(
+          sprintf(
+            _("Generated image size %s is over limit %s"),
+            size_unit(strlen($imBin)),
+            size_unit($mode[2])
+          )
+        );
+      }
+      Logger::alert(sprintf(_("Image quality decreased: src %s url %s"), $src, HTTP_HOST."/$dest"));
     }
     mkdir_plus(dirname($dest));
     $bytes = file_put_contents($dest, $imBin);
