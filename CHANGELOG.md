@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.4.6] - 2018-12-26
 ### Changed
  - Filehandler fallbacks into automatic image quality decreasion (with alert)
 
@@ -491,7 +491,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://bitbucket.org/igwr/cms/compare/dev..master
+[3.4.6]: https://bitbucket.org/igwr/cms/compare/v3.4.6..v3.4.5
 [3.4.5]: https://bitbucket.org/igwr/cms/compare/v3.4.5..v3.4.4
 [3.4.4]: https://bitbucket.org/igwr/cms/compare/v3.4.4..v3.4.3
 [3.4.3]: https://bitbucket.org/igwr/cms/compare/v3.4.3..v3.4.2
