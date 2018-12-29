@@ -6,6 +6,7 @@ use Autoprefixer;
 use DirectoryIterator;
 use Exception;
 use IGCMS\Core\Cms;
+use IGCMS\Core\ErrorPage;
 use IGCMS\Core\Logger;
 use IGCMS\Core\Plugin;
 use IGCMS\Core\Plugins;
@@ -247,10 +248,8 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
         copy_plus($src, $dest);
       }
     } catch (Exception $exc) {
-      Logger::alert(sprintf(_("Unable to handle resource '%s': %s"), $dest, $exc->getMessage()));
-      self::outputFile($src, "text/$ext");
-      exit;
-    } finally {
+      new ErrorPage(sprintf(_("Unable to handle resource '%s': %s"), $dest, $exc->getMessage()), 500);
+     } finally {
       unlock_file($filePointer, $dest);
     }
   }
@@ -374,18 +373,11 @@ class FileHandler extends Plugin implements SplObserver, ResourceInterface {
       throw new Exception(_("Unable to resize image"));
     }
     if (strlen($imBin) > $mode[2]) {
-      $imagick->setOption('jpeg:extent', $mode[2].'b');
-      $imBin = $imagick->__toString();
-      if (strlen($imBin) > $mode[2]) {
-        throw new Exception(
-          sprintf(
-            _("Generated image size %s is over limit %s"),
-            size_unit(strlen($imBin)),
-            size_unit($mode[2])
-          )
-        );
-      }
-      Logger::alert(sprintf(_("Image quality decreased: src %s url %s"), $src, HTTP_HOST."/$dest"));
+      Logger::alert(sprintf(
+        _("Generated image size %s is over limit %s"),
+        size_unit(strlen($imBin)),
+        size_unit($mode[2])
+      ), $src, HTTP_HOST."/$dest");
     }
     mkdir_plus(dirname($dest));
     $bytes = file_put_contents($dest, $imBin);
