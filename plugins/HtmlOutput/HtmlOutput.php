@@ -778,7 +778,7 @@ class HtmlOutput extends Plugin implements SplObserver, OutputStrategyInterface 
    */
   private function getTitle (DOMElementPlus $h1) {
     $title = null;
-    foreach ($this->subject->getIsInterface("IGCMS\\Core\\TitleStrategyInterface") as $clsName => $cls) {
+    foreach ($this->subject->getIsInterface("IGCMS\\Core\\TitleStrategyInterface") as $cls) {
       $title = $cls->getTitle();
       if (!is_null($title)) {
         return $title;

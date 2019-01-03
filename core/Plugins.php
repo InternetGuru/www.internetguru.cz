@@ -157,11 +157,12 @@ class Plugins implements SplSubject {
    */
   public function getIsInterface ($itf) {
     $contentStrats = [];
+    $this->sortObservers();
     foreach ($this->observerPriority as $key => $priority) {
       if (!$this->observers[$key] instanceOf $itf) {
         continue;
       }
-      $contentStrats[$key] = $this->observers[$key];
+      $contentStrats[] = $this->observers[$key];
     }
     return $contentStrats;
   }
