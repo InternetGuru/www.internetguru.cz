@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [3.4.8] - 2019-01-03
 ### Fixed
  - ServiceWorker.js not working
 
@@ -499,7 +499,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Plugin LinkList creates and displays local variable ``linklist``.
 - System messages from previous request are now marked via class.
 
-[Unreleased]: https://github.com/InternetGuru/www.internetguru.io/compare/master...dev
+[3.4.8]: https://github.com/InternetGuru/www.internetguru.io/compare/v3.4.7...v3.4.8
 [3.4.7]: https://bitbucket.org/igwr/cms/compare/v3.4.7..v3.4.6
 [3.4.6]: https://bitbucket.org/igwr/cms/compare/v3.4.6..v3.4.5
 [3.4.5]: https://bitbucket.org/igwr/cms/compare/v3.4.5..v3.4.4
