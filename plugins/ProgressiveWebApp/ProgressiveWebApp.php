@@ -26,6 +26,7 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
   /**
    * ServiceWorker constructor.
    * @param Plugins|SplSubject $s
+   * @throws \ReflectionException
    */
   public function __construct (SplSubject $s) {
     parent::__construct($s);
@@ -33,7 +34,8 @@ class ProgressiveWebApp extends Plugin implements SplObserver, ResourceInterface
   }
 
   /**
-   * @param Plugins|SplSubject $subject
+   * @param SplSubject $subject
+   * @throws \Exception
    */
   public function update (SplSubject $subject) {
     if ($subject->getStatus() != STATUS_POSTPROCESS) {
