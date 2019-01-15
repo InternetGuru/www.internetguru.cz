@@ -58,7 +58,7 @@ $inputvar-service_plain
     <dl>
       <dt>Company</dt>
       <dd>Internet Guru</dd>
-      <dt>A division of QuikStat LLC</dt>
+      <dt>Best websites ever</dt>
       <dd><ul class="logo">
         <li><span var="inputvar-email@class">icon</span><a href="mailto:info@internetguru.io">info@internetguru.io</a></li>
 <!--         <li><span var="inputvar-facebook@class">icon</span><a href="https://www.facebook.com/internetguru.cz">facebook.com/internetguru.cz</a></li> -->
