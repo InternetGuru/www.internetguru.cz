@@ -68,8 +68,8 @@ $inputvar-service_plain
     </dl>
     <dl>
       <dt>Name</dt>
-      <dt>Neel Thapar</dt>
-      <dd>Marketing and Product Management</dd>
+      <dd>Neel Thapar</dd>
+      <dt>Marketing and Product Management</dt>
       <dd><ul class="logo">
         <li><span var="inputvar-phone@class">icon</span><a href="tel:+17868724475">+1 (786) 872-4475</a></li>
         <li><span var="inputvar-email@class">icon</span><a href="mailto:neel@internetguru.io">neel@internetguru.io</a></li>
