@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ContactForm>
-  <var id="adminaddr" modifyonly="modifyonly">info@internetguru.cz</var>
+  <var id="adminaddr" modifyonly="modifyonly">info@internetguru.io</var>
 <!--   <var id="adminaddr" modifyonly="modifyonly">pavel@petrzela.eu</var> -->
-  <var id="servername" modifyonly="modifyonly">InternetGuru.cz</var>
-  <var id="subject" modifyonly="modifyonly">New Message from internetguru.cz</var>
+  <var id="servername" modifyonly="modifyonly">Internet Guru</var>
+  <var id="subject" modifyonly="modifyonly">New Message from internetguru.io</var>
   <var id="success" modifyonly="modifyonly">Thank you, message has been sent!</var>
 
   <message for="help">
@@ -16,7 +16,7 @@
     $contact
 
     --
-    Odesláno z IP adresy $cms-ip
+    Sent from IP address $cms-ip
     $inputvar-service_plain
   </message>
   <form id="help">
@@ -56,54 +56,37 @@ $inputvar-service_plain
       <dd><input type="submit" id="submit" value="Call Me"/></dd>
     </dl>
     <dl>
-      <dt>Type</dt>
-      <dd>Company Info</dd>
-      <dt>Internet Guru</dt>
+      <dt>Company</dt>
+      <dd>Internet Guru</dd>
+      <dt>Registered under QuikStat LLC</dt>
       <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:info@internetguru.cz">info@internetguru.cz</a></li>
-        <li><span var="inputvar-facebook@class">icon</span><a href="https://www.facebook.com/internetguru.cz">facebook.com/internetguru.cz</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:info@internetguru.io">info@internetguru.io</a></li>
+<!--         <li><span var="inputvar-facebook@class">icon</span><a href="https://www.facebook.com/internetguru.cz">facebook.com/internetguru.cz</a></li> -->
         <li><span var="inputvar-github@class">icon</span><a href="https://github.com/InternetGuru">github.com/InternetGuru</a></li>
-        <li><span var="inputvar-cc@class">icon</span><span><a>CZ14 6210 6701 0022 0143 3979</a> <em>(mBank)</em></span></li>
+<!--         <li><span var="inputvar-cc@class">icon</span><span><a>#### #### #### ####</a> <em>(mBank)</em></span></li> -->
       </ul></dd>
     </dl>
     <dl>
-      <dt>Type</dt>
-      <dd>People</dd>
-      <dt>Honza Pospisil</dt>
-      <dd>Marketing Support, Accounting</dd>
+      <dt>Name</dt>
+      <dt>Neel Thapar</dt>
+      <dd>Marketing and Product Management</dd>
       <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:honza@internetguru.cz">honza@internetguru.cz</a></li>
-      </ul></dd>
-      <dt>Pavel Petrzela</dt>
-      <dd>IT Support, Chief Developer</dd>
-      <dd><ul class="logo">
-<!--         <li><span var="inputvar-phone@class">icon</span><a href="tel:+420604412983">+420 604 412 983</a></li> -->
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:pavel@internetguru.cz">pavel@internetguru.cz</a></li>
-      </ul></dd>
-      <dt class="hideable-nohide hideable-here">Jan Vlnas</dt>
-      <dd class="hideable-nohide">Senior Developer, Consultant</dd>
-      <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:jan@internetguru.cz">jan@internetguru.cz</a></li>
+        <li><span var="inputvar-phone@class">icon</span><a href="tel:+17868724475">+1 (786) 872-4475</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:neel@internetguru.io">neel@internetguru.io</a></li>
       </ul></dd>
     </dl>
     <dl>
-      <dt>Type</dt>
-      <dd>Management</dd>
-      <dt>Lubomir Brejník</dt>
-      <dd>Executive Director</dd>
+      <dt>Name</dt>
+      <dd>George Pavelka</dd>
+      <dt>Business Owner, CEO</dt>
       <dd><ul class="logo">
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:lubos@internetguru.cz">lubos@internetguru.cz</a></li>
-      </ul></dd>
-      <dt>George Pavelka</dt>
-      <dd>Business Owner, CEO</dd>
-      <dd><ul class="logo">
-        <li><span var="inputvar-phone@class">icon</span><span><a href="tel:+420603307905">+420 603 307 905</a> <em>(WhatsApp, Viber)</em></span></li>
+<!--         <li><span var="inputvar-phone@class">icon</span><span><a href="tel:+420603307905">+420 603 307 905</a> <em>(WhatsApp, Viber)</em></span></li> -->
         <li><span var="inputvar-phone@class">icon</span><a href="tel:+13054870703">+1 (305) 487-0703</a></li>
-        <li><span var="inputvar-email@class">icon</span><a href="mailto:george@internetguru.cz">george@internetguru.cz</a></li>
+        <li><span var="inputvar-email@class">icon</span><a href="mailto:george@internetguru.io">george@internetguru.io</a></li>
         <li><span var="inputvar-linkedin@class">icon</span><a href="https://www.linkedin.com/in/jiripavelka">LinkedIn Profile</a></li>
       </ul></dd>
     </dl>
-      </div></div>
+  </div></div>
   </form>
 
   <message for="collaboration">
